@@ -38,20 +38,19 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.intake.IntakesCommonList;
-import org.collectionspace.services.person.PersonsCommonList;
+//import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-@Path("/intakes/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Path(IntakeClient.SERVICE_PATH_PROXY)
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public interface IntakeProxy extends CollectionSpaceProxy {
-
     /**
      * Read list.
      *
@@ -69,7 +68,7 @@ public interface IntakeProxy extends CollectionSpaceProxy {
      * @return the client response
      */
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(byte[] payload);
 
     //(R)ead
     /**
@@ -80,7 +79,7 @@ public interface IntakeProxy extends CollectionSpaceProxy {
      */
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(U)pdate
     /**
@@ -92,7 +91,7 @@ public interface IntakeProxy extends CollectionSpaceProxy {
      */
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
 
     //(D)elete
     /**

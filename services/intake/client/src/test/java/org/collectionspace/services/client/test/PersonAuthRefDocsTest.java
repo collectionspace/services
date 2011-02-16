@@ -33,8 +33,10 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
@@ -44,8 +46,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -83,6 +85,11 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     private String valuerShortId = null;
     private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
 
+    @Override
+    public String getServiceName() { 
+    	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498   
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -119,7 +126,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         createPersonRefs();
 
         IntakeClient intakeClient = new IntakeClient();
-        MultipartOutput multipart = createIntakeInstance(
+        PoxPayloadOut multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
                 currentOwnerRefName,
@@ -167,7 +174,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
      */
     protected void createPersonRefs() {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -223,7 +230,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
                 authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
@@ -437,7 +444,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
-    private MultipartOutput createIntakeInstance(String entryNumber,
+    private PoxPayloadOut createIntakeInstance(String entryNumber,
             String entryDate,
             String currentOwner,
             String depositor,
@@ -461,10 +468,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         insurers.add(insurer);
         intake.setInsurers(insurerList);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
                 multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
+        commonPart.setLabel(new IntakeClient().getCommonPartName());
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, intake common");

@@ -26,7 +26,7 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
+//import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -37,8 +37,8 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -48,17 +48,22 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 public class IntakeClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_NAME = "intakes";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+	
+	@Override
     public String getServicePathComponent() {
-        return "intakes";
+        return SERVICE_PATH_COMPONENT;
     }
-    /**
-     *
-     */
-//    private static final IntakeClient instance = new IntakeClient();
+
     /**
      *
      */
@@ -125,7 +130,7 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#getIntake(java.lang.String)
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return intakeProxy.read(csid);
     }
 
@@ -134,8 +139,8 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#createIntake(org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return intakeProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return intakeProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -144,8 +149,8 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return intakeProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return intakeProxy.update(csid, xmlPayload.getBytes());
 
     }
 

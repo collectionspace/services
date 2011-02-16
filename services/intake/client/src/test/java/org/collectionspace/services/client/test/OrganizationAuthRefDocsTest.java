@@ -35,6 +35,8 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
@@ -44,8 +46,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -81,6 +83,11 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     private String valuerRefName = null;
     private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
 
+	@Override
+	protected String getServiceName() {
+		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -117,7 +124,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         createOrgRefs();
 
         IntakeClient intakeClient = new IntakeClient();
-        MultipartOutput multipart = createIntakeInstance(
+        PoxPayloadOut multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
                 currentOwnerRefName,
@@ -168,7 +175,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         orgAuthRefName = 
     		OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
-    	MultipartOutput multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
+        PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			ORGANIZATION_AUTHORITY_NAME, ORGANIZATION_AUTHORITY_NAME, orgAuthClient.getCommonPartName());
         ClientResponse<Response> res = orgAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -210,7 +217,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         orgInfo.put(OrganizationJAXBSchema.SHORT_NAME, shortName);
         orgInfo.put(OrganizationJAXBSchema.LONG_NAME, longName);
-    	MultipartOutput multipart = 
+        PoxPayloadOut multipart = 
     		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthRefName,
     				orgInfo, orgAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
@@ -323,7 +330,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
-   private MultipartOutput createIntakeInstance(String entryNumber,
+   private PoxPayloadOut createIntakeInstance(String entryNumber,
     		String entryDate,
 				String currentOwner,
 				String depositor,
@@ -347,10 +354,10 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         insurers.add(insurer);
         intake.setInsurers(insurerList);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
+        commonPart.setLabel(new IntakeClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, intake common");

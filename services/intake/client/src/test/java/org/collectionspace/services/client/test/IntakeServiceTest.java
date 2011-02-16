@@ -28,6 +28,10 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.intake.EntryMethodList;
 import org.collectionspace.services.intake.FieldCollectionEventNameList;
 import org.collectionspace.services.intake.CurrentLocationGroup;
@@ -37,9 +41,9 @@ import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 //import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -56,26 +60,23 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate$
  */
 public class IntakeServiceTest extends AbstractServiceTestImpl {
-
    /** The logger. */
     private final String CLASS_NAME = IntakeServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-
-    // Instance variables specific to this test.
-    /** The service path component. */
-    final String SERVICE_PATH_COMPONENT = "intakes";
+    private final Logger logger = LoggerFactory.getLogger(IntakeServiceTest.class);
     
     /** The known resource id. */
     private String knownResourceId = null;
     
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
-     */
     @Override
     protected CollectionSpaceClient getClientInstance() {
     	return new IntakeClient();
     }
     
+	@Override
+	protected String getServiceName() {
+		return IntakeClient.SERVICE_NAME;
+	}
+        
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -107,7 +108,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         IntakeClient client = new IntakeClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart = createIntakeInstance(identifier);
+        PoxPayloadOut multipart = createIntakeInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -287,7 +288,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         IntakeClient client = new IntakeClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -299,24 +300,29 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-        IntakesCommon intake = (IntakesCommon) extractPart(input,
-                client.getCommonPartName(), IntakesCommon.class);
-        Assert.assertNotNull(intake);
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        IntakesCommon intakeCommons = null;
+        if (payloadInputPart != null) {
+        	intakeCommons = (IntakesCommon) payloadInputPart.getBody();
+        }
+//        IntakesCommon intake = (IntakesCommon) extractPart(input,
+//                client.getCommonPartName(), IntakesCommon.class);
+        Assert.assertNotNull(intakeCommons);
 
         // Verify the number and contents of values in repeatable fields,
         // as created in the instance record used for testing.
         List<String> entryMethods =
-                intake.getEntryMethods().getEntryMethod();
+        	intakeCommons.getEntryMethods().getEntryMethod();
         Assert.assertTrue(entryMethods.size() > 0);
         Assert.assertNotNull(entryMethods.get(0));
 
         List<String> fieldCollectionEventNames =
-                intake.getFieldCollectionEventNames().getFieldCollectionEventName();
+        	intakeCommons.getFieldCollectionEventNames().getFieldCollectionEventName();
         Assert.assertTrue(fieldCollectionEventNames.size() > 0);
         Assert.assertNotNull(fieldCollectionEventNames.get(0));
 
-        CurrentLocationGroupList currentLocationGroupList = intake.getCurrentLocationGroupList();
+        CurrentLocationGroupList currentLocationGroupList = intakeCommons.getCurrentLocationGroupList();
         Assert.assertNotNull(currentLocationGroupList);
         List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
         Assert.assertNotNull(currentLocationGroups);
@@ -324,6 +330,15 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         CurrentLocationGroup currentLocationGroup = currentLocationGroups.get(0);
         Assert.assertNotNull(currentLocationGroup);
         Assert.assertNotNull(currentLocationGroup.getCurrentLocationNote());
+
+        // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
+                    + "UTF-8 data received=" + intakeCommons.getEntryNote());
+    }
+        Assert.assertEquals(intakeCommons.getEntryNote(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + intakeCommons.getEntryNote()
+                + "' does not match expected data '" + getUTF8DataFragment());
     }
 
     // Failure outcomes
@@ -343,7 +358,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         IntakeClient client = new IntakeClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -430,8 +445,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         IntakeClient client = new IntakeClient();
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -440,20 +454,25 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug("got object to update with ID: " + knownResourceId);
         }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        IntakesCommon intake = (IntakesCommon) extractPart(input,
-                client.getCommonPartName(), IntakesCommon.class);
-        Assert.assertNotNull(intake);
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        IntakesCommon intakeCommons = null;
+        if (payloadInputPart != null) {
+        	intakeCommons = (IntakesCommon) payloadInputPart.getBody();
+        }       
+//        IntakesCommon intake = (IntakesCommon) extractPart(input,
+//                client.getCommonPartName(), IntakesCommon.class);
+        Assert.assertNotNull(intakeCommons);
 
         // Update the content of this resource.
-        intake.setEntryNumber("updated-" + intake.getEntryNumber());
-        intake.setEntryDate("updated-" + intake.getEntryDate());
+        intakeCommons.setEntryNumber("updated-" + intakeCommons.getEntryNumber());
+        intakeCommons.setEntryDate("updated-" + intakeCommons.getEntryDate());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(intake, IntakesCommon.class));
+            logger.debug(objectAsXmlString(intakeCommons, IntakesCommon.class));
         }
 
-        CurrentLocationGroupList currentLocationGroupList = intake.getCurrentLocationGroupList();
+        CurrentLocationGroupList currentLocationGroupList = intakeCommons.getCurrentLocationGroupList();
         Assert.assertNotNull(currentLocationGroupList);
         List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
         Assert.assertNotNull(currentLocationGroups);
@@ -464,12 +483,12 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(currentLocationNote);
         String updatedCurrentLocationNote = "updated-" + currentLocationNote;
         currentLocationGroups.get(0).setCurrentLocationNote(updatedCurrentLocationNote);
-        intake.setCurrentLocationGroupList(currentLocationGroupList);
+        intakeCommons.setCurrentLocationGroupList(currentLocationGroupList);
 
         // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart = output.addPart(intakeCommons, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
 
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
@@ -481,7 +500,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        input = (MultipartInput) res.getEntity();
+        input = new PoxPayloadIn(res.getEntity());        
         IntakesCommon updatedIntake =
                 (IntakesCommon) extractPart(input,
                         client.getCommonPartName(), IntakesCommon.class);
@@ -489,7 +508,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(updatedIntake);
 
         Assert.assertEquals(updatedIntake.getEntryDate(),
-                intake.getEntryDate(),
+        		intakeCommons.getEntryDate(),
                 "Data in updated object did not match submitted data.");
 
         currentLocationGroupList = updatedIntake.getCurrentLocationGroupList();
@@ -500,6 +519,17 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(currentLocationGroups.get(0));
         Assert.assertEquals(updatedCurrentLocationNote,
                 currentLocationGroups.get(0).getCurrentLocationNote(),
+                "Data in updated object did not match submitted data.");
+
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + intakeCommons.getEntryNote() + "\n"
+                    + "UTF-8 data received=" + updatedIntake.getEntryNote());
+    }
+        Assert.assertTrue(updatedIntake.getEntryNote().contains(getUTF8DataFragment()),
+                "UTF-8 data retrieved '" + updatedIntake.getEntryNote()
+                + "' does not contain expected data '" + getUTF8DataFragment());
+        Assert.assertEquals(updatedIntake.getEntryNote(),
+                intakeCommons.getEntryNote(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -638,8 +668,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         IntakeClient client = new IntakeClient();
-        MultipartOutput multipart = createIntakeInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res =
+        PoxPayloadOut multipart = createIntakeInstance(NON_EXISTENT_ID);
+        ClientResponse<String> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
@@ -752,7 +782,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return IntakeClient.SERVICE_PATH_COMPONENT;
     }
 
     /**
@@ -761,7 +791,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createIntakeInstance(String identifier) {
+    private PoxPayloadOut createIntakeInstance(String identifier) {
         return createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
@@ -776,7 +806,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      * @param depositor the depositor
      * @return the multipart output
      */
-    private MultipartOutput createIntakeInstance(String entryNumber,
+    private PoxPayloadOut createIntakeInstance(String entryNumber,
     		String entryDate,
     		String depositor) {
         IntakesCommon intake = new IntakesCommon();
@@ -807,10 +837,12 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         currentLocationGroups.add(currentLocationGroup);
         intake.setCurrentLocationGroupList(currentLocationGroupList);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
+        intake.setEntryNote(getUTF8DataFragment());
+
+        PoxPayloadOut multipart = new PoxPayloadOut(IntakeClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
+        commonPart.setLabel(new IntakeClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, intake common");
@@ -819,4 +851,5 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
+
 }

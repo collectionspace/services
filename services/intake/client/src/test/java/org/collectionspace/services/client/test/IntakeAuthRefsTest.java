@@ -33,8 +33,11 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
@@ -43,9 +46,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -66,7 +69,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = "intakes";
+    final String SERVICE_PATH_COMPONENT = IntakeClient.SERVICE_PATH_COMPONENT;//"intakes";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
     private List<String> intakeIdsCreated = new ArrayList<String>();
@@ -79,6 +82,11 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     private String valuerRefName = null;
     private final int NUM_AUTH_REFS_EXPECTED = 5;
 
+	@Override
+	protected String getServiceName() {
+		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -116,7 +124,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         
         // Submit the request to the service and store the response.
         IntakeClient intakeClient = new IntakeClient();
-        MultipartOutput multipart = createIntakeInstance(
+        PoxPayloadOut multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
                 currentOwnerRefName,
@@ -157,7 +165,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     
     protected void createPersonRefs(){
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -196,7 +204,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-    	MultipartOutput multipart = 
+        PoxPayloadOut multipart = 
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
@@ -221,7 +229,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         IntakeClient intakeClient = new IntakeClient();
-        ClientResponse<MultipartInput> res = intakeClient.read(knownResourceId);
+        ClientResponse<String> res = intakeClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -233,7 +241,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         IntakesCommon intake = (IntakesCommon) extractPart(input,
         		intakeClient.getCommonPartName(), IntakesCommon.class);
         Assert.assertNotNull(intake);
@@ -328,7 +336,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
-   private MultipartOutput createIntakeInstance(String entryNumber,
+   private PoxPayloadOut createIntakeInstance(String entryNumber,
     		String entryDate,
 				String currentOwner,
 				String depositor,
@@ -352,10 +360,10 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         insurers.add(insurer);
         intake.setInsurers(insurerList);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
+        commonPart.setLabel(new IntakeClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, intake common");
