@@ -46,6 +46,11 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
     /** The permission role proxy. */
     private PermissionRoleProxy permissionRoleProxy;
 
+	@Override
+	public String getServiceName() {
+		throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3497
+	}
+    
     /* (non-Javadoc)
      * @see 
      */

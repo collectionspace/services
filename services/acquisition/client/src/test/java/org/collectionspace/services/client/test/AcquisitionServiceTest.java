@@ -28,6 +28,10 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AcquisitionClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionDateList;
@@ -38,8 +42,6 @@ import org.collectionspace.services.acquisition.OwnerList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -64,6 +66,17 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
 
+	@Override
+	public String getServicePathComponent() {
+		return AcquisitionClient.SERVICE_PATH_COMPONENT;
+	}
+
+
+	@Override
+	protected String getServiceName() {
+		return AcquisitionClient.SERVICE_NAME;
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -105,7 +118,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         String identifier = createIdentifier();
 
         AcquisitionClient client = new AcquisitionClient();
-        MultipartOutput multipart = createAcquisitionInstance(identifier);
+        PoxPayloadOut multipart = createAcquisitionInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -302,7 +315,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         AcquisitionClient client = new AcquisitionClient();
 
         // Submit the request to the service and store the response.
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -314,7 +327,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         AcquisitionsCommon acquisitionObject = (AcquisitionsCommon) extractPart(input,
                 client.getCommonPartName(), AcquisitionsCommon.class);
         Assert.assertNotNull(acquisitionObject);
@@ -355,7 +368,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -442,7 +455,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -451,7 +464,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug("got object to update with ID: " + knownResourceId);
         }
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 
         AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
                 client.getCommonPartName(), AcquisitionsCommon.class);
@@ -464,9 +477,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
             logger.debug(objectAsXmlString(acquisition, AcquisitionsCommon.class));
         }
         // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
 
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
@@ -479,7 +492,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
 
-        input = (MultipartInput) res.getEntity();
+        input = new PoxPayloadIn(res.getEntity());
         AcquisitionsCommon updatedAcquisition =
                 (AcquisitionsCommon) extractPart(input,
                         client.getCommonPartName(), AcquisitionsCommon.class);
@@ -655,8 +668,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         AcquisitionClient client = new AcquisitionClient();
-        MultipartOutput multipart = createAcquisitionInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res =
+        PoxPayloadOut multipart = createAcquisitionInstance(NON_EXISTENT_ID);
+        ClientResponse<String> res =
             client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
@@ -778,14 +791,6 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    public String getServicePathComponent() {
-        return new AcquisitionClient().getServicePathComponent();
-    }
-
 
     /**
      * Creates the acquisition instance.
@@ -793,7 +798,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createAcquisitionInstance(String identifier) {
+    private PoxPayloadOut createAcquisitionInstance(String identifier) {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAcquisitionReferenceNumber("acquisitionReferenceNumber-"  + identifier);
 
@@ -821,10 +826,10 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         owners.add("Second Owner-" + identifier);
         acquisition.setOwners(ownersList);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(acquisition,
+        PoxPayloadOut multipart = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(acquisition,
             MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new AcquisitionClient().getCommonPartName());
+        commonPart.setLabel(new AcquisitionClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, acquisition common");
@@ -846,16 +851,16 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @return
      * @throws Exception
      */
-    private MultipartOutput createAcquisitionInstanceFromXml(String testName, String commonPartName,
+    private PoxPayloadOut createAcquisitionInstanceFromXml(String testName, String commonPartName,
             String commonPartFileName) throws Exception {
 
         AcquisitionsCommon acquisition =
                 (AcquisitionsCommon) getObjectFromFile(AcquisitionsCommon.class,
                 commonPartFileName);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(acquisition,
+        PoxPayloadOut multipart = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(acquisition,
                 MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", commonPartName);
+        commonPart.setLabel(commonPartName);
 
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " to be created, acquisitions common");
@@ -880,7 +885,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupCreate();
 
-        MultipartOutput multipart = null;
+        PoxPayloadOut multipart = null;
 
         AcquisitionClient client = new AcquisitionClient();
         if (useJaxb) {
@@ -914,17 +919,16 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @return
      * @throws Exception
      */
-    private MultipartOutput createAcquisitionInstanceFromRawXml(String testName, String commonPartName,
+    private PoxPayloadOut createAcquisitionInstanceFromRawXml(String testName, String commonPartName,
             String commonPartFileName) throws Exception {
 
-        MultipartOutput multipart = new MultipartOutput();
+        PoxPayloadOut multipart = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
         String stringObject = getXmlDocumentAsString(commonPartFileName);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " to be created, acquisition common " + "\n" + stringObject);
         }
-        OutputPart commonPart = multipart.addPart(stringObject,
-                MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", commonPartName);
+        PayloadOutputPart commonPart = multipart.addPart(stringObject, stringObject);
+        commonPart.setLabel(commonPartName);
 
         return multipart;
 
@@ -942,7 +946,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<MultipartInput> res = client.read(csid);
+        ClientResponse<String> res = client.read(csid);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -954,7 +958,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Reading Common part ...");

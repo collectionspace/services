@@ -42,6 +42,12 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * @version $Revision:$
  */
 public class AccountRoleClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_NAME = "accountroles";
+
+	@Override
+	public String getServiceName() {
+		return AccountRoleClient.SERVICE_NAME;
+	}
 
     /**
      *

@@ -506,7 +506,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @throws Exception 
      */
     @Test(dependsOnMethods = {"create"})
-    public void testSubmitRequest() throws Exception {
+    public void testSubmitRequest() throws Exception {  //FIXME:  REM - This is not testing a submit /accounts/*/accountroles, but instead just to /accounts
 
         // Expected status code: 200 OK
         final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
@@ -698,4 +698,10 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             res.releaseConnection();
         }
     }
+
+	@Override
+	protected String getServiceName() {
+		// AccountRoles service is a sub-service of the Account service, so we return Account's service name
+		return AccountClient.SERVICE_NAME;
+	}
 }

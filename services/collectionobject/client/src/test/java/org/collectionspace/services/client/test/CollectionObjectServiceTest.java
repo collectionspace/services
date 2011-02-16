@@ -7,7 +7,7 @@
  * http://wiki.collectionspace.org
  *
  * Copyright © 2009 Regents of the University of California
- *
+ *\
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
  *
@@ -30,6 +30,10 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.BriefDescriptionList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
@@ -47,8 +51,6 @@ import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -78,13 +80,18 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private final String UTF8_DATA_SAMPLE = "Audiorecording album cover signed by Lech "
             + "Wa" + '\u0142' + '\u0119' + "sa";
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    protected String getServicePathComponent() {
-        return new CollectionObjectClient().getServicePathComponent();
-    }
+//    /* (non-Javadoc)
+//     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+//     */
+//    @Override
+//    protected String getServicePathComponent() {
+//        return new CollectionObjectClient().getServicePathComponent();
+//    }
+
+	@Override
+	protected String getServiceName() {
+		return CollectionObjectClient.SERVICE_NAME;
+	}
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -125,7 +132,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
                 createCollectionObjectInstance(client.getCommonPartName(), identifier);
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
@@ -535,7 +542,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
                 createCollectionObjectInstance(client.getCommonPartName(), collectionObject, null);
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
@@ -601,7 +608,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -613,19 +620,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": Reading Common part ...");
-        }
-        CollectionobjectsCommon collectionObject =
-                (CollectionobjectsCommon) extractPart(input,
-                client.getCommonPartName(), CollectionobjectsCommon.class);
-        Assert.assertNotNull(collectionObject);
+        // Extract the common part.
+        CollectionobjectsCommon collectionobjectCommon = extractCommonPartValue(testName, res);
 
         // Verify the number and contents of values in repeatable fields,
         // as created in the instance record used for testing.
-        DimensionList dimensionList = collectionObject.getDimensions();
+        DimensionList dimensionList = collectionobjectCommon.getDimensions();
         Assert.assertNotNull(dimensionList);
         List<DimensionGroup> dimensionsGroups = dimensionList.getDimensionGroup();
         Assert.assertNotNull(dimensionsGroups);
@@ -636,9 +636,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Reading Natural History part ...");
         }
-        CollectionobjectsNaturalhistory conh =
-                (CollectionobjectsNaturalhistory) extractPart(input,
-                getNHPartName(), CollectionobjectsNaturalhistory.class);
+
+        // Currently checking only that the natural history part is non-null;
+        // can add specific field-level checks as warranted.
+        Object conh = extractPartValue(testName, res, getNHPartName());
         Assert.assertNotNull(conh);
     }
 
@@ -659,7 +660,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -743,27 +744,20 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // Perform setup.
-        setupUpdate();
 
         // Read an existing resource that will be updated.
-        ClientResponse<MultipartInput> res = updateRetrieve(testName, knownResourceId);
+        ClientResponse<String> res = updateRetrieve(testName, knownResourceId);
 
         // Extract its common part.
-        CollectionObjectClient client = new CollectionObjectClient();
-        MultipartInput input = (MultipartInput) res.getEntity();
-        CollectionobjectsCommon collectionObject =
-                (CollectionobjectsCommon) extractPart(input,
-                client.getCommonPartName(), CollectionobjectsCommon.class);
-        Assert.assertNotNull(collectionObject);
+        CollectionobjectsCommon collectionObjectCommon = extractCommonPartValue(testName, res);
 
         // Change the content of one or more fields in the common part.
 
-        collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
+        collectionObjectCommon.setObjectNumber("updated-" + collectionObjectCommon.getObjectNumber());
 
         // Change the object name in the first value instance in the
         // object name repeatable group.
-        ObjectNameList objNameList = collectionObject.getObjectNameList();
+        ObjectNameList objNameList = collectionObjectCommon.getObjectNameList();
         List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
         Assert.assertNotNull(objNameGroups);
         Assert.assertTrue(objNameGroups.size() >= 1);
@@ -771,11 +765,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(objectName, OBJECT_NAME_VALUE);
         String updatedObjectName = "updated-" + objectName;
         objNameGroups.get(0).setObjectName(updatedObjectName);
-        collectionObject.setObjectNameList(objNameList);
+        collectionObjectCommon.setObjectNameList(objNameList);
 
         // Replace the existing value instances in the dimensions repeatable group
         // with entirely new value instances, also changing the number of such instances.
-        DimensionList dimensionList = collectionObject.getDimensions();
+        DimensionList dimensionList = collectionObjectCommon.getDimensions();
         Assert.assertNotNull(dimensionList);
         List<DimensionGroup> dimensionGroups = dimensionList.getDimensionGroup();
         Assert.assertNotNull(dimensionGroups);
@@ -789,33 +783,24 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         int updatedDimensionGroupSize = dimensionGroups.size();
         Assert.assertTrue(updatedDimensionGroupSize >= 1);
         Assert.assertTrue(updatedDimensionGroupSize != originalDimensionGroupSize);
-        collectionObject.setDimensions(dimensionList);
+        collectionObjectCommon.setDimensions(dimensionList);
 
         if (logger.isDebugEnabled()) {
             logger.debug("sparse update that will be sent in update request:");
-            logger.debug(objectAsXmlString(collectionObject,
+            logger.debug(objectAsXmlString(collectionObjectCommon,
                     CollectionobjectsCommon.class));
         }
 
-        // Send the changed resource to be updated.
-        res = updateSend(testName, knownResourceId, collectionObject);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Send the changed resource to be updated and read the updated resource
+        // from the response.
+        res = updateSend(testName, knownResourceId, collectionObjectCommon);
 
-        // Read the response and verify that the resource was correctly updated.
-        input = (MultipartInput) res.getEntity();
-        CollectionobjectsCommon updatedCollectionObject =
-                (CollectionobjectsCommon) extractPart(input,
-                client.getCommonPartName(), CollectionobjectsCommon.class);
-        Assert.assertNotNull(updatedCollectionObject);
+        // Extract its common part.
+        CollectionobjectsCommon updatedCollectionobjectCommon = extractCommonPartValue(testName, res);
 
-        objNameList = collectionObject.getObjectNameList();
+        // Read the updated common part and verify that the resource was correctly updated.
+        objNameList = updatedCollectionobjectCommon.getObjectNameList();
+        Assert.assertNotNull(objNameList);
         objNameGroups = objNameList.getObjectNameGroup();
         Assert.assertNotNull(objNameGroups);
         Assert.assertTrue(objNameGroups.size() >= 1);
@@ -823,7 +808,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                 objNameGroups.get(0).getObjectName(),
                 "Data in updated object did not match submitted data.");
         
-        dimensionList = collectionObject.getDimensions();
+        dimensionList = updatedCollectionobjectCommon.getDimensions();
         Assert.assertNotNull(dimensionList);
         dimensionGroups = dimensionList.getDimensionGroup();
         Assert.assertNotNull(dimensionGroups);
@@ -841,16 +826,21 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @param id the id
      * @return the client response
      */
-    private ClientResponse<MultipartInput> updateRetrieve(String testName, String id) {
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
+    private ClientResponse<String> updateRetrieve(String testName, String id) {
+        setupRead();
         CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<MultipartInput> res = client.read(id);
+        ClientResponse<String> res = client.read(knownResourceId);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         if (logger.isDebugEnabled()) {
-            logger.debug("read in updateRetrieve for " + testName + " status = " + res.getStatus());
+            logger.debug(testName + ": read status = " + statusCode);
         }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS);
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to updateRetrieve for " + testName + " with ID: " + id);
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        if(logger.isDebugEnabled()){
+            logger.debug("got object to update with ID: " + knownResourceId);
         }
         return res;
     }
@@ -863,13 +853,23 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @param collectionObject the collection object
      * @return the client response
      */
-    private ClientResponse<MultipartInput> updateSend(String testName, String id,
-            CollectionobjectsCommon collectionObject) {
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
+    private ClientResponse<String> updateSend(String testName, String id,
+            CollectionobjectsCommon collectionObjectCommon) {
+        setupUpdate();
+        PoxPayloadOut output = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(collectionObjectCommon, MediaType.APPLICATION_XML_TYPE);
         CollectionObjectClient client = new CollectionObjectClient();
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-        ClientResponse<MultipartInput> res = client.update(knownResourceId, output);
+        commonPart.setLabel(client.getCommonPartName());
+        ClientResponse<String> res = client.update(knownResourceId, output);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         return res;
     }
 
@@ -1019,11 +1019,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateCollectionObject(), below.
         CollectionObjectClient client = new CollectionObjectClient();
-        MultipartOutput multipart =
-                createCollectionObjectInstance(client.getCommonPartName(),
-                NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res =
-                client.update(NON_EXISTENT_ID, multipart);
+        PoxPayloadOut multipart =
+                createCollectionObjectInstance(client.getCommonPartName(), NON_EXISTENT_ID);
+        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -1057,35 +1055,31 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // Perform setup.
-        setupUpdate();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + " got object to update with ID: " + knownResourceId);
-        }
 
         // Read an existing record for updating.
-        ClientResponse<MultipartInput> res = updateRetrieve(testName, knownResourceId);
+        ClientResponse<String> res = updateRetrieve(testName, knownResourceId);
 
-        CollectionObjectClient client = new CollectionObjectClient();
-        MultipartInput input = (MultipartInput) res.getEntity();
-        CollectionobjectsCommon collectionObject =
-                (CollectionobjectsCommon) extractPart(input,
-                client.getCommonPartName(), CollectionobjectsCommon.class);
-        Assert.assertNotNull(collectionObject);
+        // Extract its common part.
+        CollectionobjectsCommon collectionObjectCommon = extractCommonPartValue(testName, res);
 
-        // Update with invalid content, by setting a value to the
-        // empty String, in a field that requires a non-empty value,
+        // Update the common part with invalid content, by setting a value to
+        // the empty String, in a field that requires a non-empty value,
         // as enforced by the service's validation routine(s).
-        collectionObject.setObjectNumber("");
+        collectionObjectCommon.setObjectNumber("");
 
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " updated object");
-            logger.debug(objectAsXmlString(collectionObject,
+            logger.debug(objectAsXmlString(collectionObjectCommon,
                     CollectionobjectsCommon.class));
         }
 
         // Submit the request to the service and store the response.
-        res = updateSend(testName, knownResourceId, collectionObject);
+        setupUpdate();
+        PoxPayloadOut output = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(collectionObjectCommon, MediaType.APPLICATION_XML_TYPE);
+        CollectionObjectClient client = new CollectionObjectClient();
+        commonPart.setLabel(client.getCommonPartName());
+        res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
 
         // Read the response and verify that the update attempt failed.
@@ -1208,7 +1202,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createCollectionObjectInstance(String commonPartName,
+    private PoxPayloadOut createCollectionObjectInstance(String commonPartName,
             String identifier) {
         return createCollectionObjectInstance(commonPartName,
                 "objectNumber-" + identifier,
@@ -1223,7 +1217,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @param objectName the object name
      * @return the multipart output
      */
-    private MultipartOutput createCollectionObjectInstance(String commonPartName,
+    private PoxPayloadOut createCollectionObjectInstance(String commonPartName,
             String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 
@@ -1313,7 +1307,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         conh.setNhInt(999);
         conh.setNhLong(9999);
 
-        MultipartOutput multipart = createCollectionObjectInstance(commonPartName, collectionObject, conh);
+        PoxPayloadOut multipart = createCollectionObjectInstance(commonPartName, collectionObject, conh);
         return multipart;
     }
 
@@ -1325,10 +1319,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @param conh the conh
      * @return the multipart output
      */
-    private MultipartOutput createCollectionObjectInstance(String commonPartName,
+    private PoxPayloadOut createCollectionObjectInstance(String commonPartName,
             CollectionobjectsCommon collectionObject, CollectionobjectsNaturalhistory conh) {
 
-        MultipartOutput multipart = CollectionObjectFactory.createCollectionObjectInstance(
+        PoxPayloadOut multipart = CollectionObjectFactory.createCollectionObjectInstance(
                 commonPartName, collectionObject, getNHPartName(), conh);
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, collectionobject common");
@@ -1355,16 +1349,17 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @return
      * @throws Exception
      */
-    private MultipartOutput createCollectionObjectInstanceFromXml(String testName, String commonPartName,
+    private PoxPayloadOut createCollectionObjectInstanceFromXml(String testName, String commonPartName,
             String commonPartFileName) throws Exception {
 
         CollectionobjectsCommon collectionObject =
                 (CollectionobjectsCommon) getObjectFromFile(CollectionobjectsCommon.class,
                 commonPartFileName);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(collectionObject,
+        PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(collectionObject,
                 MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", commonPartName);
+        CollectionObjectClient client = new CollectionObjectClient();
+        commonPart.setLabel(client.getCommonPartName());
 
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " to be created, collectionobject common");
@@ -1383,20 +1378,18 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @return
      * @throws Exception
      */
-    private MultipartOutput createCollectionObjectInstanceFromRawXml(String testName, String commonPartName,
+    private PoxPayloadOut createCollectionObjectInstanceFromRawXml(String testName, String commonPartName,
             String commonPartFileName) throws Exception {
 
-        MultipartOutput multipart = new MultipartOutput();
+    	PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
         String stringObject = getXmlDocumentAsString(commonPartFileName);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " to be created, collectionobject common " + "\n" + stringObject);
         }
-        OutputPart commonPart = multipart.addPart(stringObject,
-                MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", commonPartName);
+        PayloadOutputPart commonPart = multipart.addPart(commonPartName, stringObject);
+//        commonPart.setLabel(commonPartName);
 
         return multipart;
-
     }
 
     /**
@@ -1422,7 +1415,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupCreate();
 
-        MultipartOutput multipart = null;
+        PoxPayloadOut multipart = null;
 
         CollectionObjectClient client = new CollectionObjectClient();
         if (useJaxb) {
@@ -1458,7 +1451,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<MultipartInput> res = client.read(csid);
+        ClientResponse<String> res = client.read(csid);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -1470,16 +1463,57 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": Reading Common part ...");
-        }
-        CollectionobjectsCommon collectionObject =
-                (CollectionobjectsCommon) extractPart(input,
-                client.getCommonPartName(), CollectionobjectsCommon.class);
+        // Extract the common part.
+        CollectionobjectsCommon collectionObject = extractCommonPartValue(testName, res);
         Assert.assertNotNull(collectionObject);
 
         return collectionObject;
      }
+
+    private CollectionobjectsCommon extractCommonPartValue(String testName, ClientResponse<String> res)
+        throws Exception {
+        CollectionObjectClient client = new CollectionObjectClient();
+        PayloadInputPart payloadInputPart = extractPart(testName, res, client.getCommonPartName());
+        Object obj = null;
+        if (payloadInputPart != null) {
+        	obj = payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(obj,
+                testName + ": body of " + client.getCommonPartName() + " part was unexpectedly null.");
+        CollectionobjectsCommon collectionobjectCommon = (CollectionobjectsCommon) obj;
+        Assert.assertNotNull(collectionobjectCommon,
+                testName + ": " + client.getCommonPartName() + " part was unexpectedly null.");
+        return collectionobjectCommon;
+    }
+
+    private Object extractPartValue(String testName, ClientResponse<String> res, String partLabel)
+        throws Exception {
+        Object obj = null;
+        PayloadInputPart payloadInputPart = extractPart(testName, res, partLabel);
+        if (payloadInputPart != null) {
+        	obj = payloadInputPart.getElementBody();
+        }
+        Assert.assertNotNull(obj,
+                testName + ": value of part " + partLabel + " was unexpectedly null.");
+        return obj;
+    }
+
+    private PayloadInputPart extractPart(String testName, ClientResponse<String> res, String partLabel)
+        throws Exception {
+        if (logger.isDebugEnabled()) {
+           logger.debug(testName + ": Reading part " + partLabel + " ...");
+        }
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(partLabel);
+        Assert.assertNotNull(payloadInputPart,
+                testName + ": part " + partLabel + " was unexpectedly null.");
+        return payloadInputPart;
+    }
+
+	@Override
+	protected String getServicePathComponent() {
+		// TODO Auto-generated method stub
+		return CollectionObjectClient.SERVICE_PATH_COMPONENT;
+	}
+
 }

@@ -43,12 +43,20 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * @version $Revision:$
  */
 public class RoleClient extends AbstractServiceClientImpl {
-
+	public static final String SERVICE_NAME = "authorization/roles";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
     /**
      *
      */
     private RoleProxy roleProxy;
 
+    @Override
+    public String getServiceName() { 
+    	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498 }
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */

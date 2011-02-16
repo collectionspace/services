@@ -25,9 +25,10 @@
  */
 package org.collectionspace.services.collectionobject;
 
-import java.io.InputStream;
+import java.io.InputStream; //FIXME: REM - Please remove unneeded imports
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +48,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
+import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+//import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils; //FIXME: REM - Please remove all unneeded imports
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -78,30 +82,24 @@ import org.collectionspace.services.relation.RelationshipType;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.FileUtils;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 
 //FIXME: There should be no direct dependency on Nuxeo in our resource classes.
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.api.ClientException;
+//import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+//import org.nuxeo.ecm.core.api.ClientException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * The Class CollectionObjectResource.
  */
-@Path("/collectionobjects")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path(CollectionObjectClient.SERVICE_PATH_COMPONENT)
+@Consumes("application/xml")
+@Produces("application/xml")
 public class CollectionObjectResource
         extends AbstractMultiPartCollectionSpaceResourceImpl {
-
-    /** The Constant serviceName. */
-    static final public String serviceName = "collectionobjects";
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
@@ -121,7 +119,7 @@ public class CollectionObjectResource
      */
     @Override
     public String getServiceName() {
-        return serviceName;
+        return CollectionObjectClient.SERVICE_PATH_COMPONENT;
     }
     
     /* (non-Javadoc)
@@ -136,7 +134,7 @@ public class CollectionObjectResource
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
      */
 //    @Override
-//    public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
+//    public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
 //        DocumentHandler docHandler = ctx.getDocumentHandler();
 //        if (ctx.getInput() != null) {
 //            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(),
@@ -156,9 +154,11 @@ public class CollectionObjectResource
      * @return the response
      */
     @POST
-    public Response createCollectionObject(MultipartInput input) {
+    public Response createCollectionObject(@Context HttpServletRequest req,
+    		String xmlPayload) {
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input); //
+            PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(CollectionObjectResource.class);
@@ -192,7 +192,7 @@ public class CollectionObjectResource
      */
     @GET
     @Path("{csid}")
-    public MultipartOutput getCollectionObject(
+    public byte[] getCollectionObject(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getCollectionObject with csid=" + csid);
@@ -204,12 +204,12 @@ public class CollectionObjectResource
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -237,7 +237,8 @@ public class CollectionObjectResource
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        
+        return result.getBytes();
     }
     
     /**
@@ -274,7 +275,7 @@ public class CollectionObjectResource
         profiler.start();
         
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             collectionObjectList = (CollectionobjectsCommonList) handler.getCommonPartList();
@@ -299,15 +300,15 @@ public class CollectionObjectResource
      * Update collection object.
      * 
      * @param csid the csid
-     * @param theUpdate the the update
+     * @param xmlText an XML representation of the data to be used in the update
      * 
-     * @return the multipart output
+     * @return an XML representation of the updated object
      */
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateCollectionObject(
+    public String updateCollectionObject(
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+            String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateCollectionObject with csid=" + csid);
         }
@@ -318,12 +319,13 @@ public class CollectionObjectResource
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (BadRequestException bre) {
             Response response = Response.status(
                     Response.Status.BAD_REQUEST).entity("Update failed reason " + bre.getErrorReason()).type("text/plain").build();
@@ -334,7 +336,7 @@ public class CollectionObjectResource
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("caugth exception in updateCollectionObject", dnfe);
+                logger.debug("Caught exception in updateCollectionObject", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Update failed on CollectionObject csid=" + csid).type(
@@ -345,7 +347,7 @@ public class CollectionObjectResource
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**
@@ -370,7 +372,7 @@ public class CollectionObjectResource
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -392,6 +394,8 @@ public class CollectionObjectResource
         }
 
     }
+
+    // FIXME AR: should the method below be deprecated?
 
     /**
      * Gets the intakes common list.
@@ -467,11 +471,11 @@ public class CollectionObjectResource
     	AuthorityRefList authRefList = null;
         try {
         	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
-            DocumentModelHandler<MultipartInput, MultipartOutput> docHandler = 
-            	(DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
+            DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> docHandler = 
+            	(DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>)createDocumentHandler(ctx);
             List<String> authRefFields = 
             	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
             			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -516,7 +520,7 @@ public class CollectionObjectResource
     }
 
     /**
-     * This method is deprecated.  Use kwSearchCollectionObjects() method instead.
+     * This method is deprecated.  Use SearchCollectionObjects() method instead.
      * Keywords search collection objects.
      * @param ui 
      * 
@@ -527,6 +531,7 @@ public class CollectionObjectResource
     @GET
     @Path("/search")
     @Produces("application/xml")
+    @Deprecated
     public CollectionobjectsCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
     	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
@@ -547,7 +552,7 @@ public class CollectionObjectResource
         try {
         	Profiler profiler = new Profiler("searchCollectionObjects():", 1);
         	profiler.start();
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search

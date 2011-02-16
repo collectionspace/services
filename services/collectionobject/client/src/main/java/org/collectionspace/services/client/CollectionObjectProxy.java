@@ -48,16 +48,13 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommonList
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-
 /**
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-@Path("/collectionobjects/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Path(CollectionObjectClient.SERVICE_PATH_PROXY)
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public interface CollectionObjectProxy extends CollectionSpaceProxy {
 
     /**
@@ -70,7 +67,7 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
     ClientResponse<CollectionobjectsCommonList> readList();
     
 //    /**
-//     * Read list.
+//     * Read list.  //FIXME: REM - Remove this dead code please.
 //     *
 //     * @param pageSize the page size
 //     * @param pageNumber the page number
@@ -110,11 +107,11 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
     /**
      * Creates the.
      *
-     * @param multipart the multipart
+     * @param payload the payload
      * @return the client response
      */
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(byte[] payload);
 
     //(R)ead
     /**
@@ -125,11 +122,12 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
      */
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
     
     @GET
     @Produces({"application/xml"})
     @Path("/{csid}/picture")
+    @Deprecated //FIXME: REM - Remove this method and the corresponding client, and resource as well.
     ClientResponse<Response> createPicture(@PathParam("csid") String csid);
     
     // List Authority references
@@ -155,7 +153,7 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
      */
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
 
     //(D)elete
     /**

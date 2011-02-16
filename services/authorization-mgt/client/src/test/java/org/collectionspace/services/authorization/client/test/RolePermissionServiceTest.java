@@ -81,9 +81,6 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
     /** The role values. */
     private Hashtable<String, RoleValue> roleValues = new Hashtable<String, RoleValue>();
     private Date now = new Date();
-    /*
-     * This method is called only by the parent class, AbstractServiceTestImpl
-     */
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
@@ -92,7 +89,12 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
     protected String getServicePathComponent() {
         return new RolePermissionClient().getServicePathComponent();
     }
-
+    
+    @Override
+    public String getServiceName() { 
+    	return RoleClient.SERVICE_NAME; // RolePermission is a sub-resource of 'roles' resource.
+    }
+    
     private String getRoleName() {
         return TEST_ROLE_NAME + TEST_MARKER + now.toString();
     }
@@ -511,7 +513,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
      * of the methods above.
      * @throws Exception 
      */
-    @Test(dependsOnMethods = {"create"})
+    @Test(dependsOnMethods = {"create"}) //FIXME: REM - This is not a test of a submit to the permroles service, but to just authorization/roles
     public void testSubmitRequest() throws Exception {
 
         // Expected status code: 200 OK

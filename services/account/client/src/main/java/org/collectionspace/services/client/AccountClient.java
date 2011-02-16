@@ -43,18 +43,24 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * @version $Revision:$
  */
 public class AccountClient extends AbstractServiceClientImpl {
+    public static final String SERVICE_NAME = "accounts";
 
     /**
      *
      */
     private AccountProxy accountProxy;
 
-    /* (non-Javadoc)
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override
     public String getServicePathComponent() {
-        return "accounts";
+        return SERVICE_NAME;
     }
 
     /**
