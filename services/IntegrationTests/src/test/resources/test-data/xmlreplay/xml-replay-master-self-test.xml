@@ -9,8 +9,7 @@
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
 
-    
-    <run controlFile="./xml-replay-self-test.xml" testGroup="selftestGroup" />
+    <!-- run controlFile="./xml-replay-self-test.xml" testGroup="selftestGroup" / -->
 
 </xmlReplayMaster>
 

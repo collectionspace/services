@@ -52,6 +52,8 @@
     value to update the object posted by a POST test.
 
     -->
+
+<!--
     <testGroup ID="2collectionobjects" autoDeletePOSTS="true">
         <test ID="1001">
             <method>POST</method>
@@ -248,7 +250,7 @@
 
 
 
-
+-->
     
 
 

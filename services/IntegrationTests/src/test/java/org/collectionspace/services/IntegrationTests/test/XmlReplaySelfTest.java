@@ -76,6 +76,7 @@ public class XmlReplaySelfTest extends XmlReplayTest {
         logTest(list, "runTestGroup");
     }
 
+/*
     @Test
     public void runOneTest() throws Exception {
         XmlReplay replay = createXmlReplay();
@@ -112,6 +113,7 @@ public class XmlReplaySelfTest extends XmlReplayTest {
         logTest(deleteList, "runTwoTestsManualCleanup.cleanups");
 
     }
+*/
 
 
     @Test

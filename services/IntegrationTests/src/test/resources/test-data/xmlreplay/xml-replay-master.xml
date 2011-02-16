@@ -20,9 +20,9 @@
     When the DB is cleaned with [ant create_db import] it runs OK.
     -->
 
-    <run controlFile="./security.xml" testGroup="securityRemovingRoleperms" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
+    <!-- run controlFile="./security.xml" testGroup="securityRemovingRoleperms" / -->
+    <!-- run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" / -->
+    <!-- run controlFile="objectexit/object-exit.xml" testGroup="domwalk" / -->
     <!--<run controlFile="media/media.xml" testGroup="authrefs" />-->
     <!--<run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />-->
 
