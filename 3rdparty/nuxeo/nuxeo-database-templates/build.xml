@@ -17,8 +17,8 @@
     <property name="collectionspace.template.dir.path" value="${basedir}/${db}/${collectionspace.template.dir}"/>
     <property name="backup.suffix" value=".cspace.bak"/>
 
-    <target name="init">
-    <!-- Create the time stamp -->
+    <target name="init"
+        description="creates a time stamp">
         <tstamp/>
     </target>
     
@@ -106,10 +106,21 @@
             message="Nuxeo database templates directory ${collectionspace.template.dir.path} could not be found."/>
     </target>
 
-    <target name="check-propertyfile-task-exists"
-    description="checks that the PropertyFile task exists; that task is required by one or more targets in this build file">
+    <target name="check-propertyfile-task-exists" if="has.minimum.ant.version"
+        description="checks that the PropertyFile task exists; that task is required by one or more targets in this build file"
+        depends="check-minimum-ant-version">
         <available classname="org.apache.tools.ant.taskdefs.optional.PropertyFile"
             property="has.propertyfile.task"/>
+    </target>
+    
+    <target name="check-minimum-ant-version"
+        description="checks that the minimum required Ant version is available">
+        <!-- The PropertyFile task - bundled with Ant version 1.8.0 and -->
+        <!-- integral to Ant in version 1.8.2 - is required to preserve -->
+        <!-- file comments and layout when editing properties files. -->
+        <condition property="has.minimum.ant.version">
+            <antversion atleast="1.8.0"/>
+        </condition> 
     </target>
 
 </project>
