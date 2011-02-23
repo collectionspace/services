@@ -27,6 +27,13 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
+
+
 /**
  * BlobClient.java
  *
@@ -39,6 +46,10 @@ public class BlobClient extends AbstractServiceClientImpl {
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+
+	//HTTP query param string for specifying a URI source to blob bits.
+	public static final String BLOB_URI_PARAM = "blobUri";
+	
 
 	@Override
 	public String getServiceName() {
@@ -73,7 +84,8 @@ public class BlobClient extends AbstractServiceClientImpl {
     /**
      * allow to reset proxy as per security needs
      */
-    public void setProxy() {
+    @Override
+	public void setProxy() {
         if (useAuth()) {
             blobProxy = ProxyFactory.create(BlobProxy.class,
                     getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
@@ -126,8 +138,16 @@ public class BlobClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
         return blobProxy.create(xmlPayload.getBytes());
+    }    
+    
+    public ClientResponse<Response> createBlobFromFormData(MultipartFormDataOutput formDataOutput) {
+        return blobProxy.createBlobFromFormData(formDataOutput);
     }
-
+    
+    public ClientResponse<Response> createBlobFromURI(String blobUri) {
+        return blobProxy.createBlobFromURI("".getBytes(), blobUri);
+    }
+    
     /**
      * @param csid
      * @param blob

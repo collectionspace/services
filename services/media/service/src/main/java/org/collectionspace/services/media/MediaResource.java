@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.media;
 
+import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -33,14 +34,9 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler;
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +119,7 @@ public class MediaResource extends ResourceBase {
     @Consumes("multipart/form-data")
     @Produces("application/xml")
     public Response createBlob(@Context HttpServletRequest req,
-    		@QueryParam("blobUri") String blobUri,
+    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,
     		@PathParam("csid") String csid) {
     	PoxPayloadIn input = null;
     	Response response = null;    	

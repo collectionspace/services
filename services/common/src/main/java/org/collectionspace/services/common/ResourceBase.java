@@ -22,6 +22,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+
 import java.util.List;
 
 /**
@@ -92,7 +93,8 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     //======================= CREATE ====================================================
 
     @POST
-    public Response create(String xmlPayload) {
+    public Response create(@Context UriInfo ui,
+    		String xmlPayload) {
         try {
         	PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);

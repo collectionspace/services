@@ -48,6 +48,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 //FIXME: REM - We should not have Nuxeo dependencies in our resource classes.
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
@@ -66,18 +67,18 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.MediaType;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
 @Path(BlobClient.SERVICE_PATH)
-@Consumes({"multipart/mixed", "application/xml"})
-@Produces({"multipart/mixed", "application/xml"})
+@Consumes("application/xml")
+@Produces("application/xml")
 public class BlobResource extends ResourceBase {
 
 	@Override
@@ -209,13 +210,37 @@ public class BlobResource extends ResourceBase {
     @Consumes("multipart/form-data")
     @Produces("application/xml")
     public Response createBlob(@Context HttpServletRequest req,
-    		@QueryParam("blobUri") String blobUri) {
+    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri) {
     	Response response = null;    	
     	try {
 	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 	    	blobInput.createBlobFile(req, blobUri);
 	    	response = this.create(null, ctx);
+    	} catch (Exception e) {
+    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+    	}
+    			
+		return response;
+    }
+    
+    @POST
+    @Override
+    public Response create(@Context UriInfo ui,
+    		String xmlPayload) {
+    	Response response = null;
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+    	String blobUri = queryParams.getFirst(BlobClient.BLOB_URI_PARAM);
+    	
+    	try {
+    		if (blobUri != null) {
+		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+		    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+		    	blobInput.createBlobFile(blobUri);
+		    	response = this.create(null, ctx);
+    		} else {
+    			response = super.create(ui, xmlPayload);
+    		}
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
     	}
@@ -271,7 +296,6 @@ public class BlobResource extends ResourceBase {
         
     @GET
     @Path("{csid}/derivatives")
-    @Produces("application/xml")
     public CommonList getDerivatives(
     		@PathParam("csid") String csid) {
     	CommonList result = null;

@@ -7,6 +7,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +21,8 @@ import java.util.Iterator;
  */
 public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 			
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	/**
 	 * Instantiates a new pox payload out.
 	 *
@@ -89,6 +93,13 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 			}
 		}
 		result = document.asXML();
+		
+		if (logger.isTraceEnabled() == true) {
+			logger.trace("\n\n<<<< Payload Out : BEGIN <<<<\n" +
+					result +
+					"\n<<<< Payload Out : END   <<<<\n");
+		}
+		
 		return result;
 	}
 		

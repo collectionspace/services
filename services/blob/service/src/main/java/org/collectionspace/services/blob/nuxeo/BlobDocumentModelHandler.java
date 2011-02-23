@@ -146,7 +146,7 @@ extends DocHandlerBase<BlobsCommon> {
 		BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 		if (blobInput.getBlobFile() != null) {    		
 			//
-			// If blobInput has a file then we just received a multipart/form-data file post
+			// If blobInput has a file then we just received a multipart/form-data file post or a URI query parameter
 			//
 			DocumentModel documentModel = wrapDoc.getWrappedObject();
 			RepositoryInstance repoSession = this.getRepositorySession();    	

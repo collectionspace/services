@@ -22,29 +22,30 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.io.File;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
-import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.blob.BlobsCommon;
 
-import org.jboss.resteasy.client.ClientResponse;
-
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
+import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
 /**
  * BlobServiceTest, carries out tests against a deployed and running Blob Service. <p/>
@@ -56,6 +57,9 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
     private final String CLASS_NAME = BlobServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     private String knownResourceId = null;
+    private static final String BLOBS_DIR = "blobs";
+    
+    private boolean blobCleanup = true;
 
     @Override
 	public String getServicePathComponent() {
@@ -77,6 +81,25 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         return response.getEntity(AbstractCommonList.class);
     }
 
+    /**
+     * Sets up create tests.
+     */
+    @Override
+	protected void setupCreate() {
+        super.setupCreate();
+        String noBlobCleanup = System.getProperty(NO_BLOB_CLEANUP);
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noBlobCleanup)) {
+    		//
+    		// Don't delete the blobs that we created during the test cycle
+    		//
+            this.blobCleanup = false;
+    	}
+    }
+    
+    private boolean blobCleanup() {
+    	return blobCleanup;
+    }
+    
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
@@ -91,6 +114,69 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ": knownResourceId=" + knownResourceId);
         }
         allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
+    }
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
+    public void createBlobFromURI(String testName) throws Exception {
+        logger.debug(testBanner(testName, CLASS_NAME));
+        setupCreate();
+        BlobClient client = new BlobClient();
+        
+        String currentDir = this.getResourceDir();
+        String blobsDirPath = currentDir + File.separator + BLOBS_DIR;
+        File blobsDir = new File(blobsDirPath);
+        if (blobsDir != null && blobsDir.exists()) {
+	        File[] children = blobsDir.listFiles();
+	        if (children != null && children.length > 0) {
+	        	for (File child : children) {
+	        		String mimeType = this.getMimeType(child);
+	        		logger.debug("Processing file URI: " + child.getAbsolutePath());
+	        		logger.debug("MIME type is: " + mimeType);
+		            ClientResponse<Response> res = client.createBlobFromURI(child.getAbsolutePath());
+		            assertStatusCode(res, testName);
+		            if (blobCleanup == true) {
+		            	allResourceIdsCreated.add(extractId(res));
+		            }
+	        	}
+	        } else {
+	        	logger.debug("Directory: " + blobsDirPath + " is empty or cannot be read.");
+	        }
+        } else {
+        	logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
+        }        
+    }
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"createBlobFromURI"})
+    public void createBlobwithPost(String testName) throws Exception {
+        logger.debug(testBanner(testName, CLASS_NAME));
+        setupCreate();
+        BlobClient client = new BlobClient();
+        
+        String currentDir = this.getResourceDir();
+        String blobsDirPath = currentDir + File.separator + BLOBS_DIR;
+        File blobsDir = new File(blobsDirPath);
+        if (blobsDir != null && blobsDir.exists()) {
+	        File[] children = blobsDir.listFiles();
+	        if (children != null && children.length > 0) {
+	        	for (File child : children) {
+	        		String mimeType = this.getMimeType(child);
+	        		logger.debug("Posting file: " + child.getAbsolutePath());
+	        		logger.debug("MIME type is: " + mimeType);
+		            MultipartFormDataOutput form = new MultipartFormDataOutput();
+		            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
+		            ClientResponse<Response> res = client.createBlobFromFormData(form);
+		            assertStatusCode(res, testName);
+		            if (blobCleanup == true) {
+		            	allResourceIdsCreated.add(extractId(res));
+		            }
+	        	}
+	        } else {
+	        	logger.debug("Directory: " + blobsDirPath + " is empty or cannot be read.");
+	        }
+        } else {
+        	logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
+        }
     }
 
     @Override

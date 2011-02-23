@@ -27,7 +27,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -37,9 +36,6 @@ import org.collectionspace.services.media.MediaCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -54,7 +50,7 @@ import org.slf4j.LoggerFactory;
 public class MediaServiceTest extends AbstractServiceTestImpl {
 
     private final String CLASS_NAME = MediaServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    private final Logger logger = LoggerFactory.getLogger(MediaServiceTest.class);
     private String knownResourceId = null;
 
     @Override
@@ -92,6 +88,29 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         }
         allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
     }
+    
+//    String noTest = System.getProperty("noTestCleanup");
+//	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("Skipping Cleanup phase ...");
+//        }
+//        return;
+//	}
+    
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update"})
+//    public void updateWithBlob(String testName) throws Exception {
+//        logger.debug(testBanner(testName, CLASS_NAME));
+//        setupCreate();
+//        MediaClient client = new MediaClient();
+//        PoxPayloadOut multipart = createMediaInstance(createIdentifier());
+//        ClientResponse<Response> res = client.create(multipart);
+//        assertStatusCode(res, testName);
+//        String csid = extractId(res);
+//        
+//        
+//        allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
+//    }
+    
 
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})

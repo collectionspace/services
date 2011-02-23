@@ -23,17 +23,23 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.jboss.resteasy.client.ClientResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
+
+import javax.activation.MimetypesFileTypeMap;
+
 
 /**
  * AbstractServiceTestImpl
@@ -60,7 +66,24 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     /** The Constant DEFAULT_LIST_SIZE. */
     static protected final int DEFAULT_LIST_SIZE = 10;
     static protected final int DEFAULT_PAGINATEDLIST_SIZE = 10;
+    static protected final String RESOURCE_PATH = "src" + File.separator +
+    	"test" + File.separator +
+    	"resources";
+    static protected final String DEFAULT_MIME = "application/octet-stream; charset=ISO-8859-1";
+    static private final String NO_TEST_CLEANUP = "noTestCleanup";
+    static protected final String NO_BLOB_CLEANUP = "noBlobCleanup";
 
+    protected String getMimeType(File theFile) {
+    	String result = null;
+    	result = new MimetypesFileTypeMap().getContentType(theFile);
+    	if (result == null) {
+    		logger.debug("Could not get MIME type for file at: " + theFile.getAbsolutePath());
+    		result = DEFAULT_MIME;
+    	}
+    	
+    	return result;
+
+    }
     /* Use this to keep track of resources to delete */
     protected List<String> allResourceIdsCreated = new ArrayList<String>();
     private String EMPTY_SORT_BY_ORDER = "";
@@ -74,6 +97,14 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     	return this.logger;
     }
 
+    protected String getResourceDir() {
+    	String result = null;
+        String currentDirectory = System.getProperty("user.dir");
+        result = currentDirectory + File.separator + RESOURCE_PATH;
+        return result;
+    }
+    
+    
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     //
@@ -365,8 +396,8 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
      */
     @AfterClass(alwaysRun=true)
     public void cleanUp() {
-        String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+        String noTestCleanup = System.getProperty(NO_TEST_CLEANUP);
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTestCleanup)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }

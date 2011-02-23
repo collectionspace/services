@@ -17,8 +17,12 @@ import org.dom4j.Element;
 //import org.dom4j.Namespace;
 //import org.dom4j.io.SAXReader;
 //import org.xml.sax.InputSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PoxPayloadIn extends PoxPayload<PayloadInputPart> {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/*
 	 * Parse the POX 'xmlPayload' into individual parts.  Each part is saved
@@ -26,6 +30,11 @@ public class PoxPayloadIn extends PoxPayload<PayloadInputPart> {
 	 */
 	public PoxPayloadIn(String xmlPayload) throws DocumentException {
 		super(xmlPayload);
+		if (logger.isTraceEnabled() == true) {
+			logger.trace("\n\n>>>> Payload In : BEGIN >>>>\n" +
+					xmlPayload +
+					"\n>>>> Payload In : END   >>>>\n");
+		}
 	}
 	
 	/* (non-Javadoc)

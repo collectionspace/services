@@ -26,8 +26,8 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -42,7 +42,7 @@ public class MediaClient extends AbstractServiceClientImpl {
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
-
+	
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;
@@ -122,6 +122,15 @@ public class MediaClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
         return mediaProxy.create(xmlPayload.getBytes());
     }
+    
+    /**
+     * @param media
+     * @return
+     *
+     */
+    public ClientResponse<Response> createBlob(String csid, String blobUri) {
+        return mediaProxy.createBlob(csid, blobUri);
+    }    
 
     /**
      * @param csid
@@ -132,6 +141,17 @@ public class MediaClient extends AbstractServiceClientImpl {
         return mediaProxy.update(csid, xmlPayload.getBytes());
 
     }
+    
+    /**
+     * @param csid
+     * @param media
+     * @return
+     */
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload, String URI) {
+        return mediaProxy.update(csid, xmlPayload.getBytes());
+
+    }
+    
 
     /**
      * @param csid

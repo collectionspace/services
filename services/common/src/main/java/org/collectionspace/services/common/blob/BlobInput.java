@@ -121,6 +121,13 @@ public class BlobInput {
     	File tmpFile = FileUtils.createTmpFile(req);
     	this.setBlobFile(tmpFile);
     	this.setBlobUri(blobUri);
+	}
+	
+	public void createBlobFile(String theBlobUri) {
+    	File theBlobFile = new File(theBlobUri);
+    	this.setBlobFile(theBlobFile);
+    	this.setBlobUri(blobUri);
 	}	
+	
 }
 

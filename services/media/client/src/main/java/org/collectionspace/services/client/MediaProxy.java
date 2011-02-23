@@ -1,5 +1,6 @@
 package org.collectionspace.services.client;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -8,13 +9,14 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.client.BlobClient;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision: 2108 $
@@ -27,6 +29,12 @@ public interface MediaProxy extends CollectionSpaceProxy {
     //(C)reate
     @POST
     ClientResponse<Response> create(byte[] xmlPayload);
+    
+    @POST
+    @Path("{csid}")
+    @Produces("multipart/form-data")    
+    ClientResponse<Response>createBlob(@PathParam("csid") String csid,
+    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri);
 
     //(R)ead
     @GET

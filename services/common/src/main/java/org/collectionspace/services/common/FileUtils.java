@@ -23,12 +23,26 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class FileUtils.
+ */
 public class FileUtils {
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 	
-	private static final String TMP_FILE_PREFIX = "cspace_blob_";
+	/** The Constant TMP_FILE_PREFIX. */
+	public static final String TMP_BLOB_PREFIX = "cspace_blob_";
+	public static final String DEFAULT_BLOB_NAME = "blob";
+	private static final String FILE_FORM_FIELD = "file";
 	
+	/**
+	 * Creates the tmp file.
+	 *
+	 * @param streamIn the stream in
+	 * @param filePrefix the file prefix
+	 * @return the file
+	 */
 	static public File createTmpFile(InputStream streamIn,
 			String filePrefix) {
 		File result = null;
@@ -57,6 +71,12 @@ public class FileUtils {
 		return result;
 	}
 	
+	/**
+	 * Look for an uploaded file from the HTTP request of type "multipart/form-data".
+	 *
+	 * @param request the request
+	 * @return the file
+	 */
 	static public File createTmpFile(HttpServletRequest request) {
 		File result = null;
 		
@@ -64,31 +84,33 @@ public class FileUtils {
 		ServletFileUpload upload = new ServletFileUpload(factory);
 
 		try {
-			List  items = upload.parseRequest(request);
-			Iterator iter = items.iterator();
+			List<FileItem>  items = upload.parseRequest(request);
+			Iterator<FileItem> iter = items.iterator();
 
 			while (iter.hasNext()) {
-				FileItem item = (FileItem) iter.next();
-
-				if (item.isFormField()) {
-					if (logger.isDebugEnabled() == true) {
-						String formFieldName = item.getFieldName();
-						logger.debug("FORM FIELD:" + formFieldName);
+				FileItem item = iter.next();
+				String formFieldName = item.getFieldName();
+				if (logger.isTraceEnabled() == true) {
+					logger.trace("HTTP Request form field:" + formFieldName);
+				}
+				if (formFieldName.equalsIgnoreCase(FILE_FORM_FIELD)) {
+					if (item.isFormField() == true) {
+						logger.warn(FILE_FORM_FIELD + ": part is marked as a form field.");
 					}
-				} else {
-					if (!item.isFormField()) {
-
-						String fileName = item.getName();
-						System.out.println("File Name:" + fileName);
-
-						File fullFile  = new File(item.getName());
-						String tmpDir = System.getProperty("java.io.tmpdir");
-						File savedFile = new File(tmpDir, fullFile.getName());
-
-						item.write(savedFile);
-//						item.getInputStream();//FIXME: We should make a version of this method that returns the input stream
-						result = savedFile;
+					String fileName = item.getName();
+					if (logger.isTraceEnabled() == true) {
+						logger.trace("Uploaded File Name:" + (fileName != null ? fileName : "<empty>"));
 					}
+					if (fileName == null) {
+						fileName = DEFAULT_BLOB_NAME; //if there's no file name then set it to an empty string
+						logger.warn("File was posted to the services without a file name.");
+					}					
+					File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+					File savedFile = File.createTempFile(TMP_BLOB_PREFIX, fileName, tmpDir);
+
+					item.write(savedFile);
+//						item.getInputStream();//FIXME: REM - We should make a version of this method that returns the input stream
+					result = savedFile;
 				}
 			}
 		} catch (Exception e) {
