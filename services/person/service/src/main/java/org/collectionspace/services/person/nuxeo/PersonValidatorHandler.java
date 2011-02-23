@@ -51,6 +51,7 @@ package org.collectionspace.services.person.nuxeo;
 
 import java.util.regex.Pattern;
 
+import org.collectionspace.services.common.Tools;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -80,15 +81,22 @@ public class PersonValidatorHandler implements ValidatorHandler {
             PersonsCommon person = (PersonsCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
                     PersonsCommon.class);
             String msg = "";
+            String displayName = person.getDisplayName();
             boolean invalid = false;
-            if(!person.isDisplayNameComputed() && (person.getDisplayName()==null)) {
+            if(!person.isDisplayNameComputed() && (displayName==null)) {
                 invalid = true;
                 msg += "displayName must be non-null if displayNameComputed is false!";
             }
-			String shortId = person.getShortIdentifier();
+            String shortId = person.getShortIdentifier();
+
             if(shortId==null){
-                invalid = true;
-                msg += "shortIdentifier must be non-null";
+                if (Tools.notEmpty(displayName)){  //TODO: && action == CREATE   ......
+                    //CSPACE-3178  OK to have null shortIdentifier if displayName set, because we will compute the shortIdentifier before storing.
+                    invalid = false;
+                } else {
+                    invalid = true;
+                    msg += "shortIdentifier must be non-null";
+                }
             } else if(shortIdBadPattern.matcher(shortId).find()) {
                 invalid = true;
                 msg += "shortIdentifier must only contain standard word characters";
