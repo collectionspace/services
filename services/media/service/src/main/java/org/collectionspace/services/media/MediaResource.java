@@ -52,13 +52,14 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import java.io.InputStream;
 import java.util.List;
 
 @Path(MediaClient.SERVICE_PATH)
-@Produces({"application/xml", "multipart/mixed"})
-@Consumes({"application/xml", "multipart/mixed"})
+@Consumes("application/xml")
+@Produces("application/xml")
 public class MediaResource extends ResourceBase {
     final Logger logger = LoggerFactory.getLogger(MediaResource.class);
 
@@ -114,6 +115,31 @@ public class MediaResource extends ResourceBase {
     	return MediaCommon.class;
     }
 
+    @POST
+    @Override
+    public Response create(@Context UriInfo ui,
+    		String xmlPayload) {
+    	Response response = null;
+    	PoxPayloadIn input = null;
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+    	String blobUri = queryParams.getFirst(BlobClient.BLOB_URI_PARAM);
+    	
+    	try {
+    		if (blobUri != null) {
+		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME, input);
+		    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+		    	blobInput.createBlobFile(blobUri);
+		    	response = this.create(input, ctx);
+    		} else {
+    			response = super.create(ui, xmlPayload);
+    		}
+    	} catch (Exception e) {
+    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+    	}
+    			
+		return response;
+    }    
+    
     @POST
     @Path("{csid}")
     @Consumes("multipart/form-data")
