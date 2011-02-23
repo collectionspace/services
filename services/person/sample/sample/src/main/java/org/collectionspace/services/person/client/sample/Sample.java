@@ -37,6 +37,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
@@ -225,7 +226,7 @@ public class Sample {
                 throw new RuntimeException("Unexpected Status when reading " +
                     "personAuthority, Status:"+ statusCode);
             }
-            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
             personAuthority = (PersonauthoritiesCommon) extractPart(input,
                     client.getCommonPartName(), PersonauthoritiesCommon.class);
         } catch (Exception e) {

@@ -4,24 +4,24 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.organization.client.sample</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.5-SNAPSHOT</version>
     <name>organization.client.sample</name>
     
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.organization.jaxb</artifactId>
-            <version>1.5-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
-            <version>1.5-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.organization.client</artifactId>
-            <version>1.5-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
     

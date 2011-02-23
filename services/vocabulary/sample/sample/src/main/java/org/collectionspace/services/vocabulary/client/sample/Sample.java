@@ -336,6 +336,8 @@ public class Sample {
     private Object extractPart(PoxPayloadIn input, String label,
         Class clazz) throws Exception {
         Object obj = null;
+        obj = input.getPart(label);
+        /*
         for(PayloadInputPart part : input.getParts()){
             String partLabel = part.getHeaders().getFirst("label");
             if(label.equalsIgnoreCase(partLabel)){
@@ -350,6 +352,7 @@ public class Sample {
                 break;
             }
         }
+        */
         return obj;
     }
 
