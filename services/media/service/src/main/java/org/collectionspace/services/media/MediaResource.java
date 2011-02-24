@@ -132,7 +132,7 @@ public class MediaResource extends ResourceBase {
 	    	//
 	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> mediaContext = createServiceContext();
 	    	BlobUtil.setBlobInput(mediaContext, blobInput); //and put the blobInput into the Media context
-	    	response = this.update(csid, input, mediaContext);
+	    	this.update(csid, input, mediaContext);
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
     	}
