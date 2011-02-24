@@ -115,9 +115,16 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
     }
     
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
-    public void createBlobFromURI(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
+    /**
+     * Looks in the .../src/test/resources/blobs directory for files from which to create Blob
+     * instances.
+     *
+     * @param testName the test name
+     * @param fromUri - if 'true' then send the service a URI from which to create the blob.
+     * @param fromUri - if 'false' then send the service a multipart/form-data POST from which to create the blob.
+     * @throws Exception the exception
+     */
+    protected void createBlob(String testName, boolean fromUri) throws Exception {
         setupCreate();
         BlobClient client = new BlobClient();
         
@@ -128,11 +135,18 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 	        File[] children = blobsDir.listFiles();
 	        if (children != null && children.length > 0) {
 	        	for (File child : children) {
-	        		if (child.isHidden() == false) {
+	        		if (isBlobbable(child) == true) {
+	        			ClientResponse<Response> res = null;
 		        		String mimeType = this.getMimeType(child);
 		        		logger.debug("Processing file URI: " + child.getAbsolutePath());
 		        		logger.debug("MIME type is: " + mimeType);
-			            ClientResponse<Response> res = client.createBlobFromURI(child.getAbsolutePath());
+		        		if (fromUri == true) {
+		        			res = client.createBlobFromURI(child.getAbsolutePath());
+		        		} else {
+				            MultipartFormDataOutput form = new MultipartFormDataOutput();
+				            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
+				            res = client.createBlobFromFormData(form);
+		        		}
 			            assertStatusCode(res, testName);
 			            if (isBlobCleanup() == true) {
 			            	allResourceIdsCreated.add(extractId(res));
@@ -144,42 +158,20 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 	        }
         } else {
         	logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
-        }        
+        }
+    }    
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
+    public void createBlobWithURI(String testName) throws Exception {
+        logger.debug(testBanner(testName, CLASS_NAME));
+    	createBlob(testName, true /*with URI*/);
     }
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"createBlobFromURI"})
-    public void createBlobwithPost(String testName) throws Exception {
+    		dependsOnMethods = {"createBlobWithURI"})
+    public void createBlobWithPost(String testName) throws Exception {
         logger.debug(testBanner(testName, CLASS_NAME));
-        setupCreate();
-        BlobClient client = new BlobClient();
-        
-        String currentDir = this.getResourceDir();
-        String blobsDirPath = currentDir + File.separator + BLOBS_DIR;
-        File blobsDir = new File(blobsDirPath);
-        if (blobsDir != null && blobsDir.exists()) {
-	        File[] children = blobsDir.listFiles();
-	        if (children != null && children.length > 0) {
-	        	for (File child : children) {
-	        		if (child.isHidden() == false) {
-		        		String mimeType = this.getMimeType(child);
-		        		logger.debug("Posting file: " + child.getAbsolutePath());
-		        		logger.debug("MIME type is: " + mimeType);
-			            MultipartFormDataOutput form = new MultipartFormDataOutput();
-			            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
-			            ClientResponse<Response> res = client.createBlobFromFormData(form);
-			            assertStatusCode(res, testName);
-			            if (blobCleanup == true) {
-			            	allResourceIdsCreated.add(extractId(res));
-			            }
-	        		}
-	        	}
-	        } else {
-	        	logger.debug("Directory: " + blobsDirPath + " is empty or cannot be read.");
-	        }
-        } else {
-        	logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
-        }
+    	createBlob(testName, false /*with POST*/);
     }
 
     @Override

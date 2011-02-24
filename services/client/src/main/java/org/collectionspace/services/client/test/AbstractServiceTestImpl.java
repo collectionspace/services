@@ -108,6 +108,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     }
     
     
+    
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     //
@@ -129,6 +130,21 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         EXPECTED_STATUS_CODE = STATUS_CREATED;
         REQUEST_TYPE = ServiceRequestType.CREATE;
         testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE);
+    }
+    
+    /**
+     * Checks if 'theFile' is something we can turn into a Blob instance.  It can't
+     * be read-protected, hidden, or a directory.
+     *
+     * @param theFile the the file
+     * @return true, if is blobable
+     */
+    protected boolean isBlobbable(File theFile) {
+    	boolean result = true;
+    	if (theFile.isDirectory() || theFile.isHidden() || !theFile.canRead()) {
+    		result = false;
+    	}
+    	return result;
     }
 
     /* (non-Javadoc)

@@ -34,11 +34,13 @@ public interface MediaProxy extends CollectionSpaceProxy {
     @POST
     @Path("/{csid}")
     @Consumes("multipart/form-data")
-    ClientResponse<Response> createBlobFromFormData(String csid,
+    ClientResponse<Response> createBlobFromFormData(@PathParam("csid") String csid,
     		MultipartFormDataOutput formDataOutput);
     
     @POST
     @Path("/{csid}")
+	@Produces("application/xml")
+	@Consumes("application/xml")
     ClientResponse<Response>createBlobFromUri(@PathParam("csid") String csid,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri);
 

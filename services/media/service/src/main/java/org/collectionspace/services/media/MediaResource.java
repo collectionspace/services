@@ -117,6 +117,8 @@ public class MediaResource extends ResourceBase {
     
     @POST
     @Path("{csid}")
+    @Consumes("application/xml")
+    @Produces("application/xml")    
     public Response createBlobWithUri(@PathParam("csid") String csid,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri) {
     	Response response = null;
@@ -143,25 +145,31 @@ public class MediaResource extends ResourceBase {
     @POST
     @Path("{csid}")
     @Consumes("multipart/form-data")
+    @Produces("application/xml")
     public Response createBlob(@Context HttpServletRequest req,
     		@PathParam("csid") String csid,
-    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri) { //FIXME: REM - Do we really need the blobUri query param here?
+    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri) {
     	PoxPayloadIn input = null;
-    	Response response = null;    	
+    	Response response = null;
     	try {
-    		//
-    		// First, create the blob
-    		//
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME, input);
-	    	BlobInput blobInput = BlobUtil.getBlobInput(blobContext);
-	    	blobInput.createBlobFile(req, blobUri);
-	    	response = this.create(input, blobContext);
-	    	//
-	    	// Next, update the Media record to be linked to the blob
-	    	//
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> mediaContext = createServiceContext();
-	    	BlobUtil.setBlobInput(mediaContext, blobInput); //and put the blobInput into the Media context
-	    	this.update(csid, input, mediaContext);
+    		if (blobUri == null) {
+	    		//
+	    		// First, create the blob
+	    		//
+		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME, input);
+		    	BlobInput blobInput = BlobUtil.getBlobInput(blobContext);
+		    	blobInput.createBlobFile(req, null);
+		    	response = this.create(input, blobContext);
+		    	//
+		    	// Next, update the Media record to be linked to the blob
+		    	//
+		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> mediaContext = createServiceContext();
+		    	BlobUtil.setBlobInput(mediaContext, blobInput); //and put the blobInput into the Media context
+		    	this.update(csid, input, mediaContext);
+    		} else {
+    			//A URI query param overrides the incoming multipart/form-data payload in the request
+    			response = createBlobWithUri(csid, blobUri);
+    		}
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
     	}

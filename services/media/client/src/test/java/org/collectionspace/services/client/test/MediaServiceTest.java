@@ -36,6 +36,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.MediaCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
+import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -112,10 +114,16 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
-    public void createWithBlobUri(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        
+    /**
+     * Looks in the .../src/test/resources/blobs directory for files from which to create Blob
+     * instances.
+     *
+     * @param testName the test name
+     * @param fromUri - if 'true' then send the service a URI from which to create the blob.
+     * @param fromUri - if 'false' then send the service a multipart/form-data POST from which to create the blob.
+     * @throws Exception the exception
+     */    
+    public void createBlob(String testName, boolean fromUri) throws Exception {
         setupCreate();
         MediaClient client = new MediaClient();
         PoxPayloadOut multipart = createMediaInstance(createIdentifier());
@@ -130,17 +138,31 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
 	        File[] children = blobsDir.listFiles();
 	        if (children != null && children.length > 0) {
 	        	File blobFile = null;
+	        	//
+	        	// Since Media records can have only a single associated blob,
+	        	// we'll stop after we find a valid candidate
+	        	//
 	        	for (File child : children) {
-	        		if (child.isHidden() == false) {
+	        		if (isBlobbable(child) == true) {
 	        			blobFile = child;
 	        			break;
 	        		}
 	        	}
+	        	//
+	        	// If we found a good blob candidate file, then try to create the blob record
+	        	//
 	        	if (blobFile != null) {
+	        		ClientResponse<Response> res = null;
 	        		String mimeType = this.getMimeType(blobFile);
 	        		logger.debug("Processing file URI: " + blobFile.getAbsolutePath());
 	        		logger.debug("MIME type is: " + mimeType);
-		            ClientResponse<Response> res = client.createBlobFromUri(mediaCsid, blobFile.getAbsolutePath());
+	        		if (fromUri == true) {
+	        			res = client.createBlobFromUri(mediaCsid, blobFile.getAbsolutePath());
+	        		} else {
+			            MultipartFormDataOutput formData = new MultipartFormDataOutput();
+			            OutputPart outputPart = formData.addFormData("file", blobFile, MediaType.valueOf(mimeType));
+			            res = client.createBlobFromFormData(mediaCsid, formData);
+	        		}
 		            assertStatusCode(res, testName);
 		            if (isMediaCleanup() == true) {
 		            	allResourceIdsCreated.add(extractId(res));
@@ -157,13 +179,19 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         }        
     }
     
-//    String noTest = System.getProperty("noTestCleanup");
-//	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("Skipping Cleanup phase ...");
-//        }
-//        return;
-//	}
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, 
+    		dependsOnMethods = {"create"})
+    public void createWithBlobUri(String testName) throws Exception {
+        logger.debug(testBanner(testName, CLASS_NAME));
+        createBlob(testName, true /*with URI*/);
+    }
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, 
+    		dependsOnMethods = {"createWithBlobUri"})
+    public void createWithBlobPost(String testName) throws Exception {
+        logger.debug(testBanner(testName, CLASS_NAME));
+        createBlob(testName, false /*with POST*/);
+    }
     
 //    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update"})
 //    public void updateWithBlob(String testName) throws Exception {
@@ -178,7 +206,6 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
 //        
 //        allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
 //    }
-    
 
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
