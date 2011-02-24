@@ -63,6 +63,7 @@
     <xs:element name="originalObjectPurchasePriceCurrency" type="xs:string"/>
     <xs:element name="originalObjectPurchasePriceValue" type="xs:string"/>
     <xs:element name="transferOfTitleNumber" type="xs:string"/>
+    <xs:element name="creditLine" type="xs:string"/>
 
     <!-- Object Collection Information Group -->
 

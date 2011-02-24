@@ -200,7 +200,7 @@
 
     <!-- Misc Object Description Information -->
 
-    <xs:element name="objectStatus" type="xs:string"/>
+    <xs:element name="objectStatusList" type="objectStatusList" />	
     <xs:element name="phase" type="xs:string"/>
     <xs:element name="physicalDescription" type="xs:string"/>
     <xs:element name="sex" type="xs:string"/>
@@ -342,15 +342,8 @@
     <xs:element name="viewersContributionNote" type="xs:string"/>
 
     <!-- Reference Information -->
-
-    <xs:element name="references">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="reference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="catalogNumber" type="xs:string"/>
+    
+    <xs:element name="referenceGroupList" type="referenceGroupList"/>
 
     <!--  Object Collection Information Group -->
 
@@ -505,6 +498,12 @@
             <xs:element name="materialSource" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
+    
+	<xs:complexType name="objectStatusList">
+		<xs:sequence>
+			<xs:element name="objectStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
 
     <xs:complexType name="technicalAttributeGroupList">
         <xs:sequence>
@@ -740,6 +739,19 @@
             <xs:element name="usageNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
+    
+	<xs:complexType name="referenceGroupList">
+		<xs:sequence>
+			<xs:element name="referenceGroup" type="referenceGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	 
+	<xs:complexType name="referenceGroup">
+		<xs:sequence>
+			<xs:element name="reference" type="xs:string"/>
+			<xs:element name="referenceNote" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
     
     <!-- Object Description Date Information -->
     <!-- This appears to be a placeholder structured date -->
