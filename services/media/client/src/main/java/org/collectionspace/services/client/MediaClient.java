@@ -24,6 +24,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -128,10 +129,20 @@ public class MediaClient extends AbstractServiceClientImpl {
      * @return
      *
      */
-    public ClientResponse<Response> createBlob(String csid, String blobUri) {
-        return mediaProxy.createBlob(csid, blobUri);
+    public ClientResponse<Response> createBlobFromFormData(String csid,
+    		MultipartFormDataOutput formDataOutput) {
+        return mediaProxy.createBlobFromFormData(csid, formDataOutput);
     }    
 
+    /**
+     * @param media
+     * @return
+     *
+     */
+    public ClientResponse<Response> createBlobFromUri(String csid, String blobUri) {
+        return mediaProxy.createBlobFromUri(csid, blobUri);
+    }    
+    
     /**
      * @param csid
      * @param media

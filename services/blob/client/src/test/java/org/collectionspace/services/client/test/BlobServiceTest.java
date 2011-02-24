@@ -57,7 +57,6 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
     private final String CLASS_NAME = BlobServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     private String knownResourceId = null;
-    private static final String BLOBS_DIR = "blobs";
     
     private boolean blobCleanup = true;
 
@@ -96,7 +95,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
     	}
     }
     
-    private boolean blobCleanup() {
+    private boolean isBlobCleanup() {
     	return blobCleanup;
     }
     
@@ -129,14 +128,16 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 	        File[] children = blobsDir.listFiles();
 	        if (children != null && children.length > 0) {
 	        	for (File child : children) {
-	        		String mimeType = this.getMimeType(child);
-	        		logger.debug("Processing file URI: " + child.getAbsolutePath());
-	        		logger.debug("MIME type is: " + mimeType);
-		            ClientResponse<Response> res = client.createBlobFromURI(child.getAbsolutePath());
-		            assertStatusCode(res, testName);
-		            if (blobCleanup == true) {
-		            	allResourceIdsCreated.add(extractId(res));
-		            }
+	        		if (child.isHidden() == false) {
+		        		String mimeType = this.getMimeType(child);
+		        		logger.debug("Processing file URI: " + child.getAbsolutePath());
+		        		logger.debug("MIME type is: " + mimeType);
+			            ClientResponse<Response> res = client.createBlobFromURI(child.getAbsolutePath());
+			            assertStatusCode(res, testName);
+			            if (isBlobCleanup() == true) {
+			            	allResourceIdsCreated.add(extractId(res));
+			            }
+	        		}
 	        	}
 	        } else {
 	        	logger.debug("Directory: " + blobsDirPath + " is empty or cannot be read.");
@@ -160,16 +161,18 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 	        File[] children = blobsDir.listFiles();
 	        if (children != null && children.length > 0) {
 	        	for (File child : children) {
-	        		String mimeType = this.getMimeType(child);
-	        		logger.debug("Posting file: " + child.getAbsolutePath());
-	        		logger.debug("MIME type is: " + mimeType);
-		            MultipartFormDataOutput form = new MultipartFormDataOutput();
-		            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
-		            ClientResponse<Response> res = client.createBlobFromFormData(form);
-		            assertStatusCode(res, testName);
-		            if (blobCleanup == true) {
-		            	allResourceIdsCreated.add(extractId(res));
-		            }
+	        		if (child.isHidden() == false) {
+		        		String mimeType = this.getMimeType(child);
+		        		logger.debug("Posting file: " + child.getAbsolutePath());
+		        		logger.debug("MIME type is: " + mimeType);
+			            MultipartFormDataOutput form = new MultipartFormDataOutput();
+			            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
+			            ClientResponse<Response> res = client.createBlobFromFormData(form);
+			            assertStatusCode(res, testName);
+			            if (blobCleanup == true) {
+			            	allResourceIdsCreated.add(extractId(res));
+			            }
+	        		}
 	        	}
 	        } else {
 	        	logger.debug("Directory: " + blobsDirPath + " is empty or cannot be read.");

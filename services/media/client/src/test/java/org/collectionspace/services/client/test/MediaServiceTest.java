@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.io.File;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -53,6 +54,28 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
     private final Logger logger = LoggerFactory.getLogger(MediaServiceTest.class);
     private String knownResourceId = null;
 
+    private boolean mediaCleanup = true;
+    
+    /**
+     * Sets up create tests.
+     */
+    @Override
+	protected void setupCreate() {
+        super.setupCreate();
+        String noMediaCleanup = System.getProperty(NO_MEDIA_CLEANUP);
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noMediaCleanup)) {
+    		//
+    		// Don't delete the blobs that we created during the test cycle
+    		//
+            this.mediaCleanup = false;
+    	}
+    }
+    
+    private boolean isMediaCleanup() {
+    	return mediaCleanup;
+    }
+
+    
     @Override
 	public String getServicePathComponent() {
 		return MediaClient.SERVICE_PATH_COMPONENT;
@@ -87,6 +110,51 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ": knownResourceId=" + knownResourceId);
         }
         allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
+    public void createWithBlobUri(String testName) throws Exception {
+        logger.debug(testBanner(testName, CLASS_NAME));
+        
+        setupCreate();
+        MediaClient client = new MediaClient();
+        PoxPayloadOut multipart = createMediaInstance(createIdentifier());
+        ClientResponse<Response> mediaRes = client.create(multipart);
+        assertStatusCode(mediaRes, testName);
+        String mediaCsid = extractId(mediaRes);
+        
+        String currentDir = this.getResourceDir();
+        String blobsDirPath = currentDir + File.separator + BLOBS_DIR;
+        File blobsDir = new File(blobsDirPath);
+        if (blobsDir != null && blobsDir.exists()) {
+	        File[] children = blobsDir.listFiles();
+	        if (children != null && children.length > 0) {
+	        	File blobFile = null;
+	        	for (File child : children) {
+	        		if (child.isHidden() == false) {
+	        			blobFile = child;
+	        			break;
+	        		}
+	        	}
+	        	if (blobFile != null) {
+	        		String mimeType = this.getMimeType(blobFile);
+	        		logger.debug("Processing file URI: " + blobFile.getAbsolutePath());
+	        		logger.debug("MIME type is: " + mimeType);
+		            ClientResponse<Response> res = client.createBlobFromUri(mediaCsid, blobFile.getAbsolutePath());
+		            assertStatusCode(res, testName);
+		            if (isMediaCleanup() == true) {
+		            	allResourceIdsCreated.add(extractId(res));
+		            	allResourceIdsCreated.add(mediaCsid);
+		            }
+	        	} else {
+	        		logger.debug("Directory: " + blobsDirPath + " contains no readable files.");
+	        	}
+	        } else {
+	        	logger.debug("Directory: " + blobsDirPath + " is empty or cannot be read.");
+	        }
+        } else {
+        	logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
+        }        
     }
     
 //    String noTest = System.getProperty("noTestCleanup");

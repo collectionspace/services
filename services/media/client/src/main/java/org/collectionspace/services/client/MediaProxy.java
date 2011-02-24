@@ -17,13 +17,14 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.BlobClient;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
 /**
  * @version $Revision: 2108 $
  */
 @Path(MediaClient.SERVICE_PATH + "/")
-@Produces({"application/xml", "multipart/mixed"})
-@Consumes({"application/xml", "multipart/mixed"})
+@Produces("application/xml")
+@Consumes("application/xml")
 public interface MediaProxy extends CollectionSpaceProxy {
 
     //(C)reate
@@ -31,9 +32,14 @@ public interface MediaProxy extends CollectionSpaceProxy {
     ClientResponse<Response> create(byte[] xmlPayload);
     
     @POST
-    @Path("{csid}")
-    @Produces("multipart/form-data")    
-    ClientResponse<Response>createBlob(@PathParam("csid") String csid,
+    @Path("/{csid}")
+    @Consumes("multipart/form-data")
+    ClientResponse<Response> createBlobFromFormData(String csid,
+    		MultipartFormDataOutput formDataOutput);
+    
+    @POST
+    @Path("/{csid}")
+    ClientResponse<Response>createBlobFromUri(@PathParam("csid") String csid,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri);
 
     //(R)ead
