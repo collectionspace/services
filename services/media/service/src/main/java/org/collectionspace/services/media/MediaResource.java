@@ -25,6 +25,7 @@ package org.collectionspace.services.media;
 
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.MediaClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
@@ -36,12 +37,14 @@ import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+import org.jboss.resteasy.util.HttpResponseCodes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -62,10 +65,15 @@ import java.util.List;
 @Produces("application/xml")
 public class MediaResource extends ResourceBase {
     final Logger logger = LoggerFactory.getLogger(MediaResource.class);
+    final static MediaClient mediaClient = new MediaClient();
 
     @Override
     public String getServiceName(){
         return MediaClient.SERVICE_NAME;
+    }
+    
+    public String getCommonPartName() {
+    	return mediaClient.getCommonPartName();
     }
     
     private BlobResource blobResource = new BlobResource();
@@ -125,7 +133,7 @@ public class MediaResource extends ResourceBase {
     	PoxPayloadIn input = null;
     	
     	try {
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME, input);
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(BlobClient.SERVICE_NAME, input);
 	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 	    	blobInput.createBlobFile(blobUri);
 	    	response = this.create(input, ctx);
@@ -267,4 +275,41 @@ public class MediaResource extends ResourceBase {
 	    
     	return result;
     }
+    
+    @DELETE
+    @Path("{csid}")
+    @Override
+    public Response delete(@PathParam("csid") String csid) {
+        try {
+        	//
+        	// First, the media record so we can find and delete any related
+        	// Blob instances.
+        	//
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+        	PoxPayloadOut mediaPayload = this.get(csid, ctx);
+        	PayloadOutputPart mediaPayloadPart = mediaPayload.getPart(getCommonPartName());
+        	MediaCommon mediaCommon = (MediaCommon) mediaPayloadPart.getBody();
+        	String blobCsid = mediaCommon.getBlobCsid();
+        	//
+        	// Delete the blob if it exists.
+        	//
+        	if (blobCsid != null && !blobCsid.isEmpty()) {
+        		Response response = getBlobResource().delete(blobCsid);
+        		if (logger.isDebugEnabled() == true) {
+        			if (response.getStatus() != HttpResponseCodes.SC_OK) {
+        				logger.debug("Problem deleting related blob record of Media record: " +
+        						"Media CSID=" + csid + " " +
+        						"Blob CSID=" + blobCsid);
+        			}
+        		}
+        	}
+        	//
+        	// Now that we've handled the related Blob record, delete the Media record
+        	//
+            return super.delete(csid, ctx);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
+        }
+    }
+    
 }

@@ -235,7 +235,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     }
       
     /**
-     * Attempts to marshal a DOM4j element into an instance of a JAXB object
+     * Attempts to marshal a DOM4j element (for a part) into an instance of a JAXB object
      *
      * @param elementInput the element input
      * @return the object
@@ -259,7 +259,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     }
 	
     /**
-     * Attempts to unmarshal a JAXB object to a DOM4j element.
+     * Attempts to unmarshal a JAXB object (for a part) to a DOM4j element.
      *
      * @param jaxbObject the jaxb object
      * @return the element
@@ -288,7 +288,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     }
     
     /**
-     * Attempts to unmarshal a JAXB object to a DOM4j element.
+     * Attempts to unmarshal a JAXB object (for a part) to a DOM4j element.
      *
      * @param jaxbObject the jaxb object
      * @return the element

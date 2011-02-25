@@ -60,7 +60,12 @@ public abstract class PayloadPart {
 	}
 	
 	public Object getBody() {
-		return body;
+		Object result = body;
+		if (result == null) {
+			body = PoxPayload.toObject(this.getElementBody());
+			result = body;
+		}
+		return result;
 	}
 	
 	public Element getElementBody() {
