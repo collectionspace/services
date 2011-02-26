@@ -163,7 +163,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     	String commonSchema = getServiceContext().getCommonPartLabel();
     	CommonList commonList = new CommonList();
         extractPagingInfo(commonList, wrapDoc);
-        List<ListResultField> resultsFields = getListItemsArray();
+        List<ListResultField> resultsFields = getListItemsArray(); 
         int nFields = resultsFields.size()+2;
         String fields[] = new String[nFields];
         fields[0] = "csid";

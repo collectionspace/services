@@ -110,6 +110,7 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
+import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.blob.BlobsCommon;
 //import org.collectionspace.services.blob.BlobsCommonList;
@@ -222,8 +223,18 @@ public class NuxeoImageUtils {
 
 	static public CommonList getBlobDerivatives(RepositoryInstance repoSession,
 			String repositoryId,
+			List<ListResultField> resultsFields,
 			String uri) throws Exception {
 		CommonList commonList = new CommonList();
+        int nFields = resultsFields.size()+2;
+        String fields[] = new String[nFields];//FIXME: REM - Patrick will fix this.
+        fields[0] = "csid";
+        fields[1] = "uri";
+        for(int i=2;i<nFields;i++) {
+        	ListResultField field = resultsFields.get(i-2); 
+        	fields[i]=field.getElement();
+        }
+		commonList.setFieldsReturned(fields);
 
 		IdRef documentRef = new IdRef(repositoryId);
 		DocumentModel documentModel = repoSession.getDocument(documentRef);		

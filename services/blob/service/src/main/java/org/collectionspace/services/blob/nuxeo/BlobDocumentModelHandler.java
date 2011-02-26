@@ -31,6 +31,7 @@ import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
+import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -111,8 +112,9 @@ extends DocHandlerBase<BlobsCommon> {
 		String blobRepositoryId = blobsCommon.getRepositoryId(); //cache the value to pass to the blob retriever
 		
 		if (blobInput.isDerivativeListRequested() == true) {
+	        List<ListResultField> resultsFields = getListItemsArray();
 			CommonList blobsCommonList = NuxeoImageUtils.getBlobDerivatives(
-					repoSession, blobRepositoryId, getDerivativePathBase(docModel));
+					repoSession, blobRepositoryId, resultsFields, getDerivativePathBase(docModel));
 //			ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, blobsCommonList);
 			blobInput.setDerivativeList(blobsCommonList);
 			return;  //FIXME: Don't like this exit point.  Perhaps derivatives should be a sub-resource?
