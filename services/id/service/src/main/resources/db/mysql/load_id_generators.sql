@@ -363,6 +363,49 @@ loaned out of the institution.',
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
 
+-- MEDIA_RESOURCE_IDENTIFICATION_NUMBER
+
+INSERT INTO `id_generators`
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  VALUES
+    ('cd91d8b8-f346-4925-a425-93e02bd1c5c9',
+     'Media Resource Identification Number',
+     'Unambiguously identifies a media resource within a given context.
+Recommended best practice is to identify the resource by means of a string
+conforming to a formal identification system.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>MR</initialValue>
+      <currentValue>MR</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>');
+
+
 -- MOVEMENT_REFERENCE_NUMBER
 
 INSERT INTO `id_generators`
