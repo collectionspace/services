@@ -36,56 +36,76 @@
                 <xs:element name="copyrightStatement" type="xs:string"/>
                 <xs:element name="coverage" type="xs:string"/>
                 <xs:element name="creator" type="xs:string"/>
-                <xs:element name="dates" type="dates"/>
+                <xs:element name="dateList" type="dateList"/>
                 <xs:element name="dateCreated" type="xs:string"/>
                 <xs:element name="dateModified" type="xs:string"/>
                 <xs:element name="description" type="xs:string"/>
-                <xs:element name="dimensions" type="dimensions"/>
+                <xs:element name="dimensionSummary" type="xs:string"/>
+                <xs:element name="dimensionGroupList" type="dimensionGroupList"/>
                 <xs:element name="filename" type="xs:string"/>
                 <xs:element name="format" type="xs:string"/>
                 <xs:element name="identificationNumber" type="xs:string"/>
-                <xs:element name="languages" type="languages"/>
+                <xs:element name="languageList" type="languageList"/>
                 <xs:element name="location" type="xs:string"/>
                 <xs:element name="publisher" type="xs:string"/>
-                <xs:element name="relation" type="xs:string"/>
+                <xs:element name="relationList" type="relationList"/>
                 <xs:element name="rightsHolder" type="xs:string"/>
                 <xs:element name="source" type="xs:string"/>
-                <xs:element name="subjects" type="subjects"/>
+                <xs:element name="subjectList" type="subjectList"/>
                 <xs:element name="title" type="xs:string"/>
-                <xs:element name="type" type="xs:string"/>
+                <xs:element name="typeList" type="typeList"/>
                 <xs:element name="uri" type="xs:string" />
                 <xs:element name="blobCsid" type="xs:string" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
-    <xs:complexType name="dates">
+    <xs:complexType name="dateList">
         <xs:sequence>
             <xs:element name="date" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="dimensions">
+    <xs:complexType name="dimensionGroupList">
         <xs:sequence>
-            <xs:element name="dimension" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="dimensionGroup" type="dimensionGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="dimensionGroup">
+        <xs:sequence>
+            <xs:element name="measuredPart" type="xs:string"/>
+            <xs:element name="dimension" type="xs:string"/>
+            <xs:element name="measuredBy" type="xs:string"/>
+            <xs:element name="measurementUnit" type="xs:string"/>
+            <xs:element name="measurementMethod" type="xs:string"/>
+            <xs:element name="value" type="xs:string"/>
+            <xs:element name="valueDate" type="xs:string"/>
+            <xs:element name="valueQualifier" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="languages">
+    <xs:complexType name="languageList">
         <xs:sequence>
             <xs:element name="language" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="relations">
+    <xs:complexType name="relationList">
         <xs:sequence>
             <xs:element name="relation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="subjects">
+    <xs:complexType name="subjectList">
         <xs:sequence>
             <xs:element name="subject" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="typeList">
+        <xs:sequence>
+            <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
