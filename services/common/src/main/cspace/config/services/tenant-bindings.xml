@@ -627,7 +627,7 @@
                         <types:item><types:key>authRef</types:key><types:value>creator</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>publisher</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>rightsHolder</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>subjects|subject</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>subjectList|subject</types:value></types:item>
                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -2299,13 +2299,13 @@
                               versionable="true" auditable="false"
                               label="media_common" updated="" order="1">
 
-                    <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>contributor</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>coverage</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>creator</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>publisher</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>rightsHolder</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>subjects|subject</types:value></types:item>
+                        <service:properties>
+                            <types:item><types:key>authRef</types:key><types:value>contributor</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>coverage</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>creator</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>publisher</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>rightsHolder</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>subjectList|subject</types:value></types:item>
                    </service:properties>
 
                     <service:content contentType="application/xml">
