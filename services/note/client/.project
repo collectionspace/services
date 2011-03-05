@@ -2,9 +2,12 @@
   <name>org.collectionspace.services.note.client</name>
   <comment>NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects>
-	<project>org.collectionspace.services.client</project>
+    <project>org.collectionspace.services.3rdparty.nuxeo.quote-api</project>
+    <project>org.collectionspace.services.client</project>
+    <project>org.collectionspace.services.common</project>
+    <project>org.collectionspace.services.hyperjaxb</project>
     <project>org.collectionspace.services.jaxb</project>
-	<project>org.collectionspace.services.note.jaxb</project>
+    <project>org.collectionspace.services.note.jaxb</project>
   </projects>
   <buildSpec>
     <buildCommand>

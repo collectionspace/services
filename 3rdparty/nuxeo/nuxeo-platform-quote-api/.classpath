@@ -1,7 +1,7 @@
 <classpath>
   <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
   <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="var" path="M2_REPO/jboss/jboss-common/4.0.4.GA/jboss-common-4.0.4.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/jboss/jboss-remoting/2.2.2.SP8/jboss-remoting-2.2.2.SP8.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/common/nuxeo-common/1.6.2/nuxeo-common-1.6.2.jar"/>

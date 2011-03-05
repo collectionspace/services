@@ -3,7 +3,7 @@
   <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
   <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
   <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="var" path="M2_REPO/javax/ejb/ejb-api/3.0/ejb-api-3.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/jcr/jcr/1.0.1/jcr-1.0.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/jms/jms/1.1/jms-1.1.jar"/>

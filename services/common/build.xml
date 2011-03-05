@@ -216,8 +216,8 @@
 
         <antcall target="dist_spring" />
         <copy todir="${services.trunk}/${dist.server.cspace}/cspace/config/services">
-            <fileset dir="${basedir}/src/main/cspace/config"/>
-        </copy>
+            <fileset dir="${basedir}/src/main/cspace/config/services"/>
+        </copy>		
     </target>
 
 </project>

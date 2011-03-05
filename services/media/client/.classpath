@@ -3,7 +3,7 @@
   <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
   <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
   <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar" sourcepath="M2_REPO/javax/activation/activation/1.1/activation-1.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/media/jai_core/1.1.2_01/jai_core-1.1.2_01.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/xml/bind/jaxb-api/2.1/jaxb-api-2.1.jar" sourcepath="M2_REPO/javax/xml/bind/jaxb-api/2.1/jaxb-api-2.1-sources.jar"/>
@@ -220,6 +220,7 @@
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/runtime/nuxeo-runtime-osgi/1.6.2/nuxeo-runtime-osgi-1.6.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/net/java/dev/mistral/Operations/0.9.5/Operations-0.9.5.jar"/>
   <classpathentry kind="src" path="/org.collectionspace.services.3rdparty.nuxeo.quote-api"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.blob.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.common"/>
   <classpathentry kind="src" path="/org.collectionspace.services.contact.client"/>

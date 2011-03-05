@@ -82,7 +82,7 @@
   <classpathentry kind="var" path="M2_REPO/net/java/dev/mistral/JAI-Adapter/0.9.5/JAI-Adapter-0.9.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/media/jai_codec/1.1.2_01/jai_codec-1.1.2_01.jar"/>
   <classpathentry kind="var" path="M2_REPO/cup/java-cup/0.11a/java-cup-0.11a.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javassist/javassist/3.6.0.GA/javassist-3.6.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javassist/javassist/3.4.GA/javassist-3.4.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/xml/bind/jaxb-impl/2.1.9/jaxb-impl-2.1.9.jar" sourcepath="M2_REPO/com/sun/xml/bind/jaxb-impl/2.1.9/jaxb-impl-2.1.9-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/xml/bind/jaxb-xjc/2.1/jaxb-xjc-2.1.jar" sourcepath="M2_REPO/com/sun/xml/bind/jaxb-xjc/2.1/jaxb-xjc-2.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jvnet/jaxb2_commons/jaxb2-basics-runtime/0.5.2/jaxb2-basics-runtime-0.5.2.jar" sourcepath="M2_REPO/org/jvnet/jaxb2_commons/jaxb2-basics-runtime/0.5.2/jaxb2-basics-runtime-0.5.2-sources.jar">

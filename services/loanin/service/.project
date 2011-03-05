@@ -1,25 +1,25 @@
 <projectDescription>
-	<name>org.collectionspace.services.loanin.service</name>
+  <name>org.collectionspace.services.loanin.service</name>
   <comment>NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
-	<projects>
+  <projects>
     <project>org.collectionspace.services.3rdparty.nuxeo.quote-api</project>
     <project>org.collectionspace.services.client</project>
     <project>org.collectionspace.services.collectionobject.jaxb</project>
-		<project>org.collectionspace.services.common</project>
+    <project>org.collectionspace.services.common</project>
     <project>org.collectionspace.services.hyperjaxb</project>
-		<project>org.collectionspace.services.jaxb</project>
+    <project>org.collectionspace.services.jaxb</project>
     <project>org.collectionspace.services.loanin.jaxb</project>
-	</projects>
-	<buildSpec>
-		<buildCommand>
-			<name>org.eclipse.jdt.core.javabuilder</name>
-		</buildCommand>
-		<buildCommand>
-			<name>org.maven.ide.eclipse.maven2Builder</name>
-		</buildCommand>
-	</buildSpec>
-	<natures>
-		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>org.maven.ide.eclipse.maven2Nature</nature>
-	</natures>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+    <buildCommand>
+      <name>org.maven.ide.eclipse.maven2Builder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+    <nature>org.maven.ide.eclipse.maven2Nature</nature>
+  </natures>
 </projectDescription>

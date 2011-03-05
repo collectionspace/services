@@ -96,6 +96,20 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     private void setCollectionSpaceCoreValues(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             DocumentModel documentModel,
             Action action) throws ClientException {
+    	//
+    	// Add the CSID to the DublinCore title so we can see the CSID in the default
+    	// Nuxeo webapp.
+    	//
+    	try {
+	        documentModel.setProperty("dublincore",
+	                "title",
+	                documentModel.getName());
+    	} catch (Exception x) {
+    		if (logger.isWarnEnabled() == true) {
+    			logger.warn("Could not set the Dublin Core 'title' field on document CSID:" +
+    					documentModel.getName());
+    		}
+    	}
         //
         // Add the tenant ID value to the new entity
         //
