@@ -171,19 +171,23 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
     // Even as the current hack, this logic should reside in Field, not here.
 
     private String getDatabaseName(Field field) {
-        String databaseName = field.getTable();
-        String[] databaseAndTable = databaseName.split("\\.", 2);
-        if (! databaseAndTable[0].isEmpty()) {
-            databaseName = databaseAndTable[0];
+        String databaseName = "";
+        String[] databaseAndTableNames = field.getTable().split("\\.", 2);
+        if (! databaseAndTableNames[0].isEmpty()) {
+            databaseName = databaseAndTableNames[0];
+        } else {
+            databaseName = field.getTable();
         }
         return databaseName;
     }
 
     private String getTableName(Field field) {
-        String tableName = field.getTable();
-        String[] databaseAndTable = tableName.split("\\.", 2);
-        if (! databaseAndTable[1].isEmpty()) {
-            tableName = databaseAndTable[1];
+        String tableName = "";
+        String[] databaseAndTableNames = field.getTable().split("\\.", 2);
+        if (! databaseAndTableNames[1].isEmpty()) {
+            tableName = databaseAndTableNames[1];
+        } else {
+            tableName = field.getTable();
         }
         return tableName;
     }
