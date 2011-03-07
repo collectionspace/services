@@ -122,11 +122,11 @@ public class AddIndices extends InitHandler implements IInitHandler {
             // mechanism for retrieving and populating catalog/DDL-type SQL statements
             // appropriate to a particular database product.
             if (databaseProductType == DatabaseProductType.MYSQL) {
-                 logger.trace("Creating index for column " + columnName + " in table " + tableName);
+                 logger.info("Creating index for column " + columnName + " in table " + tableName);
                  sql = "CREATE INDEX " + indexName + " ON " + tableName + " (" + columnName + ")";
             } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-                 logger.trace("Creating index for column " + columnName + " in table " + tableName);
-                sql = "CREATE INDEX ON " + tableName + " (" + columnName + ")";
+                 logger.info("Creating index for column " + columnName + " in table " + tableName);
+                 sql = "CREATE INDEX ON " + tableName + " (" + columnName + ")";
             } else {
                 throw new Exception("Unrecognized database system " + databaseProductType);
             }

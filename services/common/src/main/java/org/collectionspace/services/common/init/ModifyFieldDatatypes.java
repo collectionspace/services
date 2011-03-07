@@ -72,11 +72,13 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                 // mechanism for retrieving and populating catalog/DDL-type SQL statements
                 // appropriate to a particular database product.
                 if (databaseProductType == DatabaseProductType.MYSQL) {
-                    logger.trace("Modifying field " + field.getTable() + "."
+                    logger.info("Modifying field " + field.getTable() + "."
                             + field.getCol() + " to datatype " + datatype);
                     sql = "ALTER TABLE " + field.getTable() + " MODIFY COLUMN " + field.getCol() + " " + datatype;
                 } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-                        sql = "ALTER TABLE " + field.getTable() + " ALTER COLUMN " + field.getCol() + " " + datatype;
+                    logger.info("Modifying field " + field.getTable() + "."
+                            + field.getCol() + " to datatype " + datatype);
+                    sql = "ALTER TABLE " + field.getTable() + " ALTER COLUMN " + field.getCol() + " " + datatype;
                 } else {
                     throw new Exception("Unrecognized database system.");
                 }
