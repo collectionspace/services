@@ -17,6 +17,12 @@
  */
 package org.collectionspace.services.common.init;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+
 import org.collectionspace.services.common.Tools;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.InitHandler.Params.Field;
@@ -26,13 +32,6 @@ import org.collectionspace.services.common.storage.JDBCTools;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import java.util.List;
 
 /**
  * AddIndices, post-init action to add indexes to the database.
@@ -112,34 +111,32 @@ public class AddIndices extends InitHandler implements IInitHandler {
         String indexName = columnName + INDEX_SUFFIX;
         try {
             DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType();
+            if (indexExists(databaseProductType, tableName, indexName)) {
+                logger.trace("Index already exists for column " + columnName
+                        + " in table " + tableName);
+                // FIXME: Can add the option to drop and re-create an index here.
+                // For example, see MySQL documentation on DROP INDEX.
+                return 0;
+            }
             // TODO: Consider refactoring this 'if' statement to a general-purpose
             // mechanism for retrieving and populating catalog/DDL-type SQL statements
             // appropriate to a particular database product.
             if (databaseProductType == DatabaseProductType.MYSQL) {
-                // If the index already exists, do nothing.
-                if (indexExists(databaseProductType, tableName, indexName)) {
-                    // FIXME: Can add the option to drop and re-create an index here.
-                    // See MySQL documentation on DROP INDEX.
-                } else {
-                    sql = "CREATE INDEX " + indexName + " ON " + tableName + " (" + columnName + ")";
-                }
+                 logger.trace("Creating index for column " + columnName + " in table " + tableName);
+                 sql = "CREATE INDEX " + indexName + " ON " + tableName + " (" + columnName + ")";
             } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-                if (indexExists(databaseProductType, tableName, indexName)) {
-                    // FIXME: Can add the option to reindex an existing index here.
-                    // See PostgreSQL documentation on REINDEX.
-                } else {
-                    sql = "CREATE INDEX ON " + tableName + " (" + columnName + ")";
-                }
+                 logger.trace("Creating index for column " + columnName + " in table " + tableName);
+                sql = "CREATE INDEX ON " + tableName + " (" + columnName + ")";
             } else {
                 throw new Exception("Unrecognized database system " + databaseProductType);
             }
             if (sql != null && ! sql.trim().isEmpty()) {
                 rows = JDBCTools.executeUpdate(sql);
-                logger.info("Index added to column ("+columnName+") on table ("+tableName+")");
+                logger.trace("Index added to column ("+columnName+") on table ("+tableName+")");
             }
             return rows;
         } catch (Throwable e) {
-            logger.info("Index NOT added to column ("+columnName+") on table ("+tableName+") SQL: "+sql+" ERROR: "+e);
+            logger.debug("Index NOT added to column ("+columnName+") on table ("+tableName+") SQL: "+sql+" ERROR: "+e);
             return -1;
         }
     }
@@ -152,24 +149,25 @@ public class AddIndices extends InitHandler implements IInitHandler {
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
+
+        if (databaseProductType == DatabaseProductType.MYSQL) {
+            sql = "SHOW INDEX FROM " + tableName + " WHERE key_name='" + indexName + "'";
+        } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+            // FIXME: Add comparable SQL statement for PostgreSQL.
+        }
+
         try {
-            if (databaseProductType == DatabaseProductType.MYSQL) {
-                sql = "SHOW INDEX FROM " + tableName + " WHERE key_name='"
-                        + indexName + "'";
-                conn = JDBCTools.getConnection(JDBCTools.getDefaultRepositoryName());
-                stmt = conn.createStatement();
-                rs = stmt.executeQuery(sql);
-                if (rs.last()) {
-                   rows = rs.getRow();
-                }
-                rs.close();
-                stmt.close();
-                conn.close();
-                if (rows > 0) {
-                    indexExists = true;
-                }
-            } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-                // FIXME: Add comparable logic for PostgreSQL.
+            conn = JDBCTools.getConnection(JDBCTools.getDefaultRepositoryName());
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if (rs.last()) {
+               rows = rs.getRow();
+            }
+            rs.close();
+            stmt.close();
+            conn.close();
+            if (rows > 0) {
+                indexExists = true;
             }
         } catch (Exception e) {
             logger.debug("Error when identifying whether index exists in table "

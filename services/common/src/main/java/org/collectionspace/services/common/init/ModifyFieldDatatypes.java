@@ -22,12 +22,18 @@
  */
 package org.collectionspace.services.common.init;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.InitHandler.Params.Field;
 import org.collectionspace.services.common.service.InitHandler.Params.Property;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,13 +62,21 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
             String datatype = "";
             for (Field field : fields) {
                 datatype = getDatatypeFromLogicalType(databaseProductType, field.getType());
-                // TODO: Consider refactoring this 'if' statement to a general-purpose
+                // If the field is already of the desired datatype, skip it.
+                if (fieldHasDesiredDatatype(databaseProductType, field, datatype)) {
+                    logger.trace("Field " + field.getTable() + "." + field.getCol()
+                            + " is already of desired datatype " + datatype);
+                    continue;
+                }
+                // TODO: Consider refactoring this nested 'if' statement to a general-purpose
                 // mechanism for retrieving and populating catalog/DDL-type SQL statements
                 // appropriate to a particular database product.
                 if (databaseProductType == DatabaseProductType.MYSQL) {
+                    logger.trace("Modifying field " + field.getTable() + "."
+                            + field.getCol() + " to datatype " + datatype);
                     sql = "ALTER TABLE " + field.getTable() + " MODIFY COLUMN " + field.getCol() + " " + datatype;
                 } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-                    sql = "ALTER TABLE " + field.getTable() + " ALTER COLUMN " + field.getCol() + " " + datatype;
+                        sql = "ALTER TABLE " + field.getTable() + " ALTER COLUMN " + field.getCol() + " " + datatype;
                 } else {
                     throw new Exception("Unrecognized database system.");
                 }
@@ -73,7 +87,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         }
     }
 
-    // TODO: Refactor this method to a general-purpose mechanism for retrieving
+    // TODO: Consider refactoring this method to a general-purpose mechanism for retrieving
     // datatypes appropriate to a particular database product, that corresponds
     // to logical datatypes such as "LARGETEXT".
     //
@@ -92,5 +106,83 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
             throw new Exception("Unrecognized database system " + databaseProductType);
         }
         return datatype;
+    }
+
+    private boolean fieldHasDesiredDatatype(DatabaseProductType databaseProductType,
+            Field field, String datatype) {
+
+        boolean fieldHasDesiredDatatype = false;
+        int rows = 0;
+        String sql = "";
+        String currentDatatype = "";
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        if (databaseProductType == DatabaseProductType.MYSQL) {
+            sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS "
+                    + "WHERE TABLE_SCHEMA = '" + getDatabaseName(field) + "'"
+                    + " AND TABLE_NAME = '" + getTableName(field) + "'"
+                    + " AND COLUMN_NAME = '" + field.getCol() + "'";
+        } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+            // FIXME: Add comparable SQL statement for PostgreSQL.
+        }
+
+        try {
+            conn = JDBCTools.getConnection(JDBCTools.getDefaultRepositoryName());
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                currentDatatype = rs.getString(1);
+            }
+            if (datatype.equalsIgnoreCase(currentDatatype)) {
+                fieldHasDesiredDatatype = true;
+            }
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            logger.debug("Error when identifying datatype of field " + field.getCol()
+                    + " in table " + field.getTable() + ":" + e.getMessage());
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                logger.debug("SQL Exception closing statement/connection in ModifyFieldDatatypes: " + sqle.getLocalizedMessage());
+            }
+        }
+        return fieldHasDesiredDatatype;
+    }
+
+    // FIXME: Hacks to separate the '.'-delimited database/schema name
+    // from the table name in field.getTable, where that value is
+    // specified in tenant bindings configuration as 'database.table'.
+    //
+    // Even as the current hack, this logic should reside in Field, not here.
+
+    private String getDatabaseName(Field field) {
+        String databaseName = field.getTable();
+        String[] databaseAndTable = databaseName.split("\\.", 2);
+        if (! databaseAndTable[0].isEmpty()) {
+            databaseName = databaseAndTable[0];
+        }
+        return databaseName;
+    }
+
+    private String getTableName(Field field) {
+        String tableName = field.getTable();
+        String[] databaseAndTable = tableName.split("\\.", 2);
+        if (! databaseAndTable[1].isEmpty()) {
+            tableName = databaseAndTable[1];
+        }
+        return tableName;
     }
 }
