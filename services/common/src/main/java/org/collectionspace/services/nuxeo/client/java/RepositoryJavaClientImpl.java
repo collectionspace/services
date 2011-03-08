@@ -568,6 +568,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             }
         }
     }
+    
+    private boolean isClauseEmpty(String theString) {
+    	boolean result = true;
+    	if (theString != null && !theString.isEmpty()) {
+    		result = false;
+    	}
+    	return result;
+    }
 
     /**
      * getFiltered get all documents for an entity service from the Document repository,
@@ -581,10 +589,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
 
-        DocumentFilter filter =  handler.getDocumentFilter();
+        DocumentFilter filter = handler.getDocumentFilter();
         String oldOrderBy = filter.getOrderByClause();
-        if (oldOrderBy!=null && oldOrderBy.isEmpty()){
-            filter.setOrderByClause("collectionspace_core:updatedAt DESC");  //per http://issues.collectionspace.org/browse/CSPACE-705
+        if (isClauseEmpty(oldOrderBy) == true){
+            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);  //per http://issues.collectionspace.org/browse/CSPACE-705
         }
         QueryContext queryContext = new QueryContext(ctx, handler);
         RepositoryInstance repoSession = null;

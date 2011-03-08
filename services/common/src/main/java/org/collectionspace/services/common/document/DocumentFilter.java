@@ -43,6 +43,7 @@ public class DocumentFilter {
     /** The order by clause. */
     protected String orderByClause;	// Filtering clause. Omit the "ORDER BY".
     public static final String EMPTY_ORDER_BY_CLAUSE = "";
+    public static final String ORDER_BY_LAST_UPDATED = "collectionspace_core:updatedAt DESC";
     /** The start page. */
     protected int startPage;		// Pagination offset for list results
     /** The page size. */
