@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.IntegrationTests.test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -67,6 +68,8 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	private CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 	private RelationClient relationClient = new RelationClient();
 	private IntakeClient intakeClient = new IntakeClient();
+	
+	private static final int OBJECTS_TO_INTAKE = 1;
 	
 	@Test
 	public void relateCollectionObjectToIntake() {
@@ -184,6 +187,137 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         	i++;            
         }
 	}
+	
+	@Test
+	public void relateCollectionObjectsToIntake() {
+		relateCollectionObjectsToIntake(OBJECTS_TO_INTAKE);
+	}
+
+	private void relateCollectionObjectsToIntake(int numberOfObjects) {
+		
+		//
+		// First create a list of CollectionObjects
+		//
+		CollectionobjectsCommon co = new CollectionobjectsCommon();
+		ArrayList<String>collectionObjectIDList = new ArrayList<String>(numberOfObjects);
+		for (int i = 0; i < numberOfObjects; i++) {
+			fillCollectionObject(co, createIdentifier());
+			
+			// Next, create a part object
+			PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+			PayloadOutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
+			commonPart.setLabel(collectionObjectClient.getCommonPartName());
+			
+			// Make the create call and check the response
+			ClientResponse<Response> response = collectionObjectClient.create(multipart);
+			String collectionObjectCsid = null;
+			try {
+				Assert.assertEquals(response.getStatus(), Response.Status.CREATED
+						.getStatusCode());
+				collectionObjectCsid = extractId(response);
+				collectionObjectIDList.add(collectionObjectCsid);
+			} finally {
+				response.releaseConnection();
+			}
+		}
+	    
+	    
+	    // Next, create an Intake object
+	    IntakesCommon intake = new IntakesCommon();
+	    fillIntake(intake, createIdentifier());
+	    // Create the a part object
+	    PoxPayloadOut multipart = new PoxPayloadOut(IntakeClient.SERVICE_PAYLOAD_NAME);
+	    PayloadOutputPart commonPart = multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
+	    commonPart.setLabel(intakeClient.getCommonPartName());
+
+	    // Make the call to create and check the response
+	    ClientResponse<Response> response = intakeClient.create(multipart);
+	    String intakeCsid = null;
+	    try {
+		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+		    intakeCsid = extractId(response);
+	    } finally {
+	    	response.releaseConnection();
+	    }
+	    
+	    // Lastly, relate the two entities, by creating a new relation object
+	    RelationsCommon relation = new RelationsCommon();
+	    for (String collectionObjectCsid : collectionObjectIDList) {
+		    fillRelation(relation,
+		    		intakeCsid, IntakesCommon.class.getSimpleName(), //subject
+		    		collectionObjectCsid, CollectionobjectsCommon.class.getSimpleName(), //object		    		
+		    		RelationshipType.COLLECTIONOBJECT_INTAKE.toString()); //predicate
+		    // Create the part and fill it with the relation object
+		    multipart = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
+		    commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
+		    commonPart.setLabel(relationClient.getCommonPartName());
+	
+		    // Make the call to crate
+		    response = relationClient.create(multipart);
+		    String relationCsid = null;
+		    try {
+			    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+			    relationCsid = extractId(response);
+		    } finally {
+		    	response.releaseConnection();
+		    }
+	    }
+	    
+	    //
+	    // Now try to retrieve the Intake record of the CollectionObject.
+	    //
+	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.toString();
+		RelationsCommonList relationList = null;
+	    for (String collectionObjectCsid : collectionObjectIDList) {
+		    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList(
+		    		intakeCsid,
+		    		IntakesCommon.class.getSimpleName(), //subject
+		    		predicate,
+		    		collectionObjectCsid,
+		    		CollectionobjectsCommon.class.getSimpleName()); //object
+
+		    try {
+		    	Assert.assertEquals(resultResponse.getStatus(), Response.Status.OK.getStatusCode());
+		        relationList = resultResponse.getEntity();
+		    } finally {
+		    	resultResponse.releaseConnection();
+		    }
+	    
+		    //
+		    // Each relation returned in the list needs to match what we
+		    // requested.
+		    //
+	        List<RelationsCommonList.RelationListItem> relationListItems = relationList.getRelationListItem();
+	        Assert.assertFalse(relationListItems.isEmpty());
+	        
+	        int i = 0;
+	        RelationsCommon resultRelation = null;
+	        for(RelationsCommonList.RelationListItem listItem : relationListItems){
+	        	String foundCsid = listItem.getCsid();
+	        	ClientResponse<String> multiPartResponse = null;
+	        	try {
+	        		multiPartResponse = relationClient.read(foundCsid);
+	        		int responseStatus = multiPartResponse.getStatus();
+	        		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
+	        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.getEntity());
+	        		resultRelation = (RelationsCommon) extractPart(input,
+	        				relationClient.getCommonPartName(),
+	        				RelationsCommon.class);
+	        	} catch (Exception e) {
+	        		e.printStackTrace();
+	        	} finally {
+	        		multiPartResponse.releaseConnection();
+	        	}
+	
+	        	Assert.assertEquals(resultRelation.getDocumentId1(), intakeCsid);
+	        	Assert.assertEquals(resultRelation.getRelationshipType(), RelationshipType.COLLECTIONOBJECT_INTAKE.toString());
+	        	Assert.assertEquals(resultRelation.getDocumentId2(), collectionObjectCsid);
+	        	System.out.println();
+	        	i++;            
+	        }
+	    }
+	}
+	
 
 	/*
 	 * Private Methods

@@ -177,7 +177,7 @@ public class BlobResource extends ResourceBase {
     @Produces(MediaType.TEXT_PLAIN)
     public Response prototype(@PathParam("csid") String csid,
     		@Context HttpServletRequest req,
-    		@QueryParam("blobUri") String blobUri,
+    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,
     		MultipartFormDataInput partFormData) {
     	Response response = null;    	
     	try {
