@@ -59,6 +59,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
     private String knownRoleName = "ROLE_USERS_TEST";
+    private String knownRoleDisplayName = "ROLE_DISPLAYNAME_USERS_TEST";
     private String verifyResourceId = null;
     private String verifyRoleName = "collections_manager_test";
 //    private List<String> allResourceIdsCreated = new ArrayList<String>();
@@ -147,6 +148,49 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ": knownResourceId=" + knownResourceId);
         }
     }
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
+    public void createWithDisplayname(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup, such as initializing the type of service request
+        // (e.g. CREATE, DELETE), its valid and expected status codes, and
+        // its associated HTTP method name (e.g. POST, DELETE).
+        setupCreate();
+
+        // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
+        Role role = createRoleInstance(knownRoleName + "_" + knownRoleDisplayName,
+                "all users are required to be in this role",
+                true);
+        role.setDisplayName(knownRoleDisplayName);
+        ClientResponse<Response> res = client.create(role);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        //
+        // Specifically:
+        // Does it fall within the set of valid status codes?
+        // Does it exactly match the expected status code?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Store the ID returned from this create operation
+        // for additional tests below.
+        String csid = extractId(res);
+        allResourceIdsCreated.add(csid);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": csid=" + csid);
+        }
+    }
+    
 
     /**
      * Creates the for unique role.
@@ -154,8 +198,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
     public void createForUniqueRole(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -180,6 +223,49 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+    }
+    
+    /**
+     * Creates the for unique display name of role.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createWithDisplayname"})
+    public void createForUniqueDisplayRole(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
+
+        // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
+        Role role = createRoleInstance(knownRoleName + System.currentTimeMillis(),
+                "role users with non-unique display name",
+                true);
+        role.setDisplayName(knownRoleDisplayName);
+        ClientResponse<Response> res = client.create(role);
+        int statusCode = res.getStatus();
+
+        if (logger.isDebugEnabled()) {
+        	logger.debug(testName + ": Role with name \"" +
+        			knownRoleName + "\" should already exist, so this request should fail.");
+            logger.debug(testName + ": status = " + statusCode);
+            logger.debug(testName + ": " + res);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        if (statusCode != Response.Status.BAD_REQUEST.getStatusCode()) {
+            // If the test fails then we've just created a Role that we need to delete, so
+            // store the ID returned from this create operation.
+            String csid = extractId(res);
+            allResourceIdsCreated.add(csid);
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": csid=" + csid);
+            }
+        	Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        }
     }
 
     /**
@@ -219,7 +305,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    dependsOnMethods = {"createWithDisplayname"})
     public void createList(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

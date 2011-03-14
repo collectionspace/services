@@ -55,6 +55,10 @@
                             <orm:column-name>rolename</orm:column-name>
                             <orm:column-name>tenant_id</orm:column-name>
                         </orm:unique-constraint>
+                        <orm:unique-constraint>
+                        	<orm:column-name>displayname</orm:column-name>
+                            <orm:column-name>tenant_id</orm:column-name>
+                        </orm:unique-constraint>
                     </orm:table>
                 </hj:entity>
             </xs:appinfo>
@@ -64,7 +68,7 @@
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:basic>
-                            <orm:column name="displayName" length="200" nullable="false"/>
+                            <orm:column name="displayname" length="200" nullable="false"/>
                         </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>
