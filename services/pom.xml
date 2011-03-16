@@ -28,6 +28,7 @@
         <module>hyperjaxb</module>
         <module>common</module>
         <module>authorization-mgt</module> <!-- relies on authorization -->
+        <module>common-api</module>
         <module>common-test</module>
         <module>account</module> <!-- relies on authorization-mgt.import -->
         <module>note</module>

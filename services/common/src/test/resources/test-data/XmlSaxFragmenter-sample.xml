@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document repository="default" id="aa13777e-941d-4db9-b746-145502d49e97">
+  <schema xmlns:collectionobjects_naturalhistory="http://collectionspace.org/collectionobject/" name="collectionobjects_naturalhistory">
+    <collectionobjects_naturalhistory:nh-int/>
+    <collectionobjects_naturalhistory:nh-note>In test-data</collectionobjects_naturalhistory:nh-note>
+  </schema>
+  <schema xmlns:collectionobjects_common="http://collectionspace.org/collectionobject/" name="collectionobjects_common">
+    <collectionobjects_common:remNumber>
+      <numberValue/>
+      <numberType/>
+    </collectionobjects_common:remNumber>
+    <collectionobjects_common:sex>Male</collectionobjects_common:sex>
+  </schema>
+</document>

@@ -17,6 +17,8 @@
  */
 package org.collectionspace.services.common;
 
+import org.collectionspace.services.common.api.Tools;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 

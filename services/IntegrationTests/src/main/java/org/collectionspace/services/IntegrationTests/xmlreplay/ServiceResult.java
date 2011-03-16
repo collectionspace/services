@@ -24,7 +24,7 @@
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
 import org.apache.commons.httpclient.Header;
-import org.collectionspace.services.common.Tools;
+import org.collectionspace.services.common.api.Tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +44,8 @@ public class ServiceResult {
     public String location = "";
     public String CSID = "";
     public String subresourceCSID = "";
-    public String requestPayload = "";
+    public String requestPayload = "";  //just like requestPayloadRaw, but may have multipart boundary and headers.
+    public Map<String, String> requestPayloadsRaw = new HashMap<String, String>();
     public String result = "";
     public int responseCode = 0;
     public String responseMessage = "";
@@ -121,16 +122,22 @@ public class ServiceResult {
                 }
                 break;
             case TEXT:
-                if (!value.treesMatch()) {
-                    failureReason = " : DOM TREE MISMATCH; ";
-                    return false;
-                }
                 if (value.countFor(TreeWalkResults.TreeWalkEntry.STATUS.TEXT_DIFFERENT)>0) {
                     failureReason = " : DOM TEXT_DIFFERENT; ";
                     return false;
                 }
                 break;
             case TREE:
+                if (!value.treesMatch()) {
+                    failureReason = " : DOM TREE MISMATCH; ";
+                    return false;
+                }
+                break;
+            case TREE_TEXT:
+                if (value.countFor(TreeWalkResults.TreeWalkEntry.STATUS.TEXT_DIFFERENT)>0) {
+                    failureReason = " : DOM TEXT_DIFFERENT; ";
+                    return false;
+                }
                 if (!value.treesMatch()) {
                     failureReason = " : DOM TREE MISMATCH; ";
                     return false;
@@ -143,7 +150,20 @@ public class ServiceResult {
         return true;
     }
 
+    private boolean overrideExpectedResult = false;
+
+    /** Call this method to create a ServiceResult mock object, for when you are doing autoDelete, and you come
+     *  across a GET : GETs don't have a DELETE url, so they don't need to be autoDeleted, so an empty ServiceResult object
+     *  signifies this.
+     */
+    public void overrideGotExpectedResult(){
+        overrideExpectedResult = true;
+    }
+
     public boolean gotExpectedResult(){
+        if (overrideExpectedResult){
+            return true;
+        }
         if (Tools.notEmpty(failureReason)){
             return false;
         }
@@ -170,12 +190,16 @@ public class ServiceResult {
     //public static final String[] DUMP_OPTIONS = {"minimal", "detailed", "full"};
     public static enum DUMP_OPTIONS {minimal, detailed, full};
 
-    public static enum PAYLOAD_STRICTNESS {ZERO, ADDOK, TREE, TEXT, STRICT};
+    public static enum PAYLOAD_STRICTNESS {ZERO, ADDOK, TREE, TEXT, TREE_TEXT, STRICT};
 
     public String toString(){
         return detail(true);
 
     }
+
+    private static final String LINE = "\r\n==================================";
+    private static final String CRLF = "\r\n";
+
     public String detail(boolean includePayloads){
         String res =  "{"
                 + ( gotExpectedResult() ? "SUCCESS" : "FAILURE"  )
@@ -193,12 +217,13 @@ public class ServiceResult {
                 + ( Tools.notEmpty(location) ? "; location.CSID:"+location : "" )
                 + ( Tools.notEmpty(error) ? "; ERROR:"+error : "" )
                 + "; gotExpected:"+gotExpectedResult()
-                + ( includePayloads && Tools.notEmpty(requestPayload) ? "; requestPayload:\r\n"+requestPayload+"\r\n" : "" )
-                + ( includePayloads && Tools.notEmpty(result) ? "; result:"+result : "" )
                 + ( partsSummary(true))
-                +"}";
+                +"}"
+                + ( includePayloads && Tools.notBlank(requestPayload) ? LINE+"requestPayload:"+LINE+CRLF+requestPayload+LINE : "" )
+                + ( includePayloads && Tools.notBlank(result) ? LINE+"result:"+LINE+CRLF+result : "" );
         return res;
     }
+
     public String minimal(){
         return "{"
                 + ( gotExpectedResult() ? "SUCCESS" : "FAILURE"  )
@@ -224,6 +249,38 @@ public class ServiceResult {
                 return detail(true);
             default:
                 return toString();
+        }
+    }
+
+    /** This method may be called from a test case, using a syntax like ${testID3.resValue("persons_common", "//refName")}   */
+    public String got(String partName, String xpath) throws Exception {
+        try {
+            PayloadLogger.HttpTraffic traffic = PayloadLogger.readPayloads(this.result, this.boundary, this.contentLength);
+            PayloadLogger.Part partFromServer = traffic.getPart(partName);
+            String source = partFromServer.getContent();
+            org.jdom.Element element = (org.jdom.Element) XmlCompareJdom.selectSingleNode(source, xpath);
+            String sr = element != null ? element.getText() : "";
+            return sr;
+        } catch (Exception e){
+            return "ERROR reading response value: "+e;
+        }
+    }
+
+    /** This method may be called from a test case, using a syntax like ${oe9.reqValue("personauthorities_common","//shortIdentifier")}    */
+    public String sent(String partName, String xpath) throws Exception {
+        try {
+            if (Tools.isEmpty(partName)){
+                partName = "default";
+            }
+            String source = this.requestPayloadsRaw.get(partName);
+            if (source == null){
+                return "ERROR:null:requestPayloadsRaw["+partName+"]";
+            }
+            org.jdom.Element element = (org.jdom.Element) XmlCompareJdom.selectSingleNode(source, xpath);   //e.g. "//shortIdentifier");
+            String sr = element != null ? element.getText() : "";
+            return sr;
+        } catch (Exception e){
+            return "ERROR reading request value: "+e;
         }
     }
 }

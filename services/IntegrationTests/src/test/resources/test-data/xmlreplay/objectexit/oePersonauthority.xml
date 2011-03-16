@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="personauthorities">
+<ns2:personauthorities_common
+xmlns:ns2="http://collectionspace.org/services/person"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <displayName>Default Person Authority</displayName>
+  <shortIdentifier>defaultPersonAuthority</shortIdentifier>
+  <vocabType>PersonAuthority</vocabType>
+</ns2:personauthorities_common>
+</document>
+
+

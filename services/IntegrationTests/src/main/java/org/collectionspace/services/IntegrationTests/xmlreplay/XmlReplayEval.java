@@ -52,13 +52,26 @@ public class XmlReplayEval {
      * uri = eval(uri, serviceResultsMap, jexl, jc);  <br />
      * RESULT:    "/cspace-services/orgauthorities/43a2739c-4f40-49c8-a6d5/items/"
      */
-    public static String eval(String inputJexlExpression, Map<String, ServiceResult> serviceResultsMap, JexlEngine jexl, JexlContext jc) {
+     public static String eval(String inputJexlExpression, Map<String, ServiceResult> serviceResultsMap, Map<String,String> vars, JexlEngine jexl, JexlContext jc) {
         //System.out.println("\r\n---- REPLACE.init-uri:        "+inputJexlExpression);
         String result;
         try {
-            for (ServiceResult postResult : serviceResultsMap.values()) {
-                jc.set(postResult.testID, postResult);
-                //System.out.println("eval :: "+postResult.testID+"==>"+postResult);
+            //System.out.println("eval :: serviceResultsMap "+serviceResultsMap.size());
+            for (ServiceResult serviceResult : serviceResultsMap.values()) {
+                jc.set(serviceResult.testID, serviceResult);
+                //System.out.println("eval :: "+serviceResult.testID+"==>"+serviceResult.minimal());
+            }
+            if (vars!=null){
+                for (Map.Entry<String,String> entry: vars.entrySet()) {
+                    String value = entry.getValue();
+                    String key = entry.getKey();
+                    try {
+                        value = parse(value, jexl, jc);
+                    } catch (Exception e){
+                        value = "ERROR: "+e;
+                    }
+                    jc.set(key, value);
+                }
             }
             result = parse(inputJexlExpression, jexl, jc);
         } catch (Throwable t) {

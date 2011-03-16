@@ -51,7 +51,7 @@ package org.collectionspace.services.person.nuxeo;
 
 import java.util.regex.Pattern;
 
-import org.collectionspace.services.common.Tools;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;

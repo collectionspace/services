@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:objectexit_common
+xmlns:ns2="http://collectionspace.org/services/objectexit"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <depositor>${depositor}</depositor>
+  <currentOwner>${currentOwner}</currentOwner>
+  <exitDate>exitDate-1290026474563</exitDate>
+  <exitNumber>${exitNumber}</exitNumber>
+</ns2:objectexit_common>

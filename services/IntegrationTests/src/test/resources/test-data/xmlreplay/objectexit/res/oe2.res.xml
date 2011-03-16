@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<document name="objectexit">
 <ns2:objectexit_common 
   xmlns:ns2="http://collectionspace.org/services/objectexit" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -7,4 +8,5 @@
 <depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>
 <exitMethods></exitMethods>
 </ns2:objectexit_common>
+</document>
 

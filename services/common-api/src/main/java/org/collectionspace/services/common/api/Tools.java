@@ -21,7 +21,7 @@
  *  limitations under the License.
  */
 
-package org.collectionspace.services.common;
+package org.collectionspace.services.common.api;
 
 import java.io.File;
 import  java.util.regex.Pattern;
@@ -47,15 +47,33 @@ public class Tools {
         return first+separator+second;
     }
 
+    /** Remove all whitespace from a String.  */
+    public static String squeeze(String s) {
+        return s.replaceAll("\\s+", "");
+    }
+
+    /** Milliseconds from start time as defined by the Date class. */
+    public static Long now(){
+        return new Long((new java.util.Date()).getTime());
+    }
+
     /** Handles null strings as empty.  */
     public static boolean isEmpty(String str){
         return !notEmpty(str);
     }
 
     /** Handles null strings as empty.  */
-        public static boolean notEmpty(String str){
+    public static boolean notEmpty(String str){
         if (str==null) return false;
         if (str.length()==0) return false;
+        return true;
+    }
+    public static boolean notBlank(String str){
+        if (str==null) return false;
+        if (str.length()==0) return false;
+        if (str.trim().length()==0){
+            return false;
+        }
         return true;
     }
 
@@ -133,7 +151,18 @@ public class Tools {
         return result;
     }
 
-
+    /** Takes an Exception object and formats a message that provides more debug information
+      * suitable for developers for printing to System.out or for logging.  Not suitable for
+      * presentation of error messages to clients.
+      */
+    public static String errorToString(Throwable e, boolean stackTraceOnException){
+        if (e==null){
+            return "";
+        }
+        String s = e.toString() + "\r\n  -- message: " + e.getMessage();
+        s = s + "\r\n  -- Stack Trace: \r\n  --      " + getStackTrace(e);
+        return s;
+    }
 
 
 }

@@ -8,10 +8,11 @@
      below about not leaving any active testGroups enabled in this file
      when you check it in.
 -->
+    <!--<protoHostPort>http://173.45.245.189:8180</protoHostPort>-->
     <protoHostPort>http://localhost:8180</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full] -->
-    <dump payloads="false" dumpServiceResult="full" />
+    <dump payloads="true" dumpServiceResult="detailed" />
     
     <auths default="admin@collectionspace.org">
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
@@ -40,11 +41,22 @@
     
     <run controlFile="media/media.xml" testGroup="authrefs" />
     
+    <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
     -->
     
     
+    <!--
+      Used to verify CSPACE-3178
+    <run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
+    -->
     
+    <!--
+      Used to measure timings of 1000 records for  CSPACE-3553
+    <run controlFile="objectexit/object-exit-LOOP.xml" testGroup="LOOP" />
+    -->
+    <run controlFile="objectexit/object-exit-LOOP.xml" testGroup="LOOP" />
     
-
 </xmlReplayMaster>
 

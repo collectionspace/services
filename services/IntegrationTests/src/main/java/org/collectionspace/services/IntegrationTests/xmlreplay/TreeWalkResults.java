@@ -23,7 +23,7 @@
 
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
-import org.collectionspace.services.common.Tools;
+import org.collectionspace.services.common.api.Tools;
 
 import java.util.ArrayList;
 
@@ -50,6 +50,7 @@ public class TreeWalkResults extends ArrayList<TreeWalkResults.TreeWalkEntry> {
                  +(Tools.notEmpty(lpath) ? ", L.path:"+lpath : "")
                  +(Tools.notEmpty(rpath) ? ", R.path:"+rpath : "")
                  +(Tools.notEmpty(message) ? ", message:"+message : "")
+                 +(Tools.notEmpty(errmessage) ? ", errmessage:"+errmessage : "")
                  +((status != STATUS.MATCHED) && Tools.notEmpty(ltextTrimmed) ? ",\r\n    L.trimmed:"+ltextTrimmed : "")
                  +((status != STATUS.MATCHED) && Tools.notEmpty(rtextTrimmed) ? ",\r\n    R.trimmed:"+rtextTrimmed : "")
                  +"}";

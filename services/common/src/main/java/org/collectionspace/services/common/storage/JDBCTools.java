@@ -18,7 +18,7 @@
 package org.collectionspace.services.common.storage;
 
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.Tools;
+import org.collectionspace.services.common.api.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

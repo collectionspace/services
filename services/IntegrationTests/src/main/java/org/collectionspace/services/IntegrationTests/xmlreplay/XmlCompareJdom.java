@@ -22,7 +22,7 @@
  */
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
-import org.collectionspace.services.common.Tools;
+import org.collectionspace.services.common.api.Tools;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -105,7 +105,12 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
         return xpath.selectSingleNode(element);
     }
 
-
+    public static Object selectSingleNode(String docSource, String xpathExpression) throws Exception {
+        Document doc = getDocumentFromContent(docSource);
+        Element element = doc.getRootElement();
+        XPath xpath = new JDOMXPath(xpathExpression);
+        return xpath.selectSingleNode(element);
+    }
 
 
     public static boolean treeWalk(Document left, Document right, TreeWalkResults list) throws Exception {

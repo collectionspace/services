@@ -4,10 +4,39 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Usage for this class, if you have a URN and would like to get at its fields, is to call one of these methods:
+ *
+ *   RefName.AuthorityItem item = RefName.AuthorityItem.parse(RefName.AUTHORITY_ITEM_EXAMPLE);
+ * or
+ *   RefName.Authority authority = RefName.Authority.parse(RefName.AUTHORITY_EXAMPLE);
+ *
+ * From the object returned, you may set/get any of the public fields.
+ *
+ * If you want to format a string urn, then you need to construct either a RefName.AuthorityItem  or RefName.Authority.
+ * You can parse a URN to do so, as shown above, or you can construct one with a constructor, setting its fields afterwards.
+ * A better way is to use one of the build*() methods on this class:
+ *
+ *      RefName.Authority authority2 = RefName.buildAuthority(tenantName, serviceName, authorityShortIdentifier, authorityDisplayName);
+ *
+ *      RefName.AuthorityItem item2 = RefName.buildAuthorityItem(authority2,
+ *                                                               RefName.EX_itemShortIdentifier,
+ *                                                               RefName.EX_itemDisplayName);
+ *
+ * Note that authority2 is an object, not a String, and is passed in to RefName.buildAuthorityItem().
+ *
+ * Then simply call toString() on the object:
+ *
+ *   String authorityURN = authority2.toString();
+ *
+ *   String itemURN = item2.toString();
+ *
+ * These test cases are kept up-to-date in
+ *
+ *   org.collectionspace.services.common.api.test.RefNameTest
+ *
  * User: laramie
- * $LastChangedRevision:  $
- * $LastChangedDate:  $
  */
+ 
 public class RefName {
     public static final String HACK_VOCABULARIES = "Vocabularies"; //TODO: get rid of these.
     public static final String HACK_ORGANIZATIONS = "Organizations"; //TODO: get rid of these.

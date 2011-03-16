@@ -6,7 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
-import org.collectionspace.services.common.Tools;
+import org.collectionspace.services.common.api.Tools;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 
@@ -147,7 +147,7 @@ public class XmlReplay {
         return list;
     }
 
-    /** Use this if you wish to named tests within a testGroup, otherwise call runTestGroup(). */
+    /** Use this if you wish to run named tests within a testGroup, otherwise call runTestGroup(). */
     public List<ServiceResult>  runTests(String testGroupID, String testID) throws Exception {
         List<ServiceResult> result = runXmlReplayFile(this.basedir,
                                 this.controlFileName,
@@ -198,8 +198,17 @@ public class XmlReplay {
         List<ServiceResult> results = new ArrayList<ServiceResult>();
         for (ServiceResult pr : serviceResultsMap.values()){
             try {
-                ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, pr.auth, pr.testID, "[autodelete:"+logName+"]");
-                results.add(deleteResult);
+                if (Tools.notEmpty(pr.deleteURL)){
+                    ServiceResult deleteResult = XmlReplayTransport.doDELETE(pr.deleteURL, pr.auth, pr.testID, "[autodelete:"+logName+"]");
+                    results.add(deleteResult);
+                } else {
+                    ServiceResult errorResult = new ServiceResult();
+                    errorResult.fullURL = pr.fullURL;
+                    errorResult.testGroupID = pr.testGroupID;
+                    errorResult.fromTestID = pr.fromTestID;
+                    errorResult.overrideGotExpectedResult();
+                    results.add(errorResult);
+                }
             } catch (Throwable t){
                 String s = (pr!=null) ? "ERROR while cleaning up ServiceResult map: "+pr+" for "+pr.deleteURL+" :: "+t
                                       : "ERROR while cleaning up ServiceResult map (null ServiceResult): "+t;
@@ -272,46 +281,85 @@ public class XmlReplay {
     private static class PartsStruct {
         public List<String> partsList = new ArrayList<String>();
         public List<String> filesList = new ArrayList<String>();
+        public List<String> fromTests = new ArrayList<String>();
+        public List<Map<String,String>> varsList = new ArrayList<Map<String,String>>();
         boolean bDoingSinglePartPayload = false;
         String singlePartPayloadFilename = "";
         String overrideTestID = "";
         public static PartsStruct readParts(Node testNode, final String testID, String xmlReplayBaseDir){
-            PartsStruct result = new PartsStruct();
-            result.singlePartPayloadFilename = testNode.valueOf("filename");
+            PartsStruct resultPartsStruct = new PartsStruct();
+            resultPartsStruct.singlePartPayloadFilename = testNode.valueOf("filename");
             String singlePartPayloadFilename = testNode.valueOf("filename");
             if (Tools.notEmpty(singlePartPayloadFilename)){
-                result.bDoingSinglePartPayload = true;
-                result.singlePartPayloadFilename = xmlReplayBaseDir + '/' + singlePartPayloadFilename;
+                resultPartsStruct.bDoingSinglePartPayload = true;
+                resultPartsStruct.singlePartPayloadFilename = xmlReplayBaseDir + '/' + singlePartPayloadFilename;
+                List<Node> varNodes = testNode.selectNodes("vars/var");
+                readVars(testNode, varNodes, resultPartsStruct);
             } else {
-                result.bDoingSinglePartPayload = false;
+                resultPartsStruct.bDoingSinglePartPayload = false;
                 List<Node> parts = testNode.selectNodes("parts/part");
                 if (parts == null || parts.size()==0){
                     //path is just /testGroup/test/part/
-                    String commonPartName = testNode.valueOf("part/label");
-                    String testfile = testNode.valueOf("part/filename");
-                    String fullTestFilename = xmlReplayBaseDir + '/' + testfile;
-                    if ( Tools.isEmpty(testID) ){
-                        result.overrideTestID = testfile; //It is legal to have a missing ID attribute, and rely on a unique filename.
-                    }
-                    result.partsList.add(commonPartName);
-                    result.filesList.add(fullTestFilename);
+                    Node part = testNode.selectSingleNode("part");
+                    readPart(testNode, part, xmlReplayBaseDir, testID, resultPartsStruct);      //side-effect: adds objects to result.
                 } else {
                     // path is /testGroup/test/parts/part/
                     for (Node part : parts){
-                        String commonPartName = part.valueOf("label");
-                        String filename = part.valueOf("filename");
-                        String fullTestFilename = xmlReplayBaseDir + '/' + filename;
-                        if ( Tools.isEmpty(testID) ){  //if testID is empty, we'll use the *first*  filename as ID.
-                            result.overrideTestID = filename; //It is legal to have a missing ID attribute, and rely on a unique filename.
-                        }
-                        result.partsList.add(commonPartName);
-                        result.filesList.add(fullTestFilename);
+                        readPart(testNode, part, xmlReplayBaseDir, testID, resultPartsStruct);  //side-effect: adds objects to result.
                     }
                 }
             }
-            return result;
+            return resultPartsStruct;
+        }
+        private static void readPart(Node testNode, Node part, String xmlReplayBaseDir, String testID, PartsStruct resultPartsStruct){
+            String commonPartName = part.valueOf("label");
+            String filename = part.valueOf("filename");
+            String fullTestFilename = xmlReplayBaseDir + '/' + filename;
+            if ( Tools.isEmpty(testID) ){  //if testID is empty, we'll use the *first*  filename as ID.
+                resultPartsStruct.overrideTestID = filename; //It is legal to have a missing ID attribute, and rely on a unique filename.
+            }
+            String fromTest = part.valueOf("fromTest");
+            if (fromTest == null){
+                fromTest = "";
+            }
+
+            //These next foun members (partsList,filesList,varsList, and fromTests),
+            // should be added in lock-step, since they are assumed to exist by index (0,1,2,3, etc.)
+            resultPartsStruct.partsList.add(commonPartName);
+            resultPartsStruct.filesList.add(fullTestFilename);
+            resultPartsStruct.fromTests.add(fromTest);
+
+            List<Node> varNodes = part.selectNodes("var");
+            readVars(testNode, varNodes, resultPartsStruct);
+           /* Map<String,String> vars = new HashMap<String,String>();
+            resultPartsStruct.varsList.add(vars);
+
+            List<Node> varNodes = part.selectNodes("var");
+            //System.out.println("### vars: "+vars.size()+" ########");
+            for (Node var: varNodes){
+                String ID = var.valueOf("@ID");
+                String value = var.getText();
+                //System.out.println("ID: "+ID+" value: "+value);
+                vars.put(ID, value); //vars is already part of resultPartsStruct.varsList
+            }
+            //System.out.println("### end-vars ########");
+             */
+        }
+        private static void readVars(Node testNode, List<Node> varNodes, PartsStruct resultPartsStruct){
+            Map<String,String> vars = new HashMap<String,String>();
+            resultPartsStruct.varsList.add(vars);
+            //System.out.println("### vars: "+vars.size()+" ########");
+            for (Node var: varNodes){
+                String ID = var.valueOf("@ID");
+                String value = var.getText();
+                //System.out.println("ID: "+ID+" value: "+value);
+                vars.put(ID, value); //vars is already part of resultPartsStruct.varsList
+            }
+            //System.out.println("### end-vars ########");
         }
     }
+
+
 
     private static String fixupFullURL(String fullURL, String protoHostPort, String uri){
         if ( ! uri.startsWith(protoHostPort)){
@@ -364,7 +412,8 @@ public class XmlReplay {
         String OK = "";
         byte[] b = FileUtils.readFileToByteArray(new File(expectedResponseParts.singlePartPayloadFilename));
         String expectedPartContent = new String(b);
-        expectedPartContent = evalStruct.eval(expectedPartContent, serviceResultsMap, evalStruct.jexl, evalStruct.jc);
+        Map<String,String> vars = expectedResponseParts.varsList.get(0);  //just one part, so just one varsList.  Must be there, even if empty.
+        expectedPartContent = evalStruct.eval(expectedPartContent, serviceResultsMap, vars, evalStruct.jexl, evalStruct.jc);
         String label = "NOLABEL";
         String leftID  = "{from expected part, label:"+label+" filename: "+expectedResponseParts.singlePartPayloadFilename+"}";
         String rightID = "{from server, label:"+label
@@ -399,10 +448,18 @@ public class XmlReplay {
             for (int i=0; i<expectedResponseParts.partsList.size(); i++){
                 String fileName = expectedResponseParts.filesList.get(i);
                 String label = expectedResponseParts.partsList.get(i);
-                byte[] b = FileUtils.readFileToByteArray(new File(fileName));
-                String expectedPartContent = new String(b);
-                expectedPartContent = evalStruct.eval(expectedPartContent, serviceResultsMap, evalStruct.jexl, evalStruct.jc);
-                System.out.println("expected: "+label+ " content ==>\r\n"+expectedPartContent);
+                Map<String,String> vars = expectedResponseParts.varsList.get(i);
+                String fromTest = expectedResponseParts.fromTests.get(i);
+                String expectedPartContent;
+                if ( ! Tools.isEmpty(fromTest)){
+                    ServiceResult resultFromTest = serviceResultsMap.get(fromTest);
+                    expectedPartContent = resultFromTest.requestPayloadsRaw.get(label);  //TODO: debug this!!!!!!!
+                } else {
+                    byte[] b = FileUtils.readFileToByteArray(new File(fileName));
+                    expectedPartContent = new String(b);
+                    expectedPartContent = evalStruct.eval(expectedPartContent, serviceResultsMap, vars, evalStruct.jexl, evalStruct.jc);
+                }
+                //System.out.println("expected: "+label+ " content ==>\r\n"+expectedPartContent);
                 PayloadLogger.Part partFromServer = traffic.getPart(label);
                 String partFromServerContent = "";
                 if (partFromServer != null){
@@ -430,7 +487,7 @@ public class XmlReplay {
                 //}
             }
         } catch (Exception e){
-            String err = "ERROR in XmlReplay.validateResponse() : "+e; 
+            String err = "ERROR in XmlReplay.validateResponse() : "+e;
             //System.out.println(err);
             return err  ;
         }
@@ -504,6 +561,7 @@ public class XmlReplay {
         evalStruct.jexl = jexl;
 
         for (Node testgroup : testgroupNodes) {
+
             JexlContext jc = new MapContext();  //Get a new JexlContext for each test group.
             evalStruct.jc = jc;
 
@@ -518,7 +576,15 @@ public class XmlReplay {
             int testElementIndex = -1;
 
             for (Node testNode : tests) {
+                long startTime = System.currentTimeMillis();
                 try {
+                    /*try {
+                        //"sleeping 2");
+                        Thread.currentThread().sleep(2);
+                    } catch (InterruptedException ie){
+                        System.out.println("ERROR sleeping: "+ie);
+                    }
+                    */
                     testElementIndex++;
                     String testID = testNode.valueOf("@ID");
                     String testIDLabel = Tools.notEmpty(testID) ? (testGroupID+'.'+testID) : (testGroupID+'.'+testElementIndex);
@@ -537,7 +603,7 @@ public class XmlReplay {
                     }
 
                     if (uri.indexOf("$")>-1){
-                        uri = evalStruct.eval(uri, serviceResultsMap, jexl, jc);
+                        uri = evalStruct.eval(uri, serviceResultsMap, null, jexl, jc);
                     }
                     fullURL = fixupFullURL(fullURL, protoHostPort, uri);
 
@@ -572,14 +638,23 @@ public class XmlReplay {
                             uri = fromTestID(uri, testNode, serviceResultsMap);
                         }
                         if (parts.bDoingSinglePartPayload){
-                            serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.singlePartPayloadFilename, protoHostPort, uri, method, XmlReplayTransport.APPLICATION_XML, evalStruct, authForTest, testIDLabel);
+                            Map<String,String> vars = null;
+                            if (parts.varsList.size()>0){
+                                vars = parts.varsList.get(0);
+                            }
+                            serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.singlePartPayloadFilename, vars, protoHostPort, uri, method, XmlReplayTransport.APPLICATION_XML, evalStruct, authForTest, testIDLabel);
                         } else {
-                            serviceResult = XmlReplayTransport.doPOST_PUTFromXML_Multipart(parts.filesList, parts.partsList, protoHostPort, uri, method, evalStruct, authForTest, testIDLabel);
+                            boolean POX = true;
+                            if (POX){
+                                serviceResult = XmlReplayTransport.doPOST_PUTFromXML_POX      (parts.filesList, parts.partsList, parts.varsList, protoHostPort, uri, method, evalStruct, authForTest, testIDLabel);
+                            } else {
+                                serviceResult = XmlReplayTransport.doPOST_PUTFromXML_Multipart(parts.filesList, parts.partsList, parts.varsList, protoHostPort, uri, method, evalStruct, authForTest, testIDLabel);
+                            }
                         }
                         results.add(serviceResult);
-                        if (isPOST){
+                        //if (isPOST){
                             serviceResultsMap.put(testID, serviceResult);      //PUTs do not return a Location, so don't add PUTs to serviceResultsMap.
-                        }
+                        //}
                         fullURL = fixupFullURL(fullURL, protoHostPort, uri);
                     } else if (method.equalsIgnoreCase("DELETE")){
                         String fromTestID = testNode.valueOf("fromTestID");
@@ -610,11 +685,13 @@ public class XmlReplay {
                         fullURL = fromTestID(fullURL, testNode, serviceResultsMap);
                         serviceResult = XmlReplayTransport.doGET(fullURL, authForTest, testIDLabel);
                         results.add(serviceResult);
+                        serviceResultsMap.put(testID, serviceResult);
                     } else if (method.equalsIgnoreCase("LIST")){
                         fullURL = fixupFullURL(fullURL, protoHostPort, uri);
                         String listQueryParams = ""; //TODO: empty for now, later may pick up from XML control file.
                         serviceResult = XmlReplayTransport.doLIST(fullURL, listQueryParams, authForTest, testIDLabel);
                         results.add(serviceResult);
+                        serviceResultsMap.put(testID, serviceResult);
                     } else {
                         throw new Exception("HTTP method not supported by XmlReplay: "+method);
                     }
@@ -634,20 +711,36 @@ public class XmlReplay {
                         String level = expectedLevel.valueOf("@level");
                         serviceResult.payloadStrictness = level;
                     }
-
+                    //=====================================================
+                    //  ALL VALIDATION FOR ALL REQUESTS IS DONE HERE:
+                    //=====================================================
                     String vError = validateResponse(serviceResult, serviceResultsMap, expectedResponseParts, evalStruct);
                     if (Tools.notEmpty(vError)){
                         serviceResult.error = vError;
                         serviceResult.failureReason = " : VALIDATION ERROR; ";
                     }
 
-                    String serviceResultRow = serviceResult.dump(dump.dumpServiceResult);
+                    String serviceResultRow = serviceResult.dump(dump.dumpServiceResult)+"; time:"+(startTime-System.currentTimeMillis());
                     String leader = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed) ? "XmlReplay:"+testIDLabel+": ": "";
+                    if (   (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed)
+                        || (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.full)){
+                        System.out.println("\r\n#---------------------#");
+                    }
                     System.out.println(leader+serviceResultRow+"\r\n");
-                    if (dump.payloads) System.out.println(serviceResult.result);
+                    if (dump.payloads && Tools.notBlank(serviceResult.requestPayload)) {
+                        System.out.println("\r\n========== request payload ===============");
+                        System.out.println(serviceResult.requestPayload);
+                        System.out.println("==========================================\r\n");
+                    }
+                    if (dump.payloads && Tools.notBlank(serviceResult.result)) {
+                        System.out.println("\r\n========== response payload ==============");
+                        System.out.println(serviceResult.result);
+                        System.out.println("==========================================\r\n");
+                    }
                 } catch (Throwable t) {
                     String msg = "ERROR: XmlReplay experienced an error in a test node: "+testNode+" Throwable: "+t;
                     System.out.println(msg);
+                    System.out.println(Tools.getStackTrace(t));
                     ServiceResult serviceResult = new ServiceResult();
                     serviceResult.error = msg;
                     serviceResult.failureReason = " : SYSTEM ERROR; ";
@@ -689,6 +782,9 @@ public class XmlReplay {
         String fromProps = System.getProperty(option);
         if (Tools.notEmpty(fromProps)){
             return fromProps;
+        }
+        if (line==null){
+            return "";
         }
         result = line.getOptionValue(option);
         if (result == null){

@@ -1,0 +1,7 @@
+  <schema xmlns:personauthorities_common="http://collectionspace.org/services/person" name="personauthorities_common">
+    <personauthorities_common:displayName>Perf Test Person Auth ${docID}</personauthorities_common:displayName>
+    <personauthorities_common:shortIdentifier>perfTestPersons-${docID}</personauthorities_common:shortIdentifier>
+    <personauthorities_common:vocabType>PersonAuthority</personauthorities_common:vocabType>
+    <personauthorities_common:refName>urn:cspace:collectionspace.org:Personauthorities(perfTestPersons)'Perf Test Person Auth'</personauthorities_common:refName>
+  </schema>
+

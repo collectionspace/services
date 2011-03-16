@@ -1,0 +1,65 @@
+<document repository="default" id="0743566a-fafa-46ba-bc3d-03ede35254ed">
+  <system>
+    <type>Workspace</type>
+    <path>${ServiceName}</path>
+    <lifecycle-state>project</lifecycle-state>
+    <lifecycle-policy>default</lifecycle-policy>
+    <access-control>
+      <acl name="inherited">
+        <entry principal="Administrator" permission="Everything" grant="true"/>
+        <entry principal="members" permission="Read" grant="true"/>
+      </acl>
+    </access-control>
+  </system>
+  <schema xmlns:dc="http://www.nuxeo.org/ecm/schemas/dublincore/" name="dublincore">
+    <dc:creator>Administrator</dc:creator>
+    <dc:contributors>
+      <item>Administrator</item>
+    </dc:contributors>
+    <dc:source/>
+    <dc:created>2011-03-04T23:51:05Z</dc:created>
+    <dc:description>A CollectionSpace workspace for ${ServiceName}</dc:description>
+    <dc:rights/>
+    <dc:subjects/>
+    <dc:valid/>
+    <dc:format/>
+    <dc:issued/>
+    <dc:modified>2011-03-04T23:51:05Z</dc:modified>
+    <dc:language/>
+    <dc:expired/>
+    <dc:coverage/>
+    <dc:title>${ServiceName}</dc:title>
+  </schema>
+  <schema xmlns="http://www.nuxeo.org/ecm/schemas/files/" name="files">
+    <files/>
+  </schema>
+  <schema xmlns="http://www.nuxeo.org/ecm/schemas/common/" name="common">
+    <icon>/icons/workspace.gif</icon>
+    <icon-expanded/>
+    <size/>
+  </schema>
+  <schema xmlns="http://www.nuxeo.org/ecm/schemas/file/" name="file">
+    <content/>
+    <filename/>
+  </schema>
+  <schema xmlns:webc="http://www.nuxeo.org/ecm/schemas/webcontainer/" name="webcontainer">
+    <webc:useCaptcha/>
+    <webc:welcomeText/>
+    <webc:welcomeMedia/>
+    <webc:theme>sites</webc:theme>
+    <webc:isWebContainer/>
+    <webc:baseline/>
+    <webc:template/>
+    <webc:logo/>
+    <webc:themePerspective/>
+    <webc:themePage>workspace</webc:themePage>
+    <webc:name>${ServiceName}</webc:name>
+    <webc:moderationType>aposteriori</webc:moderationType>
+    <webc:url>${ServiceName}</webc:url>
+    <webc:email/>
+  </schema>
+  <schema xmlns:publish="http://www.nuxeo.org/ecm/schemas/publishing/" name="publishing">
+    <publish:sections/>
+  </schema>
+</document>
+
