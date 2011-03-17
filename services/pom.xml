@@ -45,6 +45,7 @@
         <module>loanout</module>
         <module>media</module>
         <module>objectexit</module>
+        <module>imports</module>
         <module>location</module>
         <module>movement</module>
         <module>report</module>
