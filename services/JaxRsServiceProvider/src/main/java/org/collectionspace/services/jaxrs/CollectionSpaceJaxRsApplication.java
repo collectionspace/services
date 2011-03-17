@@ -32,6 +32,7 @@ import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
 import org.collectionspace.services.objectexit.ObjectExitResource;
+import org.collectionspace.services.imports.ImportsResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
 import org.collectionspace.services.report.ReportResource;
@@ -91,6 +92,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new LoanoutResource());
         singletons.add(new AcquisitionResource());
         singletons.add(new ObjectExitResource());
+        singletons.add(new ImportsResource());
         singletons.add(new MediaResource());
         singletons.add(new BlobResource());
         singletons.add(new MovementResource());
