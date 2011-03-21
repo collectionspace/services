@@ -55,30 +55,29 @@ import org.slf4j.LoggerFactory;
  */
 public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
-   /** The logger. */
+    /** The logger. */
     private final String CLASS_NAME = LoanoutServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    
     /** The known resource id. */
     private String knownResourceId = null;
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new LoanoutClient();
+        return new LoanoutClient();
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
         return response.getEntity(LoansoutCommonList.class);
     }
- 
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -87,7 +86,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -112,7 +111,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         // Specifically:
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -121,13 +120,13 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Store the ID returned from the first resource created
         // for additional tests below.
-        if (knownResourceId == null){
+        if (knownResourceId == null) {
             knownResourceId = extractId(res);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
         }
-        
+
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
         allResourceIdsCreated.add(extractId(res));
@@ -137,10 +136,10 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
-        for(int i = 0; i < 3; i++){
+        for (int i = 0; i < 3; i++) {
             create(testName);
         }
     }
@@ -153,7 +152,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -161,7 +160,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -169,98 +168,97 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
 
     /*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithEmptyEntityBody(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupCreateWithEmptyEntityBody();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupCreateWithEmptyEntityBody();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getServiceRootURL();
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = "";
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getServiceRootURL();
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = "";
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("createWithEmptyEntityBody url=" + url +
-                " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug("createWithEmptyEntityBody url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupCreateWithMalformedXml();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupCreateWithMalformedXml();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getServiceRootURL();
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = MALFORMED_XML_DATA; // Constant from base class.
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getServiceRootURL();
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = MALFORMED_XML_DATA; // Constant from base class.
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": url=" + url +
-                " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupCreateWithWrongXmlSchema();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupCreateWithWrongXmlSchema();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getServiceRootURL();
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = WRONG_XML_SCHEMA_DATA;
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getServiceRootURL();
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = WRONG_XML_SCHEMA_DATA;
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": url=" + url +
-                " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
-
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
@@ -269,8 +267,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -286,7 +284,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -298,7 +296,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         LoansoutCommon loanoutCommon = null;
         if (payloadInputPart != null) {
-        	loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(loanoutCommon);
 
@@ -315,10 +313,10 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(statusGroup.getLoanedObjectStatus());
 
         // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
                     + "UTF-8 data received=" + loanoutCommon.getLoanOutNote());
-    }
+        }
         Assert.assertEquals(loanoutCommon.getLoanOutNote(), getUTF8DataFragment(),
                 "UTF-8 data retrieved '" + loanoutCommon.getLoanOutNote()
                 + "' does not match expected data '" + getUTF8DataFragment());
@@ -329,8 +327,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -346,7 +344,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -362,8 +360,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createList", "read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -380,7 +378,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -389,17 +387,17 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()) {
             List<LoansoutCommonList.LoanoutListItem> items =
                     list.getLoanoutListItem();
             int i = 0;
-            for(LoansoutCommonList.LoanoutListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] loanOutNumber=" +
-                        item.getLoanOutNumber());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+            for (LoansoutCommonList.LoanoutListItem item : items) {
+                logger.debug(testName + ": list-item[" + i + "] csid="
+                        + item.getCsid());
+                logger.debug(testName + ": list-item[" + i + "] loanOutNumber="
+                        + item.getLoanOutNumber());
+                logger.debug(testName + ": list-item[" + i + "] URI="
+                        + item.getUri());
                 i++;
             }
         }
@@ -416,8 +414,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -429,12 +427,12 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         LoanoutClient client = new LoanoutClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
         }
 
@@ -443,7 +441,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         LoansoutCommon loanoutCommon = null;
         if (payloadInputPart != null) {
-        	loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(loanoutCommon);
 
@@ -462,10 +460,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         String updatedLoanedObjectStatus = "updated-" + loanedObjectStatus;
         statusGroups.get(0).setLoanedObjectStatus(updatedLoanedObjectStatus);
         loanoutCommon.setLoanedObjectStatusGroupList(statusGroupList);
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
         }
+        loanoutCommon.setLoanOutNote("updated-" + loanoutCommon.getLoanOutNote());
 
         // Submit the updated resource in an update request to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
@@ -473,9 +472,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
-        
+
         // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -487,7 +486,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         payloadInputPart = input.getPart(client.getCommonPartName());
         LoansoutCommon updatedLoanoutCommon = null;
         if (payloadInputPart != null) {
-        	updatedLoanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+            updatedLoanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(updatedLoanoutCommon);
 
@@ -508,10 +507,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
                 updatedStatusGroups.get(0).getLoanedObjectStatus(),
                 "Data in updated object did not match submitted data.");
 
-        if(logger.isDebugEnabled()){
+        // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
+        if (logger.isDebugEnabled()) {
             logger.debug("UTF-8 data sent=" + loanoutCommon.getLoanOutNote() + "\n"
                     + "UTF-8 data received=" + updatedLoanoutCommon.getLoanOutNote());
-    }
+        }
         Assert.assertTrue(updatedLoanoutCommon.getLoanOutNote().contains(getUTF8DataFragment()),
                 "UTF-8 data retrieved '" + updatedLoanoutCommon.getLoanOutNote()
                 + "' does not contain expected data '" + getUTF8DataFragment());
@@ -527,112 +527,112 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
      */
     @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception{
-    	//Should this really be empty?
+    public void updateWithEmptyEntityBody(String testName) throws Exception {
+        //Should this really be empty?
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
      */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
      */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
 
     /*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateWithEmptyEntityBody();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupUpdateWithEmptyEntityBody();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = "";
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getResourceURL(knownResourceId);
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = "";
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": url=" + url +
-                " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithMalformedXml(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateWithMalformedXml();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupUpdateWithMalformedXml();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = MALFORMED_XML_DATA;
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getResourceURL(knownResourceId);
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = MALFORMED_XML_DATA;
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": url=" + url +
-             " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateWithWrongXmlSchema();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupUpdateWithWrongXmlSchema();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = WRONG_XML_SCHEMA_DATA;
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getResourceURL(knownResourceId);
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = WRONG_XML_SCHEMA_DATA;
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
 
@@ -640,8 +640,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"update", "testSubmitRequest"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -660,7 +660,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -676,8 +676,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -693,7 +693,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -706,8 +706,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"delete"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -723,7 +723,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -751,9 +751,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("testSubmitRequest: url=" + url +
-                " status=" + statusCode);
+        if (logger.isDebugEnabled()) {
+            logger.debug("testSubmitRequest: url=" + url
+                    + " status=" + statusCode);
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
@@ -790,14 +790,14 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @return the multipart output
      */
     private PoxPayloadOut createLoanoutInstance(String loanOutNumber,
-    		String returnDate) {
+            String returnDate) {
         LoansoutCommon loanoutCommon = new LoansoutCommon();
         loanoutCommon.setLoanOutNumber(loanOutNumber);
         loanoutCommon.setLoanReturnDate(returnDate);
         loanoutCommon.setBorrower(
-           "urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'");
+                "urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'");
         loanoutCommon.setBorrowersContact(
-            "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Chris Contact)'Chris Contact'");
+                "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Chris Contact)'Chris Contact'");
         loanoutCommon.setLoanPurpose("Allow people in cold climes to share the magic of Surfboards of the 1960s.");
         LoanedObjectStatusGroupList statusGroupList = new LoanedObjectStatusGroupList();
         List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
@@ -806,15 +806,14 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         statusGroup.setLoanedObjectStatusNote("Left under the front mat.");
         statusGroups.add(statusGroup);
         loanoutCommon.setLoanedObjectStatusGroupList(statusGroupList);
-
-        loanoutCommon.setLoanOutNote(getUTF8DataFragment());
+        loanoutCommon.setLoanOutNote(getUTF8DataFragment());  // For UTF-8 tests
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
-            multipart.addPart(loanoutCommon, MediaType.APPLICATION_XML_TYPE);
+                multipart.addPart(loanoutCommon, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(new LoanoutClient().getCommonPartName());
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("to be created, loanout common");
             logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
             // logger.debug(multipart.toXML());
@@ -823,8 +822,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         return multipart;
     }
 
-	@Override
-	protected String getServiceName() {
-		return LoanoutClient.SERVICE_NAME;
-	}
+    @Override
+    protected String getServiceName() {
+        return LoanoutClient.SERVICE_NAME;
+    }
 }
