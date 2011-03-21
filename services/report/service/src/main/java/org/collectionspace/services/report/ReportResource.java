@@ -185,7 +185,7 @@ public class ReportResource extends
      */
     @GET
     @Path("{csid}")
-    public String getReport(
+    public byte[] getReport(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getReport with csid=" + csid);
@@ -229,7 +229,7 @@ public class ReportResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**
@@ -444,7 +444,7 @@ public class ReportResource extends
      */
     @PUT
     @Path("{csid}")
-    public String updateReport(
+    public byte[] updateReport(
             @PathParam("csid") String csid,
             String xmlText) {
         if (logger.isDebugEnabled()) {
@@ -481,7 +481,7 @@ public class ReportResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**

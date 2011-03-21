@@ -125,8 +125,7 @@ public class ReportClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.ReportProxy#createReport(org.collectionspace.hello.Report)
      */
     public ClientResponse<Response> create(PoxPayloadOut multipart) {
-        String payload = multipart.toXML();
-        return reportProxy.create(payload);
+        return reportProxy.create(multipart.getBytes());
     }
 
     /**
@@ -136,9 +135,7 @@ public class ReportClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.ReportProxy#updateReport(java.lang.Long, org.collectionspace.hello.Report)
      */
     public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
-        String payload = multipart.toXML();
-        return reportProxy.update(csid, payload);
-
+        return reportProxy.update(csid, multipart.getBytes());
     }
 
     /**

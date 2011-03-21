@@ -67,7 +67,7 @@ public interface ReportProxy extends CollectionSpaceProxy {
      * @return the client response
      */
     @POST
-    ClientResponse<Response> create(String payload);
+    ClientResponse<Response> create(byte[] payload);
 
     //(R)ead
     /**
@@ -90,7 +90,7 @@ public interface ReportProxy extends CollectionSpaceProxy {
      */
     @PUT
     @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, String payload);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
 
     //(D)elete
     /**
