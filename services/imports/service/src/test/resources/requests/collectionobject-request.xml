@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <imports>
-    <import ID="0" workspace="CollectionObjects" />
-    <import ID="1" service="CollectionObjects" type="CollectionObject">
+    <import seq="1" service="CollectionObjects" type="CollectionObject">
         <schema xmlns:collectionobjects_naturalhistory="http://collectionspace.org/collectionobject/" name="collectionobjects_naturalhistory">
             <collectionobjects_naturalhistory:nh-int/>
             <collectionobjects_naturalhistory:nh-note/>
