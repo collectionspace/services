@@ -159,8 +159,7 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @return the client response
      */
     public ClientResponse<Response> create(PoxPayloadOut poxPayloadout) {
-    	String xmlPayload = poxPayloadout.toXML();
-        return vocabularyProxy.create(xmlPayload);
+        return vocabularyProxy.create(poxPayloadout.getBytes());
     }
 
     /**
@@ -171,8 +170,7 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @return the client response
      */
     public ClientResponse<String> update(String csid, PoxPayloadOut poxPayloadout) {
-    	String xmlPayload = poxPayloadout.toXML();
-        return vocabularyProxy.update(csid, xmlPayload);
+        return vocabularyProxy.update(csid, poxPayloadout.getBytes());
 
     }
 

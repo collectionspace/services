@@ -60,14 +60,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
     private final String CLASS_NAME = VocabularyServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = VocabularyClient.SERVICE_PATH_COMPONENT;//"vocabularies";
     final String SERVICE_PATH_ITEMS_COMPONENT = VocabularyClient.SERVICE_PATH_ITEMS_COMPONENT;//"items";
-    
     final String SERVICE_PAYLOAD_NAME = VocabularyClient.SERVICE_PAYLOAD_NAME;
     final String SERVICE_ITEM_PAYLOAD_NAME = VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME;
-    
     private String knownResourceId = null;
     private String knownResourceShortIdentifer = null;
     private String knownResourceRefName = null;
@@ -76,14 +73,14 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     private int nItemsToCreateInList = 5;
     private List<String> allResourceIdsCreated = new ArrayList<String>();
     private Map<String, String> allResourceItemIdsCreated =
-        new HashMap<String, String>();
-    
-    protected void setKnownResource( String id, String shortIdentifer,
-    								String refName, String fullRefName ) {
-    	knownResourceId = id;
-    	knownResourceShortIdentifer = shortIdentifer;
-    	knownResourceRefName = refName;
-    	knownResourceFullRefName = fullRefName;
+            new HashMap<String, String>();
+
+    protected void setKnownResource(String id, String shortIdentifer,
+            String refName, String fullRefName) {
+        knownResourceId = id;
+        knownResourceShortIdentifer = shortIdentifer;
+        knownResourceRefName = refName;
+        knownResourceFullRefName = fullRefName;
     }
 
     /* (non-Javadoc)
@@ -91,26 +88,26 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new VocabularyClient();
+        return new VocabularyClient();
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
         return response.getEntity(VocabulariesCommonList.class);
     }
- 
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
@@ -123,8 +120,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         VocabularyClient client = new VocabularyClient();
         String identifier = createIdentifier();
         String displayName = "displayName-" + identifier;
-    	PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
-    					displayName, identifier, client.getCommonPartName());
+        PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
+                displayName, identifier, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
 
@@ -134,7 +131,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Specifically:
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -143,10 +140,10 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Store the ID returned from the first resource created
         // for additional tests below.
-        if (knownResourceId == null){
-        	setKnownResource(extractId(res), identifier,
-        			VocabularyClientUtils.createVocabularyRefName(identifier, null),
-        			VocabularyClientUtils.createVocabularyRefName(identifier, displayName));
+        if (knownResourceId == null) {
+            setKnownResource(extractId(res), identifier,
+                    VocabularyClientUtils.createVocabularyRefName(identifier, null),
+                    VocabularyClientUtils.createVocabularyRefName(identifier, displayName));
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -157,11 +154,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
     public void createItem(String testName) {
 
-        if (null!=testName && logger.isDebugEnabled()) {
+        if (null != testName && logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
         // Perform setup.
@@ -171,15 +168,15 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         String shortId = createIdentifier();
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
-        itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-"+shortId);
+        itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-" + shortId);
         String newID = VocabularyClientUtils.createItemInVocabulary(knownResourceId,
-				knownResourceRefName, itemInfo, client);
+                knownResourceRefName, itemInfo, client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
-        if (knownItemResourceId == null){
+        if (knownItemResourceId == null) {
             knownItemResourceId = newID;
-            if (null!=testName && logger.isDebugEnabled()) {
+            if (null != testName && logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
             }
         }
@@ -190,13 +187,13 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     }
 
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            dependsOnMethods = {"create", "createItem", "readItem"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create", "createItem", "readItem"})
     public void createList(String testName) throws Exception {
         for (int i = 0; i < 3; i++) {
-        	// Force create to reset the known resource info
-        	setKnownResource(null, null, null, null);
-        	knownItemResourceId = null;
+            // Force create to reset the known resource info
+            setKnownResource(null, null, null, null);
+            knownItemResourceId = null;
             create(testName);
             // Add nItemsToCreateInList items to each vocab
             for (int j = 0; j < nItemsToCreateInList; j++) {
@@ -220,10 +217,10 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     public void createWithWrongXmlSchema(String testName) throws Exception {
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
     public void createWithBadShortId(String testName) throws Exception {
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
@@ -231,8 +228,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
-    	PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
-    					"Vocab with Bad Short Id", "Bad Short Id!", client.getCommonPartName());
+        PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
+                "Vocab with Bad Short Id", "Bad Short Id!", client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
 
@@ -242,7 +239,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Specifically:
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -250,10 +247,10 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"createItem"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createItem"})
     public void createItemWithBadShortId(String testName) throws Exception {
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
@@ -264,120 +261,119 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, "Bad Item Short Id!");
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "Bad Item!");
-    	PoxPayloadOut multipart = 
-    		VocabularyClientUtils.createVocabularyItemInstance( knownResourceRefName,
-    				itemInfo, client.getCommonPartItemName() );
-    	ClientResponse<Response> res = client.createItem(knownResourceId, multipart);
+        PoxPayloadOut multipart =
+                VocabularyClientUtils.createVocabularyItemInstance(knownResourceRefName,
+                itemInfo, client.getCommonPartItemName());
+        ClientResponse<Response> res = client.createItem(knownResourceId, multipart);
 
-    	int statusCode = res.getStatus();
+        int statusCode = res.getStatus();
 
-    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+itemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-    				+"\" in personAuthority: \"" + knownResourceRefName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	}
-    	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-    				+"\" in personAuthority: \"" + knownResourceRefName +"\", Status:"+ statusCode);
-    	}
+        if (!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+            throw new RuntimeException("Could not create Item: \"" + itemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
+                    + "\" in personAuthority: \"" + knownResourceRefName
+                    + "\" " + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        }
+        if (statusCode != EXPECTED_STATUS_CODE) {
+            throw new RuntimeException("Unexpected Status when creating Item: \"" + itemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
+                    + "\" in personAuthority: \"" + knownResourceRefName + "\", Status:" + statusCode);
+        }
     }
 
     /*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithEmptyEntityBody(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupCreateWithEmptyEntityBody(testName, CLASS_NAME);
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupCreateWithEmptyEntityBody(testName, CLASS_NAME);
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getServiceRootURL();
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = "";
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getServiceRootURL();
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = "";
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()) {
-            logger.debug(testName + ": url=" + url +
-                " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()) {
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupCreateWithMalformedXml();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupCreateWithMalformedXml();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getServiceRootURL();
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = MALFORMED_XML_DATA; // Constant from base class.
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getServiceRootURL();
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = MALFORMED_XML_DATA; // Constant from base class.
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": url=" + url +
-                " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupCreateWithWrongXmlSchema();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupCreateWithWrongXmlSchema();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getServiceRootURL();
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = WRONG_XML_SCHEMA_DATA;
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getServiceRootURL();
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = WRONG_XML_SCHEMA_DATA;
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": url=" + url +
-                " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
-
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -393,22 +389,18 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
-        try {
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-            VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
-                    client.getCommonPartName(), VocabulariesCommon.class);
-            Assert.assertNotNull(vocabulary);
-            Assert.assertEquals(vocabulary.getRefName(), knownResourceFullRefName);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
+                client.getCommonPartName(), VocabulariesCommon.class);
+
+        Assert.assertNotNull(vocabulary);
+        Assert.assertEquals(vocabulary.getRefName(), knownResourceFullRefName);
     }
 
     /**
@@ -417,9 +409,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"read"})
-        public void readByName(String testName) throws Exception {
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read"})
+    public void readByName(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
@@ -430,68 +422,59 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
         ClientResponse<String> res = client.readByName(knownResourceShortIdentifer);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	        //FIXME: remove the following try catch once Aron fixes signatures
-	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	            VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
-	            		client.getCommonPartName(), VocabulariesCommon.class);
-	            Assert.assertNotNull(vocabulary);
-	        } catch (Exception e) {
-	            throw new RuntimeException(e);
-	        }
-        } finally {
-        	res.releaseConnection();
-        }
-    }
-
-    /*
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-            dependsOnMethods = {"read"})
-        public void readByName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        ClientResponse<PoxPayloadIn> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
-        try {
-            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
-            VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
-                    client.getCommonPartName(), VocabulariesCommon.class);
-            Assert.assertNotNull(vocabulary);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-    */
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
+                client.getCommonPartName(), VocabulariesCommon.class);
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createItem", "read"})
+        Assert.assertNotNull(vocabulary);
+    }
+
+    /*
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    dependsOnMethods = {"read"})
+    public void readByName(String testName) throws Exception {
+
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupRead();
+
+    // Submit the request to the service and store the response.
+    ClientResponse<PoxPayloadIn> res = client.read(knownResourceId);
+    int statusCode = res.getStatus();
+
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": status = " + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    //FIXME: remove the following try catch once Aron fixes signatures
+    try {
+    PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+    VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
+    client.getCommonPartName(), VocabulariesCommon.class);
+    Assert.assertNotNull(vocabulary);
+    } catch (Exception e) {
+    throw new RuntimeException(e);
+    }
+    }
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createItem", "read"})
     public void readItem(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -507,7 +490,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -523,8 +506,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            dependsOnMethods = {"updateItem"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"updateItem"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -532,7 +515,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         }
         // Perform setup.
         testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
-    	// setupUpdateWithWrongXmlSchema(testName);
+        // setupUpdateWithWrongXmlSchema(testName);
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -541,7 +524,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -564,13 +547,13 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("updateItem: status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE, 
-        		"Expecting invalid message because of null displayName.");
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
+                "Expecting invalid message because of null displayName.");
 
         // Now try to Update with 1-char displayName (too short)
         vitem.setDisplayName("a");
@@ -583,18 +566,18 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("updateItem: status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE, 
-        	"Expecting invalid message because of 1-char displayName.");
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
+                "Expecting invalid message because of 1-char displayName.");
     }
 
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read"})
     public void readNonExistent(String testName) {
 
         if (logger.isDebugEnabled()) {
@@ -610,7 +593,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -618,8 +601,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"readItem", "readNonExistent"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"readItem", "readNonExistent"})
     public void readItemNonExistent(String testName) {
 
         if (logger.isDebugEnabled()) {
@@ -635,7 +618,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -648,8 +631,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     // Success outcomes
 
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createList", "read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -666,7 +649,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -681,28 +664,28 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
             int i = 0;
             for (VocabulariesCommonList.VocabularyListItem item : items) {
                 String csid = item.getCsid();
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        csid);
-                logger.debug(testName + ": list-item[" + i + "] displayName=" +
-                        item.getDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+                logger.debug(testName + ": list-item[" + i + "] csid="
+                        + csid);
+                logger.debug(testName + ": list-item[" + i + "] displayName="
+                        + item.getDisplayName());
+                logger.debug(testName + ": list-item[" + i + "] URI="
+                        + item.getUri());
                 readItemListInt(csid, null, "readList");
                 i++;
             }
         }
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            dependsOnMethods = {"createList", "readItem"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createList", "readItem"})
     public void readItemList(String testName) {
-    	readItemListInt(knownResourceId, null, testName);
+        readItemListInt(knownResourceId, null, testName);
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            dependsOnMethods = {"createList", "readItem"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createList", "readItem"})
     public void readItemListByName(String testName) {
-    	readItemListInt(null, knownResourceShortIdentifer, testName);
+        readItemListInt(null, knownResourceShortIdentifer, testName);
     }
 
     private void readItemListInt(String vcsid, String shortId, String testName) {
@@ -713,19 +696,19 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
         ClientResponse<VocabularyitemsCommonList> res = null;
-        if(vcsid!=null) {
+        if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
-        } else if(shortId!=null) {
+        } else if (shortId != null) {
             res = client.readItemListForNamedVocabulary(shortId, null, null);
         } else {
-        	Assert.fail("Internal Error: readItemList both vcsid and shortId are null!");
+            Assert.fail("Internal Error: readItemList both vcsid and shortId are null!");
         }
         VocabularyitemsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("  " + testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -733,14 +716,14 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         List<VocabularyitemsCommonList.VocabularyitemListItem> items =
-            list.getVocabularyitemListItem();
+                list.getVocabularyitemListItem();
         int nItemsReturned = items.size();
         long nItemsTotal = list.getTotalItems();
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("  " + testName + ": Expected "
-           		+ nItemsToCreateInList+" items; got: "+nItemsReturned+" of: "+nItemsTotal);
+                    + nItemsToCreateInList + " items; got: " + nItemsReturned + " of: " + nItemsTotal);
         }
-        Assert.assertEquals( nItemsTotal, nItemsToCreateInList);
+        Assert.assertEquals(nItemsTotal, nItemsToCreateInList);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
@@ -748,12 +731,12 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
             logger.debug("  " + testName + ": checking items");
             int i = 0;
             for (VocabularyitemsCommonList.VocabularyitemListItem item : items) {
-                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
-                        item.getDisplayName());
-                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+                logger.debug("  " + testName + ": list-item[" + i + "] csid="
+                        + item.getCsid());
+                logger.debug("  " + testName + ": list-item[" + i + "] displayName="
+                        + item.getDisplayName());
+                logger.debug("  " + testName + ": list-item[" + i + "] URI="
+                        + item.getUri());
                 i++;
             }
         }
@@ -766,8 +749,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -780,12 +763,12 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         VocabularyClient client = new VocabularyClient();
         ClientResponse<String> res =
                 client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("got Vocabulary to update with ID: " + knownResourceId);
         }
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -796,21 +779,21 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Update the contents of this resource.
         vocabulary.setDisplayName("updated-" + vocabulary.getDisplayName());
         vocabulary.setVocabType("updated-" + vocabulary.getVocabType());
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("to be updated Vocabulary");
             logger.debug(objectAsXmlString(vocabulary, VocabulariesCommon.class));
         }
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(SERVICE_PAYLOAD_NAME);
-        
+
         PayloadOutputPart commonPart = output.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("update: status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -821,7 +804,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         input = new PoxPayloadIn(res.getEntity());
         VocabulariesCommon updatedVocabulary =
                 (VocabulariesCommon) extractPart(input,
-                        client.getCommonPartName(), VocabulariesCommon.class);
+                client.getCommonPartName(), VocabulariesCommon.class);
         Assert.assertNotNull(updatedVocabulary);
 
         // Verify that the updated resource received the correct data.
@@ -830,8 +813,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
                 "Data in updated object did not match submitted data.");
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"readItem", "update", "verifyIgnoredUpdateWithInAuthority"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"readItem", "update", "verifyIgnoredUpdateWithInAuthority"})
     public void updateItem(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -844,15 +827,15 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         VocabularyClient client = new VocabularyClient();
         ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("got VocabularyItem to update with ID: " +
-                knownItemResourceId +
-                " in Vocab: " + knownResourceId );
+        if (logger.isDebugEnabled()) {
+            logger.debug("got VocabularyItem to update with ID: "
+                    + knownItemResourceId
+                    + " in Vocab: " + knownResourceId);
         }
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         VocabularyitemsCommon vocabularyItem = (VocabularyitemsCommon) extractPart(input,
@@ -861,10 +844,10 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Update the contents of this resource.
         vocabularyItem.setDisplayName("updated-" + vocabularyItem.getDisplayName());
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("to be updated VocabularyItem");
             logger.debug(objectAsXmlString(vocabularyItem,
-                VocabularyitemsCommon.class));
+                    VocabularyitemsCommon.class));
         }
 
         // Submit the updated resource to the service and store the response.
@@ -875,7 +858,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("updateItem: status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -886,7 +869,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         input = new PoxPayloadIn(res.getEntity());
         VocabularyitemsCommon updatedVocabularyItem =
                 (VocabularyitemsCommon) extractPart(input,
-                        client.getCommonPartItemName(), VocabularyitemsCommon.class);
+                client.getCommonPartItemName(), VocabularyitemsCommon.class);
         Assert.assertNotNull(updatedVocabularyItem);
 
         // Verify that the updated resource received the correct data.
@@ -895,67 +878,67 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
                 "Data in updated VocabularyItem did not match submitted data.");
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"readItem"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"readItem"})
     public void verifyIgnoredUpdateWithInAuthority(String testName) throws Exception {
 
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testBanner(testName, CLASS_NAME));
-    	}
-    	// Perform setup.
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
         setupUpdate();
 
-    	// Submit the request to the service and store the response.
-    	VocabularyClient client = new VocabularyClient();
-    	ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-    	int statusCode = res.getStatus();
+        // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
+        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        int statusCode = res.getStatus();
 
-    	// Check the status code of the response: does it match
-    	// the expected response(s)?
-    	if(logger.isDebugEnabled()){
-    		logger.debug(testName + " read Vocab:"+knownResourceId+"/Item:"
-    				+knownItemResourceId+" status = " + statusCode);
-    	}
-    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " read Vocab:" + knownResourceId + "/Item:"
+                    + knownItemResourceId + " status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
 
-    	PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-    	VocabularyitemsCommon vitem = (VocabularyitemsCommon) extractPart(input,
-    			client.getCommonPartItemName(), VocabularyitemsCommon.class);
-    	Assert.assertNotNull(vitem);
-    	// Try to Update with new parent vocab (use self, for test).
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        VocabularyitemsCommon vitem = (VocabularyitemsCommon) extractPart(input,
+                client.getCommonPartItemName(), VocabularyitemsCommon.class);
+        Assert.assertNotNull(vitem);
+        // Try to Update with new parent vocab (use self, for test).
         Assert.assertEquals(vitem.getInAuthority(),
-        		knownResourceId,
+                knownResourceId,
                 "VocabularyItem inAuthority does not match knownResourceId.");
-    	vitem.setInAuthority(knownItemResourceId);
+        vitem.setInAuthority(knownItemResourceId);
 
-    	// Submit the updated resource to the service and store the response.
-    	PoxPayloadOut output = new PoxPayloadOut(SERVICE_ITEM_PAYLOAD_NAME);
-    	PayloadOutputPart commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
-    	commonPart.setLabel(client.getCommonPartItemName());
-    	res = client.updateItem(knownResourceId, knownItemResourceId, output);
-    	statusCode = res.getStatus();
+        // Submit the updated resource to the service and store the response.
+        PoxPayloadOut output = new PoxPayloadOut(SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartItemName());
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        statusCode = res.getStatus();
 
-    	// Check the status code of the response: does it match the expected response(s)?
-    	if(logger.isDebugEnabled()){
-    		logger.debug(testName + ": status = " + statusCode);
-    	}
-    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Retrieve the updated resource and verify that the parent did not change
-    	res = client.readItem(knownResourceId, knownItemResourceId);
+        res = client.readItem(knownResourceId, knownItemResourceId);
         input = new PoxPayloadIn(res.getEntity());
         VocabularyitemsCommon updatedVocabularyItem =
                 (VocabularyitemsCommon) extractPart(input,
-                        client.getCommonPartItemName(), VocabularyitemsCommon.class);
+                client.getCommonPartItemName(), VocabularyitemsCommon.class);
         Assert.assertNotNull(updatedVocabularyItem);
 
         // Verify that the updated resource received the correct data.
         Assert.assertEquals(updatedVocabularyItem.getInAuthority(),
-        		knownResourceId,
+                knownResourceId,
                 "VocabularyItem allowed update to the parent (inAuthority).");
     }
 
@@ -977,96 +960,94 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     /*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateWithEmptyEntityBody();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupUpdateWithEmptyEntityBody();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = "";
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getResourceURL(knownResourceId);
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = "";
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": url=" + url +
-                " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithMalformedXml(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateWithMalformedXml();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupUpdateWithMalformedXml();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = MALFORMED_XML_DATA;
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getResourceURL(knownResourceId);
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = MALFORMED_XML_DATA;
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": url=" + url +
-               " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateWithWrongXmlSchema();
+    if (logger.isDebugEnabled()) {
+    logger.debug(testBanner(testName, CLASS_NAME));
+    }
+    // Perform setup.
+    setupUpdateWithWrongXmlSchema();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = WRONG_XML_SCHEMA_DATA;
-        int statusCode = submitRequest(method, url, mediaType, entity);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getResourceURL(knownResourceId);
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = WRONG_XML_SCHEMA_DATA;
+    int statusCode = submitRequest(method, url, mediaType, entity);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateWithWrongXmlSchema: url=" + url +
-                " status=" + statusCode);
-         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    if(logger.isDebugEnabled()){
+    logger.debug("updateWithWrongXmlSchema: url=" + url +
+    " status=" + statusCode);
+    }
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
-
-
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"update", "testSubmitRequest"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -1079,16 +1060,16 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         VocabularyClient client = new VocabularyClient();
-    	String displayName = "displayName-" + NON_EXISTENT_ID;
-    	PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
-				displayName, NON_EXISTENT_ID, client.getCommonPartName());
+        String displayName = "displayName-" + NON_EXISTENT_ID;
+        PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
+                displayName, NON_EXISTENT_ID, client.getCommonPartName());
         ClientResponse<String> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -1096,8 +1077,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
     public void updateNonExistentItem(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -1113,17 +1094,17 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, "nonex");
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-nonex");
-        PoxPayloadOut multipart = 
-        	VocabularyClientUtils.createVocabularyItemInstance( 
-        		VocabularyClientUtils.createVocabularyRefName(NON_EXISTENT_ID, null),
-        		itemInfo, client.getCommonPartItemName());
+        PoxPayloadOut multipart =
+                VocabularyClientUtils.createVocabularyItemInstance(
+                VocabularyClientUtils.createVocabularyRefName(NON_EXISTENT_ID, null),
+                itemInfo, client.getCommonPartItemName());
         ClientResponse<String> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -1136,8 +1117,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "deleteItem"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "deleteItem"})
     public void delete(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -1153,7 +1134,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -1161,9 +1142,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-   @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createItem", "readItemList", "testItemSubmitRequest",
-            "updateItem", "verifyIllegalItemDisplayName", "verifyIgnoredUpdateWithInAuthority"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createItem", "readItemList", "testItemSubmitRequest",
+        "updateItem", "verifyIllegalItemDisplayName", "verifyIgnoredUpdateWithInAuthority"})
     public void deleteItem(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -1179,7 +1160,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("delete: status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -1189,8 +1170,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
     // Failure outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"delete"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -1206,7 +1187,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -1214,8 +1195,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"deleteItem"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"deleteItem"})
     public void deleteNonExistentItem(String testName) {
 
         if (logger.isDebugEnabled()) {
@@ -1231,7 +1212,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -1251,7 +1232,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Expected status code: 200 OK
         setupRead();
-        
+
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
         String url = getResourceURL(knownResourceId);
@@ -1259,9 +1240,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("testSubmitRequest: url=" + url +
-                " status=" + statusCode);
+        if (logger.isDebugEnabled()) {
+            logger.debug("testSubmitRequest: url=" + url
+                    + " status=" + statusCode);
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
@@ -1280,9 +1261,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("testItemSubmitRequest: url=" + url +
-                " status=" + statusCode);
+        if (logger.isDebugEnabled()) {
+            logger.debug("testItemSubmitRequest: url=" + url
+                    + " status=" + statusCode);
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
@@ -1291,7 +1272,6 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Cleanup of resources created during testing
     // ---------------------------------------------------------------
-    
     /**
      * Deletes all resources created by tests, after all tests have been run.
      *
@@ -1300,15 +1280,15 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
      */
-    @AfterClass(alwaysRun=true)
+    @AfterClass(alwaysRun = true)
     public void cleanUp() {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
-    	}
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
@@ -1367,8 +1347,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         return getItemServiceRootURL(parentResourceIdentifier) + "/" + resourceIdentifier;
     }
 
-	@Override
-	protected String getServiceName() {
-		return VocabularyClient.SERVICE_NAME;
-	}
+    @Override
+    protected String getServiceName() {
+        return VocabularyClient.SERVICE_NAME;
+    }
 }

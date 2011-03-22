@@ -252,7 +252,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
 	@GET
 	@Path("{csid}")
-	public String getAuthority(@PathParam("csid") String specifier) {
+	public byte[] getAuthority(@PathParam("csid") String specifier) {
 		PoxPayloadOut result = null;
 		try {
 			Specifier spec = getSpecifier(specifier, "getAuthority", "GET");
@@ -298,7 +298,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			throw new WebApplicationException(response);
 		}
 
-		return result.toXML();
+		return result.getBytes();
 	}
 
 	/**
@@ -346,7 +346,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
 	@PUT
 	@Path("{csid}")
-	public String updateAuthority(
+	public byte[] updateAuthority(
 			@PathParam("csid") String specifier,
 			String xmlPayload) {
 		PoxPayloadOut result = null;
@@ -381,7 +381,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 					Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result.toXML();
+		return result.getBytes();
 	}
 
 	/**
@@ -485,7 +485,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
 	@GET
 	@Path("{csid}/items/{itemcsid}")
-	public String getAuthorityItem(
+	public byte[] getAuthorityItem(
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier) {
 		PoxPayloadOut result = null;
@@ -541,7 +541,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 					"text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result.toXML();
+		return result.getBytes();
 	}
 
 
@@ -782,7 +782,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
 	@PUT
 	@Path("{csid}/items/{itemcsid}")
-	public String updateAuthorityItem(
+	public byte[] updateAuthorityItem(
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier,
 			String xmlPayload) {
@@ -837,7 +837,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 					Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result.toXML();
+		return result.getBytes();
 	}
 
 	/**
