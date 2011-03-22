@@ -151,7 +151,7 @@ public class NewRelationResource extends
 	 */
 	@GET
 	@Path("{csid}")
-	public String getRelation(@Context UriInfo ui,
+	public byte[] getRelation(@Context UriInfo ui,
 			@PathParam("csid") String csid) {
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 		if (logger.isDebugEnabled()) {
@@ -201,7 +201,7 @@ public class NewRelationResource extends
 					.build();
 			throw new WebApplicationException(response);
 		}
-		return result.toXML();
+		return result.getBytes();
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class NewRelationResource extends
 	 */
 	@PUT
 	@Path("{csid}")
-	public String updateRelation(@PathParam("csid") String csid,
+	public byte[] updateRelation(@PathParam("csid") String csid,
 			String xmlText) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("updateRelation with csid=" + csid);
@@ -276,7 +276,7 @@ public class NewRelationResource extends
 					"Update failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result.toXML();
+		return result.getBytes();
 	}
 
 	/**

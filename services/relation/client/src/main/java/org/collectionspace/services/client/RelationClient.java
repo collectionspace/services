@@ -144,8 +144,7 @@ public class RelationClient extends AbstractServiceClientImpl {
 	 * @return the client response
 	 */
 	public ClientResponse<Response> create(PoxPayloadOut multipart) {
-            String payload = multipart.toXML();
-            return relationProxy.create(payload);
+            return relationProxy.create(multipart.getBytes());
 	}
 
 	/**
@@ -157,8 +156,7 @@ public class RelationClient extends AbstractServiceClientImpl {
 	 */
 	public ClientResponse<String> update(String csid,
                 PoxPayloadOut multipart) {
-            String payload = multipart.toXML();
-            return relationProxy.update(csid, payload);
+            return relationProxy.update(csid, multipart.getBytes());
 	}
 
 	/**
