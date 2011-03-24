@@ -25,10 +25,7 @@
  */
 package org.collectionspace.services.collectionobject;
 
-import java.io.InputStream; //FIXME: REM - Please remove unneeded imports
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,13 +50,8 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 //import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils; //FIXME: REM - Please remove all unneeded imports
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.blob.BlobInput;
-import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.common.context.ServiceContextFactory;
 //import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -71,16 +63,14 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.intake.IntakesCommonList;
 //import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
-import org.collectionspace.services.relation.NewRelationResource;
+import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
 import org.collectionspace.services.common.profile.Profiler;
-import org.collectionspace.services.common.FileUtils;
 
 import org.jboss.resteasy.util.HttpResponseCodes;
 
@@ -420,7 +410,7 @@ public class CollectionObjectResource
         	String subjectCsid = csid;
         	String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.value();
         	String objectCsid = null;
-        	NewRelationResource relationResource = new NewRelationResource();
+        	RelationResource relationResource = new RelationResource();
         	RelationsCommonList relationsCommonList = relationResource.getRelationList(queryParams,
         			subjectCsid,
         			null, /*subjectType*/

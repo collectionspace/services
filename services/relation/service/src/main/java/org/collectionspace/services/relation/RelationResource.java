@@ -1,5 +1,5 @@
 /**	
- * NewRelationResource.java
+ * RelationResource.java
  *
  * {Purpose of This Class}
  *
@@ -54,27 +54,25 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class NewRelationResource.
+ * The Class RelationResource.
  */
 @Path("/relations")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class NewRelationResource extends
+public class RelationResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
 	/** The Constant serviceName. */
 	public final static String serviceName = "relations";
 	
 	/** The logger. */
-	final Logger logger = LoggerFactory.getLogger(NewRelationResource.class);
+	final Logger logger = LoggerFactory.getLogger(RelationResource.class);
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.common.AbstractCollectionSpaceResource#getVersionString()
@@ -117,7 +115,7 @@ public class NewRelationResource extends
 			DocumentHandler handler = createDocumentHandler(ctx);
 			String csid = getRepositoryClient(ctx).create(ctx, handler);
 			UriBuilder path = UriBuilder
-					.fromResource(NewRelationResource.class);
+					.fromResource(RelationResource.class);
 			path.path("" + csid);
 			Response response = Response.created(path.build()).build();
 			return response;

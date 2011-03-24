@@ -70,6 +70,7 @@ public class RefNameServiceUtils {
         AbstractCommonList commonList = (AbstractCommonList) wrapperList;
         commonList.setPageNum(pageNum);
         commonList.setPageSize(pageSize);
+
         
         List<AuthorityRefDocList.AuthorityRefDocItem> list =
                 wrapperList.getAuthorityRefDocItem();

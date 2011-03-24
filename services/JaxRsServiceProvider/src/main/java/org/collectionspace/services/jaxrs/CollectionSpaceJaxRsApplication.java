@@ -35,8 +35,8 @@ import org.collectionspace.services.objectexit.ObjectExitResource;
 import org.collectionspace.services.imports.ImportsResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
+import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.report.ReportResource;
-import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
 import org.collectionspace.services.dimension.DimensionResource;
 import org.collectionspace.services.contact.ContactResource;
@@ -86,7 +86,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new ContactResource());
         singletons.add(new PersonAuthorityResource());
         singletons.add(new OrgAuthorityResource());
-        singletons.add(new NewRelationResource());
+        singletons.add(new RelationResource());
         singletons.add(new NoteResource());
         singletons.add(new LoaninResource());
         singletons.add(new LoanoutResource());
