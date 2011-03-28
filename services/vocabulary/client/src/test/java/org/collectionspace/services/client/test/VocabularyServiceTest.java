@@ -699,7 +699,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
         } else if (shortId != null) {
-            res = client.readItemListForNamedVocabulary(shortId, null, null);
+            res = client.readItemListForNamedAuthority(shortId, null, null);
         } else {
             Assert.fail("Internal Error: readItemList both vcsid and shortId are null!");
         }

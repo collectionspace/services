@@ -30,29 +30,20 @@ import javax.ws.rs.core.Response;
 
 //import org.collectionspace.services.authorization.AccountRolesList;
 import org.collectionspace.services.authorization.AccountRole;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * A AccountRoleClient.
 
  * @version $Revision:$
  */
-public class AccountRoleClient extends AbstractServiceClientImpl {
+public class AccountRoleClient extends AbstractServiceClientImpl<AccountRoleProxy> {
 	public static final String SERVICE_NAME = "accountroles";
 
 	@Override
 	public String getServiceName() {
 		return AccountRoleClient.SERVICE_NAME;
 	}
-
-    /**
-     *
-     */
-    private AccountRoleProxy accountRoleProxy;
 
     /* (non-Javadoc)
      * @see 
@@ -61,36 +52,15 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
         return "accounts";
     }
 
-    /**
-     *
-     * Default constructor for AccountRoleClient class.
-     *
-     */
-    public AccountRoleClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
+	@Override
+	public Class<AccountRoleProxy> getProxyClass() {
+		return AccountRoleProxy.class;
+	}
 
-    @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.accountRoleProxy;
-    }
-    
-    /**
-     * allow to reset proxy as per security needs
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            accountRoleProxy = ProxyFactory.create(AccountRoleProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            accountRoleProxy = ProxyFactory.create(AccountRoleProxy.class,
-                    getBaseURL());
-        }
-    }
-
-
+	/*
+	 * CRUD+L Methods
+	 */
+	
     /**
      * @param csid
      * @param arcsid relationship does not have an id, junk is fine
@@ -98,7 +68,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
      * @see 
      */
     public ClientResponse<AccountRole> read(String csid, String arcsid) {
-        return accountRoleProxy.read(csid, arcsid);
+        return getProxy().read(csid, arcsid);
     }
 
     /**
@@ -109,7 +79,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
      * @return the client response
      */
     public ClientResponse<AccountRole> read(String csid) {
-        return accountRoleProxy.read(csid);
+        return getProxy().read(csid);
     }
 
     /**
@@ -119,7 +89,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
      * @see 
      */
     public ClientResponse<Response> create(String csid, AccountRole accRole) {
-        return accountRoleProxy.create(csid, accRole);
+        return getProxy().create(csid, accRole);
     }
 
 
@@ -130,13 +100,6 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
      * @see 
      */
     public ClientResponse<Response> delete(String csid, AccountRole accRole) {
-        return accountRoleProxy.delete(csid, "delete", accRole);
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#delete(java.lang.String)
-     */
-    public ClientResponse<Response> delete(String csid) {
-        return accountRoleProxy.delete(csid);
+        return getProxy().delete(csid, "delete", accRole);
     }
 }

@@ -24,6 +24,7 @@
 
 package org.collectionspace.services.common;
 
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -34,7 +35,6 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -91,39 +91,6 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
         }
     }
 
-    protected WebApplicationException bigReThrow(Exception e, String serviceMsg)
-    throws WebApplicationException {
-        return bigReThrow(e, serviceMsg, "");
-    }
-
-	protected WebApplicationException bigReThrow(Exception e,
-			String serviceMsg, String csid) throws WebApplicationException {
-		Response response;
-		//if (logger.isDebugEnabled()) {
-			logger.error(getClass().getName(), e);
-		//}
-		if (e instanceof UnauthorizedException) {
-			response = Response.status(Response.Status.UNAUTHORIZED)
-					.entity(serviceMsg + e.getMessage()).type("text/plain")
-					.build();
-			return new WebApplicationException(response);
-		} else if (e instanceof DocumentNotFoundException) {
-			response = Response
-					.status(Response.Status.NOT_FOUND)
-					.entity(serviceMsg + " on " + getClass().getName()
-							+ " csid=" + csid).type("text/plain").build();
-			return new WebApplicationException(response);
-		} else if (e instanceof WebApplicationException) {
-			//
-			// subresource may have already thrown this exception
-			// so just pass it on
-			return (WebApplicationException)e;
-		} else { // e is now instanceof Exception
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(serviceMsg).type("text/plain").build();
-			return new WebApplicationException(response);
-		}
-	}
 
     //======================= CREATE ====================================================
 

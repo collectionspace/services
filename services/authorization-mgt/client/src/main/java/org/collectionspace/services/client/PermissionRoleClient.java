@@ -27,25 +27,15 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-
-
-import org.collectionspace.services.authorization.PermissionRole;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.collectionspace.services.authorization.PermissionRole;
 
 /**
  * A PermissionRoleClient.
 
  * @version $Revision:$
  */
-public class PermissionRoleClient extends AbstractServiceClientImpl {
-
-    /** The permission role proxy. */
-    private PermissionRoleProxy permissionRoleProxy;
-
+public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRoleProxy> {
 	@Override
 	public String getServiceName() {
 		throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3497
@@ -54,42 +44,20 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
     /* (non-Javadoc)
      * @see 
      */
-    public String getServicePathComponent() {
+    @Override
+	public String getServicePathComponent() {
         return "authorization/permissions";
     }
 
-    /**
-     *
-     * Default constructor for PermissionRoleClient class.
-     *
-     */
-    public PermissionRoleClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
+	@Override
+	public Class<PermissionRoleProxy> getProxyClass() {
+		return PermissionRoleProxy.class;
+	}
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.CollectionSpaceClient#getProxy()
-     */
-    @Override
-    public CollectionSpaceProxy getProxy() {
-        return this.permissionRoleProxy;
-    }
-
-    /**
-     * allow to reset proxy as per security needs.
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            permissionRoleProxy = ProxyFactory.create(PermissionRoleProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            permissionRoleProxy = ProxyFactory.create(PermissionRoleProxy.class,
-                    getBaseURL());
-        }
-    }
-
+	/*
+	 * CRUD+L Methods
+	 */
+	
     /**
      * Read.
      *
@@ -99,7 +67,7 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
      * @see
      */
     public ClientResponse<PermissionRole> read(String csid, String prcsid) {
-        return permissionRoleProxy.read(csid, prcsid);
+        return getProxy().read(csid, prcsid);
     }
 
     /**
@@ -111,7 +79,7 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
      * @see
      */
     public ClientResponse<PermissionRole> read(String csid) {
-        return permissionRoleProxy.read(csid);
+        return getProxy().read(csid);
     }
 
     /**
@@ -123,25 +91,17 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
      * @see
      */
     public ClientResponse<Response> create(String csid, PermissionRole permRole) {
-        return permissionRoleProxy.create(csid, permRole);
+        return getProxy().create(csid, permRole);
     }
-
-
+    
     /**
-     * Delete given relationships between given permission and role(s)
+     * Delete with payload
      *
      * @param csid the csid
-     * @param relationships to delete
-     * @return response
-     * @see
+     * @param permRole the perm role
+     * @return the client response
      */
     public ClientResponse<Response> delete(String csid, PermissionRole permRole) {
-        return permissionRoleProxy.delete(csid, "delete", permRole);
+    	return getProxy().delete(csid, "delete", permRole);
     }
-    
-    @Override
-    public ClientResponse<Response> delete(String csid) {
-        return permissionRoleProxy.delete(csid);
-    }
-    
 }

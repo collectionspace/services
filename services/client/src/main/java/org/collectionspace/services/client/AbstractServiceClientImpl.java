@@ -28,16 +28,21 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Properties;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-
-//import javax.ws.rs.core.Response;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope; //import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.workflow.WorkflowsCommon;
 import org.jboss.resteasy.client.ClientResponse; //import org.collectionspace.services.common.context.ServiceContext;
+import org.jboss.resteasy.client.ProxyFactory;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
+import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +53,8 @@ import org.slf4j.LoggerFactory;
  * @param <CommonListType> 
  * @param <ListType> 
  */
-public abstract class AbstractServiceClientImpl implements
-        CollectionSpaceClient {
+public abstract class AbstractServiceClientImpl<T extends CollectionSpaceProxy> implements
+        CollectionSpaceClient<T> {
 
     /** The logger. */
     protected final Logger logger = LoggerFactory.getLogger(AbstractServiceClientImpl.class);
@@ -65,6 +70,8 @@ public abstract class AbstractServiceClientImpl implements
     private URL url;
     /** The http client. */
     private HttpClient httpClient;
+    /** The RESTEasy proxy */
+    private T proxy;
 
     /**
      * Gets the logger.
@@ -127,6 +134,9 @@ public abstract class AbstractServiceClientImpl implements
     protected AbstractServiceClientImpl() {
         readProperties();
         setupHttpClient();
+        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
+        RegisterBuiltin.register(factory);
+        setProxy();        
     }
 
     /*
@@ -330,6 +340,86 @@ public abstract class AbstractServiceClientImpl implements
         return Boolean.getBoolean("cspace.server.secure");
     }
 
+    @Override
+    public T getProxy() {
+    	return proxy;
+    }
+    
+    /**
+     * allow to reset proxy as per security needs
+     */
+    @Override
+	public void setProxy() {
+    	Class<T> proxyClass = this.getProxyClass();
+        if (useAuth()) {
+            proxy = ProxyFactory.create(proxyClass,
+                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
+        } else {
+        	proxy = ProxyFactory.create(proxyClass,
+                    getBaseURL());
+        }
+    }
+
+    @Override
+	public void setAuth(boolean useAuth,
+            String user, boolean useUser,
+            String password, boolean usePassword) {
+        if (useAuth == true) {
+            setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
+            if (useUser) {
+                setProperty(CollectionSpaceClient.USER_PROPERTY,
+                        user);
+            } else {
+                removeProperty(CollectionSpaceClient.USER_PROPERTY);
+            }
+            if (usePassword) {
+                setProperty(CollectionSpaceClient.PASSWORD_PROPERTY,
+                        password);
+            } else {
+                removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
+            }
+        } else {
+            removeProperty(CollectionSpaceClient.AUTH_PROPERTY);
+        }
+        setupHttpClient();
+        setProxy();
+    }
+    
+	/*
+	 * 
+	 * Common Proxied service calls
+	 * 
+	 */
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#delete(java.lang.String)
+     */
+    @Override
+	public ClientResponse<Response> delete(String csid) {
+        return getProxy().delete(csid);
+    }
+
+    /**
+     * @param csid
+     * @return
+     * @see org.collectionspace.services.client.BlobProxy#getAuthorityRefs(java.lang.String)
+     */
+    @Override
+	public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
+        return getProxy().getAuthorityRefs(csid);
+    }
+    
+    @Override
+	public ClientResponse<String> getWorkflow(@PathParam("csid") String csid) {
+    	return getProxy().getWorkflow(csid);
+    }    
+    
+    /*
+     * Because of how RESTEasy creates proxy classes, sub-interfaces will need to override
+     * these methods with their specific "common" list return types.  Otherwise, only the info
+     * in the AbstractCommonList type will be returned to the callers
+     */
+    
     /*
      * (non-Javadoc)
      *
@@ -354,45 +444,5 @@ public abstract class AbstractServiceClientImpl implements
     public ClientResponse<AbstractCommonList> readList(String sortBy, Long pageSize,
             Long pageNumber) {
         return getProxy().readList(sortBy, pageSize, pageNumber);
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.CollectionSpaceClient#delete(java.lang.String)
-     */
-    @Override
-    public ClientResponse<Response> delete(String csid) {
-        // must override in children if you want behavior
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public abstract CollectionSpaceProxy getProxy();
-
-    @Override
-    public abstract void setProxy();
-
-    public void setAuth(boolean useAuth,
-            String user, boolean useUser,
-            String password, boolean usePassword) {
-        if (useAuth) {
-            setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                    "true");
-            if (useUser) {
-                setProperty(CollectionSpaceClient.USER_PROPERTY,
-                        user);
-            } else {
-                removeProperty(CollectionSpaceClient.USER_PROPERTY);
-            }
-            if (usePassword) {
-                setProperty(CollectionSpaceClient.PASSWORD_PROPERTY,
-                        password);
-            } else {
-                removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
-            }
-        } else {
-            removeProperty(CollectionSpaceClient.AUTH_PROPERTY);
-        }
-        setupHttpClient();
-        setProxy();
     }
 }

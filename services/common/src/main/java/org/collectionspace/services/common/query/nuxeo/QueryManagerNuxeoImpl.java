@@ -26,14 +26,9 @@
  */
 package org.collectionspace.services.common.query.nuxeo;
 
-import java.util.StringTokenizer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -43,9 +38,7 @@ import org.nuxeo.ecm.core.client.NuxeoClient;
 
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
-import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.query.IQueryManager;
-import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.client.IQueryManager;
 
 public class QueryManagerNuxeoImpl implements IQueryManager {
 	

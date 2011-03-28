@@ -26,6 +26,7 @@
  */
 package org.collectionspace.services.common.query;
 
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.query.nuxeo.QueryManagerNuxeoImpl;
 
 public class QueryManager {

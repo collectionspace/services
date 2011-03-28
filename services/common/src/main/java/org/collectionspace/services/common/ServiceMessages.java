@@ -34,6 +34,7 @@ package org.collectionspace.services.common;
 public class ServiceMessages {
 
     private static final String FAILED = "failed: ";
+    private static final String UNSUPPORTED = "unsupported: ";
 
     public static final String POST_FAILED = "POST " + FAILED;
     public static final String GET_FAILED = "GET " + FAILED;
@@ -42,6 +43,12 @@ public class ServiceMessages {
     public static final String CREATE_FAILED = "Create request " + FAILED;
     public static final String READ_FAILED = "Read request " + FAILED;
     public static final String UPDATE_FAILED = "Update request " + FAILED;
+    
+    public static final String POST_UNSUPPORTED = "POST " + UNSUPPORTED;
+    public static final String GET_UNSUPPORTED = "GET " + UNSUPPORTED;
+    public static final String GET_LIST_UNSUPPORTED = "GET/LIST " + UNSUPPORTED;
+    public static final String PUT_UNSUPPORTED = "PUT " + UNSUPPORTED;
+    public static final String DELETE_UNSUPPORTED = "DELETE " + UNSUPPORTED;
 
     public static final String DELETE_FAILED = "Delete request " + FAILED;
     public static final String LIST_FAILED = "List request " + FAILED;

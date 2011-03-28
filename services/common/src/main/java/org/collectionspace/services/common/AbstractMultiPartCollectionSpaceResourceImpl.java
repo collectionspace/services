@@ -26,6 +26,12 @@
  */
 package org.collectionspace.services.common;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -34,9 +40,12 @@ import org.collectionspace.services.common.context.MultipartServiceContextFactor
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.common.workflow.client.WorkflowClient;
+import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
+import org.collectionspace.services.workflow.WorkflowsCommon;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +62,40 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
     	return MultipartServiceContextFactory.get();
     }
 
+    protected WebApplicationException bigReThrow(Exception e, String serviceMsg)
+    throws WebApplicationException {
+        return bigReThrow(e, serviceMsg, "");
+    }
+
+	protected WebApplicationException bigReThrow(Exception e,
+			String serviceMsg, String csid) throws WebApplicationException {
+		Response response;
+		if (logger.isDebugEnabled()) {
+			logger.debug(getClass().getName(), e);
+		}
+		if (e instanceof UnauthorizedException) {
+			response = Response.status(Response.Status.UNAUTHORIZED)
+					.entity(serviceMsg + e.getMessage()).type("text/plain")
+					.build();
+			return new WebApplicationException(response);
+		} else if (e instanceof DocumentNotFoundException) {
+			response = Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(serviceMsg + " on " + getClass().getName()
+							+ " csid=" + csid).type("text/plain").build();
+			return new WebApplicationException(response);
+		} else if (e instanceof WebApplicationException) {
+			//
+			// subresource may have already thrown this exception
+			// so just pass it on
+			return (WebApplicationException)e;
+		} else { // e is now instanceof Exception
+			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(serviceMsg).type("text/plain").build();
+			return new WebApplicationException(response);
+		}
+	}
+    
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
     	return createDocumentHandler(ctx, ctx.getCommonPartLabel(), getCommonPartClass());
@@ -98,6 +141,53 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		Class<Object> commonClass) throws Exception {
     	return createDocumentHandler(ctx, ctx.getCommonPartLabel(), commonClass);
+    }
+    
+    /**
+     * Creates the contact document handler.
+     * 
+     * @param ctx the ctx
+     * @param inAuthority the in authority
+     * @param inItem the in item
+     * 
+     * @return the document handler
+     * 
+     * @throws Exception the exception
+     */
+    private WorkflowDocumentModelHandler createWorkflowDocumentHandler(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
+    	
+    	WorkflowDocumentModelHandler docHandler = (WorkflowDocumentModelHandler)createDocumentHandler(ctx,
+    			WorkflowClient.SERVICE_COMMONPART_NAME,
+    			WorkflowsCommon.class);        	
+    	
+        return docHandler;
+    }
+    
+    /*
+     * JAX-RS Annotated methods
+     */
+        
+    @GET
+    @Path("{csid}/workflow")
+    public byte[] getWorkflow(
+            @PathParam("csid") String csid) {
+        PoxPayloadOut result = null;
+
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext();
+            String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
+        	
+        	MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME);
+        	WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
+        	ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
+            getRepositoryClient(ctx).get(ctx, csid, handler);
+            result = ctx.getOutput();
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
+        }
+                
+        return result.getBytes();
     }
     
 }

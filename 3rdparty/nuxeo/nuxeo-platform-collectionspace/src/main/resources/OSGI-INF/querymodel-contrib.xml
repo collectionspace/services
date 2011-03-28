@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<component name="com.myexample.query.model.override">
+<component name="com.collectionspace.query.model.override">
   <require>org.nuxeo.ecm.webapp.querymodel.DefaultQueryModels</require>
   <extension
     target="org.nuxeo.ecm.core.search.api.client.querymodel.QueryModelService"

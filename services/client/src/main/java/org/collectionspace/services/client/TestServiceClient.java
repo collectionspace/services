@@ -31,7 +31,7 @@ import org.jboss.resteasy.client.ClientResponse;
 
  * @version $Revision:$
  */
-public class TestServiceClient extends AbstractServiceClientImpl {
+public class TestServiceClient extends AbstractServiceClientImpl<TestServiceProxy> {
 
     /**
      *
@@ -44,23 +44,14 @@ public class TestServiceClient extends AbstractServiceClientImpl {
         throw new UnsupportedOperationException();
     }
 
-
-    @Override
-    public CollectionSpaceProxy getProxy() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setProxy() {
-        throw new UnsupportedOperationException();
-    }
-
-    public ClientResponse<Response> delete(String csid) {
-	throw new UnsupportedOperationException();
-    }
-
 	@Override
 	public String getServiceName() {
 		throw new UnsupportedOperationException();
-    } 
+    }
+
+	@Override
+	public Class<TestServiceProxy> getProxyClass() {
+		// TODO Auto-generated method stub
+		return TestServiceProxy.class;
+	} 
 }

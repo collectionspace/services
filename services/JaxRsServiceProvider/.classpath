@@ -303,6 +303,7 @@
   <classpathentry kind="src" path="/org.collectionspace.services.vocabulary.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.vocabulary.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.vocabulary.service"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.workflow.service"/>
   <classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.1.0/org.osgi.core-4.1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/restlet/org.restlet/1.0.7/org.restlet-1.0.7.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.jar" sourcepath="M2_REPO/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1-sources.jar">

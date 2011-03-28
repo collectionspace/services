@@ -10,7 +10,7 @@ import org.nuxeo.ecm.core.client.NuxeoClient;
 
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
-import org.collectionspace.services.common.query.IQueryManager;
+//import org.collectionspace.services.common.query.IQueryManager;
 
 public class VocabManagerImpl implements IVocabManager {
 	

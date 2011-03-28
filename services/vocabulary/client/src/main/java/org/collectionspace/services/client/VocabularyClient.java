@@ -26,22 +26,16 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.Response;
+import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
 import org.collectionspace.services.client.VocabularyProxy;
 
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
 /**
  * The Class VocabularyClient.
  */
-public class VocabularyClient extends AbstractServiceClientImpl {
+public class VocabularyClient extends AuthorityClientImpl<VocabularyitemsCommonList, VocabularyProxy> {
 	public static final String SERVICE_NAME = "vocabularies";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -58,9 +52,6 @@ public class VocabularyClient extends AbstractServiceClientImpl {
 		return SERVICE_NAME;
 	}
 	
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-     */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
@@ -70,6 +61,11 @@ public class VocabularyClient extends AbstractServiceClientImpl {
     	return SERVICE_PAYLOAD_NAME;
     }
 
+	@Override
+	public Class<VocabularyProxy> getProxyClass() {
+		return VocabularyProxy.class;
+	}    
+    
     /**
      * Gets the item common part name.
      *
@@ -79,189 +75,16 @@ public class VocabularyClient extends AbstractServiceClientImpl {
         return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
     }
     
-    /** The Constant instance. */ //FIXME: This is wrong.  There should not be a static instance of the client.
-//    private static final VocabularyClient instance = new VocabularyClient();
+    /*
+     * Service calls
+     */
     
-    /** The vocabulary proxy. */
-    private VocabularyProxy vocabularyProxy;
-
-    /**
-     * Instantiates a new vocabulary client.
-     */
-    public VocabularyClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.CollectionSpaceClient#getProxy()
-     */
-    @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.vocabularyProxy;
-    }    
-
-    /**
-     * Sets the proxy.
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            vocabularyProxy = ProxyFactory.create(VocabularyProxy.class, getBaseURL(), 
-            		new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            vocabularyProxy = ProxyFactory.create(VocabularyProxy.class, getBaseURL());
-        }
-    }
-
-    /**
-     * Gets the single instance of VocabularyClient.
-     *
-     * @return single instance of VocabularyClient //FIXME: This is wrong.  There should not be a static instance of the client.
-     */
-//    public static VocabularyClient getInstance() {
-//        return instance;
-//    }
-
     /**
      * Read list.
      *
      * @return the client response
      */
     public ClientResponse<VocabulariesCommonList> readList() {
-        return vocabularyProxy.readList();
-    }
-
-    /**
-     * Read.
-     *
-     * @param csid the csid
-     * @return the client response
-     */
-    public ClientResponse<String> read(String csid) {
-        return vocabularyProxy.read(csid);
-    }
-
-    /**
-     * Read by name.
-     *
-     * @param name the name
-     * @return the client response
-     */
-    public ClientResponse<String> readByName(String name) {
-        return vocabularyProxy.readByName(name);
-    }
-
-    /**
-     * Creates the.
-     *
-     * @param multipart the multipart
-     * @return the client response
-     */
-    public ClientResponse<Response> create(PoxPayloadOut poxPayloadout) {
-        return vocabularyProxy.create(poxPayloadout.getBytes());
-    }
-
-    /**
-     * Update.
-     *
-     * @param csid the csid
-     * @param multipart the multipart
-     * @return the client response
-     */
-    public ClientResponse<String> update(String csid, PoxPayloadOut poxPayloadout) {
-        return vocabularyProxy.update(csid, poxPayloadout.getBytes());
-
-    }
-
-    /**
-     * Delete.
-     *
-     * @param csid the csid
-     * @return the client response
-     */
-    public ClientResponse<Response> delete(String csid) {
-        return vocabularyProxy.delete(csid);
-    }
-
-    /**
-     * Read item list, filtering by partial term match, or keywords. Only one of
-     * partialTerm or keywords should be specified. If both are specified, keywords
-     * will be ignored.
-     *
-     * @param inAuthority the parent authority
-     * @param partialTerm A partial term on which to match,
-     *     which will filter list results to return only matched resources.
-     * @param keywords A set of keywords on which to match,
-     *     which will filter list results to return only matched resources.
-     * @return the client response
-     */
-    public ClientResponse<VocabularyitemsCommonList> 
-    		readItemList(String inAuthority, String partialTerm, String keywords) {
-        return vocabularyProxy.readItemList(inAuthority, partialTerm, keywords);
-    }
-
-    /**
-     * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
-     * partialTerm or keywords should be specified. If both are specified, keywords
-     * will be ignored.
-     *
-     * @param specifier the specifier
-     * @param partialTerm A partial term on which to match,
-     *     which will filter list results to return only matched resources.
-     * @param keywords A set of keywords on which to match,
-     *     which will filter list results to return only matched resources.
-     * @return the client response
-     */
-    public ClientResponse<VocabularyitemsCommonList> 
-    		readItemListForNamedVocabulary(String specifier, String partialTerm, String keywords) {
-        return vocabularyProxy.readItemListForNamedVocabulary(specifier, partialTerm, keywords);
-    }
-
-    /**
-     * Read item.
-     *
-     * @param vcsid the vcsid
-     * @param csid the csid
-     * @return the client response
-     */
-    public ClientResponse<String> readItem(String vcsid, String csid) {
-        return vocabularyProxy.readItem(vcsid, csid);
-    }
-
-    /**
-     * Creates the item.
-     *
-     * @param vcsid the vcsid
-     * @param multipart the multipart
-     * @return the client response
-     */
-    public ClientResponse<Response> createItem(String vcsid, PoxPayloadOut poxPayloadOut) {
-    	String xmlPayload = poxPayloadOut.toXML();
-        return vocabularyProxy.createItem(vcsid, xmlPayload);
-    }
-
-    /**
-     * Update item.
-     *
-     * @param vcsid the vcsid
-     * @param csid the csid
-     * @param multipart the multipart
-     * @return the client response
-     */
-    public ClientResponse<String> updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut) {
-    	String xmlPayload = poxPayloadOut.toXML();
-        return vocabularyProxy.updateItem(vcsid, csid, xmlPayload);
-    }
-
-    /**
-     * Delete item.
-     *
-     * @param vcsid the vcsid
-     * @param csid the csid
-     * @return the client response
-     */
-    public ClientResponse<Response> deleteItem(String vcsid, String csid) {
-        return vocabularyProxy.deleteItem(vcsid, csid);
+        return getProxy().readList();
     }
 }

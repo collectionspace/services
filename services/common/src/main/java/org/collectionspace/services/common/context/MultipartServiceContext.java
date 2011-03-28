@@ -109,4 +109,6 @@ public interface MultipartServiceContext
      * @param contentType media type
      */
     public void addOutputPart(String label, Element doc, String contentType) throws Exception;
+    
+    public void setRespositoryWorkspaceName(String workspaceName);    
 }

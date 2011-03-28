@@ -27,28 +27,17 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-
-
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * A AccountClient.
 
  * @version $Revision:$
  */
-public class AccountClient extends AbstractServiceClientImpl {
+public class AccountClient extends AbstractServiceClientImpl<AccountProxy> {
     public static final String SERVICE_NAME = "accounts";
-
-    /**
-     *
-     */
-    private AccountProxy accountProxy;
 
 	@Override
 	public String getServiceName() {
@@ -62,48 +51,30 @@ public class AccountClient extends AbstractServiceClientImpl {
     public String getServicePathComponent() {
         return SERVICE_NAME;
     }
-
-    /**
-     *
-     * Default constructor for AccountClient class.
-     *
-     */
-    public AccountClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
+    
+    public String getTenantId() {
+        return getProperty(AccountClient.TENANT_PROPERTY);
     }
 
-    @Override
-    public CollectionSpaceProxy getProxy() {
-        return this.accountProxy;
-    }
+	@Override
+	public Class<AccountProxy> getProxyClass() {
+		return AccountProxy.class;
+	}    
 
-    /**
-     * allow to reset proxy as per security needs
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            accountProxy = ProxyFactory.create(AccountProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            accountProxy = ProxyFactory.create(AccountProxy.class,
-                    getBaseURL());
-        }
-    }
-
+	/*
+	 * CRUD+L Methods
+	 */
+	
     /**
      * @return response
      * @see org.collectionspace.hello.client.AccountProxy#readList()
      */
     public ClientResponse<AccountsCommonList> readList() {
-        return accountProxy.readList();
-
+        return getProxy().readList();
     }
 
     public ClientResponse<AccountsCommonList> readSearchList(String screenName, String uid, String email) {
-        return accountProxy.readSearchList(screenName, uid, email);
-
+        return getProxy().readSearchList(screenName, uid, email);
     }
 
     /**
@@ -112,7 +83,7 @@ public class AccountClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.AccountProxy#getAccount(java.lang.String)
      */
     public ClientResponse<AccountsCommon> read(String csid) {
-        return accountProxy.read(csid);
+        return getProxy().read(csid);
     }
 
     /**
@@ -122,7 +93,7 @@ public class AccountClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.AccountProxy#create(org.collectionspace.services.account.AccountsCommon)
      */
     public ClientResponse<Response> create(AccountsCommon multipart) {
-        return accountProxy.create(multipart);
+        return getProxy().create(multipart);
     }
 
     /**
@@ -133,21 +104,6 @@ public class AccountClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.AccountProxy#updateAccount(java.lang.Long, org.collectionspace.services.account.AccountsCommon)
      */
     public ClientResponse<AccountsCommon> update(String csid, AccountsCommon multipart) {
-        return accountProxy.update(csid, multipart);
-    }
-
-    /**
-     * @param csid
-     * @return response
-     * @see org.collectionspace.hello.client.AccountProxy#deleteAccount(java.lang.Long)
-     */
-    @Override
-    public ClientResponse<Response> delete(String csid) {
-        return accountProxy.delete(csid);
-    }
-    
-    
-    public String getTenantId() {
-        return getProperty(AccountClient.TENANT_PROPERTY);
+        return getProxy().update(csid, multipart);
     }
 }

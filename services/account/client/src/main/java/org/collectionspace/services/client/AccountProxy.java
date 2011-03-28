@@ -56,7 +56,7 @@ public interface AccountProxy extends CollectionSpaceProxy {
     @Produces({"application/xml"})
     ClientResponse<AccountsCommonList> readList();
 
-        @GET
+    @GET
     @Produces({"application/xml"})
     ClientResponse<AccountsCommonList> readSearchList(@QueryParam("sn") String screenName, @QueryParam("uid") String uid, @QueryParam("email") String email);
 
@@ -73,9 +73,4 @@ public interface AccountProxy extends CollectionSpaceProxy {
     @PUT
     @Path("/{csid}")
     ClientResponse<AccountsCommon> update(@PathParam("csid") String csid, AccountsCommon multipart);
-
-    //(D)elete
-    @DELETE
-    @Path("/{csid}")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

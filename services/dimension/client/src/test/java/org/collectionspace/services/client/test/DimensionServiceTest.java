@@ -62,7 +62,6 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
     // Instance variables specific to this test.
     /** The SERVIC e_ pat h_ component. */
-    final String SERVICE_PATH_COMPONENT = "dimensions";
     /** The known resource id. */
     private String knownResourceId = null;
 
@@ -716,7 +715,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return DimensionClient.SERVICE_PATH_COMPONENT;
     }
 
     /**

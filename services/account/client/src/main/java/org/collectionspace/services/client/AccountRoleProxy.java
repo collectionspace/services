@@ -27,9 +27,9 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -72,7 +72,8 @@ public interface AccountRoleProxy extends CollectionSpaceProxy {
             AccountRole accRole);
 
     //(D)elete
-    @DELETE
+    @Override
+	@DELETE
     @Path("/{csid}/accountroles")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

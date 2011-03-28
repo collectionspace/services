@@ -47,7 +47,6 @@ import org.jboss.resteasy.client.ClientResponse;
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface PermissionRoleProxy extends CollectionSpaceProxy {
-
     //(C)reate
     @POST
     @Path("/{csid}/permroles")
@@ -65,15 +64,14 @@ public interface PermissionRoleProxy extends CollectionSpaceProxy {
             @PathParam("prcsid") String prcsid);
 
     //(D)elete
-    @POST
-    @Path("/{csid}/permroles")
-    ClientResponse<Response> delete(@PathParam("csid") String csid,
-            @QueryParam("_method") String method,
-            PermissionRole permRole);
-    
-    //(D)elete
     @DELETE
     @Path("/{csid}/permroles")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
     
+    //(D)elete - with a payload
+    @POST
+    @Path("/{csid}/permroles")
+    ClientResponse<Response> delete(@PathParam("csid") String csid,
+            @QueryParam("_method") String method,
+            PermissionRole permRole);    
 }

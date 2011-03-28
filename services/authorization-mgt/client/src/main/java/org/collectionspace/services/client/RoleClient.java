@@ -31,26 +31,18 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * A RoleClient.
 
  * @version $Revision:$
  */
-public class RoleClient extends AbstractServiceClientImpl {
+public class RoleClient extends AbstractServiceClientImpl<RoleProxy> {
 	public static final String SERVICE_NAME = "authorization/roles";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
-    /**
-     *
-     */
-    private RoleProxy roleProxy;
 
     @Override
     public String getServiceName() { 
@@ -60,37 +52,9 @@ public class RoleClient extends AbstractServiceClientImpl {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
-    public String getServicePathComponent() {
-        return "authorization/roles";
-    }
-
-    /**
-     *
-     * Default constructor for RoleClient class.
-     *
-     */
-    public RoleClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
-
     @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.roleProxy;
-    }    
-
-    /**
-     * allow to reset proxy as per security needs
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            roleProxy = ProxyFactory.create(RoleProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            roleProxy = ProxyFactory.create(RoleProxy.class,
-                    getBaseURL());
-        }
+	public String getServicePathComponent() {
+        return SERVICE_PATH_COMPONENT;
     }
 
     /**
@@ -98,12 +62,12 @@ public class RoleClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.RoleProxy#readList()
      */
     public ClientResponse<RolesList> readList() {
-        return roleProxy.readList();
+        return getProxy().readList();
 
     }
 
     public ClientResponse<RolesList> readSearchList(String roleName) {
-        return roleProxy.readSearchList(roleName);
+        return getProxy().readSearchList(roleName);
 
     }
 
@@ -113,16 +77,17 @@ public class RoleClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.RoleProxy#getAccount(java.lang.String)
      */
     public ClientResponse<Role> read(String csid) {
-        return roleProxy.read(csid);
+        return getProxy().read(csid);
     }
 
     /**
-     * @param role
-     * @return
-     * @see org.collectionspace.hello.client.RoleProxy#create(org.collectionspace.services.role.Role)
+     * Creates the.
+     *
+     * @param role the role
+     * @return the client response
      */
     public ClientResponse<Response> create(Role role) {
-        return roleProxy.create(role);
+        return getProxy().create(role);
     }
 
     /**
@@ -132,15 +97,11 @@ public class RoleClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.RoleProxy#updateAccount(java.lang.Long, org.collectionspace.services.role.Role)
      */
     public ClientResponse<Role> update(String csid, Role role) {
-        return roleProxy.update(csid, role);
+        return getProxy().update(csid, role);
     }
 
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.hello.client.RoleProxy#deleteAccount(java.lang.Long)
-     */
-    public ClientResponse<Response> delete(String csid) {
-        return roleProxy.delete(csid);
-    }
+	@Override
+	public Class<RoleProxy> getProxyClass() {
+		return RoleProxy.class;
+	}
 }

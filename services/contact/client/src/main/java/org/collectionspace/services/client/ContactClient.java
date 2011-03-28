@@ -16,15 +16,8 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.Response;
-
-import org.collectionspace.services.contact.ContactsCommonList;
-
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.collectionspace.services.contact.ContactsCommonList;
 
 /**
  * ContactClient.java
@@ -33,7 +26,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * $LastChangedDate: $
  */
  
-public class ContactClient extends AbstractServiceClientImpl {
+public class ContactClient extends AbstractPoxServiceClientImpl<ContactProxy> {
 	public static final String SERVICE_NAME = "contacts";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -50,98 +43,20 @@ public class ContactClient extends AbstractServiceClientImpl {
         return SERVICE_PATH_COMPONENT;
 	}
 
-	/**
-     *
-     */
-//    private static final ContactClient instance = new ContactClient();
-    
-    /**
-     *
-     */
-    private ContactProxy contactProxy;
+	@Override
+	public Class<ContactProxy> getProxyClass() {
+		return ContactProxy.class;
+	}
 
-    /**
-     *
-     * Default constructor for ContactClient class.
-     *
-     */
-    public ContactClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
-
-    @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.contactProxy;
-    }
-    
-    /**
-     * allow to reset proxy as per security needs
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            contactProxy = ProxyFactory.create(ContactProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            contactProxy = ProxyFactory.create(ContactProxy.class,
-                    getBaseURL());
-        }
-    }
-
-    /**
-     * FIXME Comment this
-     *
-     * @return
-     */
-//    public static ContactClient getInstance() {
-//        return instance;
-//    }
-
+	/*
+	 * Service calls
+	 */
+	
     /**
      * @return
      * @see org.collectionspace.services.client.Contact#getContact()
      */
     public ClientResponse<ContactsCommonList> readList() {
-        return contactProxy.readList();
-    }
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.Contact#getContact(java.lang.String)
-     */
-
-    public ClientResponse<String> read(String csid) {
-        return contactProxy.read(csid);
-    }
-
-    /**
-     * @param contact
-     * @return
-     * @see org.collectionspace.services.client.Contact#createContact(org.collectionspace.services.Contact)
-     */
-    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
-        return contactProxy.create(xmlPayload.getBytes());
-    }
-
-    /**
-     * @param csid
-     * @param contact
-     * @return
-     * @see org.collectionspace.services.client.Contact#updateContact(java.lang.Long, org.collectionspace.services.Contact)
-     */
-    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
-        return contactProxy.update(csid, xmlPayload.getBytes());
-
-    }
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.Contact#deleteContact(java.lang.Long)
-     */
-    public ClientResponse<Response> delete(String csid) {
-        return contactProxy.delete(csid);
+        return getProxy().readList();
     }
 }

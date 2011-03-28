@@ -26,27 +26,16 @@
  */
 package org.collectionspace.services.client;
 
+import org.jboss.resteasy.client.ClientResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
-//import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-//import javax.ws.rs.core.UriInfo;
 
-//import org.collectionspace.services.client.IClientQueryParams;
-import org.collectionspace.services.client.CollectionSpaceProxy;
-import org.collectionspace.services.common.query.IQueryManager;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
-
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * @version $Revision:$
@@ -55,31 +44,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path(CollectionObjectClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface CollectionObjectProxy extends CollectionSpaceProxy {
-
-    /**
-     * Read list.
-     *
-     * @return the client response
-     */
-    @GET
-    @Produces({"application/xml"})
-    ClientResponse<CollectionobjectsCommonList> readList();
-    
-//    /**
-//     * Read list.  //FIXME: REM - Remove this dead code please.
-//     *
-//     * @param pageSize the page size
-//     * @param pageNumber the page number
-//     * @return the client response
-//     */
-//    @GET
-//    @Produces({"application/xml"})
-//    @Override
-//    ClientResponse<CollectionobjectsCommonList> readList(
-//    		@QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) String pageSize,
-//    		@QueryParam(IClientQueryParams.START_PAGE_PARAM) String pageNumber);
-    
+public interface CollectionObjectProxy extends CollectionSpacePoxProxy {
 
     /**
      * Roundtrip.
@@ -93,6 +58,15 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
     ClientResponse<Response> roundtrip(@PathParam("ms") int ms);
 
     /**
+     * Read list.
+     *
+     * @return the client response
+     */
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<CollectionobjectsCommonList> readList();
+    
+    /**
      * Keyword search.
      *
      * @param keywords the keywords
@@ -102,67 +76,5 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
     @Produces({"application/xml"})
     ClientResponse<CollectionobjectsCommonList> keywordSearch(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
-
-    //(C)reate
-    /**
-     * Creates the.
-     *
-     * @param payload the payload
-     * @return the client response
-     */
-    @POST
-    ClientResponse<Response> create(byte[] payload);
-
-    //(R)ead
-    /**
-     * Read.
-     *
-     * @param csid the csid
-     * @return the client response
-     */
-    @GET
-    @Path("/{csid}")
-    ClientResponse<String> read(@PathParam("csid") String csid);
     
-    @GET
-    @Produces({"application/xml"})
-    @Path("/{csid}/picture")
-    @Deprecated //FIXME: REM - Remove this method and the corresponding client, and resource as well.
-    ClientResponse<Response> createPicture(@PathParam("csid") String csid);
-    
-    // List Authority references
-    /**
-     * Gets the authority refs.
-     *
-     * @param csid the csid
-     * @return the authority refs
-     */
-    @GET
-    @Produces({"application/xml"})
-    @Path("/{csid}/authorityrefs/")
-    ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
-    
-
-    //(U)pdate
-    /**
-     * Update.
-     *
-     * @param csid the csid
-     * @param multipart the multipart
-     * @return the client response
-     */
-    @PUT
-    @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
-
-    //(D)elete
-    /**
-     * Delete.
-     *
-     * @param csid the csid
-     * @return the client response
-     */
-    @DELETE
-    @Path("/{csid}")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

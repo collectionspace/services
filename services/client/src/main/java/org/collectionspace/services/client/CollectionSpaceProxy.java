@@ -27,10 +27,16 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.workflow.WorkflowsCommon;
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
@@ -39,6 +45,25 @@ import org.jboss.resteasy.client.ClientResponse;
  */
 public interface CollectionSpaceProxy {
 
+    //(D)elete
+    @DELETE
+    @Path("/{csid}")
+    ClientResponse<Response> delete(@PathParam("csid") String csid);
+	
+    // List Authority References
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{csid}/authorityrefs/")
+    ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
+    
+    @GET
+    @Path("{csid}/workflow")
+    ClientResponse<String> getWorkflow(@PathParam("csid") String csid);
+    
+    /*
+     * (R)read List operations
+     */
+    
     /**
      * Read list.
      *

@@ -41,6 +41,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
@@ -69,7 +70,7 @@ import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
 //import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.query.IQueryManager;
+//import org.collectionspace.services.common.query.IQueryManager;
 //import org.collectionspace.services.common.query.QueryManager;
 //import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 //import org.jboss.remoting.samples.chat.exceptions.InvalidArgumentException;

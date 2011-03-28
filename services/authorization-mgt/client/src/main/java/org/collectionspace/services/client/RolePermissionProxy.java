@@ -64,14 +64,15 @@ public interface RolePermissionProxy extends CollectionSpaceProxy {
     ClientResponse<PermissionRole> read(@PathParam("csid") String csid,
             @PathParam("prcsid") String prcsid);
 
-    //(D)elete - with a payload
-    @POST
-    @Path("/{csid}/permroles")
-    ClientResponse<Response> delete(@PathParam("csid") String csid, 
-            @QueryParam("_method") String method, PermissionRole permRole);
-
     //(D)elete
     @DELETE
     @Path("/{csid}/permroles")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
+    
+    //(D)elete - with a payload
+    @POST
+    @Path("/{csid}/permroles")
+    ClientResponse<Response> delete(@PathParam("csid") String csid, 
+            @QueryParam("_method") String method,
+            PermissionRole permRole);
 }

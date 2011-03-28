@@ -1,21 +1,14 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.common.relation.IRelationsManager;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import javax.ws.rs.QueryParam;
 
 /**
@@ -24,7 +17,7 @@ import javax.ws.rs.QueryParam;
 @Path("/relations/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface RelationProxy extends CollectionSpaceProxy {
+public interface RelationProxy extends CollectionSpacePoxProxy {
 
     @GET
     @Produces({"application/xml"})
@@ -50,23 +43,4 @@ public interface RelationProxy extends CollectionSpaceProxy {
             @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortBy,
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
     	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);
-
-    //(C)reate
-    @POST
-    ClientResponse<Response> create(byte[] payload);
-
-    //(R)ead
-    @GET
-    @Path("/{csid}")
-    ClientResponse<String> read(@PathParam("csid") String csid);
-
-    //(U)pdate
-    @PUT
-    @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
-
-    //(D)elete
-    @DELETE
-    @Path("/{csid}")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

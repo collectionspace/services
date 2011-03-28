@@ -25,7 +25,7 @@ package org.collectionspace.services.common.relation.nuxeo;
 
 import java.lang.StringBuilder;
 
-import org.collectionspace.services.common.query.IQueryManager;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 
 import org.slf4j.Logger;

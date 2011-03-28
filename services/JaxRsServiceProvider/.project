@@ -59,6 +59,7 @@
     <project>org.collectionspace.services.vocabulary.client</project>
     <project>org.collectionspace.services.vocabulary.jaxb</project>
     <project>org.collectionspace.services.vocabulary.service</project>
+    <project>org.collectionspace.services.workflow.service</project>
   </projects>
   <buildSpec>
     <buildCommand>

@@ -26,93 +26,52 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.Response;
-
-import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.context.ServiceContext;
-//import org.collectionspace.services.common.query.IQueryManager;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-//import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
-//import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
-import org.slf4j.Logger;
+import javax.ws.rs.core.Response;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 
 /**
  * The Class CollectionObjectClient.
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public class CollectionObjectClient extends AbstractServiceClientImpl {
+public class CollectionObjectClient extends AbstractPoxServiceClientImpl<CollectionObjectProxy> {
 	public static final String SERVICE_NAME = "collectionobjects";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;	
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";		
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
-
-    /** The collection object proxy. */
-    private CollectionObjectProxy collectionObjectProxy;
     
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;
 	}
     
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-	 */
 	@Override
     public String getServicePathComponent() {
 		return SERVICE_PATH_COMPONENT;
 	}
 
-    /**
-     * Instantiates a new collection object client.
-     */
-    public CollectionObjectClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
-    
-    @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.collectionObjectProxy;
-    }
+	@Override
+	public Class<CollectionObjectProxy> getProxyClass() {
+		return CollectionObjectProxy.class;
+	}
 
-    /**
-     * Sets the proxy.
-     */
-    public void setProxy() {
-        if(useAuth()){
-            collectionObjectProxy = ProxyFactory.create(CollectionObjectProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        }else{
-            collectionObjectProxy = ProxyFactory.create(CollectionObjectProxy.class,
-                    getBaseURL());
-        }
-    }
-
-    /**
+	/*
+	 * Proxied service calls
+	 */
+	
+	/**
      * Read list.
      * 
      * @see org.collectionspace.services.client.CollectionObjectProxy#readList()
      * @return the client response< collectionobjects common list>
      */
     public ClientResponse<CollectionobjectsCommonList> readList() {
-        return collectionObjectProxy.readList();
+    	CollectionObjectProxy proxy = (CollectionObjectProxy)getProxy();
+        return proxy.readList();
 
     }
 
-//    @Override
-//    public ClientResponse<CollectionobjectsCommonList> readList(String pageSize,
-//    		String pageNumber) {
-//        return collectionObjectProxy.readList(pageSize, pageNumber);
-//    }
-    
     /**
      * Roundtrip.
      * 
@@ -124,7 +83,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<Response> roundtrip(int ms) {
     	getLogger().debug(">>>>Roundtrip start.");
-    	ClientResponse<Response> result = collectionObjectProxy.roundtrip(ms);
+    	ClientResponse<Response> result = getProxy().roundtrip(ms);
     	getLogger().debug("<<<<Roundtrip stop.");
     	return result;
     }
@@ -137,74 +96,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.CollectionObjectProxy#keywordSearch()
      * @return the client response< collectionobjects common list>
      */
-    public ClientResponse<CollectionobjectsCommonList> keywordSearch(String keywords) {    	
-        return collectionObjectProxy.keywordSearch(keywords);
+    public ClientResponse<CollectionobjectsCommonList> keywordSearch(String keywords) {
+        return getProxy().keywordSearch(keywords);
     }
-
-    
-    /**
-     * Read.
-     * 
-     * @param csid the csid
-     * 
-     * @see org.collectionspace.services.client.CollectionObjectProxy#keywordSearch()
-     * @return the client response< multipart input>
-     */
-    public ClientResponse<String> read(String csid) {
-        return collectionObjectProxy.read(csid);
-    }
-
-    public ClientResponse<Response> createPicture(String csid) {
-        return collectionObjectProxy.createPicture(csid);
-    }
-    
-    /**
-     * @param csid
-     * @return response
-     * @see org.collectionspace.services.client.CollectionObjectProxy#getAuthorityRefs(java.lang.String)
-     */
-    public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
-        return collectionObjectProxy.getAuthorityRefs(csid);
-    }
-
-
-    /**
-     * Creates the.
-     * 
-     * @param multipart the multipart
-     * 
-     * @see org.collectionspace.services.client.CollectionObjectProxy#create()
-     * @return the client response< response>
-     */
-    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
-        return collectionObjectProxy.create(xmlPayload.getBytes());
-    }
-
-    /**
-     * Update.
-     * 
-     * @param csid the csid
-     * @param multipart the multipart
-     * 
-     * @see org.collectionspace.services.client.CollectionObjectProxy#update()
-     * @return the client response< multipart input>
-     */
-    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
-    	String payload = multipart.toXML();
-        return collectionObjectProxy.update(csid, payload.getBytes());
-    }
-
-    /**
-     * Delete.
-     * 
-     * @param csid the csid
-     * 
-     * @see org.collectionspace.services.client.CollectionObjectProxy#delete()
-     * @return the client response< response>
-     */
-    @Override
-    public ClientResponse<Response> delete(String csid) {
-        return collectionObjectProxy.delete(csid);
-    }
-
 }

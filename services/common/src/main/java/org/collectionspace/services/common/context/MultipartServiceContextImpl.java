@@ -55,6 +55,7 @@ public class MultipartServiceContextImpl
 
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(MultipartServiceContextImpl.class);
+	private String repositoryWorkspaceName;
 
     /**
      * Instantiates a new multipart service context impl.
@@ -176,5 +177,23 @@ public class MultipartServiceContextImpl
         Constructor ctor = ctxClass.getConstructor(java.lang.String.class);
         ServiceContext ctx = (ServiceContext) ctor.newInstance(getServiceName());
         return ctx;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getRepositoryWorkspaceName()
+     */
+    @Override
+    public String getRepositoryWorkspaceName() {
+    	String result = repositoryWorkspaceName;
+        //service name is workspace name by convention
+        if (result == null) {
+        	result = serviceBinding.getName();
+        }
+        return result;
+    }
+    
+    @Override
+    public void setRespositoryWorkspaceName(String workspaceName) {
+    	repositoryWorkspaceName = workspaceName;
     }
 }

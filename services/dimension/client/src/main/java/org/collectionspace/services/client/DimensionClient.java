@@ -26,25 +26,15 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.Response;
-
-//import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.dimension.DimensionsCommonList;
-
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * A DimensionClient.
 
  * @version $Revision:$
  */
-public class DimensionClient extends AbstractServiceClientImpl {
+public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionProxy> {
 	public static final String SERVICE_NAME = "dimensions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -61,101 +51,18 @@ public class DimensionClient extends AbstractServiceClientImpl {
 		return SERVICE_NAME;
 	}
 	
-	/**
-     *
-     */
-//    private static final DimensionClient instance = new DimensionClient();
-    
-    /**
-     *
-     */
-    private DimensionProxy dimensionProxy;
-
-    /**
-     *
-     * Default constructor for DimensionClient class.
-     *
-     */
-    public DimensionClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.CollectionSpaceClient#getProxy()
-     */
-    @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.dimensionProxy;
-    }
-
-    /**
-     * allow to reset proxy as per security needs
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            dimensionProxy = ProxyFactory.create(DimensionProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            dimensionProxy = ProxyFactory.create(DimensionProxy.class,
-                    getBaseURL());
-        }
-    }
-
-    /**
-     * FIXME Comment this
-     *
-     * @return
-     */
-//    public static DimensionClient getInstance() {
-//        return instance;
-//    }
-
-    /**
-     * @return
-     * @see org.collectionspace.services.client.DimensionProxy#getDimension()
-     */
+	@Override
+	public Class<DimensionProxy> getProxyClass() {
+		return DimensionProxy.class;
+	}
+	
+	/*
+	 * Proxied service calls
+	 */
+	
     public ClientResponse<DimensionsCommonList> readList() {
-        return dimensionProxy.readList();
+    	DimensionProxy proxy = (DimensionProxy)getProxy();
+    	return proxy.readList();
     }
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.DimensionProxy#getDimension(java.lang.String)
-     */
-
-    public ClientResponse<String> read(String csid) {
-        return dimensionProxy.read(csid);
-    }
-
-    /**
-     * @param dimension
-     * @return
-     * @see org.collectionspace.services.client.DimensionProxy#createDimension(org.collectionspace.services.Dimension)
-     */
-    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
-        return dimensionProxy.create(xmlPayload.getBytes());
-    }
-
-    /**
-     * @param csid
-     * @param dimension
-     * @return
-     * @see org.collectionspace.services.client.DimensionProxy#updateDimension(java.lang.Long, org.collectionspace.services.Dimension)
-     */
-    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
-        return dimensionProxy.update(csid, xmlPayload.getBytes());
-    }
-
-    /**
-     * @param csid
-     * @return response
-     * @see org.collectionspace.services.client.DimensionProxy#deleteDimension(java.lang.Long)
-     */
-    @Override
-    public ClientResponse<Response> delete(String csid) {
-        return dimensionProxy.delete(csid);
-    }
+    
 }

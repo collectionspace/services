@@ -17,16 +17,8 @@
 
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.Response;
-
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.movement.MovementsCommonList;
-
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.collectionspace.services.movement.MovementsCommonList;
 
 /**
  * MovementClient.java
@@ -35,63 +27,38 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * $LastChangedDate$
  *
  */
-public class MovementClient extends AbstractServiceClientImpl {
+public class MovementClient extends AbstractPoxServiceClientImpl<MovementProxy> {
     public static final String SERVICE_NAME = "movements";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    private MovementProxy movementProxy;
-    /**
-     *
-     * Default constructor for MovementClient class.
-     *
-     */
-    public MovementClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
-
     @Override
     public String getServiceName() {
         return SERVICE_NAME;
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
-    
-    @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.movementProxy;
-    }    
 
-    /**
-     * allow to reset proxy as per security needs
-     */
-    @Override
-    public void setProxy() {
-        if (useAuth()) {
-            movementProxy = ProxyFactory.create(MovementProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            movementProxy = ProxyFactory.create(MovementProxy.class,
-                    getBaseURL());
-        }
-    }
+	@Override
+	public Class<MovementProxy> getProxyClass() {
+		return MovementProxy.class;
+	}
 
+	/*
+	 * Proxied service calls
+	 */
+	
     /**
      * @return
      * @see org.collectionspace.services.client.MovementProxy#readList()
      */
     public ClientResponse<MovementsCommonList> readList() {
-        return movementProxy.readList();
+        return getProxy().readList();
     }
 
     /**
@@ -100,7 +67,7 @@ public class MovementClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.MovementProxy#readList(java.lang.String)
      */
     public ClientResponse<MovementsCommonList> readListSortedBy(String sortFieldName) {
-        return movementProxy.readListSortedBy(sortFieldName);
+        return getProxy().readListSortedBy(sortFieldName);
     }
 
     /**
@@ -110,55 +77,6 @@ public class MovementClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.MovementProxy#keywordSearchSortedBy(java.lang.String, java.lang.String)
      */
     public ClientResponse<MovementsCommonList> keywordSearchSortedBy(String keywords, String sortFieldName) {
-        return movementProxy.keywordSearchSortedBy(keywords, sortFieldName);
-    }
-    
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.MovementProxy#getAuthorityRefs(java.lang.String)
-     */
-    public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
-        return movementProxy.getAuthorityRefs(csid);
-    }
-
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.MovementProxy#getMovement(java.lang.String)
-     */
-    public ClientResponse<String> read(String csid) {
-        return movementProxy.read(csid);
-    }
-
-    /**
-     * @param multipart
-     * @return
-     * @see org.collectionspace.services.client.MovementProxy#createMovement(org.collectionspace.hello.Movement)
-     */
-    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
-        return movementProxy.create(xmlPayload.getBytes());
-    }
-
-    /**
-     * @param csid
-     * @param multipart
-     * @return
-     * @see org.collectionspace.services.client.MovementProxy#updateMovement(java.lang.Long, org.collectionspace.hello.Movement)
-     */
-    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
-        return movementProxy.update(csid, xmlPayload.getBytes());
-
-    }
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.MovementProxy#deleteMovement(java.lang.Long)
-     */
-    @Override
-    public ClientResponse<Response> delete(String csid) {
-        return movementProxy.delete(csid);
-    }
+        return getProxy().keywordSearchSortedBy(keywords, sortFieldName);
+    }    
 }

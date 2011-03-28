@@ -51,6 +51,7 @@
         <module>report</module>
         <module>dimension</module>
         <module>contact</module>
+        <module>workflow</module>
         <module>JaxRsServiceProvider</module>
         <!--module>sdk</module-->
         <module>IntegrationTests</module>

@@ -33,60 +33,36 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * $LastChangedDate: $
  */
  
-public class NoteClient extends AbstractServiceClientImpl {
+public class NoteClient extends AbstractServiceClientImpl<NoteProxy> {
 
-    private NoteProxy noteProxy;
     public static final String SERVICE_NAME = "notes";
     public static final String SERVICE_PATH_COMPONENT = "notes";
-
-    /**
-     *
-     * Default constructor for NoteClient class.
-     *
-     */
-    public NoteClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
 
     @Override
     public String getServiceName() {
             return SERVICE_NAME;
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-     */
     @Override
     public String getServicePathComponent() {
             return SERVICE_PATH_COMPONENT;
     }
 
-    @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.noteProxy;
-    }
-    
-    /**
-     * allow to reset proxy as per security needs
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            noteProxy = ProxyFactory.create(NoteProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            noteProxy = ProxyFactory.create(NoteProxy.class,
-                    getBaseURL());
-        }
-    }
+	@Override
+	public Class<NoteProxy> getProxyClass() {
+		return NoteProxy.class;
+	}
 
+	/*
+	 * Proxied service calls
+	 */
+	
     /**
      * @return
      * @see org.collectionspace.services.client.Note#getNote()
      */
     public ClientResponse<NotesCommonList> readList() {
-        return noteProxy.readList();
+        return getProxy().readList();
     }
 
     /**
@@ -96,7 +72,7 @@ public class NoteClient extends AbstractServiceClientImpl {
      */
 
     public ClientResponse<String> read(String csid) {
-        return noteProxy.read(csid);
+        return getProxy().read(csid);
     }
 
     /**
@@ -107,7 +83,7 @@ public class NoteClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<Response> create(PoxPayloadOut multipart) {
         String payload = multipart.toXML();
-        return noteProxy.create(payload);
+        return getProxy().create(payload);
     }
 
     /**
@@ -118,17 +94,7 @@ public class NoteClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
         String payload = multipart.toXML();
-        return noteProxy.update(csid, payload);
+        return getProxy().update(csid, payload);
 
-    }
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.Note#deleteNote(java.lang.Long)
-     */
-    @Override
-    public ClientResponse<Response> delete(String csid) {
-        return noteProxy.delete(csid);
     }
 }

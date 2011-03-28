@@ -26,17 +26,9 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.Response;
-
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.report.ReportsCommonList;
-
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * A ReportClient.
@@ -44,108 +36,36 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public class ReportClient extends AbstractServiceClientImpl {
+public class ReportClient extends AbstractPoxServiceClientImpl<ReportProxy> {
 
-    private ReportProxy reportProxy;
     public static final String SERVICE_NAME = "reports";
     public static final String SERVICE_PATH_COMPONENT = "reports";
-
-    /**
-     *
-     * Default constructor for ReportClient class.
-     *
-     */
-    public ReportClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
 
     @Override
     public String getServiceName() {
         return SERVICE_NAME;
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
-    public String getServicePathComponent() {
+    @Override
+	public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
-
-    @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.reportProxy;
-    }
-    
-    /**
-     * allow to reset proxy as per security needs
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            reportProxy = ProxyFactory.create(ReportProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            reportProxy = ProxyFactory.create(ReportProxy.class,
-                    getBaseURL());
-        }
-    }
-
+	@Override
+	public Class<ReportProxy> getProxyClass() {
+		return ReportProxy.class;
+	}
+	
+	/*
+	 * Proxied service calls.
+	 */
+	
     /**
      * @return
      * @see org.collectionspace.services.client.ReportProxy#getReport()
      */
     public ClientResponse<ReportsCommonList> readList() {
-        return reportProxy.readList();
+        return getProxy().readList();
     }
     
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.ReportProxy#getAuthorityRefs(java.lang.String)
-     */
-    public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
-        return reportProxy.getAuthorityRefs(csid);
-    }
-
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.ReportProxy#getReport(java.lang.String)
-     */
-    public ClientResponse<String> read(String csid) {
-        return reportProxy.read(csid);
-    }
-
-    /**
-     * @param report
-     * @return
-     * @see org.collectionspace.services.client.ReportProxy#createReport(org.collectionspace.hello.Report)
-     */
-    public ClientResponse<Response> create(PoxPayloadOut multipart) {
-        return reportProxy.create(multipart.getBytes());
-    }
-
-    /**
-     * @param csid
-     * @param report
-     * @return
-     * @see org.collectionspace.services.client.ReportProxy#updateReport(java.lang.Long, org.collectionspace.hello.Report)
-     */
-    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
-        return reportProxy.update(csid, multipart.getBytes());
-    }
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.ReportProxy#deleteReport(java.lang.Long)
-     */
-    public ClientResponse<Response> delete(String csid) {
-        return reportProxy.delete(csid);
-    }
-
-
 }

@@ -27,78 +27,54 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-
+import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionsList;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * A PermissionClient.
 
  * @version $Revision:$
  */
-public class PermissionClient extends AbstractServiceClientImpl {
+public class PermissionClient extends AbstractServiceClientImpl<PermissionProxy> {
 	public static final String SERVICE_NAME = "authorization/permissions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
-    /**
-     *
-     */
-    private PermissionProxy permissionProxy;
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
-    public String getServicePathComponent() {
+    @Override
+	public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
-    /**
-     *
-     * Default constructor for PermissionClient class.
-     *
-     */
-    public PermissionClient() {
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();
-    }
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
 
-    @Override
-    public CollectionSpaceProxy getProxy() {
-    	return this.permissionProxy;
-    }    
-
-    /**
-     * allow to reset proxy as per security needs
-     */
-    public void setProxy() {
-        if (useAuth()) {
-            permissionProxy = ProxyFactory.create(PermissionProxy.class,
-                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-        } else {
-            permissionProxy = ProxyFactory.create(PermissionProxy.class,
-                    getBaseURL());
-        }
-    }
-
+	@Override
+	public Class<PermissionProxy> getProxyClass() {
+		return PermissionProxy.class;
+	}
+	
+	/*
+	 * CRUD+L Methods
+	 */
+	
     /**
      * @return
      * @see org.collectionspace.hello.client.PermissionProxy#readList()
      */
     public ClientResponse<PermissionsList> readList() {
-        return permissionProxy.readList();
+        return getProxy().readList();
 
     }
 
     public ClientResponse<PermissionsList> readSearchList(String resourceName) {
-        return permissionProxy.readSearchList(resourceName);
+        return getProxy().readSearchList(resourceName);
 
     }
 
@@ -108,7 +84,7 @@ public class PermissionClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.PermissionProxy#getAccount(java.lang.String)
      */
     public ClientResponse<Permission> read(String csid) {
-        return permissionProxy.read(csid);
+        return getProxy().read(csid);
     }
 
     /**
@@ -117,7 +93,7 @@ public class PermissionClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.PermissionProxy#create(org.collectionspace.services.permission.Permission)
      */
     public ClientResponse<Response> create(Permission permission) {
-        return permissionProxy.create(permission);
+        return getProxy().create(permission);
     }
 
     /**
@@ -127,20 +103,6 @@ public class PermissionClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.PermissionProxy#updateAccount(java.lang.Long, org.collectionspace.services.permission.Permission)
      */
     public ClientResponse<Permission> update(String csid, Permission permission) {
-        return permissionProxy.update(csid, permission);
+        return getProxy().update(csid, permission);
     }
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.hello.client.PermissionProxy#deleteAccount(java.lang.Long)
-     */
-    public ClientResponse<Response> delete(String csid) {
-        return permissionProxy.delete(csid);
-    }
-
-	@Override
-	public String getServiceName() {
-		return SERVICE_NAME;
-	}
 }

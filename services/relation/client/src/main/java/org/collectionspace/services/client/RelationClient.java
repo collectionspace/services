@@ -26,21 +26,14 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.Response;
-
-//import org.collectionspace.services.common.context.ServiceContext;
+import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.relation.RelationsCommonList;
 
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * The Class RelationClient.
  */
-public class RelationClient extends AbstractServiceClientImpl {
+public class RelationClient extends AbstractPoxServiceClientImpl<RelationProxy> {
 	public static final String SERVICE_NAME = "relations";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -57,44 +50,22 @@ public class RelationClient extends AbstractServiceClientImpl {
 		return SERVICE_PATH_COMPONENT;
 	}
 
-	/** The relation proxy. */
-	private RelationProxy relationProxy;
-
-	/**
-	 * Instantiates a new relation client.
-	 */
-	public RelationClient() {
-		ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-		RegisterBuiltin.register(factory);
-		setProxy();
-	}
-
-    @Override
-	public CollectionSpaceProxy getProxy() {
-    	return this.relationProxy;
-    }
-
-    /**
-	 * Sets the proxy.
-	 */
 	@Override
-	public void setProxy() {
-		if (useAuth()) {
-			relationProxy = ProxyFactory.create(RelationProxy.class,
-					getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
-		} else {
-			relationProxy = ProxyFactory.create(RelationProxy.class,
-					getBaseURL());
-		}
+	public Class<RelationProxy> getProxyClass() {
+		return RelationProxy.class;
 	}
 
+	/*
+	 * Proxied service calls
+	 */
+	
 	/**
 	 * Read list.
 	 *
 	 * @return the client response
 	 */
 	public ClientResponse<RelationsCommonList> readList() {
-		return relationProxy.readList();
+		return getProxy().readList();
 	}
 
 	/**
@@ -112,7 +83,7 @@ public class RelationClient extends AbstractServiceClientImpl {
 			String predicate,
 			String objectCsid,
 			String objectType) {
-		return relationProxy.readList(subjectCsid, subjectType, predicate, objectCsid, objectType);
+		return getProxy().readList(subjectCsid, subjectType, predicate, objectCsid, objectType);
 	}
 
     public ClientResponse<RelationsCommonList> readList(String subjectCsid,
@@ -123,49 +94,6 @@ public class RelationClient extends AbstractServiceClientImpl {
             String sortBy,
             Long pageSize,
             Long pageNumber) {
-        return relationProxy.readList(subjectCsid, subjectType, predicate, objectCsid, objectType, sortBy, pageSize, pageNumber);
+        return getProxy().readList(subjectCsid, subjectType, predicate, objectCsid, objectType, sortBy, pageSize, pageNumber);
     }
-
-
-	/**
-	 * Read.
-	 *
-	 * @param csid the csid
-	 * @return the client response
-	 */
-	public ClientResponse<String> read(String csid) {
-		return relationProxy.read(csid);
-	}
-
-	/**
-	 * Creates the.
-	 *
-	 * @param multipart the multipart
-	 * @return the client response
-	 */
-	public ClientResponse<Response> create(PoxPayloadOut multipart) {
-            return relationProxy.create(multipart.getBytes());
-	}
-
-	/**
-	 * Update.
-	 *
-	 * @param csid the csid
-	 * @param multipart the multipart
-	 * @return the client response
-	 */
-	public ClientResponse<String> update(String csid,
-                PoxPayloadOut multipart) {
-            return relationProxy.update(csid, multipart.getBytes());
-	}
-
-	/**
-	 * Delete.
-	 *
-	 * @param csid the csid
-	 * @return the client response
-	 */
-	public ClientResponse<Response> delete(String csid) {
-		return relationProxy.delete(csid);
-	}
 }

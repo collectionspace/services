@@ -27,7 +27,6 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -36,7 +35,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-
 
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionsList;
@@ -55,7 +53,6 @@ public interface PermissionProxy extends CollectionSpaceProxy {
     ClientResponse<PermissionsList> readList();
 
     @GET
-
     ClientResponse<PermissionsList> readSearchList(@QueryParam("res") String resourceName);
 
     //(C)reate
@@ -71,9 +68,4 @@ public interface PermissionProxy extends CollectionSpaceProxy {
     @PUT
     @Path("/{csid}")
     ClientResponse<Permission> update(@PathParam("csid") String csid, Permission permission);
-
-    //(D)elete
-    @DELETE
-    @Path("/{csid}")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

@@ -43,6 +43,7 @@ import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
 import org.collectionspace.services.person.PersonAuthorityResource;
+import org.collectionspace.services.workflow.WorkflowResource;
 
 //import org.collectionspace.services.query.QueryResource;
 
@@ -79,13 +80,13 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new AccountResource());
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
-        singletons.add(new CollectionObjectResource());
-        singletons.add(new IntakeResource());
         singletons.add(new VocabularyResource());
-        singletons.add(new DimensionResource());
         singletons.add(new ContactResource());
         singletons.add(new PersonAuthorityResource());
         singletons.add(new OrgAuthorityResource());
+        singletons.add(new CollectionObjectResource());
+        singletons.add(new IntakeResource());
+        singletons.add(new DimensionResource());
         singletons.add(new RelationResource());
         singletons.add(new NoteResource());
         singletons.add(new LoaninResource());
@@ -99,6 +100,9 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new ReportResource());
         singletons.add(new LocationAuthorityResource());
         singletons.add(new IDResource());
+        /*
+        singletons.add(new WorkflowResource());
+        */
 //        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());

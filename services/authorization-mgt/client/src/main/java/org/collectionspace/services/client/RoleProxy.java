@@ -27,7 +27,6 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -55,7 +54,6 @@ public interface RoleProxy extends CollectionSpaceProxy {
     ClientResponse<RolesList> readList();
 
     @GET
-
     ClientResponse<RolesList> readSearchList(@QueryParam("r") String roleName);
 
     //(C)reate
@@ -71,9 +69,4 @@ public interface RoleProxy extends CollectionSpaceProxy {
     @PUT
     @Path("/{csid}")
     ClientResponse<Role> update(@PathParam("csid") String csid, Role role);
-
-    //(D)elete
-    @DELETE
-    @Path("/{csid}")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

@@ -635,7 +635,6 @@ public class RoleResource
     @Path("{csid}/permroles")
     public Response deleteRolePermission(
     		@PathParam("csid") String roleCsid) {
-
         if (logger.isDebugEnabled()) {
             logger.debug("deleteRolePermission with roleCsid=" + roleCsid);
         }

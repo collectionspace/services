@@ -23,15 +23,18 @@
  */
 package org.collectionspace.services.client;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.workflow.WorkflowsCommon;
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
  *
  */
-public interface CollectionSpaceClient {
+public interface CollectionSpaceClient<T extends CollectionSpaceProxy> {
 
     public static final String AUTH_PROPERTY = "cspace.auth";
     public static final String PASSWORD_PROPERTY = "cspace.password";
@@ -45,8 +48,10 @@ public interface CollectionSpaceClient {
      *
      * @return the proxy
      */
-    CollectionSpaceProxy getProxy();
+    T getProxy();
 
+    Class<T> getProxyClass();
+    
     /**
      * Gets the base url.
      *
@@ -136,6 +141,10 @@ public interface CollectionSpaceClient {
      * @return boolean
      */
     boolean isServerSecure();
+    
+    /*
+     * Common proxied service calls
+     */
 
     /**
      * Read list.
@@ -161,6 +170,22 @@ public interface CollectionSpaceClient {
             Long pageSize,
             Long pageNumber);
 
+    /**
+     * Gets the workflow information
+     *
+     * @param csid the csid of the entity
+     * @return the workflow
+     */
+    public ClientResponse<String> getWorkflow(@PathParam("csid") String csid);
+    
+    /**
+     * Gets the authority refs.
+     *
+     * @param csid the csid
+     * @return the authority refs
+     */
+    public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid);
+    
     /**
      * Delete.
      *

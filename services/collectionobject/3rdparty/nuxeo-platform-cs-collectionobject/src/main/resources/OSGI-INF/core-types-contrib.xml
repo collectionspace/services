@@ -5,7 +5,7 @@
         <schema name="collectionobjects_naturalhistory" prefix="collectionobjects_naturalhistory" src="schemas/collectionobjects_naturalhistory.xsd"/>
     </extension>
     <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
-        <doctype name="CollectionObject" extends="Document">
+        <doctype name="CollectionObject" extends="CollectionSpaceDocument">
             <schema name="common"/>
             <schema name="dublincore"/>
             <schema name="collectionspace_core"/>

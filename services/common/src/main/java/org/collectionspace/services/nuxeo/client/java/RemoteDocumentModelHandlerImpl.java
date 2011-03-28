@@ -127,7 +127,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @param partMeta the part meta
      * @throws Exception the exception
      */
-    private void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
+    protected void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
             throws Exception {
         Element doc = DocumentUtils.buildDocument(partMeta, schema,
                 unQObjectProperties);

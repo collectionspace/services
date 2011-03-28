@@ -25,6 +25,7 @@
 	>
 
     <!-- This is the base class for paginated lists -->
+	<!--
     <xs:complexType name="abstractCommonList">
         <xs:annotation>
             <xs:appinfo>
@@ -32,6 +33,7 @@
             </xs:appinfo>
         </xs:annotation>
     </xs:complexType>
+    -->
 
 	<xs:element name="authority-ref-doc-list">
 		<xs:complexType>

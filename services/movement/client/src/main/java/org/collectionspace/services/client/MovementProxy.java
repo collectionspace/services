@@ -24,22 +24,14 @@
 
 package org.collectionspace.services.client;
 
+import org.jboss.resteasy.client.ClientResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.common.query.IQueryManager;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.movement.MovementsCommonList;
-import org.jboss.resteasy.client.ClientResponse;
-
 
 /**
  * MovementProxy.java
@@ -50,27 +42,8 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/movements/")
 @Produces("application/xml")
 @Consumes("application/xml")
-public interface MovementProxy extends CollectionSpaceProxy {
+public interface MovementProxy extends CollectionSpacePoxProxy {
 
-    //(C)reate
-    @POST
-    ClientResponse<Response> create(byte[] payload);
-
-    //(R)ead
-    @GET
-    @Path("/{csid}")
-    ClientResponse<String> read(@PathParam("csid") String csid);
-
-    //(U)pdate
-    @PUT
-    @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
-
-    //(D)elete
-    @DELETE
-    @Path("/{csid}")
-    ClientResponse<Response> delete(@PathParam("csid") String csid);
-    
     // List
     @GET
     @Produces({"application/xml"})
@@ -87,11 +60,4 @@ public interface MovementProxy extends CollectionSpaceProxy {
     ClientResponse<MovementsCommonList> keywordSearchSortedBy(
         @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
         @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortFieldName);
-
-    // List Authority References
-    @GET
-    @Produces({"application/xml"})
-    @Path("/{csid}/authorityrefs/")
-    ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
-    
 }

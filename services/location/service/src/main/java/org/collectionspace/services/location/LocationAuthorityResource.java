@@ -65,7 +65,6 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
-import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.location.nuxeo.LocationDocumentModelHandler;
 import org.jboss.resteasy.util.HttpResponseCodes;

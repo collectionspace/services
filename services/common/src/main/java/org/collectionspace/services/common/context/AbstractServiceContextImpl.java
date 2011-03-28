@@ -76,7 +76,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     /** The object part map. */
     Map<String, ObjectPartType> objectPartMap = new HashMap<String, ObjectPartType>();
     /** The service binding. */
-    private ServiceBindingType serviceBinding;
+    protected ServiceBindingType serviceBinding;
     /** The tenant binding. */
     private TenantBindingType tenantBinding;
     /** repository domain used by the service */
