@@ -107,15 +107,17 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy workflow service">
+        description="deploy workflow">
+        <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy workflow service">
+        description="undeploy workflow service">
+        <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist" depends="package"
-    description="distribute workflow service">
+        description="distribute workflow service">
+        <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
     </target>
-
 </project>
