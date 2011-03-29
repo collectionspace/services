@@ -25,20 +25,18 @@
 	>
 
     <!-- This is the base class for paginated lists -->
-	<!--
-    <xs:complexType name="abstractCommonList">
+    <xs:complexType name="abstractCommonList2">
         <xs:annotation>
             <xs:appinfo>
                 <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
             </xs:appinfo>
         </xs:annotation>
     </xs:complexType>
-    -->
 
 	<xs:element name="authority-ref-doc-list">
 		<xs:complexType>
             <xs:complexContent>
-                <xs:extension base="abstractCommonList">
+                <xs:extension base="abstractCommonList2">
 					<xs:sequence>
 						 <xs:element name="authority-ref-doc-item" maxOccurs="unbounded">
 							<xs:complexType>

@@ -13,7 +13,6 @@
     <packaging>jar</packaging>
 
     <dependencies>
-
         <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -268,7 +267,7 @@
             <version>4.1.0</version>
         </dependency>
 
-        <!-- fixme remove restlet dependencies once REST client is no more used -->
+        <!-- fixme remove restlet dependencies once REST client is no longer  used -->
         <dependency>
             <groupId>org.restlet</groupId>
             <artifactId>org.restlet</artifactId>
@@ -284,13 +283,6 @@
             <artifactId>com.noelios.restlet</artifactId>
             <version>1.0.7</version>
         </dependency>
-
-        <!--fixme where is jaxen needed? -->
-<!--        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>1.1.1</version>
-        </dependency> -->
 		<dependency>
 		    <groupId>commons-fileupload</groupId>
 		    <artifactId>commons-fileupload</artifactId>
@@ -301,6 +293,7 @@
 
     <build>
         <finalName>collectionspace-services-common</finalName>
+    	<defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
