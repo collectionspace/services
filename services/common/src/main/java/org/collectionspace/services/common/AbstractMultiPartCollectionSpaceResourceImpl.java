@@ -26,9 +26,12 @@
  */
 package org.collectionspace.services.common;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -45,6 +48,7 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.workflow.client.WorkflowClient;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.workflow.WorkflowsCommon;
+import org.jboss.resteasy.client.ClientResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,14 +171,14 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
     /*
      * JAX-RS Annotated methods
      */
-        
+       
     @GET
     @Path("{csid}/workflow")
     public byte[] getWorkflow(
             @PathParam("csid") String csid) {
         PoxPayloadOut result = null;
 
-        try {
+        try {        	
             ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext();
             String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
         	
@@ -189,5 +193,26 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
                 
         return result.getBytes();
     }
+    
+    @PUT
+    @Path("{csid}/workflow")
+    public byte[] updateWorkflow(@PathParam("csid") String csid, String xmlPayload) {
+        PoxPayloadOut result = null;
+    	try {
+	        ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext();
+	        String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
+	    	
+        	PoxPayloadIn workflowUpdate = new PoxPayloadIn(xmlPayload);
+	    	MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, workflowUpdate);
+	    	WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
+	    	ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
+	        getRepositoryClient(ctx).update(ctx, csid, handler);
+	        result = ctx.getOutput();
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
+        }
+        return result.getBytes();
+    }
+    
     
 }

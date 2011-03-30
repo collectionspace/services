@@ -32,6 +32,11 @@ public class WorkflowClient extends AbstractPoxServiceClientImpl<WorkflowProxy> 
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 	public static final String SERVICE_COMMONPART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+	public static final String WORKFLOWSTATE_DELETED = "deleted";
+	public static final String WORKFLOWSTATE_PROJECT = "project";
+	public static final String WORKFLOWSTATE_APPROVED = "approved";
+
+	
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;

@@ -35,6 +35,7 @@ import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.common.service.DocHandlerParams;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
@@ -67,7 +68,8 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         return commonList;
     }
 
-    public void setCommonPartList(AbstractCommonList aCommonList) {
+    @Override
+	public void setCommonPartList(AbstractCommonList aCommonList) {
         this.commonList = aCommonList;
     }
 
@@ -78,7 +80,8 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         return (T)commonPart;
     }
 
-    public void setCommonPart(T commonPart) {
+    @Override
+	public void setCommonPart(T commonPart) {
         this.commonPart = commonPart;
     }
 
@@ -100,21 +103,22 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         		docModel, label, id, true);
     }
 
-    public DocHandlerParams.Params getDocHandlerParams(){
-    	MultipartServiceContext sc = (MultipartServiceContext) getServiceContext();
-    	ServiceBindingType sb = sc.getServiceBinding();
-    	DocHandlerParams dhb = sb.getDocHandlerParams();
-    	if(dhb!=null&&dhb.getParams()!=null) {
-    		return dhb.getParams();
-    	}
-        throw new RuntimeException("No DocHandlerParams configured for: "+sb.getName());
-    }
+	public DocHandlerParams.Params getDocHandlerParams() throws DocumentException {
+		MultipartServiceContext sc = (MultipartServiceContext) getServiceContext();
+		ServiceBindingType sb = sc.getServiceBinding();
+		DocHandlerParams dhb = sb.getDocHandlerParams();
+		if (dhb != null && dhb.getParams() != null) {
+			return dhb.getParams();
+		}
+		throw new DocumentException("No DocHandlerParams configured for: "
+				+ sb.getName());
+	}
 
-    public String getSummaryFields(AbstractCommonList commonList){
+    public String getSummaryFields(AbstractCommonList theCommonList) throws DocumentException {
         return getDocHandlerParams().getSummaryFields();
     }
 
-    public List<ListResultField> getListItemsArray(){
+    public List<ListResultField> getListItemsArray() throws DocumentException {
         return getDocHandlerParams().getListResultsFields().getListResultField();
     }
 
@@ -123,7 +127,8 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         throw new UnsupportedOperationException();
     }
 
-    public void fillCommonPart(T objectexitObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+	@Override
+	public void fillCommonPart(T objectexitObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
@@ -199,7 +204,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     }
 
     @Override
-    public String getQProperty(String prop) {
+    public String getQProperty(String prop) throws DocumentException {
         return getDocHandlerParams().getSchemaName() + ":" + prop;
     }
 
@@ -211,13 +216,28 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         fillDublinCoreObject(wrapDoc);
     }
 
+    /**
+     * Fill dublin core object, but only if there are document handler parameters in the service
+     * bindings.
+     *
+     * @param wrapDoc the wrap doc
+     * @throws Exception the exception
+     */
     protected void fillDublinCoreObject(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        String title = getDocHandlerParams().getDublinCoreTitle();
-        if (Tools.isEmpty(title)){
-            return;
-        }
-        DocumentModel docModel = wrapDoc.getWrappedObject();
-        docModel.setPropertyValue("dublincore:title", title);
+    	DocHandlerParams.Params docHandlerParams = null;
+    	try {
+    		docHandlerParams = getDocHandlerParams();
+    	} catch (Exception e) {
+    		logger.warn(e.getMessage());
+    	}
+    	
+    	if (docHandlerParams != null) {
+	        String title = getDocHandlerParams().getDublinCoreTitle();
+	        if (Tools.isEmpty(title) == false){
+		        DocumentModel docModel = wrapDoc.getWrappedObject();
+		        docModel.setPropertyValue("dublincore:title", title);
+	        }
+    	}
     }
 
     //================== UTILITY METHODS ================================================

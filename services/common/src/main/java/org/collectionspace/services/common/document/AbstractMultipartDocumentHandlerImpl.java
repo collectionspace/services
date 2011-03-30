@@ -101,6 +101,6 @@ public abstract class AbstractMultipartDocumentHandlerImpl<T, TL, WT, WTL>
     public abstract void setCommonPartList(TL obj);
 
     @Override
-    public abstract String getQProperty(String prop);
+    public abstract String getQProperty(String prop) throws DocumentException;
 
 }

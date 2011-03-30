@@ -63,6 +63,5 @@ public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionProxy
     public ClientResponse<DimensionsCommonList> readList() {
     	DimensionProxy proxy = (DimensionProxy)getProxy();
     	return proxy.readList();
-    }
-    
+    }    
 }

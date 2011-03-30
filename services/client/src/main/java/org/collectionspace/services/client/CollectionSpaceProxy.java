@@ -26,8 +26,10 @@
  */
 package org.collectionspace.services.client;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -57,8 +59,16 @@ public interface CollectionSpaceProxy {
     ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
     
     @GET
+    @Produces({"application/xml"})
+    @Consumes({"application/xml"})    
     @Path("{csid}/workflow")
     ClientResponse<String> getWorkflow(@PathParam("csid") String csid);
+    
+    @PUT
+    @Produces({"application/xml"})
+    @Consumes({"application/xml"})    
+    @Path("{csid}/workflow")
+    ClientResponse<String> updateWorkflow(@PathParam("csid") String csid, byte[] xmlPayload);
     
     /*
      * (R)read List operations

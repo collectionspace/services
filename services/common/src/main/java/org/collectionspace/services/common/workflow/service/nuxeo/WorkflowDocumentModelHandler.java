@@ -24,20 +24,47 @@
 package org.collectionspace.services.common.workflow.service.nuxeo;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.workflow.client.WorkflowClient;
 import org.collectionspace.services.common.workflow.jaxb.WorkflowJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.workflow.WorkflowsCommon;
+import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorkflowDocumentModelHandler 
 	extends DocHandlerBase<WorkflowsCommon> {
+
+    /** The logger. */
+    private final Logger logger = LoggerFactory.getLogger(WorkflowDocumentModelHandler.class);
+    
+    /*
+     * Workflow transitions
+     */
+    private static final String TRANSITION_DELETE = "delete";
+    private static final String TRANSITION_APPROVE = "approve";
+    private static final String TRANSITION_UNKNOWN = "unknown";
+
+    /*
+	 * Handle read (GET)
+	 */
 	
 	@Override
     protected Map<String, Object> extractPart(DocumentModel docModel, 
@@ -62,7 +89,6 @@ public class WorkflowDocumentModelHandler
     @Override
     public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
-
         DocumentModel docModel = wrapDoc.getWrappedObject();
         String[] schemas = {WorkflowClient.SERVICE_COMMONPART_NAME};
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
@@ -75,6 +101,28 @@ public class WorkflowDocumentModelHandler
             addOutputPart(unQObjectProperties, schema, partMeta);
         }
     }
+    
+    private String getTransitionFromState(String state) {
+    	String result = TRANSITION_UNKNOWN;
+    	if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+    		result = TRANSITION_DELETE;
+    	} else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_APPROVED)) {
+    		result = TRANSITION_APPROVE;
+    	} 
+    	return result;
+    }
+    /*
+     * Handle Update (PUT)
+     */
 	
+    @Override
+	protected void fillPart(PayloadInputPart part, DocumentModel docModel,
+    		ObjectPartType partMeta, Action action,
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
+    		throws Exception {
+		WorkflowsCommon workflowsCommon = (WorkflowsCommon)part.getBody();
+		docModel.followTransition(getTransitionFromState(workflowsCommon.getCurrentLifeCycleState()));
+    }
+
 }
 

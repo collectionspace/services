@@ -307,8 +307,9 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * getQProperty get qualified property (useful for mapping to repository document property)
      * @param prop
      * @return
+     * @throws DocumentException 
      */
-    public String getQProperty(String prop);
+    public String getQProperty(String prop) throws DocumentException;
 
     /**
      * getUnQProperty unqualifies document property from repository

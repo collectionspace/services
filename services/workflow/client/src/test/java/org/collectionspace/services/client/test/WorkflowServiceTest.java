@@ -23,6 +23,7 @@
 package org.collectionspace.services.client.test;
 
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -36,6 +37,7 @@ import org.collectionspace.services.common.workflow.client.WorkflowClient;
 import org.collectionspace.services.workflow.WorkflowsCommon;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.dimension.DimensionsCommon;
+import org.collectionspace.services.dimension.DimensionsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -92,10 +94,10 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
 //        allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
 //    }
     
+    
     /*
      * Create a Dimension instance to use as our test target.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createTestObject(String testName) throws Exception {
     	logger.debug(testBanner(testName, CLASS_NAME));
     	setupCreate();
@@ -116,7 +118,7 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     }
 
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createTestObject"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupRead();
@@ -151,30 +153,52 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
 //            }
 //        }
 //    }
-
+    
     @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupUpdate();
-        WorkflowClient client = new WorkflowClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-        logger.debug("got object to update with ID: " + knownResourceId);
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        WorkflowsCommon objectexit = (WorkflowsCommon) extractPart(input, client.getCommonPartName(), WorkflowsCommon.class);
-        Assert.assertNotNull(objectexit);
+        updateLifeCycleState(testName, knownResourceId, WorkflowClient.WORKFLOWSTATE_APPROVED);
+    }    
 
-//        objectexit.setExitNumber("updated-" + objectexit.getExitNumber());
-        logger.debug("Object to be updated:"+objectAsXmlString(objectexit, WorkflowsCommon.class));
+    private void updateLifeCycleState(String testName, String resourceId, String lifeCycleState) throws Exception {
+        //
+        // Read the existing object
+        //
+        DimensionClient client = new DimensionClient();
+        ClientResponse<String> res = client.getWorkflow(resourceId);
+        assertStatusCode(res, testName);
+        logger.debug("Got object to update life cycle state with ID: " + resourceId);
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        WorkflowsCommon workflowCommons = (WorkflowsCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowsCommon.class);
+        Assert.assertNotNull(workflowCommons);
+        //
+        // Mark it for a soft delete.
+        //
+        logger.debug("Current workflow state:" + objectAsXmlString(workflowCommons, WorkflowsCommon.class));
+        workflowCommons.setCurrentLifeCycleState(lifeCycleState);
         PoxPayloadOut output = new PoxPayloadOut(WorkflowClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(objectexit, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
-        res = client.update(knownResourceId, output);
+        PayloadOutputPart commonPart = output.addPart(workflowCommons, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(WorkflowClient.SERVICE_COMMONPART_NAME);
+        //
+        // Perform the update
+        //
+        res = client.updateWorkflow(resourceId, output);
         assertStatusCode(res, testName);
         input = new PoxPayloadIn(res.getEntity());
-        WorkflowsCommon updatedObjectExit = (WorkflowsCommon) extractPart(input, client.getCommonPartName(), WorkflowsCommon.class);
-        Assert.assertNotNull(updatedObjectExit);
+        WorkflowsCommon updatedWorkflowCommons = (WorkflowsCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowsCommon.class);
+        Assert.assertNotNull(updatedWorkflowCommons);
+        //
+        // Read the updated object and make sure it was updated correctly.
+        //
+        res = client.getWorkflow(resourceId);
+        assertStatusCode(res, testName);
+        logger.debug("Got workflow state of updated object with ID: " + resourceId);
+        input = new PoxPayloadIn(res.getEntity());
+        updatedWorkflowCommons = (WorkflowsCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowsCommon.class);
+        Assert.assertNotNull(workflowCommons);
+        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
     }
 
     @Override
@@ -289,13 +313,63 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     }
 
 	@Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
 	public void create(String testName) throws Exception {
-		//empty N/A
+		this.createTestObject(testName);
 	}
 
-	@Override
+	private void readList(String testName, int expectedSize, String queryParam) {
+        // Perform setup.
+        setupReadList();
+
+        // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
+        ClientResponse<DimensionsCommonList> res = client.readList();
+        DimensionsCommonList list = res.getEntity();
+        int statusCode = res.getStatus();
+        //
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        //
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        //
+        // Now check that list size is correct
+        //
+        List<DimensionsCommonList.DimensionListItem> items =
+            list.getDimensionListItem();
+        Assert.assertEquals(items.size(), expectedSize);
+	}
+	
+	/*
+	 * This test assumes that no objects exist yet.
+	 * 
+	 * http://localhost:8180/cspace-services/intakes?wf_deleted=false
+	 */
+    @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update"})
 	public void readList(String testName) throws Exception {
-		//empty N/A
+    	//
+    	// Create 3 new objects
+    	//
+    	final int OBJECTS_TOTAL = 3;
+    	for (int i = 0; i < OBJECTS_TOTAL; i++) {
+    		this.createTestObject(testName);
+    	}
+    	//
+    	// Mark one as soft deleted
+    	//
+    	int currentTotal = allResourceIdsCreated.size();
+    	String csid = allResourceIdsCreated.get(currentTotal - 1); //get the last one added
+    	this.setupUpdate();
+    	this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
+    	//
+    	// Read the list back
+    	//
 	}
 	
 	@Override

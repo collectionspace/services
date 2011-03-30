@@ -410,9 +410,14 @@ public abstract class AbstractServiceClientImpl<T extends CollectionSpaceProxy> 
     }
     
     @Override
-	public ClientResponse<String> getWorkflow(@PathParam("csid") String csid) {
+	public ClientResponse<String> getWorkflow(String csid) {
     	return getProxy().getWorkflow(csid);
-    }    
+    }
+    
+    @Override
+	public ClientResponse<String> updateWorkflow(String csid, PoxPayloadOut xmlPayload) {
+    	return getProxy().updateWorkflow(csid, xmlPayload.getBytes());
+    }        
     
     /*
      * Because of how RESTEasy creates proxy classes, sub-interfaces will need to override

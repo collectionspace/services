@@ -176,7 +176,9 @@ public interface CollectionSpaceClient<T extends CollectionSpaceProxy> {
      * @param csid the csid of the entity
      * @return the workflow
      */
-    public ClientResponse<String> getWorkflow(@PathParam("csid") String csid);
+    public ClientResponse<String> getWorkflow(String csid);
+    
+	public ClientResponse<String> updateWorkflow(String csid, PoxPayloadOut xmlPayload);
     
     /**
      * Gets the authority refs.
