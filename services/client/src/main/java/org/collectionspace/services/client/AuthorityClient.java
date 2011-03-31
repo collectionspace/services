@@ -7,7 +7,13 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
-public interface AuthorityClient<TL extends AbstractCommonList, T extends AuthorityProxy<TL>> extends CollectionSpacePoxClient<T> {	
+/*
+ * LT - List type
+ * ILT - Authority item list type
+ * P - Proxy type
+ */
+public interface AuthorityClient<LT extends AbstractCommonList, ILT extends AbstractCommonList, P extends AuthorityProxy<LT, ILT>> 
+	extends CollectionSpacePoxClient<LT, P> {
 	/*
 	 * Basic CRUD operations
 	 */
@@ -88,7 +94,7 @@ public interface AuthorityClient<TL extends AbstractCommonList, T extends Author
      *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<TL> readItemList(String inAuthority, String partialTerm, String keywords);
+    public ClientResponse<ILT> readItemList(String inAuthority, String partialTerm, String keywords);
     
     /**
      * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
@@ -102,7 +108,7 @@ public interface AuthorityClient<TL extends AbstractCommonList, T extends Author
      *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<TL> readItemListForNamedAuthority(String specifier, 
+    public ClientResponse<ILT> readItemListForNamedAuthority(String specifier, 
     		String partialTerm, String keywords);
     
 }

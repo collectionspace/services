@@ -21,7 +21,7 @@ import org.collectionspace.services.client.BlobClient;
 @Path(MediaClient.SERVICE_PATH + "/")
 @Produces("application/xml")
 @Consumes("application/xml")
-public interface MediaProxy extends CollectionSpacePoxProxy {
+public interface MediaProxy extends CollectionSpacePoxProxy<AbstractCommonList> {
 
     @POST
     @Path("/{csid}")

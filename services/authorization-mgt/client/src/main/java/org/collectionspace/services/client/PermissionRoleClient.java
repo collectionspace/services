@@ -35,7 +35,7 @@ import org.collectionspace.services.authorization.PermissionRole;
 
  * @version $Revision:$
  */
-public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRoleProxy> {
+public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRole, PermissionRoleProxy> {
 	@Override
 	public String getServiceName() {
 		throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3497

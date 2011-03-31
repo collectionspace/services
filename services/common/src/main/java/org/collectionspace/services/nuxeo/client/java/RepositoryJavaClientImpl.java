@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
  * 
  * $LastChangedRevision: $ $LastChangedDate: $
  */
-public class RepositoryJavaClientImpl implements RepositoryClient {
+public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, PoxPayloadOut> {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RepositoryJavaClientImpl.class);
@@ -306,9 +306,21 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             }
         }
     }
-
+    
+    private static String getByNameWhereClause(String csid) {
+    	String result = null;
+    	
+    	if (csid != null) {
+    		result = "ecm:name = " + "\'" + csid + "\'";
+    	}
+    	
+    	return result;
+    }
+    
     /**
-     * get wrapped documentModel from the Nuxeo repository
+     * Get wrapped documentModel from the Nuxeo repository.  The search is restricted to the workspace
+     * of the current context.
+     * 
      * @param ctx service context under which this method is invoked
      * @param id
      *            of the document to retrieve
@@ -316,19 +328,19 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      */
     @Override
     public DocumentWrapper<DocumentModel> getDoc(
-            ServiceContext ctx, String id)
+            ServiceContext ctx, String csid)
             throws DocumentNotFoundException, DocumentException {
         RepositoryInstance repoSession = null;
         DocumentWrapper<DocumentModel> wrapDoc = null;
 
         try {
             repoSession = getRepositorySession();
-            DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
+            DocumentRef docRef = NuxeoUtils.createPathRef(ctx, csid);
             DocumentModel doc = null;
             try {
                 doc = repoSession.getDocument(docRef);
             } catch (ClientException ce) {
-                String msg = "could not find document with id=" + id;
+                String msg = "could not find document with id=" + csid;
                 logger.error(msg, ce);
                 throw new DocumentNotFoundException(msg, ce);
             }
@@ -408,7 +420,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      */
     @Override
     public String findDocCSID(
-            ServiceContext ctx, String whereClause)
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String whereClause)
             throws DocumentNotFoundException, DocumentException {
         String csid = null;
         try {
@@ -438,7 +450,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      */
     @Override
     public DocumentWrapper<DocumentModelList> findDocs(
-            ServiceContext ctx,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             List<String> docTypes,
             String whereClause,
             int pageSize, int pageNum, boolean computeTotal)
@@ -573,6 +585,42 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     	}
     	return result;
     }
+
+    /*
+     * A method to find a CollectionSpace document (of any type) given just a service context and
+     * its CSID.  A search across *all* service workspaces (within a given tenant context) is performed to find
+     * the document
+     * 
+     * This query searches Nuxeo's Hierarchy table where our CSIDs are stored in the "name" column.
+     */
+    @Override
+    public DocumentWrapper<DocumentModel> getDocFromCsid(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		String csid)
+            throws Exception {
+        DocumentWrapper<DocumentModel> result = null;
+        RepositoryInstance repoSession = getRepositorySession();
+        DocumentModelList docModelList = null;
+        //
+        // Set of query context using the current service context, but change the document type
+        // to be the base Nuxeo document type so we can look for the document across service workspaces
+        //
+        QueryContext queryContext = new QueryContext(ctx, getByNameWhereClause(csid));
+        queryContext.setDocType(NuxeoUtils.BASE_DOCUMENT_TYPE);
+        //
+        // Since we're doing a query, we get back a list so we need to make sure there is only
+        // a single result since CSID values are supposed to be unique.
+        String query = buildNXQLQuery(queryContext);
+        docModelList = repoSession.query(query);
+        long resultSize = docModelList.totalSize();
+        if (resultSize == 1) {
+        	result = new DocumentWrapperImpl<DocumentModel>(docModelList.get(0));
+        } else if (resultSize > 1) {
+        	throw new DocumentException("Found more than 1 document with CSID = " + csid);
+        }
+        
+        return result;
+    }
+
 
     /**
      * getFiltered get all documents for an entity service from the Document repository,

@@ -14,7 +14,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 @Path("/loansin/")
 @Produces({"application/xml;charset=UTF-8"})
 @Consumes({"application/xml"})
-public interface LoaninProxy extends CollectionSpacePoxProxy {    
+public interface LoaninProxy extends CollectionSpacePoxProxy<AbstractCommonList> {    
     // List
     @GET
     ClientResponse<AbstractCommonList> readList();

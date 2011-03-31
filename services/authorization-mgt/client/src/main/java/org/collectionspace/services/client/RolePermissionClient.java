@@ -42,7 +42,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class RolePermissionClient extends AbstractServiceClientImpl<RolePermissionProxy> {
+public class RolePermissionClient extends AbstractServiceClientImpl<PermissionRole, RolePermissionProxy> {
     @Override
     public String getServiceName() { 
     	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498
@@ -51,6 +51,7 @@ public class RolePermissionClient extends AbstractServiceClientImpl<RolePermissi
     /* (non-Javadoc)
      * @see 
      */
+    @Override
 	public String getServicePathComponent() {
         return "authorization/roles";
     }

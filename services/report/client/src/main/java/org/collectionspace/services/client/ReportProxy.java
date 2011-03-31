@@ -41,7 +41,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/reports/")
 @Produces({"application/xml;charset=UTF-8"})
 @Consumes({"application/xml"})
-public interface ReportProxy extends CollectionSpacePoxProxy {
+public interface ReportProxy extends CollectionSpacePoxProxy<ReportsCommonList> {
     /**
      * Read list.
      *

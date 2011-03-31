@@ -8,7 +8,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
  * @version $Revision:$
  */
-public class AcquisitionClient extends AbstractPoxServiceClientImpl<AcquisitionProxy> {
+public class AcquisitionClient extends AbstractPoxServiceClientImpl<AbstractCommonList, AcquisitionProxy> {
 	public static final String SERVICE_NAME = "acquisitions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

@@ -23,18 +23,16 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.workflow.WorkflowsCommon;
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
  *
  */
-public interface CollectionSpaceClient<T extends CollectionSpaceProxy> {
+public interface CollectionSpaceClient<LT, P extends CollectionSpaceProxy> {
 
     public static final String AUTH_PROPERTY = "cspace.auth";
     public static final String PASSWORD_PROPERTY = "cspace.password";
@@ -48,9 +46,9 @@ public interface CollectionSpaceClient<T extends CollectionSpaceProxy> {
      *
      * @return the proxy
      */
-    T getProxy();
+    P getProxy();
 
-    Class<T> getProxyClass();
+    Class<P> getProxyClass();
     
     /**
      * Gets the base url.

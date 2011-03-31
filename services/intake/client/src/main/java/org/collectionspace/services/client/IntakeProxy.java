@@ -41,7 +41,7 @@ import org.collectionspace.services.intake.IntakesCommonList;
 @Path(IntakeClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface IntakeProxy extends CollectionSpacePoxProxy {
+public interface IntakeProxy extends CollectionSpacePoxProxy<IntakesCommonList> {
     /**
      * Read list.
      *

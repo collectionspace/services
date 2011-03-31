@@ -33,7 +33,7 @@ import org.collectionspace.services.organization.OrganizationsCommonList;
 /**
  * The Class OrgAuthorityClient.
  */
-public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrganizationsCommonList, OrgAuthorityProxy> {
+public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrgauthoritiesCommonList, OrganizationsCommonList, OrgAuthorityProxy> {
 	public static final String SERVICE_NAME = "orgauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

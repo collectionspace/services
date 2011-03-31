@@ -7,8 +7,14 @@ import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-public abstract class AuthorityClientImpl<TL extends AbstractCommonList, T extends AuthorityProxy<TL>> extends AbstractPoxServiceClientImpl<T>
-		implements AuthorityClient<TL, T> {
+/*
+ * LT - List type
+ * ILT - Authority item list type
+ * P - Proxy type
+ */
+public abstract class AuthorityClientImpl<LT extends AbstractCommonList, ILT extends AbstractCommonList, P extends AuthorityProxy<LT, ILT>>
+	extends AbstractPoxServiceClientImpl<LT, P>
+	implements AuthorityClient<LT, ILT, P> {
 
 	/*
 	 * Basic CRUD proxied methods
@@ -119,7 +125,7 @@ public abstract class AuthorityClientImpl<TL extends AbstractCommonList, T exten
      * @return the client response
      */
     @Override
-    public ClientResponse<TL> 
+    public ClientResponse<ILT> 
     		readItemList(String inAuthority, String partialTerm, String keywords) {
         return getProxy().readItemList(inAuthority, partialTerm, keywords);
     }
@@ -138,7 +144,7 @@ public abstract class AuthorityClientImpl<TL extends AbstractCommonList, T exten
      */
 
 	@Override
-	public ClientResponse<TL> readItemListForNamedAuthority(
+	public ClientResponse<ILT> readItemListForNamedAuthority(
 			String specifier, String partialTerm, String keywords) {
         return getProxy().readItemListForNamedAuthority(specifier, partialTerm, keywords);
 	}

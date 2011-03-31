@@ -35,7 +35,7 @@ import org.collectionspace.services.client.VocabularyProxy;
 /**
  * The Class VocabularyClient.
  */
-public class VocabularyClient extends AuthorityClientImpl<VocabularyitemsCommonList, VocabularyProxy> {
+public class VocabularyClient extends AuthorityClientImpl<VocabulariesCommonList, VocabularyitemsCommonList, VocabularyProxy> {
 	public static final String SERVICE_NAME = "vocabularies";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

@@ -65,6 +65,9 @@ public class NuxeoUtils {
 
     /** The logger. */
     private static Logger logger = LoggerFactory.getLogger(NuxeoUtils.class);
+    //
+    // Base document type in Nuxeo is "Document"
+    public static final String BASE_DOCUMENT_TYPE = "Document";
 
     public static void exportDocModel(DocumentModel src) {
     	DocumentReader reader = null;
@@ -202,7 +205,10 @@ public class NuxeoUtils {
     }
 
     /**
-     * Gets the document model.
+     * Gets the document model corresponding to the Nuxeo ID.
+     * 
+     * WARNING: Service should *rarely* if ever use this method.  It bypasses our tenant and
+     * security filters.
      *
      * @param repoSession the repo session
      * @param csid the csid
@@ -212,12 +218,12 @@ public class NuxeoUtils {
      * @throws DocumentException the document exception
      */
     public static DocumentModel getDocumentModel(
-            RepositoryInstance repoSession, String csid)
+            RepositoryInstance repoSession, String nuxeoId)
             throws DocumentException {
         DocumentModel result = null;
 
         try {
-            DocumentRef documentRef = new IdRef(csid);
+            DocumentRef documentRef = new IdRef(nuxeoId);
             result = repoSession.getDocument(documentRef);
         } catch (ClientException e) {
             e.printStackTrace();

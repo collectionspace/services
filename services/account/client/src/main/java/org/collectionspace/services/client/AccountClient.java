@@ -36,7 +36,7 @@ import org.jboss.resteasy.client.ClientResponse;
 
  * @version $Revision:$
  */
-public class AccountClient extends AbstractServiceClientImpl<AccountProxy> {
+public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList, AccountProxy> {
     public static final String SERVICE_NAME = "accounts";
 
 	@Override

@@ -26,7 +26,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
  * $LastChangedDate$
  *
  */
-public class LoaninClient extends AbstractPoxServiceClientImpl<LoaninProxy> {
+public class LoaninClient extends AbstractPoxServiceClientImpl<AbstractCommonList, LoaninProxy> {
     public static final String SERVICE_NAME = "loansin";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
 

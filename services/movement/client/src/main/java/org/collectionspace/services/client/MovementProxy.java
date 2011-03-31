@@ -42,7 +42,7 @@ import org.collectionspace.services.movement.MovementsCommonList;
 @Path("/movements/")
 @Produces("application/xml")
 @Consumes("application/xml")
-public interface MovementProxy extends CollectionSpacePoxProxy {
+public interface MovementProxy extends CollectionSpacePoxProxy<MovementsCommonList> {
 
     // List
     @GET

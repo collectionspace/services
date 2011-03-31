@@ -1,16 +1,17 @@
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.workflow.WorkflowsCommon;
 import org.jboss.resteasy.client.ClientResponse;
 
-public abstract class AbstractPoxServiceClientImpl<T extends CollectionSpacePoxProxy> extends AbstractServiceClientImpl<T> 
-		implements CollectionSpacePoxClient<T> {
+/*
+ * LT = List type
+ * P = Proxy type
+ */
+public abstract class AbstractPoxServiceClientImpl<LT extends AbstractCommonList, P extends CollectionSpacePoxProxy<LT>>
+	extends AbstractServiceClientImpl<LT, P> 
+	implements CollectionSpacePoxClient<LT, P> {
 	@Override
 	public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
         return getProxy().create(xmlPayload.getBytes());

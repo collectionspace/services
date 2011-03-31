@@ -36,7 +36,7 @@ import org.collectionspace.services.client.PersonAuthorityProxy;
 /**
  * The Class PersonAuthorityClient.
  */
-public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonsCommonList, PersonAuthorityProxy> {
+public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonauthoritiesCommonList, PersonsCommonList, PersonAuthorityProxy> {
 	public static final String SERVICE_NAME = "personauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

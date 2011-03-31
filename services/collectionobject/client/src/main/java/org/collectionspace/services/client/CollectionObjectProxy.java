@@ -44,7 +44,7 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommonList
 @Path(CollectionObjectClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface CollectionObjectProxy extends CollectionSpacePoxProxy {
+public interface CollectionObjectProxy extends CollectionSpacePoxProxy<CollectionobjectsCommonList> {
 
     /**
      * Roundtrip.

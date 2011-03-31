@@ -33,7 +33,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * $LastChangedDate: $
  */
  
-public class NoteClient extends AbstractServiceClientImpl<NoteProxy> {
+public class NoteClient extends AbstractServiceClientImpl<NotesCommonList, NoteProxy> {
 
     public static final String SERVICE_NAME = "notes";
     public static final String SERVICE_PATH_COMPONENT = "notes";

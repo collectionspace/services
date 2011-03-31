@@ -1,9 +1,16 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
-public interface CollectionSpacePoxClient<T extends CollectionSpacePoxProxy> extends CollectionSpaceClient<T> {
+/*
+ * <LT> = List type
+ * <P> = Proxy type
+ */
+public interface CollectionSpacePoxClient<LT extends AbstractCommonList, P extends CollectionSpacePoxProxy<LT>>
+	extends CollectionSpaceClient<LT, P> {
 	/*
 	 * Common service calls
 	 */

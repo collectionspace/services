@@ -6,7 +6,13 @@ import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
-public interface AuthorityWithContactsClient<TL extends AbstractCommonList, T extends AuthorityProxy<TL>> extends AuthorityClient<TL, T> {
+/*
+ * LT - List type
+ * ILT - Authority item list type
+ * P - Proxy type
+ */
+public interface AuthorityWithContactsClient<LT extends AbstractCommonList, ILT extends AbstractCommonList, P extends AuthorityProxy<LT, ILT>>
+	extends AuthorityClient<LT, ILT, P> {
     /**
      * Creates the contact.
      *

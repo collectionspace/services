@@ -33,9 +33,9 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.common.workflow.client.WorkflowClient;
 import org.collectionspace.services.workflow.WorkflowsCommon;
 import org.collectionspace.services.client.DimensionClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.dimension.DimensionsCommonList;
 
@@ -70,7 +70,7 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     
     @Override
     protected CollectionSpaceClient getClientInstance() {
-        return new WorkflowClient();
+        return new DimensionClient();
     }
 
     @Override
@@ -318,13 +318,14 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
 		this.createTestObject(testName);
 	}
 
-	private void readList(String testName, int expectedSize, String queryParam) {
+	private int readIncludeDeleted(String testName, Boolean includeDeleted) {
+		int result = 0;
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
-        ClientResponse<DimensionsCommonList> res = client.readList();
+        ClientResponse<DimensionsCommonList> res = client.readIncludeDeleted(includeDeleted);
         DimensionsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
         //
@@ -342,7 +343,9 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
         //
         List<DimensionsCommonList.DimensionListItem> items =
             list.getDimensionListItem();
-        Assert.assertEquals(items.size(), expectedSize);
+        result = items.size();
+        
+        return result;
 	}
 	
 	/*
@@ -364,12 +367,14 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     	// Mark one as soft deleted
     	//
     	int currentTotal = allResourceIdsCreated.size();
-    	String csid = allResourceIdsCreated.get(currentTotal - 1); //get the last one added
+    	String csid = allResourceIdsCreated.get(currentTotal - 1); //0-based index to get the last one added
     	this.setupUpdate();
     	this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
     	//
-    	// Read the list back
+    	// Read the list back.  The deleted item should not be in the list
     	//
+    	int updatedTotal = readIncludeDeleted(testName, Boolean.FALSE);
+    	Assert.assertEquals(updatedTotal, currentTotal - 1, "Deleted items seem to be returned in list results.");
 	}
 	
 	@Override

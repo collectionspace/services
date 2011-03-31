@@ -7,10 +7,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrganizationsCommonList;
-import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
@@ -19,7 +17,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path(OrgAuthorityClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface OrgAuthorityProxy extends AuthorityWithContactsProxy<OrganizationsCommonList> {
+public interface OrgAuthorityProxy extends AuthorityWithContactsProxy<OrgauthoritiesCommonList, OrganizationsCommonList> {
     // List OrgAuthorities
     @GET
     ClientResponse<OrgauthoritiesCommonList> readList();

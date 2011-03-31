@@ -10,7 +10,6 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.common-api</artifactId>
     <name>services.common-api</name>
-    <version>1.5.1</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>

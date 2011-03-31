@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.PropertyItemUtils;
@@ -432,6 +434,17 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         }
     }
 
+    private static String buildWorkflowWhereClause(MultivaluedMap<String, String> queryParams) {
+    	String result = null;
+    	
+        String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
+    	if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {    	
+    		result = "ecm:currentLifeCycleState <> 'deleted'";
+    	}
+    	
+    	return result;
+    }
+    
     /**
      * Creates the document handler instance.
      * 
@@ -461,6 +474,11 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         if (this.getQueryParams() != null) {
           docFilter.setSortOrder(this.getQueryParams());
           docFilter.setPagination(this.getQueryParams());
+          String workflowWhereClause = buildWorkflowWhereClause(queryParams);
+          if (workflowWhereClause != null) {
+        	  docFilter.appendWhereClause(workflowWhereClause, IQueryManager.SEARCH_QUALIFIER_AND);			
+          }            
+
         }
         docHandler.setDocumentFilter(docFilter);
 

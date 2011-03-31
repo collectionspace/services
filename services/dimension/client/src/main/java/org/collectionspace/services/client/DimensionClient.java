@@ -34,7 +34,7 @@ import org.jboss.resteasy.client.ClientResponse;
 
  * @version $Revision:$
  */
-public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionProxy> {
+public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionsCommonList, DimensionProxy> {
 	public static final String SERVICE_NAME = "dimensions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -63,5 +63,10 @@ public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionProxy
     public ClientResponse<DimensionsCommonList> readList() {
     	DimensionProxy proxy = (DimensionProxy)getProxy();
     	return proxy.readList();
-    }    
+    } 
+	
+    public ClientResponse<DimensionsCommonList> readIncludeDeleted(Boolean includeDeleted) { //FIXME: REM - This should be defined in the base class with a generic return list type
+    	DimensionProxy proxy = (DimensionProxy)getProxy();
+    	return proxy.readIncludeDeleted(includeDeleted.toString());
+    } 
 }

@@ -14,7 +14,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 @Path(ObjectExitClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface ObjectExitProxy extends CollectionSpacePoxProxy {
+public interface ObjectExitProxy extends CollectionSpacePoxProxy<AbstractCommonList> {
     // List
     @GET
     ClientResponse<AbstractCommonList> readList();

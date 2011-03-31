@@ -53,8 +53,8 @@ import org.slf4j.LoggerFactory;
  * @param <CommonListType> 
  * @param <ListType> 
  */
-public abstract class AbstractServiceClientImpl<T extends CollectionSpaceProxy> implements
-        CollectionSpaceClient<T> {
+public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpaceProxy>
+	implements CollectionSpaceClient<LT, P> {
 
     /** The logger. */
     protected final Logger logger = LoggerFactory.getLogger(AbstractServiceClientImpl.class);
@@ -71,7 +71,7 @@ public abstract class AbstractServiceClientImpl<T extends CollectionSpaceProxy> 
     /** The http client. */
     private HttpClient httpClient;
     /** The RESTEasy proxy */
-    private T proxy;
+    private P proxy;
 
     /**
      * Gets the logger.
@@ -341,7 +341,7 @@ public abstract class AbstractServiceClientImpl<T extends CollectionSpaceProxy> 
     }
 
     @Override
-    public T getProxy() {
+    public P getProxy() {
     	return proxy;
     }
     
@@ -350,7 +350,7 @@ public abstract class AbstractServiceClientImpl<T extends CollectionSpaceProxy> 
      */
     @Override
 	public void setProxy() {
-    	Class<T> proxyClass = this.getProxyClass();
+    	Class<P> proxyClass = this.getProxyClass();
         if (useAuth()) {
             proxy = ProxyFactory.create(proxyClass,
                     getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));

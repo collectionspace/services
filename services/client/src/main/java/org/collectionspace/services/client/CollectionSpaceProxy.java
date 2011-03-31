@@ -38,7 +38,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.workflow.WorkflowsCommon;
+
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
@@ -100,5 +100,5 @@ public interface CollectionSpaceProxy {
     ClientResponse<AbstractCommonList> readList(
             @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortBy,
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
-    	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);
+    	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);    
 }

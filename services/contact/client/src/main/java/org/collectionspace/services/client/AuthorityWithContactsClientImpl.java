@@ -6,9 +6,14 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-public abstract class AuthorityWithContactsClientImpl<TL extends AbstractCommonList, T extends AuthorityWithContactsProxy<TL>>
-	extends AuthorityClientImpl<TL, T>
-	implements AuthorityWithContactsClient<TL, T> {
+/*
+ * LT - List type
+ * ILT - Authority item list type
+ * P - Proxy type
+ */
+public abstract class AuthorityWithContactsClientImpl<LT extends AbstractCommonList, ILT extends AbstractCommonList, P extends AuthorityWithContactsProxy<LT, ILT>>
+	extends AuthorityClientImpl<LT, ILT, P>
+	implements AuthorityWithContactsClient<LT, ILT, P> {
 	
 	@Override
     public ClientResponse<Response> createContact(String parentcsid,

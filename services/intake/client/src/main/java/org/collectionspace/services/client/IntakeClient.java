@@ -35,7 +35,7 @@ import org.collectionspace.services.intake.IntakesCommonList;
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public class IntakeClient extends AbstractPoxServiceClientImpl<IntakeProxy> {
+public class IntakeClient extends AbstractPoxServiceClientImpl<IntakesCommonList, IntakeProxy> {
 	public static final String SERVICE_NAME = "intakes";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

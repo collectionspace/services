@@ -45,7 +45,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 /**
  * The Class LocationAuthorityClient.
  */
-public class LocationAuthorityClient extends AuthorityClientImpl<LocationsCommonList, LocationAuthorityProxy> {
+public class LocationAuthorityClient extends AuthorityClientImpl<LocationauthoritiesCommonList, LocationsCommonList, LocationAuthorityProxy> {
 	public static final String SERVICE_NAME = "locationauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

@@ -7,7 +7,7 @@ import org.jboss.resteasy.client.ClientResponse;
 
  * @version $Revision:$
  */
-public class IdClient extends AbstractServiceClientImpl<IdProxy> {
+public class IdClient extends AbstractServiceClientImpl<String, IdProxy> {
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()

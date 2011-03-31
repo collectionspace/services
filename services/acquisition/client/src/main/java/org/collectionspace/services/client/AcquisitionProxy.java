@@ -14,7 +14,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path(AcquisitionClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface AcquisitionProxy extends CollectionSpacePoxProxy {
+public interface AcquisitionProxy extends CollectionSpacePoxProxy<AbstractCommonList> {
     @GET
     ClientResponse<AbstractCommonList> readList();
 }

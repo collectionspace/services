@@ -17,7 +17,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path(PersonAuthorityClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface PersonAuthorityProxy extends AuthorityWithContactsProxy<PersonsCommonList> {
+public interface PersonAuthorityProxy extends AuthorityWithContactsProxy<PersonauthoritiesCommonList, PersonsCommonList> {
 
     // List Personauthorities
     @GET

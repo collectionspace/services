@@ -34,7 +34,7 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommonList
  * The Class CollectionObjectClient.
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public class CollectionObjectClient extends AbstractPoxServiceClientImpl<CollectionObjectProxy> {
+public class CollectionObjectClient extends AbstractPoxServiceClientImpl<CollectionobjectsCommonList, CollectionObjectProxy> {
 	public static final String SERVICE_NAME = "collectionobjects";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;	

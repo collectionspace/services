@@ -24,13 +24,10 @@
 package org.collectionspace.services.workflow;
 
 import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.common.workflow.client.WorkflowClient;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;

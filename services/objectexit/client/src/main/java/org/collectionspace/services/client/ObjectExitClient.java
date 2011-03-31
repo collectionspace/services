@@ -26,7 +26,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class ObjectExitClient extends AbstractPoxServiceClientImpl<ObjectExitProxy> {
+public class ObjectExitClient extends AbstractPoxServiceClientImpl<AbstractCommonList, ObjectExitProxy> {
 	public static final String SERVICE_NAME = "objectexit";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

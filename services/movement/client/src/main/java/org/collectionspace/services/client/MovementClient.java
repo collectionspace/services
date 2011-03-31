@@ -27,7 +27,7 @@ import org.collectionspace.services.movement.MovementsCommonList;
  * $LastChangedDate$
  *
  */
-public class MovementClient extends AbstractPoxServiceClientImpl<MovementProxy> {
+public class MovementClient extends AbstractPoxServiceClientImpl<MovementsCommonList, MovementProxy> {
     public static final String SERVICE_NAME = "movements";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

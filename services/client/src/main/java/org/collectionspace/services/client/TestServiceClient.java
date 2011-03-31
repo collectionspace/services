@@ -22,16 +22,12 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.Response;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 /**
  * A CollectionObjectClient.
 
  * @version $Revision:$
  */
-public class TestServiceClient extends AbstractServiceClientImpl<TestServiceProxy> {
+public class TestServiceClient extends AbstractServiceClientImpl<Object, TestServiceProxy> {
 
     /**
      *

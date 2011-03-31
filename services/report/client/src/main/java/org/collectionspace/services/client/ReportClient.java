@@ -36,7 +36,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public class ReportClient extends AbstractPoxServiceClientImpl<ReportProxy> {
+public class ReportClient extends AbstractPoxServiceClientImpl<ReportsCommonList, ReportProxy> {
 
     public static final String SERVICE_NAME = "reports";
     public static final String SERVICE_PATH_COMPONENT = "reports";

@@ -43,7 +43,7 @@ import org.collectionspace.services.client.IQueryManager;
 public class QueryManagerNuxeoImpl implements IQueryManager {
 	
 	private final Logger logger = LoggerFactory
-			.getLogger(RepositoryJavaClientImpl.class);
+			.getLogger(QueryManagerNuxeoImpl.class);
 	
 	// Consider that letters, letter-markers, numbers, '_' and apostrophe are words  
 	private static Pattern nonWordChars = Pattern.compile("[^\\p{L}\\p{M}\\p{N}_']");

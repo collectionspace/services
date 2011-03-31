@@ -14,8 +14,9 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-package org.collectionspace.services.common.workflow.client;
+package org.collectionspace.services.client.workflow;
 
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.AbstractPoxServiceClientImpl;
 
 /**
@@ -25,16 +26,22 @@ import org.collectionspace.services.client.AbstractPoxServiceClientImpl;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class WorkflowClient extends AbstractPoxServiceClientImpl<WorkflowProxy> {
+public class WorkflowClient extends AbstractPoxServiceClientImpl<AbstractCommonList, WorkflowProxy> {
 	public static final String SERVICE_NAME = "workflows";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 	public static final String SERVICE_COMMONPART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
-
+	//
+	// Workflow states
+	//
 	public static final String WORKFLOWSTATE_DELETED = "deleted";
 	public static final String WORKFLOWSTATE_PROJECT = "project";
-	public static final String WORKFLOWSTATE_APPROVED = "approved";
+	public static final String WORKFLOWSTATE_APPROVED = "approved";	
+	//
+	// Service Query Params
+	//
+	public static final String WORKFLOW_QUERY_NONDELETED = "wf_deleted";	
 
 	
 	@Override

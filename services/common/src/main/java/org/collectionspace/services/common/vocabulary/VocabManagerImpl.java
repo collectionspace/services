@@ -15,7 +15,7 @@ import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 public class VocabManagerImpl implements IVocabManager {
 	
 	private final Logger logger = LoggerFactory
-			.getLogger(RepositoryJavaClientImpl.class);
+			.getLogger(VocabManagerImpl.class);
 	
 	public void exampleMethod(String someParam) {
 	}

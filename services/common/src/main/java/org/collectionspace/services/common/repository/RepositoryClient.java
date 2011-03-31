@@ -44,7 +44,7 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
  * The repository client then calls handle on the handler
  * 
  */
-public interface RepositoryClient extends StorageClient {
+public interface RepositoryClient<IT, OT> extends StorageClient {
 
     /**
      * createDomain creates a doamin in the default repository
@@ -96,9 +96,13 @@ public interface RepositoryClient extends StorageClient {
      * @throws DocumentException
      */
     public DocumentWrapper<DocumentModel> getDoc(
-            ServiceContext ctx, String id)
+            ServiceContext<IT, OT> ctx, String id)
             throws DocumentNotFoundException, DocumentException;
 
+    public DocumentWrapper<DocumentModel> getDocFromCsid(ServiceContext<IT, OT> ctx,
+    		String csid)
+            throws Exception;
+    
     /**
      * Find wrapped documentModel from the Nuxeo repository
      * @param ctx service context under which this method is invoked
@@ -107,7 +111,7 @@ public interface RepositoryClient extends StorageClient {
      * @throws DocumentException
      */
     public DocumentWrapper<DocumentModel> findDoc(
-            ServiceContext ctx, String where)
+            ServiceContext<IT, OT> ctx, String where)
             throws DocumentNotFoundException, DocumentException;
 
     /**
@@ -118,7 +122,7 @@ public interface RepositoryClient extends StorageClient {
      * @throws DocumentException
      */
     public String findDocCSID(
-            ServiceContext ctx, String where)
+            ServiceContext<IT, OT> ctx, String where)
             throws DocumentNotFoundException, DocumentException;
 
     /**
@@ -135,7 +139,7 @@ public interface RepositoryClient extends StorageClient {
      * @throws DocumentException 
      */
     public DocumentWrapper<DocumentModelList> findDocs(
-            ServiceContext ctx,
+            ServiceContext<IT, OT> ctx,
             List<String> docTypes,
             String where,
             int pageSize, int pageNum, boolean computeTotal)

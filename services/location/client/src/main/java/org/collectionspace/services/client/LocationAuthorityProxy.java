@@ -13,11 +13,13 @@ import org.collectionspace.services.location.LocationsCommonList;
 
 /**
  * @version $Revision:$
+ * ILT = Item list type
+ * LT = List type
  */
 @Path(LocationAuthorityClient.SERVICE_PATH + "/")
 @Produces("application/xml")
 @Consumes("application/xml")
-public interface LocationAuthorityProxy extends AuthorityProxy<LocationsCommonList> {
+public interface LocationAuthorityProxy extends AuthorityProxy<LocationauthoritiesCommonList, LocationsCommonList> {
 
     // List Locationauthorities
     @GET

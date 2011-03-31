@@ -37,7 +37,7 @@ import org.collectionspace.services.authorization.PermissionsList;
 
  * @version $Revision:$
  */
-public class PermissionClient extends AbstractServiceClientImpl<PermissionProxy> {
+public class PermissionClient extends AbstractServiceClientImpl<PermissionsList, PermissionProxy> {
 	public static final String SERVICE_NAME = "authorization/permissions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

@@ -14,7 +14,7 @@ import org.collectionspace.services.contact.ContactsCommonList;
 @Path(ContactClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface ContactProxy extends CollectionSpacePoxProxy {
+public interface ContactProxy extends CollectionSpacePoxProxy<ContactsCommonList> {
     @GET
     ClientResponse<ContactsCommonList> readList();
 }

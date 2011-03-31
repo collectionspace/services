@@ -15,7 +15,11 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
-public interface AuthorityProxy<TL extends AbstractCommonList> extends CollectionSpacePoxProxy {
+/*
+ * ILT = Item list type
+ * LT = List type
+ */
+public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends AbstractCommonList> extends CollectionSpacePoxProxy<LT> {
 	
 	/*
 	 * Basic CRUD operations
@@ -101,7 +105,7 @@ public interface AuthorityProxy<TL extends AbstractCommonList> extends Collectio
     @GET
     @Produces({"application/xml"})
     @Path("/{csid}/items/")
-    ClientResponse<TL> readItemList(
+    ClientResponse<ILT> readItemList(
     		@PathParam("csid") String vcsid,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
@@ -110,7 +114,7 @@ public interface AuthorityProxy<TL extends AbstractCommonList> extends Collectio
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
-    ClientResponse<TL> readItemListForNamedAuthority(
+    ClientResponse<ILT> readItemListForNamedAuthority(
     		@PathParam("specifier") String specifier,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);

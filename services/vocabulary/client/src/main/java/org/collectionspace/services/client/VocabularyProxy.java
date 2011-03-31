@@ -17,7 +17,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface VocabularyProxy extends AuthorityProxy<VocabularyitemsCommonList> {
+public interface VocabularyProxy extends AuthorityProxy<VocabulariesCommonList, VocabularyitemsCommonList> {
     // List Vocabularies
     @GET
     @Produces({"application/xml"})

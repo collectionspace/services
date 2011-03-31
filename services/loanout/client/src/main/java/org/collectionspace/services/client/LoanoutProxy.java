@@ -14,7 +14,7 @@ import org.collectionspace.services.loanout.LoansoutCommonList;
 @Path("/loansout/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface LoanoutProxy extends CollectionSpacePoxProxy {    
+public interface LoanoutProxy extends CollectionSpacePoxProxy<LoansoutCommonList> {    
     // List
     @GET
     @Produces({"application/xml"})

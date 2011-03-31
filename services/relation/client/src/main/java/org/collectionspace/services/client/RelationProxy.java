@@ -17,7 +17,7 @@ import javax.ws.rs.QueryParam;
 @Path("/relations/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface RelationProxy extends CollectionSpacePoxProxy {
+public interface RelationProxy extends CollectionSpacePoxProxy<RelationsCommonList> {
 
     @GET
     @Produces({"application/xml"})

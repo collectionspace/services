@@ -133,4 +133,13 @@ public class QueryContext {
     public String getDocType() {
     	return this.docType;
     }
+
+    /**
+     * Gets the doc type.
+     *
+     * @return the doc type
+     */
+    public void setDocType(String theDocType) {
+    	this.docType = theDocType;
+    }
 }

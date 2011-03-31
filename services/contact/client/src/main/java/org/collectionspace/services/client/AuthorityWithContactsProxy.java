@@ -13,7 +13,11 @@ import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
-public interface AuthorityWithContactsProxy<TL extends AbstractCommonList> extends AuthorityProxy<TL> {
+/*
+ * ILT = Item list type
+ * LT = List type
+ */
+public interface AuthorityWithContactsProxy<LT extends AbstractCommonList, ILT extends AbstractCommonList> extends AuthorityProxy<LT, ILT> {
     @GET
     @Produces({"application/xml"})
     @Path("/{parentcsid}/items/{itemcsid}/contacts/")

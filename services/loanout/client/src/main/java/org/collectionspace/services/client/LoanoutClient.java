@@ -25,7 +25,7 @@ import org.collectionspace.services.loanout.LoansoutCommonList;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class LoanoutClient extends AbstractPoxServiceClientImpl<LoanoutProxy> {
+public class LoanoutClient extends AbstractPoxServiceClientImpl<LoansoutCommonList, LoanoutProxy> {
 	public static final String SERVICE_NAME = "loansout";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

@@ -33,7 +33,7 @@ import org.collectionspace.services.relation.RelationsCommonList;
 /**
  * The Class RelationClient.
  */
-public class RelationClient extends AbstractPoxServiceClientImpl<RelationProxy> {
+public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommonList, RelationProxy> {
 	public static final String SERVICE_NAME = "relations";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

@@ -37,7 +37,7 @@ import org.jboss.resteasy.client.ClientResponse;
 
  * @version $Revision:$
  */
-public class AccountRoleClient extends AbstractServiceClientImpl<AccountRoleProxy> {
+public class AccountRoleClient extends AbstractServiceClientImpl<AccountRole, AccountRoleProxy> {
 	public static final String SERVICE_NAME = "accountroles";
 
 	@Override
@@ -48,6 +48,7 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AccountRoleProx
     /* (non-Javadoc)
      * @see 
      */
+	@Override
     public String getServicePathComponent() {
         return "accounts";
     }
