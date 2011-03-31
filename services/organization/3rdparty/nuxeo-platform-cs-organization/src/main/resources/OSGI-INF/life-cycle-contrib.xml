@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.ecm.platform.organization.LifeCycleManagerExtensions">
+
+  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
+             point="types">
+    <types>
+      <type name="Orgauthority">default</type>
+      <type name="Organization">default</type>
+    </types>
+  </extension>
+
+</component>

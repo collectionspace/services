@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.ecm.platform.person.LifeCycleManagerExtensions">
+
+  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
+             point="types">
+    <types>
+      <type name="Personauthority">default</type>
+      <type name="Person">default</type>
+    </types>
+  </extension>
+
+</component>
