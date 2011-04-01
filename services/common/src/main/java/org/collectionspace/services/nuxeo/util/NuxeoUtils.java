@@ -383,7 +383,7 @@ public class NuxeoUtils {
     static public DocumentModel getDocFromCsid(RepositoryInstance repoSession,
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		String csid) throws Exception {
-	    DocumentWrapper<DocumentModel> result = null;
+	    DocumentModel result = null;
 	
 	    DocumentModelList docModelList = null;
         //
@@ -399,7 +399,7 @@ public class NuxeoUtils {
         docModelList = repoSession.query(query);
         long resultSize = docModelList.totalSize();
         if (resultSize == 1) {
-        	result = new DocumentWrapperImpl<DocumentModel>(docModelList.get(0));
+        	result = docModelList.get(0);
         } else if (resultSize > 1) {
         	throw new DocumentException("Found more than 1 document with CSID = " + csid);
         }
