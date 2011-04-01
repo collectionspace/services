@@ -380,7 +380,7 @@ public class NuxeoUtils {
         return query.toString();
     }
     
-    static public DocumentWrapper<DocumentModel> getDocFromCsid(RepositoryInstance repoSession,
+    static public DocumentModel getDocFromCsid(RepositoryInstance repoSession,
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		String csid) throws Exception {
 	    DocumentWrapper<DocumentModel> result = null;

@@ -586,7 +586,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         DocumentWrapper<DocumentModel> result = null;
         RepositoryInstance repoSession = getRepositorySession();
         try {
-        	result = NuxeoUtils.getDocFromCsid(repoSession, ctx, csid);
+        	result = new DocumentWrapperImpl(NuxeoUtils.getDocFromCsid(repoSession, ctx, csid));
         } finally {
             if (repoSession != null) {
                 releaseRepositorySession(repoSession);
