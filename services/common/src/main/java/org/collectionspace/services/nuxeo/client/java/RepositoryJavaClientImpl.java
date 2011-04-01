@@ -71,10 +71,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 //    private final Logger profilerLogger = LoggerFactory.getLogger("remperf");
 //    private String foo = Profiler.createLogger();
 
-    // Regular expressions pattern for identifying valid ORDER BY clauses.
-    // FIXME: Currently supports only USASCII word characters in field names.
-    final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?(, \\w+(_\\w+)?:\\w+( ASC| DESC)?)*";
-
     /**
      * Instantiates a new repository java client impl.
      */
@@ -275,7 +271,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
-            String query = buildNXQLQuery(queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(queryContext);
             docList = repoSession.query(query, null, 1, 0, false);
             if (docList.size() != 1) {
                 throw new DocumentNotFoundException("No document found matching filter params.");
@@ -305,16 +301,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 releaseRepositorySession(repoSession);
             }
         }
-    }
-    
-    private static String getByNameWhereClause(String csid) {
-    	String result = null;
-    	
-    	if (csid != null) {
-    		result = "ecm:name = " + "\'" + csid + "\'";
-    	}
-    	
-    	return result;
     }
     
     /**
@@ -380,7 +366,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             repoSession = getRepositorySession();
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
-            String query = buildNXQLQuery(queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(queryContext);
             docList = repoSession.query(query,
                     null, //Filter
                     1, //limit
@@ -467,7 +453,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
             QueryContext queryContext = new QueryContext(ctx, whereClause);
-            String query = buildNXQLQuery(docTypes, queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
             docList = repoSession.query(query, null, pageSize, pageNum, computeTotal);
             wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
         } catch (IllegalArgumentException iae) {
@@ -599,25 +585,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throws Exception {
         DocumentWrapper<DocumentModel> result = null;
         RepositoryInstance repoSession = getRepositorySession();
-        DocumentModelList docModelList = null;
-        //
-        // Set of query context using the current service context, but change the document type
-        // to be the base Nuxeo document type so we can look for the document across service workspaces
-        //
-        QueryContext queryContext = new QueryContext(ctx, getByNameWhereClause(csid));
-        queryContext.setDocType(NuxeoUtils.BASE_DOCUMENT_TYPE);
-        //
-        // Since we're doing a query, we get back a list so we need to make sure there is only
-        // a single result since CSID values are supposed to be unique.
-        String query = buildNXQLQuery(queryContext);
-        docModelList = repoSession.query(query);
-        long resultSize = docModelList.totalSize();
-        if (resultSize == 1) {
-        	result = new DocumentWrapperImpl<DocumentModel>(docModelList.get(0));
-        } else if (resultSize > 1) {
-        	throw new DocumentException("Found more than 1 document with CSID = " + csid);
+        try {
+        	result = NuxeoUtils.getDocFromCsid(repoSession, ctx, csid);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(repoSession);
+            }
         }
-        
         return result;
     }
 
@@ -645,7 +619,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             handler.prepare(Action.GET_ALL);
             repoSession = getRepositorySession();
             DocumentModelList docList = null;
-            String query = buildNXQLQuery(queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(queryContext);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Executing NXQL query: " + query.toString());
@@ -919,126 +893,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         return workspaceId;
     }
 
-    /**
-     * Append a WHERE clause to the NXQL query.
-     *
-     * @param query         The NXQL query to which the WHERE clause will be appended.
-     * @param queryContext  The query context, which provides the WHERE clause to append.
-     */
-    private final void appendNXQLWhere(StringBuilder query, QueryContext queryContext) {
-        //
-        // Restrict search to a specific Nuxeo domain
-        // TODO This is a slow method for tenant-filter
-        // We should make this a property that is indexed.
-        //
-//        query.append(" WHERE ecm:path STARTSWITH '/" + queryContext.domain + "'");
-
-        //
-        // Restrict search to the current tenant ID.  Is the domain path filter (above) still needed?
-        //
-        query.append(/*IQueryManager.SEARCH_QUALIFIER_AND +*/ " WHERE " + DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA + ":"
-                + DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID
-                + " = " + queryContext.getTenantId());
-        //
-        // Finally, append the incoming where clause
-        //
-        String whereClause = queryContext.getWhereClause();
-        if (whereClause != null && ! whereClause.trim().isEmpty()) {
-            // Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
-            // into SQL, we need to parenthesize our 'where' clause
-            query.append(IQueryManager.SEARCH_QUALIFIER_AND + "(" + whereClause + ")");
-        }
-        //
-        // Please lookup this use in Nuxeo support and document here
-        //
-        query.append(IQueryManager.SEARCH_QUALIFIER_AND + "ecm:isProxy = 0");
-    }
-
-    /**
-     * Append an ORDER BY clause to the NXQL query.
-     *
-     * @param query         the NXQL query to which the ORDER BY clause will be appended.
-     * @param queryContext  the query context, which provides the ORDER BY clause to append.
-     *
-     * @throws DocumentException  if the supplied value of the orderBy clause is not valid.
-     *
-     */
-    private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext)
-            throws Exception {
-        String orderByClause = queryContext.getOrderByClause();
-        if (orderByClause != null && ! orderByClause.trim().isEmpty()) {
-            if (isValidOrderByClause(orderByClause)) {
-                query.append(" ORDER BY ");
-                query.append(orderByClause);
-            } else {
-                throw new DocumentException("Invalid format in sort request '" + orderByClause
-                        + "': must be schema_name:fieldName followed by optional sort order (' ASC' or ' DESC').");
-            }
-        }
-    }
-
-    /**
-     * Identifies whether the ORDER BY clause is valid.
-     *
-     * @param orderByClause the ORDER BY clause.
-     *
-     * @return              true if the ORDER BY clause is valid;
-     *                      false if it is not.
-     */
-    private final boolean isValidOrderByClause(String orderByClause) {
-        boolean isValidClause = false;
-        try {
-            Pattern orderByPattern = Pattern.compile(ORDER_BY_CLAUSE_REGEX);
-            Matcher orderByMatcher = orderByPattern.matcher(orderByClause);
-            if (orderByMatcher.matches()) {
-                isValidClause = true;
-            }
-        } catch (PatternSyntaxException pe) {
-            logger.warn("ORDER BY clause regex pattern '" + ORDER_BY_CLAUSE_REGEX
-                    + "' could not be compiled: " + pe.getMessage());
-            // If reached, method will return a value of false.
-        }
-        return isValidClause;
-    }
-    
-
-    /**
-     * Builds an NXQL SELECT query for a single document type.
-     *
-     * @param queryContext The query context
-     * @return an NXQL query
-     * @throws Exception if supplied values in the query are invalid.
-     */
-    private final String buildNXQLQuery(QueryContext queryContext) throws Exception {
-        StringBuilder query = new StringBuilder("SELECT * FROM ");
-        query.append(queryContext.getDocType());
-        appendNXQLWhere(query, queryContext);
-        appendNXQLOrderBy(query, queryContext);
-        return query.toString();
-    }
-
-    /**
-     * Builds an NXQL SELECT query across multiple document types.
-     *
-     * @param docTypes     a list of document types to be queried
-     * @param queryContext the query context
-     * @return an NXQL query
-     */
-    private final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) {
-        StringBuilder query = new StringBuilder("SELECT * FROM ");
-        boolean fFirst = true;
-        for (String docType : docTypes) {
-            if (fFirst) {
-                fFirst = false;
-            } else {
-                query.append(",");
-            }
-            query.append(docType);
-        }
-        appendNXQLWhere(query, queryContext);
-        // FIXME add 'order by' clause here, if appropriate
-        return query.toString();
-    }
 
     /**
      * Gets the repository session.
