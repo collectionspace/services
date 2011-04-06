@@ -46,7 +46,7 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
-import org.collectionspace.services.workflow.WorkflowsCommon;
+import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.slf4j.Logger;
@@ -162,7 +162,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
     	
     	WorkflowDocumentModelHandler docHandler = (WorkflowDocumentModelHandler)createDocumentHandler(ctx,
     			WorkflowClient.SERVICE_COMMONPART_NAME,
-    			WorkflowsCommon.class);        	
+    			WorkflowCommon.class);        	
     	
         return docHandler;
     }
@@ -172,7 +172,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
      */
        
     @GET
-    @Path("{csid}/workflow")
+    @Path("{csid}" + WorkflowClient.SERVICE_PATH)
     public byte[] getWorkflow(
             @PathParam("csid") String csid) {
         PoxPayloadOut result = null;
@@ -194,7 +194,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
     }
     
     @PUT
-    @Path("{csid}/workflow")
+    @Path("{csid}" + WorkflowClient.SERVICE_PATH)
     public byte[] updateWorkflow(@PathParam("csid") String csid, String xmlPayload) {
         PoxPayloadOut result = null;
     	try {

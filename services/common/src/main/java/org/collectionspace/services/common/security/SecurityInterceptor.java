@@ -48,6 +48,7 @@ import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
@@ -104,7 +105,26 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 				Response response = Response.status(
 						Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
 				throw new WebApplicationException(response);
+			} else {
+				//
+				// They passed the first round of security checks, so now let's check to see if they're trying
+				// to perform a workflow state change and make sure they are allowed to to this.
+				//
+				if (uriPath.endsWith(WorkflowClient.SERVICE_PATH_COMPONENT) == true) {
+					String workflowSubResName = getResourceName(request.getUri());
+					res = new URIResourceImpl(workflowSubResName, httpMethod);
+					if (!authZ.isAccessAllowed(res)) {
+						logger.error("Access to " + resName + ":" + res.getId() + " is NOT allowed to "
+								+ " user=" + AuthN.get().getUserId());
+						Response response = Response.status(
+								Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
+						throw new WebApplicationException(response);
+					}
+				}
 			}
+			//
+			// We've passed all the checks.  Now just log the results
+			//
 			if (logger.isDebugEnabled()) {
 				logger.debug("Access to " + res.getId() + " is allowed to "
 						+ " user=" + AuthN.get().getUserId() +

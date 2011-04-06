@@ -27,11 +27,12 @@ import org.collectionspace.services.client.AbstractPoxServiceClientImpl;
  *
  */
 public class WorkflowClient extends AbstractPoxServiceClientImpl<AbstractCommonList, WorkflowProxy> {
-	public static final String SERVICE_NAME = "workflows";
+	public static final String SERVICE_NAME = "workflow";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 	public static final String SERVICE_COMMONPART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+	public static final String SERVICE_AUTHZ_SUFFIX = "/*/" + SERVICE_PATH_COMPONENT + "/";
 	//
 	// Workflow states
 	//

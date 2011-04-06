@@ -43,14 +43,14 @@ import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.workflow.jaxb.WorkflowJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.workflow.WorkflowsCommon;
+import org.collectionspace.services.workflow.WorkflowCommon;
 import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WorkflowDocumentModelHandler 
-	extends DocHandlerBase<WorkflowsCommon> {
+	extends DocHandlerBase<WorkflowCommon> {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(WorkflowDocumentModelHandler.class);
@@ -120,7 +120,7 @@ public class WorkflowDocumentModelHandler
     		ObjectPartType partMeta, Action action,
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
     		throws Exception {
-		WorkflowsCommon workflowsCommon = (WorkflowsCommon)part.getBody();
+		WorkflowCommon workflowsCommon = (WorkflowCommon)part.getBody();
 		docModel.followTransition(getTransitionFromState(workflowsCommon.getCurrentLifeCycleState()));
     }
 

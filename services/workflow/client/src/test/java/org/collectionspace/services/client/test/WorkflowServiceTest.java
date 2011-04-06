@@ -33,7 +33,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.workflow.WorkflowsCommon;
+import org.collectionspace.services.workflow.WorkflowCommon;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.dimension.DimensionsCommon;
@@ -98,7 +98,21 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     /*
      * Create a Dimension instance to use as our test target.
      */
-    public void createTestObject(String testName) throws Exception {
+    @Override
+    protected String createWorkflowTarget(String testName) throws Exception {
+    	String result = null;
+    	
+    	result = createTestObject(testName);
+    	
+    	return result;
+    }
+    
+    /*
+     * Create a Dimension instance to use as our test target.
+     */
+    protected String createTestObject(String testName) throws Exception {
+    	String result = null;
+    	
     	logger.debug(testBanner(testName, CLASS_NAME));
     	setupCreate();
     	DimensionClient client = new DimensionClient();
@@ -109,7 +123,10 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     		knownResourceId = extractId(res);  // Store the ID returned from the first resource created for additional tests below.
     		logger.debug(testName + ": knownResourceId=" + knownResourceId);
     	}
-    	allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
+    	result = extractId(res);
+    	allResourceIdsCreated.add(result); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
+    	
+    	return result;
     }
 
     @Override
@@ -126,7 +143,7 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
         ClientResponse<String> res = client.getWorkflow(knownResourceId);
         assertStatusCode(res, testName);
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        WorkflowsCommon workflowsCommon = (WorkflowsCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowsCommon.class);
+        WorkflowCommon workflowsCommon = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
         if (logger.isDebugEnabled() == true) {
         	logger.debug("Workflow payload is: " + input.getXmlPayload());
         }
@@ -162,44 +179,6 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
         updateLifeCycleState(testName, knownResourceId, WorkflowClient.WORKFLOWSTATE_APPROVED);
     }    
 
-    private void updateLifeCycleState(String testName, String resourceId, String lifeCycleState) throws Exception {
-        //
-        // Read the existing object
-        //
-        DimensionClient client = new DimensionClient();
-        ClientResponse<String> res = client.getWorkflow(resourceId);
-        assertStatusCode(res, testName);
-        logger.debug("Got object to update life cycle state with ID: " + resourceId);
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        WorkflowsCommon workflowCommons = (WorkflowsCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowsCommon.class);
-        Assert.assertNotNull(workflowCommons);
-        //
-        // Mark it for a soft delete.
-        //
-        logger.debug("Current workflow state:" + objectAsXmlString(workflowCommons, WorkflowsCommon.class));
-        workflowCommons.setCurrentLifeCycleState(lifeCycleState);
-        PoxPayloadOut output = new PoxPayloadOut(WorkflowClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(workflowCommons, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(WorkflowClient.SERVICE_COMMONPART_NAME);
-        //
-        // Perform the update
-        //
-        res = client.updateWorkflow(resourceId, output);
-        assertStatusCode(res, testName);
-        input = new PoxPayloadIn(res.getEntity());
-        WorkflowsCommon updatedWorkflowCommons = (WorkflowsCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowsCommon.class);
-        Assert.assertNotNull(updatedWorkflowCommons);
-        //
-        // Read the updated object and make sure it was updated correctly.
-        //
-        res = client.getWorkflow(resourceId);
-        assertStatusCode(res, testName);
-        logger.debug("Got workflow state of updated object with ID: " + resourceId);
-        input = new PoxPayloadIn(res.getEntity());
-        updatedWorkflowCommons = (WorkflowsCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowsCommon.class);
-        Assert.assertNotNull(workflowCommons);
-        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
-    }
 
     @Override
 //    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update", "testSubmitRequest"})
@@ -348,33 +327,42 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
         return result;
 	}
 	
+	@Override
+	public void readList(String testName) throws Exception {
+	}	
+	
 	/*
 	 * This test assumes that no objects exist yet.
 	 * 
 	 * http://localhost:8180/cspace-services/intakes?wf_deleted=false
 	 */
-    @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update"})
-	public void readList(String testName) throws Exception {
+	public void readWorkflow(String testName) throws Exception {
+    	//
+    	// Get the total count of non-deleted existing records
+    	//
+    	int existingRecords = readIncludeDeleted(testName, Boolean.FALSE);
+
     	//
     	// Create 3 new objects
     	//
-    	final int OBJECTS_TOTAL = 3;
-    	for (int i = 0; i < OBJECTS_TOTAL; i++) {
-    		this.createTestObject(testName);
+    	final int OBJECTS_TO_CREATE = 3;
+    	for (int i = 0; i < OBJECTS_TO_CREATE; i++) {
+    		this.createWorkflowTarget(testName);
     	}
+    	
     	//
     	// Mark one as soft deleted
     	//
-    	int currentTotal = allResourceIdsCreated.size();
-    	String csid = allResourceIdsCreated.get(currentTotal - 1); //0-based index to get the last one added
+    	int existingTestCreated = allResourceIdsCreated.size(); // assumption is that no other test created records were soft deleted
+    	String csid = allResourceIdsCreated.get(existingTestCreated - 1); //0-based index to get the last one added
     	this.setupUpdate();
     	this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
     	//
-    	// Read the list back.  The deleted item should not be in the list
+    	// Read the list of existing non-deleted records
     	//
     	int updatedTotal = readIncludeDeleted(testName, Boolean.FALSE);
-    	Assert.assertEquals(updatedTotal, currentTotal - 1, "Deleted items seem to be returned in list results.");
+    	Assert.assertEquals(updatedTotal, existingRecords + OBJECTS_TO_CREATE - 1, "Deleted items seem to be returned in list results.");
 	}
 	
 	@Override

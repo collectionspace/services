@@ -28,7 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.workflow.WorkflowCommon;
+import org.collectionspace.services.client.AbstractPoxServiceClientImpl;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.slf4j.Logger;
@@ -39,6 +45,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.ws.rs.core.Response;
 
 
 /**
@@ -595,17 +602,59 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         			totalItems);//expected total num of items
         }
     }
-
-//	@Override
-//	protected CollectionSpaceClient getClientInstance() {
-//		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
-//	}
-//	
-//	@Override
-//	protected String getServiceName() {
-//		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
-//	}
-
+    
+    @SuppressWarnings("rawtypes")
+	protected void updateLifeCycleState(String testName, String resourceId, String lifeCycleState) throws Exception {
+        //
+        // Read the existing object
+        //
+    	CollectionSpaceClient client = this.getClientInstance();
+    	ClientResponse<String> res = client.getWorkflow(resourceId);
+        assertStatusCode(res, testName);
+        logger.debug("Got object to update life cycle state with ID: " + resourceId);
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        WorkflowCommon workflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+        Assert.assertNotNull(workflowCommons);
+        //
+        // Mark it for a soft delete.
+        //
+        logger.debug("Current workflow state:" + objectAsXmlString(workflowCommons, WorkflowCommon.class));
+        workflowCommons.setCurrentLifeCycleState(lifeCycleState);
+        PoxPayloadOut output = new PoxPayloadOut(WorkflowClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(WorkflowClient.SERVICE_COMMONPART_NAME, workflowCommons);
+        //
+        // Perform the update
+        //
+        res = client.updateWorkflow(resourceId, output);
+        assertStatusCode(res, testName);
+        input = new PoxPayloadIn(res.getEntity());
+        WorkflowCommon updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+        Assert.assertNotNull(updatedWorkflowCommons);
+        //
+        // Read the updated object and make sure it was updated correctly.
+        //
+        res = client.getWorkflow(resourceId);
+        assertStatusCode(res, testName);
+        logger.debug("Got workflow state of updated object with ID: " + resourceId);
+        input = new PoxPayloadIn(res.getEntity());
+        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+        Assert.assertNotNull(workflowCommons);
+        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
+    }
+    
+    /*
+     * Sub-classes must override for the workflow tests.
+     */
+    
+    protected String createWorkflowTarget(String testName) throws Exception {
+    	logger.warn("Sub-class test clients should override this method");
+    	throw new UnsupportedOperationException();
+    }
+    
+    protected String createTestObject(String testName) throws Exception {
+    	logger.warn("Sub-class test clients should override this method");
+    	throw new UnsupportedOperationException();
+    }
 }
 
 

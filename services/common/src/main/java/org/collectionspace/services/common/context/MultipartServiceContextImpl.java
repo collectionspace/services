@@ -159,8 +159,17 @@ public class MultipartServiceContextImpl
 	    if (logger.isTraceEnabled() == true) {
 	    	logger.trace("Adding part:" + label +
 	    			" to " + getOutput().getName() + " document.");
-                }
-            }
+	    }
+    }
+
+    @Override
+    public void addOutputPart(PayloadOutputPart outputPart) throws Exception {
+	    PayloadOutputPart part = getOutput().addPart(outputPart);
+	    if (logger.isTraceEnabled() == true) {
+	    	logger.trace("Adding part:" + part.getLabel() +
+	    			" to " + getOutput().getName() + " document.");
+	    }
+    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.RemoteServiceContextImpl#getLocalContext(java.lang.String)

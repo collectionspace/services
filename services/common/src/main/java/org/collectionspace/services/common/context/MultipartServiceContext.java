@@ -26,6 +26,7 @@ package org.collectionspace.services.common.context;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.dom4j.Element;
@@ -109,6 +110,8 @@ public interface MultipartServiceContext
      * @param contentType media type
      */
     public void addOutputPart(String label, Element doc, String contentType) throws Exception;
+    
+    public void addOutputPart(PayloadOutputPart outputPart) throws Exception;    
     
     public void setRespositoryWorkspaceName(String workspaceName);    
 }

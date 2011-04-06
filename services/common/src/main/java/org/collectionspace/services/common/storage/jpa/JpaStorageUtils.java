@@ -67,7 +67,7 @@ public class JpaStorageUtils {
     /** The Constant CS_PERSISTENCE_UNIT. */
     public final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
     private final static String CS_AUTHZ_PERSISTENCE_UNIT = "org.collectionspace.services.authorization";
-    private final static String CS_CURRENT_USER = "0";
+    public final static String CS_CURRENT_USER = "0";
 
     /**
      * getEntity for given id and class
@@ -166,11 +166,20 @@ public class JpaStorageUtils {
     	return result;
     }
     
-    //FIXME: This method should be moved to the AccountPermissionDocumemntHandler
+    //FIXME: REM - This method should probably be moved to the AccountPermissionDocumemntHandler
     /*
      * This is a prototype for the /accounts/{csid}/permissions GET service call.
      */
     public static AccountPermission getAccountPermissions(String csid)
+		throws UnauthorizedException, DocumentNotFoundException {
+    	return getAccountPermissions(csid, null, null);
+    }
+    
+    //FIXME: REM - This method should probably be moved to the AccountPermissionDocumemntHandler    
+    /*
+     * This is a prototype for the /accounts/{csid}/permissions GET service call.
+     */
+    public static AccountPermission getAccountPermissions(String csid, String currentResource, String permissionResource)
     	throws UnauthorizedException, DocumentNotFoundException {
         //
         // Make sure the user asking for this list has the correct
@@ -198,8 +207,18 @@ public class JpaStorageUtils {
         try {
             StringBuilder queryStrBldr = new StringBuilder("SELECT ar, pr FROM " + AccountRoleRel.class.getName() +
             		" ar, " + PermissionRoleRel.class.getName() + " pr" +
-            		" WHERE ar.roleId = pr.roleId and ar.userId=" + "'" + userId + "'" +
-            		"group by pr.permissionId");
+            		" WHERE ar.roleId = pr.roleId and ar.userId=" + "'" + userId + "'");
+            //
+            // Filter by the permissionResource param if it is set to something
+            //
+            if (permissionResource != null && currentResource != null) {
+            	queryStrBldr.append(" and (pr.permissionResource = " + "'" + currentResource + "'" +
+            			" or pr.permissionResource = " + "'" + permissionResource + "'" + ")");
+            }
+            //
+            // Add group by clause
+            //
+            queryStrBldr.append(" group by pr.permissionId");
 
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();

@@ -34,9 +34,11 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.dimension.DimensionsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.workflow.WorkflowCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -755,4 +757,100 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
+
+    @Override
+    protected String createWorkflowTarget(String testName) throws Exception {
+    	String result = null;
+    	
+    	result = createTestObject(testName);
+    	
+    	return result;
+    }
+	
+	@Override
+    protected String createTestObject(String testName) throws Exception {
+		String result = null;
+		
+        DimensionClient client = new DimensionClient();
+        String identifier = createIdentifier();
+        PoxPayloadOut multipart = createDimensionInstance(client.getCommonPartName(),
+                identifier);
+        ClientResponse<Response> res = client.create(multipart);
+
+        int statusCode = res.getStatus();
+        Assert.assertEquals(statusCode, STATUS_CREATED);
+
+        result = extractId(res);
+        allResourceIdsCreated.add(result);
+
+        return result;
+	}
+	
+	/*
+	 * This test assumes that no objects exist yet.
+	 * 
+	 * http://localhost:8180/cspace-services/intakes?wf_deleted=false
+	 */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update"})
+	public void readWorkflowList(String testName) throws Exception {
+    	//
+    	// Create 3 new objects
+    	//
+    	final int OBJECTS_TOTAL = 3;
+    	for (int i = 0; i < OBJECTS_TOTAL; i++) {
+    		this.createWorkflowTarget(testName);
+    	}
+    	//
+    	// Mark one as soft deleted
+    	//
+    	int currentTotal = allResourceIdsCreated.size();
+    	String csid = allResourceIdsCreated.get(currentTotal - 1); //0-based index to get the last one added
+    	this.setupUpdate();
+    	this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
+    	//
+    	// Read the list back.  The deleted item should not be in the list
+    	//
+//    	int updatedTotal = readIncludeDeleted(testName, Boolean.FALSE);
+//    	Assert.assertEquals(updatedTotal, currentTotal - 1, "Deleted items seem to be returned in list results.");
+	}
+    
+    protected void updateLifeCycleState(String testName, String resourceId, String lifeCycleState) throws Exception {
+        //
+        // Read the existing object
+        //
+        DimensionClient client = new DimensionClient();
+        ClientResponse<String> res = client.getWorkflow(resourceId);
+        assertStatusCode(res, testName);
+        logger.debug("Got object to update life cycle state with ID: " + resourceId);
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        WorkflowCommon workflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+        Assert.assertNotNull(workflowCommons);
+        //
+        // Mark it for a soft delete.
+        //
+        logger.debug("Current workflow state:" + objectAsXmlString(workflowCommons, WorkflowCommon.class));
+        workflowCommons.setCurrentLifeCycleState(lifeCycleState);
+        PoxPayloadOut output = new PoxPayloadOut(WorkflowClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(workflowCommons, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(WorkflowClient.SERVICE_COMMONPART_NAME);
+        //
+        // Perform the update
+        //
+        res = client.updateWorkflow(resourceId, output);
+        assertStatusCode(res, testName);
+        input = new PoxPayloadIn(res.getEntity());
+        WorkflowCommon updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+        Assert.assertNotNull(updatedWorkflowCommons);
+        //
+        // Read the updated object and make sure it was updated correctly.
+        //
+        res = client.getWorkflow(resourceId);
+        assertStatusCode(res, testName);
+        logger.debug("Got workflow state of updated object with ID: " + resourceId);
+        input = new PoxPayloadIn(res.getEntity());
+        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+        Assert.assertNotNull(workflowCommons);
+        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
+    }
+    
 }

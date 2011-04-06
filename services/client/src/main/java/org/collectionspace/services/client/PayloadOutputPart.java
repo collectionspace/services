@@ -8,7 +8,7 @@ public class PayloadOutputPart extends PayloadPart {
 	//
 	// Constructors
 	//
-	PayloadOutputPart(String label, Object body) {
+	public PayloadOutputPart(String label, Object body) {
 		super(label, body);
 	}
 	

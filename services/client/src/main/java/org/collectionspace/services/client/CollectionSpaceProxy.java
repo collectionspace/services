@@ -36,6 +36,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
@@ -61,13 +62,13 @@ public interface CollectionSpaceProxy {
     @GET
     @Produces({"application/xml"})
     @Consumes({"application/xml"})    
-    @Path("{csid}/workflow")
+    @Path("{csid}" + WorkflowClient.SERVICE_PATH)
     ClientResponse<String> getWorkflow(@PathParam("csid") String csid);
     
     @PUT
     @Produces({"application/xml"})
     @Consumes({"application/xml"})    
-    @Path("{csid}/workflow")
+    @Path("{csid}" + WorkflowClient.SERVICE_PATH)
     ClientResponse<String> updateWorkflow(@PathParam("csid") String csid, byte[] xmlPayload);
     
     /*

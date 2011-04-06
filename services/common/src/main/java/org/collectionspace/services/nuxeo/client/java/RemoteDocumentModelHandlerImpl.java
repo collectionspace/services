@@ -35,19 +35,26 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.service.ObjectPartType;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.dom4j.Element;
 
@@ -182,6 +189,16 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             Map<String, Object> unQObjectProperties = extractPart(docModel, schema, partMeta);
             addOutputPart(unQObjectProperties, schema, partMeta);
         }
+        addAccountPermissionsPart();
+    }
+    
+    private void addAccountPermissionsPart() throws Exception {
+        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
+        String currentServiceName = ctx.getServiceName();
+        AccountPermission accountPermission = JpaStorageUtils.getAccountPermissions(JpaStorageUtils.CS_CURRENT_USER,
+        		currentServiceName, "/" + currentServiceName + WorkflowClient.SERVICE_AUTHZ_SUFFIX);
+        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", accountPermission);
+        ctx.addOutputPart(accountPermissionPart);
     }
 
     /* (non-Javadoc)

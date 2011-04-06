@@ -63,11 +63,16 @@ public class AuthorizationGen {
     final public static String ROLE_TENANT_ADMINISTRATOR = "TENANT_ADMINISTRATOR";
     final public static String ROLE_TENANT_READER = "TENANT_READER";
     final public static String ROLE_ADMINISTRATOR_ID = "0";
+    final public static String ADMINISTRATOR_TENANT_ID = "0";
     //
     // ActionGroup labels/constants
     //
     final public static String ACTIONGROUP_CRUDL = "CRUDL";
     final public static String ACTIONGROUP_RL = "RL";
+    //
+    // Should the base resource act as a proxy for its sub-resources for AuthZ purposes
+    //
+    final public static boolean AUTHZ_IS_ENTITY_PROXY = false;
     
     final Logger logger = LoggerFactory.getLogger(AuthorizationGen.class);
     private List<Permission> adminPermList = new ArrayList<Permission>();
@@ -100,10 +105,10 @@ public class AuthorizationGen {
      */
     public void createDefaultPermissions() {
         for (String tenantId : tenantBindings.keySet()) {
-            List<Permission> adminPerms = createDefaultAdminPermissions(tenantId);
+            List<Permission> adminPerms = createDefaultAdminPermissions(tenantId, AUTHZ_IS_ENTITY_PROXY);
             adminPermList.addAll(adminPerms);
 
-            List<Permission> readerPerms = createDefaultReaderPermissions(tenantId);
+            List<Permission> readerPerms = createDefaultReaderPermissions(tenantId, AUTHZ_IS_ENTITY_PROXY);
             readerPermList.addAll(readerPerms);
         }
     }
@@ -114,14 +119,14 @@ public class AuthorizationGen {
      * @param tenantId
      * @return
      */
-    public List<Permission> createDefaultAdminPermissions(String tenantId) {
+    public List<Permission> createDefaultAdminPermissions(String tenantId, boolean isEntityProxy) {
         ArrayList<Permission> apcList = new ArrayList<Permission>();
         TenantBindingType tbinding = tenantBindings.get(tenantId);
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
 
             //add permissions for the main path
         	String resourceName = sbinding.getName().toLowerCase().trim();
-        	if (SecurityUtils.isEntityProxy() == true) {
+        	if (isEntityProxy == true) {
         		resourceName = SecurityUtils.getResourceEntity(resourceName);
         	}
             Permission perm = buildAdminPermission(tbinding.getId(),
@@ -129,7 +134,7 @@ public class AuthorizationGen {
             apcList.add(perm);
 
             //add permissions for alternate paths
-            if (SecurityUtils.isEntityProxy() == false) {
+            if (isEntityProxy == false) {
 	            List<String> uriPaths = sbinding.getUriPath();
 	            for (String uriPath : uriPaths) {
 	                perm = buildAdminPermission(tbinding.getId(),
@@ -180,13 +185,13 @@ public class AuthorizationGen {
      * @param tenantId
      * @return
      */
-    public List<Permission> createDefaultReaderPermissions(String tenantId) {
+    public List<Permission> createDefaultReaderPermissions(String tenantId, boolean isEntityProxy) {
         ArrayList<Permission> apcList = new ArrayList<Permission>();
         TenantBindingType tbinding = tenantBindings.get(tenantId);
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
             //add permissions for the main path
         	String resourceName = sbinding.getName().toLowerCase().trim();
-        	if (SecurityUtils.isEntityProxy() == true) {
+        	if (isEntityProxy == true) {
         		resourceName = SecurityUtils.getResourceEntity(resourceName);
         	}        	
             Permission perm = buildReaderPermission(tbinding.getId(),
@@ -194,7 +199,7 @@ public class AuthorizationGen {
             apcList.add(perm);
 
             //add permissions for alternate paths
-            if (SecurityUtils.isEntityProxy() == false) {
+            if (isEntityProxy == false) {
 	            List<String> uriPaths = sbinding.getUriPath();
 	            for (String uriPath : uriPaths) {
 	                perm = buildReaderPermission(tbinding.getId(),
@@ -298,12 +303,12 @@ public class AuthorizationGen {
 
     public void associateDefaultPermissionsRoles() {
         for (Permission p : adminPermList) {
-            PermissionRole permAdmRole = associatePermissionRoles(p, adminRoles);
+            PermissionRole permAdmRole = associatePermissionRoles(p, adminRoles, true);
             adminPermRoleList.add(permAdmRole);
         }
 
         for (Permission p : readerPermList) {
-            PermissionRole permRdrRole = associatePermissionRoles(p, readerRoles);
+            PermissionRole permRdrRole = associatePermissionRoles(p, readerRoles, true);
             readerPermRoleList.add(permRdrRole);
         }
         
@@ -311,23 +316,33 @@ public class AuthorizationGen {
         List<Role> roles = new ArrayList<Role>();
         roles.add(cspaceAdminRole);
         for (Permission p : adminPermList) {
-            PermissionRole permCAdmRole = associatePermissionRoles(p, roles);
+            PermissionRole permCAdmRole = associatePermissionRoles(p, roles, false);
             adminPermRoleList.add(permCAdmRole);
         }        
     }
 
-    public List<PermissionRole> associatePermissionsRoles(List<Permission> perms, List<Role> roles) {
+    public List<PermissionRole> associatePermissionsRoles(List<Permission> perms, List<Role> roles, boolean enforceTenancy) {
+    	List<PermissionRole> result = null;
+    	
         List<PermissionRole> permRoles = new ArrayList<PermissionRole>();
         for (Permission perm : perms) {
-            PermissionRole permRole = associatePermissionRoles(perm, roles);
-            permRoles.add(permRole);
+            PermissionRole permRole = associatePermissionRoles(perm, roles, enforceTenancy);
+            if (permRole != null) {
+            	permRoles.add(permRole);
+            }
         }
-        return permRoles;
+        
+        if (permRoles.isEmpty() == false) {
+        	result = permRoles;
+        }
+        
+        return result;
     }
 
     private PermissionRole associatePermissionRoles(Permission perm,
-            List<Role> roles) {
-
+            List<Role> roles, boolean enforceTenancy) {
+    	PermissionRole result = null;
+    	
         PermissionRole pr = new PermissionRole();
         pr.setSubject(SubjectType.ROLE);
         List<PermissionValue> permValues = new ArrayList<PermissionValue>();
@@ -340,15 +355,32 @@ public class AuthorizationGen {
 
         List<RoleValue> roleValues = new ArrayList<RoleValue>();
         for (Role role : roles) {
-            RoleValue rv = new RoleValue();
-            // This needs to use the qualified name, not the display name
-            rv.setRoleName(role.getRoleName().toUpperCase());
-            rv.setRoleId(role.getCsid());
-            roleValues.add(rv);
+        	boolean tenantIdsMatched = true;
+        	if (enforceTenancy == true) {
+        		tenantIdsMatched = role.getTenantId().equals(perm.getTenantId());
+        	}
+        	if (tenantIdsMatched == true) {
+	            RoleValue rv = new RoleValue();
+	            // This needs to use the qualified name, not the display name
+	            rv.setRoleName(role.getRoleName().toUpperCase());
+	            rv.setRoleId(role.getCsid());
+	            roleValues.add(rv);
+        	} else {
+        		if (logger.isDebugEnabled() == true) {
+        			logger.debug("Role and Permission tenant ID did not match."); //FIXME: REM - Remove this debug statement.
+        		}
+        	}
         }
-        pr.setRoles(roleValues);
+        //
+        // If 'roleValues' is not empty, then associate it with the incoming 'perm' values
+        // otherwise, return null;
+        //
+        if (roleValues.isEmpty() == false) {
+        	pr.setRoles(roleValues);
+        	result = pr;
+        }
 
-        return pr;
+        return result;
     }
 
     public List<PermissionRole> getDefaultPermissionRoles() {
@@ -371,6 +403,7 @@ public class AuthorizationGen {
         role.setDisplayName(ROLE_ADMINISTRATOR);
         role.setRoleName(ROLE_PREFIX + role.getDisplayName());
         role.setCsid(ROLE_ADMINISTRATOR_ID);
+        role.setTenantId(ADMINISTRATOR_TENANT_ID);
         return role;
     }
 

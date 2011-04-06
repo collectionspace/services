@@ -4,7 +4,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandlerImpl;
-import org.collectionspace.services.workflow.WorkflowsCommon;
+import org.collectionspace.services.workflow.WorkflowCommon;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +20,13 @@ public class WorkflowValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
 	
     @Override
     protected Class<?> getCommonPartClass() {
-    	return WorkflowsCommon.class;
+    	return WorkflowCommon.class;
     }
 	
 	@Override
 	protected void handleCreate() throws InvalidDocumentException {
 		try {
-			WorkflowsCommon intakesCommon = (WorkflowsCommon)getCommonPart();
+			WorkflowCommon intakesCommon = (WorkflowCommon)getCommonPart();
 			assert(intakesCommon != null);
     	} catch (AssertionError e) {
     		if (logger.isErrorEnabled() == true) {

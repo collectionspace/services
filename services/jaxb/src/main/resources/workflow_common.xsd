@@ -24,7 +24,7 @@
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
 -->    
     <!-- workflow -->
-    <xs:element name="workflows_common">
+    <xs:element name="workflow_common">
         <xs:complexType>
             <xs:sequence>
                 <!--  Workflow Information Group -->

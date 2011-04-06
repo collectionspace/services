@@ -37,7 +37,7 @@ import org.apache.commons.httpclient.auth.AuthScope; //import org.collectionspac
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.workflow.WorkflowsCommon;
+import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.client.ClientResponse; //import org.collectionspace.services.common.context.ServiceContext;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
