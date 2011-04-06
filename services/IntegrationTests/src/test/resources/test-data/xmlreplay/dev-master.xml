@@ -56,7 +56,7 @@
       Used to measure timings of 1000 records for  CSPACE-3553
     <run controlFile="objectexit/object-exit-LOOP.xml" testGroup="LOOP" />
     -->
-    <run controlFile="objectexit/object-exit-LOOP.xml" testGroup="LOOP" />
-    
+     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
+
 </xmlReplayMaster>
 

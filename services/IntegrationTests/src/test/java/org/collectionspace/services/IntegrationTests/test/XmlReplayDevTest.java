@@ -24,10 +24,6 @@ public class XmlReplayDevTest extends XmlReplayTest {
 
     @Test
     public void runMaster() throws Exception {
-
-        if (true) return;
-        //This was a hack test.
-
         String masterFile = System.getProperty("xmlReplayMaster");
         if (Tools.notEmpty(masterFile)){
             System.out.println("Using masterFile specified in System property: "+masterFile);
@@ -35,9 +31,15 @@ public class XmlReplayDevTest extends XmlReplayTest {
             masterFile = XmlReplay.DEFAULT_DEV_MASTER_CONTROL;
             System.out.println("Using default masterFile: "+masterFile);
         }
-        //XmlReplay replay = createXmlReplayUsingIntegrationTestsModule("..");
-        //List<List<ServiceResult>> list = replay.runMaster(masterFile);
-        //logTestForGroup(list, "XmlReplayMasterTest");
+        XmlReplay replay = createXmlReplayUsingIntegrationTestsModule("..");
+        List<List<ServiceResult>> list = replay.runMaster(masterFile);
+        logTestForGroup(list, "XmlReplayMasterTest");
+
+       //used for testing load.
+       // bigLoop(masterFile);
+    }
+
+    private void bigLoop(String masterFile){
         int MAXWORKERS = 20;
         long start = System.currentTimeMillis();
         for (int t=0; t<MAXWORKERS; t++){

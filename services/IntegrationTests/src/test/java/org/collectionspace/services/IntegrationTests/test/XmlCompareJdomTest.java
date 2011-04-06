@@ -154,9 +154,9 @@ public class XmlCompareJdomTest {
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
     }
 
-
     // ============  expected part, will be used as LEFT tree ==========================================================
     private static String exHEAD    ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+                                    +"<document name=\"objectexit\">"
                                     +"<ns2:objectexit_common \r\n"
                                     +"    xmlns:ns2=\"http://collectionspace.org/services/objectexit\" \r\n"
                                     +"    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \r\n"
@@ -174,7 +174,8 @@ public class XmlCompareJdomTest {
                                     +" </first>\r\n";
     private static String exDEP     =" <depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>\r\n";
     private static String exNEW     =" <newField>objectexitNumber-1290026472360</newField>\r\n";
-    private static String exFOOT    ="</ns2:objectexit_common>";
+    private static String exFOOT    ="</ns2:objectexit_common>"
+                                                     +"</document>";
 
     private static String expectedPartContent = exHEAD + exEN + exDEP  + exFOOT;
 
@@ -182,11 +183,14 @@ public class XmlCompareJdomTest {
     // ============  from-server part, will be used as RIGHT tree ==========================================================
 
     private static String srvHEAD =  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+                                    +"<document name=\"objectexit\">"
                                     +"<ns2:objectexit_common xmlns:ns2=\"http://collectionspace.org/services/objectexit\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd\">\r\n";
+
     private static String srvEN    = "<exitNumber>objectexitNumber-1290026472360</exitNumber>\r\n";
     private static String srvEN2   = "<exitNumber>objectexitNumber-9999999999999</exitNumber>\r\n";
     private static String srvDEPOSITOR  = "<depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>\r\n";
-    private static String srvFOOT =  "</ns2:objectexit_common>\r\n";
+    private static String srvFOOT =  "</ns2:objectexit_common>\r\n"
+                                                       +"</document>";
 
     private static String partFromServer = srvHEAD+srvEN+srvDEPOSITOR+srvFOOT;
 

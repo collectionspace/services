@@ -258,7 +258,7 @@ public class ServiceResult {
             PayloadLogger.HttpTraffic traffic = PayloadLogger.readPayloads(this.result, this.boundary, this.contentLength);
             PayloadLogger.Part partFromServer = traffic.getPart(partName);
             String source = partFromServer.getContent();
-            org.jdom.Element element = (org.jdom.Element) XmlCompareJdom.selectSingleNode(source, xpath);
+            org.jdom.Element element = (org.jdom.Element) XmlCompareJdom.selectSingleNode(source, xpath, null);  //todo: passing null for namespace may not work.
             String sr = element != null ? element.getText() : "";
             return sr;
         } catch (Exception e){
@@ -276,7 +276,7 @@ public class ServiceResult {
             if (source == null){
                 return "ERROR:null:requestPayloadsRaw["+partName+"]";
             }
-            org.jdom.Element element = (org.jdom.Element) XmlCompareJdom.selectSingleNode(source, xpath);   //e.g. "//shortIdentifier");
+            org.jdom.Element element = (org.jdom.Element) XmlCompareJdom.selectSingleNode(source, xpath, null);   //e.g. "//shortIdentifier");  //todo: passing null for namespace may not work.
             String sr = element != null ? element.getText() : "";
             return sr;
         } catch (Exception e){

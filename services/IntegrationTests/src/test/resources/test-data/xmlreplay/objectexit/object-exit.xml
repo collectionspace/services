@@ -43,20 +43,17 @@
          <test ID="oe1"  auth="test">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
-             <part>
-                 <label>objectexit_common</label>
-                 <filename>objectexit/oe1.xml</filename>
-             </part>
+             <filename>objectexit/oe1.xml</filename>
          </test>
         <test ID="oe2">
             <method>GET</method>
             <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
             <response>
-                <expected level="TEXT" />
-                <part>
-                     <label>objectexit_common</label>
-                     <filename>objectexit/res/oe2.res.xml</filename>
-                 </part>
+
+                <expected level="TREE" />
+                <!-- TODO: this is a bit funky right now (2011-03-31) because collectionspace_core adds things like createdAt, which are all part of the POX payload now -->
+
+                <filename>objectexit/res/oe2.res.xml</filename>
              </response>
         </test>
     </testGroup>

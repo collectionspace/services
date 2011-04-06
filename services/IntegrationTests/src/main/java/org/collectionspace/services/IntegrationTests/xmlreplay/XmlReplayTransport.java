@@ -184,7 +184,8 @@ public class XmlReplayTransport {
             ||(partsList.size() != filesList.size())){
             throw new Exception("filesList and partsList must not be empty and must have the same number of items each.");
         }
-        StringBuffer content = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+        //NO: Patrick sez all test files should be complete XML now:  StringBuffer content = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+        StringBuffer content = new StringBuffer();
         //content.append(CRLF).append("<document name=\"objectexit\">").append(CRLF);
         Map<String, String> contentRaw = new HashMap<String, String>();
         for (int i=0; i<partsList.size(); i++){

@@ -26,6 +26,7 @@ import org.collectionspace.services.common.api.Tools;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jaxen.XPath;
 import org.jaxen.jdom.JDOMXPath;
@@ -60,6 +61,10 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
     }
 
     public static TreeWalkResults compareParts(String expectedContent, String leftID, String actualPartContent, String rightID){
+
+        System.out.println("expected: \r\n"+expectedContent+"\r\n\r\n");
+        System.out.println("ACTUAL: \r\n"+actualPartContent);
+
         TreeWalkResults list = new TreeWalkResults();
         try {
 
@@ -95,23 +100,35 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
         return list;
     }
 
-    public static List select(Element element, String xpathExpression) throws Exception {
+    public static List select(Element element, String xpathExpression, Namespace namespace) throws Exception {
         XPath xpath = new JDOMXPath(xpathExpression);
+        String prefix = namespace.getPrefix();
+        String uri = namespace.getURI();
+        xpath.addNamespace(prefix, uri);
         return xpath.selectNodes(element);
     }
 
-    public static Object selectSingleNode(Element element, String xpathExpression) throws Exception {
+    public static Object selectSingleNode(Element element, String xpathExpression, Namespace namespace) throws Exception {
         XPath xpath = new JDOMXPath(xpathExpression);
+        if (namespace != null) {
+            String prefix = namespace.getPrefix();
+            String uri = namespace.getURI();
+            xpath.addNamespace(prefix, uri);
+        }
         return xpath.selectSingleNode(element);
     }
 
-    public static Object selectSingleNode(String docSource, String xpathExpression) throws Exception {
+    public static Object selectSingleNode(String docSource, String xpathExpression, Namespace namespace) throws Exception {
         Document doc = getDocumentFromContent(docSource);
         Element element = doc.getRootElement();
         XPath xpath = new JDOMXPath(xpathExpression);
+        if (namespace != null) {
+            String prefix = namespace.getPrefix();
+            String uri = namespace.getURI();
+            xpath.addNamespace(prefix, uri);
+        }
         return xpath.selectSingleNode(element);
     }
-
 
     public static boolean treeWalk(Document left, Document right, TreeWalkResults list) throws Exception {
         boolean res = treeWalk(left.getRootElement(), right.getRootElement(), "/", list);
@@ -138,31 +155,35 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
                 continue;
             }
             Element leftChild = (Element)o;
-            String leftChildName = leftChild.getName();
+            //String leftChildName = leftChild.getName();
+            String leftChildName = leftChild.getQualifiedName();
             if (Tools.isEmpty(leftChildName)){
                 continue;
             }
+
+            Namespace namespace =  leftChild.getNamespace();
+
             String leftChildPath = Tools.glue(parentPath, "/", leftChildName);
 
             if (foundRepeatingList.indexOf(leftChildPath)>=0){
                 continue;
             }
-            List leftlist = select(left, leftChildName);
+            List leftlist = select(left, leftChildName, namespace);
             if (leftlist != null && leftlist.size() > 1){
                 //System.out.println("-----------------doRepeating------"+leftChildPath);
                 foundRepeatingList.add(leftChildPath);
                 boolean repeatingIdentical =
-                    doRepeatingFieldComparison(leftlist, leftChildPath, leftChildName, left, right, msgList) ; //todo: deal with foundRightMap in this repeating field block.
+                    doRepeatingFieldComparison(leftlist, leftChildPath, leftChildName, left, right, msgList, namespace) ; //todo: deal with foundRightMap in this repeating field block.
                 if ( ! repeatingIdentical ){
                     //System.out.println("\r\n\r\n\r\n*****************************\r\nOne repeating field failed: "+msgList);
                     return false;
                 }
                 foundRightMap.put(leftChildName, "OK");
             } else {
-                Element rightChild  = (Element)selectSingleNode(right,leftChildName);
+                Element rightChild  = (Element)selectSingleNode(right,leftChildName, namespace);
                 if (rightChild == null){
                     TreeWalkEntry entry = new TreeWalkEntry();
-                    entry.lpath = leftChildPath;
+                    entry.lpath = leftChildPath;                  //this works, but is questionable: selectSingleNode(right, "//*[local-name() = \"objectexit_common\"]")
                     entry.status = TreeWalkEntry.STATUS.R_MISSING;
                     msgList.add(entry);
                     continue;
@@ -192,7 +213,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
                 continue;
             }
             Element rightChild = (Element)r;
-            String rname = rightChild.getName();
+            String rname = rightChild.getQualifiedName();
             if (null==foundRightMap.get(rname)){
                 String rightChildPath = Tools.glue(parentPath, "/", rname);
 
@@ -214,10 +235,10 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
         return outputter.outputString(el);
     }
 
-    public static boolean doRepeatingFieldComparison(List leftList, String leftChildPath, String leftChildName, Element left, Element right, TreeWalkResults msgList)
+    public static boolean doRepeatingFieldComparison(List leftList, String leftChildPath, String leftChildName, Element left, Element right, TreeWalkResults msgList, Namespace namespace)
     throws Exception {
         //todo: deal with foundRightMap in this repeating field block.
-        List rightList = select(right, leftChildName);
+        List rightList = select(right, leftChildName, namespace);
         if (rightList == null || rightList.size() == 0 || rightList.size() < leftList.size()){
             TreeWalkEntry twe = new TreeWalkEntry();
             twe.lpath = leftChildPath;
@@ -271,7 +292,8 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
     }
 
     private static void pl(String name, Element el) throws Exception {
-        Object lobid = selectSingleNode(el, "@ID");
+        Namespace namespace = el.getNamespace();
+        Object lobid = selectSingleNode(el, "@ID", namespace);
         String lid = "";
         if (lobid!=null){
             lid = lobid.toString();

@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document name="objectexit">
-<ns2:objectexit_common 
-  xmlns:ns2="http://collectionspace.org/services/objectexit" 
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  xsi:schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
-<exitNumber>objectexitNumber-1290026472360</exitNumber>
-<depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>
-<exitMethods></exitMethods>
+<ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <exitMethods/>
+    <exitNumber>objectexitNumber-1290026472360</exitNumber>
+    <depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'
+    </depositor>
 </ns2:objectexit_common>
+<ns2:collectionspace_core xmlns:ns2="http://collectionspace.org/collectionspace_core/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <tenantId>1</tenantId>
+    <updatedAt>2011-03-31T17:47:11Z</updatedAt>
+    <createdAt>2011-03-31T17:47:11Z</createdAt>
+</ns2:collectionspace_core>
 </document>
+
 
