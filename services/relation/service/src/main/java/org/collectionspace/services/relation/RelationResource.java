@@ -42,10 +42,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
-import org.collectionspace.services.common.query.IQueryManager;
+import  org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
@@ -351,7 +352,7 @@ public class RelationResource extends
 			DocumentHandler handler = createDocumentHandler(ctx);
 			String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate,
 					objectCsid, objectType);
-			handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);			
+			handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);
 			getRepositoryClient(ctx).getFiltered(ctx, handler);
 			relationList = (RelationsCommonList)handler.getCommonPartList();
 
