@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -93,8 +94,9 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
 			// so just pass it on
 			return (WebApplicationException)e;
 		} else { // e is now instanceof Exception
+            String detail = Tools.errorToString(e, true);
 			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(serviceMsg).type("text/plain").build();
+					.entity(serviceMsg+" detail: "+detail).type("text/plain").build();
 			return new WebApplicationException(response);
 		}
 	}

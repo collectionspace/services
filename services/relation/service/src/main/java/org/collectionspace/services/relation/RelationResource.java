@@ -42,10 +42,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-//import org.collectionspace.services.common.query.IQueryManager;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
@@ -55,10 +55,13 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 
+import org.collectionspace.services.common.service.ServiceBindingType;
 import org.jboss.resteasy.util.HttpResponseCodes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * The Class RelationResource.
@@ -104,8 +107,7 @@ public class RelationResource extends
 	/**
 	 * Creates the relation.
 	 * 
-	 * @param input the input
-	 * 
+	 *
 	 * @return the response
 	 */
 	@POST
@@ -231,8 +233,7 @@ public class RelationResource extends
 	 * Update relation.
 	 * 
 	 * @param csid the csid
-	 * @param theUpdate the the update
-	 * 
+	 *
 	 * @return the multipart output
 	 */
 	@PUT
@@ -353,6 +354,17 @@ public class RelationResource extends
 			handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);			
 			getRepositoryClient(ctx).getFiltered(ctx, handler);
 			relationList = (RelationsCommonList)handler.getCommonPartList();
+
+
+
+            /*handler.
+            int i=0;
+            for (RelationsCommonList.RelationListItem item: relationList.getRelationListItem()){
+                i++;
+                item.setSubjectDocumentNumber("FooSubjectDocumentNumber" + i);
+                item.setDoc
+            }
+            */
 		} catch (UnauthorizedException ue) {
 			Response response = Response.status(Response.Status.UNAUTHORIZED).entity(
 					"Get relations failed reason " +
@@ -369,5 +381,25 @@ public class RelationResource extends
 		}
 		
 		return relationList;
-	}
+    }
+
+             /*
+    private void fillListItem(){
+        String docType = docModel.getDocumentType().getName();
+        ServiceBindingType sb = queriedServiceBindings.get(docType);
+        if (sb == null) { throw new RuntimeException( "getAuthorityRefDocs: No Service Binding for docType: " + docType); }
+        String serviceContextPath = "/" + sb.getName().toLowerCase() + "/";
+        // The id and URI are the same on all doctypes
+        ilistItem.setDocId(csid);
+        ilistItem.setUri(serviceContextPath + csid);
+        ilistItem.setDocType(docType);
+        ilistItem.setDocNumber(
+        ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NUMBER_PROP, docModel));
+        ilistItem.setDocName(
+        ServiceBindingUtils.getMappedFieldInDoc(sb,
+        ServiceBindingUtils.OBJ_NAME_PROP, docModel));
+
+    }
+    */
 }
+

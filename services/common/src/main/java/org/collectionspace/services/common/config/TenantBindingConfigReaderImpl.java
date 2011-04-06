@@ -30,6 +30,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.common.service.ServiceObjectType;
 import org.collectionspace.services.common.tenant.RepositoryDomainType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingConfig;
@@ -60,6 +61,11 @@ public class TenantBindingConfigReaderImpl
     //tenant-qualified servicename, service binding
     private Hashtable<String, ServiceBindingType> serviceBindings =
             new Hashtable<String, ServiceBindingType>();
+
+    //tenant-qualified service object name to service name, service binding
+    private Hashtable<String, ServiceBindingType> docTypes =
+            new Hashtable<String, ServiceBindingType>();
+
 
     public TenantBindingConfigReaderImpl(String serverRootDir) {
         super(serverRootDir);
@@ -161,6 +167,15 @@ public class TenantBindingConfigReaderImpl
             String key = getTenantQualifiedServiceName(tenantBinding.getId(),
                     serviceBinding.getName());
             serviceBindings.put(key, serviceBinding);
+
+            if (serviceBinding!=null){
+                ServiceObjectType objectType = serviceBinding.getObject();
+                if (objectType!=null){
+                    String docType = objectType.getName();
+                    String docTypeKey = getTenantQualifiedIdentifier(tenantBinding.getId(), docType);
+                    docTypes.put(docTypeKey, serviceBinding);
+                }
+            }
             if (logger.isDebugEnabled()) {
                 logger.debug("readServiceBindings() added service "
                         + " name=" + key
@@ -242,6 +257,17 @@ public class TenantBindingConfigReaderImpl
     /**
      * getServiceBinding gets service binding for given tenant for a given service
      * @param tenantId
+     * @param docType
+     * @return
+     */
+    public ServiceBindingType getServiceBindingForDocType (String tenantId, String docType) {
+        String key = getTenantQualifiedIdentifier(tenantId, docType);
+        return docTypes.get(key);
+    }
+
+    /**
+     * getServiceBinding gets service binding for given tenant for a given service
+     * @param tenantId
      * @param serviceName
      * @return
      */
@@ -272,6 +298,9 @@ public class TenantBindingConfigReaderImpl
         return tenantId + "." + serviceName.toLowerCase();
     }
 
+    public static String getTenantQualifiedIdentifier(String tenantId, String identifier) {
+        return tenantId + "." + identifier;
+    }
     /**
      * Sets properties in the passed list on the local properties for this TenantBinding.
      * Note: will only set properties not already set on the TenantBinding.
@@ -296,5 +325,9 @@ public class TenantBindingConfigReaderImpl
                         TenantBindingUtils.SET_PROP_IF_MISSING);
             }
         }
+    }
+
+    public String getResourcesDir(){
+        return getConfigRootDir() + File.separator + "resources";
     }
 }

@@ -25,12 +25,14 @@ package org.collectionspace.services.imports;
 
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.api.ZipTools;
 
 // The modified Nuxeo ImportCommand from nuxeo's shell:
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.imports.nuxeo.ImportCommand;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -96,7 +98,16 @@ public class ImportsResource extends ResourceBase {
     */
 
 
-    public static final String TEMPLATE_DIR = "/src/trunk/services/imports/service/src/main/resources/templates";
+    //public static final String TEMPLATE_DIR = "/src/trunk/services/imports/service/src/main/resources/templates";
+
+    private static String _templateDir = null;
+    public static String getTemplateDir(){
+        if (_templateDir == null){
+            TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+            _templateDir = tReader.getResourcesDir()+File.separator+"templates";
+        }
+        return _templateDir;
+    }
 
     /** you can test this with something like:
      * curl -X POST http://localhost:8180/cspace-services/imports -i  -u "Admin@collectionspace.org:Administrator" -H "Content-Type: application/xml" -T in.xml
@@ -123,7 +134,7 @@ public class ImportsResource extends ResourceBase {
     public static String createFromInputSource(InputSource inputSource) throws Exception {
         // We must expand the request and wrap it with all kinds of Nuxeo baggage, which expandXmlPayloadToDir knows how to do.
         String outputDir = FileTools.createTmpDir("imports-").getCanonicalPath();
-        expandXmlPayloadToDir(inputSource, TEMPLATE_DIR, outputDir);
+        expandXmlPayloadToDir(inputSource, getTemplateDir(), outputDir);
 
         // Next, call the nuxeo import service, pointing it to our local directory that has the expanded request.
         ImportCommand importCommand = new ImportCommand();

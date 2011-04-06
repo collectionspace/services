@@ -31,6 +31,10 @@
                 <!-- type of relationship between two entities -->
                 <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
                 <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
+                <!--- New Names -->
+                <xs:element name="subjectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentId1 -->
+                <xs:element name="objectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentId2 -->
+                <xs:element name="predicate" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>   <!-- new name for relationshipType -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -59,7 +63,19 @@
             </xs:appinfo>
         </xs:annotation>
     </xs:complexType>
-    
+
+
+    <xs:complexType name="relationsDocListItem">
+        <xs:sequence>
+            <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
+            <xs:element name="csid" type="xs:string" minOccurs="1"/>
+            <xs:element name="type" type="xs:string" minOccurs="1"/>
+            <xs:element name="name" type="xs:string" minOccurs="1"/>
+            <xs:element name="number" type="xs:string" minOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
     <!-- collection objects as in nuxeo repository -->
     <xs:element name="relations-common-list">
         <xs:complexType>
@@ -69,13 +85,16 @@
                         <xs:element name="relation-list-item" maxOccurs="unbounded">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <!-- uri to retrive collection object details -->
+                                    <!-- uri to retrieve collection object details -->
                                     <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
                                     <xs:element name="csid" type="xs:string" minOccurs="1"/>
                                     <xs:element name="subjectCsid" type="xs:string" minOccurs="1"/>
                                     <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="predicate" type="xs:string" minOccurs="1"/>
                                     <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
                                     <xs:element name="objectCsid" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="subject" type="relationsDocListItem" minOccurs="1"/>
+                                    <xs:element name="object" type="relationsDocListItem" minOccurs="1"/>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>

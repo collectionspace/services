@@ -145,7 +145,7 @@ public class ServiceBindingUtils {
     		return (String)docModel.getPropertyValue(propName);
     	} catch(ClientException ce) {
     		throw new RuntimeException(
-    				"getMappedFieldInDoc: Problem fetching: "+propName, ce);
+    				"getMappedFieldInDoc: Problem fetching: "+propName+" logicalfieldName: "+logicalFieldName+" docModel: "+docModel, ce);
     	}
     } 
 

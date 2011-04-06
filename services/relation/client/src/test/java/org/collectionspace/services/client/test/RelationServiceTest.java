@@ -175,7 +175,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertEquals(statusCode, STATUS_INTERNAL_SERVER_ERROR);   //should be an error: same objectID and subjectID are not allowed by validator.
     }
 
     // Failure outcomes
@@ -825,7 +825,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         fillRelation(relationCommon, identifier);
         return relationCommon;
     }
-    
+
     private PoxPayloadOut createRelationInstance(RelationsCommon relation) {
         PoxPayloadOut result = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
@@ -853,7 +853,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     /**
      * Fills the relation.
      *
-     * @param relation the relation
+     * @param relationCommon the relation
      * @param identifier the identifier
      */
     private void fillRelation(RelationsCommon relationCommon, String identifier) {
@@ -868,7 +868,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     /**
      * Fills the relation.
      *
-     * @param relation the relation
+     * @param relationCommon the relation
      * @param documentId1 the document id1
      * @param documentType1 the document type1
      * @param documentId2 the document id2

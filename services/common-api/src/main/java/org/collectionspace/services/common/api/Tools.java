@@ -160,6 +160,16 @@ public class Tools {
             return "";
         }
         String s = e.toString() + "\r\n  -- message: " + e.getMessage();
+
+        StringBuffer causeBuffer = new StringBuffer();
+        Throwable cause = e.getCause();
+        while (cause != null){
+            causeBuffer.append(cause.getClass().getName()+"::"+cause.getMessage()+"\r\n");
+            cause = cause.getCause();
+        }
+        if (causeBuffer.length()>0) s = s + "\r\n  -- Causes: "+causeBuffer.toString();
+
+
         s = s + "\r\n  -- Stack Trace: \r\n  --      " + getStackTrace(e);
         return s;
     }

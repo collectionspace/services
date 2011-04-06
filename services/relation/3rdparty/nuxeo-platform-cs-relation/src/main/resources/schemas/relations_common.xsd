@@ -35,12 +35,15 @@
             <!-- document-id-2 would be the id of the contained (or child) collectionobject -->
             <!-- document-type-2 would be the doc-type of the collectionobejct -->
     <xs:element name="documentId1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+    <xs:element name="subjectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentId1 -->
     <xs:element name="documentType1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
     <xs:element name="documentId2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+    <xs:element name="objectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentId2 -->
     <xs:element name="documentType2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
 
             <!-- type of relatinoship between two entities -->
     <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
+    <xs:element name="predicate" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>   <!-- new name for relationshipType -->
     <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
 
     <!-- enumeration defining the type of relationship between two entities -->

@@ -24,13 +24,19 @@
 package org.collectionspace.services.relation.nuxeo;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.repository.RepositoryClientFactory;
+import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
@@ -38,11 +44,10 @@ import org.collectionspace.services.relation.RelationsCommonList.RelationListIte
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.collectionspace.services.relation.RelationsDocListItem;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +60,6 @@ import org.slf4j.LoggerFactory;
 public class RelationDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<RelationsCommon, RelationsCommonList> {
 
-    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RelationDocumentModelHandler.class);
     /**
      * relation is used to stash JAXB object to use when handle is called
@@ -68,128 +72,139 @@ public class RelationDocumentModelHandler
      */
     private RelationsCommonList relationList;
 
-
-    /**
-     * getCommonObject get associated Relation
-     * @return relation
-     */
     @Override
     public RelationsCommon getCommonPart() {
         return relation;
     }
 
-    /**
-     * setCommonObject set associated relation
-     * @param relation
-     */
     @Override
     public void setCommonPart(RelationsCommon theRelation) {
         this.relation = theRelation;
     }
 
-    /**
-     * getRelationList get associated Relation (for index/GET_ALL)
-     * @return relationCommonList
+    /**get associated Relation (for index/GET_ALL)
      */
     @Override
     public RelationsCommonList getCommonPartList() {
         return relationList;
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
-     */
     @Override
     public void setCommonPartList(RelationsCommonList theRelationList) {
         this.relationList = theRelationList;
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
-     */
     @Override
     public RelationsCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
-     */
     @Override
     public void fillCommonPart(RelationsCommon theRelation, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
-     */
     @Override
     public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc) ;
-        AbstractCommonList commonList = (AbstractCommonList) relList;
-        commonList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid");
-        List<RelationsCommonList.RelationListItem> itemList = relList.getRelationListItem();
+        relList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object");
+        ServiceContext ctx = getServiceContext();
+        String serviceContextPath = getServiceContextPath();
+
+        TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        String serviceName = getServiceContext().getServiceName().toLowerCase();
+        ServiceBindingType sbt = tReader.getServiceBinding(ctx.getTenantId(), serviceName);
+
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
-            RelationListItem relListItem = getRelationListItem(getServiceContext(),
-                    docModel, getServiceContextPath());
-            itemList.add(relListItem);
+            RelationListItem relListItem = getRelationListItem(ctx, sbt, tReader, docModel, serviceContextPath);
+            relList.getRelationListItem().add(relListItem);
         }
         return relList;
     }
 
-  
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#fillAllParts(org.collectionspace.services.common.document.DocumentWrapper)
-    @Override
-    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        super.fillAllParts(wrapDoc);
-    }
-     */
-
-    /**
-     * Gets the relation list item.
-     *
+    /** Gets the relation list item, looking up the subject and object documents, and getting summary
+     *  info via the objectName and objectNumber properties in tenant-bindings.
      * @param ctx the ctx
+     * @param sbt the ServiceBindingType of Relations service
+     * @param tReader the tenant-bindings reader, for looking up docnumber and docname
      * @param docModel the doc model
      * @param serviceContextPath the service context path
-     * @return the relation list item
+     * @return the relation list item, with nested subject and object summary info.
      * @throws Exception the exception
      */
     private RelationListItem getRelationListItem(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-    		DocumentModel docModel,
-            String serviceContextPath) throws Exception {
+                                                                        ServiceBindingType sbt,
+                                                                        TenantBindingConfigReaderImpl tReader,
+                                                                        DocumentModel docModel,
+                                                                        String serviceContextPath) throws Exception {
         RelationListItem relationListItem = new RelationListItem();
-        String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+        String id = getCsid(docModel);
         relationListItem.setCsid(id);
-        //
-        // Subject
-        //
-        relationListItem.setSubjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(),
-        		RelationJAXBSchema.DOCUMENT_ID_1));
-        //
-        // Predicate
-        //
-        relationListItem.setRelationshipType((String) docModel.getProperty(ctx.getCommonPartLabel(),
-        		RelationJAXBSchema.RELATIONSHIP_TYPE));
-        relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(),
-        		RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
-        //
-        // Object
-        //
-        relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(),
-        		RelationJAXBSchema.DOCUMENT_ID_2));
+
+        relationListItem.setSubjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_ID_1));
+
+        String predicate = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.RELATIONSHIP_TYPE);
+        relationListItem.setRelationshipType(predicate);
+        relationListItem.setPredicate(predicate); //predicate is new name for relationshipType.
+        relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
+
+        relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_ID_2));
         
         relationListItem.setUri(serviceContextPath + id);
+
+        //Now fill in summary info for the related docs: subject and object.
+        String subjectCsid = relationListItem.getSubjectCsid();
+        RelationsDocListItem subject = createRelationsDocListItem(ctx, sbt, subjectCsid, tReader);
+        relationListItem.setSubject(subject);
+
+        String objectCsid = relationListItem.getObjectCsid();
+        RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader);
+        relationListItem.setObject(object);
+
         return relationListItem;
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl#getQProperty(java.lang.String)
-     */
+    protected RelationsDocListItem createRelationsDocListItem(ServiceContext  ctx, 
+                                                                                                 ServiceBindingType sbt,
+                                                                                                 String itemCsid,
+                                                                                                 TenantBindingConfigReaderImpl tReader) throws Exception {
+        RelationsDocListItem item = new RelationsDocListItem();
+       // DocumentModel itemDocModel = docModelFromCSID(ctx, itemCsid);
+        DocumentModel itemDocModel =  NuxeoUtils.getDocFromCsid(getRepositorySession(), ctx, itemCsid);    //null if not found.
+        if (itemDocModel!=null){
+            String itemDocType = itemDocModel.getDocumentType().getName();
+
+            //TODO: ensure that itemDocType is really the entry point, i.e. servicename==doctype
+            //ServiceBindingType itemSbt = tReader.getServiceBinding(ctx.getTenantId(), itemDocType);
+            ServiceBindingType itemSbt = tReader.getServiceBindingForDocType(ctx.getTenantId(), itemDocType);
+            //String bar = "\r\n=======================\r\n";
+            //System.out.println(bar+"itemDocType: "+itemDocType);
+            //System.out.println(bar+"ServiceBindingType: "+itemSbt);
+            //System.out.println(bar);
+
+            try {
+                String itemDocname = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP, itemDocModel);
+                item.setName(itemDocname);
+                //System.out.println("\r\n\r\n\r\n=================\r\n~~found prop : "+ServiceBindingUtils.OBJ_NAME_PROP+" in :"+itemDocname);
+            } catch (Throwable t){
+                 System.out.println("\r\n\r\n\r\n=================\r\n NOTE: "+itemDocModel+" field "+ServiceBindingUtils.OBJ_NAME_PROP+" not found in DocModel: "+itemDocModel.getName()+" inner: "+t.getMessage());
+            }
+            try {
+                String itemDocnumber = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NUMBER_PROP, itemDocModel);
+                item.setNumber(itemDocnumber);
+                //System.out.println("\r\n\r\n\r\n=================\r\n~~found prop : "+ServiceBindingUtils.OBJ_NUMBER_PROP+" in :"+itemDocnumber);
+            } catch (Throwable t){
+                System.out.println("\r\n\r\n\r\n=================\r\n NOTE:  field "+ServiceBindingUtils.OBJ_NUMBER_PROP+" not found in DocModel: "+itemDocModel.getName()+" inner: "+t.getMessage());
+            }
+            item.setType(itemDocType);
+        }
+        item.setCsid(itemCsid);
+        return item;
+    }
+
     @Override
     public String getQProperty(String prop) {
         return "/" + RelationConstants.NUXEO_SCHEMA_ROOT_ELEMENT + "/" + prop;
