@@ -412,7 +412,7 @@ public class CollectionObjectResource
         	String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.value();
         	String objectCsid = null;
         	RelationResource relationResource = new RelationResource();
-        	RelationsCommonList relationsCommonList = relationResource.getRelationList(queryParams,
+        	RelationsCommonList relationsCommonList = (RelationsCommonList)relationResource.getRelationList(queryParams,
         			subjectCsid,
         			null, /*subjectType*/
         			predicate,
