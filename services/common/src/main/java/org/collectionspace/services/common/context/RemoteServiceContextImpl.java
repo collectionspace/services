@@ -45,10 +45,21 @@ public class RemoteServiceContextImpl<IT, OT>
     final Logger logger = LoggerFactory.getLogger(RemoteServiceContextImpl.class);
     //input stores original content as received over the wire
     /** The input. */
-    private IT input;
-    
+    private IT input;    
     /** The output. */
     private OT output;
+    /** The target of the HTTP request **/
+    JaxRsContext jaxRsContext;
+    
+    @Override
+    public void setJaxRsContext(JaxRsContext theJaxRsContext) {
+    	this.jaxRsContext = theJaxRsContext;
+    }
+    
+    @Override
+    public JaxRsContext getJaxRsContext() {
+    	return this.jaxRsContext;
+    }
 
     /**
      * Instantiates a new remote service context impl.

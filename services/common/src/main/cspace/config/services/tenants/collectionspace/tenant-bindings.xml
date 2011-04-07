@@ -166,6 +166,9 @@
 
         <!-- begin blob service meta-data -->
         <tenant:serviceBindings name="Blobs" type="procedure" version="0.1">
+		    <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /blobs/*/workflow/
+            </service:uriPath>
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -568,6 +571,9 @@
 
         <!-- begin imports service meta-data -->
         <tenant:serviceBindings name="Imports" type="procedure" version="0.1">
+			<service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /imports/*/workflow/
+            </service:uriPath>
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -868,6 +874,9 @@
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /vocabularies/*/workflow/
             </service:uriPath>
+			<service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+				/vocabularies/*/items/*/workflow/
+            </service:uriPath>
             <!-- other URI paths using which this service could be accessed -->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
@@ -933,12 +942,14 @@
         -->
         <tenant:serviceBindings name="Vocabularyitems" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+			<!--            
+			<service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /vocabularies/*/items/
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /vocabularies/*/items/*/refObjs
-            </service:uriPath>-->
+            </service:uriPath>
+			-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -1005,6 +1016,9 @@
         <tenant:serviceBindings name="Orgauthorities" version="0.1">
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/workflow/
+            </service:uriPath>
+			<service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+				/orgauthorities/*/items/*/workflow/
             </service:uriPath>
             <!-- other URI paths using which this service could be accessed -->
 <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
@@ -1148,6 +1162,12 @@
 
         <!-- begin personauthority service meta-data -->
         <tenant:serviceBindings name="Personauthorities" version="0.1">
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /personauthorities/*/workflow/
+            </service:uriPath>
+			<service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+				/personauthorities/*/items/*/workflow/
+            </service:uriPath>
             <!-- other URI paths using which this service could be accessed -->
 <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/
@@ -1288,6 +1308,9 @@
         <tenant:serviceBindings name="Locationauthorities" version="0.1">
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /locationauthorities/*/workflow/
+            </service:uriPath>
+			<service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+				/locationauthorities/*/items/*/workflow/
             </service:uriPath>
             <!-- other URI paths using which this service could be accessed -->
 <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>

@@ -38,6 +38,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -45,15 +46,21 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
+import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.context.JaxRsContext;
+import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
+import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -475,6 +482,53 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 		}
 	}
 
+    @GET
+    @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH)
+    public byte[] getItemWorkflow(
+            @PathParam("csid") String csid,
+            @PathParam("itemcsid") String itemcsid) {
+        PoxPayloadOut result = null;
+
+        try {        	
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
+            String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
+        	
+        	MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME);
+        	WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
+        	ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
+            getRepositoryClient(ctx).get(ctx, itemcsid, handler);
+            result = ctx.getOutput();
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
+        }
+                
+        return result.getBytes();
+    }
+    
+    @PUT
+    @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH)
+    public byte[] updateWorkflow(
+            @PathParam("csid") String csid,
+            @PathParam("itemcsid") String itemcsid,
+    		String xmlPayload) {
+        PoxPayloadOut result = null;
+    	try {
+	        ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
+	        String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
+	    	
+        	PoxPayloadIn workflowUpdate = new PoxPayloadIn(xmlPayload);
+	    	MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, workflowUpdate);
+	    	WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
+	    	ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
+	        getRepositoryClient(ctx).update(ctx, itemcsid, handler);
+	        result = ctx.getOutput();
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
+        }
+        return result.getBytes();
+    }    
+    
+	
 	/**
 	 * Gets the authority item.
 	 * 
@@ -486,23 +540,28 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	@GET
 	@Path("{csid}/items/{itemcsid}")
 	public byte[] getAuthorityItem(
+    		@Context Request request,
+            @Context UriInfo ui,
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier) {
 		PoxPayloadOut result = null;
 		try {
+	    	JaxRsContext jaxRsContext = new JaxRsContext(request, ui);
+
 			Specifier parentSpec = getSpecifier(parentspecifier, "getAuthorityItem(parent)", "GET_ITEM");
 			Specifier itemSpec = getSpecifier(itemspecifier, "getAuthorityItem(item)", "GET_ITEM");
 			// Note that we have to create the service context for the Items, not the main service
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+			RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;
 			} else {
 				String whereClause = buildWhereForAuthByName(parentSpec.value);
-				ctx = createServiceContext(getServiceName());
+				ctx = (RemoteServiceContext)createServiceContext(getServiceName());
 				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
 			}
-			ctx = createServiceContext(getItemServiceName());
+			ctx = (RemoteServiceContext)createServiceContext(getItemServiceName());
+			ctx.setJaxRsContext(jaxRsContext);
 			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
 			if(itemSpec.form==SpecifierForm.CSID) {
 				getRepositoryClient(ctx).get(ctx, itemSpec.value, handler);

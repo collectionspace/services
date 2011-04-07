@@ -50,8 +50,6 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.relation.RelationJAXBSchema;
-import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

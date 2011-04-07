@@ -44,6 +44,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
+import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -52,6 +53,7 @@ import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
@@ -195,8 +197,16 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     private void addAccountPermissionsPart() throws Exception {
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         String currentServiceName = ctx.getServiceName();
+        String workflowSubResource = "/";
+        JaxRsContext jaxRsContext = ctx.getJaxRsContext();
+        if (jaxRsContext != null) {
+        	String resourceName = SecurityUtils.getResourceName(jaxRsContext.getUriInfo());
+        	workflowSubResource = workflowSubResource + resourceName + WorkflowClient.SERVICE_PATH + "/";
+        } else {
+        	workflowSubResource = workflowSubResource + currentServiceName + WorkflowClient.SERVICE_AUTHZ_SUFFIX;
+        }
         AccountPermission accountPermission = JpaStorageUtils.getAccountPermissions(JpaStorageUtils.CS_CURRENT_USER,
-        		currentServiceName, "/" + currentServiceName + WorkflowClient.SERVICE_AUTHZ_SUFFIX);
+        		currentServiceName, workflowSubResource);
         PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", accountPermission);
         ctx.addOutputPart(accountPermissionPart);
     }

@@ -159,7 +159,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
      * 
      * @throws Exception the exception
      */
-    private WorkflowDocumentModelHandler createWorkflowDocumentHandler(
+    protected WorkflowDocumentModelHandler createWorkflowDocumentHandler(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
     	
     	WorkflowDocumentModelHandler docHandler = (WorkflowDocumentModelHandler)createDocumentHandler(ctx,

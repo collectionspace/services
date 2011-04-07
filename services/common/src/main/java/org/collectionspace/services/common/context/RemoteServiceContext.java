@@ -32,6 +32,10 @@ import javax.ws.rs.core.MultivaluedMap;
 public interface RemoteServiceContext<IT, OT>
         extends ServiceContext<IT, OT> {
 
+    public void setJaxRsContext(JaxRsContext theJaxRsContext);
+    
+    public JaxRsContext getJaxRsContext();
+	
     /**
      * Get input parts as received over the wire from service consumer
      * @return the input

@@ -79,7 +79,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 		if (logger.isDebugEnabled()) {
 			logger.debug("received " + httpMethod + " on " + uriPath);
 		}
-		String resName = getResourceName(request.getUri());
+		String resName = SecurityUtils.getResourceName(request.getUri());
 		String resEntity = SecurityUtils.getResourceEntity(resName);
 		
 		//
@@ -111,7 +111,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 				// to perform a workflow state change and make sure they are allowed to to this.
 				//
 				if (uriPath.endsWith(WorkflowClient.SERVICE_PATH_COMPONENT) == true) {
-					String workflowSubResName = getResourceName(request.getUri());
+					String workflowSubResName = SecurityUtils.getResourceName(request.getUri());
 					res = new URIResourceImpl(workflowSubResName, httpMethod);
 					if (!authZ.isAccessAllowed(res)) {
 						logger.error("Access to " + resName + ":" + res.getId() + " is NOT allowed to "
@@ -174,53 +174,5 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 					Response.Status.FORBIDDEN).entity(msg).type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-	}
-
-	/**
-	 * Gets the resource name.
-	 *
-	 * @param uriInfo the uri info
-	 * @return the resource name
-	 */
-	private String getResourceName(UriInfo uriInfo) {
-		String uriPath = uriInfo.getPath();
-
-		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
-		
-		for (String pathParamName : pathParams.keySet()) {
-			//assumption : path params for csid for any entity has substring csid in name
-			String pathParamValue = pathParams.get(pathParamName).get(0);
-			if ((pathParamName.toLowerCase().indexOf("csid") > -1)) {
-				//replace csids with wildcard
-				uriPath = uriPath.replace(pathParamValue, "*");
-			}
-			if ((pathParamName.toLowerCase().indexOf("predicate") > -1)) {
-				//replace csids with wildcard
-				uriPath = uriPath.replace(pathParamValue, "*");
-			}
-			if (pathParamName.toLowerCase().indexOf("specifier") > -1) {
-				//replace name and specifiers with wildcard
-				uriPath = uriPath.replace("urn:cspace:name(" + pathParamValue
-						+ ")", "*");
-			}
-			if ((pathParamName.toLowerCase().indexOf("ms") > -1)) {
-				//replace csids with wildcard
-				uriPath = uriPath.replace(pathParamValue, "*");
-			}
-		}
-		
-		// FIXME: REM
-		// Since the hjid (HyperJaxb3 generated IDs are not unique strings in URIs that also have a CSID,
-		// we need to replace hjid last.  We can fix this by having HyperJaxb3 generate UUID.
-		// Assumption : path param name for csid is lowercase
-		//
-		List<String> hjidValueList = pathParams.get("id");
-		if (hjidValueList != null) {
-			String hjidValue = hjidValueList.get(0); //should be just one value, so get the first.
-			uriPath = uriPath.replace(hjidValue, "*");
-		}
-		
-		uriPath = uriPath.replace("//", "/");
-		return uriPath;
 	}
 }
