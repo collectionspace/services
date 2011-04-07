@@ -73,7 +73,7 @@ public class RelationResource extends ResourceBase {
 
 	@GET
 	@Produces("application/xml")
-	public AbstractCommonList getRelationList(@Context UriInfo ui,
+	public RelationsCommonList getRelationList(@Context UriInfo ui,
 			@QueryParam(IRelationsManager.SUBJECT_QP) String subjectCsid,
 			@QueryParam(IRelationsManager.SUBJECT_TYPE_QP) String subjectType,
 			@QueryParam(IRelationsManager.PREDICATE_QP) String predicate,
@@ -83,7 +83,7 @@ public class RelationResource extends ResourceBase {
 		return this.getRelationList(queryParams, subjectCsid, subjectType, predicate, objectCsid, objectType);
 	}
 
-    public AbstractCommonList getRelationList(MultivaluedMap<String, String> queryParams, String subjectCsid, String subjectType,
+    public RelationsCommonList getRelationList(MultivaluedMap<String, String> queryParams, String subjectCsid, String subjectType,
                                                                          String predicate, String objectCsid, String objectType) throws WebApplicationException {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
@@ -92,7 +92,7 @@ public class RelationResource extends ResourceBase {
             String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType);
             handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);
 
-            return finish_getList(ctx, handler);
+            return (RelationsCommonList)finish_getList(ctx, handler);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
