@@ -50,7 +50,7 @@
             <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
             <response>
 
-                <expected level="TREE" />
+                <expected level="ADDOK" />
                 <!-- TODO: this is a bit funky right now (2011-03-31) because collectionspace_core adds things like createdAt, which are all part of the POX payload now -->
 
                 <filename>objectexit/res/oe2.res.xml</filename>
