@@ -263,6 +263,14 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
         }
     }
 
+    protected  AbstractCommonList finish_getList(ServiceContext ctx, DocumentHandler handler){
+        try{
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
+			return (AbstractCommonList)handler.getCommonPartList();
+         } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.LIST_FAILED);
+         }
+    }
     protected AbstractCommonList search(MultivaluedMap<String, String> queryParams, String keywords) {
         try {
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
@@ -295,6 +303,8 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
     }
+
+
 
     //======================== GET : getAuthorityRefs ========================================
 
