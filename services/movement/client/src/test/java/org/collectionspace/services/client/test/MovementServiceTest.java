@@ -808,7 +808,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
      * @return Multipart output suitable for use as a payload
      *     in a create or update request.
      */
-    private PoxPayloadOut createInstance(String movementReferenceNumber) {
+    @Override
+    public PoxPayloadOut createInstance(String movementReferenceNumber) {
         MovementsCommon movementCommon = new MovementsCommon();
         // FIXME: Values of currentLocation, normalLocation,
         // and movementContact should be refNames.

@@ -297,74 +297,11 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
 		this.createTestObject(testName);
 	}
 
-	private int readIncludeDeleted(String testName, Boolean includeDeleted) {
-		int result = 0;
-        // Perform setup.
-        setupReadList();
-
-        // Submit the request to the service and store the response.
-        DimensionClient client = new DimensionClient();
-        ClientResponse<DimensionsCommonList> res = client.readIncludeDeleted(includeDeleted);
-        DimensionsCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-        //
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //
-        // Now check that list size is correct
-        //
-        List<DimensionsCommonList.DimensionListItem> items =
-            list.getDimensionListItem();
-        result = items.size();
-        
-        return result;
-	}
 	
 	@Override
 	public void readList(String testName) throws Exception {
 	}	
-	
-	/*
-	 * This test assumes that no objects exist yet.
-	 * 
-	 * http://localhost:8180/cspace-services/intakes?wf_deleted=false
-	 */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update"})
-	public void readWorkflow(String testName) throws Exception {
-    	//
-    	// Get the total count of non-deleted existing records
-    	//
-    	int existingRecords = readIncludeDeleted(testName, Boolean.FALSE);
-
-    	//
-    	// Create 3 new objects
-    	//
-    	final int OBJECTS_TO_CREATE = 3;
-    	for (int i = 0; i < OBJECTS_TO_CREATE; i++) {
-    		this.createWorkflowTarget(testName);
-    	}
-    	
-    	//
-    	// Mark one as soft deleted
-    	//
-    	int existingTestCreated = allResourceIdsCreated.size(); // assumption is that no other test created records were soft deleted
-    	String csid = allResourceIdsCreated.get(existingTestCreated - 1); //0-based index to get the last one added
-    	this.setupUpdate();
-    	this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
-    	//
-    	// Read the list of existing non-deleted records
-    	//
-    	int updatedTotal = readIncludeDeleted(testName, Boolean.FALSE);
-    	Assert.assertEquals(updatedTotal, existingRecords + OBJECTS_TO_CREATE - 1, "Deleted items seem to be returned in list results.");
-	}
-	
+		
 	@Override
     public void readPaginatedList(String testName) throws Exception {
 		//empty N/A

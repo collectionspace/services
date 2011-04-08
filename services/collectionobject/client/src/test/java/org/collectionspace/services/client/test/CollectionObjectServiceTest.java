@@ -1208,6 +1208,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                 "objectNumber-" + identifier,
                 "objectName-" + identifier);
     }
+    
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	String commonPartName = CollectionObjectClient.SERVICE_COMMON_PART_NAME;
+    	return createCollectionObjectInstance(commonPartName, identifier);
+    }
 
     /**
      * Creates the collection object instance.

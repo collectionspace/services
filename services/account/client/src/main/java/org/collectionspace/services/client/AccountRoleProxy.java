@@ -46,7 +46,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/accounts")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface AccountRoleProxy extends CollectionSpaceProxy {
+public interface AccountRoleProxy extends CollectionSpaceProxy<AccountRole> {
 
     //(C)reate
     @POST

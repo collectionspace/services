@@ -941,6 +941,9 @@
             Repository workspace so we have to configure that.
         -->
         <tenant:serviceBindings name="Vocabularyitems" version="0.1">
+			<service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+				/vocabularyitems/*/workflow/
+            </service:uriPath>
             <!-- other URI paths using which this service could be accessed -->
 			<!--            
 			<service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>

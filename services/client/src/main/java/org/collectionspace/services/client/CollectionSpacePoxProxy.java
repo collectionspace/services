@@ -13,7 +13,7 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
-public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends CollectionSpaceProxy {
+public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends CollectionSpaceProxy<LT> {
     //(C)reate
     @POST
     ClientResponse<Response> create(byte[] payload);

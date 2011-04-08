@@ -31,6 +31,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.movement.MovementsCommonList;
 
 /**
@@ -54,6 +55,12 @@ public interface MovementProxy extends CollectionSpacePoxProxy<MovementsCommonLi
     @Produces({"application/xml"})
     ClientResponse<MovementsCommonList> readListSortedBy(
         @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortFieldName);
+    
+    @Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<MovementsCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
 
     @GET
     @Produces({"application/xml"})

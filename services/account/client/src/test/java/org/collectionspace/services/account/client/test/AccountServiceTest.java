@@ -99,7 +99,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
      */
-    @Test(dataProvider = "testName")
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    	    dependsOnMethods = {"readList"})
     @Override
     public void readPaginatedList(String testName) throws Exception {
         //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697

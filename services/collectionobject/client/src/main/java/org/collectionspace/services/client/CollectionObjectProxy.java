@@ -35,6 +35,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 
 /**
@@ -65,6 +66,12 @@ public interface CollectionObjectProxy extends CollectionSpacePoxProxy<Collectio
     @GET
     @Produces({"application/xml"})
     ClientResponse<CollectionobjectsCommonList> readList();
+    
+    @Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<CollectionobjectsCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
     /**
      * Keyword search.

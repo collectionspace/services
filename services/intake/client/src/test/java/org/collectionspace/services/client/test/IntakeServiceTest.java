@@ -108,7 +108,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         IntakeClient client = new IntakeClient();
         String identifier = createIdentifier();
-        PoxPayloadOut multipart = createIntakeInstance(identifier);
+        PoxPayloadOut multipart = createInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -668,7 +668,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         IntakeClient client = new IntakeClient();
-        PoxPayloadOut multipart = createIntakeInstance(NON_EXISTENT_ID);
+        PoxPayloadOut multipart = createInstance(NON_EXISTENT_ID);
         ClientResponse<String> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -715,7 +715,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
-
+    
     // Failure outcomes
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
@@ -791,7 +791,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private PoxPayloadOut createIntakeInstance(String identifier) {
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
         return createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,

@@ -27,7 +27,6 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -37,12 +36,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-
-
 
 /**
  * @version $Revision:$
@@ -50,7 +46,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/accounts/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface AccountProxy extends CollectionSpaceProxy {
+public interface AccountProxy extends CollectionSpaceProxy<AccountsCommonList> {
 
     @GET
     @Produces({"application/xml"})
@@ -72,5 +68,5 @@ public interface AccountProxy extends CollectionSpaceProxy {
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<AccountsCommon> update(@PathParam("csid") String csid, AccountsCommon multipart);
+    ClientResponse<AccountsCommon> update(@PathParam("csid") String csid, AccountsCommon multipart);    
 }

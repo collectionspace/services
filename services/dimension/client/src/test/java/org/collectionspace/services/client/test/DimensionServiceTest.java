@@ -757,15 +757,6 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
-
-    @Override
-    protected String createWorkflowTarget(String testName) throws Exception {
-    	String result = null;
-    	
-    	result = createTestObject(testName);
-    	
-    	return result;
-    }
 	
 	@Override
     protected String createTestObject(String testName) throws Exception {

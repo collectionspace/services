@@ -8,6 +8,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.location.LocationauthoritiesCommonList;
 import org.collectionspace.services.location.LocationsCommonList;
 
@@ -48,5 +49,11 @@ public interface LocationAuthorityProxy extends AuthorityProxy<Locationauthoriti
     		@PathParam("specifier") String specifier,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
+    
+    @Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<LocationauthoritiesCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
     
 }

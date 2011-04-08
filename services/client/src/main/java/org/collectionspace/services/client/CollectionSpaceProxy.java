@@ -46,7 +46,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * The Interface CollectionSpaceProxy.
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public interface CollectionSpaceProxy {
+public interface CollectionSpaceProxy<LT> {
 
     //(D)elete
     @DELETE
@@ -87,7 +87,7 @@ public interface CollectionSpaceProxy {
     ClientResponse<AbstractCommonList> readList(
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
     	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);
-	
+        
     /**
      * Read list.
      * @param sortBy 

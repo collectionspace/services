@@ -19,4 +19,6 @@ public interface CollectionSpacePoxClient<LT extends AbstractCommonList, P exten
     public ClientResponse<String> read(String csid);
 
     public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload);
+    
+    public ClientResponse<LT> readIncludeDeleted(Boolean includeDeleted);
 }

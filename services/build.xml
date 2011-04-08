@@ -149,6 +149,7 @@
             description="deploy services in ${jboss.server.cspace}">
         <ant antfile="authentication/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="authorization/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="authority/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="blob/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="workflow/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="common/build.xml" target="deploy" inheritAll="false"/>
@@ -201,6 +202,7 @@
         <ant antfile="media/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="blob/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="workflow/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="authority/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authorization/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="undeploy" inheritAll="false"/>
     </target>
@@ -215,6 +217,7 @@
             description="create distribution for services">
         <ant antfile="authentication/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="authorization/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="authority/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="account/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="blob/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="workflow/build.xml" target="dist" inheritAll="false"/>

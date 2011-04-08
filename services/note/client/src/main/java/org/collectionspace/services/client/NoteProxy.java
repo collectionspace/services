@@ -19,7 +19,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/notes/")
 @Produces({"application/xml;charset=UTF-8"})
 @Consumes({"application/xml"})
-public interface NoteProxy extends CollectionSpaceProxy {
+public interface NoteProxy extends CollectionSpaceProxy<NotesCommonList> {
 
     @GET
     @Produces({"application/xml"})

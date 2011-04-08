@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * @param <CommonListType> 
  * @param <ListType> 
  */
-public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpaceProxy>
+public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpaceProxy<LT>>
 	implements CollectionSpaceClient<LT, P> {
 
     /** The logger. */

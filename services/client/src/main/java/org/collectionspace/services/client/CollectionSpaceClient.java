@@ -32,7 +32,7 @@ import org.jboss.resteasy.client.ClientResponse;
 /**
  *
  */
-public interface CollectionSpaceClient<LT, P extends CollectionSpaceProxy> {
+public interface CollectionSpaceClient<LT, P extends CollectionSpaceProxy<LT>> {
 
     public static final String AUTH_PROPERTY = "cspace.auth";
     public static final String PASSWORD_PROPERTY = "cspace.password";

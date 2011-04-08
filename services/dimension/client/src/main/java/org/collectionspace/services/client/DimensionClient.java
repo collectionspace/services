@@ -63,10 +63,5 @@ public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionsComm
     public ClientResponse<DimensionsCommonList> readList() {
     	DimensionProxy proxy = (DimensionProxy)getProxy();
     	return proxy.readList();
-    } 
-	
-    public ClientResponse<DimensionsCommonList> readIncludeDeleted(Boolean includeDeleted) { //FIXME: REM - This should be defined in the base class with a generic return list type
-    	DimensionProxy proxy = (DimensionProxy)getProxy();
-    	return proxy.readIncludeDeleted(includeDeleted.toString());
-    } 
+    }	
 }

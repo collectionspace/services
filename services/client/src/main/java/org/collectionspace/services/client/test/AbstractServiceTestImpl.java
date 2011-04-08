@@ -31,6 +31,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.collectionspace.services.client.AbstractPoxServiceClientImpl;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.CollectionSpacePoxClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -455,9 +456,11 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
      */
     private AbstractCommonList readList(String testName,
                     CollectionSpaceClient client,
-                    long pageSize, long pageNumber) throws Exception {
+                    long pageSize,
+                    long pageNumber,
+                    int expectedStatus) throws Exception {
 
-        return readList(testName, client, EMPTY_SORT_BY_ORDER, pageSize, pageNumber);
+        return readList(testName, client, EMPTY_SORT_BY_ORDER, pageSize, pageNumber, expectedStatus);
 
     }
     /**
@@ -472,8 +475,11 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
      * @throws Exception the exception
      */
     private AbstractCommonList readList(String testName,
-                    CollectionSpaceClient client, String sortBy,
-                    long pageSize, long pageNumber) throws Exception {
+                    CollectionSpaceClient client,
+                    String sortBy,
+                    long pageSize,
+                    long pageNumber,
+                    int expectedStatus) throws Exception {
         ClientResponse<AbstractCommonList> response =
                 client.readList(sortBy, pageSize, pageNumber);
         AbstractCommonList result = null;
@@ -485,9 +491,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
             if (getLogger().isDebugEnabled()) {
                     getLogger().debug(testName + ": status = " + statusCode);
             }
-            Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
-                            invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
+            Assert.assertEquals(statusCode, expectedStatus);
 
             result = this.getAbstractCommonList(response);
         } finally {
@@ -563,10 +567,19 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
         // Get the current total number of items.
         // If there are no items then create some
-        AbstractCommonList list = (AbstractCommonList) this.readList(testName, client, 1 /*pgSz*/, 0 /*pgNum*/);
+        AbstractCommonList list = (AbstractCommonList) this.readList(testName,
+        		client,
+        		1 /*pgSz*/,
+        		0 /*pgNum*/,
+        		EXPECTED_STATUS_CODE);
         if (list == null || list.getTotalItems() == 0) {
         	this.createPaginatedList(testName, DEFAULT_PAGINATEDLIST_SIZE);
-        	list = (AbstractCommonList) this.readList(testName, client, 1 /*pgSz*/, 0 /*pgNum*/);
+            setupReadList();
+        	list = (AbstractCommonList) this.readList(testName,
+        			client,
+        			1 /*pgSz*/,
+        			0 /*pgNum*/,
+        			EXPECTED_STATUS_CODE);
         }
 
         // Print out the current list size to be paginated
@@ -581,7 +594,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         long pageSize = totalItems / 3; //create up to 3 pages to iterate over
         long pagesTotal = pageSize > 0 ? (totalItems / pageSize) : 0;
         for (int i = 0; i < pagesTotal; i++) {
-        	list = (AbstractCommonList) this.readList(testName, client, pageSize, i);
+        	list = (AbstractCommonList) this.readList(testName, client, pageSize, i, EXPECTED_STATUS_CODE);
         	assertPaginationInfo(testName,
         			list,
         			i,			//expected page number
@@ -593,7 +606,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         // if there are any remainders be sure to paginate them as well
         long mod = pageSize != 0 ? totalItems % pageSize : totalItems;
         if (mod != 0) {
-        	list = (AbstractCommonList) this.readList(testName, client, pageSize, pagesTotal);
+        	list = (AbstractCommonList) this.readList(testName, client, pageSize, pagesTotal, EXPECTED_STATUS_CODE);
         	assertPaginationInfo(testName,
         			list,
         			pagesTotal, //expected page number
@@ -642,16 +655,121 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
     }
     
+	protected long readIncludeDeleted(String testName, Boolean includeDeleted) {
+		long result = 0;
+        // Perform setup.
+        setupReadList();
+
+        //
+        // Check to see if we have a POX client
+        //
+        CollectionSpaceClient clientCandidate = this.getClientInstance();
+        if (CollectionSpacePoxClient.class.isInstance(clientCandidate) != true) {  //FIXME: REM - We should remove this check and instead make CollectionSpaceClient support the readIncludeDeleted() method.
+        	String msg = "Workflow tests are incomplete because " +
+        	clientCandidate.getClass().getName() + " does not support readIncludeDeleted() method.";
+        	logger.warn(msg);
+        	throw new UnsupportedOperationException();
+        }
+        
+        //
+        // Ask for a list of all resources filtered by the incoming 'includeDeleted' workflow param
+        //
+        CollectionSpacePoxClient client = (CollectionSpacePoxClient)clientCandidate;
+        ClientResponse<AbstractCommonList> res = client.readIncludeDeleted(includeDeleted);
+        AbstractCommonList list = res.getEntity();
+        int statusCode = res.getStatus();
+        //
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        //
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        //
+        // Now check that list size is correct
+        //
+        /*
+        List<AbstractCommonList.ListItem> items =
+            list.getListItem();
+        result = items.size();
+        */
+        result = list.getTotalItems();
+        
+        return result;
+	}
+	
+	/*
+	 * This test assumes that no objects exist yet.
+	 * 
+	 * http://localhost:8180/cspace-services/intakes?wf_deleted=false
+	 */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+	public void readWorkflow(String testName) throws Exception {
+    	try {
+    		//
+    		// Get the total count of non-deleted existing records
+    		//
+    		long existingRecords = readIncludeDeleted(testName, Boolean.FALSE);
+
+    		//
+    		// Create 3 new objects
+    		//
+    		final int OBJECTS_TO_CREATE = 3;
+    		for (int i = 0; i < OBJECTS_TO_CREATE; i++) {
+    			this.createWorkflowTarget(testName);
+    		}
+
+    		//
+    		// Mark one as soft deleted
+    		//
+    		int existingTestCreated = allResourceIdsCreated.size(); // assumption is that no other test created records were soft deleted
+    		String csid = allResourceIdsCreated.get(existingTestCreated - 1); //0-based index to get the last one added
+    		this.setupUpdate();
+    		this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
+    		//
+    		// Read the list of existing non-deleted records
+    		//
+    		long updatedTotal = readIncludeDeleted(testName, Boolean.FALSE);
+    		Assert.assertEquals(updatedTotal, existingRecords + OBJECTS_TO_CREATE - 1, "Deleted items seem to be returned in list results.");
+    	} catch (UnsupportedOperationException e) {
+    		logger.warn(this.getClass().getName() + " did not implement createWorkflowTarget() method.  No workflow tests performed.");
+    		return;
+    	}
+	}
+
+    protected String createTestObject(String testName) throws Exception {
+		String result = null;
+		
+		CollectionSpacePoxClient client = (CollectionSpacePoxClient)getClientInstance();
+        String identifier = createIdentifier();
+        PoxPayloadOut multipart = createInstance(identifier);
+        ClientResponse<Response> res = client.create(multipart);
+
+        int statusCode = res.getStatus();
+        Assert.assertEquals(statusCode, STATUS_CREATED);
+
+        result = extractId(res);
+        allResourceIdsCreated.add(result);
+
+        return result;
+	}
+    
+    protected String createWorkflowTarget(String testName) throws Exception {
+    	String result = null;
+    	
+    	result = createTestObject(testName);
+    	
+    	return result;
+    }
+    
     /*
      * Sub-classes must override for the workflow tests.
      */
     
-    protected String createWorkflowTarget(String testName) throws Exception {
-    	logger.warn("Sub-class test clients should override this method");
-    	throw new UnsupportedOperationException();
-    }
-    
-    protected String createTestObject(String testName) throws Exception {
+    protected PoxPayloadOut createInstance(String identifier) {
     	logger.warn("Sub-class test clients should override this method");
     	throw new UnsupportedOperationException();
     }

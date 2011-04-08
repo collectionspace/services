@@ -11,7 +11,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/idgenerators/")
 @Produces({"application/xml"})
 @Consumes({"text/plain"})
-public interface IdProxy extends CollectionSpaceProxy {
+public interface IdProxy extends CollectionSpaceProxy<String> {
 
     @GET
     @Produces({"application/xml"})

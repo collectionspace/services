@@ -24,13 +24,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
@@ -79,12 +83,36 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     	
     }
 
+    public void assertWorkflowState(ServiceContext ctx,
+    		DocumentModel docModel) throws DocumentNotFoundException, ClientException {
+    	MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+    	if (queryParams != null) {
+	    	//
+	    	// Look for the workflow "delete" query param and see if we need to assert that the
+	    	// docModel is in a non-deleted workflow state.
+	    	//
+    		String currentState = docModel.getCurrentLifeCycleState();
+	        String includeDeletedStr = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
+	        boolean includeDeleted = Boolean.parseBoolean(includeDeletedStr);
+	    	if (includeDeleted == false) {
+	    		//
+	    		// We don't wanted soft-deleted object, so throw an exception if this one is soft-deleted.
+	    		//
+	    		if (currentState.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+	    			String msg = "GET assertion that docModel not be in 'deleted' workflow state failed.";
+	    			logger.debug(msg);
+	    			throw new DocumentNotFoundException(msg);
+	    		}
+	    	}
+    	}
+    }
+    
     /**
      * Sets the collection space core values.
      *
      * @param ctx the ctx
      * @param documentModel the document model
-     * @throws ClientException the client exception
+     * @throws ClientException the client exception	//FIXME: REM - This behavior needs to be part of the base DocumentHandler classes, so our JPA services get this behavior as well
      */
     private void setCollectionSpaceCoreValues(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             DocumentModel documentModel,
@@ -222,17 +250,18 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             handler.prepare(Action.GET);
             repoSession = getRepositorySession();
             DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
-            DocumentModel doc = null;
+            DocumentModel docModel = null;
             try {
-                doc = repoSession.getDocument(docRef);
+            	docModel = repoSession.getDocument(docRef);
+                assertWorkflowState(ctx, docModel);
             } catch (ClientException ce) {
-                String msg = "could not find document with id=" + id;
+                String msg = "Could not find document with id=" + id;
                 logger.error(msg, ce);
                 throw new DocumentNotFoundException(msg, ce);
             }
             //set reposession to handle the document
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-            DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
+            DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(docModel);
             handler.handle(Action.GET, wrapDoc);
             handler.complete(Action.GET, wrapDoc);
         } catch (IllegalArgumentException iae) {
