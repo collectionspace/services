@@ -8,6 +8,7 @@
     <project>org.collectionspace.services.authorization.jaxb</project>
     <project>org.collectionspace.services.authorization.service</project>
     <project>org.collectionspace.services.client</project>
+    <project>org.collectionspace.services.common-api</project>
     <project>org.collectionspace.services.hyperjaxb</project>
     <project>org.collectionspace.services.jaxb</project>
   </projects>

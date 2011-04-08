@@ -4,10 +4,15 @@
   <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar" sourcepath="M2_REPO/javax/activation/activation/1.1/activation-1.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/script/bsh-engine/1.0/bsh-engine-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/media/jai_core/1.1.2_01/jai_core-1.1.2_01.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/xml/bind/jaxb-api/2.1/jaxb-api-2.1.jar" sourcepath="M2_REPO/javax/xml/bind/jaxb-api/2.1/jaxb-api-2.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/script/jexl-engine/1.0/jexl-engine-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/script/jruby-engine/1.0/jruby-engine-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/script/js-engine/1.0/js-engine-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.jar" sourcepath="M2_REPO/javax/annotation/jsr250-api/1.0/jsr250-api-1.0-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/transaction/jta/1.1/jta-1.1.jar" sourcepath="M2_REPO/javax/transaction/jta/1.1/jta-1.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/script/jython-engine/1.0/jython-engine-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar" sourcepath="M2_REPO/javax/mail/mail/1.4/mail-1.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar" sourcepath="M2_REPO/javax/persistence/persistence-api/1.0/persistence-api-1.0-sources.jar">
     <attributes>
@@ -26,9 +31,13 @@
       <attribute value="jar:file:/C:/Documents%20and%20Settings/remillet/.m2/repository/org/apache/james/apache-mime4j/0.6/apache-mime4j-0.6-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/asm/asm/2.2.3/asm-2.2.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/asm/asm-commons/2.2.3/asm-commons-2.2.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/asm/asm-tree/2.2.3/asm-tree-2.2.3.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjrt/1.6.8/aspectjrt-1.6.8.jar" sourcepath="M2_REPO/org/aspectj/aspectjrt/1.6.8/aspectjrt-1.6.8-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjweaver/1.6.8/aspectjweaver-1.6.8.jar" sourcepath="M2_REPO/org/aspectj/aspectjweaver/1.6.8/aspectjweaver-1.6.8-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/avalon-framework/avalon-framework/4.1.3/avalon-framework-4.1.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/bouncycastle/bcmail-jdk14/138/bcmail-jdk14-138.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcmail-jdk14/1.38/bcmail-jdk14-1.38.jar"/>
   <classpathentry kind="var" path="M2_REPO/bouncycastle/bcprov-jdk14/138/bcprov-jdk14-138.jar"/>
@@ -120,6 +129,8 @@
   <classpathentry kind="var" path="M2_REPO/jfree/jfreechart/1.0.12/jfreechart-1.0.12.jar"/>
   <classpathentry kind="var" path="M2_REPO/jline/jline/0.9.94/jline-0.9.94.jar"/>
   <classpathentry kind="var" path="M2_REPO/joda-time/joda-time/1.6/joda-time-1.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jruby/jruby/1.0.3/jruby-1.0.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/rhino/js/1.7R1/js-1.7R1.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/jcraft/jsch/0.1.27/jsch-0.1.27.jar" sourcepath="M2_REPO/com/jcraft/jsch/0.1.27/jsch-0.1.27-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Documents%20and%20Settings/remillet/.m2/repository/com/jcraft/jsch/0.1.27/jsch-0.1.27-javadoc.jar!/" name="javadoc_location"/>
@@ -131,6 +142,7 @@
       <attribute value="jar:file:/C:/Documents%20and%20Settings/remillet/.m2/repository/junit/junit/4.1/junit-4.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/python/jython/2.2.1/jython-2.2.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar" sourcepath="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/logkit/logkit/1.0.1/logkit-1.0.1.jar" sourcepath="M2_REPO/logkit/logkit/1.0.1/logkit-1.0.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/maven/maven-artifact/2.0.6/maven-artifact-2.0.6.jar" sourcepath="M2_REPO/org/apache/maven/maven-artifact/2.0.6/maven-artifact-2.0.6-sources.jar">
@@ -232,19 +244,26 @@
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/core/nuxeo-core-query/1.6.2/nuxeo-core-query-1.6.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/core/nuxeo-core-schema/1.6.2/nuxeo-core-schema-1.6.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/core/nuxeo-core-storage-sql/1.6.2/nuxeo-core-storage-sql-1.6.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-api/5.3.2/nuxeo-platform-api-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-commandline-executor/5.3.2/nuxeo-platform-commandline-executor-5.3.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-directory-api/5.3.2/nuxeo-platform-directory-api-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-filemanager-api/5.3.2/nuxeo-platform-filemanager-api-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-filemanager-core/5.3.2/nuxeo-platform-filemanager-core-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-forms-layout-api/5.3.2/nuxeo-platform-forms-layout-api-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-imaging-api/5.3.2/nuxeo-platform-imaging-api-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-imaging-core/5.3.2/nuxeo-platform-imaging-core-5.3.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-login/5.3.2/nuxeo-platform-login-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-mimetype-api/5.3.2/nuxeo-platform-mimetype-api-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-search-api/5.3.2/nuxeo-platform-search-api-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-types-api/5.3.2/nuxeo-platform-types-api-5.3.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-usermanager-api/5.3.2/nuxeo-platform-usermanager-api-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-platform-versioning-api/5.3.2/nuxeo-platform-versioning-api-5.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/runtime/nuxeo-runtime/1.6.2/nuxeo-runtime-1.6.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/nuxeo/runtime/nuxeo-runtime-jtajca/1.6.2/nuxeo-runtime-jtajca-1.6.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/runtime/nuxeo-runtime-management/1.6.2/nuxeo-runtime-management-1.6.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/runtime/nuxeo-runtime-osgi/1.6.2/nuxeo-runtime-osgi-1.6.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/nuxeo/runtime/nuxeo-runtime-scripting/1.6.2/nuxeo-runtime-scripting-1.6.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/nuxeo/ecm/platform/nuxeo-shell-core/5.3.2/nuxeo-shell-core-5.3.2.jar" sourcepath="M2_REPO/org/nuxeo/ecm/platform/nuxeo-shell-core/5.3.2/nuxeo-shell-core-5.3.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/net/java/dev/mistral/Operations/0.9.5/Operations-0.9.5.jar"/>
   <classpathentry kind="src" path="/org.collectionspace.services.3rdparty.nuxeo.quote-api"/>
   <classpathentry kind="src" path="/org.collectionspace.services.account.jaxb"/>
@@ -263,6 +282,7 @@
   <classpathentry kind="src" path="/org.collectionspace.services.collectionobject.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.collectionobject.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.common"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.common-api"/>
   <classpathentry kind="src" path="/org.collectionspace.services.contact.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.contact.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.contact.service"/>
@@ -270,6 +290,8 @@
   <classpathentry kind="src" path="/org.collectionspace.services.dimension.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.hyperjaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.id.service"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.imports.jaxb"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.imports.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.intake.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.intake.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.intake.service"/>

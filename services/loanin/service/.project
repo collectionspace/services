@@ -6,6 +6,7 @@
     <project>org.collectionspace.services.client</project>
     <project>org.collectionspace.services.collectionobject.jaxb</project>
     <project>org.collectionspace.services.common</project>
+    <project>org.collectionspace.services.common-api</project>
     <project>org.collectionspace.services.hyperjaxb</project>
     <project>org.collectionspace.services.jaxb</project>
     <project>org.collectionspace.services.loanin.jaxb</project>

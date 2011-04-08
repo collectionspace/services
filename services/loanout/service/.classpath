@@ -223,6 +223,7 @@
   <classpathentry kind="src" path="/org.collectionspace.services.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.collectionobject.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.common"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.common-api"/>
   <classpathentry kind="src" path="/org.collectionspace.services.hyperjaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.loanout.jaxb"/>

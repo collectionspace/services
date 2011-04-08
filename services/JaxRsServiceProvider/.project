@@ -19,6 +19,7 @@
     <project>org.collectionspace.services.collectionobject.jaxb</project>
     <project>org.collectionspace.services.collectionobject.service</project>
     <project>org.collectionspace.services.common</project>
+    <project>org.collectionspace.services.common-api</project>
     <project>org.collectionspace.services.contact.client</project>
     <project>org.collectionspace.services.contact.jaxb</project>
     <project>org.collectionspace.services.contact.service</project>
@@ -26,6 +27,8 @@
     <project>org.collectionspace.services.dimension.service</project>
     <project>org.collectionspace.services.hyperjaxb</project>
     <project>org.collectionspace.services.id.service</project>
+    <project>org.collectionspace.services.imports.jaxb</project>
+    <project>org.collectionspace.services.imports.service</project>
     <project>org.collectionspace.services.intake.client</project>
     <project>org.collectionspace.services.intake.jaxb</project>
     <project>org.collectionspace.services.intake.service</project>
