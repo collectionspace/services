@@ -8,9 +8,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 
+import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
 
@@ -34,5 +35,11 @@ public interface BlobProxy extends CollectionSpacePoxProxy<AbstractCommonList> {
     // List
     @GET
     @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> readList();    
+    ClientResponse<AbstractCommonList> readList();
+    
+    @Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<AbstractCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
 }

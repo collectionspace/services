@@ -5,7 +5,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.contact.ContactsCommonList;
 
 /**
@@ -17,4 +19,10 @@ import org.collectionspace.services.contact.ContactsCommonList;
 public interface ContactProxy extends CollectionSpacePoxProxy<ContactsCommonList> {
     @GET
     ClientResponse<ContactsCommonList> readList();
+
+    @Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<ContactsCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
 }

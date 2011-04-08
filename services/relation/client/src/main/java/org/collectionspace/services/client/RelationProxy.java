@@ -7,6 +7,7 @@ import javax.ws.rs.Produces;
 
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.common.relation.IRelationsManager;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 
 import org.jboss.resteasy.client.ClientResponse;
 import javax.ws.rs.QueryParam;
@@ -22,6 +23,12 @@ public interface RelationProxy extends CollectionSpacePoxProxy<RelationsCommonLi
     @GET
     @Produces({"application/xml"})
     ClientResponse<RelationsCommonList> readList();
+    
+    @Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<RelationsCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);        
     
     @GET
     @Produces({"application/xml"})

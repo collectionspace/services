@@ -9,6 +9,8 @@ import javax.ws.rs.QueryParam;
 
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
@@ -23,6 +25,12 @@ public interface PersonAuthorityProxy extends AuthorityWithContactsProxy<Persona
     @GET
     ClientResponse<PersonauthoritiesCommonList> readList();
 
+    @Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<PersonauthoritiesCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
+    
     /*
      * List results that must be overridden for the RESTEasy proxy generation to work correctly.
      */

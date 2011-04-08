@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.BlobClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 
 /**
  * @version $Revision: 2108 $
@@ -28,6 +29,12 @@ public interface MediaProxy extends CollectionSpacePoxProxy<AbstractCommonList> 
     @Consumes("multipart/form-data")
     ClientResponse<Response> createBlobFromFormData(@PathParam("csid") String csid,
     		MultipartFormDataOutput formDataOutput);
+    
+    @Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<AbstractCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
     
     @POST
     @Path("/{csid}")

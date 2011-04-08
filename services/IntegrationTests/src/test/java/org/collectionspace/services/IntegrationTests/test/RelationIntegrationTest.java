@@ -188,7 +188,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         }
 	}
 	
-	@Test
+//	@Test
 	public void relateCollectionObjectsToIntake() {
 		relateCollectionObjectsToIntake(OBJECTS_TO_INTAKE);
 	}

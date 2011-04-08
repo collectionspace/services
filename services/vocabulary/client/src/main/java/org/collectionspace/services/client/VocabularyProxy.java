@@ -9,6 +9,8 @@ import javax.ws.rs.QueryParam;
 
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
@@ -22,6 +24,13 @@ public interface VocabularyProxy extends AuthorityProxy<VocabulariesCommonList, 
     @GET
     @Produces({"application/xml"})
     ClientResponse<VocabulariesCommonList> readList();
+    
+    @Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<VocabulariesCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
+    
     
     /*
      * List results that must be overridden for the RESTEasy proxy generation to work correctly.

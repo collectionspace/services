@@ -8,9 +8,12 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.note.NotesCommonList;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
@@ -24,7 +27,7 @@ public interface NoteProxy extends CollectionSpaceProxy<NotesCommonList> {
     @GET
     @Produces({"application/xml"})
     ClientResponse<NotesCommonList> readList();
-
+    
     //(C)reate
     @POST
     ClientResponse<Response> create(String payload);

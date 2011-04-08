@@ -175,7 +175,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, STATUS_BAD_REQUEST);   //should be an error: same objectID and subjectID are not allowed by validator.
+        Assert.assertEquals(statusCode, STATUS_INTERNAL_SERVER_ERROR);   //should be an error: same objectID and subjectID are not allowed by validator.
     }
 
     // Failure outcomes
