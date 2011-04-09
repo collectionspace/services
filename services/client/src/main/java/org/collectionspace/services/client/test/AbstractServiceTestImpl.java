@@ -665,8 +665,12 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         //
         CollectionSpaceClient clientCandidate = this.getClientInstance();
         if (CollectionSpacePoxClient.class.isInstance(clientCandidate) != true) {  //FIXME: REM - We should remove this check and instead make CollectionSpaceClient support the readIncludeDeleted() method.
+        	String clientCandidateName = "Unknown";
+        	if (clientCandidate != null) {
+        		clientCandidateName = clientCandidate.getClass().getName();
+        	}
         	String msg = "Workflow tests are incomplete because " +
-        	clientCandidate.getClass().getName() + " does not support readIncludeDeleted() method.";
+        		clientCandidateName + " does not support readIncludeDeleted() method.";
         	logger.warn(msg);
         	throw new UnsupportedOperationException();
         }
