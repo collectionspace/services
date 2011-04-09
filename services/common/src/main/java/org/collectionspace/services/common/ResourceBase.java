@@ -242,9 +242,9 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     //======================= GET without csid. List, search, etc. =====================================
 
 	@GET
-	public AbstractCommonList getList(@Context UriInfo ui,
-			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+	public AbstractCommonList getList(@Context UriInfo ui) {
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
 		if (keywords != null) {
 			return search(queryParams, keywords);
 		} else {

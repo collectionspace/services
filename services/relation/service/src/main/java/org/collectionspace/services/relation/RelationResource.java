@@ -71,15 +71,18 @@ public class RelationResource extends ResourceBase {
     	return RelationsCommon.class;
     }
 
+	@Override
 	@GET
 	@Produces("application/xml")
-	public RelationsCommonList getRelationList(@Context UriInfo ui,
-			@QueryParam(IRelationsManager.SUBJECT_QP) String subjectCsid,
-			@QueryParam(IRelationsManager.SUBJECT_TYPE_QP) String subjectType,
-			@QueryParam(IRelationsManager.PREDICATE_QP) String predicate,
-			@QueryParam(IRelationsManager.OBJECT_QP) String objectCsid,
-			@QueryParam(IRelationsManager.OBJECT_TYPE_QP) String objectType) {
+	public RelationsCommonList getList(@Context UriInfo ui) {
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+
+		String subjectCsid = queryParams.getFirst(IRelationsManager.SUBJECT_QP);
+		String subjectType = queryParams.getFirst(IRelationsManager.SUBJECT_TYPE_QP);
+		String predicate = queryParams.getFirst(IRelationsManager.PREDICATE_QP);
+		String objectCsid = queryParams.getFirst(IRelationsManager.OBJECT_QP);
+		String objectType = queryParams.getFirst(IRelationsManager.OBJECT_TYPE_QP);
+
 		return this.getRelationList(queryParams, subjectCsid, subjectType, predicate, objectCsid, objectType);
 	}
 
