@@ -153,6 +153,18 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         return response.getEntity(LocationsCommonList.class);
     }
 
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	LocationAuthorityClient client = new LocationAuthorityClient();
+        String shortId = createIdentifier();
+    	String displayName = "displayName-" + shortId;
+    	String baseRefName = LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
+    	PoxPayloadOut multipart = 
+            LocationAuthorityClientUtils.createLocationAuthorityInstance(
+    	    displayName, shortId, client.getCommonPartName());
+    	return multipart;
+    }
+        
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------

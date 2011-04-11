@@ -259,11 +259,14 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
 	@GET
 	@Path("{csid}")
-	public byte[] getAuthority(@PathParam("csid") String specifier) {
+	public byte[] getAuthority(
+    		@Context UriInfo ui,
+			@PathParam("csid") String specifier) {
 		PoxPayloadOut result = null;
 		try {
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 			Specifier spec = getSpecifier(specifier, "getAuthority", "GET");
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			if(spec.form == SpecifierForm.CSID) {
 				if (logger.isDebugEnabled()) {

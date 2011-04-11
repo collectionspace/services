@@ -100,6 +100,16 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         return response.getEntity(VocabulariesCommonList.class);
     }
 
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	VocabularyClient client = new VocabularyClient();
+        String displayName = "displayName-" + identifier;
+        PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
+                displayName, identifier, client.getCommonPartName());
+        return multipart;
+    }
+    
+    
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------

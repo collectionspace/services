@@ -770,6 +770,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         return LoanoutClient.SERVICE_PATH_COMPONENT;
     }
 
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	return createLoanoutInstance(identifier);
+    }
+    
     /**
      * Creates the loanout instance.
      *

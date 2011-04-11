@@ -98,8 +98,7 @@ public class WorkflowResource extends ResourceBase {
 	 */
 	@Override
 	@GET
-	public AbstractCommonList getList(@Context UriInfo ui,
-			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+	public AbstractCommonList getList(@Context UriInfo ui) {
 		Response response = Response.status(Response.Status.BAD_REQUEST)
 				.entity(ServiceMessages.GET_LIST_UNSUPPORTED).type("text/plain")
 				.build();

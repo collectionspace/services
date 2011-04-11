@@ -89,6 +89,14 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         return response.getEntity(ContactsCommonList.class);
     }
 
+//    @Override
+//    protected PoxPayloadOut createInstance(String identifier) {
+//    	ContactClient client = new ContactClient();
+//        PoxPayloadOut multipart =
+//            ContactClientUtils.createContactInstance(identifier, client.getCommonPartName());
+//        return multipart;
+//    }
+        
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------

@@ -37,11 +37,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
 import org.collectionspace.services.loanin.LoansinCommon;
-//import org.collectionspace.services.loanin.LoansinCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
-//import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
@@ -797,6 +795,11 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         return SERVICE_PATH_COMPONENT;
     }
 
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	return createLoaninInstance(identifier);
+    }
+    
     /**
      * Creates the loanin instance.
      *

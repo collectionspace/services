@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ns2:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/collectionobject">
-  <objectNumber>objectNumber</objectNumber>
-  <otherNumber>XXX</otherNumber>
-  <otherNumberType>otherNumberType</otherNumberType>
-  <distinguishingFeatures>This is an UPDATEd distFeatures</distinguishingFeatures>
-  <titleGroupList><titleGroup><title>NEW TITLE UPDATED</title></titleGroup></titleGroupList>
-</ns2:collectionobjects_common>

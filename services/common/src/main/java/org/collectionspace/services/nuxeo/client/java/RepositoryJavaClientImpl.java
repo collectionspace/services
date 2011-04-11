@@ -93,7 +93,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 	    	//
     		String currentState = docModel.getCurrentLifeCycleState();
 	        String includeDeletedStr = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
-	        boolean includeDeleted = Boolean.parseBoolean(includeDeletedStr);
+	        boolean includeDeleted = includeDeletedStr == null ? true : Boolean.parseBoolean(includeDeletedStr);
 	    	if (includeDeleted == false) {
 	    		//
 	    		// We don't wanted soft-deleted object, so throw an exception if this one is soft-deleted.

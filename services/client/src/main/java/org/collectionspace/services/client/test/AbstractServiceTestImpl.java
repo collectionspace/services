@@ -655,14 +655,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
     }
     
-	protected long readIncludeDeleted(String testName, Boolean includeDeleted) {
-		long result = 0;
-        // Perform setup.
-        setupReadList();
-
-        //
-        // Check to see if we have a POX client
-        //
+    private CollectionSpacePoxClient assertPoxCandidate() {
         CollectionSpaceClient clientCandidate = this.getClientInstance();
         if (CollectionSpacePoxClient.class.isInstance(clientCandidate) != true) {  //FIXME: REM - We should remove this check and instead make CollectionSpaceClient support the readIncludeDeleted() method.
         	String clientCandidateName = "Unknown";
@@ -674,11 +667,18 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         	logger.warn(msg);
         	throw new UnsupportedOperationException();
         }
-        
+        return (CollectionSpacePoxClient)clientCandidate;
+    }
+    
+	protected long readIncludeDeleted(String testName, Boolean includeDeleted) {
+		long result = 0;
+        // Perform setup.
+        setupReadList();
+
         //
         // Ask for a list of all resources filtered by the incoming 'includeDeleted' workflow param
         //
-        CollectionSpacePoxClient client = (CollectionSpacePoxClient)clientCandidate;
+        CollectionSpacePoxClient client = assertPoxCandidate();
         ClientResponse<AbstractCommonList> res = client.readIncludeDeleted(includeDeleted);
         AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -738,6 +738,15 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     		//
     		long updatedTotal = readIncludeDeleted(testName, Boolean.FALSE);
     		Assert.assertEquals(updatedTotal, existingRecords + OBJECTS_TO_CREATE - 1, "Deleted items seem to be returned in list results.");
+    		
+    		//
+    		// Next, test that a GET with WorkflowClient.WORKFLOWSTATE_DELETED query param set to 'false' returns a 404
+    		//
+    		CollectionSpacePoxClient client = this.assertPoxCandidate();
+            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
+            int result = res.getStatus();
+            Assert.assertEquals(result, STATUS_NOT_FOUND);
+            
     	} catch (UnsupportedOperationException e) {
     		logger.warn(this.getClass().getName() + " did not implement createWorkflowTarget() method.  No workflow tests performed.");
     		return;
@@ -772,7 +781,6 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     /*
      * Sub-classes must override for the workflow tests.
      */
-    
     protected PoxPayloadOut createInstance(String identifier) {
     	logger.warn("Sub-class test clients should override this method");
     	throw new UnsupportedOperationException();

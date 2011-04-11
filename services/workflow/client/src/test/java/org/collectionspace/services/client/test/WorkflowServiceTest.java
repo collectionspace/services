@@ -78,57 +78,6 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
         return response.getEntity(AbstractCommonList.class);
     }
 
-//    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-//    public void create(String testName) throws Exception {
-//        logger.debug(testBanner(testName, CLASS_NAME));
-//        setupCreate();
-//        WorkflowClient client = new WorkflowClient();
-//        PoxPayloadOut multipart = createObjectExitInstance(createIdentifier());
-//        ClientResponse<Response> res = client.create(multipart);
-//        assertStatusCode(res, testName);
-//        if (knownResourceId == null) {
-//            knownResourceId = extractId(res);  // Store the ID returned from the first resource created for additional tests below.
-//            logger.debug(testName + ": knownResourceId=" + knownResourceId);
-//        }
-//        allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
-//    }
-    
-    
-    /*
-     * Create a Dimension instance to use as our test target.
-     */
-    @Override
-    protected String createWorkflowTarget(String testName) throws Exception {
-    	String result = null;
-    	
-    	result = createTestObject(testName);
-    	
-    	return result;
-    }
-    
-    /*
-     * Create a Dimension instance to use as our test target.
-     */
-    protected String createTestObject(String testName) throws Exception {
-    	String result = null;
-    	
-    	logger.debug(testBanner(testName, CLASS_NAME));
-    	setupCreate();
-    	DimensionClient client = new DimensionClient();
-    	PoxPayloadOut multipart = createDimensionInstance(createIdentifier());
-    	ClientResponse<Response> res = client.create(multipart);
-    	assertStatusCode(res, testName);
-    	if (knownResourceId == null) {
-    		knownResourceId = extractId(res);  // Store the ID returned from the first resource created for additional tests below.
-    		logger.debug(testName + ": knownResourceId=" + knownResourceId);
-    	}
-    	result = extractId(res);
-    	allResourceIdsCreated.add(result); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
-    	
-    	return result;
-    }
-
     @Override
     public void createList(String testName) throws Exception {
     	//empty N/A
@@ -274,6 +223,12 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	return createDimensionInstance(identifier);
+    }    
+    
     private PoxPayloadOut createDimensionInstance(String dimensionValue) {
         String value = "dimensionValue-" + dimensionValue;
         String dimensionsCommonPartName = new DimensionClient().getCommonPartName();
@@ -294,7 +249,10 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
 	@Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
 	public void create(String testName) throws Exception {
-		this.createTestObject(testName);
+		String csid = this.createTestObject(testName);
+		if (this.knownResourceId == null) {
+			this.knownResourceId = csid;
+		}
 	}
 
 	

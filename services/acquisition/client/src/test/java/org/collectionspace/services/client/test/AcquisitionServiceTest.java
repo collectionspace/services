@@ -35,14 +35,10 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionDateList;
-import org.collectionspace.services.acquisition.AcquisitionFunding;
-import org.collectionspace.services.acquisition.AcquisitionFundingList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -792,6 +788,11 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     // Utility methods used by tests above
     // ---------------------------------------------------------------
 
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	return createAcquisitionInstance(identifier);
+    }
+        
     /**
      * Creates the acquisition instance.
      *

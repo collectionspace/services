@@ -80,6 +80,12 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
         return response.getEntity(ReportsCommonList.class);
     }
 
+//    @Override
+//    protected PoxPayloadOut createInstance(String identifier) {
+//        PoxPayloadOut multipart = createReportInstance(identifier);
+//        return multipart;
+//    }
+        
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -469,7 +475,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "readWorkflow"})
     public void delete(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

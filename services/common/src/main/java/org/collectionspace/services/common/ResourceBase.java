@@ -192,11 +192,14 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     @GET
     @Path("{csid}")
-    public byte[] get(@PathParam("csid") String csid) {
+    public byte[] get(
+    		@Context UriInfo ui,    		
+    		@PathParam("csid") String csid) {
     	PoxPayloadOut result = null;
         ensureCSID(csid, READ);
         try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
         	result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
@@ -242,9 +245,9 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     //======================= GET without csid. List, search, etc. =====================================
 
 	@GET
-	public AbstractCommonList getList(@Context UriInfo ui,
-			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+	public AbstractCommonList getList(@Context UriInfo ui) {
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
 		if (keywords != null) {
 			return search(queryParams, keywords);
 		} else {
