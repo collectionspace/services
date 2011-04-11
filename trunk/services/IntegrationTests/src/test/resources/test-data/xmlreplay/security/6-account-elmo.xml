@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:accounts_common
+xmlns:ns2="http://collectionspace.org/services/account"
+xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
+  <screenName>elmo2010</screenName>
+  <personRefName>elmo2010</personRefName>
+  <email>elmo@cspace.org</email>
+  <phone>1234567890</phone>
+  <userId>elmo2010</userId>
+  <password>ZWxtbzIwMTA=</password>
+  <tenants>
+    <tenant_id>1</tenant_id>
+  </tenants>
+</ns2:accounts_common>

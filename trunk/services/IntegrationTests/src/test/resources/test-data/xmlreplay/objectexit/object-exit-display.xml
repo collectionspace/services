@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+        <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+    </auths>
+
+    <!-- 
+    ========================================================
+            testGroup :: refNameDisplayNameOnly
+              Creates a record using only displayName and not shortIdentifier. 
+    ======================================================== 
+    -->
+    
+    <testGroup ID="refNameDisplayNameOnly" autoDeletePOSTS="false">
+        <test ID="oePersonauthority">  
+             <method>POST</method>
+             <uri>/cspace-services/personauthorities/</uri>
+             <filename>objectexit/oePersonauthority.xml</filename>
+        </test>
+        <test ID="oePerson">
+             <method>POST</method>
+             <uri>/cspace-services/personauthorities/${oePersonauthority.CSID}/items/</uri>
+             <filename>objectexit/oePersonDisplayOnly.xml</filename>
+             <vars>
+                <var ID="displayName">Finbar the DisplayName</var>
+             </vars>
+        </test>
+        <test ID="oePersonGET">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${oePersonauthority.CSID}/items/${oePerson.CSID}</uri>
+            <!--
+            TODO: this response can't be validated because HttpTraffic object doesn't know
+                   how to parse new POX format.
+             <response>
+                <expected level="ADDOK" />
+                <part>
+                     <label>persons_common</label>
+                     <filename>objectexit/res/oePersonDisplayGET.res.xml</filename>
+                     <var ID="displayName">${oePerson.sent("persons_common","//displayName")}</var>
+                     <var ID="refName">urn:cspace:collectionspace.org:Personauthorities(${oePersonauthority.sent("personauthorities_common","//shortIdentifier")}):items(foobar)'${oePerson.sent("persons_common","//displayName")}'</var>
+                 </part>
+             </response>
+             -->
+        </test>
+    </testGroup>
+
+</xmlReplay>
+        
+        

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Copyright 2009 University of California at Berkeley
+	Licensed under the Educational Community License (ECL), Version 2.0.
+	You may not use this file except in compliance with this License.
+
+	You may obtain a copy of the ECL 2.0 License at
+	https://source.collectionspace.org/collection-space/LICENSE.txt
+
+	Document   : authorityref.xsd
+	Revision   : $LastChangedRevision: 1292 $
+	Created on : $LastChangedDate: 2010-01-29 14:55:28 -0800 (Fri, 29 Jan 2010) $
+	Author     : $LastChangedBy: $
+	Description: AuthorityRef describes a list of values that describe
+							 references to authorities (Person, Org, etc.) within some
+							 context object (e.g., a CollectionObject or Intake instance).
+-->
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	jaxb:version="1.0" elementFormDefault="unqualified"
+	xmlns="http://collectionspace.org/services/common/authorityref"
+	targetNamespace="http://collectionspace.org/services/common/authorityref"
+	version="0.1"
+	>
+
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonList">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+
+	<xs:element name="authority-ref-list">
+		<xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">
+					<xs:sequence>
+						 <xs:element name="authority-ref-item" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="sourceField"     type="xs:string" minOccurs="1" />
+									<xs:element name="refName"         type="xs:string" minOccurs="1" />
+									<xs:element name="authDisplayName" type="xs:string" minOccurs="1" />
+									<xs:element name="itemDisplayName" type="xs:string" minOccurs="1" />
+									<xs:element name="uri"             type="xs:anyURI" minOccurs="1" />
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+                </xs:extension>
+            </xs:complexContent>        
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

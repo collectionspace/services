@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.dimension.layouts.webapp">
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="dimension">
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>dimension</widget></row>
+        <row><widget>measuredPart</widget></row>
+        <row><widget>measurementUnit</widget></row>
+        <row><widget>value</widget></row>
+        <row><widget>valueDate</widget></row>
+        <row><widget>valueQualifier</widget></row>
+      </rows>
+
+      <widget name="dimension" type="text">
+        <labels>
+          <label mode="any">dimension</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="dimensions_common">dimension</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="measuredPart" type="text">
+        <labels>
+          <label mode="any">measuredPart</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="dimensions_common">measuredPart</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="measurementUnit" type="text">
+        <labels>
+          <label mode="any">measurementUnit</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="dimensions_common">measurementUnit</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="value" type="text">
+        <labels>
+          <label mode="any">value</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="dimensions_common">value</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="valueDate" type="text">
+        <labels>
+          <label mode="any">valueDate</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="dimensions_common">valueDate</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="valueQualifier" type="text">
+        <labels>
+          <label mode="any">valueQualifier</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="dimensions_common">valueQualifier</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+    </layout>
+  </extension>
+</component>

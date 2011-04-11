@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:organizations_common
+xmlns:ns2="http://collectionspace.org/services/organization"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <shortIdentifier>1288047801161</shortIdentifier>
+  <refName>urn:cspace:org.collectionspace.demo:orgauthority:name(1288047801161):organization:name(1288047801161)</refName>
+  <displayNameComputed>true</displayNameComputed>
+  <shortDisplayNameComputed>true</shortDisplayNameComputed>
+  <shortName>Test Organization-1288047801161</shortName>
+  <longName>Test Organization Name</longName>
+  <contactNames>
+    <contactName>urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth)'TestPersonAuth':person:name(charlieOrgcontact)</contactName>
+    <contactName>urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth)'TestPersonAuth':person:name(chelsieContact)</contactName>
+  </contactNames>
+  <foundingPlace>Anytown, USA</foundingPlace>
+  <subBodies>
+    <subBody>urn:cspace:org.collectionspace.demo:orgauthority:name(1288047801161):organization:name(1288047803708)</subBody>
+  </subBodies>
+  <functions>
+    <function>My new function</function>
+    <function>My second function</function>
+  </functions>
+  <groups>
+      <group>My new group</group>
+      <group>My second group</group>
+      <group>My third group</group>
+  </groups>
+  
+</ns2:organizations_common>
+
+

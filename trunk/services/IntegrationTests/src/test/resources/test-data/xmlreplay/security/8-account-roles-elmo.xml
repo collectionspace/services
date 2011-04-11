@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:account_role
+xmlns:ns2="http://collectionspace.org/services/authorization">
+  <subject>ROLE</subject>
+  <account>
+    <accountId>${permElmo.CSID}</accountId>
+    <screenName>elmo2010</screenName>
+    <userId>elmo2010</userId>
+  </account>
+  <role>
+    <roleId>${roleIntern.CSID}</roleId>
+    <roleName>ROLE_TEST_INTERN</roleName>
+  </role>
+</ns2:account_role>
+

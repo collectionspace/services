@@ -1,0 +1,305 @@
+<project name="services-main" default="package" basedir=".">
+    <description>
+        collectionspace services main
+    </description>
+    <!-- set global properties for this build -->
+    <property name="services.trunk" value=".."/>
+    <property file="${services.trunk}/build.properties" />
+    <property name="mvn.opts" value="" />
+    <property name="src" location="src"/>
+    <property name="javadoc.jar" value="org.collectionspace.services-javadoc.jar"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+
+    <target name="package" depends="package-unix,package-windows"
+            description="Package CollectionSpace Services" />
+
+    <target name="package-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="package-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+
+    <target name="install" depends="install-unix,install-windows"
+            description="Install" />
+    <target name="install-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="install-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="clean" depends="clean-unix,clean-windows"
+            description="Delete target directories" >
+        <delete dir="${build}"/>
+    </target>
+    <target name="clean-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="clean-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="test" depends="test-unix,test-windows" description="Run tests" />
+    <target name="test-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="test-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="doc" depends="install,doc-unix,doc-windows" description="Build Java API docs">
+        <jar destfile="${basedir}/target/${javadoc.jar}"
+             basedir="${basedir}/target/site"
+             />
+    </target>
+    <target name="doc-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="javadoc:aggregate" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="doc-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="javadoc:aggregate" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="gen_ddl"
+            description="generate service-specific tables(s), indices, etc.">
+        <ant antfile="authentication/build.xml" target="gen_ddl" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="gen_ddl" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="gen_ddl" inheritAll="false"/>
+    </target>
+
+    <target name="create_db"
+            description="create service-specific tables(s), indices, etc.">
+        <ant antfile="authentication/build.xml" target="create_db" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="create_db" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="create_db" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="create_db" inheritAll="false"/>
+    </target>
+
+    <target name="import"
+            description="import default configuration">
+        <ant antfile="authorization-mgt/build.xml" target="import" inheritAll="false"/>
+    </target>
+
+    <!-- this target is called in order based on the dependencies between the services -->
+    <target name="deploy" depends="install"
+            description="deploy services in ${jboss.server.cspace}">
+        <ant antfile="authentication/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="authority/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="blob/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="workflow/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="common/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="note/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="intake/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="loanin/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="loanout/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="objectexit/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="location/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="media/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="movement/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="report/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="organization/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="person/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="dimension/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="contact/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false"/>
+    </target>
+
+    <!-- this target is called in reverse order of deploy targets -->
+    <target name="undeploy"
+            description="undeploy services from ${jboss.server.cspace}">
+        <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="organization/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="person/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="location/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="objectexit/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="report/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="movement/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="loanout/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="loanin/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="media/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="note/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="common/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="media/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="blob/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="workflow/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="authority/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="undeploy" inheritAll="false"/>
+    </target>
+
+    <target name="hotdeploy" depends="install"
+            description="deploy services in running ${jboss.server.cspace}">
+        <ant antfile="JaxRsServiceProvider/build.xml" target="hotdeploy" inheritAll="false"/>
+    </target>
+
+    <!-- this target is called in order based on the dependencies between the services -->
+    <target name="dist" depends="doc"
+            description="create distribution for services">
+        <ant antfile="authentication/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="authority/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="blob/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="workflow/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="common/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="intake/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="loanin/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="loanout/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="location/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="objectexit/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="media/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="movement/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="report/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="organization/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="person/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritAll="false"/>
+        <copy file="${basedir}/target/${javadoc.jar}"
+              todir="${services.trunk}/${dist.server.cspace}/cspace/services/docs"/>
+    </target>
+
+    <!-- this target is called in order based on the dependencies between the services -->
+    <target name="dist_installer"
+            description="create distribution for CollectionSpace installer">
+
+        <!-- copy install scripts, etc. -->
+        <copy todir="${services.trunk}/${dist.installer.services}">
+            <fileset dir="./installer"/>
+        </copy>
+        <ant antfile="id/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="organization/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="person/build.xml" target="dist_installer" inheritAll="false"/>
+        <!--
+        <ant antfile="account/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="common/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="intake/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="loanin/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="dist_installer" inheritAll="false"/>
+-->        
+    </target>
+    
+   <target name="generate-dependencies-reports"
+            description="Generate a report of dependencies, including their licensing information.">
+        <exec executable="mvn" failonerror="true">
+            <arg value="project-info-reports:dependencies"/>
+        </exec>
+    </target>
+
+    <target name="copy-dependencies-reports" 
+            description="Copy dependencies reports to a single directory.">
+        <property name="dependencies-reports-dir" value="${basedir}/target/dependencies"/>
+        <mkdir dir="${dependencies-reports-dir}"/>
+        <!-- Copy the top-level services dependencies report -->
+        <copy todir="${dependencies-reports-dir}"
+             file="${basedir}/target/site/dependencies.html"/>
+        <!-- Copy the dependencies reports from each module, flattening -->
+        <!-- report names by substituting dot notation for full module paths -->
+        <copy todir="${dependencies-reports-dir}">
+            <fileset
+                id="dependency-report-files"
+                dir="${basedir}">
+                <include name="**/dependencies.html"/>
+            </fileset>
+            <chainedmapper>
+                <regexpmapper
+                     handledirsep="true"
+                     from="(.*?)/target/site/(.*)"
+                     to="\1${file.separator}\2"/>
+                <filtermapper>
+                    <replacestring from="${file.separator}" to="."/>
+                </filtermapper>
+            </chainedmapper>
+        </copy>
+    </target>
+
+</project>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:persons_common
+xmlns:ns2="http://collectionspace.org/services/person"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <!--<inAuthority>7f441679-ab83-4832-85f9</inAuthority>-->
+  <shortIdentifier>owenCurOwner2</shortIdentifier>
+  <refName>urn:cspace:org.collectionspace.demo:personauthority:name(MediaPersonAuth2)'MediaPersonAuth2':person:name(owenCurOwner2)</refName>
+  <displayNameComputed>true</displayNameComputed>
+  <shortDisplayNameComputed>true</shortDisplayNameComputed>
+  <foreName>Owen the Cur</foreName>
+  <surName>Owner</surName>
+</ns2:persons_common>
+
+

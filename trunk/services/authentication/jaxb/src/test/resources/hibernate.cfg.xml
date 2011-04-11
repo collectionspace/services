@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : hibernate.cfg.xml.xml
+    Created on : November 12, 2009, 12:02 PM
+    Author     : sanjaydalal
+    Description:
+        Purpose of the document follows.
+-->
+<!DOCTYPE hibernate-configuration PUBLIC
+          "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url">@DB_URL@</property>
+        <property name="connection.driver_class">@DB_DRIVER_CLASS@</property>
+        <property name="connection.username">@DB_USER@</property>
+        <property name="connection.password">@DB_PASSWORD@</property>
+        <property name="dialect">@DB_DIALECT@</property>
+        <property name="transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
+        <property name="current_session_context_class">thread</property>
+        <property name="hibernate.show_sql">true</property>
+    </session-factory>
+</hibernate-configuration>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>org.collectionspace.services.main</artifactId>
+        <groupId>org.collectionspace.services</groupId>
+        <version>1.6-SNAPSHOT</version>
+    </parent>
+    <groupId>org.collectionspace.services</groupId>
+    <artifactId>org.collectionspace.services.authorization</artifactId>
+    <name>services.authorization</name>
+    <packaging>pom</packaging>
+    <url>http://www.collectionspace.org</url>
+    <properties>
+    </properties>
+
+
+    <modules>
+        <module>jaxb</module>
+        <module>pstore</module>
+        <module>service</module>
+    </modules>
+</project>

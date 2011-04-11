@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : testCambridge.xml
+    Created on : February 18, 2010, 12:10 PM
+    Author     : 
+    Description:
+        Purpose of the document follows.
+-->
+
+<ns2:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/collectionobject">
+  <objectNumber>objectNumber</objectNumber>
+  <distinguishingFeatures>distFeatures</distinguishingFeatures>
+  <numberOfObjects>numberOfObjects</numberOfObjects>
+</ns2:collectionobjects_common> 

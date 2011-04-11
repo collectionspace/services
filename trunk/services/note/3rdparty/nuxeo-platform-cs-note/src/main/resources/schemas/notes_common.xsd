@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Contact schema (XSD)
+    
+    Entity  : Note
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: 1409 $
+    $LastChangedDate: 2010-02-22 21:34:53 -0800 (Mon, 22 Feb 2010) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/note/"
+    xmlns="http://collectionspace.org/note/"
+    targetNamespace="http://collectionspace.org/note/"
+    version="0.1">
+
+		<!-- Subitem info is in a general schema -->
+    <xs:element name="content" type="xs:string" />
+    <xs:element name="author" type="xs:string" />
+    <xs:element name="date" type="xs:string" />
+    
+</xs:schema>

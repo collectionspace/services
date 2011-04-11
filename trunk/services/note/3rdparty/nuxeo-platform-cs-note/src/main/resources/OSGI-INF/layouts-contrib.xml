@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.note.layouts.webapp">
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="cs_note">
+
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>content</widget></row>
+        <row><widget>author</widget></row>
+        <row><widget>date</widget></row>
+      </rows>
+
+      <widget name="content" type="text">
+        <labels>
+          <label mode="any">content</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="notes_common">content</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="author" type="text">
+        <labels>
+          <label mode="any">author</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="notes_common">author</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="date" type="text">
+        <labels>
+          <label mode="any">date</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="notes_common">date</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+     
+    </layout>
+  </extension>
+</component>

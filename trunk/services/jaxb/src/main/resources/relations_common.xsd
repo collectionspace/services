@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Relation schema (XSD)
+    
+    Entity  : Relation
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+            
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
+    xmlns="http://collectionspace.org/services/relation"
+    xmlns:rel="http://collectionspace.org/services/relation"
+    targetNamespace="http://collectionspace.org/services/relation">
+
+    <!-- Relation -->
+    <xs:element name="relations_common">
+        <xs:complexType>
+            <xs:sequence>
+            	<xs:element name="csid" type="xs:string" />            
+                <xs:element name="documentId1" type="xs:string" minOccurs="1"/>
+                <xs:element name="documentType1" type="xs:string" minOccurs="1"/>
+                <xs:element name="documentId2" type="xs:string" minOccurs="1"/>
+                <xs:element name="documentType2" type="xs:string" minOccurs="1"/>
+                <!-- type of relationship between two entities -->
+                <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
+                <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
+                <!--- New Names -->
+                <xs:element name="subjectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentId1 -->
+                <xs:element name="objectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentId2 -->
+                <xs:element name="predicate" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>   <!-- new name for relationshipType -->
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- enumeration defining the type of relationship between two entities -->
+    <!-- REM: Deprecating this type as it is too restrictive for the "relations_common:relationshipType" field  and will be replaced with "xs:string" -->
+    <xs:simpleType name="RelationshipType">
+        <xs:restriction base="xs:string">
+            <!-- Added for compatibility with current default value -->
+            <!-- in the Application Layer; see CSPACE-1815 -->
+            <xs:enumeration value="affects"/>
+            <!-- document with id as document-id-1 is associated with document with id as document-id-2 -->
+            <xs:enumeration value="association"/>
+            <!-- document with id as document-id-1 contains one or more document with id as document-id-2 -->
+            <xs:enumeration value="contains"/>
+            <!-- document with id as document-id-1 contains one or more document with id as document-id-2 -->
+            <xs:enumeration value="collectionobject-intake"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonList">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+
+
+    <xs:complexType name="relationsDocListItem">
+        <xs:sequence>
+            <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
+            <xs:element name="csid" type="xs:string" minOccurs="1"/>
+            <xs:element name="type" type="xs:string" minOccurs="1"/>
+            <xs:element name="name" type="xs:string" minOccurs="1"/>
+            <xs:element name="number" type="xs:string" minOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <!-- collection objects as in nuxeo repository -->
+    <xs:element name="relations-common-list">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">                    
+                    <xs:sequence>
+                        <xs:element name="relation-list-item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <!-- uri to retrieve collection object details -->
+                                    <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
+                                    <xs:element name="csid" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="subjectCsid" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="predicate" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="objectCsid" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="subject" type="relationsDocListItem" minOccurs="1"/>
+                                    <xs:element name="object" type="relationsDocListItem" minOccurs="1"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>                    
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+
+
+
+
+
+

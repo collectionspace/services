@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:acquisitions_common xmlns:ns2="http://collectionspace.org/services/acquisition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/acquisition http://services.collectionspace.org/acquisition/acquisitions_common.xsd">
+<acquisitionReferenceNumber>acquisitionReferenceNumber-1</acquisitionReferenceNumber>
+<acquisitionFundingList/>
+<acquisitionDates>
+<acquisitionDate>NEW First Acquisition Date-334</acquisitionDate>
+<acquisitionDate>Second Acquisition Date-1292275630222</acquisitionDate>
+</acquisitionDates>
+<acquisitionSources>
+<acquisitionSource>Donor Acquisition Source-1292275630222</acquisitionSource>
+<acquisitionSource>Museum Acquisition Source-1292275630222</acquisitionSource>
+</acquisitionSources>
+<owners>
+<owner>First Owner -1292275630222</owner>
+<owner>Second Owner-1292275630222</owner>
+</owners>
+<fieldCollectionEventNames/>
+</ns2:acquisitions_common>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Person schema (XSD)
+
+    Entity  : Person
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision: $
+    $LastChangedDate: $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
+    xmlns:ns="http://collectionspace.org/services/person"
+    xmlns="http://collectionspace.org/services/person"
+    targetNamespace="http://collectionspace.org/services/person"
+    version="0.1"
+    >
+    
+    <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Person+Service+Home -->    
+    
+    <!-- Person -->
+    <xs:element name="persons_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Common identifier -->
+                <xs:element name="csid" type="xs:string" />
+                
+                <!--  Person Information Group -->
+                <xs:element name="inAuthority" type="xs:string" />
+				<xs:element name="shortIdentifier" type="xs:string"/>
+                <xs:element name="refName" type="xs:string" />
+                <xs:element name="termStatus" type="xs:string"/>
+                <xs:element name="displayName" type="xs:string"/>
+                <xs:element name="displayNameComputed" type="xs:boolean"/>
+                <xs:element name="shortDisplayName" type="xs:string"/>
+                <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
+                <xs:element name="foreName" type="xs:string"/>
+                <xs:element name="middleName" type="xs:string"/>
+                <xs:element name="surName" type="xs:string"/>
+                <xs:element name="initials" type="xs:string"/>
+                <xs:element name="salutation" type="xs:string"/>
+                <xs:element name="title" type="xs:string"/>
+                <xs:element name="nameAdditions" type="xs:string"/>
+                <xs:element name="birthDate" type="xs:string"/>
+                <xs:element name="deathDate" type="xs:string"/>
+                <xs:element name="birthPlace" type="xs:string"/>
+                <xs:element name="deathPlace" type="xs:string"/>
+                <xs:element name="groups" type="groupList"/>
+                <xs:element name="nationalities" type="nationalityList"/>
+                <xs:element name="gender" type="xs:string"/>
+                <xs:element name="occupations" type="occupationList"/>
+                <xs:element name="schoolsOrStyles" type="schoolOrStyleList"/>
+                <xs:element name="bioNote" type="xs:string"/>
+                <xs:element name="nameNote" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="groupList">
+        <xs:sequence>
+            <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="nationalityList">
+        <xs:sequence>
+            <xs:element name="nationality" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="occupationList">
+        <xs:sequence>
+            <xs:element name="occupation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="schoolOrStyleList">
+        <xs:sequence>
+            <xs:element name="schoolOrStyle" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonListItem">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+    
+    <!-- Person instances, as in nuxeo repository -->
+    <xs:element name="persons-common-list">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonListItem">                    
+                    <xs:sequence>
+                        <xs:element name="person_list_item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="displayName" type="xs:string"
+                                        minOccurs="1" />
+									<xs:element name="shortIdentifier" type="xs:string"
+                                        minOccurs="1" />
+                                    <!-- uri to retrieve person details -->
+                                    <xs:element name="uri" type="xs:anyURI"
+                                        minOccurs="1" />
+                                    <xs:element name="refName" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string"
+                                        minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<imports>
+    <import seq="1" service="Personauthorities" type="Personauthority">
+        <schema xmlns:personauthorities_common="http://collectionspace.org/services/person" name="personauthorities_common">
+            <personauthorities_common:displayName>Perf Test Person Auth ${docID}</personauthorities_common:displayName>
+            <personauthorities_common:shortIdentifier>perfTestPersons-${docID}</personauthorities_common:shortIdentifier>
+            <personauthorities_common:vocabType>PersonAuthority</personauthorities_common:vocabType>
+            <personauthorities_common:refName>urn:cspace:collectionspace.org:Personauthorities(perfTestPersons)'Perf Test Person Auth'</personauthorities_common:refName>
+        </schema>
+    </import>
+    <import seq="2" service="Personauthorities" type="Personauthority" CSID="11111111-2222-3333-4444-123456789012">
+        <schema xmlns:personauthorities_common="http://collectionspace.org/services/person" name="personauthorities_common">
+            <personauthorities_common:displayName>Perf Test Person Auth ${docID}</personauthorities_common:displayName>
+            <personauthorities_common:shortIdentifier>perfTestPersons-${docID}</personauthorities_common:shortIdentifier>
+            <personauthorities_common:vocabType>PersonAuthority</personauthorities_common:vocabType>
+            <personauthorities_common:refName>urn:cspace:collectionspace.org:Personauthorities(perfTestPersons)'Perf Test Person Auth'</personauthorities_common:refName>
+        </schema>
+    </import>
+</imports>

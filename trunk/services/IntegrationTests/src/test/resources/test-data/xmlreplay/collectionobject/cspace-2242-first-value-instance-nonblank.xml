@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : cspace-2242-first-value-instance-nonblank.xml
+    Created on : 
+    Author     : 
+    Description: Test data for http://issues.collectionspace.org/browse/CSPACE-2242
+-->
+
+<ns2:collectionobjects_common
+    xmlns:ns2="http://collectionspace.org/services/collectionobject"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://collectionspace.org/services/collectionobject http://services.collectionspace.org/collectionobject/collectionobjects_common.xsd">
+    <objectNumber>2</objectNumber>
+    <distinguishingFeatures>features</distinguishingFeatures>
+    <briefDescriptions>
+        <!-- First value instance of this repeatable field is non-blank -->
+        <briefDescription>data</briefDescription>
+        <briefDescription></briefDescription>
+        <briefDescription>bob2</briefDescription>
+    </briefDescriptions>
+</ns2:collectionobjects_common>

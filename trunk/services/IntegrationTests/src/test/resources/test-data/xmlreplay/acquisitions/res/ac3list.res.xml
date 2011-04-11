@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:acquisitions-common-list
+xmlns:ns2="http://collectionspace.org/services/jaxb"
+xmlns:ns3="http://collectionspace.org/services/acquisition">
+  <pageNum>0</pageNum>
+  <pageSize>10</pageSize>
+  <itemsInPage>2</itemsInPage>
+  <totalItems>2</totalItems>
+  <fieldsReturned>
+  acquisitionReferenceNumber|acquisitionSources|owners|uri|csid</fieldsReturned>
+  <acquisition-list-item>
+    <acquisitionReferenceNumber>acquisitionReferenceNumber-1292275631503</acquisitionReferenceNumber>
+    <acquisitionSource>Donor Acquisition Source-1292275631503</acquisitionSource>
+    <owner>First Owner -1292275631503</owner>
+    <uri>/acquisitions/bff1deb6-03af-457c-af98</uri>
+    <csid>bff1deb6-03af-457c-af98</csid>
+  </acquisition-list-item>
+  <acquisition-list-item>
+    <acquisitionReferenceNumber>acquisitionReferenceNumber-1292275630222</acquisitionReferenceNumber>
+    <acquisitionSource>Museum Acquisition Source-1292275630222</acquisitionSource>
+    <owner>Second Owner-1292275630222</owner>
+    <uri>/acquisitions/549dd907-01cd-4f20-aeb7</uri>
+    <csid>549dd907-01cd-4f20-aeb7</csid>
+  </acquisition-list-item>
+</ns3:acquisitions-common-list>
+
+

@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.collectionspace_core.layouts.webapp">
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="collectionspace_core">
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>tenantId</widget></row>
+      </rows>
+
+      <widget name="tenantId" type="text">
+        <labels>
+          <label mode="any">tenantId</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="collectionspace_core">tenantId</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+    </layout>
+  </extension>
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="subitem">
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>owner</widget></row>
+        <row><widget>isPrimary</widget></row>
+        <row><widget>order</widget></row>
+      </rows>
+
+      <widget name="owner" type="text">
+        <labels>
+          <label mode="any">owner</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="subitem">owner</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="isPrimary" type="text">
+        <labels>
+          <label mode="any">isPrimary</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="subitem">isPrimary</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="order" type="text">
+        <labels>
+          <label mode="any">order</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="subitem">order</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+    </layout>
+  </extension>
+	
+</component>

@@ -1,0 +1,132 @@
+<!--
+    Document   : applicationContext-security.xml
+    Created on :
+    Author     :
+    Copyright 2010 University of California at Berkeley
+    Description:
+        spring security namespace for CS service layer
+        ref: http://blog.springsource.com/2010/03/06/behind-the-spring-security-namespace/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--
+        debugging tips : enable following categories in
+        $JBOSS_HOME/server/cspace/conf/jboss-log4j.xml to priority DEBUG
+        org.apache.catalina.core
+        org.springframework.security
+    -->
+
+    <bean id="springSecurityFilterChain"
+          class="org.springframework.security.web.FilterChainProxy">
+        <sec:filter-chain-map path-type="ant">
+            <sec:filter-chain pattern="/**"
+                              filters="securityContextPersistenceFilter,basicAuthenticationFilter,logoutFilter,exTranslationFilter,filterInvocationInterceptor"/>
+        </sec:filter-chain-map>
+    </bean>
+
+    <bean id="securityContextPersistenceFilter"
+          class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
+        <property name='securityContextRepository'>
+            <bean class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
+                <property name='allowSessionCreation' value='true' />
+            </bean>
+        </property>
+    </bean>
+
+
+    <bean id="basicAuthenticationFilter"
+          class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
+    </bean>
+
+    <bean id="basicAuthenticationEntryPoint"
+          class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+        <property name="realmName" value="org.collectionspace.services"/>
+    </bean>
+
+    <bean id="logoutFilter"
+          class="org.springframework.security.web.authentication.logout.LogoutFilter">
+        <constructor-arg value="/"/>
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="exTranslationFilter"
+          class="org.springframework.security.web.access.ExceptionTranslationFilter">
+        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
+    </bean>
+
+    <sec:authentication-manager alias="authenticationManager">
+        <sec:authentication-provider ref="jaasAuthenticationProvider" user-service-ref="userDetailsService"/>
+    </sec:authentication-manager>
+
+    <bean id="jaasAuthenticationProvider"
+          class="org.springframework.security.authentication.jaas.JaasAuthenticationProvider">
+        <property name="loginContextName">
+            <value>cspace</value> <!-- value should be same as in application-policy in JBoss login-config.xml -->
+        </property>
+        <property name="loginConfig">
+            <value>/WEB-INF/login.conf</value> <!-- filler, not used at runtime -->
+        </property>
+        <property name="callbackHandlers">
+            <list>
+                <bean class="org.springframework.security.authentication.jaas.JaasNameCallbackHandler"/>
+                <bean class="org.springframework.security.authentication.jaas.JaasPasswordCallbackHandler"/>
+            </list>
+        </property>
+        <property name="authorityGranters">
+            <list>
+                <bean class="org.collectionspace.authentication.spring.CSpaceAuthorityGranter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="userDetailsService"
+          class="org.collectionspace.authentication.spring.CSpaceUserDetailsService">
+    </bean>
+
+    <bean id="filterInvocationInterceptor"
+          class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
+        <!--property name="securityMetadataSource" ref="cspaceMetadataSource"/-->
+        <property name="securityMetadataSource">
+            <sec:filter-security-metadata-source>
+                <sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_REMEMBERED"/>
+            </sec:filter-security-metadata-source>
+        </property>
+    </bean>
+
+    <bean id="httpRequestAccessDecisionManager"
+          class="org.springframework.security.access.vote.AffirmativeBased">
+        <property name="allowIfAllAbstainDecisions" value="false"/>
+        <property name="decisionVoters">
+            <list>
+                <ref bean="roleVoter"/>
+                <ref bean="authenticatedVoter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="authenticatedVoter"
+          class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+    <bean id="roleVoter"
+          class="org.springframework.security.access.vote.RoleVoter"/>
+    <!--bean id="cspaceMetadataSource" class="org.collectionspace.services.authorization.spring.CSpaceSecurityMetadataSource">
+        <property name="urlProperties">
+            <util:properties location="classpath:urls.properties" />
+        </property>
+    </bean-->
+
+</beans>

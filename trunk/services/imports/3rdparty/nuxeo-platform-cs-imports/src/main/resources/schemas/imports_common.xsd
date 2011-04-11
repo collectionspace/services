@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/imports/"
+    xmlns="http://collectionspace.org/imports/"
+    targetNamespace="http://collectionspace.org/imports/"
+    version="0.1">
+
+    <xs:element name="importsField" type="xs:string"/>
+    <xs:element name="params">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="param" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>   
+</xs:schema>

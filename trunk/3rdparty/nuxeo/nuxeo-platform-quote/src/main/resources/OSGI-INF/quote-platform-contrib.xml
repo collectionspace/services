@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component
+    name="org.collectionspace.ecm.platform.quote.service.binding.contrib">
+
+  <require>org.collectionspace.ecm.platform.quote.service.QuoteService</require>
+
+  <extension target="org.nuxeo.runtime.api.ServiceManagement"
+      point="services">
+    <documentation>Define the Quote bean as a platform service.</documentation>
+    <service class="org.collectionspace.ecm.platform.quote.api.QuoteManager" group="platform/quotes">
+      <locator>%QuoteManagerBean</locator>
+    </service>
+
+    <service class="org.collectionspace.ecm.platform.quote.workflow.services.QuotesModerationService" group="platform/quotes">
+      <locator>%QuotesModerationBean</locator>
+    </service>
+  </extension>
+
+</component>

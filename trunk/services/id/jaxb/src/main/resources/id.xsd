@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+ id.xsd
+ 
+ A W3C XML Schema file for the 'jaxb' module of the ID Service project.
+ 
+ Declares schema for identifiers (IDs), ID patterns, and
+ lists of multiple IDs and ID patterns.
+
+ This document is a part of the source code and related artifacts
+ for CollectionSpace, an open source collections management system
+ for museums and related institutions:
+ 
+ http://www.collectionspace.org
+ http://wiki.collectionspace.org
+ 
+ $LastChangedBy: aron $
+ $LastChangedRevision$
+ $LastChangedDate$
+-->
+
+<!-- TODO: ** These schemas are currently incomplete placeholders ** -->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/id"
+  xmlns="http://collectionspace.org/id"
+  targetNamespace="http://services.collectionspace.org/id"
+  version="0.1"
+>
+
+  <!--
+    Avoid XmlRootElement nightmare, see
+    http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+  -->
+    
+  <!-- id  -->
+  <xs:element name="id">
+    <xs:complexType>
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" />
+    </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- id-list as in nuxeo repository -->
+  <xs:element name="id-list">
+    <xs:complexType>
+    <xs:sequence>
+      <xs:element name="id-list-item" maxOccurs="unbounded">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="idName" type="xs:string" minOccurs="1" />
+          <!-- URI to retrive details of this list item -->
+          <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+          <xs:element name="csid" type="xs:string" minOccurs="1" />
+        </xs:sequence>
+      </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+          
+  <!-- id-pattern  -->
+  <xs:element name="id-pattern">
+    <xs:complexType>
+    <xs:sequence>
+      <xs:element name="csid" type="xs:string" />
+      <xs:element name="idPatternName" type="xs:string"/>
+      <!-- More elements go here -->
+    </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <!-- id-pattern-list as in nuxeo repository -->
+  <xs:element name="id-pattern-list">
+    <xs:complexType>
+    <xs:sequence>
+      <xs:element name="id-pattern-list-item" maxOccurs="unbounded">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="idPatternName" type="xs:string" minOccurs="1" />
+          <!-- URI to retrive details of this list item -->
+          <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+          <xs:element name="csid" type="xs:string" minOccurs="1" />
+        </xs:sequence>
+      </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+</xs:schema>
+

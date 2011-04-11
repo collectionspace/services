@@ -1,0 +1,414 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.person.layouts.webapp">
+
+	<extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="cspersonauthority">
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>displayName</widget></row>
+        <row><widget>shortIdentifier</widget></row>
+        <row><widget>refName</widget></row>
+        <row><widget>vocabType</widget></row>
+      </rows>
+
+      <widget name="displayName" type="text">
+        <labels>
+          <label mode="any">Display Name</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="personauthorities_common">displayName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="shortIdentifier" type="text">
+        <labels>
+          <label mode="any">Short Identifier</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="personauthorities_common">shortIdentifier</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="refName" type="text">
+        <labels>
+          <label mode="any">RefName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="personauthorities_common">refName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="vocabType" type="text">
+        <labels>
+          <label mode="any">Type</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="personauthorities_common">vocabType</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+    </layout>
+  </extension>
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+		<layout name="person">
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>displayName</widget></row>
+        <row><widget>shortIdentifier</widget></row>
+        <row><widget>refName</widget></row>
+        <row><widget>inAuthority</widget></row>
+        <row><widget>foreName</widget></row>
+        <row><widget>middleName</widget></row>
+        <row><widget>surName</widget></row>
+        <row><widget>initials</widget></row>
+        <row><widget>salutation</widget></row>
+        <row><widget>title</widget></row>
+        <row><widget>nameAdditions</widget></row>
+        <row><widget>birthDate</widget></row>
+        <row><widget>deathDate</widget></row>
+        <row><widget>birthPlace</widget></row>
+        <row><widget>deathPlace</widget></row>
+        <!-- Repeatable fields are commented out for now until we -->
+        <!-- identify how to represent these complex types in layouts. -->
+        <!-- <row><widget>group</widget></row> -->
+        <!-- <row><widget>nationality</widget></row> -->
+        <row><widget>gender</widget></row>
+        <!-- <row><widget>occupation</widget></row> -->
+        <!-- <row><widget>schoolOrStyle</widget></row> -->
+        <row><widget>bioNote</widget></row>
+        <row><widget>nameNote</widget></row>
+        <row><widget>termStatus</widget></row>
+      </rows>
+
+      <widget name="displayName" type="text">
+        <labels>
+          <label mode="any">displayName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">displayName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="shortIdentifier" type="text">
+        <labels>
+          <label mode="any">Short Identifier</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">shortIdentifier</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="refName" type="text">
+        <labels>
+          <label mode="any">refName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">refName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="inAuthority" type="text">
+        <labels>
+          <label mode="any">inAuthority (PersonAuthority)</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">inAuthority</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="foreName" type="text">
+        <labels>
+          <label mode="any">foreName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">foreName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="middleName" type="text">
+        <labels>
+          <label mode="any">middleName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">middleName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="surName" type="text">
+        <labels>
+          <label mode="any">surName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">surName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="initials" type="text">
+        <labels>
+          <label mode="any">initials</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">initials</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="salutation" type="text">
+        <labels>
+          <label mode="any">salutation</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">salutation</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="title" type="text">
+        <labels>
+          <label mode="any">title</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">title</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="nameAdditions" type="text">
+        <labels>
+          <label mode="any">nameAdditions</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">nameAdditions</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="birthDate" type="text">
+        <labels>
+          <label mode="any">birthDate</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">birthDate</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="deathDate" type="text">
+        <labels>
+          <label mode="any">deathDate</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">deathDate</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="birthPlace" type="text">
+        <labels>
+          <label mode="any">birthPlace</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">birthPlace</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="deathPlace" type="text">
+        <labels>
+          <label mode="any">deathPlace</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">deathPlace</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+<!--
+      <widget name="group" type="text">
+        <labels>
+          <label mode="any">group</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">group</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="nationality" type="text">
+        <labels>
+          <label mode="any">nationality</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">nationality</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+-->
+
+      <widget name="gender" type="text">
+        <labels>
+          <label mode="any">gender</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">gender</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+<!--
+      <widget name="occupation" type="text">
+        <labels>
+          <label mode="any">occupation</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">occupation</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="schoolOrStyle" type="text">
+        <labels>
+          <label mode="any">schoolOrStyle</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">schoolOrStyle</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+-->
+
+      <widget name="bioNote" type="text">
+        <labels>
+          <label mode="any">bioNote</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">bioNote</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="nameNote" type="text">
+        <labels>
+          <label mode="any">nameNote</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">nameNote</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="termStatus" type="text">
+        <labels>
+          <label mode="any">termStatus</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">termStatus</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+    </layout>
+  </extension>
+</component>

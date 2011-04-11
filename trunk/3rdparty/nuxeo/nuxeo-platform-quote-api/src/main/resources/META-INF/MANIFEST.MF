@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 1
+Bundle-Name: CSpace Nuxeo Quote API project
+Bundle-SymbolicName: org.collectionspace.ecm.platform.quote.api;singleton=true
+Bundle-Vendor: Nuxeo
+Require-Bundle: org.nuxeo.ecm.core.api
+Nuxeo-Component: OSGI-INF/QuoteableAdapter.xml
+Export-Package: org.collectionspace.ecm.platform.quote.api

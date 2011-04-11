@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.organization.ecm.types">
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Orgauthority" coretype="Orgauthority">
+      <label>org.collectionspace.orgauthority</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>collectionspace_core</layout>
+        <layout>csorgauthority</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Orgauthority</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Orgauthority</type>
+      </subtypes>
+    </type>
+
+  </extension>
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Organization" coretype="Organization">
+      <label>org.collectionspace.organization</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>collectionspace_core</layout>
+        <layout>organization</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Organization</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Organization</type>
+      </subtypes>
+    </type>
+
+  </extension>
+</component>

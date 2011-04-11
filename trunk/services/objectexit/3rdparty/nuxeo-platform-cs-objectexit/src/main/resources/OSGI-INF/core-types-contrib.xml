@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.objectexit.coreTypes">
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
+    <schema name="objectexit_common" prefix="objectexit_common" src="schemas/objectexit_common.xsd"/>
+  </extension>
+  
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
+    <doctype name="ObjectExit" extends="Document">
+      <schema name="common"/>
+      <schema name="dublincore"/>
+      <schema name="collectionspace_core"/>
+      <schema name="objectexit_common"/>
+    </doctype>
+  </extension>
+</component>

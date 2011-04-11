@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Loan Out schema (XSD)
+    
+    Entity  : Workflow
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/workflow"
+  xmlns="http://collectionspace.org/services/workflow"
+  targetNamespace="http://collectionspace.org/services/workflow"
+  version="0.1">
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->    
+    <!-- workflow -->
+    <xs:element name="workflow_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Workflow Information Group -->
+                <xs:element name="lifeCyclePolicy" type="xs:string"/>
+                <xs:element name="currentLifeCycleState" type="xs:string"/>
+				<xs:element name="allowedStateTransitionList">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="stateTransition" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+	<!--
+    <xs:complexType name="stateTransitionList">
+        <xs:sequence>
+            <xs:element name="stateTransition" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+	-->
+    
+</xs:schema>
+

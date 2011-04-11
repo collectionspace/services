@@ -1,0 +1,219 @@
+
+<project name="authentication.pstore" default="package" basedir=".">
+    <description>
+        collectionspace authentication service
+    </description>
+    <!-- set global properties for this build -->
+    <property name="services.trunk" value="../../.."/>
+    <!-- environment should be declared before reading build.properties -->
+    <property environment="env" />
+    <property file="${services.trunk}/build.properties" />
+    <property name="mvn.opts" value="" />
+    <property name="src" location="src"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp/>
+    </target>
+
+
+    <target name="package" depends="package-unix,package-windows"
+            description="Package CollectionSpace Services" />
+    <target name="package-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="package-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="install" depends="install-unix,install-windows"
+            description="Install" />
+    <target name="install-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="install-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="clean" depends="clean-unix,clean-windows"
+            description="Delete target directories" >
+        <delete dir="${build}"/>
+    </target>
+    <target name="clean-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="clean-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="test" depends="test-unix,test-windows" description="Run tests" />
+    <target name="test-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="test-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="setup_hibernate.cfg" description="replace property keywords in hibernate.cfg.xml">
+        <property name="src.hibernate.cfg" value="${basedir}/src/test/resources/hibernate.cfg.xml"/>
+        <property name="dest.hibernate.cfg" value="${basedir}/target/test-classes/hibernate.cfg.xml"/>
+        <delete file="${dest.hibernate.cfg}" verbose="true" />
+        <filter token="DB_URL" value="${db.jdbc.url}" />
+        <filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
+        <filter token="DB_USER" value="${env.DB_USER}" /> <!-- double-sub from ${db.user} fails -->
+        <filter token="DB_PASSWORD" value="${env.DB_PASSWORD}" /> <!-- double-sub from ${db.user.password} fails -->
+        <filter token="DB_DIALECT" value="${db.dialect}" />
+        <copy todir="${basedir}/target/test-classes" filtering="true">
+            <fileset dir="${basedir}/src/test/resources">
+                <include name="hibernate.cfg.xml" />
+            </fileset>
+        </copy>
+    </target>
+
+
+    <target name="gen_ddl" depends="gen_ddl-unix,gen_ddl-windows"
+            description="geneate ddl" />
+    <target name="gen_ddl-unix" if="osfamily-unix" depends="setup_hibernate.cfg">
+        <exec executable="mvn" failonerror="true">
+            <arg value="-Pddl" />
+            <arg value="process-test-resources" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="gen_ddl-windows" if="osfamily-windows" depends="setup_hibernate.cfg">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="-Pddl" />
+            <arg value="process-test-resources" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="create_db"
+            description="create tables(s), indices for authentication service">
+        <sql driver="com.mysql.jdbc.Driver"
+             url="jdbc:mysql://${db.host}:${db.port}/cspace"
+             userid="${db.user}"
+             password="${db.user.password}"
+             src="${db.script.dir}/authentication.sql"
+             >
+            <classpath>
+                <pathelement path="${db.driver.jar}"/>
+            </classpath>
+        </sql>
+        <sql driver="com.mysql.jdbc.Driver"
+             url="jdbc:mysql://${db.host}:${db.port}/cspace"
+             userid="${db.user}"
+             password="${db.user.password}"
+             src="${db.script.dir}/authentication_index.sql"
+             >
+            <classpath>
+                <pathelement path="${db.driver.jar}"/>
+            </classpath>
+        </sql>
+        <sql driver="com.mysql.jdbc.Driver"
+             url="jdbc:mysql://${db.host}:${db.port}/cspace"
+             userid="${db.user}"
+             password="${db.user.password}"
+             src="${db.script.dir}/test_authentication.sql"
+             >
+            <classpath>
+                <pathelement path="${db.driver.jar}"/>
+            </classpath>
+        </sql>
+    </target>
+
+    <target name="deploy" depends="install"
+            description="deploy authentication service in ${jboss.server.cspace}">
+        <copy todir="${jboss.server.cspace}/cspace/services">
+            <fileset dir="${src}/main/resources/"/>
+        </copy>
+    </target>
+
+    <target name="undeploy"
+            description="undeploy authentication service from ${jboss.server.cspace}"
+            depends="check.db.scripts.deploy.dir" if="${db.scripts.deploy.dir.exists}">
+        <delete>
+            <fileset dir="${db.scripts.deploy.dir}"
+                     includes="**authentication**.sql"/>
+        </delete>
+    </target>
+
+    <target name="dist"
+            description="generate distribution for authentication service" depends="package">
+        <!-- copy db scripts, etc. -->
+        <copy todir="${services.trunk}/${dist.server.cspace}/cspace/services">
+            <fileset dir="${src}/main/resources/"/>
+        </copy>
+    </target>
+    
+    <target name="check.db.scripts.deploy.dir">
+        <property name="db.scripts.deploy.dir" value="${jboss.server.cspace}/cspace/services/db/${db}"/>
+        <condition property="db.scripts.deploy.dir.exists">
+            <available file="${db.scripts.deploy.dir}" type="dir"/>
+        </condition>
+    </target>
+
+</project>

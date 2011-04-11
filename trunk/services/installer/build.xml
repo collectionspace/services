@@ -1,0 +1,79 @@
+
+<project name="main-install" basedir=".">
+    <description>
+    </description>
+  <!-- set global properties for this build -->
+    <property name="installer.trunk" value=".."/>
+    <property name="services.trunk" value="../../.."/>
+    <property file="${installer.trunk}/build.properties" />
+    <property name="mvn.opts" value="" />
+    <property name="src" location="src"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+    
+    <target name="install"
+    	description="Copy artifacts for CollectionSpace Nuxeo doctypes">
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionSpace Service's &apos;install&apos; target." />
+				</exec>
+        <ant antfile="id/build.xml" target="install" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="install" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="install" inheritAll="false"/>
+    </target>
+    
+    <target name="config" description="" depends="install">
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionSpace Service's &apos;config&apos; target." />
+				</exec>
+    </target>    
+
+    <!-- this target is called in order based on the dependencies between the services -->
+    <target name="predeploy" description="" depends="config">
+        <exec executable="echo">
+        		<arg value="Installer: Executing services &apos;predeploy&apos; target." />
+				</exec>    	
+<!--
+        <ant antfile="common/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="setup" inheritAll="false"/>
+-->        
+        <ant antfile="id/build.xml" target="predeploy" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="predeploy" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="predeploy" inheritAll="false"/>
+<!--        
+        <ant antfile="intake/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="setup" inheritAll="false"/>
+-->        
+    </target>
+
+    <target name="deploy" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionSpace Service's &apos;deploy&apos; target." />
+				</exec>
+    </target>
+
+    <target name="postdeploy" description="">
+        <exec executable="echo">
+        		<arg value="Executing CollectionSpace Service's &apos;postdeploy&apos; target." />
+				</exec>    	
+<!--
+        <ant antfile="common/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="setup" inheritAll="false"/>
+-->        
+        <ant antfile="id/build.xml" target="postdeploy" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="postdeploy" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="postdeploy" inheritAll="false"/>
+<!--        
+        <ant antfile="intake/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="setup" inheritAll="false"/>
+-->        
+    </target>    
+</project>

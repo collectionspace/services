@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Movement schema (XSD)
+    
+    Entity  : Movement
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/movement"
+  xmlns="http://collectionspace.org/services/movement"
+  targetNamespace="http://collectionspace.org/services/movement"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+   <!-- See http://wiki.collectionspace.org/display/collectionspace/Location+and+Movement+Control+Schema -->
+
+    <xs:element name="movements_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Object Location Information Group -->
+                <xs:element name="currentLocation" type="xs:string"/>
+                <xs:element name="currentLocationFitness" type="xs:string"/>
+                <xs:element name="currentLocationNote" type="xs:string"/>
+                <xs:element name="locationDate" type="xs:string"/>
+                <xs:element name="normalLocation" type="xs:string"/>
+                <!--  Movement Information Group -->
+                <xs:element name="movementContact" type="xs:string"/>
+                <xs:element name="movementMethods" type="movementMethodsList"/>
+                <xs:element name="movementNote" type="xs:string"/>
+                <xs:element name="movementReferenceNumber" type="xs:string"/>
+                <xs:element name="plannedRemovalDate" type="xs:string"/>
+                <xs:element name="removalDate" type="xs:string"/>
+                <xs:element name="reasonForMove" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:complexType name="movementMethodsList">
+        <xs:sequence>
+            <xs:element name="movementMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+ 
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonList">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+    
+    <!-- movements records, as in nuxeo repository -->
+    <xs:element name="movements-common-list">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">                    
+                    <xs:sequence>
+                        <xs:element name="movement-list-item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="movementReferenceNumber" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="currentLocation" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="locationDate" type="xs:string"
+                                        minOccurs="1" />
+                                    <!-- uri to retrive details -->
+                                    <xs:element name="uri" type="xs:anyURI"
+                                        minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string"
+                                        minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>                    
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+

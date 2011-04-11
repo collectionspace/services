@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    $LastChangedRevision: 1341 $
+    $LastChangedDate: 2010-02-15 22:01:55 -0800 (Mon, 15 Feb 2010) $
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:ns="http://collectionspace.org/services/jaxb" 
+	xmlns="http://collectionspace.org/services/jaxb" 
+	targetNamespace="http://collectionspace.org/services/jaxb" version="0.6">
+	
+	<xs:element name="abstract-common-list">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pageNum" type="xs:unsignedInt"/>
+				<xs:element name="pageSize" type="xs:unsignedInt"/>
+				<!-- "itemsInPage" is useful to our testing framework's unit tests -->
+				<xs:element name="itemsInPage" type="xs:unsignedInt"/>
+				<xs:element name="totalItems" type="xs:unsignedInt"/>
+				<xs:element name="fieldsReturned" type="xs:string"/>
+				<xs:element name="list-item" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:any processContents="skip" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

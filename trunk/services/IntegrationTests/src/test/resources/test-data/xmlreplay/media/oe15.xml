@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:media_common
+xmlns:ns2="http://collectionspace.org/services/media"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <contributor>urn:cspace:org.collectionspace.demo:personauthority:name(MediaPersonAuth2)'MediaPersonAuth2':person:name(owenCurOwner2)</contributor>
+  <title>title new authority</title>
+  <source>source 1</source>
+</ns2:media_common>
+
+

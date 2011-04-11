@@ -1,0 +1,397 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.acquisition.layouts.webapp">
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="acquisition">
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>accessionDate</widget></row>
+        <row><widget>acquisitionAuthorizer</widget></row>
+        <row><widget>acquisitionAuthorizerDate</widget></row>
+        <row><widget>acquisitionDate</widget></row>
+        <row><widget>acquisitionFundingCurrency</widget></row>
+        <row><widget>acquisitionFundingValue</widget></row>
+        <row><widget>acquisitionFundingSource</widget></row>
+        <row><widget>acquisitionFundingSourceProvisos</widget></row>
+        <row><widget>acquisitionMethod</widget></row>
+        <row><widget>acquisitionNote</widget></row>
+        <row><widget>acquisitionProvisos</widget></row>
+        <row><widget>acquisitionReason</widget></row>
+        <row><widget>acquisitionReferenceNumber</widget></row>
+        <row><widget>owner</widget></row>
+        <!-- row><widget>acquisitionSource</widget></row -->
+        <row><widget>groupPurchasePriceCurrency</widget></row>
+        <row><widget>groupPurchasePriceValue</widget></row>
+        <row><widget>objectOfferPriceCurrency</widget></row>
+        <row><widget>objectOfferPriceValue</widget></row>
+        <row><widget>objectPurchaseOfferPriceCurrency</widget></row>
+        <row><widget>objectPurchaseOfferPriceValue</widget></row>
+        <row><widget>objectPurchasePriceCurrency</widget></row>
+        <row><widget>objectPurchasePriceValue</widget></row>
+        <row><widget>originalObjectPurchasePriceCurrency</widget></row>
+        <row><widget>originalObjectPurchasePriceValue</widget></row>
+        <row><widget>transferOfTitleNumber</widget></row>
+        <row><widget>fieldCollectionEventName</widget></row>
+      </rows>
+
+      <widget name="accessionDate" type="text">
+        <labels>
+          <label mode="any">accessionDate</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:accessionDate</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionAuthorizer" type="text">
+        <labels>
+          <label mode="any">acquisitionAuthorizer</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionAuthorizer</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionAuthorizerDate" type="text">
+        <labels>
+          <label mode="any">acquisitionAuthorizerDate</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionAuthorizerDate</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionDate" type="text">
+        <labels>
+          <label mode="any">acquisitionDate</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionDate</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionFundingCurrency" type="text">
+        <labels>
+          <label mode="any">acquisitionFundingCurrency</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionFundingCurrency</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="acquisitionFundingValue" type="text">
+        <labels>
+          <label mode="any">acquisitionFundingValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionFundingValue</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="acquisitionFundingSource" type="text">
+        <labels>
+          <label mode="any">acquisitionFundingSource</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionFundingSource</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionFundingSourceProvisos" type="text">
+        <labels>
+          <label mode="any">acquisitionFundingSourceProvisos</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionFundingSourceProvisos</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionMethod" type="text">
+        <labels>
+          <label mode="any">acquisitionMethod</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionMethod</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionNote" type="text">
+        <labels>
+          <label mode="any">acquisitionNote</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionNote</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionProvisos" type="text">
+        <labels>
+          <label mode="any">acquisitionProvisos</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionProvisos</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionReason" type="text">
+        <labels>
+          <label mode="any">acquisitionReason</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionReason</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="acquisitionReferenceNumber" type="text">
+        <labels>
+          <label mode="any">acquisitionReferenceNumber</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionReferenceNumber</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+        <widget name="owner" type="text">
+        <labels>
+          <label mode="any">owner</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:owner</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <!--
+      <widget name="acquisitionSource" type="text">
+        <labels>
+          <label mode="any">acquisitionSources</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:acquisitionSources</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      -->
+      
+      <widget name="groupPurchasePriceCurrency" type="text">
+        <labels>
+          <label mode="any">groupPurchasePriceCurrency</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:groupPurchasePriceCurrency</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="groupPurchasePriceValue" type="text">
+        <labels>
+          <label mode="any">groupPurchasePriceValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:groupPurchasePriceValue</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="objectOfferPriceCurrency" type="text">
+        <labels>
+          <label mode="any">objectOfferPriceCurrency</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:objectOfferPriceCurrency</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+     <widget name="objectOfferPriceValue" type="text">
+        <labels>
+          <label mode="any">objectOfferPriceValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:objectOfferPriceValue</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="objectPurchaseOfferPriceCurrency" type="text">
+        <labels>
+          <label mode="any">objectPurchaseOfferPriceCurrency</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:objectPurchaseOfferPriceCurrency</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+       <widget name="objectPurchaseOfferPriceValue" type="text">
+        <labels>
+          <label mode="any">objectPurchaseOfferPriceValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:objectPurchaseOfferPriceValue</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="objectPurchasePriceCurrency" type="text">
+        <labels>
+          <label mode="any">objectPurchasePriceCurrency</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:objectPurchasePriceCurrency</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+       <widget name="objectPurchasePriceValue" type="text">
+        <labels>
+          <label mode="any">objectPurchasePriceValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:objectPurchasePriceValue</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="originalObjectPurchasePriceCurrency" type="text">
+        <labels>
+          <label mode="any">originalObjectPurchasePriceCurrency</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:originalObjectPurchasePriceCurrency</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="originalObjectPurchasePriceValue" type="text">
+        <labels>
+          <label mode="any">originalObjectPurchasePriceValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:originalObjectPurchasePriceValue</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="transferOfTitleNumber" type="text">
+        <labels>
+          <label mode="any">transferOfTitleNumber</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:transferOfTitleNumber</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="fieldCollectionEventName" type="text">
+        <labels>
+          <label mode="any">fieldCollectionEventName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:fieldCollectionEventName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+    </layout>
+  </extension>
+</component>

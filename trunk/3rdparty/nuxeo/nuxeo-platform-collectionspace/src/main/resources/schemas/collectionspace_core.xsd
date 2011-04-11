@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Older (?) CollectionObject Core Schema for Nuxeo EP
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/collectionspace_core/"
+    xmlns="http://collectionspace.org/collectionspace_core/"
+    targetNamespace="http://collectionspace.org/collectionspace_core/"
+    version="0.1">
+         
+
+    <xs:element name="tenantId" type="xs:string"/>
+    <!--<xs:element name="createdAt" type="xs:string"/>-->
+    <xs:element name="createdAt" type="xs:dateTime"/>
+    <xs:element name="updatedAt" type="xs:dateTime"/>
+</xs:schema>

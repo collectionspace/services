@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.intake.layouts.webapp">
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="intake">
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>currentOwner</widget></row>
+        <row><widget>depositor</widget></row>
+        <row><widget>depositorsRequirements</widget></row>
+        <row><widget>entryDate</widget></row>
+        <!-- Repeatable fields are commented out for now until we -->
+        <!-- identify how to represent these complex types in layouts. -->
+        <!-- <row><widget>entryMethod</widget></row> -->
+        <row><widget>entryNote</widget></row>
+        <row><widget>entryNumber</widget></row>
+        <row><widget>entryReason</widget></row>
+        <row><widget>packingNote</widget></row>
+        <row><widget>returnDate</widget></row>
+      </rows>
+
+      <widget name="currentOwner" type="text">
+        <labels>
+          <label mode="any">currentOwner</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">currentOwner</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="depositor" type="text">
+        <labels>
+          <label mode="any">depositor</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">depositor</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="depositorsRequirements" type="text">
+        <labels>
+          <label mode="any">depositorsRequirements</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">depositorsRequirements</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="entryDate" type="text">
+        <labels>
+          <label mode="any">entryDate</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">entryDate</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+<!--
+      <widget name="entryMethod" type="text">
+        <labels>
+          <label mode="any">entryMethod</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">entryMethod</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+-->
+
+      <widget name="entryNote" type="text">
+        <labels>
+          <label mode="any">entryNote</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">entryNote</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="entryNumber" type="text">
+        <labels>
+          <label mode="any">entryNumber</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">entryNumber</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="entryReason" type="text">
+        <labels>
+          <label mode="any">entryReason</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">entryReason</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="packingNote" type="text">
+        <labels>
+          <label mode="any">packingNote</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">packingNote</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="returnDate" type="text">
+        <labels>
+          <label mode="any">returnDate</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="intakes_common">returnDate</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+    </layout>
+  </extension>
+</component>

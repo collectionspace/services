@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.ecm.platform.quote.service.listener" version="1.0">
+  <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+
+    <listener name="quoteListener" async="false" postCommit="true" class="org.collectionspace.ecm.platform.quote.listener.QuoteRemovedEventListener">
+    </listener>
+
+    <listener name="docRemovedQuoteListener" async="true" postCommit="true" class="org.collectionspace.ecm.platform.quote.listener.DocumentRemovedQuoteEventListener">
+    </listener>
+
+  </extension>
+</component>

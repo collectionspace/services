@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Workflow schema (XSD)
+    
+    Entity  : Workflow
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/workflow/"
+    xmlns="http://collectionspace.org/workflow/"
+    targetNamespace="http://collectionspace.org/workflow/"
+    version="0.1">
+    <!--  Workflow Information Group -->
+	<xs:element name="lifeCyclePolicy" type="xs:string"/>
+	<xs:element name="currentLifeCycleState" type="xs:string"/>
+	<xs:element name="allowedStateTransitionList" type="stateTransitionList">
+        <xs:complexType>
+            <xs:sequence>
+				<xs:element name="stateTransition" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

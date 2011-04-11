@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.collectionspace_core.ecm.types">
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="CollectionSpace_Core" coretype="CollectionSpace_Core">
+      <label>org.collectionspace.collectionspace_core</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>collectionspace_core</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>CollectionSpace_Core</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>CollectionSpace_Core</type>
+      </subtypes>
+    </type>
+  </extension>
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Subitem" coretype="Subitem">
+      <label>org.collectionspace.subitem</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>subitem</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Subitem</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Subitem</type>
+      </subtypes>
+    </type>
+  </extension>
+</component>

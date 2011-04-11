@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.intake.coreTypes">
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
+    <schema name="intakes_common" prefix="intakes_common" src="schemas/intakes_common.xsd"/>
+  </extension>
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
+    <doctype name="Intake" extends="CollectionSpaceDocument">
+      <schema name="common"/>
+      <schema name="dublincore"/>
+      <schema name="collectionspace_core"/>
+      <schema name="intakes_common"/>
+      <prefetch>intakes_common:entryNumber intakes_common:depositor intakes_common:currentOwner</prefetch>
+    </doctype>
+  </extension>
+</component>

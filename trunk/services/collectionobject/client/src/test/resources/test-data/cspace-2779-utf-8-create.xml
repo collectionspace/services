@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : cspace-2779-utf-8-create.xml
+    Created on : 
+    Author     : 
+    Description: Test data for http://issues.collectionspace.org/browse/CSPACE-2779
+-->
+
+<ns2:collectionobjects_common
+    xmlns:ns2="http://collectionspace.org/services/collectionobject">
+    <objectNumber>2</objectNumber>
+    <comments>Katowice Spodek Live '94 by the band Perfect</comments>
+    <distinguishingFeatures>Audiorecording album cover signed by Lech Wałęsa</distinguishingFeatures>
+</ns2:collectionobjects_common>

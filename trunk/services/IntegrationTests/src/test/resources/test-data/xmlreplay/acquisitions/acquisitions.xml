@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+        <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+    </auths>
+   
+    <testGroup ID="makeone" autoDeletePOSTS="false">
+       <test ID="ac1"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/acquisitions/</uri>
+             <part>
+                 <label>acquisitions_common</label>
+                 <filename>acquisitions/ac1.xml</filename>
+             </part>
+         </test>
+        <test ID="ac1get">
+            <method>GET</method>
+            <uri>/cspace-services/acquisitions/${ac1.CSID}</uri>
+            <response>
+                <expected level="TEXT" />
+                <part>
+                     <label>acquisitions_common</label>
+                     <filename>acquisitions/res/ac1.res.xml</filename>
+                 </part>
+             </response>
+         </test>
+    </testGroup>       
+
+    <testGroup ID="testList" autoDeletePOSTS="true">
+         <test ID="ac1"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/acquisitions/</uri>
+             <part>
+                 <label>acquisitions_common</label>
+                 <filename>acquisitions/ac1.xml</filename>
+             </part>
+         </test>
+         
+         <test ID="ac1get">
+            <method>GET</method>
+            <uri>/cspace-services/acquisitions/${ac1.CSID}</uri>
+            <response>
+                <expected level="TEXT" />
+                <part>
+                     <label>acquisitions_common</label>
+                     <filename>acquisitions/res/ac1.res.xml</filename>
+                 </part>
+             </response>
+         </test>
+
+        <test ID="ac2"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/acquisitions/</uri>
+             <part>
+                 <label>acquisitions_common</label>
+                 <filename>acquisitions/ac2.xml</filename>
+             </part>
+         </test>
+         
+        <test ID="ac2get">
+            <method>GET</method>
+            <uri>/cspace-services/acquisitions/${ac2.CSID}</uri>
+            <response>
+                <expected level="TEXT" />
+                <part>
+                     <label>acquisitions_common</label>
+                     <filename>acquisitions/res/ac2.res.xml</filename>
+                 </part>
+             </response>
+        </test>
+
+        <!--
+        <test ID="ac3list">
+            <method>GET</method>
+            <uri>/cspace-services/acquisitions/?sortBy=&amp;pgNum=0&amp;pgSz=10</uri>
+            <response>acquisitions/res/ac3list.res.xml</response>
+            <response>
+                <expected level="TEXT" />
+                <part>
+                     <label>acquisitions_common</label>
+                     <filename>acquisitions/res/ac3list.res.xml</filename>
+                 </part>
+             </response>
+        </test>
+        -->
+        
+    </testGroup>
+     
+         
+             
+    <testGroup ID="cleanup" autoDeletePOSTS="true">
+         <test ID="ac1"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/acquisitions/8080b6b8-393a-4e8a-b823</uri>
+         </test>
+         <test ID="ac1"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/acquisitions/231e8787-4d77-4eaf-8d10</uri>
+         </test>
+         <test ID="ac1"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/acquisitions/cbb82bbc-9513-4f83-ab4f</uri>
+         </test>
+         <test ID="ac1"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/acquisitions/516c2435-4560-408c-8628</uri>
+         </test>
+    </testGroup>
+    
+
+</xmlReplay>
+        
+        

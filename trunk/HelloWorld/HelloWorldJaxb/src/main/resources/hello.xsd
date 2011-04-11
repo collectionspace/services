@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/hello"
+  xmlns="http://collectionspace.org/hello"
+  targetNamespace="http://collectionspace.org/hello"
+  version="0.1"
+>
+
+<!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+
+    <!-- domain-identifier  -->
+    <xs:element name="domain-identifier">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="dsid" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    
+    <!-- collection-object  -->
+    <xs:element name="collection-object">
+        <xs:complexType>
+            <xs:sequence>
+			    <xs:element name="csid" type="xs:string" />
+			    <xs:element name="objectNumber" type="xs:string"/>
+			    <xs:element name="otherNumber" type="xs:string"/>
+			    <xs:element name="briefDescription" type="xs:string"/>
+			    <xs:element name="comments" type="xs:string"/>
+			    <xs:element name="distFeatures" type="xs:string"/>
+			    <xs:element name="objectName" type="xs:string"/>
+			    <xs:element name="responsibleDept" type="xs:string"/>
+			    <xs:element name="title" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- collection objects as in nuxeo repository -->
+    <xs:element name="collection-object-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="collection-object-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="objectNumber" type="xs:string"
+                                minOccurs="1" />
+                            <!-- uri to retrive collection object details -->
+                            <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+

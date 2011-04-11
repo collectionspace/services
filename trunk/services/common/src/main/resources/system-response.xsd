@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : system-response.xsd
+    Created on : May 26, 2009, 1:31 PM
+    Author     :
+    $LastChangedRevision$
+    $LastChangedDate$
+    Copyright 2009 University of California at Berkeley
+    Description:
+        Schema for system specific information for service response envelope.
+        This envelope contains various contextual information such as error,
+        tenant and query. This context is over and above what is exchanged in
+        transport protocol specific session. e.g. cookies, headers and parameters
+        of HTTP session
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://collectionspace.org/services/common/system"
+    xmlns:tns="http://collectionspace.org/services/common/system"
+    elementFormDefault="qualified">
+
+    <xs:element name="system-response">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- error related information -->
+                <!-- available only if error/exception occurs on the service side -->
+                <xs:element name="error" minOccurs="0"  maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <!-- error code is mandatory in case of error -->
+                            <xs:element name="code" type="xs:string" minOccurs="1"  maxOccurs="1"/>
+                            <!-- error message -->
+                            <xs:element name="message" type="xs:string" minOccurs="0"  maxOccurs="1"/>
+                            <!-- id of resource if available -->
+                            <xs:element name="resource-id" type="xs:string" minOccurs="0"  maxOccurs="1"/>
+                            <!-- uri of request -->
+                            <xs:element name="request-uri" type="xs:anyURI" minOccurs="1"  maxOccurs="1"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <!-- tenant related information -->
+                <!-- available only in multi-tenant mode -->
+                <xs:element name="tenant-context" minOccurs="0"  maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <!-- tenant id would usually be in the form of UUID -->
+                            <!-- tenant id might also identify Nuxeo repository id -->
+                            <!-- system generated -->
+                            <xs:element name="id" type="xs:string" minOccurs="1"  maxOccurs="1"/>
+                            <!-- tenant name could be domain name, e.g.sfmoma.org -->
+                            <xs:element name="name" type="xs:string" minOccurs="1"  maxOccurs="1"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <!-- async service related information -->
+                <!-- ref: XML.com REST Web Services Best Practices and Guide -->
+                <xs:element name="receipt" minOccurs="0"  maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                                <!-- timestamp available only in case of async services -->
+                            <xs:element name="timestamp" type="xs:dateTime" minOccurs="1" maxOccurs="1"/>
+                            <!-- uri of the requester -->
+                            <xs:element name="requester-uri" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                            <xs:element name="activity-status" minOccurs="1" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="activity-uri" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                                        <!-- status of the activity -->
+                                        <!-- todo: due to JAXB limitation, the status type is defined here -->
+                                        <!-- it would be nice to share status between the activity-status and status service !-->
+                                        <!-- defined elsewhere -->
+                                        <xs:element name="status" minOccurs="1" maxOccurs="1">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <!-- activity has started -->
+                                                    <xs:enumeration value="started" />
+                                                    <!-- request is accepted, validated and persisted -->
+                                                    <xs:enumeration value="accepted" />
+                                                    <!-- activity is completed successfully -->
+                                                    <xs:enumeration value="completed" />
+                                                    <!-- activity failed to completed -->
+                                                    <xs:enumeration value="failed" />
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                
+                <!-- query specific context -->
+                <!-- query context is available only for queries resulting in large result sets -->
+                <xs:element name="query-result" minOccurs="0"  maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="total-results" type="xs:int" minOccurs="1"  maxOccurs="1"/>
+                            <xs:element name="current-index" type="xs:int" minOccurs="1"  maxOccurs="1"/>
+                            <xs:element name="max-results" type="xs:int" default="25" minOccurs="1"  maxOccurs="1"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

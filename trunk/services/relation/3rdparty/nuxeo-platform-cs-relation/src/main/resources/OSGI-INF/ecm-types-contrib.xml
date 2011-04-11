@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+    Copyright 2009 University of California at Berkeley
+    Licensed under the Educational Community License (ECL), Version 2.0.
+    You may not use this file except in compliance with this License.
+
+    You may obtain a copy of the ECL 2.0 License at
+    https://source.collectionspace.org/collection-space/LICENSE.txt
+
+    Document   : ecm-types-contrib.xml
+    Created on : $LastChangedDate: $
+    Author     : $LastChangedBy: $
+    Revision   : $LastChangedRevision: $
+    Description:
+        Nuxeo ecm type for CollectionSpace Relation
+-->
+<component name="org.collectionspace.relation.ecm.types">
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Relation" coretype="Relation">
+      <label>org.collectionspace.relation</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>collectionspace_core</layout>
+        <layout>relation</layout>
+      </layouts>
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Relation</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Relation</type>
+      </subtypes>
+    </type>
+
+  </extension>
+</component>

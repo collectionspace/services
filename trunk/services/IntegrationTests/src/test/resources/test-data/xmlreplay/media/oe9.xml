@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:personauthorities_common
+xmlns:ns2="http://collectionspace.org/services/person"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <displayName>MediaPersonAuth2</displayName>
+  <shortIdentifier>MediaPersonAuth2</shortIdentifier>
+  <refName>urn:cspace:org.collectionspace.demo:personauthority:name(MediaPersonAuth2)'MediaPersonAuth2'</refName>
+  <vocabType>PersonAuthority</vocabType>
+</ns2:personauthorities_common>
+

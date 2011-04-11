@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <protoHostPort>http://localhost:8280</protoHostPort>
+    <testGroup ID="nonlatin" autoDeletePOSTS="false">
+        <test ID="1001">
+            <method>POST</method>
+            <uri>/cspace-services/acquisitions/</uri>
+            <part>
+                <label>acquisitions_common</label>
+                <filename>acq19-mod.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/acquisitions/</uri>
+            <fromTestID>1001</fromTestID>
+        </test>
+     </testGroup>
+</xmlReplay>

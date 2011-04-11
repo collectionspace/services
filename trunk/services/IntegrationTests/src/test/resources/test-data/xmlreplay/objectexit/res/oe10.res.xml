@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:personauthorities_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/personauthorities_common.xsd">
+<shortIdentifier>ObjectexitPersonAuth</shortIdentifier>
+<refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth'</refName>
+<csid>${oe9.CSID}</csid>
+<displayName>ObjectexitPersonAuth</displayName>
+<vocabType>PersonAuthority</vocabType>
+</ns2:personauthorities_common>
+

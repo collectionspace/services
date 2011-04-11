@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <testGroup ID="organization" autoDeletePOSTS="true">
+        <test ID="OrgAuth1" auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/orgauthorities/</uri>
+            <part>
+                <label>orgauthorities_common</label>
+                <filename>organization/orgauthorities_common.xml</filename>
+            </part>
+        </test>
+        <test ID="Org1">
+            <method>POST</method>
+            <uri>/cspace-services/orgauthorities/${OrgAuth1.CSID}/items/</uri>
+            <part>
+                <label>organizations_common</label>
+                <filename>organization/organizations_common.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/orgauthorities/${OrgAuth1.CSID}/items/${Org1.CSID}</uri>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/orgauthorities/${OrgAuth1.CSID}</uri>
+        </test>
+        <test ID="oneOrg">
+            <method>LIST</method>
+            <uri>/cspace-services/orgauthorities/${OrgAuth1.CSID}</uri>
+        </test>
+        <test ID="organizationList2">
+            <method>LIST</method>
+            <uri>/cspace-services/orgauthorities/${OrgAuth1.CSID}/items/</uri>
+        </test>
+    </testGroup>
+</xmlReplay>

@@ -1,0 +1,27 @@
+Here are the steps we tried:
+
+On nightly.collectionspace.org, which is running Nuxeo 5.3 with mysql
+
+    Update a record through Nuxeo Web GUI, inserting a greek psi character. 
+    ==> failure: able to edit record, but on read and edit again, character is tranformed into question mark.
+    
+On nightly, we ran a SQL update and then a SQL dump on a table, and got the UTF8 non-Latin1 characters back. 
+    ==> success: full round trip, from file.sql to MySQL to file.out .
+    Note that we used the UTF8 option on the command line:
+     
+      mysql  -u cspace_user -p  --default_character_set utf8 nuxeo < ~/acq.sql
+     
+      mysqldump -u cspace_user -p nuxeo acquisitions_common_acquisitionsources > acq.out
+     
+On localhost which is running the older version of Nuxeo with mysql
+
+    Update a record through Nuxeo Web GUI, inserting a greek psi character. 
+    ==> success: able to read and edit record and see character.
+    
+    
+    
+Notes:
+  Check the encoding of the DB:
+    mysql> SHOW VARIABLES LIKE 'character_set_database';      
+
+

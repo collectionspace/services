@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="test">dGVzdDp0ZXN0</auth>
+        <auth ID="bigbird2010">YmlnYmlyZDIwMTA6YmlnYmlyZDIwMTA=</auth>
+    </auths>
+    
+   <!-- ================================================================================ -->
+    
+   <testGroup ID="dimensionTestGroup" autoDeletePOSTS="false">
+        <!-- should fail on auth="bigbird2010" since bigbird2010 is not defined on back end. -->
+        <test ID="dimension1"  auth="bigbird2010">
+            <expectedCodes>401,403</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/dimensions/</uri>
+            <part>
+                <label>dimensions_common</label>
+                <filename>dimension/1.xml</filename>
+            </part>
+        </test>
+
+        <!-- should succeed on auth="test" since test is admin user. -->
+        <test ID="dimension2"  auth="test">
+            <method>POST</method>
+            <uri>/cspace-services/dimensions/</uri>
+            <part>
+                <label>dimensions_common</label>
+                <filename>dimension/1.xml</filename>
+            </part>
+        </test>
+
+        
+    </testGroup>
+</xmlReplay>
+        
+        

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+
+<testGroup ID="authrefs" autoDeletePOSTS="false">
+        <test ID="oe9">
+         <method>POST</method>
+         <uri>/cspace-services/personauthorities/</uri>
+         <part>
+             <label>personauthorities_common</label>
+             <filename>media/oe9.xml</filename>
+         </part>
+      </test>
+      <test ID="oe11">
+             <method>POST</method>
+             <uri>/cspace-services/personauthorities/${oe9.CSID}/items/</uri>
+             <part>
+                 <label>persons_common</label>
+                 <filename>media/oe11.xml</filename>
+             </part>
+        </test>
+        <test ID="oe15">
+             <method>POST</method>
+             <uri>/cspace-services/media/</uri>
+             <part>
+                 <label>media_common</label>
+                 <filename>media/oe15.xml</filename>
+             </part>
+        </test>
+       <test ID="authorityrefs">
+             <method>GET</method>
+             <uri>/cspace-services/media/${oe15.CSID}/authorityrefs</uri>
+        </test>
+        <test ID="refObjs">
+             <method>GET</method>
+             <uri>/cspace-services/personauthorities/${oe9.CSID}/items/${oe11.CSID}/refObjs</uri>
+        </test>
+    </testGroup>
+
+</xmlReplay>

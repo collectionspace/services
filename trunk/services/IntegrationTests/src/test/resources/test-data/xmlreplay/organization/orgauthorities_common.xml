@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:orgauthorities_common
+xmlns:ns2="http://collectionspace.org/services/organization"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <shortIdentifier>1288047801161</shortIdentifier>
+  <displayName>TestOrgAuth-1288047801161</displayName>
+  <refName>urn:cspace:org.collectionspace.demo:orgauthority:name(1288047801161)'TestOrgAuth-1288047801161'</refName>
+  <vocabType>OrgAuthority</vocabType>
+</ns2:orgauthorities_common>
+

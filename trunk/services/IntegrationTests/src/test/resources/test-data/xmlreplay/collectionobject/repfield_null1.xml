@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/collectionobject">
+<objectNumber>objectNumber</objectNumber>
+<!-- test child repeatable field with null value -->
+<responsibleDepartments><responsibleDepartment></responsibleDepartment></responsibleDepartments>
+</ns2:collectionobjects_common> 

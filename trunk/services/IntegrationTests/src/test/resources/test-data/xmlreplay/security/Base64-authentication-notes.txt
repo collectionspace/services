@@ -1,0 +1,44 @@
+        bigbird2010
+        bsh % unp = "bigbird2010:bigbird2010";
+        <bigbird2010bigbird2010>
+        bsh % String encoding = new sun.misc.BASE64Encoder().encode (unp.getBytes());
+        bsh % encoding = new sun.misc.BASE64Encoder().encode (unp.getBytes());
+        <YmlnYmlyZDIwMTBiaWdiaXJkMjAxMA==>
+        
+        bsh % unp = "bigbird2010:bigbird2010";
+        <bigbird2010:bigbird2010>
+        bsh %  encoding = new sun.misc.BASE64Encoder().encode (unp.getBytes());
+        <YmlnYmlyZDIwMTA6YmlnYmlyZDIwMTA=>
+        
+        bsh % String  decode(String s){return new String(Base64.decode(s.getBytes()));}
+        
+        bsh % decode("dGVzdC1wYWhtYTp0ZXN0");
+        test-pahma:test
+        //used for DELETE /cspace-services/accounts/9230dc97-0888-4252-8c89-795c92305ca0 HTTP/1.1
+        
+        //used for creating accounts, roles, etc:
+        bsh % decode("dGVzdDp0ZXN0");
+        test:test
+        
+        //used for dimension service tests:
+        bsh % decode("dXNlcjFAbXVzZXVtMS5vcmc6dXNlcjFAbXVzZXVtMS5vcmc=");
+        user1@museum1.org:user1@museum1.org
+        
+        dGVzdDpudWxs
+        bsh % decode("dGVzdDpudWxs");
+        test:null  (no password)
+        ==> HTTP/1.1 401 Password Incorrect/Password Required
+        
+        bsh % decode("dXNlcjJAbXVzZXVtMi5vcmc6dXNlcjJAbXVzZXVtMi5vcmc=");
+        user2@museum2.org:user2@museum2.org
+        DELETE OK on DELETE /cspace-services/dimensions/7922ea12-401d-4a7b-9f1a HTTP/1.1
+
+        dGVzdDpiYXI=
+        test:bar
+        //used for incorrect password.
+        Some more forbidden auths:
+        bsh % decode("YmFieWJvcDpiYWJ5Ym9wMDk=");
+        babybop:babybop09
+        bsh % decode("YmFybmV5OmJhcm5leTA4");
+        barney:barney08
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:account_role
+xmlns:ns2="http://collectionspace.org/services/authorization">
+  <subject>ROLE</subject>
+  <account>
+    <accountId>${accountBigbird.CSID}</accountId>
+    <screenName>bigbird2010</screenName>
+    <userId>bigbird2010</userId>
+  </account>
+  <role>
+    <roleId>${roleTestCM.CSID}</roleId>
+    <roleName>ROLE_TEST_CM</roleName>
+  </role>
+</ns2:account_role>
+

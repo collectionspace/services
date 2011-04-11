@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Contact schema (XSD)
+    
+    Entity  : Contact
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/contact/"
+    xmlns="http://collectionspace.org/contact/"
+    targetNamespace="http://collectionspace.org/contact/"
+    version="0.1">
+
+    <xs:element name="csid" type="xs:string" />
+    <xs:element name="inAuthority" type="xs:string" />
+    <xs:element name="inItem" type="xs:string" />
+
+    <xs:element name="addressType" type="xs:string"/>
+    <xs:element name="addressPlace" type="xs:string"/>
+    <!-- FIXME After release 1.0, four additional fields are introduced here, -->
+    <!-- and these fields, plus addressType and addressPlace, constitute a -->
+    <!-- repeatable group. -->
+
+    <xs:element name="web" type="xs:string"/>
+    <xs:element name="email" type="xs:string"/>
+    <xs:element name="telephoneNumber" type="xs:string"/>
+    <xs:element name="faxNumber" type="xs:string"/>
+    
+</xs:schema>

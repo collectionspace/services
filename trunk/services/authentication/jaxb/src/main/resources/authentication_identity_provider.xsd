@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    CollectionSpace default (security) identity provider schema (XSD)
+
+    Entity(s)  : users
+    Used for:
+
+    $LastChangedRevision: 916 $
+    $LastChangedDate: 2009-11-05 16:59:20 -0800 (Thu, 05 Nov 2009) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
+    xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:ns="http://collectionspace.org/services/authentication"
+    xmlns="http://collectionspace.org/services/authentication"
+    targetNamespace="http://collectionspace.org/services/authentication"
+    version="0.1"
+    jaxb:extensionBindingPrefixes="hj orm"
+    >
+
+    <!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!--
+    Notes for MySQL
+    MySQL puts key length limit of 1000 bytes
+    username - rolename constraint shoudl be within 1000 bytes
+    hbm2ddl makes column length >= 256 as long text, such as column cannot be used
+    in defining a key (pk, fk or constraint)
+-->
+    <xs:element name="user">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>
+                    User definition of CollectionSpace Identity Provider (CSIP)
+                    - username is unique within all the realms in CollectionSpace
+                    including the one managed by CSIP
+                </xs:documentation>
+                <xs:appinfo>
+                    <hj:entity>
+                        <orm:table name="users"/>
+                    </hj:entity>
+                </xs:appinfo>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:element name="username" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:id>
+                                <orm:column name="username" length="128" nullable="false"/>
+                            </hj:id>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="passwd" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="passwd" length="128" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="createdAt" type="xs:dateTime">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="created_at" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="updatedAt" type="xs:dateTime">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="updated_at" />
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
+

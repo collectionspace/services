@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.note.coreTypes">
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
+    <schema name="notes_common" prefix="notes_common" src="schemas/notes_common.xsd"/>
+  </extension>
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
+    <doctype name="CSNote" extends="Document">
+      <schema name="common"/>
+      <schema name="dublincore"/>
+      <schema name="collectionspace_core"/>
+      <schema name="subitem"/>
+      <schema name="notes_common"/>
+    </doctype>
+  </extension>
+</component>

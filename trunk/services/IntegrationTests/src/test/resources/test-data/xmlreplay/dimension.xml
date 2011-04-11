@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@collectionspace.org">59PnafP1k9rcuGNMxbCfyQ3TphxKBqecsJI2Yv5vrms=</auth>
+        <auth ID="bigbird2010">YmlnYmlyZDIwMTA6YmlnYmlyZDIwMTA=</auth>
+    </auths>
+    
+   <!-- ================================================================================ -->
+    
+   <testGroup ID="dimensionTestGroup" autoDeletePOSTS="false">
+        <!-- should fail on auth="bigbird2010" since bigbird2010 is not defined on back end. -->
+        <test ID="dimension1"  auth="bigbird2010">
+            <expectedCodes>401,403</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/dimensions/</uri>
+            <part>
+                <label>dimensions_common</label>
+                <filename>dimension/1.xml</filename>
+            </part>
+        </test>
+
+        <!-- should succeed on auth="test" since test is admin user. -->
+        <test ID="dimension2"  auth="admin@collectionspace.org">
+            <!-- actually, this one should succeed since "test" is admin, but it fails now. -->
+            <expectedCodes>201,403</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/dimensions/</uri>
+            <part>
+                <label>dimensions_common</label>
+                <filename>dimension/1.xml</filename>
+            </part>
+        </test>
+
+        
+    </testGroup>
+
+    <testGroup ID="dimensionCRUDGroup" autoDeletePOSTS="true">
+         <!-- should succeed on auth="test" since test is admin user. -->
+         <test ID="dimPOST"  auth="admin@collectionspace.org">
+             <!-- actually, this one should succeed since "test" is admin, but it fails now. -->
+             <expectedCodes>201</expectedCodes>
+             <method>POST</method>
+             <uri>/cspace-services/dimensions/</uri>
+             <part>
+                 <label>dimensions_common</label>
+                 <filename>dimension/1.xml</filename>
+             </part>
+         </test>
+
+        <test ID="dimGET"  auth="admin@collectionspace.org">
+            <!-- actually, this one should succeed since "test" is admin, but it fails now. -->
+            <method>GET</method>
+            <uri>/cspace-services/dimensions/${dimPOST.CSID}</uri>
+        </test>
+
+        <test ID="dimPUT"  auth="admin@collectionspace.org">
+            <method>PUT</method>
+            <uri>/cspace-services/dimensions/${dimPOST.CSID}</uri>
+            <part>
+                <label>dimensions_common</label>
+                <filename>dimension/2-put.xml</filename>
+            </part>
+        </test>
+
+        <test ID="dimGET2"  auth="admin@collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/dimensions/${dimPOST.CSID}</uri>
+        </test>
+
+
+     </testGroup>
+
+</xmlReplay>
+        
+        

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>org.collectionspace.services.client.sample</name>
+	<comment></comment>
+	<projects>
+		<project>org.collectionspace.services.client</project>
+		<project>org.collectionspace.services.collectionobject.client</project>
+		<project>org.collectionspace.services.collectionobject.jaxb</project>
+		<project>org.collectionspace.services.common</project>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+</projectDescription>

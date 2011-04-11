@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!--
+    Document   : cspace-2578-no-whitespace.xml
+    Created on :
+    Author     :
+    Description: Test data for http://issues.collectionspace.org/browse/CSPACE-2578
+-->
+
+<ns2:acquisitions_common xmlns:ns2="http://collectionspace.org/services/acquisition"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <acquisitionFundingList>
+    <!-- Note: no whitespace between acquisitionFunding and its first child element tag -->
+    <acquisitionFunding><acquisitionFundingSource>
+      urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth)'TestPersonAuth':person:name(franFundingSourceOne)</acquisitionFundingSource>
+    </acquisitionFunding>
+  </acquisitionFundingList>
+</ns2:acquisitions_common>

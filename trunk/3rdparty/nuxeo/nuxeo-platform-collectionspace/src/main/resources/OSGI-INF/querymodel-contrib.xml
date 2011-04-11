@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<component name="com.collectionspace.query.model.override">
+  <require>org.nuxeo.ecm.webapp.querymodel.DefaultQueryModels</require>
+  <extension
+    target="org.nuxeo.ecm.core.search.api.client.querymodel.QueryModelService"
+    point="model">
+    <queryModel name="CURRENT_DOC_CHILDREN">
+      <pattern>
+        SELECT * FROM Document WHERE ecm:parentId = ? AND
+        ecm:isCheckedInVersion = 0 AND ecm:mixinType != 'HiddenInNavigation'
+        AND ecm:currentLifeCycleState != 'deleted' AND ecm:isProxy = 0 
+      </pattern>
+      <sortable value="true" defaultSortColumn="dc:created"
+        defaultSortAscending="false" />
+      <max>50</max>
+    </queryModel>
+		
+</extension>
+</component>
+

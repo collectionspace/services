@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.contact.layouts.webapp">
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="contact">
+
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>addressType</widget></row>
+        <row><widget>addressPlace</widget></row>
+        <row><widget>web</widget></row>
+        <row><widget>email</widget></row>
+        <row><widget>telephoneNumber</widget></row>
+        <row><widget>faxNumber</widget></row>
+      </rows>
+
+      <widget name="addressType" type="text">
+        <labels>
+          <label mode="any">addressType</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="contacts_common">addressType</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="addressPlace" type="text">
+        <labels>
+          <label mode="any">addressPlace</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="contacts_common">addressPlace</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="web" type="text">
+        <labels>
+          <label mode="any">web</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="contacts_common">web</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="email" type="text">
+        <labels>
+          <label mode="any">email</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="contacts_common">email</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="telephoneNumber" type="text">
+        <labels>
+          <label mode="any">telephoneNumber</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="contacts_common">telephoneNumber</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="faxNumber" type="text">
+        <labels>
+          <label mode="any">faxNumber</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="contacts_common">faxNumber</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+     
+    </layout>
+  </extension>
+</component>

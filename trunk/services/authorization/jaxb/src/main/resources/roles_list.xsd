@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    CollectionSpace default (security) authorization provider schema (XSD)
+
+    Entity(s)  : roles_list
+    Used for:
+
+    $LastChangedRevision: 916 $
+    $LastChangedDate: 2009-11-05 16:59:20 -0800 (Thu, 05 Nov 2009) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
+    xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:ns="http://collectionspace.org/services/authorization"
+    xmlns="http://collectionspace.org/services/authorization"
+    targetNamespace="http://collectionspace.org/services/authorization"
+    version="0.1"
+    jaxb:extensionBindingPrefixes="hj orm"
+    >
+
+    <!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!--
+    Notes for MySQL
+    MySQL puts key length limit of 1000 bytes
+    username - rolename constraint should be within 1000 bytes
+    hbm2ddl makes column length >= 256 as long text, such as column cannot be used
+    in defining a key (pk, fk or constraint)
+    -->
+    <xs:include schemaLocation="roles.xsd"/>
+
+    <xs:element name="roles_list">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:appinfo>
+                    <hj:ignored/>
+                </xs:appinfo>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:annotation>
+                    <xs:documentation>role list</xs:documentation>
+                </xs:annotation>
+                <xs:element name="role" type="ns:role" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
+

@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <groupId>org.collectionspace.services</groupId>
+    <artifactId>org.collectionspace.services.3rdparty.nuxeo</artifactId>
+    <version>1.6-SNAPSHOT</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.collectionspace.services</groupId>
+  <artifactId>org.collectionspace.services.3rdparty.nuxeo.collectionspace_core</artifactId>
+  <name>Nuxeo CollectionSpace core extension</name>
+  <description> Nuxeo Enterprise Platform: CS extensions </description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <archive>
+            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+            <manifestEntries>
+              <Bundle-Version>${eclipseVersion}</Bundle-Version>
+              <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

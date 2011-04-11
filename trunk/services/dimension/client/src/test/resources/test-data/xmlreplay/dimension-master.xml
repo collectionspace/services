@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplayMaster>
+    <protoHostPort>http://localhost:8280</protoHostPort>
+    
+    <!-- legal values for dumpServiceResult=[minimal,detailed,full] -->
+    <dump payloads="false" dumpServiceResult="minimal" />
+    
+    <auths default="test">
+       <auth ID="test">dGVzdDp0ZXN0</auth>
+    </auths>
+
+    
+    <!-- run controlFile="./dimension.xml" testGroup="dimensionTestGroup" / -->
+    
+</xmlReplayMaster>
+

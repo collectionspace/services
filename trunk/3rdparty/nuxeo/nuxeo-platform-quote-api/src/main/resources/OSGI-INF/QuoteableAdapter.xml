@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.ecm.platform.quote.api.Adapter">
+
+  <documentation>
+    Defines CSpace Commentable document adapter
+  </documentation>
+
+  <!-- Commentable Document Adapter -->
+  <extension target="org.nuxeo.ecm.core.api.DocumentAdapterService" point="adapters">
+    <adapter class="org.collectionspace.ecm.platform.quote.api.QuoteableDocument"
+      factory="org.collectionspace.ecm.platform.quote.impl.QuoteableAdapterFactory" />
+  </extension>
+
+</component>

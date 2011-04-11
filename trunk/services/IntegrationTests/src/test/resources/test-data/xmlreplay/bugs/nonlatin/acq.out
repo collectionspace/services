@@ -1,0 +1,54 @@
+-- MySQL dump 10.11
+--
+-- Host: localhost    Database: nuxeo
+-- ------------------------------------------------------
+-- Server version	5.0.51a-24+lenny3
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `acquisitions_common_acquisitionsources`
+--
+
+DROP TABLE IF EXISTS `acquisitions_common_acquisitionsources`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `acquisitions_common_acquisitionsources` (
+  `id` varchar(36) character set utf8 collate utf8_bin NOT NULL,
+  `pos` int(11) default NULL,
+  `item` varchar(500) default NULL,
+  KEY `acquisitions_common_acquisitionsources_id_hierarchy_fk` (`id`),
+  KEY `id_idx` (`id`),
+  CONSTRAINT `acquisitions_common_acquisitionsources_id_hierarchy_fk` FOREIGN KEY (`id`) REFERENCES `hierarchy` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `acquisitions_common_acquisitionsources`
+--
+
+LOCK TABLES `acquisitions_common_acquisitionsources` WRITE;
+/*!40000 ALTER TABLE `acquisitions_common_acquisitionsources` DISABLE KEYS */;
+INSERT INTO `acquisitions_common_acquisitionsources` VALUES ('7a517303-afad-458f-b8fb-3adaaad901b0',0,'urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(stephencharla)\'Stephen+Charla\''),('7a517303-afad-458f-b8fb-3adaaad901b0',1,'urn:cspace:org.collectionspace.demo:orgauthority:name(organization):organization:name(emersonradiophonographcorporation)\'Emerson+Radio+Phonograph+Corporation\''),('7a517303-afad-458f-b8fb-3adaaad901b0',2,''),('7a517303-afad-458f-b8fb-3adaaad901b0',3,'urn:cspace:org.collectionspace.demo:orgauthority:name(organization):organization:name(irwintoylimited)\'Irwin+Toy+Limited\''),('08372066-b1cd-4168-b480-6e198eff4df3',0,''),('a5235e94-9612-4fcd-a125-019a937cfb39',0,''),('65d03bcd-8c4a-48e6-a204-850bb382cb15',0,''),('4e330edd-ebf4-4425-bb18-2d58624cbb25',0,' âº  , 0 1The  Î² Source of All  Ïˆ Acquisitions'),('d675779c-e93d-48ce-bed9-3ac3dd3740c2',0,' ? , 0 1The  ? Source of All  ? Acquisitions');
+/*!40000 ALTER TABLE `acquisitions_common_acquisitionsources` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2010-10-08 22:31:11

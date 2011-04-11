@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/jaxb" xmlns:ns3="http://collectionspace.org/services/collectionobject">
+<remNumber>
+<numberValue>2271966-1285644709415</numberValue>
+<numberType>remNumber</numberType>
+</remNumber>
+<objectNumber>objectNumber-1285644709375</objectNumber>
+<otherNumberList>
+<otherNumber>
+<numberValue>101.objectName-1285644709375</numberValue>
+<numberType>integer</numberType>
+</otherNumber>
+<otherNumber>
+<numberValue>101.502.23.456.objectName-1285644709375</numberValue>
+<numberType>ipaddress</numberType>
+</otherNumber>
+</otherNumberList>
+<otherNumber>urn:org.walkerart.id:123</otherNumber>
+<briefDescriptions>
+<briefDescription>Papier mache bird cow mask with horns, painted red with black and yellow spots. Puerto Rico. ca. 8&amp;quot; high, 6&amp;quot; wide, projects 10&amp;quot; (with horns).</briefDescription>
+<briefDescription>Acrylic rabbit mask with wings, painted red with green and aquamarine spots. Puerto Rico. ca. 8&amp;quot; high, 6&amp;quot; wide, projects 10&amp;quot; (with wings).</briefDescription>
+</briefDescriptions>
+<objectNameList>
+<objectNameGroup>
+<objectName>an object name</objectName>
+</objectNameGroup>
+</objectNameList>
+<responsibleDepartments>
+<responsibleDepartment>urn:org.collectionspace.services.department:Registrar</responsibleDepartment>
+<responsibleDepartment>urn:org.walkerart.department:Fine Art</responsibleDepartment>
+</responsibleDepartments>
+<titleGroupList><titleGroup><title>title</title></titleGroup></titleGroupList>
+<age>
+</age>
+<dimensions>
+<dimensionGroup>
+<dimension>length</dimension>
+<measuredPart>head</measuredPart>
+<measurementUnit>cm</measurementUnit>
+<value>30</value>
+</dimensionGroup>
+<dimensionGroup>
+<dimension>width</dimension>
+<measuredPart>leg</measuredPart>
+<measurementUnit>m</measurementUnit>
+<value>2.57</value>
+<valueQualifier>
+</valueQualifier>
+</dimensionGroup>
+</dimensions>
+</ns3:collectionobjects_common>
+

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Person schema (XSD)
+    
+    Entity  : Person
+    Part    : Common
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision: 860 $
+    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/person"
+  xmlns="http://collectionspace.org/services/person"
+  targetNamespace="http://collectionspace.org/services/person"
+  version="0.1"
+>
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Person+Service+Home -->    
+
+    <!--  Person Information Group -->
+    <!--  inAuthority is the csid of the owning PersonAuthority -->
+    <xs:element name="inAuthority" type="xs:string" />
+    <xs:element name="shortIdentifier" type="xs:string"/>
+    <xs:element name="refName" type="xs:string"/>
+    <xs:element name="termStatus" type="xs:string"/>
+    <xs:element name="displayName" type="xs:string"/>
+    <xs:element name="displayNameComputed" type="xs:boolean"/>
+    <xs:element name="shortDisplayName" type="xs:string"/>
+    <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
+
+    <!-- FIXME: Currently marked in repeatability spreadsheet as a -->
+    <!-- repeatable group.  However, multiple personal names for the -->
+    <!-- same individual may ultimately be handled using a different approach. -->
+    <xs:element name="foreName" type="xs:string"/>
+    <xs:element name="middleName" type="xs:string"/>
+    <xs:element name="surName" type="xs:string"/>
+    <xs:element name="initials" type="xs:string"/>
+    <xs:element name="salutation" type="xs:string"/>
+    <xs:element name="title" type="xs:string"/>
+    <xs:element name="nameAdditions" type="xs:string"/>
+    <!-- FIXME: End of provisional repeatable group. -->
+
+    <xs:element name="birthDate" type="xs:string"/>
+    <xs:element name="deathDate" type="xs:string"/>
+    <xs:element name="birthPlace" type="xs:string"/>
+    <xs:element name="deathPlace" type="xs:string"/>
+    <xs:element name="groups">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="nationalities">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="nationality" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="gender" type="xs:string"/>
+    <xs:element name="occupations">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="occupation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="schoolsOrStyles">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="schoolOrStyle" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="bioNote" type="xs:string"/>
+    <xs:element name="nameNote" type="xs:string"/>
+
+</xs:schema>
+

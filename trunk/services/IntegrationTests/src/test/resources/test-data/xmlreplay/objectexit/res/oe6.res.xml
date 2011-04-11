@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:objectexit_common_list
+xmlns:ns2="http://collectionspace.org/services/objectexit"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <pageNum>0</pageNum>
+  <pageSize>40</pageSize>
+  <itemsInPage>4</itemsInPage>
+  <totalItems>4</totalItems>
+  <fieldsReturned>exitNumber|currentOwner|uri|csid</fieldsReturned>
+
+  <objectexit_list_item ID="e1-oe5">
+    <exitNumber>objectexitNumber-1290026473860</exitNumber>
+    <uri>/objectexit/${oe5.CSID}</uri>
+    <csid>${oe5.CSID}</csid>
+  </objectexit_list_item>
+  
+  <objectexit_list_item ID="e2-oe3">
+    <exitNumber>objectexitNumber-1290026473391</exitNumber>
+    <uri>/objectexit/${oe3.CSID}</uri>
+    <csid>${oe3.CSID}</csid>
+  </objectexit_list_item>
+  
+  <objectexit_list_item ID="e3-oe4">
+    <exitNumber>objectexitNumber-1290026473626</exitNumber>
+    <uri>/objectexit/${oe4.CSID}</uri>
+    <csid>${oe4.CSID}</csid>
+  </objectexit_list_item>
+
+  <objectexit_list_item ID="e4-oe1">
+    <exitNumber>objectexitNumber-1290026472360</exitNumber>
+    <uri>/objectexit/${oe1.CSID}</uri>
+    <csid>${oe1.CSID}</csid>
+  </objectexit_list_item>
+  </ns2:objectexit_common_list>
+
+

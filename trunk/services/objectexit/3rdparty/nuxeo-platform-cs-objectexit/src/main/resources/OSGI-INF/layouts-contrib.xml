@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+
+<!--
+layouts-contrib.xml
+
+Layout file for configuring screen layouts in the
+user interface of Nuxeo EP's web application, for
+viewing or editing CollectionSpace records stored
+in the Nuxeo repository,
+
+See the "Nuxeo Book" for an introductory description
+of how to edit this file.  For instance, for Nuxeo EP 5.3:
+http://doc.nuxeo.org/5.3/books/nuxeo-book/html/
+
+$LastChangedRevision: $
+$LastChangedDate: $
+-->
+
+<component name="org.collectionspace.objectexit.layouts.webapp">
+
+    <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+               point="layouts">
+
+        <layout name="objectexit">
+            <templates>
+                <template mode="any">/layouts/layout_default_template.xhtml</template>
+            </templates>       
+            
+            <rows>
+                <row><widget>objectExitNumber</widget></row>
+                <row><widget>borrower</widget></row>
+                <row><widget>borrowersContact</widget></row>
+                <row><widget>lendersAuthorizer</widget></row>
+                <row><widget>lendersAuthorizationDate</widget></row>
+                <row><widget>lendersContact</widget></row>
+                
+                <!--
+                     Omitting loaned object status fields in release 0.5.2,
+                     as these are likely to be repeatable or else handled
+                     in some alternate way in release 0.7.
+                -->
+                <!-- <row><widget>loanedObjectStatus</widget></row> -->
+                <!-- <row><widget>loanedObjectStatusDate</widget></row> -->
+                <!-- <row><widget>loanedObjectStatusNote</widget></row> -->
+                
+                <row><widget>objectExitDate</widget></row>
+                <row><widget>loanReturnDate</widget></row>
+                <row><widget>loanRenewalApplicationDate</widget></row>
+                <row><widget>specialConditionsOfLoan</widget></row>
+                <row><widget>objectExitNote</widget></row>
+                <row><widget>loanPurpose</widget></row>
+            </rows>
+
+            <widget name="objectExitNumber" type="text">
+                <labels>
+                    <label mode="any">objectExitNumber</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">objectExitNumber</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="borrower" type="text">
+                <labels>
+                    <label mode="any">borrower</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">borrower</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+            
+            <widget name="borrowersContact" type="text">
+                <labels>
+                    <label mode="any">borrowersContact</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">borrowersContact</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="lendersAuthorizer" type="text">
+                <labels>
+                    <label mode="any">lendersAuthorizer</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">lendersAuthorizer</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="lendersAuthorizationDate" type="text">
+                <labels>
+                    <label mode="any">lendersAuthorizationDate</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">lendersAuthorizationDate</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="lendersContact" type="text">
+                <labels>
+                    <label mode="any">lendersContact</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">lendersContact</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="objectExitDate" type="text">
+                <labels>
+                    <label mode="any">objectExitDate</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">objectExitDate</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="loanReturnDate" type="text">
+                <labels>
+                    <label mode="any">loanReturnDate</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">loanReturnDate</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="loanRenewalApplicationDate" type="text">
+                <labels>
+                    <label mode="any">loanRenewalApplicationDate</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">loanRenewalApplicationDate</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="specialConditionsOfLoan" type="text">
+                <labels>
+                    <label mode="any">specialConditionsOfLoan</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">specialConditionsOfLoan</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+          </widget>
+
+          <widget name="objectExitNote" type="text">
+                <labels>
+                    <label mode="any">objectExitNote</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">objectExitNote</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="loanPurpose" type="text">
+                <labels>
+                    <label mode="any">loanPurpose</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="objectexit_common">loanPurpose</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+        </layout>
+    </extension>
+</component>

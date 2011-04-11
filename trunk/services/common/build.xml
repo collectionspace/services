@@ -1,0 +1,223 @@
+<project name="common" default="package" basedir=".">
+    <description>
+        collectionspace services common
+    </description>
+    <!-- set global properties for this build -->
+    <property name="services.trunk" value="../.."/>
+    <!-- enviornment should be declared before reading build.properties -->
+    <property environment="env" />
+    <property file="${services.trunk}/build.properties" />
+
+    <property name="mvn.opts" value="" />
+    <property name="src" location="src"/>
+    <property name="build" location="build"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+
+    </condition>
+
+    <target name="init" >
+        <!-- Create the time stamp -->
+        <tstamp/>
+    </target>
+
+    <target name="package" depends="package-unix,package-windows"
+            description="Package CollectionSpace Services" />
+    <target name="package-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="package-windows" if="osfamily-windows">
+
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+
+        </exec>
+    </target>
+
+    <target name="install" depends="install-unix,install-windows"
+            description="Install" />
+    <target name="install-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="install-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="clean" depends="clean-unix,clean-windows"
+            description="Delete target directories" >
+        <delete dir="${build}"/>
+    </target>
+    <target name="clean-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="clean-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="test" depends="test-unix,test-windows" description="Run tests" />
+    <target name="test-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="test-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="deploy_jpa" description="deploy jpa binaries in ${jboss.server.cspace}">
+        <move todir="${jboss.server.cspace}/jpa-upgrade/lib" overwrite="false">
+
+            <fileset dir="${jboss.server.cspace}/lib">
+              <include name="hibernate-annotations*.jar"/>
+              <include name="hibernate-entitymanager*.jar"/>
+              <include name="ejb3-persistence*.jar"/>
+            </fileset>
+        </move>
+        <copy todir="${jboss.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/jpa-upgrade"/>
+        </copy>
+
+    </target>
+
+    <target name="deploy_spring"
+            description="deploy spring binaries in ${jboss.server.cspace}">
+        <copy todir="${jboss.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/spring"/>
+        </copy>
+    </target>
+
+    <target name="deploy_slf4j"
+            description="deploy spring binaries in ${jboss.server.cspace}">
+        <copy todir="${jboss.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/slf4j"/>
+        </copy>
+    </target>
+
+    <target name="deploy" depends="install"
+            description="deploy common elements in ${jboss.server.cspace}">
+        <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml.org"
+              file="${jboss.server.cspace}/conf/jboss-log4j.xml"
+              overwrite="false"/>
+
+        <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml"
+              file="${src}/main/cspace/config/log/jboss-log4j.xml"
+              overwrite="true"/>
+        <copy todir="${jboss.server.cspace}/conf"
+              file="${src}/main/cspace/config/log/jboss-log4j-release.xml"
+              />
+        <antcall target="deploy_jpa" />
+        <antcall target="deploy_spring" />
+        <antcall target="deploy_slf4j" />
+    	
+        <copy todir="${jboss.server.cspace}/cspace/config/services">
+            <fileset dir="${basedir}/src/main/cspace/config/services"/>
+        </copy>
+    	
+    </target>
+
+    <target name="undeploy"
+            description="undeploy common elements from ${jboss.server.cspace}">
+        <antcall target="undeploy_spring" />
+		<antcall target="undeploy_slf4j" />
+        <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml"
+              file="${jboss.server.cspace}/conf/jboss-log4j.xml.org"
+              overwrite="true" failonerror="false" />
+        <delete failonerror="false" file="${jboss.server.cspace}/conf/jboss-log4j-release.xml"/>
+        <delete failonerror="false" dir="${jboss.server.cspace}/cspace/config/services"/>
+    </target>
+
+    <target name="undeploy_spring"
+            description="undeploy spring binaries from ${jboss.server.cspace}">
+        <delete>
+            <fileset dir="${jboss.server.cspace}/lib" includes="org.springframework.*.jar"/>
+            <fileset dir="${jboss.server.cspace}/lib" includes="spring-security*.jar"/>
+        </delete>
+    </target>
+	
+    <target name="undeploy_slf4j"
+            description="undeploy spring binaries from ${jboss.server.cspace}">
+        <delete>
+            <fileset dir="${jboss.server.cspace}/lib" includes="slf4j*.jar"/>
+        </delete>
+    </target>
+	
+
+    <target name="dist_jpa"
+            description="dist jpa binaries in ${dist.server.cspace}">
+        <copy todir="${services.trunk}/${dist.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/jpa-upgrade"/>
+        </copy>
+
+    </target>
+
+    <target name="dist_spring"
+            description="dist spring binaries in ${dist.server.cspace}">
+        <copy todir="${services.trunk}/${dist.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/spring"/>
+        </copy>
+    </target>
+
+    <target name="dist"
+            description="generate distribution for common elements" depends="package">
+        <antcall target="dist_jpa" />
+
+        <antcall target="dist_spring" />
+        <copy todir="${services.trunk}/${dist.server.cspace}/cspace/config/services">
+            <fileset dir="${basedir}/src/main/cspace/config/services"/>
+        </copy>		
+    </target>
+
+</project>
