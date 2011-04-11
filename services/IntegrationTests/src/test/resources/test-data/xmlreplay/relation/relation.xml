@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+    </auths>
+   
+    <testGroup ID="makeRelations" autoDeletePOSTS="false">
+         <test ID="oe1"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+         </test>
+         <test ID="oe2"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+         </test>
+         <test ID="oe2"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/relations/</uri>
+             <filename>relation/r-1.xml</filename>
+             <vars>
+                <var ID="documentId1">${oe1.CSID}</var>
+                <var ID="documentId2">${oe2.CSID}</var>
+             </vars>
+         </test>
+         <!--
+         <test>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${OrgAuth1.CSID}/items/${Org1.CSID}</uri>
+        </test>
+        -->
+    </testGroup>
+         
+</xmlReplay>
+        
+        

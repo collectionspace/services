@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="relations">
+  <ns2:relations_common 
+          xmlns:ns2="http://collectionspace.org/services/relation" 
+          xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <documentId1>${documentId1}</documentId1>
+
+    <documentType1>objectexit</documentType1>
+
+    <documentId2>${documentId2}</documentId2>
+
+    <documentType2>objectexit</documentType2>
+
+    <relationshipType>COLLECTIONOBJECT_INTAKE</relationshipType>
+
+    <predicateDisplayName>COLLECTIONOBJECT_INTAKE.displayName</predicateDisplayName>
+  </ns2:relations_common>
+</document>
+
+
