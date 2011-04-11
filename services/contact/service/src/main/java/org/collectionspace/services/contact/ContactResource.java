@@ -152,6 +152,7 @@ public class ContactResource extends
     @GET
     @Path("{csid}")
     public String getContact(
+    		@Context UriInfo ui,
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getContact with csid=" + csid);
@@ -165,7 +166,8 @@ public class ContactResource extends
         }
         PoxPayloadOut result = null;
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();

@@ -192,11 +192,14 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     @GET
     @Path("{csid}")
-    public byte[] get(@PathParam("csid") String csid) {
+    public byte[] get(
+    		@Context UriInfo ui,    		
+    		@PathParam("csid") String csid) {
     	PoxPayloadOut result = null;
         ensureCSID(csid, READ);
         try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
         	result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(

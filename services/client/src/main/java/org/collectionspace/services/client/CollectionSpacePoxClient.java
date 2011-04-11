@@ -15,10 +15,18 @@ public interface CollectionSpacePoxClient<LT extends AbstractCommonList, P exten
 	 * Common service calls
 	 */
 	public ClientResponse<Response> create(PoxPayloadOut xmlPayload);
-		
+	
+	/*
+	 * GET resource with workflow 'deleted' state
+	 */
     public ClientResponse<String> read(String csid);
+    
+    public ClientResponse<String> readIncludeDeleted(String csid, Boolean includeDeleted);    
 
     public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload);
     
+    /*
+     * GET list with workflow 'deleted' state
+     */
     public ClientResponse<LT> readIncludeDeleted(Boolean includeDeleted);
 }

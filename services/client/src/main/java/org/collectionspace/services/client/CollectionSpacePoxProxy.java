@@ -23,6 +23,12 @@ public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends 
     @Path("/{csid}")
     ClientResponse<String> read(@PathParam("csid") String csid);
 
+    //(R)ead
+    @GET
+    @Path("/{csid}")
+    ClientResponse<String> readIncludeDeleted(@PathParam("csid") String csid,
+    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+
     //(U)pdate
     @PUT
     @Path("/{csid}")

@@ -172,6 +172,7 @@ public class IntakeResource extends
     @GET
     @Path("{csid}")
     public byte[] getIntake(
+    		@Context UriInfo ui,
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getIntake with csid=" + csid);
@@ -185,7 +186,8 @@ public class IntakeResource extends
         }
         PoxPayloadOut result = null;
         try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();        	
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();

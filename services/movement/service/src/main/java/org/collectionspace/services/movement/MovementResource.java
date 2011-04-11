@@ -182,6 +182,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
     @GET
     @Path("{csid}")
     public byte[] getMovement(
+    		@Context UriInfo ui,
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getMovement with csid=" + csid);
@@ -194,7 +195,8 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
         }
         PoxPayloadOut result = null;
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();

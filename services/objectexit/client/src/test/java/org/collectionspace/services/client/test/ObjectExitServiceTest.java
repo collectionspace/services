@@ -27,8 +27,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ObjectExitClient;
+import org.collectionspace.services.client.ObjectExitProxy;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -37,7 +37,6 @@ import org.collectionspace.services.objectexit.ObjectexitCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -67,7 +66,7 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
 	}
     
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient<AbstractCommonList, ObjectExitProxy> getClientInstance() {
         return new ObjectExitClient();
     }
 
@@ -254,6 +253,13 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	ObjectExitClient client = new ObjectExitClient();
+    	return createObjectExitInstance(identifier);
+    }
+    
     private PoxPayloadOut createObjectExitInstance(String exitNumber) {
         String identifier = "objectexitNumber-" + exitNumber;
         ObjectexitCommon objectexit = new ObjectexitCommon();

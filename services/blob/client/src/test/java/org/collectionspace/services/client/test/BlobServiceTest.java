@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.BlobProxy;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -71,7 +72,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 	}
     
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient<AbstractCommonList, BlobProxy> getClientInstance() {
         return new BlobClient();
     }
 
@@ -336,6 +337,12 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	return createBlobInstance(identifier);
+    }    
+    
     private PoxPayloadOut createBlobInstance(String exitNumber) {
         String identifier = "blobNumber-" + exitNumber;
         BlobsCommon blob = new BlobsCommon();

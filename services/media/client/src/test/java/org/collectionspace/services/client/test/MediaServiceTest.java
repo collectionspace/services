@@ -366,6 +366,12 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
     }
 
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	return createMediaInstance(identifier);
+    }
+    
+    
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------

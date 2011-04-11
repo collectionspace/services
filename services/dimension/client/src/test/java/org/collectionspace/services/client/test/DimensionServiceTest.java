@@ -627,7 +627,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "readWorkflow"})
     public void delete(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -720,6 +720,12 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         return DimensionClient.SERVICE_PATH_COMPONENT;
     }
 
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	DimensionClient client = new DimensionClient();
+    	return createDimensionInstance(client.getCommonPartName(), identifier);
+    }
+    
     /**
      * Creates the dimension instance.
      *
@@ -758,52 +764,52 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         return multipart;
     }
 	
-	@Override
-    protected String createTestObject(String testName) throws Exception {
-		String result = null;
-		
-        DimensionClient client = new DimensionClient();
-        String identifier = createIdentifier();
-        PoxPayloadOut multipart = createDimensionInstance(client.getCommonPartName(),
-                identifier);
-        ClientResponse<Response> res = client.create(multipart);
-
-        int statusCode = res.getStatus();
-        Assert.assertEquals(statusCode, STATUS_CREATED);
-
-        result = extractId(res);
-        allResourceIdsCreated.add(result);
-
-        return result;
-	}
+//	@Override
+//    protected String createTestObject(String testName) throws Exception {
+//		String result = null;
+//		
+//        DimensionClient client = new DimensionClient();
+//        String identifier = createIdentifier();
+//        PoxPayloadOut multipart = createDimensionInstance(client.getCommonPartName(),
+//                identifier);
+//        ClientResponse<Response> res = client.create(multipart);
+//
+//        int statusCode = res.getStatus();
+//        Assert.assertEquals(statusCode, STATUS_CREATED);
+//
+//        result = extractId(res);
+//        allResourceIdsCreated.add(result);
+//
+//        return result;
+//	}
 	
-	/*
-	 * This test assumes that no objects exist yet.
-	 * 
-	 * http://localhost:8180/cspace-services/intakes?wf_deleted=false
-	 */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update"})
-	public void readWorkflowList(String testName) throws Exception {
-    	//
-    	// Create 3 new objects
-    	//
-    	final int OBJECTS_TOTAL = 3;
-    	for (int i = 0; i < OBJECTS_TOTAL; i++) {
-    		this.createWorkflowTarget(testName);
-    	}
-    	//
-    	// Mark one as soft deleted
-    	//
-    	int currentTotal = allResourceIdsCreated.size();
-    	String csid = allResourceIdsCreated.get(currentTotal - 1); //0-based index to get the last one added
-    	this.setupUpdate();
-    	this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
-    	//
-    	// Read the list back.  The deleted item should not be in the list
-    	//
-//    	int updatedTotal = readIncludeDeleted(testName, Boolean.FALSE);
-//    	Assert.assertEquals(updatedTotal, currentTotal - 1, "Deleted items seem to be returned in list results.");
-	}
+//	/*
+//	 * This test assumes that no objects exist yet.
+//	 * 
+//	 * http://localhost:8180/cspace-services/intakes?wf_deleted=false
+//	 */
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update"})
+//	public void readWorkflowList(String testName) throws Exception {
+//    	//
+//    	// Create 3 new objects
+//    	//
+//    	final int OBJECTS_TOTAL = 3;
+//    	for (int i = 0; i < OBJECTS_TOTAL; i++) {
+//    		this.createWorkflowTarget(testName);
+//    	}
+//    	//
+//    	// Mark one as soft deleted
+//    	//
+//    	int currentTotal = allResourceIdsCreated.size();
+//    	String csid = allResourceIdsCreated.get(currentTotal - 1); //0-based index to get the last one added
+//    	this.setupUpdate();
+//    	this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
+//    	//
+//    	// Read the list back.  The deleted item should not be in the list
+//    	//
+////    	int updatedTotal = readIncludeDeleted(testName, Boolean.FALSE);
+////    	Assert.assertEquals(updatedTotal, currentTotal - 1, "Deleted items seem to be returned in list results.");
+//	}
     
     protected void updateLifeCycleState(String testName, String resourceId, String lifeCycleState) throws Exception {
         //

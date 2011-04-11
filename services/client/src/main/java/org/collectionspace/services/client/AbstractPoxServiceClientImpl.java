@@ -23,6 +23,11 @@ public abstract class AbstractPoxServiceClientImpl<LT extends AbstractCommonList
     }
 
     @Override
+	public ClientResponse<String> readIncludeDeleted(String csid, Boolean includeDeleted) {
+        return getProxy().readIncludeDeleted(csid, includeDeleted.toString());
+    }
+
+    @Override
     public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
         return getProxy().update(csid, xmlPayload.getBytes());
     }
