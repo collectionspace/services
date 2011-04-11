@@ -552,7 +552,7 @@ public class CollectionObjectResource
             if (keywords != null && !keywords.isEmpty()) {
                 String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
                 DocumentFilter documentFilter = handler.getDocumentFilter();
-                documentFilter.setWhereClause(whereClause);
+                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
                 if (logger.isDebugEnabled()) {
                     logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
                 }
