@@ -71,10 +71,16 @@ public class VocabularyClient extends AuthorityClientImpl<VocabulariesCommonList
      *
      * @return the item common part name
      */
-    public String getCommonPartItemName() {
+	@Override
+    public String getItemCommonPartName() {
         return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
     }
     
+	@Deprecated // Use getItemCommonPartName() instead
+    public String getCommonPartItemName() {
+        return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
+    }
+
     /*
      * Service calls
      */

@@ -37,6 +37,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 
@@ -215,6 +216,29 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         allResourceIdsCreated.add(newID);
     }
 
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	PersonAuthorityClient client = new PersonAuthorityClient();
+        String displayName = "displayName-" + identifier;
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+                displayName, identifier, client.getCommonPartName());
+        return multipart;
+    }
+    
+    @Override
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    	String headerLabel = new PersonAuthorityClient().getItemCommonPartName();
+        HashMap<String, String> personInfo = new HashMap<String, String>();
+        String shortId = "johnWayneTempActor";
+        personInfo.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
+        personInfo.put(PersonJAXBSchema.DISPLAY_NAME, "John Wayne Temp");
+        personInfo.put(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED, "false");
+        personInfo.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, "JohnWayneTemp");
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+
+    	return PersonAuthorityClientUtils.createPersonInstance(parentCsid, identifier, personInfo, headerLabel);
+    }
+    
     /**
      * Creates the item.
      *

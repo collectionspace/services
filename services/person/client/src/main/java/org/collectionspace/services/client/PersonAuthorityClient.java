@@ -65,8 +65,14 @@ public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<Perso
         return SERVICE_PATH_COMPONENT;
     }
 
+	@Override
     public String getItemCommonPartName() {
-        return getCommonPartName(SERVICE_ITEM_NAME);
+        return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
+    }
+    
+	@Deprecated // Use getItemCommonPartName() instead
+    public String getCommonPartItemName() {
+        return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
     }
     
 	@Override

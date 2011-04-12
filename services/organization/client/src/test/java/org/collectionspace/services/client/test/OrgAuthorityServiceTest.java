@@ -30,10 +30,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.OrganizationJAXBSchema;
+import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.contact.ContactsCommon;
@@ -199,6 +202,29 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         allResourceIdsCreated.add(newID);
     }
 
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	OrgAuthorityClient client = new OrgAuthorityClient();
+        String displayName = "displayName-" + identifier;
+        PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
+                displayName, identifier, client.getCommonPartName());
+        return multipart;
+    }
+    
+    @Override
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {    	
+    	String headerLabel = new OrgAuthorityClient().getItemCommonPartName();
+        String shortId = "testOrg";
+        Map<String, String> testOrgMap = new HashMap<String,String>();
+        testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
+        testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, TEST_ORG_SHORTNAME);
+        testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
+        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
+        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
+
+    	return OrgAuthorityClientUtils.createOrganizationInstance(identifier, testOrgMap, headerLabel);
+    }
+    
     /**
      * Creates the item.
      *

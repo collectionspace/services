@@ -548,8 +548,9 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier) {
 		PoxPayloadOut result = null;
-		try {
+		try {			
 	    	JaxRsContext jaxRsContext = new JaxRsContext(request, ui);
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 
 			Specifier parentSpec = getSpecifier(parentspecifier, "getAuthorityItem(parent)", "GET_ITEM");
 			Specifier itemSpec = getSpecifier(itemspecifier, "getAuthorityItem(item)", "GET_ITEM");
@@ -560,10 +561,10 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				parentcsid = parentSpec.value;
 			} else {
 				String whereClause = buildWhereForAuthByName(parentSpec.value);
-				ctx = (RemoteServiceContext)createServiceContext(getServiceName());
-				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
+				ctx = (RemoteServiceContext)createServiceContext(getServiceName(), queryParams);
+				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
 			}
-			ctx = (RemoteServiceContext)createServiceContext(getItemServiceName());
+			ctx = (RemoteServiceContext)createServiceContext(getItemServiceName(), queryParams);
 			ctx.setJaxRsContext(jaxRsContext);
 			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
 			if(itemSpec.form==SpecifierForm.CSID) {
@@ -636,16 +637,16 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				parentcsid = spec.value;
 			} else {
 				String whereClause = buildWhereForAuthByName(spec.value);
-				ctx = createServiceContext(getServiceName());
+				ctx = createServiceContext(getServiceName(), queryParams);
 				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
 			}
 			ctx = createServiceContext(getItemServiceName(), queryParams);
 			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
 			DocumentFilter myFilter = handler.getDocumentFilter();
-			myFilter.setWhereClause(
-					authorityItemCommonSchemaName + ":"
-					+ AuthorityItemJAXBSchema.IN_AUTHORITY + "="
-					+ "'" + parentcsid + "'");
+			myFilter.appendWhereClause(authorityItemCommonSchemaName + ":" +
+					AuthorityItemJAXBSchema.IN_AUTHORITY + "=" + 
+					"'" + parentcsid + "'",
+					IQueryManager.SEARCH_QUALIFIER_AND);
 
 			// AND vocabularyitems_common:displayName LIKE '%partialTerm%'
 			if (partialTerm != null && !partialTerm.isEmpty()) {
@@ -710,8 +711,8 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				parentcsid = parentSpec.value;
 			} else {
 				String whereClause = buildWhereForAuthByName(parentSpec.value);
-	            ctx = createServiceContext(getServiceName());
-				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
+	            ctx = createServiceContext(getServiceName(), queryParams);
+				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause); //FIXME: REM - If the parent is soft-deleted should we still try to find the item?
 			}
     		ctx = createServiceContext(getItemServiceName(), queryParams);
             String itemcsid;
@@ -720,7 +721,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			} else {
 				String itemWhereClause = 
 					buildWhereForAuthItemByName(itemSpec.value, parentcsid);
-				itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause);
+				itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
 			}
     		// Note that we have to create the service context for the Items, not the main service
     		DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);

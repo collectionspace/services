@@ -1,5 +1,6 @@
 package org.collectionspace.services.client;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -10,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -33,8 +35,10 @@ public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends Abstr
     //(R)ead Item
     @GET
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<String> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
-
+    ClientResponse<String> readItem(@PathParam("vcsid") String vcsid,
+    		@PathParam("csid") String csid,
+    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+    
     //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
@@ -59,7 +63,8 @@ public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends Abstr
     @Produces("application/xml")
     ClientResponse<AuthorityRefDocList> getReferencingObjects(
             @PathParam("csid") String parentcsid,
-            @PathParam("itemcsid") String itemcsid);
+            @PathParam("itemcsid") String itemcsid,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
     // List Item Authority References
     @GET
@@ -76,7 +81,8 @@ public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends Abstr
     //(R)ead by name
     @GET
     @Path("/urn:cspace:name({name})")
-    ClientResponse<String> readByName(@PathParam("name") String name);
+    ClientResponse<String> readByName(@PathParam("name") String name,
+    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
     /*
      * Item subresource methods
@@ -85,17 +91,23 @@ public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends Abstr
     //(R)ead Named Item
     @GET
     @Path("/{vcsid}/items/urn:cspace:name({specifier})")
-    ClientResponse<String> readNamedItem(@PathParam("vcsid") String vcsid, @PathParam("specifier") String specifier);
+    ClientResponse<String> readNamedItem(@PathParam("vcsid") String vcsid,
+    		@PathParam("specifier") String specifier,
+    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 
     //(R)ead Item In Named Authority
     @GET
     @Path("/urn:cspace:name({specifier})/items/{csid}")
-    ClientResponse<String> readItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("csid") String csid);
+    ClientResponse<String> readItemInNamedAuthority(@PathParam("specifier") String specifier,
+    		@PathParam("csid") String csid,
+    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 
     //(R)ead Named Item In Named Authority
     @GET
     @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
-    ClientResponse<String> readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("itemspecifier") String itemspecifier);
+    ClientResponse<String> readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, 
+    		@PathParam("itemspecifier") String itemspecifier,
+    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
     /*
      * Item subresource List methods
@@ -108,7 +120,8 @@ public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends Abstr
     ClientResponse<ILT> readItemList(
     		@PathParam("csid") String vcsid,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
-            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
     // List Items for a named authority matching a partial term or keywords.
     @GET
@@ -117,6 +130,27 @@ public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends Abstr
     ClientResponse<ILT> readItemListForNamedAuthority(
     		@PathParam("specifier") String specifier,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
-            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 
+    /*
+     * Workflow related methods
+     * 
+     */
+    
+    //(R)ead Item workflow
+    @GET
+    @Produces({"application/xml"})
+    @Consumes({"application/xml"})    
+    @Path("/{vcsid}/items/{csid}" + WorkflowClient.SERVICE_PATH)
+    ClientResponse<String> readItemWorkflow(@PathParam("vcsid") String vcsid,
+    		@PathParam("csid") String csid);
+            
+    //(U)pdate Item workflow
+    @PUT
+    @Path("/{vcsid}/items/{csid}" + WorkflowClient.SERVICE_PATH)
+    ClientResponse<String> updateItemWorkflow(@PathParam("vcsid") String vcsid,
+    		@PathParam("csid") String csid,
+    		byte[] xmlPayload);
+    
 }

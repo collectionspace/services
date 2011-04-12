@@ -71,9 +71,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     private String knownResourceFullRefName = null;
     private String knownItemResourceId = null;
     private int nItemsToCreateInList = 5;
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
-    private Map<String, String> allResourceItemIdsCreated =
-            new HashMap<String, String>();
+//    private List<String> allResourceIdsCreated = new ArrayList<String>();
+//    private Map<String, String> allResourceItemIdsCreated =
+//            new HashMap<String, String>();
 
     protected void setKnownResource(String id, String shortIdentifer,
             String refName, String fullRefName) {
@@ -107,8 +107,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
                 displayName, identifier, client.getCommonPartName());
         return multipart;
-    }
-    
+    }    
     
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -164,6 +163,17 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    @Override
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    	String headerLabel = new VocabularyClient().getItemCommonPartName();
+        HashMap<String, String> vocabItemInfo = new HashMap<String, String>();
+        String shortId = createIdentifier();
+        vocabItemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
+        vocabItemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-" + shortId);
+
+    	return VocabularyClientUtils.createVocabularyItemInstance(identifier, vocabItemInfo, headerLabel);
+    }    
+    
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createItem(String testName) {
@@ -1290,35 +1300,35 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
      */
-    @AfterClass(alwaysRun = true)
-    public void cleanUp() {
-        String noTest = System.getProperty("noTestCleanup");
-        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
-            return;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        VocabularyClient client = new VocabularyClient();
-        String vocabularyResourceId;
-        String vocabularyItemResourceId;
-        // Clean up vocabulary item resources.
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            vocabularyItemResourceId = entry.getKey();
-            vocabularyResourceId = entry.getValue();
-            // Note: Any non-success responses are ignored and not reported.
-            client.deleteItem(vocabularyResourceId, vocabularyItemResourceId).releaseConnection();
-        }
-        // Clean up vocabulary resources.
-        for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-            client.delete(resourceId).releaseConnection();
-        }
-
-    }
+//    @AfterClass(alwaysRun = true)
+//    public void cleanUp() {
+//        String noTest = System.getProperty("noTestCleanup");
+//        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+//            if (logger.isDebugEnabled()) {
+//                logger.debug("Skipping Cleanup phase ...");
+//            }
+//            return;
+//        }
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("Cleaning up temporary resources created for testing ...");
+//        }
+//        VocabularyClient client = new VocabularyClient();
+//        String vocabularyResourceId;
+//        String vocabularyItemResourceId;
+//        // Clean up vocabulary item resources.
+//        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
+//            vocabularyItemResourceId = entry.getKey();
+//            vocabularyResourceId = entry.getValue();
+//            // Note: Any non-success responses are ignored and not reported.
+//            client.deleteItem(vocabularyResourceId, vocabularyItemResourceId).releaseConnection();
+//        }
+//        // Clean up vocabulary resources.
+//        for (String resourceId : allResourceIdsCreated) {
+//            // Note: Any non-success responses are ignored and not reported.
+//            client.delete(resourceId).releaseConnection();
+//        }
+//
+//    }
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above

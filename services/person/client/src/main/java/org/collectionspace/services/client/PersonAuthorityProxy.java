@@ -43,7 +43,8 @@ public interface PersonAuthorityProxy extends AuthorityWithContactsProxy<Persona
     ClientResponse<PersonsCommonList> readItemList(
     		@PathParam("csid") String vcsid,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
-            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
     // List Items for a named authority matching a partial term or keywords.
     @Override
@@ -53,5 +54,6 @@ public interface PersonAuthorityProxy extends AuthorityWithContactsProxy<Persona
     ClientResponse<PersonsCommonList> readItemListForNamedAuthority(
     		@PathParam("specifier") String specifier,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
-            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 }
