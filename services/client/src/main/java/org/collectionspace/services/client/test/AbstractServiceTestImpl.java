@@ -25,11 +25,14 @@ package org.collectionspace.services.client.test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.collectionspace.services.client.AbstractPoxServiceClientImpl;
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CollectionSpacePoxClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -97,6 +100,9 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     }
     /* Use this to keep track of resources to delete */
     protected List<String> allResourceIdsCreated = new ArrayList<String>();
+    /* Use this to track authority items */
+    protected Map<String, String> allResourceItemIdsCreated = new HashMap<String, String>(); /* itemCsid, parentCsid */
+
     private String EMPTY_SORT_BY_ORDER = "";
 
     /**
@@ -434,6 +440,21 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
         CollectionSpaceClient client = this.getClientInstance();
+        //
+        // First, check to see if we need to cleanup any authority items
+        //
+        if (this.isAuthorityClient(client) == true) {
+        	AuthorityClient authorityClient = (AuthorityClient)client;
+	        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
+	            String itemResourceId = entry.getKey();
+	            String authorityResourceId = entry.getValue();
+	            // Note: Any non-success responses are ignored and not reported.
+	            authorityClient.deleteItem(authorityResourceId, itemResourceId).releaseConnection();
+	        }
+        }
+        //
+        // Next, delete all other entities include possible authorities.
+        //
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             client.delete(resourceId).releaseConnection();
@@ -655,7 +676,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
     }
     
-    private CollectionSpacePoxClient assertPoxCandidate() {
+    private CollectionSpacePoxClient assertPoxClient() {
         CollectionSpaceClient clientCandidate = this.getClientInstance();
         if (CollectionSpacePoxClient.class.isInstance(clientCandidate) != true) {  //FIXME: REM - We should remove this check and instead make CollectionSpaceClient support the readIncludeDeleted() method.
         	String clientCandidateName = "Unknown";
@@ -678,7 +699,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         //
         // Ask for a list of all resources filtered by the incoming 'includeDeleted' workflow param
         //
-        CollectionSpacePoxClient client = assertPoxCandidate();
+        CollectionSpacePoxClient client = assertPoxClient();
         ClientResponse<AbstractCommonList> res = client.readIncludeDeleted(includeDeleted);
         AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -704,6 +725,37 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         
         return result;
 	}
+	
+	protected long readItemsIncludeDeleted(String testName, String parentCsid, Boolean includeDeleted) {
+		long result = 0;
+        // Perform setup.
+        setupReadList();
+
+        //
+        // Ask for a list of all resources filtered by the incoming 'includeDeleted' workflow param
+        //
+        AuthorityClient client = (AuthorityClient)this.getClientInstance();
+        ClientResponse<AbstractCommonList> res = client.readItemList(parentCsid,
+        		null, /* partial terms */
+        		null, /* keywords */
+        		includeDeleted);
+        AbstractCommonList list = res.getEntity();
+        int statusCode = res.getStatus();
+        //
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        //
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        result = list.getTotalItems();
+        
+        return result;
+	}	
 	
 	/*
 	 * This test assumes that no objects exist yet.
@@ -742,7 +794,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     		//
     		// Next, test that a GET with WorkflowClient.WORKFLOWSTATE_DELETED query param set to 'false' returns a 404
     		//
-    		CollectionSpacePoxClient client = this.assertPoxCandidate();
+    		CollectionSpacePoxClient client = this.assertPoxClient();
             ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
             int result = res.getStatus();
             Assert.assertEquals(result, STATUS_NOT_FOUND);
@@ -785,6 +837,134 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     	logger.warn("Sub-class test clients should override this method");
     	throw new UnsupportedOperationException();
     }
+    
+    /*
+     * Test classes for authority services should override these method and return 'true'
+     */
+    protected boolean isAuthorityClient(CollectionSpaceClient theClient) {
+    	return AuthorityClient.class.isInstance(theClient);
+    }
+    
+    protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
+    	logger.warn("Sub-class test clients should override this method");
+    	throw new UnsupportedOperationException();
+    }    
+    
+    final protected String createWorkflowItemTarget(String testName, String parentCsid) throws Exception {
+    	String result = null;
+    	
+    	result = createTestItemObject(testName, parentCsid);
+    	
+    	return result;
+    }
+    
+    protected String createTestItemObject(String testName, String parentCsid) throws Exception {
+		String result = null;
+		
+		AuthorityClient client = (AuthorityClient)getClientInstance();
+        String identifier = createIdentifier();
+        PoxPayloadOut multipart = createItemInstance(parentCsid, identifier);
+        ClientResponse<Response> res = client.createItem(parentCsid, multipart);
+
+        int statusCode = res.getStatus();
+        Assert.assertEquals(statusCode, STATUS_CREATED);
+
+        result = extractId(res);
+        allResourceItemIdsCreated.put(result, parentCsid);
+
+        return result;
+	}
+    
+	/*
+	 * This test assumes that no objects exist yet.
+	 * 
+	 * http://localhost:8180/cspace-services/intakes?wf_deleted=false
+	 */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+	public void readAuthorityItemWorkflow(String testName) throws Exception {
+    	//
+    	// Run this test only if the client is an AuthorityClient //FIXME: REM - Replace this will an AuthorityServiceTest class
+    	//
+    	if (this.isAuthorityClient(this.getClientInstance()) == true) {
+	    	try {
+	    		//
+	    		// Get the total count of non-deleted existing records
+	    		//
+	    		String parentCsid = this.createTestObject(testName);
+	
+	    		//
+	    		// Create 3 new items
+	    		//
+	    		final int OBJECTS_TO_CREATE = 3;
+	    		String lastCreatedItem = null;
+	    		for (int i = 0; i < OBJECTS_TO_CREATE; i++) {
+	    			lastCreatedItem = this.createWorkflowItemTarget(testName, parentCsid);
+	    		}
+	
+	    		//
+	    		// Mark one item as soft deleted
+	    		//
+	    		String csid = lastCreatedItem;
+	    		this.setupUpdate();
+	    		this.updateItemLifeCycleState(testName, parentCsid, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
+	    		//
+	    		// Read the list of existing non-deleted records
+	    		//
+	    		long updatedTotal = readItemsIncludeDeleted(testName, parentCsid, Boolean.FALSE);
+	    		Assert.assertEquals(updatedTotal, OBJECTS_TO_CREATE - 1, "Deleted items seem to be returned in list results.");
+	    		
+	    		//
+	    		// Next, test that a GET with WorkflowClient.WORKFLOWSTATE_DELETED query param set to 'false' returns a 404
+	    		//
+	    		AuthorityClient client = (AuthorityClient)this.getClientInstance();
+	            ClientResponse<String> res = client.readItem(parentCsid, csid, Boolean.FALSE);
+	            int result = res.getStatus();
+	            Assert.assertEquals(result, STATUS_NOT_FOUND);
+	            
+	    	} catch (UnsupportedOperationException e) {
+	    		logger.warn(this.getClass().getName() + " did not implement createWorkflowTarget() method.  No workflow tests performed.");
+	    		return;
+	    	}
+    	}
+	}
+    
+	protected void updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String lifeCycleState) throws Exception {
+        //
+        // Read the existing object
+        //
+    	AuthorityClient client = (AuthorityClient)this.getClientInstance();
+    	ClientResponse<String> res = client.readItemWorkflow(parentCsid, itemCsid);
+        assertStatusCode(res, testName);
+        logger.debug("Got object to update life cycle state with ID: " + itemCsid);
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        WorkflowCommon workflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+        Assert.assertNotNull(workflowCommons);
+        //
+        // Mark it for a soft delete.
+        //
+        logger.debug("Current workflow state:" + objectAsXmlString(workflowCommons, WorkflowCommon.class));
+        workflowCommons.setCurrentLifeCycleState(lifeCycleState);
+        PoxPayloadOut output = new PoxPayloadOut(WorkflowClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(WorkflowClient.SERVICE_COMMONPART_NAME, workflowCommons);
+        //
+        // Perform the update
+        //
+        res = client.updateItemWorkflow(parentCsid, itemCsid, output);
+        assertStatusCode(res, testName);
+        input = new PoxPayloadIn(res.getEntity());
+        WorkflowCommon updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+        Assert.assertNotNull(updatedWorkflowCommons);
+        //
+        // Read the updated object and make sure it was updated correctly.
+        //
+        res = client.readItemWorkflow(parentCsid, itemCsid);
+        assertStatusCode(res, testName);
+        logger.debug("Got workflow state of updated object with ID: " + itemCsid);
+        input = new PoxPayloadIn(res.getEntity());
+        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+        Assert.assertNotNull(workflowCommons);
+        Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
+    }    
 }
 
 

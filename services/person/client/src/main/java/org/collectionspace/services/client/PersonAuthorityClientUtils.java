@@ -165,8 +165,9 @@ public class PersonAuthorityClientUtils {
      * @return the multipart output
      */
     public static PoxPayloadOut createPersonInstance(String inAuthority,
-    		String personAuthRefName, Map<String, String> personInfo,
-                String headerLabel){
+    		String personAuthRefName,
+    		Map<String, String> personInfo,
+    		String headerLabel){
         final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO =
                 new HashMap<String, List<String>>();
         return createPersonInstance(inAuthority, personAuthRefName, personInfo,

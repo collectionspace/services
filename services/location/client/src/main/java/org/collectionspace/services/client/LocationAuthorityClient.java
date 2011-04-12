@@ -74,6 +74,7 @@ public class LocationAuthorityClient extends AuthorityClientImpl<Locationauthori
         return SERVICE_PATH_COMPONENT;
     }
 
+    @Override
     public String getItemCommonPartName() {
         return getCommonPartName(SERVICE_ITEM_NAME);
     }

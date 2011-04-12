@@ -18,11 +18,16 @@ public interface AuthorityClient<LT extends AbstractCommonList, ILT extends Abst
 	 * Basic CRUD operations
 	 */
 	
+    String getItemCommonPartName();
+	
     //(C)reate Item
     ClientResponse<Response> createItem(String vcsid, PoxPayloadOut poxPayloadOut);
 
     //(R)ead Item
     ClientResponse<String> readItem(String vcsid, String csid);
+    
+    //(R)ead Item
+    ClientResponse<String> readItem(String vcsid, String csid, Boolean includeDeleted);    
 
     //(U)pdate Item
     ClientResponse<String> updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut);
@@ -51,6 +56,8 @@ public interface AuthorityClient<LT extends AbstractCommonList, ILT extends Abst
     
     ClientResponse<String> readByName(String name);
     
+    ClientResponse<String> readByName(String name, Boolean includeDeleted);
+    
     /*
      * Item subresource methods
      */
@@ -64,6 +71,8 @@ public interface AuthorityClient<LT extends AbstractCommonList, ILT extends Abst
      */
     public ClientResponse<String> readNamedItem(String vcsid, String shortId);
 
+    public ClientResponse<String> readNamedItem(String vcsid, String shortId, Boolean includeDeleted);
+
     /**
      * Read item in Named Authority.
      *
@@ -73,6 +82,8 @@ public interface AuthorityClient<LT extends AbstractCommonList, ILT extends Abst
      */
     public ClientResponse<String> readItemInNamedAuthority(String authShortId, String csid);
 
+    public ClientResponse<String> readItemInNamedAuthority(String authShortId, String csid, Boolean includeDeleted);
+
     /**
      * Read named item in Named Authority.
      *
@@ -81,6 +92,8 @@ public interface AuthorityClient<LT extends AbstractCommonList, ILT extends Abst
      * @return the client response
      */
     public ClientResponse<String> readNamedItemInNamedAuthority(String authShortId, String itemShortId);
+    
+    public ClientResponse<String> readNamedItemInNamedAuthority(String authShortId, String itemShortId, Boolean includeDeleted);
     
     /**
      * Read item list, filtering by partial term match, or keywords. Only one of
@@ -95,6 +108,8 @@ public interface AuthorityClient<LT extends AbstractCommonList, ILT extends Abst
      * @return the client response
      */
     public ClientResponse<ILT> readItemList(String inAuthority, String partialTerm, String keywords);
+    
+    public ClientResponse<ILT> readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted);
     
     /**
      * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
@@ -111,4 +126,16 @@ public interface AuthorityClient<LT extends AbstractCommonList, ILT extends Abst
     public ClientResponse<ILT> readItemListForNamedAuthority(String specifier, 
     		String partialTerm, String keywords);
     
+    public ClientResponse<ILT> readItemListForNamedAuthority(String specifier, 
+    		String partialTerm, 
+    		String keywords,
+    		Boolean includeDeleted);
+    
+    /*
+     * Workflow related methods
+     */
+    
+    public ClientResponse<String> readItemWorkflow(String vcsid, String csid);
+    
+    public ClientResponse<String> updateItemWorkflow(String vcsid, String csid, PoxPayloadOut workflowPayload);
 }

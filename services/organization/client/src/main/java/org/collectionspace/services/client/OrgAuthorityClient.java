@@ -67,6 +67,7 @@ public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<Orgautho
 		return OrgAuthorityProxy.class;
 	}
 	
+	@Override
     public String getItemCommonPartName() {
         return getCommonPartName(SERVICE_ITEM_NAME);
     }
