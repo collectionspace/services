@@ -28,7 +28,6 @@
 package org.collectionspace.services.common.security;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
@@ -39,10 +38,7 @@ import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AuthZ;
@@ -89,7 +85,9 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 		if (SecurityUtils.isEntityProxy() == true && !resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS)) {
 			resName = resEntity;
 		}
-		
+		//
+		// Make sure the account is current and active
+		//
 		checkActive();
 		
 		//
@@ -100,11 +98,17 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 			AuthZ authZ = AuthZ.get();
 			CSpaceResource res = new URIResourceImpl(resName, httpMethod);
 			if (!authZ.isAccessAllowed(res)) {
-				logger.error("Access to " + res.getId() + " is NOT allowed to "
-						+ " user=" + AuthN.get().getUserId());
-				Response response = Response.status(
-						Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
-				throw new WebApplicationException(response);
+				//
+				// They failed the first check, but let's see if they're try to access the Blob service
+				// with a GET method.   If so they are allow, see http://issues.collectionspace.org/browse/CSPACE-3797
+				//
+				if (resName.contains("blobs") == false) { //FIXME : REM - Yuk!  Remove this ASAP -see http://issues.collectionspace.org/browse/CSPACE-3797
+					logger.error("Access to " + res.getId() + " is NOT allowed to "
+							+ " user=" + AuthN.get().getUserId());
+					Response response = Response.status(
+							Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
+					throw new WebApplicationException(response);
+				}
 			} else {
 				//
 				// They passed the first round of security checks, so now let's check to see if they're trying
@@ -141,7 +145,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 	 */
 	private void checkActive() throws WebApplicationException {
 		String userId = AuthN.get().getUserId();
-		String tenantId = AuthN.get().getCurrentTenantId();
+		String tenantId = AuthN.get().getCurrentTenantId(); //FIXME: REM - This variable 'tenantId' is never used.  Why?
 		try {
 			//can't use JAXB here as this runs from the common jar which cannot
 			//depend upon the account service
