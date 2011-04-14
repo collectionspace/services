@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.imports;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMain;
@@ -33,6 +35,7 @@ import org.collectionspace.services.common.api.ZipTools;
 
 // The modified Nuxeo ImportCommand from nuxeo's shell:
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.imports.nuxeo.ImportCommand;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -46,7 +49,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
@@ -109,6 +115,14 @@ public class ImportsResource extends ResourceBase {
         return _templateDir;
     }
 
+    @POST
+    public Response create(@Context UriInfo ui, String xmlPayload) {
+        try {
+        	return this.create(xmlPayload);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+        }
+    }
     /** you can test this with something like:
      * curl -X POST http://localhost:8180/cspace-services/imports -i  -u "Admin@collectionspace.org:Administrator" -H "Content-Type: application/xml" -T in.xml
      * -T /src/trunk/services/imports/service/src/main/resources/templates/authority-request.xml
@@ -120,8 +134,10 @@ public class ImportsResource extends ResourceBase {
         String result;
         javax.ws.rs.core.Response.ResponseBuilder rb;
         try {
-            InputSource inputSource = payloadToInputSource(xmlPayload);
-            result = createFromInputSource(inputSource);
+            //InputSource inputSource = payloadToInputSource(xmlPayload);
+            //result = createFromInputSource(inputSource);
+            String inputFilename = payloadToFilename(xmlPayload);
+            result = createFromFilename(inputFilename);
             rb = javax.ws.rs.core.Response.ok();
 	    } catch (Exception e) {
             result = Tools.errorToString(e, true);
@@ -134,15 +150,38 @@ public class ImportsResource extends ResourceBase {
     public static String createFromInputSource(InputSource inputSource) throws Exception {
         // We must expand the request and wrap it with all kinds of Nuxeo baggage, which expandXmlPayloadToDir knows how to do.
         String outputDir = FileTools.createTmpDir("imports-").getCanonicalPath();
-        expandXmlPayloadToDir(inputSource, getTemplateDir(), outputDir);
+        File outpd = new File(outputDir);
+        outpd.mkdirs();
+        expandXmlPayloadToDir(inputSource, getTemplateDir(), outpd.getCanonicalPath());
 
         // Next, call the nuxeo import service, pointing it to our local directory that has the expanded request.
         ImportCommand importCommand = new ImportCommand();
         String destWorkspaces = "/default-domain/workspaces";
-        String report = importCommand.run(outputDir, destWorkspaces);
+        String report = "NORESULTS";
+        try {
+            report = importCommand.run(outputDir, destWorkspaces);
+        } catch (Exception e){
+            report =  "<?xml ?><import><msg>ERROR</msg><report></report>"+Tools.errorToString(e, true)+"</import>";
+        }
         String result = "<?xml ?><import><msg>SUCCESS</msg><report></report>"+report+"</import>";
         return result;
     }
+
+    public static String createFromFilename(String filename) throws Exception {
+         // We must expand the request and wrap it with all kinds of Nuxeo baggage, which expandXmlPayloadToDir knows how to do.
+         String outputDir = FileTools.createTmpDir("imports-").getCanonicalPath();
+         File outpd = new File(outputDir);
+         outpd.mkdirs();
+         expandXmlPayloadToDir(filename, getTemplateDir(), outpd.getCanonicalPath());
+
+         // Next, call the nuxeo import service, pointing it to our local directory that has the expanded request.
+         ImportCommand importCommand = new ImportCommand();
+         String destWorkspaces = "/default-domain/workspaces";
+         String report = importCommand.run(outputDir, destWorkspaces);
+         String result = "<?xml ?><import><msg>SUCCESS</msg><report></report>"+report+"</import>";
+         return result;
+     }
+
 
     /**  @param xmlPayload   A request file has a specific format, you can look at:
      *      trunk/services/imports/service/src/test/resources/requests/authority-request.xml
@@ -159,6 +198,26 @@ public class ImportsResource extends ResourceBase {
         return inputSource;
     }
 
+    public static String payloadToFilename(String xmlPayload) throws Exception {
+        String requestDir = FileTools.createTmpDir("imports-request-").getCanonicalPath();
+        File requestFile = FileTools.saveFile(requestDir, "request.xml", xmlPayload, true);
+        if (requestFile == null){
+            throw new FileNotFoundException("Could not create file in requestDir: "+requestDir);
+        }
+        String requestFilename = requestFile.getCanonicalPath();
+        System.out.println("############## REQUEST_FILENAME: "+requestFilename);
+        return requestFilename;
+    }
+
+    public static void expandXmlPayloadToDir(String inputFilename, String templateDir, String outputDir) throws Exception {
+     System.out.println("############## TEMPLATE_DIR: "+templateDir);
+        System.out.println("############## OUTPUT_DIR:"+outputDir);
+        File file = new File(inputFilename);
+        FileInputStream is = new FileInputStream(file);
+        InputSource inputSource = new InputSource(is);
+        TemplateExpander.expandInputSource(templateDir, outputDir, inputSource, "/imports/import");
+    }
+
     /** This method may be called statically from outside this class; there is a test call in
      *   org.collectionspace.services.test.ImportsServiceTest
      *
@@ -172,6 +231,7 @@ public class ImportsResource extends ResourceBase {
         System.out.println("############## TEMPLATE_DIR: "+templateDir);
         System.out.println("############## OUTPUT_DIR:"+outputDir);
         TemplateExpander.expandInputSource(templateDir, outputDir, inputSource, "/imports/import");
+        //TemplateExpander.expandInputSource(templateDir, outputDir, inputFilename, "/imports/import");
     }
 
     /** you can test like this:

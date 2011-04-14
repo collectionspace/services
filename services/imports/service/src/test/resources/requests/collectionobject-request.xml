@@ -9,7 +9,7 @@
             <collectionobjects_naturalhistory:nh-date/>
          </schema>
          <schema xmlns:collectionobjects_common="http://collectionspace.org/collectionobject/" name="collectionobjects_common">
-            <collectionobjects_common:assocCulturalContextGroupListNONEXISTENT/>
+            <collectionobjects_common:assocCulturalContextGroupList/>
             <collectionobjects_common:assocCulturalContextGroupList/>
             <collectionobjects_common:assocObjectGroupList/>
             <collectionobjects_common:assocEventNameType></collectionobjects_common:assocEventNameType>
