@@ -2,8 +2,8 @@
   <system>
     <type>${ServiceType}</type>
     <path>${ServiceName}/${docID}</path>
-    <lifecycle-state>undefined</lifecycle-state>
-    <lifecycle-policy>undefined</lifecycle-policy>
+    <lifecycle-state>project</lifecycle-state>
+    <lifecycle-policy>default</lifecycle-policy>
     <access-control>
       <acl name="inherited">
         <entry principal="Administrator" permission="Everything" grant="true"/>
