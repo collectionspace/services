@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -91,6 +92,8 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     private DocumentHandler docHandler = null;
     /** security context */
     private SecurityContext securityContext;
+
+    private UriInfo uriInfo;
 
     /**
      * Instantiates a new abstract service context impl.
@@ -160,7 +163,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      * @see org.collectionspace.services.common.context.ServiceContext#getCommonPartLabel(java.lang.String)
      */
     public String getCommonPartLabel(String schemaName) {
-        return schemaName.toLowerCase() + PART_LABEL_SEPERATOR + PART_COMMON_LABEL;
+        return schemaName.toLowerCase() + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
     }
 
     /* (non-Javadoc)
@@ -590,7 +593,15 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      */
     @Override
     public MultivaluedMap<String, String> getQueryParams() {
+         if (queryParams == null){
+             queryParams = new org.jboss.resteasy.specimpl.MultivaluedMapImpl<String,String>();
+        }
         return this.queryParams;
+    }
+
+    @Override
+     public MultivaluedMap<String, String> getQueryParamsPtr() {
+           return this.queryParams;
     }
 
     /* (non-Javadoc)
@@ -599,5 +610,15 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     @Override
     public void setQueryParams(MultivaluedMap<String, String> theQueryParams) {
         this.queryParams = theQueryParams;
+    }
+
+    @Override
+    public void setUriInfo(UriInfo ui){
+        this.uriInfo = ui;
+    }
+
+   @Override
+   public UriInfo getUriInfo(){
+        return this.uriInfo;
     }
 }

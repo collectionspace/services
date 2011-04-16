@@ -52,6 +52,8 @@
             <xs:enumeration value="contains"/>
             <!-- document with id as document-id-1 contains one or more document with id as document-id-2 -->
             <xs:enumeration value="collectionobject-intake"/>
+            <!-- document with id as document-id-1 has parent document with id as document-id-2 -->
+            <xs:enumeration value="hasBroader" />
         </xs:restriction>
     </xs:simpleType>
 

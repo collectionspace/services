@@ -23,8 +23,11 @@
  */
 package org.collectionspace.services.common.vocabulary;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 
+import javax.management.relation.Relation;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Encoded;
@@ -44,9 +47,14 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
@@ -72,6 +80,10 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.relation.RelationResource;
+import org.collectionspace.services.relation.RelationsCommon;
+import org.collectionspace.services.relation.RelationsCommonList;
+import org.collectionspace.services.relation.RelationshipType;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -201,8 +213,6 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	/**
 	 * Creates the authority.
 	 * 
-	 * @param input the input
-	 * 
 	 * @return the response
 	 */
 	@POST
@@ -216,24 +226,11 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			path.path("" + csid);
 			Response response = Response.created(path.build()).build();
 			return response;
-		} catch (BadRequestException bre) {
-			Response response = Response.status(
-					Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
-		} catch (UnauthorizedException ue) {
-			Response response = Response.status(
-					Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
 		} catch (Exception e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Caught exception in createVocabulary", e);
-			}
-			Response response = Response.status(
-					Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
-			throw new WebApplicationException(response);
+			throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
 		}
 	}
-	
+
 	protected String buildWhereForAuthByName(String name) {
 		return authorityCommonSchemaName+
 				":"+AuthorityJAXBSchema.SHORT_IDENTIFIER+
@@ -348,10 +345,9 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 
 	/**
 	 * Update authority.
-	 * 
+	 *
 	 * @param specifier the csid or id
-	 * @param theUpdate the the update
-	 * 
+	 *
 	 * @return the multipart output
 	 */
 	@PUT
@@ -374,22 +370,8 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			}
 			getRepositoryClient(ctx).update(ctx, csid, handler);
 			result = ctx.getOutput();
-		} catch (UnauthorizedException ue) {
-			Response response = Response.status(
-					Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
-		} catch (DocumentNotFoundException dnfe) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("caught exception in updateAuthority", dnfe);
-			}
-			Response response = Response.status(Response.Status.NOT_FOUND).entity(
-					"Update failed on Authority specifier=" + specifier).type(
-					"text/plain").build();
-			throw new WebApplicationException(response);
 		} catch (Exception e) {
-			Response response = Response.status(
-					Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
-			throw new WebApplicationException(response);
+			throw bigReThrow(e, ServiceMessages.UPDATE_FAILED);
 		}
 		return result.getBytes();
 	}
@@ -442,13 +424,13 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	/*************************************************************************
 	 * Create an AuthorityItem - this is a sub-resource of Authority
 	 * @param specifier either a CSID or one of the urn forms
-	 * @param input the payload 
 	 * @return Authority item response
 	 *************************************************************************/
 	@POST
 	@Path("{csid}/items")
-	public Response createAuthorityItem(@PathParam("csid") String specifier, String xmlPayload) {
+	public Response createAuthorityItem(@Context UriInfo ui, @PathParam("csid") String specifier, String xmlPayload) {
 		try {
+
 			PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 			Specifier spec = getSpecifier(specifier, "createAuthorityItem", "CREATE_ITEM");
@@ -461,27 +443,19 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
 			}
 			ctx = createServiceContext(getItemServiceName(), input);
+            ctx.setUriInfo(ui);    //Laramie
 			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
 			String itemcsid = getRepositoryClient(ctx).create(ctx, handler);
 			UriBuilder path = UriBuilder.fromResource(resourceClass);
 			path.path(parentcsid + "/items/" + itemcsid);
 			Response response = Response.created(path.build()).build();
+
+            //updateRelations(ui, itemcsid, input);
+
 			return response;
-		} catch (BadRequestException bre) {
-			Response response = Response.status(
-					Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
-		} catch (UnauthorizedException ue) {
-			Response response = Response.status(
-					Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
 		} catch (Exception e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Caught exception in createAuthorityItem", e);
-			}
-			Response response = Response.status(
-					Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
-			throw new WebApplicationException(response);
+            //TODO:    if e is 400 type error, then call throwWebAppException(400,...);
+            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
 		}
 	}
 
@@ -504,10 +478,9 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }
-                
         return result.getBytes();
     }
-    
+
     @PUT
     @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH)
     public byte[] updateWorkflow(
@@ -518,10 +491,10 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
     	try {
 	        ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
 	        String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
-	    	
+
         	PoxPayloadIn workflowUpdate = new PoxPayloadIn(xmlPayload);
 	    	MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, workflowUpdate);
-	    	WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
+            WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
 	    	ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
 	        getRepositoryClient(ctx).update(ctx, itemcsid, handler);
 	        result = ctx.getOutput();
@@ -529,8 +502,8 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }
         return result.getBytes();
-    }    
-    
+    }
+
 	
 	/**
 	 * Gets the authority item.
@@ -566,9 +539,17 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			}
 			ctx = (RemoteServiceContext)createServiceContext(getItemServiceName(), queryParams);
 			ctx.setJaxRsContext(jaxRsContext);
+
+
+
+            // NEW laramie
+            ctx.setUriInfo(ui); //ARG!   must pass this or subsequent calls will not have a ui.
+            // NEW
+
+
 			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
 			if(itemSpec.form==SpecifierForm.CSID) {
-				getRepositoryClient(ctx).get(ctx, itemSpec.value, handler);
+    				getRepositoryClient(ctx).get(ctx, itemSpec.value, handler);
 			} else {
 				String itemWhereClause = 
 					buildWhereForAuthItemByName(itemSpec.value, parentcsid);
@@ -578,25 +559,8 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			}
 			// TODO should we assert that the item is in the passed vocab?
 			result = ctx.getOutput();
-		} catch (UnauthorizedException ue) {
-			Response response = Response.status(
-					Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
-		} catch (DocumentNotFoundException dnfe) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("getAuthorityItem", dnfe);
-			}
-			Response response = Response.status(Response.Status.NOT_FOUND).entity(
-					"Get failed on AuthorityItem specifier=" + itemspecifier).type(
-					"text/plain").build();
-			throw new WebApplicationException(response);
 		} catch (Exception e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("getAuthorityItem", e);
-			}
-			Response response = Response.status(
-					Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
-			throw new WebApplicationException(response);
+			throw bigReThrow(e, ServiceMessages.GET_FAILED);
 		}
 		if (result == null) {
 			Response response = Response.status(Response.Status.NOT_FOUND).entity(
@@ -664,17 +628,8 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			}
 			getRepositoryClient(ctx).getFiltered(ctx, handler);
 			return (AuthItemCommonList) handler.getCommonPartList();
-		} catch (UnauthorizedException ue) {
-			Response response = Response.status(
-					Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
 		} catch (Exception e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Caught exception in getAuthorityItemList", e);
-			}
-			Response response = Response.status(
-					Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
-			throw new WebApplicationException(response);
+			throw bigReThrow(e, ServiceMessages.LIST_FAILED);
 		}
 	}
 
@@ -741,27 +696,9 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
     				serviceType,
     				refName,
     				myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/ );
-    	} catch (UnauthorizedException ue) {
-    		Response response = Response.status(
-    				Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
-    		throw new WebApplicationException(response);
-    	} catch (DocumentNotFoundException dnfe) {
-    		if (logger.isDebugEnabled()) {
-    			logger.debug("getReferencingObjects", dnfe);
-    		}
-    		Response response = Response.status(Response.Status.NOT_FOUND).entity(
-    				"GetReferencingObjects failed with parentspecifier=" 
-    				+ parentspecifier + " and itemspecifier=" + itemspecifier).type(
-    				"text/plain").build();
-    		throw new WebApplicationException(response);
-    	} catch (Exception e) {	// Includes DocumentException
-    		if (logger.isDebugEnabled()) {
-    			logger.debug("GetReferencingObjects", e);
-    		}
-    		Response response = Response.status(
-    				Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
-    		throw new WebApplicationException(response);
-    	}
+    	} catch (Exception e) {
+			throw bigReThrow(e, ServiceMessages.GET_FAILED);
+		}
     	if (authRefDocList == null) {
     		Response response = Response.status(Response.Status.NOT_FOUND).entity(
     				"Get failed, the requested Item CSID:" + itemspecifier + ": was not found.").type(
@@ -819,19 +756,9 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
             	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
             	ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
             authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
-        } catch (UnauthorizedException ue) {
-            Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Failed to retrieve authority references: reason " + ue.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in getAuthorityRefs", e);
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to retrieve authority references").type("text/plain").build();
-            throw new WebApplicationException(response);
-        }
-        return authRefList;
+			throw bigReThrow(e, ServiceMessages.GET_FAILED  + " parentspecifier: "+parentspecifier + " itemspecifier:" +itemspecifier);
+		}return authRefList;
     }
 
 	/**
@@ -839,13 +766,13 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 * 
 	 * @param parentspecifier either a CSID or one of the urn forms
 	 * @param itemspecifier either a CSID or one of the urn forms
-	 * @param theUpdate the the update
-	 * 
+	 *
 	 * @return the multipart output
 	 */
 	@PUT
 	@Path("{csid}/items/{itemcsid}")
 	public byte[] updateAuthorityItem(
+            @Context UriInfo ui,
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier,
 			String xmlPayload) {
@@ -877,28 +804,14 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			}
 			// Note that we have to create the service context for the Items, not the main service
 			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+            ctx.setUriInfo(ui);
 			getRepositoryClient(ctx).update(ctx, itemcsid, handler);
 			result = ctx.getOutput();
-		} catch (BadRequestException bre) {
-			Response response = Response.status(
-					Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
-		} catch (UnauthorizedException ue) {
-			Response response = Response.status(
-					Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
-		} catch (DocumentNotFoundException dnfe) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("caught DNF exception in updateAuthorityItem", dnfe);
-			}
-			Response response = Response.status(Response.Status.NOT_FOUND).entity(
-					"Update failed on AuthorityItem csid=" + itemspecifier).type(
-					"text/plain").build();
-			throw new WebApplicationException(response);
+
+            //PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+            //updateRelations(itemcsid, input);
 		} catch (Exception e) {
-			Response response = Response.status(
-					Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
-			throw new WebApplicationException(response);
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED);
 		}
 		return result.getBytes();
 	}
@@ -916,44 +829,35 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	public Response deleteAuthorityItem(
 			@PathParam("csid") String parentcsid,
 			@PathParam("itemcsid") String itemcsid) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("deleteAuthorityItem with parentcsid=" + parentcsid + " and itemcsid=" + itemcsid);
-		}
-		if (parentcsid == null || "".equals(parentcsid)) {
-			logger.error("deleteVocabularyItem: missing csid!");
-			Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-					"delete failed on AuthorityItem parentcsid=" + parentcsid).type(
-					"text/plain").build();
-			throw new WebApplicationException(response);
-		}
-		if (itemcsid == null || "".equals(itemcsid)) {
-			logger.error("deleteVocabularyItem: missing itemcsid!");
-			Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-					"delete failed on AuthorityItem=" + itemcsid).type(
-					"text/plain").build();
-			throw new WebApplicationException(response);
-		}
+		try{
+            if (logger.isDebugEnabled()) {
+                logger.debug("deleteAuthorityItem with parentcsid=" + parentcsid + " and itemcsid=" + itemcsid);
+            }
+
+            if (parentcsid == null || "".equals(parentcsid)) {
+                logger.error("deleteVocabularyItem: missing csid!");
+                Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                        "delete failed on AuthorityItem parentcsid=" + parentcsid).type(
+                        "text/plain").build();
+                throw new WebApplicationException(response);
+            }
+            if (itemcsid == null || "".equals(itemcsid)) {
+                logger.error("deleteVocabularyItem: missing itemcsid!");
+                Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                        "delete failed on AuthorityItem=" + itemcsid).type(
+                        "text/plain").build();
+                throw new WebApplicationException(response);
+            }
+        }catch (Throwable t){
+            System.out.println("ERROR in setting up DELETE: "+t);
+        }
 		try {
 			// Note that we have to create the service context for the Items, not the main service
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName());
 			getRepositoryClient(ctx).delete(ctx, itemcsid);
 			return Response.status(HttpResponseCodes.SC_OK).build();
-		} catch (UnauthorizedException ue) {
-			Response response = Response.status(
-					Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
-			throw new WebApplicationException(response);
-		} catch (DocumentNotFoundException dnfe) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("caught exception in deleteAuthorityItem", dnfe);
-			}
-			Response response = Response.status(Response.Status.NOT_FOUND).entity(
-					"Delete failed on AuthorityItem itemcsid=" + itemcsid).type(
-					"text/plain").build();
-			throw new WebApplicationException(response);
-		} catch (Exception e) {
-			Response response = Response.status(
-					Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
-			throw new WebApplicationException(response);
+            } catch (Exception e) {
+			throw bigReThrow(e, ServiceMessages.DELETE_FAILED + "  itemcsid: " + itemcsid+ " parentcsid:" + parentcsid);
 		}
 	}
     

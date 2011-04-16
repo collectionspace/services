@@ -43,6 +43,7 @@ import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.security.UnauthorizedException;
@@ -88,6 +89,8 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
 					.entity(serviceMsg + " on " + getClass().getName()
 							+ " csid=" + csid).type("text/plain").build();
 			return new WebApplicationException(response);
+		} else if (e instanceof BadRequestException) {
+            return new WebApplicationException(e, ((BadRequestException) e).getErrorCode());
 		} else if (e instanceof WebApplicationException) {
 			//
 			// subresource may have already thrown this exception

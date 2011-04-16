@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="persons">
+  <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <inAuthority>${inAuthority}</inAuthority>
+    <shortIdentifier>${shortIdentifier}</shortIdentifier>
+    <refName>urn:cspace:org.collectionspace.demo:personauthority:name(${authShortIdentifier}):person:name(${shortIdentifier})'John Wayne'</refName>
+    <displayName>John Wayne</displayName>
+    <displayNameComputed>false</displayNameComputed>
+    <shortDisplayName>JohnWayne</shortDisplayName>
+    <shortDisplayNameComputed>false</shortDisplayNameComputed>
+    <foreName>John</foreName>
+    <surName>Wayne</surName>
+    <birthDate>May 26, 1907</birthDate>
+    <deathDate>June 11, 1979</deathDate>
+    <birthPlace>Winterset, Iowa</birthPlace>
+    <groups>
+      <group>Irish</group>
+      <group>Scottish</group>
+    </groups>
+    <gender>male</gender>
+    <bioNote>born Marion Robert Morrison and betterknown by his stage name John Wayne, was an American film actor, director and producer. He epitomized rugged masculinity and has become an enduring American icon. He is famous for his distinctive
+    voice, walk and height. He was also known for his conservative political views and his support in the 1950s for anti-communist positions.</bioNote>
+  </ns2:persons_common>
+  
+  <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <pageSize>40</pageSize>
+    <itemsInPage>1</itemsInPage>
+    <totalItems>1</totalItems>
+    <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
+    <relation-list-item>
+		<subjectCsid>${myCSID}</subjectCsid>
+		<relationshipType>hasBroader</relationshipType>
+		<predicate>hasBroader</predicate>
+		<predicateDisplayName>hasBroader</predicateDisplayName>
+		<objectCsid>${parentCSID}</objectCsid>
+		<subject>
+		  <csid>${myCSID}</csid>
+		  <type>Person</type>
+		  <name>John Wayne, Me</name>
+		</subject>
+		<object>
+		  <csid>${parentCSID}</csid>
+		  <type>Person</type>
+		  <name>John Wayne 2, the evil twin, Parent</name>
+		</object>
+	</relation-list-item>
+	<relation-list-item>
+		<subjectCsid>${childCSID}</subjectCsid>
+		<relationshipType>hasBroader</relationshipType>
+		<predicate>hasBroader</predicate>
+		<predicateDisplayName>hasBroader</predicateDisplayName>
+		<objectCsid>${myCSID}</objectCsid>
+		<subject>
+		  <csid>${childCSID}</csid>
+		  <type>Person</type>
+		  <name>John Wayne 2, the evil twin, child</name>
+		</subject>
+		<object>
+		  <csid>${myCSID}</csid>
+		  <type>Person</type>
+		  <name>John Wayne</name>
+		</object>
+	</relation-list-item>
+  </ns3:relations-common-list>
+
+  
+</document>
+
+

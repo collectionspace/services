@@ -82,7 +82,7 @@ import org.dom4j.Document;
  * @param <T> 
  * @param <TL> 
  */
-public abstract class RemoteDocumentModelHandlerImpl<T, TL>
+public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         extends DocumentModelHandler<T, TL> {
 
     /** The logger. */
@@ -115,10 +115,14 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
 	        List<PayloadInputPart> inputParts = ctx.getInput().getParts();
 	        for (PayloadInputPart part : inputParts) {
 	            String partLabel = part.getLabel();
-	            ObjectPartType partMeta = partsMetaMap.get(partLabel);
-	//            extractPart(docModel, partLabel, partMeta);
-	            Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
-	            addOutputPart(unQObjectProperties, partLabel, partMeta);
+                try{
+                    ObjectPartType partMeta = partsMetaMap.get(partLabel);
+        //            extractPart(docModel, partLabel, partMeta);
+                    Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
+                    addOutputPart(unQObjectProperties, partLabel, partMeta);
+                } catch (Throwable t){
+                    System.out.println("===============================\r\nUnable to addOutputPart: "+partLabel+" error: "+t);
+                }
 	        }
         } else {
         	if (logger.isWarnEnabled() == true) {

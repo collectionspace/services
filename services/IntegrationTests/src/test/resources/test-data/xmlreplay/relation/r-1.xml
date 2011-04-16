@@ -4,16 +4,11 @@
           xmlns:ns2="http://collectionspace.org/services/relation" 
           xmlns:ns3="http://collectionspace.org/services/jaxb">
     <documentId1>${documentId1}</documentId1>
-
-    <documentType1>objectexit</documentType1>
-
+    <documentType1>${documentType1}</documentType1>
     <documentId2>${documentId2}</documentId2>
-
-    <documentType2>objectexit</documentType2>
-
-    <relationshipType>COLLECTIONOBJECT_INTAKE</relationshipType>
-
-    <predicateDisplayName>COLLECTIONOBJECT_INTAKE.displayName</predicateDisplayName>
+    <documentType2>${documentType1}</documentType2>
+    <relationshipType>${relationshipType}</relationshipType>
+    <predicateDisplayName>${relationshipType}</predicateDisplayName>
   </ns2:relations_common>
 </document>
 

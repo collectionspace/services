@@ -27,6 +27,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
@@ -226,19 +227,22 @@ public class XmlReplayTransport {
         return doPOST_PUT(urlString, xmlString, contentRaw, BOUNDARY, method, contentType, authForTest, fromTestID); //method is POST or PUT.
     }
 
-
-    public static ServiceResult doPOST_PUT(String urlString, String content, Map<String,String> contentRaw,
-                                           String boundary, String method, String contentType,
-                                           String authForTest, String fromTestID) throws Exception {
-        ServiceResult result = new ServiceResult();
-        result.method = method;
-        //HACK for speed testing.  Result: XmlReplay takes 9ms to process one test
+        //HACK for speed testing in doPOST_PUT.
+        //  Result: XmlReplay takes 9ms to process one test
         // right up to the point of actually firing an HTTP request.
         // or ~ 120 records per second.
         //result.CSID = "2";
         //result.overrideGotExpectedResult();
         //if (true) return result;
         //END-HACK
+
+    public static ServiceResult doPOST_PUT(String urlString, String content, Map<String,String> contentRaw,
+                                           String boundary, String method, String contentType,
+                                           String authForTest, String fromTestID) throws Exception {
+        ServiceResult result = new ServiceResult();
+        result.method = method;
+        String deleteURL = "";
+        String location = "";
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn;
@@ -261,7 +265,6 @@ public class XmlReplayTransport {
             wr.write(content);
             wr.flush();
 
-
             try {
                 result.requestPayload = content;
                 result.requestPayloadsRaw = contentRaw;
@@ -270,26 +273,13 @@ public class XmlReplayTransport {
                 if (400 <= result.responseCode && result.responseCode <= 499){
                     return result;
                 }
-                BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String line;
-                StringBuffer sb = new StringBuffer();
-                while ((line = rd.readLine()) != null) {
-                    sb.append(line).append("\r\n");
-                }
-                String msg = sb.toString();
-                result.result = msg;
-                result.boundary = PayloadLogger.parseBoundary(conn.getHeaderField("CONTENT-TYPE"));
-
-                rd.close();
+                readStream(conn, result);
             } catch (Throwable t){
                 //System.err.println("ERROR getting content from response: "+t);
                 result.error = t.toString();
             }
             wr.close();
 
-
-            String deleteURL = "";
-            String location = "";
             Map<String, List<String>> headers = conn.getHeaderFields();
             List<String> locations = headers.get("Location");
             if (locations != null){
@@ -303,11 +293,77 @@ public class XmlReplayTransport {
             result.location = location;
             result.deleteURL = deleteURL;
             result.CSID = location;
-
         } catch (Throwable t2){
             result.error = "ERROR in XmlReplayTransport: "+t2;
         }
         return result;
+    }
+
+
+    public static ServiceResult doPOST_PUT_PostMethod(String urlString, String content, Map<String,String> contentRaw,
+                                           String boundary, String method, String contentType,
+                                           String authForTest, String fromTestID) throws Exception {
+        ServiceResult result = new ServiceResult();
+        result.method = method;
+        String deleteURL = "";
+        String location = "";
+        try {
+            HttpClient client = new HttpClient();
+            PostMethod postMethod = new PostMethod(urlString);
+            postMethod.setRequestHeader("Accept", "multipart/mixed");
+            postMethod.addRequestHeader("Accept", "application/xml");
+            postMethod.setRequestHeader("Authorization", "Basic " + authForTest);
+            postMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
+            //this method takes an array of params.  Not sure what they expect us to do with a raw post:
+            //   postMethod.setRequestBody();
+            int statusCode1 = 0;
+            String res = "";
+            try {
+                statusCode1 = client.executeMethod(postMethod);
+                result.responseCode = statusCode1;
+                //System.out.println("statusCode: "+statusCode1+" statusLine ==>" + postMethod.getStatusLine());
+                result.responseMessage = postMethod.getStatusText();
+                res = postMethod.getResponseBodyAsString();
+                Header[] headers = postMethod.getResponseHeaders("Location");
+                if (headers.length>0) {
+                    System.out.println("headers[0]:  "+headers[0]);
+                    String locationZero = headers[0].getValue();
+                    if (locationZero != null){
+                        String[] segments = locationZero.split("/");
+                        location = segments[segments.length - 1];
+                        deleteURL = Tools.glue(urlString, "/", location);
+                    }
+                }
+                postMethod.releaseConnection();
+            } catch (Throwable t){
+                result.error = t.toString();
+            }
+            result.result = res;
+            result.location = location;
+            result.deleteURL = deleteURL;
+            result.CSID = location;
+        } catch (Throwable t2){
+            result.error = "ERROR in XmlReplayTransport: "+t2;
+        }
+        return result;
+    }
+
+    private static void readStream(HttpURLConnection  conn, ServiceResult result) throws Throwable {
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        try {
+                String line;
+                StringBuffer sb = new StringBuffer();
+                while ((line = rd.readLine()) != null) {
+                    sb.append(line).append("\r\n");
+                }
+                String msg = sb.toString();
+                result.result = msg;
+                result.boundary = PayloadLogger.parseBoundary(conn.getHeaderField("CONTENT-TYPE"));
+        } finally {
+            rd.close();
+        }
+
+
     }
 
 }
