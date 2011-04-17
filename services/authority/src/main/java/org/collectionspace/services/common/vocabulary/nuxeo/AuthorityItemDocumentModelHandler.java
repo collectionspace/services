@@ -234,7 +234,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         RelationsCommonList relationsCommonListBody = (RelationsCommonList) part.getBody();
 
         ServiceContext ctx = getServiceContext();
-        MultivaluedMap queryParams = ctx.getQueryParamsPtr();
+        MultivaluedMap queryParams = ctx.getQueryParams();
        String predicate = RelationshipType.HAS_BROADER.value();
         queryParams.putSingle(IRelationsManager.PREDICATE_QP, predicate);
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, null);
@@ -244,7 +244,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
 
         RelationsCommonList childList = (new RelationResource()).getList(ctx.getUriInfo());    //magically knows all query params because they are in the context.
         for (RelationsCommonList.RelationListItem childListItem : childList.getRelationListItem()) {
-            System.out.println("    childListItem: " + childListItem);
+           // System.out.println("    childListItem: " + childListItem);
             //todo: if not found in update list, remove from system
             //todo: if update list item not found in child list, add to system.
         }
@@ -255,7 +255,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
 
         RelationsCommonList parentList = (new RelationResource()).getList(ctx.getUriInfo());
         for (RelationsCommonList.RelationListItem parentListItem : parentList.getRelationListItem()) {
-            System.out.println("    parentListItem: " + parentListItem);
+           // System.out.println("    parentListItem: " + parentListItem);
             //todo: if num-parents > 1 then complain.
             //todo: if not found in update list, remove from system
             //todo: if update list item not found in parent list, add to system.
@@ -268,6 +268,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
             rc.setDocumentId2(item.getObjectCsid());
             rc.setRelationshipType(item.getPredicate());
             //todo: is an enum:  rc.setPredicate(item.getPredicate());
+            rc.setDocumentType1(item.getSubject().getType());
+            rc.setDocumentType2(item.getObject().getType());
 
             PoxPayloadOut payloadOut = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
             PayloadOutputPart outputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMONPART_NAME, rc);

@@ -27,6 +27,15 @@
     <!--<run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />-->
 
     <!--<run controlFile="./organization.xml" testGroup="organization" />-->
-
+    
+    
+    <!-- ============================================= -->
+    <!-- XmlReplay now compatible with POX payloads.
+         File below this line have been ported. -->
+    <!-- ============================================= -->
+    
+    <run controlFile="person/person.xml" testGroup="updatePerson" />
+    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
+    
 </xmlReplayMaster>
 
