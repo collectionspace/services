@@ -64,6 +64,7 @@
     <run controlFile="person/person.xml" testGroup="addOnePerson" />
     -->
     <run controlFile="person/person.xml" testGroup="updatePerson" />
+    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
     
 </xmlReplayMaster>
 

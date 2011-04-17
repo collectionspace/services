@@ -30,6 +30,8 @@
     <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
     <relation-list-item>
 		<subjectCsid>${myCSID}</subjectCsid>
+		<documentType1>${documentType1}</documentType1>
+		<documentType2>${documentType2}</documentType2>
 		<relationshipType>hasBroader</relationshipType>
 		<predicate>hasBroader</predicate>
 		<predicateDisplayName>hasBroader</predicateDisplayName>

@@ -57,8 +57,8 @@
              <vars>
                 <var ID="documentId1">${Person1.CSID}</var>
                 <var ID="documentId2">${Person2.CSID}</var>
-                <var ID="documentType1">persons</var>
-                <var ID="documentType2">persons</var>
+                <var ID="documentType1">Persons</var>
+                <var ID="documentType2">Persons</var>
                 <var ID="relationshipType">hasBroader</var>
              </vars>
         </test>
@@ -73,8 +73,8 @@
              -->
                 <var ID="documentId1">${Person2.CSID}</var>
                 <var ID="documentId2">${Person1.CSID}</var>
-                <var ID="documentType1">persons</var>
-                <var ID="documentType2">persons</var>
+                <var ID="documentType1">Persons</var>
+                <var ID="documentType2">Persons</var>
                 <var ID="relationshipType">hasNarrower</var>
              </vars>
          </test>
@@ -93,6 +93,14 @@
         </test>
         
 	</testGroup>
+	
+	
+	
+	
+	
+	
+	<!-- ONLY SETTING autoDeletePOSTS TO FALSE FOR TESTING.  DON'T CHECK IN. -->
+	
 	
 	<testGroup ID="updatePerson" autoDeletePOSTS="true">
 	    <test ID="PersonAuth1" auth="admin@collectionspace.org">
@@ -160,6 +168,8 @@
             	<var ID="myCSID">${Person1.CSID}</var>
             	<var ID="parentCSID">${PersonParent.CSID}</var>
             	<var ID="childCSID">${PersonChild.CSID}</var>
+            	<var ID="documentType1">Person</var>
+            	<var ID="documentType2">Person</var>
             </vars>
         </test>
         
