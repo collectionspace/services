@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplay>
+    <!-- 
+         testGroup ID="person" is not live.  It works, but may not clean up correctly. 
+         For now, use ID="updatePerson"
+    -->
     <testGroup ID="person" autoDeletePOSTS="true">
         <test ID="PersonAuth1" auth="admin@collectionspace.org">
             <method>POST</method>
@@ -94,14 +98,6 @@
         
 	</testGroup>
 	
-	
-	
-	
-	
-	
-	<!-- ONLY SETTING autoDeletePOSTS TO FALSE FOR TESTING.  DON'T CHECK IN. -->
-	
-	
 	<testGroup ID="updatePerson" autoDeletePOSTS="true">
 	    <test ID="PersonAuth1" auth="admin@collectionspace.org">
             <method>POST</method>
@@ -168,8 +164,6 @@
             	<var ID="myCSID">${Person1.CSID}</var>
             	<var ID="parentCSID">${PersonParent.CSID}</var>
             	<var ID="childCSID">${PersonChild.CSID}</var>
-            	<var ID="documentType1">Person</var>
-            	<var ID="documentType2">Person</var>
             </vars>
         </test>
         
