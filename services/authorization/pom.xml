@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.7-SNAPSHOT</version>
+        <version>1.6</version>
     </parent>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authorization</artifactId>
