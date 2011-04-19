@@ -86,6 +86,7 @@ public class RelationResource extends ResourceBase {
 		return this.getRelationList(queryParams, subjectCsid, subjectType, predicate, objectCsid, objectType);
 	}
 
+    //this is called by collectionobjectresource...so it is still public.
     public RelationsCommonList getRelationList(MultivaluedMap<String, String> queryParams, String subjectCsid, String subjectType,
                                                                          String predicate, String objectCsid, String objectType) throws WebApplicationException {
         try {
@@ -94,7 +95,6 @@ public class RelationResource extends ResourceBase {
 
             String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType);
             handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);
-
             return (RelationsCommonList)finish_getList(ctx, handler);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);

@@ -1079,6 +1079,12 @@
                     </service:field>
                 </service:params>
             </service:initHandler>
+            <service:properties xmlns:service='http://collectionspace.org/services/common/service'>
+                <types:item><types:key>objectNameProperty</types:key><types:value>displayName</types:value></types:item>
+                <!-- there is no objectNumberProperty for persons
+                     <types:item><types:key>objectNumberProperty</types:key><types:value>displayName</types:value></types:item>
+                -->
+            </service:properties>
             <service:object id="1" name="Person" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"

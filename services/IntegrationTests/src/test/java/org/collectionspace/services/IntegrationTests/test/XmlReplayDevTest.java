@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class XmlReplayDevTest extends XmlReplayTest {
 
-//    @Test
+    @Test
     public void runMaster() throws Exception {
         String masterFile = System.getProperty("xmlReplayMaster");
         if (Tools.notEmpty(masterFile)){

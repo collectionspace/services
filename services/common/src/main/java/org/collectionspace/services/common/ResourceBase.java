@@ -99,6 +99,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     		String xmlPayload) {
         try {
         	PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+            //System.out.println("\r\n\r\n==============================\r\nxmlPayload:\r\n"+xmlPayload);
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             return create(input, ctx);
         } catch (Exception e) {

@@ -217,6 +217,7 @@ public class ServiceResult {
                 + ( Tools.notEmpty(location) ? "; location.CSID:"+location : "" )
                 + ( Tools.notEmpty(error) ? "; ERROR:"+error : "" )
                 + "; gotExpected:"+gotExpectedResult()
+                +";result:"+result+";"
                 + ( partsSummary(true))
                 +"}"
                 + ( includePayloads && Tools.notBlank(requestPayload) ? LINE+"requestPayload:"+LINE+CRLF+requestPayload+LINE : "" )

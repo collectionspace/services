@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -47,7 +48,7 @@ public interface ServiceContext<IT, OT> {
     /**
      * The character used to separate the words in a part label
      */
-    public static final String PART_LABEL_SEPERATOR = "_";
+    public static final String PART_LABEL_SEPARATOR = "_";
     /** The Constant PART_COMMON_LABEL. */
     public static final String PART_COMMON_LABEL = "common";
 
@@ -246,12 +247,19 @@ public interface ServiceContext<IT, OT> {
      */
     public MultivaluedMap<String, String> getQueryParams();
 
+    public MultivaluedMap<String, String>  getQueryParamsPtr();
+
     /**
      * Sets the query params.
      * 
      * @param queryParams the query params
      */
     public void setQueryParams(MultivaluedMap<String, String> queryParams);
+
+    public void setUriInfo(UriInfo ui);
+
+    public UriInfo getUriInfo();
+
 }
 
 

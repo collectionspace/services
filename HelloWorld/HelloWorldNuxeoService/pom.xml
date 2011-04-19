@@ -102,7 +102,7 @@
         <apacheds.version>1.5.1</apacheds.version>
         <apachedshared.version>0.9.7</apachedshared.version>
         <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
-        <nuxeo.version.1.5>1.6-SNAPSHOT</nuxeo.version.1.5>
+        <nuxeo.version.1.5>1.7-SNAPSHOT</nuxeo.version.1.5>
     </properties>
 
 
