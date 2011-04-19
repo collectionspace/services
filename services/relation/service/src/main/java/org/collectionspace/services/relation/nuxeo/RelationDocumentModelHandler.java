@@ -157,34 +157,38 @@ public class RelationDocumentModelHandler
 
         //Now fill in summary info for the related docs: subject and object.
         String subjectCsid = relationListItem.getSubjectCsid();
-        RelationsDocListItem subject = createRelationsDocListItem(ctx, sbt, subjectCsid, tReader);
+        String documentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_1);
+        RelationsDocListItem subject = createRelationsDocListItem(ctx, sbt, subjectCsid, tReader, documentType);
         relationListItem.setSubject(subject);
 
         String objectCsid = relationListItem.getObjectCsid();
-        RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader);
+        documentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_2);
+        RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, documentType);
         relationListItem.setObject(object);
 
         return relationListItem;
     }
 
+     // DocumentModel itemDocModel = docModelFromCSID(ctx, itemCsid);
+
     protected RelationsDocListItem createRelationsDocListItem(ServiceContext  ctx, 
                                                                                                  ServiceBindingType sbt,
                                                                                                  String itemCsid,
-                                                                                                 TenantBindingConfigReaderImpl tReader) throws Exception {
+                                                                                                 TenantBindingConfigReaderImpl tReader,
+                                                                                                 String documentType) throws Exception {
         RelationsDocListItem item = new RelationsDocListItem();
-       // DocumentModel itemDocModel = docModelFromCSID(ctx, itemCsid);
+        item.setDocumentType(documentType);//this one comes from the record, as documentType1, documentType2.
+        item.setService(documentType);//this one comes from the record, as documentType1, documentType2.   Current app seems to use servicename for this.
+        item.setCsid(itemCsid);
+
         DocumentModel itemDocModel =  NuxeoUtils.getDocFromCsid(getRepositorySession(), ctx, itemCsid);    //null if not found.
         if (itemDocModel!=null){
             String itemDocType = itemDocModel.getDocumentType().getName();
+            item.setDocumentTypeFromModel(itemDocType);           //this one comes from the nuxeo documentType
 
             //TODO: ensure that itemDocType is really the entry point, i.e. servicename==doctype
-            //ServiceBindingType itemSbt = tReader.getServiceBinding(ctx.getTenantId(), itemDocType);
+            //ServiceBindingType itemSbt2 = tReader.getServiceBinding(ctx.getTenantId(), itemDocType);
             ServiceBindingType itemSbt = tReader.getServiceBindingForDocType(ctx.getTenantId(), itemDocType);
-            //String bar = "\r\n=======================\r\n";
-            //System.out.println(bar+"itemDocType: "+itemDocType);
-            //System.out.println(bar+"ServiceBindingType: "+itemSbt);
-            //System.out.println(bar);
-
             try {
                 String itemDocname = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP, itemDocModel);
                 item.setName(itemDocname);
@@ -199,9 +203,9 @@ public class RelationDocumentModelHandler
             } catch (Throwable t){
                 System.out.println("\r\n\r\n\r\n=================\r\n NOTE:  field "+ServiceBindingUtils.OBJ_NUMBER_PROP+" not found in DocModel: "+itemDocModel.getName()+" inner: "+t.getMessage());
             }
-            item.setType(itemDocType);
+        } else {
+            item.setError("INVALID: related object is absent");
         }
-        item.setCsid(itemCsid);
         return item;
     }
 

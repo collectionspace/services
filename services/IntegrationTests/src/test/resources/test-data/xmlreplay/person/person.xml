@@ -153,7 +153,7 @@
         </test>
         
         
-	    <test ID="PersonPUT">
+	    <test ID="PersonPUT_1p2c">
             <method>PUT</method>
             <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${Person1.CSID}</uri>
             <filename>person/persons_common_w_relations.xml</filename>
@@ -167,7 +167,64 @@
             </vars>
         </test>
         
-        <test ID="GETPersonPUT">
+        <test ID="GETPersonPUT_1p2c">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
+        </test>
+        
+	    <test ID="PersonPUT_1p">
+            <method>PUT</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${Person1.CSID}</uri>
+            <filename>person/persons_common_w_relations_2.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${PersonAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+            	<var ID="shortIdentifier">johnWayneActor</var>
+            	<var ID="myCSID">${Person1.CSID}</var>
+            	<var ID="parentCSID">${PersonParent.CSID}</var>
+            </vars>
+        </test>
+        
+        <test ID="GETPersonPUT_1p">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
+        </test>
+        
+      
+        <test ID="PersonPUT_1p1c">
+            <method>PUT</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${Person1.CSID}</uri>
+            <filename>person/persons_common_w_relations.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${PersonAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+            	<var ID="shortIdentifier">johnWayneActor</var>
+            	<var ID="myCSID">${Person1.CSID}</var>
+            	<var ID="parentCSID">${PersonParent.CSID}</var>
+            	<var ID="childCSID">${PersonChild.CSID}</var>
+            </vars>
+        </test>
+        
+        <test ID="GETPersonPUT_1p1c">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
+        </test>
+      
+	    <test ID="PersonPUT_2c">
+            <method>PUT</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${Person1.CSID}</uri>
+            <filename>person/persons_common_w_relations_3.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${PersonAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+            	<var ID="shortIdentifier">johnWayneActor</var>
+            	<var ID="myCSID">${Person1.CSID}</var>
+            	<var ID="childCSID">${PersonChild.CSID}</var>
+            	<var ID="child2CSID">${PersonChild2.CSID}</var>
+            </vars>
+        </test>
+        
+        <test ID="GETPersonPUT_2c">
             <method>GET</method>
             <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
         </test>

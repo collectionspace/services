@@ -24,7 +24,10 @@
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.collectionspace.services.client.PayloadInputPart;
@@ -33,6 +36,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 //import org.collectionspace.services.common.authority.AuthorityItemRelations;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -47,6 +51,8 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
@@ -59,6 +65,8 @@ import javax.ws.rs.core.UriInfo;
  */
 public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         extends RemoteDocumentModelHandlerImpl<AICommon, AICommonList> {
+
+    private final Logger logger = LoggerFactory.getLogger(AuthorityItemDocumentModelHandler.class);
 
 	private String authorityItemCommonSchemaName;
 	
@@ -225,6 +233,22 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
     }
 
     //===================================================================
+    /*
+        for (RelationsCommonList.RelationListItem parentListItem : parentList.getRelationListItem()) {
+            System.out.println("    parentListItems " + parentListItem);
+            //todo: if num-parents > 1 then complain.
+            //todo: if not found in update list, remove from system
+            //todo: if update list item not found in parent list, add to system.
+        }
+        for (RelationsCommonList.RelationListItem childListItem : childList.getRelationListItem()) {
+           System.out.println("    childListItem: " + childListItem);
+            //todo: if not found in update list, remove from system
+            //todo: if update list item not found in child list, add to system.
+        }
+
+
+
+     */
     public RelationsCommonList updateRelations(String itemCSID, PoxPayloadIn input) throws Exception {
         PayloadInputPart part = input.getPart(RelationClient.SERVICE_COMMON_LIST_NAME);        //input.getPart("relations_common");
         if (part == null) {
@@ -242,43 +266,132 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         queryParams.putSingle(IRelationsManager.OBJECT_QP, itemCSID);
         queryParams.putSingle(IRelationsManager.OBJECT_TYPE_QP, null);
 
-        RelationsCommonList childList = (new RelationResource()).getList(ctx.getUriInfo());    //magically knows all query params because they are in the context.
-        for (RelationsCommonList.RelationListItem childListItem : childList.getRelationListItem()) {
-           // System.out.println("    childListItem: " + childListItem);
-            //todo: if not found in update list, remove from system
-            //todo: if update list item not found in child list, add to system.
-        }
+        RelationsCommonList childListOuter = (new RelationResource()).getList(ctx.getUriInfo());    //magically knows all query params because they are in the context.
 
         //Leave predicate, swap subject and object.
+        queryParams.putSingle(IRelationsManager.PREDICATE_QP, predicate);
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, itemCSID);
         queryParams.putSingle(IRelationsManager.OBJECT_QP, null);
 
-        RelationsCommonList parentList = (new RelationResource()).getList(ctx.getUriInfo());
-        for (RelationsCommonList.RelationListItem parentListItem : parentList.getRelationListItem()) {
-           // System.out.println("    parentListItem: " + parentListItem);
-            //todo: if num-parents > 1 then complain.
-            //todo: if not found in update list, remove from system
-            //todo: if update list item not found in parent list, add to system.
-        }
+        RelationsCommonList parentListOuter = (new RelationResource()).getList(ctx.getUriInfo());
+        /*
+            go through inboundList, remove anything from childList that matches  from childList
+            go through inboundList, remove anything from parentList that matches  from parentList
+            go through parentList, delete all remaining
+            go through childList, delete all remaining
+            go through actionList, add all remaining.
+            check for duplicate children
+            check for more than one parent.
+
+        inboundList                           parentList                      childList          actionList
+        ----------------                          ---------------                  ----------------       ----------------
+        child-a                                   parent-c                        child-a             child-b
+        child-b                                   parent-d                        child-c
+         parent-a
+           */
+        String HAS_BROADER = RelationshipType.HAS_BROADER.value();
+
         List<RelationsCommonList.RelationListItem> inboundList = relationsCommonListBody.getRelationListItem();
-        for (RelationsCommonList.RelationListItem item : inboundList) {
+        List<RelationsCommonList.RelationListItem> actionList = newList();
+        List<RelationsCommonList.RelationListItem> childList = childListOuter.getRelationListItem();
+        List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
+
+        for (RelationsCommonList.RelationListItem inboundItem : inboundList) {
+            if (inboundItem.getObjectCsid().equals(itemCSID) && inboundItem.getPredicate().equals(HAS_BROADER)){
+                //then this is an item that says we have a child.
+                RelationsCommonList.RelationListItem childItem = findInList(childList, inboundItem);
+                if (childItem != null){
+                    removeFromList(childList,  childItem);    //exists, just take it off delete list
+                } else {
+                    actionList.add(inboundItem);   //doesn't exist as a child, but is a child.  Add to additions list
+                }
+            } else if  (inboundItem.getSubjectCsid().equals(itemCSID) && inboundItem.getPredicate().equals(HAS_BROADER)) {
+                //then this is an item that says we have a parent
+                RelationsCommonList.RelationListItem parentItem = findInList(parentList, inboundItem);
+                if (parentItem != null){
+                    removeFromList(parentList,  parentItem);    //exists, just take it off delete list
+                } else {
+                    actionList.add(inboundItem);   //doesn't exist as a parent, but is a parent. Add to additions list
+                }
+            }  else {
+                System.out.println("\r\n\r\n================\r\n    Element didn't match parent or child, but may have partial fields that match. inboundItem: "+inboundItem);
+                //not dealing with: hasNarrower or any other predicate.
+
+            }
+        }
+        deleteRelations(parentList, ctx);
+        deleteRelations(childList, ctx);
+        createRelations(actionList, ctx);
+
+        return relationsCommonListBody;
+    }
+
+    private void createRelations(List<RelationsCommonList.RelationListItem> inboundList, ServiceContext ctx){
+         for (RelationsCommonList.RelationListItem item : inboundList) {
             RelationsCommon rc = new RelationsCommon();
-            rc.setCsid(item.getCsid());
+            //rc.setCsid(item.getCsid());
             rc.setDocumentId1(item.getSubjectCsid());
             rc.setDocumentId2(item.getObjectCsid());
             rc.setRelationshipType(item.getPredicate());
             //todo: is an enum:  rc.setPredicate(item.getPredicate());
-            rc.setDocumentType1(item.getSubject().getType());
-            rc.setDocumentType2(item.getObject().getType());
+            rc.setDocumentType1(item.getSubject().getDocumentType());
+            rc.setDocumentType2(item.getObject().getDocumentType());
 
             PoxPayloadOut payloadOut = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
             PayloadOutputPart outputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMONPART_NAME, rc);
             payloadOut.addPart(outputPart);
-
+            System.out.println("\r\n==== TO CREATE: "+rc.getDocumentId1()+"==>"+rc.getPredicate()+"==>"+rc.getDocumentId2());
             RelationResource relationResource = new RelationResource();
             Object res = relationResource.create(ctx.getUriInfo(), payloadOut.toXML());    //NOTE ui recycled from above to pass in unknown query params.
         }
-        return relationsCommonListBody;
+    }
+     private void deleteRelations(List<RelationsCommonList.RelationListItem> list,ServiceContext ctx){
+          try {
+              for (RelationsCommonList.RelationListItem inboundItem : list) {
+                  RelationResource relationResource = new RelationResource();
+                  System.out.println("\r\n==== TO DELETE: "+inboundItem.getCsid());
+                  Object res = relationResource.delete(inboundItem.getCsid());
+              }
+          } catch (Throwable t){
+              String msg = "Unable to deleteRelations: "+ Tools.errorToString(t, true);
+              logger.error(msg);
+          }
+     }
+
+    private  List<RelationsCommonList.RelationListItem> newList(){
+        List<RelationsCommonList.RelationListItem> result = new ArrayList<RelationsCommonList.RelationListItem>();
+        return result;
+    }
+     protected List<RelationsCommonList.RelationListItem> cloneList(List<RelationsCommonList.RelationListItem> inboundList){
+        List<RelationsCommonList.RelationListItem> result = newList();
+        for (RelationsCommonList.RelationListItem item: inboundList){
+            result.add(item);
+        }
+        return result;
+    }
+     private RelationsCommonList.RelationListItem findInList(List<RelationsCommonList.RelationListItem> list, RelationsCommonList.RelationListItem item){
+         for (RelationsCommonList.RelationListItem listItem : list) {
+             if (itemsEqual(listItem, item)){   //equals must be defined, else
+                return listItem;
+             }
+         }
+         return null;
+     }
+
+    private boolean itemsEqual(RelationsCommonList.RelationListItem item, RelationsCommonList.RelationListItem item2){
+        if (item==null || item2==null){
+            return false;
+        }
+        return     (item.getSubjectCsid().equals(item2.getSubjectCsid()))
+                && (item.getObjectCsid().equals(item2.getObjectCsid()))
+                && ( (item.getPredicate().equals(item2.getPredicate()))
+                && (item.getRelationshipType().equals(item2.getRelationshipType()))   )
+                && (item.getObject().getDocumentType().equals(item2.getObject().getDocumentType()))
+                && (item.getSubject().getDocumentType().equals(item2.getSubject().getDocumentType())) ;
+    }
+
+     private void removeFromList(List<RelationsCommonList.RelationListItem> list, RelationsCommonList.RelationListItem item){
+        list.remove(item);
     }
     //================= TODO: move this to common, refactoring this and  CollectionObjectResource.java
 

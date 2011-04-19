@@ -71,9 +71,12 @@
         <xs:sequence>
             <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
             <xs:element name="csid" type="xs:string" minOccurs="1"/>
-            <xs:element name="type" type="xs:string" minOccurs="1"/>
+            <xs:element name="service" type="xs:string" minOccurs="1"/>
             <xs:element name="name" type="xs:string" minOccurs="1"/>
             <xs:element name="number" type="xs:string" minOccurs="1"/>
+            <xs:element name="documentType" type="xs:string" minOccurs="1"/>
+            <xs:element name="documentTypeFromModel" type="xs:string" minOccurs="1"/>
+            <xs:element name="error" type="xs:string" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 

@@ -47,25 +47,6 @@
 		  <name>John Wayne 2, the evil twin, Parent</name>
 		</object>
 	</relation-list-item>
-	<relation-list-item>
-		<subjectCsid>${childCSID}</subjectCsid>
-		<documentType1>Person</documentType1>
-		<documentType2>Person</documentType2>
-		<relationshipType>hasBroader</relationshipType>
-		<predicate>hasBroader</predicate>
-		<predicateDisplayName>hasBroader</predicateDisplayName>
-		<objectCsid>${myCSID}</objectCsid>
-		<subject>
-		  <csid>${childCSID}</csid>
-		  <documentType>Person</documentType>
-		  <name>John Wayne 2, the evil twin, child</name>
-		</subject>
-		<object>
-		  <csid>${myCSID}</csid>
-		  <documentType>Person</documentType>
-		  <name>John Wayne</name>
-		</object>
-	</relation-list-item>
   </ns3:relations-common-list>
 
   

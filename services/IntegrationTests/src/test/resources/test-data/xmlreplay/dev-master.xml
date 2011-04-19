@@ -62,10 +62,13 @@
     <run controlFile="relation/relation.xml" testGroup="makeRelations" />
     <run controlFile="person/person.xml" testGroup="person" />
     <run controlFile="person/person.xml" testGroup="addOnePerson" />
-    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
-    <run controlFile="person/person.xml" testGroup="updatePerson" />
-    -->
     
+    <run controlFile="person/person.xml" testGroup="updatePerson" />
+    <run controlFile="person/person.xml" testGroup="updatePerson" />
+    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
+     <run controlFile="person/person.xml" testGroup="updatePerson" />
+    -->
+   
     
 </xmlReplayMaster>
 

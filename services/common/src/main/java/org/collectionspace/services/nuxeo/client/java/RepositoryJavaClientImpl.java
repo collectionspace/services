@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.client.IQueryManager;
@@ -730,6 +731,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw bre;
         } catch (DocumentException de) {
             throw de;
+        } catch (WebApplicationException wae){
+            throw wae;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
