@@ -260,13 +260,14 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
         	ctx = createServiceContext(getContactServiceName(), queryParams);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             DocumentFilter myFilter = handler.getDocumentFilter(); //new DocumentFilter();
-            myFilter.setWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
+            myFilter.appendWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_AUTHORITY +
                 "='" + parentcsid + "'" +
                 IQueryManager.SEARCH_QUALIFIER_AND +
                 ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_ITEM +
-                "='" + itemcsid + "'" );
+                "='" + itemcsid + "'",
+                IQueryManager.SEARCH_QUALIFIER_AND);  // "AND" this clause to any existing
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
