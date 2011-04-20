@@ -29,4 +29,6 @@ public interface CollectionSpacePoxClient<LT extends AbstractCommonList, P exten
      * GET list with workflow 'deleted' state
      */
     public ClientResponse<LT> readIncludeDeleted(Boolean includeDeleted);
+
+    public ClientResponse<LT> keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted);
 }

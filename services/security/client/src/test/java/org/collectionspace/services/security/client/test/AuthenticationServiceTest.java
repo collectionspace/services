@@ -432,6 +432,16 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         res.releaseConnection();
     }
+    
+    // ---------------------------------------------------------------
+    // Search tests
+    // ---------------------------------------------------------------
+    
+    @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void searchWorkflowDeleted(String testName) throws Exception {
+        // Fixme: null test for now, overriding test in base class
+    } 
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above

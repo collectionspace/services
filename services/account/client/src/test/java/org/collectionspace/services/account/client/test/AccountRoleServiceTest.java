@@ -496,6 +496,16 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         //ignoring this test as the service side returns 200 now even if it does
         //not find a record in the db
     }
+    
+    // ---------------------------------------------------------------
+    // Search tests
+    // ---------------------------------------------------------------
+    
+    @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void searchWorkflowDeleted(String testName) throws Exception {
+        // Fixme: null test for now, overriding test in base class
+    }    
 
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above

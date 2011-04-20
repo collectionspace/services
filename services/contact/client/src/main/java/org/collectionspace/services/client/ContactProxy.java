@@ -24,5 +24,12 @@ public interface ContactProxy extends CollectionSpacePoxProxy<ContactsCommonList
 	@GET
     @Produces({"application/xml"})
     ClientResponse<ContactsCommonList> readIncludeDeleted(
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+            
+    @Override
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<ContactsCommonList> keywordSearchIncludeDeleted(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 }

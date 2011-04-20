@@ -205,6 +205,13 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
     }
+    
+    // ---------------------------------------------------------------
+    // Search tests
+    // ---------------------------------------------------------------
+    
+    public void searchWorkflowDeleted(String testName) throws Exception {
+    }    
 
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above

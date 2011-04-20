@@ -14,6 +14,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends CollectionSpaceProxy<LT> {
+
     //(C)reate
     @POST
     ClientResponse<Response> create(byte[] payload);
@@ -39,4 +40,20 @@ public interface CollectionSpacePoxProxy<LT extends AbstractCommonList> extends 
     @Produces({"application/xml"})
     ClientResponse<LT> readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+
+
+    /**
+     * Keyword search.
+     *
+     * @param keywords keywords on which to search
+     * @param includeDeleted
+     * @return the client response
+     */
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<LT> keywordSearchIncludeDeleted(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+                @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+
+
 }

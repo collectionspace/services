@@ -83,5 +83,12 @@ public interface CollectionObjectProxy extends CollectionSpacePoxProxy<Collectio
     @Produces({"application/xml"})
     ClientResponse<CollectionobjectsCommonList> keywordSearch(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
+
+    @Override
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<CollectionobjectsCommonList> keywordSearchIncludeDeleted(
+    	    @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
 }

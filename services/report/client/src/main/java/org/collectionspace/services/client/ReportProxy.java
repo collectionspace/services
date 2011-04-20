@@ -59,5 +59,11 @@ public interface ReportProxy extends CollectionSpacePoxProxy<ReportsCommonList> 
     @Produces({"application/xml"})
     ClientResponse<ReportsCommonList> readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
-    
+
+    @Override
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<ReportsCommonList> keywordSearchIncludeDeleted(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
 }

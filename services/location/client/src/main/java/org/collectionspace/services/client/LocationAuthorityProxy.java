@@ -57,5 +57,11 @@ public interface LocationAuthorityProxy extends AuthorityProxy<Locationauthoriti
     @Produces({"application/xml"})
     ClientResponse<LocationauthoritiesCommonList> readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
-    
+ 
+    @Override
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<LocationauthoritiesCommonList> keywordSearchIncludeDeleted(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);   
 }
