@@ -12,8 +12,9 @@ import org.jboss.resteasy.client.ClientResponse;
 public abstract class AbstractPoxServiceClientImpl<LT extends AbstractCommonList, P extends CollectionSpacePoxProxy<LT>>
 	extends AbstractServiceClientImpl<LT, P> 
 	implements CollectionSpacePoxClient<LT, P> {
-	@Override
-	public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+	
+    @Override
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
         return getProxy().create(xmlPayload.getBytes());
     }
 		
@@ -36,5 +37,12 @@ public abstract class AbstractPoxServiceClientImpl<LT extends AbstractCommonList
     public ClientResponse<LT> readIncludeDeleted(Boolean includeDeleted) {
     	CollectionSpacePoxProxy<LT> proxy = getProxy();
     	return proxy.readIncludeDeleted(includeDeleted.toString());
-    }        
+    }
+
+    @Override
+    public ClientResponse<LT> keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted) {
+        CollectionSpacePoxProxy<LT> proxy = getProxy();
+        return proxy.keywordSearchIncludeDeleted(keywords, includeDeleted.toString());
+    }
+
 }

@@ -599,6 +599,16 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         //instead of giving FORBIDDEN
         Assert.assertEquals(statusCode, Response.Status.NOT_FOUND.getStatusCode());
     }
+    
+    // ---------------------------------------------------------------
+    // Search tests
+    // ---------------------------------------------------------------
+    
+    @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void searchWorkflowDeleted(String testName) throws Exception {
+        // Fixme: null test for now, overriding test in base class
+    } 
 
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above

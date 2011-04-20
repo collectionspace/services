@@ -680,6 +680,16 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
+    
+    // ---------------------------------------------------------------
+    // Search tests
+    // ---------------------------------------------------------------
+    
+    @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void searchWorkflowDeleted(String testName) throws Exception {
+        // Fixme: null test for now, overriding test in base class
+    }
 
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above

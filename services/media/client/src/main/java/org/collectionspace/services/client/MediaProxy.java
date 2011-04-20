@@ -24,18 +24,30 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 @Consumes("application/xml")
 public interface MediaProxy extends CollectionSpacePoxProxy<AbstractCommonList> {
 
-    @POST
-    @Path("/{csid}")
-    @Consumes("multipart/form-data")
-    ClientResponse<Response> createBlobFromFormData(@PathParam("csid") String csid,
-    		MultipartFormDataOutput formDataOutput);
+    // List
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<AbstractCommonList> readList();
     
     @Override
 	@GET
     @Produces({"application/xml"})
     ClientResponse<AbstractCommonList> readIncludeDeleted(
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+
+    @Override
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<AbstractCommonList> keywordSearchIncludeDeleted(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
+    @POST
+    @Path("/{csid}")
+    @Consumes("multipart/form-data")
+    ClientResponse<Response> createBlobFromFormData(@PathParam("csid") String csid,
+    		MultipartFormDataOutput formDataOutput);
+            
     @POST
     @Path("/{csid}")
 	@Produces("application/xml")
@@ -43,8 +55,4 @@ public interface MediaProxy extends CollectionSpacePoxProxy<AbstractCommonList> 
     ClientResponse<Response>createBlobFromUri(@PathParam("csid") String csid,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri);
     
-    // List
-    @GET
-    @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> readList();
 }

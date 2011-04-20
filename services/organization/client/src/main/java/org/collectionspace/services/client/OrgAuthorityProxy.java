@@ -28,7 +28,15 @@ public interface OrgAuthorityProxy extends AuthorityWithContactsProxy<Orgauthori
 	@GET
     @Produces({"application/xml"})
     ClientResponse<OrgauthoritiesCommonList> readIncludeDeleted(
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+
+    @Override
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<OrgauthoritiesCommonList> keywordSearchIncludeDeleted(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+            
     
     /*
      * List results that must be overridden for the RESTEasy proxy generation to work correctly.

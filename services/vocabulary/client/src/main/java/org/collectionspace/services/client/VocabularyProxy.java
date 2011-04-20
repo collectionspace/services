@@ -31,7 +31,13 @@ public interface VocabularyProxy extends AuthorityProxy<VocabulariesCommonList, 
     ClientResponse<VocabulariesCommonList> readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
     
-    
+    @Override
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<VocabulariesCommonList> keywordSearchIncludeDeleted(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+
     /*
      * List results that must be overridden for the RESTEasy proxy generation to work correctly.
      */

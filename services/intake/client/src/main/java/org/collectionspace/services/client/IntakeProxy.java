@@ -58,4 +58,11 @@ public interface IntakeProxy extends CollectionSpacePoxProxy<IntakesCommonList> 
     @Produces({"application/xml"})
     ClientResponse<IntakesCommonList> readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
+
+    @Override
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<IntakesCommonList> keywordSearchIncludeDeleted(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 }
