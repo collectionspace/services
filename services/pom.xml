@@ -41,6 +41,7 @@
         <module>person</module>
         <module>id</module>
         <module>collectionobject</module>
+        <module>group</module>
         <module>intake</module>
         <module>loanin</module>
         <module>loanout</module>

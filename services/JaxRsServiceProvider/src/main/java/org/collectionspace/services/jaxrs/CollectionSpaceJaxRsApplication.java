@@ -28,6 +28,7 @@ import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.note.NoteResource;
+import org.collectionspace.services.group.GroupResource;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
@@ -85,6 +86,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new PersonAuthorityResource());
         singletons.add(new OrgAuthorityResource());
         singletons.add(new CollectionObjectResource());
+        singletons.add(new GroupResource());
         singletons.add(new IntakeResource());
         singletons.add(new DimensionResource());
         singletons.add(new RelationResource());
