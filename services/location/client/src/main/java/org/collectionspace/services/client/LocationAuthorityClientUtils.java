@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.LocationJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.location.LocationsCommon;
+import org.collectionspace.services.location.ConditionGroupList;
+import org.collectionspace.services.location.ConditionGroup;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
@@ -54,12 +56,14 @@ public class LocationAuthorityClientUtils {
 
     /**
      * @param locationRefName  The proper refName for this authority
-     * @param locationInfo the properties for the new Location
+     * @param locationInfo the properties for the new Location. Can pass in one condition
+     * 						note and date string.
      * @param headerLabel	The common part label
      * @return	The PoxPayloadOut payload for the create call
      */
     public static PoxPayloadOut createLocationInstance( 
-    		String locationAuthRefName, Map<String, String> locationInfo, String headerLabel){
+    		String locationAuthRefName, Map<String, String> locationInfo, 
+				String headerLabel){
         LocationsCommon location = new LocationsCommon();
     	String shortId = locationInfo.get(LocationJAXBSchema.SHORT_IDENTIFIER);
     	String displayName = locationInfo.get(LocationJAXBSchema.DISPLAY_NAME);
@@ -72,10 +76,16 @@ public class LocationAuthorityClientUtils {
     	location.setDisplayNameComputed(displayNameComputed);
         if((value = (String)locationInfo.get(LocationJAXBSchema.NAME))!=null)
         	location.setName(value);
-        if((value = (String)locationInfo.get(LocationJAXBSchema.CONDITION_NOTE))!=null)
-        	location.setConditionNote(value);
-        if((value = (String)locationInfo.get(LocationJAXBSchema.CONDITION_NOTE_DATE))!=null)
-        	location.setConditionNoteDate(value);
+        if((value = (String)locationInfo.get(LocationJAXBSchema.CONDITION_NOTE))!=null) {
+            ConditionGroupList conditionGroupList = new ConditionGroupList();
+            List<ConditionGroup> conditionGroups = conditionGroupList.getConditionGroup();
+            ConditionGroup conditionGroup = new ConditionGroup();
+            conditionGroup.setConditionNote(value);
+            if((value = (String)locationInfo.get(LocationJAXBSchema.CONDITION_NOTE_DATE))!=null)
+            	conditionGroup.setConditionNoteDate(value);
+            conditionGroups.add(conditionGroup);
+            location.setConditionGroupList(conditionGroupList);
+        }
         if((value = (String)locationInfo.get(LocationJAXBSchema.SECURITY_NOTE))!=null)
         	location.setSecurityNote(value);
         if((value = (String)locationInfo.get(LocationJAXBSchema.ACCESS_NOTE))!=null)
@@ -86,6 +96,7 @@ public class LocationAuthorityClientUtils {
         	location.setAddress(value);
         if((value = (String)locationInfo.get(LocationJAXBSchema.TERM_STATUS))!=null)
         	location.setTermStatus(value);
+
         PoxPayloadOut multipart = new PoxPayloadOut(LocationAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(location,
             MediaType.APPLICATION_XML_TYPE);

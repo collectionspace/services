@@ -31,12 +31,24 @@
     <xs:element name="shortDisplayName" type="xs:string"/>
     <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
     <xs:element name="name" type="xs:string"/>
-    <xs:element name="conditionNote" type="xs:string"/>
-    <xs:element name="conditionNoteDate" type="xs:string"/>
+		<xs:element name="conditionGroupList" type="conditionGroupList"/>
     <xs:element name="securityNote" type="xs:string"/>
     <xs:element name="accessNote" type="xs:string"/>
     <xs:element name="address" type="xs:string"/>
     <xs:element name="locationType" type="xs:string"/>
 
+    <xs:complexType name="conditionGroupList">
+        <xs:sequence>
+            <xs:element name="conditionGroup" type="conditionGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="conditionGroup">
+        <xs:sequence>
+					<xs:element name="conditionNote" type="xs:string"/>
+					<xs:element name="conditionNoteDate" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
 </xs:schema>
 

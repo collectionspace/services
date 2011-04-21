@@ -156,9 +156,10 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     @Override
     protected PoxPayloadOut createInstance(String identifier) {
     	LocationAuthorityClient client = new LocationAuthorityClient();
-        String shortId = createIdentifier();
+        String shortId = identifier;
     	String displayName = "displayName-" + shortId;
-    	String baseRefName = LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
+    	String baseRefName = 
+    		LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
     	PoxPayloadOut multipart = 
             LocationAuthorityClientUtils.createLocationAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
@@ -189,7 +190,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         LocationAuthorityClient client = new LocationAuthorityClient();
         String shortId = createIdentifier();
     	String displayName = "displayName-" + shortId;
-    	String baseRefName = LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
+    	String baseRefName = 
+    		LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
+    	
     	PoxPayloadOut multipart = 
             LocationAuthorityClientUtils.createLocationAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
