@@ -36,6 +36,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 //import org.collectionspace.services.common.authority.AuthorityItemRelations;
+import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -54,6 +55,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.management.relation.Relation;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
@@ -198,16 +200,32 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
             throws Exception {
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         super.extractAllParts(wrapDoc);
+         String showRelations = ctx.getQueryParams().getFirst(CommonAPI.showRelations_QP);
+         if (!Tools.isTrue(showRelations)){
+             return;
+         }
+         String thisCSID = NuxeoUtils.getCsid(wrapDoc.getWrappedObject());
 
-        String thisCSID = NuxeoUtils.getCsid(wrapDoc.getWrappedObject());
+         String predicate = RelationshipType.HAS_BROADER.value();
+         RelationsCommonList parentListOuter = getRelations(thisCSID, null, predicate);
+         List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
 
-        //TODO: add broader, etc. here.
-        String predicate = RelationshipType.HAS_BROADER.value();
-        RelationsCommonList relationsCommonList = getRelations(thisCSID, null, predicate);
-        if (relationsCommonList.getTotalItems() == 0){
-            relationsCommonList = getRelations(null, thisCSID, predicate);   //for development... try switching subject and object.  This is not correct, though.
+         RelationsCommonList childrenListOuter = getRelations(null, thisCSID, predicate);
+         List<RelationsCommonList.RelationListItem> childrenList = childrenListOuter.getRelationListItem();
+
+         //Assume that there are more children than parents.  Will be true for parent/child, but maybe not for other relations.
+         //Now add all parents to our childrenList, to be able to return just one list of consolidated results.
+         //Not optimal, but that's the current design spec.
+        long added = 0;
+        for (RelationsCommonList.RelationListItem parent : parentList) {
+             childrenList.add(parent);
+             added++;
         }
-        PayloadOutputPart relationsPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, relationsCommonList);
+        long childrenSize = childrenList.size();
+        childrenListOuter.setTotalItems(childrenSize);
+        childrenListOuter.setItemsInPage(childrenListOuter.getItemsInPage()+added);
+
+        PayloadOutputPart relationsPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, childrenListOuter);
         ctx.addOutputPart(relationsPart);
     }
 
@@ -252,14 +270,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
     public RelationsCommonList updateRelations(String itemCSID, PoxPayloadIn input) throws Exception {
         PayloadInputPart part = input.getPart(RelationClient.SERVICE_COMMON_LIST_NAME);        //input.getPart("relations_common");
         if (part == null) {
-            System.out.println("Nothing to do in updateRelations: " + input);
+            //System.out.println("Nothing to do in updateRelations: " + input);
             return null;
         }
         RelationsCommonList relationsCommonListBody = (RelationsCommonList) part.getBody();
 
         ServiceContext ctx = getServiceContext();
-        MultivaluedMap queryParams = ctx.getQueryParams();
-       String predicate = RelationshipType.HAS_BROADER.value();
+        UriInfo uriInfo = ctx.getUriInfo();
+        MultivaluedMap queryParams = uriInfo.getQueryParameters();
+
+        String predicate = RelationshipType.HAS_BROADER.value();
         queryParams.putSingle(IRelationsManager.PREDICATE_QP, predicate);
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, null);
         queryParams.putSingle(IRelationsManager.SUBJECT_TYPE_QP, null);
@@ -297,7 +317,15 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
 
         for (RelationsCommonList.RelationListItem inboundItem : inboundList) {
-            if (inboundItem.getObjectCsid().equals(itemCSID) && inboundItem.getPredicate().equals(HAS_BROADER)){
+            if (inboundItem.getObject().getCsid().equalsIgnoreCase(CommonAPI.AuthorityItemCSID_REPLACE)){
+                inboundItem.setObjectCsid(itemCSID);
+                inboundItem.getObject().setCsid(itemCSID);
+            }
+            if (inboundItem.getSubject().getCsid().equalsIgnoreCase(CommonAPI.AuthorityItemCSID_REPLACE)){
+                inboundItem.setSubjectCsid(itemCSID);
+                inboundItem.getSubject().setCsid(itemCSID);
+            }
+            if (inboundItem.getObject().getCsid().equals(itemCSID) && inboundItem.getPredicate().equals(HAS_BROADER)) {
                 //then this is an item that says we have a child.
                 RelationsCommonList.RelationListItem childItem = findInList(childList, inboundItem);
                 if (childItem != null){
@@ -305,7 +333,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
                 } else {
                     actionList.add(inboundItem);   //doesn't exist as a child, but is a child.  Add to additions list
                 }
-            } else if  (inboundItem.getSubjectCsid().equals(itemCSID) && inboundItem.getPredicate().equals(HAS_BROADER)) {
+            } else if  (inboundItem.getSubject().getCsid().equals(itemCSID) && inboundItem.getPredicate().equals(HAS_BROADER)) {
                 //then this is an item that says we have a parent
                 RelationsCommonList.RelationListItem parentItem = findInList(parentList, inboundItem);
                 if (parentItem != null){
@@ -314,12 +342,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
                     actionList.add(inboundItem);   //doesn't exist as a parent, but is a parent. Add to additions list
                 }
             }  else {
+
                 System.out.println("\r\n\r\n================\r\n    Element didn't match parent or child, but may have partial fields that match. inboundItem: "+inboundItem);
                 //not dealing with: hasNarrower or any other predicate.
-
             }
         }
-        deleteRelations(parentList, ctx);
+        deleteRelations(parentList, ctx);               //todo: there are items appearing on both lists....april 20.
         deleteRelations(childList, ctx);
         createRelations(actionList, ctx);
 
@@ -328,19 +356,27 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
 
     private void createRelations(List<RelationsCommonList.RelationListItem> inboundList, ServiceContext ctx){
          for (RelationsCommonList.RelationListItem item : inboundList) {
-            RelationsCommon rc = new RelationsCommon();
-            //rc.setCsid(item.getCsid());
-            rc.setDocumentId1(item.getSubjectCsid());
-            rc.setDocumentId2(item.getObjectCsid());
-            rc.setRelationshipType(item.getPredicate());
-            //todo: is an enum:  rc.setPredicate(item.getPredicate());
-            rc.setDocumentType1(item.getSubject().getDocumentType());
-            rc.setDocumentType2(item.getObject().getDocumentType());
+             RelationsCommon rc = new RelationsCommon();
+             //rc.setCsid(item.getCsid());
+             String itemCsid =  item.getSubject().getCsid();
+             rc.setDocumentId1(itemCsid);
+             rc.setSubjectCsid(itemCsid);
+
+             String objCsid = item.getObject().getCsid();
+             rc.setDocumentId2(objCsid);
+             rc.setObjectCsid(objCsid);
+
+             rc.setRelationshipType(item.getPredicate());
+             //RelationshipType  foo = (RelationshipType.valueOf(item.getPredicate())) ;
+             //rc.setPredicate(foo);
+
+             rc.setDocumentType1(item.getSubject().getDocumentType());
+             rc.setDocumentType2(item.getObject().getDocumentType());
 
             PoxPayloadOut payloadOut = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
             PayloadOutputPart outputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMONPART_NAME, rc);
             payloadOut.addPart(outputPart);
-            System.out.println("\r\n==== TO CREATE: "+rc.getDocumentId1()+"==>"+rc.getPredicate()+"==>"+rc.getDocumentId2());
+            //System.out.println("\r\n==== TO CREATE: "+rc.getDocumentId1()+"==>"+rc.getPredicate()+"==>"+rc.getDocumentId2());
             RelationResource relationResource = new RelationResource();
             Object res = relationResource.create(ctx.getUriInfo(), payloadOut.toXML());    //NOTE ui recycled from above to pass in unknown query params.
         }
@@ -349,7 +385,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
           try {
               for (RelationsCommonList.RelationListItem inboundItem : list) {
                   RelationResource relationResource = new RelationResource();
-                  System.out.println("\r\n==== TO DELETE: "+inboundItem.getCsid());
+                  //System.out.println("\r\n==== TO DELETE: "+inboundItem.getCsid());
                   Object res = relationResource.delete(inboundItem.getCsid());
               }
           } catch (Throwable t){
@@ -382,12 +418,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         if (item==null || item2==null){
             return false;
         }
-        return     (item.getSubjectCsid().equals(item2.getSubjectCsid()))
-                && (item.getObjectCsid().equals(item2.getObjectCsid()))
+        RelationsDocListItem subj1 = item.getSubject();
+        RelationsDocListItem subj2 = item2.getSubject();
+        RelationsDocListItem obj1 = item.getObject();
+        RelationsDocListItem obj2 = item2.getObject();
+
+        return     (subj1.getCsid().equals(subj2.getCsid()))
+                && (obj1.getCsid().equals(obj1.getCsid()))
                 && ( (item.getPredicate().equals(item2.getPredicate()))
                 && (item.getRelationshipType().equals(item2.getRelationshipType()))   )
-                && (item.getObject().getDocumentType().equals(item2.getObject().getDocumentType()))
-                && (item.getSubject().getDocumentType().equals(item2.getSubject().getDocumentType())) ;
+                && (obj1.getDocumentType().equals(obj2.getDocumentType()))
+                && (subj1.getDocumentType().equals(subj2.getDocumentType())) ;
     }
 
      private void removeFromList(List<RelationsCommonList.RelationListItem> list, RelationsCommonList.RelationListItem item){

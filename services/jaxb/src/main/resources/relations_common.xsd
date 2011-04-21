@@ -76,6 +76,11 @@
             <xs:element name="number" type="xs:string" minOccurs="1"/>
             <xs:element name="documentType" type="xs:string" minOccurs="1"/>
             <xs:element name="documentTypeFromModel" type="xs:string" minOccurs="1"/>
+            <!-- order is for potential use by app/gui.  services won't do anything with it.-->
+            <xs:element name="order" type="xs:string" minOccurs="0"/>
+            <!-- key is for things like -which predicate type search did this list come from-->
+            <xs:element name="key" type="xs:string" minOccurs="0"/>
+            <!-- error is filled in and present only when sercices has crawled this record, and found that the related item was not in DB.-->
             <xs:element name="error" type="xs:string" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
@@ -90,7 +95,6 @@
                         <xs:element name="relation-list-item" maxOccurs="unbounded">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <!-- uri to retrieve collection object details -->
                                     <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
                                     <xs:element name="csid" type="xs:string" minOccurs="1"/>
                                     <xs:element name="subjectCsid" type="xs:string" minOccurs="1"/>

@@ -25,8 +25,12 @@ package org.collectionspace.services.IntegrationTests.xmlreplay;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.MapContext;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: laramie
@@ -113,8 +117,8 @@ public class XmlReplayEval {
             Object resultObj = expr.evaluate(jc);
             String resultStr;
             if (null == resultObj){
-                resultStr = "ERROR";
-                System.out.println("Jexl context: "+jc.toString());
+                //debug: System.out.println("null found while evaluationg variable: '"+var+"' Jexl context: "+dumpContext(jc));
+                resultStr = "${"+var+"}";
             } else {
                 resultStr = resultObj.toString();
 
@@ -123,5 +127,24 @@ public class XmlReplayEval {
         }
         return result.toString();
     }
+
+    protected static String dumpContext(JexlContext jc){
+        String result = "";
+        if (jc instanceof MapContextWKeys){
+            Set keys = ((MapContextWKeys)jc).getKeys();
+            result = keys.toString();
+        }  else {
+            result = jc.toString();
+        }
+        return result;
+    }
+
+    public static class MapContextWKeys extends MapContext implements JexlContext {
+        private Map<String,Object> map = new HashMap();
+        public Set getKeys(){
+            return this.map.keySet();
+        }
+    }
+
 
 }

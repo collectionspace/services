@@ -593,6 +593,12 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      */
     @Override
     public MultivaluedMap<String, String> getQueryParams() {
+
+         if (queryParams == null){
+              if (this.uriInfo != null){
+                queryParams = this.uriInfo.getQueryParameters();
+            }
+         }
          if (queryParams == null){
              queryParams = new org.jboss.resteasy.specimpl.MultivaluedMapImpl<String,String>();
         }

@@ -10,5 +10,7 @@ public class CommonAPI {
     public static String getVersionString(){
         return COMMON_API;
     }
+    public static String AuthorityItemCSID_REPLACE="${itemCSID}";
+    public static String showRelations_QP = "showRelations";
 }
 

@@ -50,8 +50,7 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
 	    	//
 	    	// Assert that the Subject ID and Predicate ID are not the same
 	    	//
-	    	assert(relationsCommon.getDocumentId1().equalsIgnoreCase(relationsCommon.getDocumentId2()) == false) :
-	    		SUBJECT_EQUALS_PREDICATE_ERROR;
+	    	assert(relationsCommon.getDocumentId1().equalsIgnoreCase(relationsCommon.getDocumentId2()) == false) : 	SUBJECT_EQUALS_PREDICATE_ERROR;
     	} catch (AssertionError e) {
     		if (logger.isErrorEnabled() == true) {
     			logger.error(e.getMessage(), e);
