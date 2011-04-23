@@ -54,7 +54,6 @@ public class LocationAuthorityClient extends AuthorityClientImpl<Locationauthori
 	// Subitem constants
 	//
 	public static final String SERVICE_ITEM_NAME = "locations";
-	public static final String SERVICE_PATH_ITEMS_COMPONENT = "items";	//FIXME: REM - This should be defined in an AuthorityClient base class
 	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_ITEM_NAME;
 	//
 	// Payload Part/Schema part names

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class XmlReplayMasterTest  extends XmlReplayTest {
 
-//    @Test
+    @Test
     public void runMaster() throws Exception {
         XmlReplay replay = createXmlReplayUsingIntegrationTestsModule("..");
         List<List<ServiceResult>> list = replay.runMaster(XmlReplay.DEFAULT_MASTER_CONTROL);

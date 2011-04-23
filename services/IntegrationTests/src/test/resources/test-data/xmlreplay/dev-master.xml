@@ -66,15 +66,18 @@
     <run controlFile="person/person.xml" testGroup="updatePerson" />
     <run controlFile="person/person.xml" testGroup="updatePerson" />
     <run controlFile="relation/relation.xml" testGroup="makeRelations" />
-
-    <run controlFile="person/person.xml" testGroup="updatePerson" autoDeletePOSTS="true"  />
-    <run controlFile="person/person.xml" testGroup="updatePerson" autoDeletePOSTS="true"  />
-   <run controlFile="relation/relation.xml" testGroup="makeRelations" />
-     
-   <run controlFile="person/person.xml" testGroup="postPerson" />
-    -->
-    <!-- TODO: make this an override: autoDeletePOSTS="true"-->
    
-    
+    <run controlFile="person/person.xml" testGroup="updatePerson" autoDeletePOSTS="true"  />
+    <run controlFile="person/person.xml" testGroup="updatePerson" autoDeletePOSTS="true"  />
+     
+    <run controlFile="person/person.xml" testGroup="postPerson" />
+    <run controlFile="relation/relation.xml" testGroup="makeRelationsNested" />
+    <run controlFile="relation/relation.xml" testGroup="r2only" />
+    <run controlFile="person/person.xml" testGroup="postPerson" />
+    -->
+   
+
+   
+    <!-- TODO: make this an override: autoDeletePOSTS="true"-->
 </xmlReplayMaster>
 

@@ -53,6 +53,54 @@
         </test>
         -->
     </testGroup>
+    
+    <testGroup ID="makeRelationsNested" autoDeletePOSTS="true">
+         <test ID="oe1"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+         </test>
+         <test ID="oe2"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+         </test>
+         <test ID="relate1"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/relations/</uri>
+             <filename>relation/r-2.xml</filename>
+             <vars>
+                <var ID="documentId1">${oe1.CSID}</var>
+                <var ID="documentId2">${itemCSID}</var>
+                <var ID="documentType1">ObjectExit</var>
+                <var ID="documentType2">ObjectExit</var>
+                <var ID="relationshipType">hasBroader</var>
+             </vars>
+         </test>
+         <test ID="relationsGET"  auth="test">
+             <method>GET</method>
+             <uri>/cspace-services/relations/</uri>
+         </test>
+    </testGroup>
+         
+    <testGroup ID="r2only" autoDeletePOSTS="true">
+         <test ID="relate"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/relations/</uri>
+             <filename>relation/r-2.xml</filename>
+             <vars>
+                <var ID="documentId1">1234-5678</var>
+                <var ID="documentId2">${itemCSID}</var>
+                <var ID="documentType1">ObjectExit</var>
+                <var ID="documentType2">ObjectExit</var>
+                <var ID="relationshipType">hasBroader</var>
+             </vars>
+         </test>
+         <test ID="relationsGET"  auth="test">
+             <method>GET</method>
+             <uri>/cspace-services/relations/</uri>
+         </test>
+    </testGroup>
          
 </xmlReplay>
         

@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.PersonJAXBSchema;
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
@@ -2129,7 +2130,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
      * @return the item service path component
      */
     public String getItemServicePathComponent() {
-        return OrgAuthorityClient.SERVICE_PATH_ITEMS_COMPONENT;
+        return AuthorityClient.ITEMS;
     }
 
     /**

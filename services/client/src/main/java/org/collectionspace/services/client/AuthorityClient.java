@@ -14,6 +14,10 @@ import org.jboss.resteasy.client.ClientResponse;
  */
 public interface AuthorityClient<LT extends AbstractCommonList, ILT extends AbstractCommonList, P extends AuthorityProxy<LT, ILT>> 
 	extends CollectionSpacePoxClient<LT, P> {
+
+    /** The uri path element for items in an authority */
+    public static String ITEMS = "items";    //used to construct uri's in service paths for authorities.
+
 	/*
 	 * Basic CRUD operations
 	 */

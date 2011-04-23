@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -62,7 +63,6 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = VocabularyClient.SERVICE_PATH_COMPONENT;//"vocabularies";
-    final String SERVICE_PATH_ITEMS_COMPONENT = VocabularyClient.SERVICE_PATH_ITEMS_COMPONENT;//"items";
     final String SERVICE_PAYLOAD_NAME = VocabularyClient.SERVICE_PAYLOAD_NAME;
     final String SERVICE_ITEM_PAYLOAD_NAME = VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME;
     private String knownResourceId = null;
@@ -1339,7 +1339,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     }
 
     public String getServicePathItemsComponent() {
-        return this.SERVICE_PATH_ITEMS_COMPONENT;
+        return AuthorityClient.ITEMS;
     }
 
     /**

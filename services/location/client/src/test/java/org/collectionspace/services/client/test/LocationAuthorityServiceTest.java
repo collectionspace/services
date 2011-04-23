@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.collectionspace.services.LocationJAXBSchema;
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
@@ -79,7 +80,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	}
     
     public String getItemServicePathComponent() {
-        return LocationAuthorityClient.SERVICE_PATH_ITEMS_COMPONENT;
+        return AuthorityClient.ITEMS;
     }	
     
     // Instance variables specific to this test.

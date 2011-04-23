@@ -68,6 +68,10 @@ public abstract class DocumentModelHandler<T, TL>
     public String getCsid(DocumentModel docModel) {
     	return NuxeoUtils.getCsid(docModel);
     }
+
+    public String getUri(DocumentModel docModel) {
+        return getServiceContextPath()+getCsid(docModel);
+    }
     /**
      * getRepositorySession returns Nuxeo Repository Session
      * @return

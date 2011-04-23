@@ -159,11 +159,20 @@ public class RelationDocumentModelHandler
         String subjectCsid = relationListItem.getSubjectCsid();
         String documentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_1);
         RelationsDocListItem subject = createRelationsDocListItem(ctx, sbt, subjectCsid, tReader, documentType);
+
+        //Object o1 =  docModel.getProperty(ctx.getCommonPartLabel(), "subject");
+        //Object o2 =  docModel.getProperty(ctx.getCommonPartLabel(), "object");
+
+        String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.subjectUri);
+        subject.setUri(subjectUri);
         relationListItem.setSubject(subject);
 
         String objectCsid = relationListItem.getObjectCsid();
         documentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_2);
         RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, documentType);
+
+        String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.objectUri);
+        object.setUri(objectUri);
         relationListItem.setObject(object);
 
         return relationListItem;

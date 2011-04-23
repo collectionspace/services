@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -81,7 +82,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 	}
     
     public String getItemServicePathComponent() {
-        return PersonAuthorityClient.SERVICE_PATH_ITEMS_COMPONENT;
+        return AuthorityClient.ITEMS;
     }	
     
     /** The test forename. */

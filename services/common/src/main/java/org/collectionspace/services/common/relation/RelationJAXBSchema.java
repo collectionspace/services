@@ -56,6 +56,11 @@ public interface RelationJAXBSchema {
 	
 	/** The Constant RELATIONSHIP_TYPE_DISPLAYNAME. */
 	final static String RELATIONSHIP_TYPE_DISPLAYNAME = "predicateDisplayName";
+
+    final static String subjectUri = "subjectUri";
+
+    final static String objectUri = "objectUri";
+
 }
 
 

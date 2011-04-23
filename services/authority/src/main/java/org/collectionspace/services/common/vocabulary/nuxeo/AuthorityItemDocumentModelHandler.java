@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -100,6 +101,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
 	public void setInAuthority(String inAuthority) {
 		this.inAuthority = inAuthority;
 	}
+
+    @Override
+    public String getUri(DocumentModel docModel) {
+        return getServiceContextPath()+inAuthority+"/"+ AuthorityClient.ITEMS+"/"+getCsid(docModel);
+    }
+
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
@@ -236,8 +243,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         DocumentModel documentModel = (wrapDoc.getWrappedObject());
         String itemCsid = documentModel.getName();
 
-        //TODO: create all relations....  UPDATE and CREATE will call.   Updates AuthorityItem part
-        RelationsCommonList relationsCommonList = updateRelations(itemCsid, input);
+        //UPDATE and CREATE will call.   Updates relations part
+        RelationsCommonList relationsCommonList = updateRelations(itemCsid, input, wrapDoc);
+
         PayloadOutputPart payloadOutputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, relationsCommonList);
         ctx.setProperty(RelationClient.SERVICE_COMMON_LIST_NAME, payloadOutputPart);
     }
@@ -250,28 +258,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         ((PoxPayloadOut)ctx.getOutput()).addPart(foo);
     }
 
-    //===================================================================
-    /*
-        for (RelationsCommonList.RelationListItem parentListItem : parentList.getRelationListItem()) {
-            System.out.println("    parentListItems " + parentListItem);
-            //todo: if num-parents > 1 then complain.
-            //todo: if not found in update list, remove from system
-            //todo: if update list item not found in parent list, add to system.
-        }
-        for (RelationsCommonList.RelationListItem childListItem : childList.getRelationListItem()) {
-           System.out.println("    childListItem: " + childListItem);
-            //todo: if not found in update list, remove from system
-            //todo: if update list item not found in child list, add to system.
-        }
-
-
-
-     */
-    public RelationsCommonList updateRelations(String itemCSID, PoxPayloadIn input) throws Exception {
+    public RelationsCommonList updateRelations(String itemCSID, PoxPayloadIn input, DocumentWrapper<DocumentModel> wrapDoc)
+     throws Exception {
         PayloadInputPart part = input.getPart(RelationClient.SERVICE_COMMON_LIST_NAME);        //input.getPart("relations_common");
         if (part == null) {
-            //System.out.println("Nothing to do in updateRelations: " + input);
-            return null;
+            return null;  //nothing to do--they didn't send a list of relations.
         }
         RelationsCommonList relationsCommonListBody = (RelationsCommonList) part.getBody();
 
@@ -316,14 +307,18 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         List<RelationsCommonList.RelationListItem> childList = childListOuter.getRelationListItem();
         List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
 
+        DocumentModel docModel = wrapDoc.getWrappedObject();
+
         for (RelationsCommonList.RelationListItem inboundItem : inboundList) {
             if (inboundItem.getObject().getCsid().equalsIgnoreCase(CommonAPI.AuthorityItemCSID_REPLACE)){
                 inboundItem.setObjectCsid(itemCSID);
                 inboundItem.getObject().setCsid(itemCSID);
+                inboundItem.getObject().setUri(getUri(docModel));
             }
             if (inboundItem.getSubject().getCsid().equalsIgnoreCase(CommonAPI.AuthorityItemCSID_REPLACE)){
                 inboundItem.setSubjectCsid(itemCSID);
                 inboundItem.getSubject().setCsid(itemCSID);
+                 inboundItem.getSubject().setUri(getUri(docModel));
             }
             if (inboundItem.getObject().getCsid().equals(itemCSID) && inboundItem.getPredicate().equals(HAS_BROADER)) {
                 //then this is an item that says we have a child.
@@ -350,17 +345,23 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         deleteRelations(parentList, ctx);               //todo: there are items appearing on both lists....april 20.
         deleteRelations(childList, ctx);
         createRelations(actionList, ctx);
-
+        //We return all elements on the inbound list, since we have just worked to make them exist in the system
+        // and be non-redundant, etc.  That list came from relationsCommonListBody, so it is still attached to it, just pass that back.
         return relationsCommonListBody;
     }
 
+    // this method calls the RelationResource to have it create the relations and persist them.
     private void createRelations(List<RelationsCommonList.RelationListItem> inboundList, ServiceContext ctx){
          for (RelationsCommonList.RelationListItem item : inboundList) {
              RelationsCommon rc = new RelationsCommon();
              //rc.setCsid(item.getCsid());
-             String itemCsid =  item.getSubject().getCsid();
-             rc.setDocumentId1(itemCsid);
-             rc.setSubjectCsid(itemCsid);
+             //todo: assignTo(item, rc);
+             RelationsDocListItem itemSubject = item.getSubject();
+             RelationsDocListItem itemObject = item.getObject();
+
+             String subjectCsid =  itemSubject.getCsid();
+             rc.setDocumentId1(subjectCsid);
+             rc.setSubjectCsid(subjectCsid);
 
              String objCsid = item.getObject().getCsid();
              rc.setDocumentId2(objCsid);
@@ -368,10 +369,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
 
              rc.setRelationshipType(item.getPredicate());
              //RelationshipType  foo = (RelationshipType.valueOf(item.getPredicate())) ;
-             //rc.setPredicate(foo);
+             //rc.setPredicate(foo);     //this must be one of the type found in the enum in  services/jaxb/src/main/resources/relations_common.xsd
 
-             rc.setDocumentType1(item.getSubject().getDocumentType());
-             rc.setDocumentType2(item.getObject().getDocumentType());
+             rc.setDocumentType1(itemSubject.getDocumentType());
+             rc.setDocumentType2(itemObject.getDocumentType());
+
+             rc.setSubjectUri(itemSubject.getUri());
+             rc.setObjectUri(itemObject.getUri());
+
 
             PoxPayloadOut payloadOut = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
             PayloadOutputPart outputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMONPART_NAME, rc);

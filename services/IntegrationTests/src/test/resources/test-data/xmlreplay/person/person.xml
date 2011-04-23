@@ -285,8 +285,11 @@
             	<var ID="shortIdentifier">johnWayneActor</var>
             	<var ID="CSID">${itemCSID}</var>
             	<var ID="parentCSID">${PersonParent.CSID}</var>
+            	<var ID="parentUri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonParent.CSID}</var>
             	<var ID="childCSID">${PersonChild.CSID}</var>
+            	<var ID="childUri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonChild.CSID}</var>
             	<var ID="child2CSID">${PersonChild2.CSID}</var>
+            	<var ID="child2Uri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonChild2.CSID}</var>
             </vars>
         </test>
         

@@ -34,8 +34,13 @@
          File below this line have been ported. -->
     <!-- ============================================= -->
     
-    <run controlFile="person/person.xml" testGroup="updatePerson" />
+    <!--
     <run controlFile="relation/relation.xml" testGroup="makeRelations" />
+    <run controlFile="person/person.xml" testGroup="updatePerson" />
+    -->
+    <run controlFile="relation/relation.xml" testGroup="r2only" />
+    <run controlFile="person/person.xml" testGroup="postPerson" />
+   
     
 </xmlReplayMaster>
 
