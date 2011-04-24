@@ -45,7 +45,7 @@ public class ServiceResult {
     public String CSID = "";
     public String subresourceCSID = "";
     public String requestPayload = "";  //just like requestPayloadRaw, but may have multipart boundary and headers.
-    public Map<String, String> requestPayloadsRaw = new HashMap<String, String>();
+    public String requestPayloadsRaw = "";
     public String result = "";
     public int responseCode = 0;
     public String responseMessage = "";
@@ -164,23 +164,26 @@ public class ServiceResult {
         if (overrideExpectedResult){
             return true;
         }
-        if (Tools.notEmpty(failureReason)){
-            return false;
-        }
+        //if (Tools.notEmpty(failureReason)){
+        //    return false;
+        //}
         for (Integer oneExpected : expectedCodes){
             if (responseCode == oneExpected){
+                failureReason = "";
                 return isDomWalkOK();
             }
         }
         if ( expectedCodes.size()>0 && codeInSuccessRange(responseCode)){ //none found, but result expected.
             for (Integer oneExpected : expectedCodes){
                 if ( ! codeInSuccessRange(oneExpected)){
+                    failureReason = "";
                     return isDomWalkOK();
                 }
             }
         }
         boolean ok = codeInSuccessRange(responseCode);
         if (ok) {
+            failureReason = "";
             return isDomWalkOK();
         }
         failureReason = " : STATUS CODE UNEXPECTED; ";
@@ -188,7 +191,7 @@ public class ServiceResult {
     }
 
     //public static final String[] DUMP_OPTIONS = {"minimal", "detailed", "full"};
-    public static enum DUMP_OPTIONS {minimal, detailed, full};
+    public static enum DUMP_OPTIONS {minimal, detailed, full, auto};
 
     public static enum PAYLOAD_STRICTNESS {ZERO, ADDOK, TREE, TEXT, TREE_TEXT, STRICT};
 
@@ -226,6 +229,10 @@ public class ServiceResult {
     }
 
     public String minimal(){
+        return minimal(false);
+    }
+
+    public String minimal(boolean verbosePartsSummary){
         return "{"
                 + ( gotExpectedResult() ? "SUCCESS" : "FAILURE"  )
                 + failureReason
@@ -237,28 +244,34 @@ public class ServiceResult {
                 +"; URL:"+fullURL
                 +"; auth: "+auth
                 + ( Tools.notEmpty(error) ? "; ERROR:"+error : "" )
-                + ( partsSummary(false))
+                + (verbosePartsSummary ? partsSummary(true) : partsSummary(false) )
                 +"}";
     }
-    public String dump(ServiceResult.DUMP_OPTIONS opt){
+    public String dump(ServiceResult.DUMP_OPTIONS opt, boolean hasError){
         switch (opt){
             case minimal:
-                return minimal();
+                return minimal(false);
             case detailed:
                 return detail(false);
             case full:
                 return detail(true);
+            case auto:
+                return minimal(hasError);
             default:
                 return toString();
         }
     }
 
     /** This method may be called from a test case, using a syntax like ${testID3.resValue("persons_common", "//refName")}   */
-    public String got(String partName, String xpath) throws Exception {
+    public String got(String xpath) throws Exception {
         try {
-            PayloadLogger.HttpTraffic traffic = PayloadLogger.readPayloads(this.result, this.boundary, this.contentLength);
-            PayloadLogger.Part partFromServer = traffic.getPart(partName);
-            String source = partFromServer.getContent();
+            //PayloadLogger.HttpTraffic traffic = PayloadLogger.readPayloads(this.result, this.boundary, this.contentLength);
+            //PayloadLogger.Part partFromServer = traffic.getPart(partName);
+            //String source = partFromServer.getContent();
+            String source = this.result;
+            if (Tools.isBlank(source)){
+                return "";
+            }
             org.jdom.Element element = (org.jdom.Element) XmlCompareJdom.selectSingleNode(source, xpath, null);  //todo: passing null for namespace may not work.
             String sr = element != null ? element.getText() : "";
             return sr;
@@ -268,14 +281,11 @@ public class ServiceResult {
     }
 
     /** This method may be called from a test case, using a syntax like ${oe9.reqValue("personauthorities_common","//shortIdentifier")}    */
-    public String sent(String partName, String xpath) throws Exception {
+    public String sent(String xpath) throws Exception {
         try {
-            if (Tools.isEmpty(partName)){
-                partName = "default";
-            }
-            String source = this.requestPayloadsRaw.get(partName);
+            String source = this.requestPayloadsRaw;
             if (source == null){
-                return "ERROR:null:requestPayloadsRaw["+partName+"]";
+                return "ERROR:null:requestPayloadsRaw";
             }
             org.jdom.Element element = (org.jdom.Element) XmlCompareJdom.selectSingleNode(source, xpath, null);   //e.g. "//shortIdentifier");  //todo: passing null for namespace may not work.
             String sr = element != null ? element.getText() : "";

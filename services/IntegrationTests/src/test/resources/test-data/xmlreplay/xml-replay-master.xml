@@ -2,8 +2,8 @@
 <xmlReplayMaster>
     <protoHostPort>http://localhost:8180</protoHostPort>
     
-    <!-- legal values for dumpServiceResult=[minimal,detailed,full] -->
-    <dump payloads="false" dumpServiceResult="minimal" />
+    <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
+    <dump payloads="false" dumpServiceResult="auto" />
     
     <auths default="admin@collectionspace.org">
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
@@ -24,7 +24,6 @@
     <!-- run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" / -->
     <!-- run controlFile="objectexit/object-exit.xml" testGroup="domwalk" / -->
     <!--<run controlFile="media/media.xml" testGroup="authrefs" />-->
-    <!--<run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />-->
 
     <!--<run controlFile="./organization.xml" testGroup="organization" />-->
     
@@ -37,10 +36,19 @@
     <!--
     <run controlFile="relation/relation.xml" testGroup="makeRelations" />
     <run controlFile="person/person.xml" testGroup="updatePerson" />
-    -->
+   -->
+   
+    <run controlFile="./security.xml" testGroup="deleteBug" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
+	<run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
+    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
     <run controlFile="relation/relation.xml" testGroup="r2only" />
     <run controlFile="person/person.xml" testGroup="postPerson" />
-   
+    <run controlFile="person/person.xml" testGroup="updatePerson" />
+        
+    
     
 </xmlReplayMaster>
 

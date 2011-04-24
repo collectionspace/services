@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<document name="acquisitions">
 <ns2:acquisitions_common xmlns:ns2="http://collectionspace.org/services/acquisition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/acquisition http://services.collectionspace.org/acquisition/acquisitions_common.xsd">
 <acquisitionReferenceNumber>acquisitionReferenceNumber-1292275630222</acquisitionReferenceNumber>
 <acquisitionFundingList/>
@@ -16,4 +17,5 @@
 </owners>
 <fieldCollectionEventNames/>
 </ns2:acquisitions_common>
+</document>
 

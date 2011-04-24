@@ -7,6 +7,50 @@
         <auth ID="bigbird2010">YmlnYmlyZDIwMTA6YmlnYmlyZDIwMTA=</auth>
         <auth ID="elmo2010">ZWxtbzIwMTA6ZWxtbzIwMTA=</auth>
     </auths>
+    
+    
+    <testGroup ID="deleteBug" autoDeletePOSTS="false">
+        <test ID="permElmo">
+            <method>POST</method>
+            <uri>/cspace-services/authorization/permissions</uri>
+            <filename>security/2-elmo-permission.xml</filename>
+        </test>
+        <test ID="elmoPermroles">
+            <method>POST</method>
+            <uri>/cspace-services/authorization/permissions/${permElmo.CSID}/permroles</uri>
+            <filename>security/10-permissionroles-elmo.xml</filename>
+        </test>
+        <test ID="accountElmo">
+            <method>POST</method>
+            <uri>/cspace-services/accounts</uri>
+            <filename>security/6-account-elmo.xml</filename>
+        </test>
+
+		<test ID="dimension1"  auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/dimensions/</uri>
+            <filename>dimension/1.xml</filename>
+        </test>
+		<test ID="dimensionElmoDELETE" auth="elmo2010">
+            <expectedCodes>403</expectedCodes>
+            <method>DELETE</method>
+            <fromTestID>dimension1</fromTestID>
+        </test>
+        <test ID="dimensionAdminDELETE" auth="admin@collectionspace.org">
+            <method>DELETE</method>
+            <fromTestID>dimension1</fromTestID>
+        </test>
+        <test ID="deleteElmoPermroles">
+            <method>DELETE</method>
+            <uri>/cspace-services/authorization/permissions/${permElmo.CSID}/permroles</uri>
+        </test>
+        <test ID="deleteAccountElmo">
+            <method>DELETE</method>
+            <fromTestID>accountElmo</fromTestID>
+        </test>
+    </testGroup>
+    
+    
     <testGroup ID="security" autoDeletePOSTS="false">
 
         <!--First test that bigbird2010 does NOT have write access: -->
@@ -14,10 +58,7 @@
             <expectedCodes>401,500,501</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/1.xml</filename>
-            </part>
+            <filename>dimension/1.xml</filename>
         </test>
 
         <!--Next, set up permissions and roles, and test bigbird2010 and elmo2010. -->
@@ -75,18 +116,12 @@
         <test ID="dimension1"  auth="bigbird2010">
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/1.xml</filename>
-            </part>
+            <filename>dimension/1.xml</filename>
         </test>
         <test ID="dimension2">
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimension1.CSID}</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/2-put.xml</filename>
-            </part>
+            <filename>dimension/2-put.xml</filename>
         </test>
         <test>
             <method>GET</method>
@@ -97,19 +132,13 @@
             <expectedCodes>403</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/1.xml</filename>
-            </part>
+            <filename>dimension/1.xml</filename>
         </test>
         <test ID="dimensionElmoPUT">
             <expectedCodes>403</expectedCodes>
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimension1.CSID}</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/2-put.xml</filename>
-            </part>
+            <filename>dimension/2-put.xml</filename>
         </test>
         <test ID="dimensionElmoGET">
             <method>GET</method>
@@ -132,7 +161,7 @@
         -->
 
 
-        <test auth="admin@collectionspace.org">
+        <test ID="dimensionBigBirdDELETEpermroles" auth="admin@collectionspace.org">
             <method>DELETE</method>
             <uri>/cspace-services/authorization/permissions/${permBigbird.CSID}/permroles</uri>
             <!-- don't do <fromTestID>, no CSID of permrole on end of url, but deleteURL will put one there for you, so don't use it.
@@ -152,19 +181,13 @@
             <expectedCodes>403,404</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/1.xml</filename>
-            </part>
+            <filename>dimension/1.xml</filename>
         </test>
         <test ID="dimensionBigbirdPUTAfterPermrolesDeleted">
             <expectedCodes>404</expectedCodes>
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimension1.CSID}</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/2-put.xml</filename>
-            </part>
+            <filename>dimension/2-put.xml</filename>
         </test>
 
         
@@ -210,10 +233,7 @@
             <expectedCodes>401,403,500,501</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/1.xml</filename>
-            </part>
+            <filename>dimension/1.xml</filename>
         </test>
 
         <!--Next, set up permissions and roles, and test bigbird2010.-->
@@ -249,19 +269,13 @@
         <test ID="dimensionBigbird_POST"  auth="bigbird2010">
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/1.xml</filename>
-            </part>
+			<filename>dimension/1.xml</filename>
         </test>
         <!-- TODO: FAILING, BUT SHOULD SUCCEED.  REMOVING TEST FOR NOW. -->
         <test ID="dimensionBigbird_PUT">
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimensionBigbird_POST.CSID}</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/2-put.xml</filename>
-            </part>
+			<filename>dimension/2-put.xml</filename>
         </test>
 
 
@@ -291,19 +305,13 @@
             <expectedCodes>403,404</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/1.xml</filename>
-            </part>
+			<filename>dimension/1.xml</filename>
         </test>
         <test ID="dimensionBigbird_PUT_AfterPermrolesDeleted">
             <expectedCodes>403,404,405</expectedCodes><!-- Expected failure because dimensionBigbird_POST_AfterPermrolesDeleted failed.-->
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimensionBigbird_POST_AfterPermrolesDeleted.CSID}</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/2-put.xml</filename>
-            </part>
+			<filename>dimension/2-put.xml</filename>
         </test>
         <test ID="dimensionBigbird_GET_AfterPermrolesDeleted">
             <expectedCodes>403,404</expectedCodes>
@@ -335,18 +343,12 @@
         <test ID="dimensionBigbird_POST_CRU"  auth="bigbird2010">
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/1.xml</filename>
-            </part>
+			<filename>dimension/1.xml</filename>
         </test>
         <test ID="dimensionBigbird_PUT_CRU">
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimensionBigbird_POST_CRU.CSID}</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/2-put.xml</filename>
-            </part>
+			<filename>dimension/2-put.xml</filename>
         </test>
         <test ID="dimensionBigbird_GET_CRU">
             <method>GET</method>
@@ -386,19 +388,13 @@
             <expectedCodes>403,404</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/1.xml</filename>
-            </part>
+			<filename>dimension/1.xml</filename>
         </test>
         <test ID="dimensionBigbird_PUT_R">
             <expectedCodes>403,404,405</expectedCodes>
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimensionBigbird_POST_R.CSID}</uri>
-            <part>
-                <label>dimensions_common</label>
-                <filename>dimension/2-put.xml</filename>
-            </part>
+			<filename>dimension/2-put.xml</filename>
         </test>
         <test ID="dimensionBigbird_GET_R">
             <method>GET</method>
@@ -413,6 +409,12 @@
         </test>
         
         <!-- CLEANUP -->
+        
+        <test ID="deletePermrolesBigbird" auth="admin@collectionspace.org">
+            <msg>Deleting permroles from bigbird2010</msg>
+            <method>DELETE</method>
+            <uri>/cspace-services/authorization/permissions/${permBigbird.CSID}/permroles</uri>
+        </test>
         <test  auth="admin@collectionspace.org">
             <method>DELETE</method>
             <uri>/cspace-services/accounts/${accountBigbird.CSID}/accountroles</uri>
@@ -425,6 +427,7 @@
             <method>DELETE</method>
             <fromTestID>accountBigbird</fromTestID>
         </test>
+        
     </testGroup>
 
         <!-- proposed simplification for re-runs:

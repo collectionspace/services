@@ -60,17 +60,15 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
         return doc;
     }
 
-    public static TreeWalkResults compareParts(String expectedContent, String leftID, String actualPartContent, String rightID){
-
-        System.out.println("expected: \r\n"+expectedContent+"\r\n\r\n");
-        System.out.println("ACTUAL: \r\n"+actualPartContent);
-
+    public static TreeWalkResults compareParts(String expectedContent, String leftID, String actualPartContent, String rightID, String startElement){
         TreeWalkResults list = new TreeWalkResults();
         try {
 
             list.leftID = leftID;
             list.rightID = rightID;
             TreeWalkResults.TreeWalkEntry infoentry = new TreeWalkResults.TreeWalkEntry();
+            infoentry.expected = expectedContent;
+            infoentry.actual = actualPartContent;
             infoentry.status = TreeWalkResults.TreeWalkEntry.STATUS.INFO;
             infoentry.message = "\r\n    LEFT file: "+leftID+"\r\n    RIGHT file: "+rightID;
             list.add(infoentry);
@@ -87,7 +85,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
             } else {
                 Document expected = getDocumentFromContent(expectedContent);
                 Document actual = getDocumentFromContent(actualPartContent);
-                treeWalk(expected, actual, list);
+                treeWalk(expected, actual, list, startElement);
             }
         } catch (Throwable t){
             String msg = "ERROR in XmlReplay.compareParts(): "+t;
@@ -130,8 +128,28 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
         return xpath.selectSingleNode(element);
     }
 
-    public static boolean treeWalk(Document left, Document right, TreeWalkResults list) throws Exception {
-        boolean res = treeWalk(left.getRootElement(), right.getRootElement(), "/", list);
+    /*   MAYBE DEAL WITH NAMESPACES IN THIS KIND OF APPROACH.
+
+    for (Element el : doc.getRootElement().getDescendants(new ElementFilter())) {
+    if (el.getNamespace() != null) el.setNamespace(null);
+
+    xpath.addNamespace("x", d.getRootElement().getNamespaceUri());
+    */
+    public static boolean treeWalk(Document left, Document right, TreeWalkResults list, String startElement) throws Exception {
+        Element leftElement = left.getRootElement();
+        Element rightElement = right.getRootElement();
+        if (Tools.notBlank(startElement)) {
+            XPath xpath = new JDOMXPath(startElement);
+            Object test = xpath.selectSingleNode(leftElement);
+            if (test!=null){
+                leftElement = (Element)test;
+            }
+            Object rtest = xpath.selectSingleNode(rightElement);
+            if (rtest!=null){
+                rightElement = (Element)rtest;
+            }
+        }
+        boolean res = treeWalk(leftElement, rightElement, "/", list);
         return res;
     }
 

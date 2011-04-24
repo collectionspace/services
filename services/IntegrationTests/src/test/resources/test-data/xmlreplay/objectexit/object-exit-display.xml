@@ -30,19 +30,18 @@
         <test ID="oePersonGET">
             <method>GET</method>
             <uri>/cspace-services/personauthorities/${oePersonauthority.CSID}/items/${oePerson.CSID}</uri>
-            <!--
-            TODO: this response can't be validated because HttpTraffic object doesn't know
-                   how to parse new POX format.
-             <response>
-                <expected level="ADDOK" />
-                <part>
-                     <label>persons_common</label>
-                     <filename>objectexit/res/oePersonDisplayGET.res.xml</filename>
-                     <var ID="displayName">${oePerson.sent("persons_common","//displayName")}</var>
-                     <var ID="refName">urn:cspace:collectionspace.org:Personauthorities(${oePersonauthority.sent("personauthorities_common","//shortIdentifier")}):items(foobar)'${oePerson.sent("persons_common","//displayName")}'</var>
-                 </part>
+            <response>
+                <expected level="ADDOK" /><!--server adds the csid -->
+                <label>persons_common</label>
+                <filename>objectexit/res/oePersonDisplayGET.res.xml</filename>
+                <vars>
+                    <!-- TODO: .got is not namespace aware yet, so you must make the xpath work around it for now.-->
+                    <var ID="csidGot">${oePersonGET.got("//csid")}</var>                      
+                    <var ID="inAuthority">${oePersonauthority.CSID}</var>
+                	<var ID="displayName">${oePerson.sent("//displayName")}</var>
+                    <var ID="refName">urn:cspace:collectionspace.org:Personauthorities(${oePersonauthority.sent("//shortIdentifier")}):items(foobar)'${oePerson.sent("//displayName")}'</var>
+                </vars>
              </response>
-             -->
         </test>
     </testGroup>
 

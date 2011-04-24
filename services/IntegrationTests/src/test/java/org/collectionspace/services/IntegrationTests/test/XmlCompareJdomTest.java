@@ -99,7 +99,8 @@ public class XmlCompareJdomTest {
                     XmlCompareJdom.compareParts(expectedPartContent,
                                         "expected",
                                         partFromServer,
-                                        "from-server");
+                                        "from-server",
+                                        exPARTNAME);
         assertTreeWalkResults(results,0,0,0,true,true);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
     }
@@ -111,7 +112,8 @@ public class XmlCompareJdomTest {
             XmlCompareJdom.compareParts(expectedPartContent,
                                         "expected",
                                         srvHEAD+srvEN2+srvDEPOSITOR+srvFOOT,
-                                        "from-server");
+                                        "from-server",
+                                        exPARTNAME);
         assertTreeWalkResults(results,0,0,1,false,true);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
     }
@@ -124,7 +126,8 @@ public class XmlCompareJdomTest {
             XmlCompareJdom.compareParts(expectedPartContent,
                                         "expected",
                                         srvHEAD+srvEN+exNEWTREE+srvDEPOSITOR+exNEW+srvFOOT,
-                                        "from-server");
+                                        "from-server",
+                                        exPARTNAME);
         assertTreeWalkResults(results,2,0,0,false,false);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
 
@@ -137,7 +140,8 @@ public class XmlCompareJdomTest {
             XmlCompareJdom.compareParts(exHEAD + exEN_WCH + exNEWTREE + exDEP  + exNEW + exFOOT,
                                     "expected",
                                     partFromServer,
-                                    "from-server");
+                                    "from-server",
+                                    exPARTNAME);
         assertTreeWalkResults(results,0,3,0,false,false);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
     }
@@ -149,12 +153,15 @@ public class XmlCompareJdomTest {
             XmlCompareJdom.compareParts(exHEAD  + exDEP + exEN + exFOOT,
                                     "expected",
                                     partFromServer,
-                                    "from-server");
+                                    "from-server",
+                                    exPARTNAME);
         assertTreeWalkResults(results,0,0,0,true,true);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
     }
 
     // ============  expected part, will be used as LEFT tree ==========================================================
+    private static String exPARTNAME = "objectexit_common";
+
     private static String exHEAD    ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
                                     +"<document name=\"objectexit\">"
                                     +"<ns2:objectexit_common \r\n"

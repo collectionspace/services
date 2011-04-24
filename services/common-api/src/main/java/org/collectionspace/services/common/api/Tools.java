@@ -62,6 +62,11 @@ public class Tools {
         return !notEmpty(str);
     }
 
+    /** nulls, empty strings, and empty after trim() are considered blank. */
+    public static boolean isBlank(String str){
+        return !notBlank(str);
+    }
+
     /** Handles null strings as empty.  */
     public static boolean notEmpty(String str){
         if (str==null) return false;

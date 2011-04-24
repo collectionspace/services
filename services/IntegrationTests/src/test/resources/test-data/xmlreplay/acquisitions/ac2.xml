@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="acquisitions">
 <ns3:acquisitions_common
 xmlns:ns2="http://collectionspace.org/services/jaxb"
 xmlns:ns3="http://collectionspace.org/services/acquisition">
@@ -16,5 +17,6 @@ xmlns:ns3="http://collectionspace.org/services/acquisition">
     <acquisitionSource>Donor Acquisition Source-1292275631503</acquisitionSource>
   </acquisitionSources>
 </ns3:acquisitions_common>
+</document>
 
 

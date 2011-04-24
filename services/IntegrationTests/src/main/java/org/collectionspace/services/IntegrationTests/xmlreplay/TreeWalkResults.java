@@ -39,6 +39,8 @@ public class TreeWalkResults extends ArrayList<TreeWalkResults.TreeWalkEntry> {
         public String rpath = "";
         public String ltextTrimmed = "";
         public String rtextTrimmed = "";
+        public String expected = "";
+        public String actual = "";
         public String message = "";
         public String errmessage = "";
         public static enum STATUS {INFO, MATCHED, R_MISSING, R_ADDED, DOC_ERROR, TEXT_DIFFERENT};
@@ -51,8 +53,12 @@ public class TreeWalkResults extends ArrayList<TreeWalkResults.TreeWalkEntry> {
                  +(Tools.notEmpty(rpath) ? ", R.path:"+rpath : "")
                  +(Tools.notEmpty(message) ? ", message:"+message : "")
                  +(Tools.notEmpty(errmessage) ? ", errmessage:"+errmessage : "")
+                 +", status:"+status
                  +((status != STATUS.MATCHED) && Tools.notEmpty(ltextTrimmed) ? ",\r\n    L.trimmed:"+ltextTrimmed : "")
                  +((status != STATUS.MATCHED) && Tools.notEmpty(rtextTrimmed) ? ",\r\n    R.trimmed:"+rtextTrimmed : "")
+                 +((status != STATUS.MATCHED) && Tools.notEmpty(expected) ? "\r\nEXPECTED:\r\n------------------\r\n"+expected.trim()+"\r\n------------------" : "")
+                 +((status != STATUS.MATCHED) && Tools.notEmpty(actual) ? "\r\nACTUAL:\r\n------------------\r\n"+actual.trim()+"\r\n------------------\r\n" : "")
+
                  +"}";
 
         }

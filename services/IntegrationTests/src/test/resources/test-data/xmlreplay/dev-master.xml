@@ -11,8 +11,8 @@
     <!--<protoHostPort>http://173.45.245.189:8180</protoHostPort>-->
     <protoHostPort>http://localhost:8180</protoHostPort>
     
-    <!-- legal values for dumpServiceResult=[minimal,detailed,full] -->
-    <dump payloads="true" dumpServiceResult="detailed" />
+    <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
+    <dump payloads="false" dumpServiceResult="auto" />
     
     <auths default="admin@collectionspace.org">
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
@@ -72,12 +72,25 @@
      
     <run controlFile="person/person.xml" testGroup="postPerson" />
     <run controlFile="relation/relation.xml" testGroup="makeRelationsNested" />
+    -->
+    
+    <!-- TODO: this almost works now:
+    <run controlFile="./security.xml" testGroup="security" />
+    --> 
+   
+    <!--  These all work with POX:
+    <run controlFile="./security.xml" testGroup="deleteBug" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
     <run controlFile="relation/relation.xml" testGroup="r2only" />
     <run controlFile="person/person.xml" testGroup="postPerson" />
-    -->
-   
-
-   
+	<run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
+    --> 
     <!-- TODO: make this an override: autoDeletePOSTS="true"-->
+    
+        
+    
+
 </xmlReplayMaster>
 
