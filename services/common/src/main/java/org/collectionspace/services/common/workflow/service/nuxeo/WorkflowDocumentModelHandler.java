@@ -52,29 +52,34 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WorkflowDocumentModelHandler 
-	extends DocHandlerBase<WorkflowCommon> {
+public class WorkflowDocumentModelHandler
+        extends DocHandlerBase<WorkflowCommon> {
 
     /** The logger. */
     private static final Logger logger = LoggerFactory.getLogger(WorkflowDocumentModelHandler.class);
-    
     /*
      * Workflow transitions
+     *
+     * See the "Nuxeo core default life cycle definition", an XML configuration
+     * for Nuxeo's "lifecycle" extension point that specifies valid workflow
+     * states and the operations that transition documents to those states, via:
+     *
+     * org.nuxeo.ecm.core.LifecycleCoreExtensions--lifecycle (as opposed to --types)
      */
     private static final String TRANSITION_DELETE = "delete";
     private static final String TRANSITION_APPROVE = "approve";
+    private static final String TRANSITION_UNDELETE = "undelete";
     private static final String TRANSITION_UNKNOWN = "unknown";
 
     /*
-	 * Handle read (GET)
-	 */
-	
-	@Override
-    protected Map<String, Object> extractPart(DocumentModel docModel, 
+     * Handle read (GET)
+     */
+    @Override
+    protected Map<String, Object> extractPart(DocumentModel docModel,
             String schema,
             ObjectPartType partMeta,
             Map<String, Object> addToMap)
-            	throws Exception {
+            throws Exception {
         Map<String, Object> result = null;
 
         MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType()); //FIXME: REM - This is no longer needed.  Everything is POX
@@ -88,7 +93,7 @@ public class WorkflowDocumentModelHandler
 
         return result;
     }
-	
+
     @Override
     public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
@@ -104,27 +109,42 @@ public class WorkflowDocumentModelHandler
             addOutputPart(unQObjectProperties, schema, partMeta);
         }
     }
-    
+
+    /**
+     * Get the identifier for the transition that sets a document to
+     * the supplied, destination workflow state.
+     *
+     * @param state a destination workflow state.
+     * @return an identifier for the transition required to
+     * place the document in that workflow state.
+     */
     private String getTransitionFromState(String state) {
-    	String result = TRANSITION_UNKNOWN;
-    	if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-    		result = TRANSITION_DELETE;
-    	} else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_APPROVED)) {
-    		result = TRANSITION_APPROVE;
-    	} 
-    	return result;
+        String result = TRANSITION_UNKNOWN;
+
+        // FIXME We may wish to add calls, such as those in
+        // org.nuxeo.ecm.core.lifecycle.impl.LifeCycleImpl, to validate incoming
+        // destination workflow state and the set of allowable state transitions.
+
+        if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+            result = TRANSITION_DELETE;
+        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_APPROVED)) {
+            result = TRANSITION_APPROVE;
+        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
+            result = TRANSITION_UNDELETE;
+        }
+        return result;
     }
     /*
      * Handle Update (PUT)
      */
-	
+
     @Override
-	protected void fillPart(PayloadInputPart part, DocumentModel docModel,
-    		ObjectPartType partMeta, Action action,
-		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
-    		throws Exception {
-		WorkflowCommon workflowsCommon = (WorkflowCommon)part.getBody();
-		docModel.followTransition(getTransitionFromState(workflowsCommon.getCurrentLifeCycleState()));
-    }    
+    protected void fillPart(PayloadInputPart part, DocumentModel docModel,
+            ObjectPartType partMeta, Action action,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
+            throws Exception {
+        WorkflowCommon workflowsCommon = (WorkflowCommon) part.getBody();
+        docModel.followTransition(getTransitionFromState(workflowsCommon.getCurrentLifeCycleState()));
+    }
 }
 
