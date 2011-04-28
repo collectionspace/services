@@ -93,6 +93,10 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     public AbstractCommonList createAbstractCommonListImpl() throws Exception {
         //  String classname = this.commonList.getClass().getName();
         String classname = getDocHandlerParams().getAbstractCommonListClassname();
+        if (classname == null){
+            throw new Exception("in createAbstractCommonListImpl. getDocHandlerParams().getAbstractCommonListClassname() is null");
+        }
+        classname = classname.trim();
         return (AbstractCommonList)(ReflectionMapper.instantiate(classname));
     }
 
@@ -132,8 +136,36 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         throw new UnsupportedOperationException();
     }
 
+    //Laramie20110427 Restored this method since it correctly grabs all params from DocHandlerParams.
     @Override
     public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        String classname = getDocHandlerParams().getAbstractCommonListClassname();
+        if (Tools.isBlank(classname)){
+             return extractCommonPartListPATRICK(wrapDoc);
+        }
+
+        String label = getServiceContext().getCommonPartLabel();
+        AbstractCommonList commonList = createAbstractCommonListImpl();
+        //LC extractPagingInfo((commonList), wrapDoc);
+        commonList.setFieldsReturned(getSummaryFields(commonList));
+        List list = createItemsList(commonList);
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        while(iter.hasNext()){
+            DocumentModel docModel = iter.next();
+            String id = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+            Object item = createItemForCommonList(docModel, label, id);
+            list.add(item);
+        }
+        extractPagingInfo((commonList), wrapDoc); //LC
+        return commonList;
+    }
+
+    // Laramie20110427 I renamed this method, and restored the method of the same name above.
+    //                               this makes the AbstractCommonList descendents as specified in DocHandlerParams
+    //                                get pulled in correctly.  XPath search works.
+    //     And I commented out the @Override annotation:
+    //@Override
+    public AbstractCommonList extractCommonPartListPATRICK(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         //String label = getServiceContext().getCommonPartLabel();
         
         /*
@@ -168,7 +200,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     	String commonSchema = getServiceContext().getCommonPartLabel();
     	CommonList commonList = new CommonList();
         extractPagingInfo(commonList, wrapDoc);
-        List<ListResultField> resultsFields = getListItemsArray(); 
+        List<ListResultField> resultsFields = getListItemsArray();  //Lookup in tenant-bindings.xml
         int nFields = resultsFields.size()+2;
         String fields[] = new String[nFields];
         fields[0] = "csid";

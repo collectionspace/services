@@ -48,6 +48,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
@@ -137,13 +138,6 @@ public class LoaninResource extends
 //        return docHandler;
 //    }
 
-    /**
-     * Creates the loanin.
-     * 
-     * @param input the input
-     * 
-     * @return the response
-     */
     @POST
     public Response createLoanin(String xmlText) {
         try {
@@ -263,17 +257,8 @@ public class LoaninResource extends
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             loaninObjectList = (CommonList) handler.getCommonPartList();
-        } catch (UnauthorizedException ue) {
-            Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in getLoaninList", e);
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw bigReThrow(e, ServiceMessages.LIST_FAILED, "no-csid-for-list");
         }
         return loaninObjectList;
     }
@@ -353,10 +338,7 @@ public class LoaninResource extends
     
     /**
      * Update loanin.
-     * 
      * @param csid the csid
-     * @param theUpdate the the update
-     * 
      * @return the multipart output
      */
     @PUT

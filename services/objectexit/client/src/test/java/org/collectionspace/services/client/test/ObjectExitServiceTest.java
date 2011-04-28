@@ -33,6 +33,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.objectexit.ObjectexitCommonList;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -42,6 +43,8 @@ import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//import org.w3c.dom.Element;
+//import org.w3c.dom.Node;
 
 /**
  * ObjectExitServiceTest, carries out tests against a deployed and running ObjectExit Service. <p/>
@@ -66,13 +69,13 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
 	}
     
     @Override
-    protected CollectionSpaceClient<AbstractCommonList, ObjectExitProxy> getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() {
         return new ObjectExitClient();
     }
 
     @Override
     protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
+        return response.getEntity(ObjectexitCommonList.class);
     }
 
     @Override
@@ -119,9 +122,14 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadList();
         ObjectExitClient client = new ObjectExitClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        AbstractCommonList list = res.getEntity();
+        ClientResponse<ObjectexitCommonList> res = client.readList();
+        String bar = "\r\n\r\n=================================\r\n\r\n";
+        System.out.println(bar+" res: "+res);
+        ObjectexitCommonList  list = res.getEntity();
+
+        System.out.println(bar+" list: "+list);
         assertStatusCode(res, testName);
+
         if (logger.isDebugEnabled()) {
             List<AbstractCommonList.ListItem> items =
                 list.getListItem();
@@ -132,6 +140,23 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
                 i++;
             }
         }
+
+        /*
+        List<AbstractCommonList.ListItem> items = list.getListItem();
+        int i = 0;
+        for(AbstractCommonList.ListItem item : items){
+            List<Element> elList = item.getAny();
+            StringBuilder elementStrings = new StringBuilder();
+            for(Element el : elList) {
+                Node textEl = el.getFirstChild();
+                if (textEl != null){
+                    elementStrings.append("["+el.getNodeName()+":"+textEl.getNodeValue()+"] ");
+                }
+            }
+            System.out.println("\r\n\r\n\r\n~~~~~~~~~~~~~~~~~~~~~~~~~~~"+testName + ": list-item[" + i + "]: "+elementStrings.toString());
+            i++;
+        }
+        */
     }
 
     @Override

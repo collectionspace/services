@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="objectexit">
+    <ns2:objectexit_common
+            xmlns:ns2="http://collectionspace.org/services/objectexit"
+            xmlns:ns3="http://collectionspace.org/services/jaxb">
+        <depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>
+        <exitNumber>${exitNumber}</exitNumber>
+    </ns2:objectexit_common>
+</document>
+

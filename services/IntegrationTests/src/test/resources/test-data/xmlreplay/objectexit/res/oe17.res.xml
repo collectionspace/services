@@ -1,2 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns3:authority-ref-list xmlns:ns2="http://collectionspace.org/services/jaxb" xmlns:ns3="http://collectionspace.org/services/common/authorityref"><pageNum>0</pageNum><pageSize>40</pageSize><itemsInPage>1</itemsInPage><totalItems>1</totalItems><authority-ref-item><sourceField>objectexit_common:depositor</sourceField><refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(davenportDepositor)</refName><authDisplayName>ObjectexitPersonAuth</authDisplayName><uri>/personauthorities/urn:cspace:name(ObjectexitPersonAuth)/items/urn:cspace:name(davenportDepositor)</uri></authority-ref-item></ns3:authority-ref-list>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:authority-ref-list xmlns:ns2="http://collectionspace.org/services/jaxb" xmlns:ns3="http://collectionspace.org/services/common/authorityref">
+  <pageNum>0</pageNum>
+  <pageSize>40</pageSize>
+  <itemsInPage>1</itemsInPage>
+  <totalItems>1</totalItems>
+  <authority-ref-item>
+    <sourceField>objectexit_common:depositor</sourceField>
+    <refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(davenportDepositor)</refName>
+    <authDisplayName>ObjectexitPersonAuth</authDisplayName>
+    <uri>/personauthorities/urn:cspace:name(ObjectexitPersonAuth)/items/urn:cspace:name(davenportDepositor)</uri>
+  </authority-ref-item>
+</ns3:authority-ref-list>
 

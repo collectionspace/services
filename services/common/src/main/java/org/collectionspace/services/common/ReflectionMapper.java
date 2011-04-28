@@ -91,6 +91,10 @@ public class ReflectionMapper {
     }
 
     public static Object instantiate(String classname) throws Exception {
+        if (classname == null) {
+            throw new Exception("classname was null in ReflectionMapper.instantiate()");
+        }
+        classname = classname.trim();
         Class cl = Class.forName(classname);
         Class [] classParm = null;
         Object [] objectParm = null;

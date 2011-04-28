@@ -33,13 +33,9 @@
          File below this line have been ported. -->
     <!-- ============================================= -->
     
-    <!--
-    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
-    <run controlFile="person/person.xml" testGroup="updatePerson" />
-   -->
-   
     <run controlFile="./security.xml" testGroup="deleteBug" />
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
 	<run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />

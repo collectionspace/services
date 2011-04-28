@@ -12,7 +12,7 @@
     <protoHostPort>http://localhost:8180</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
-    <dump payloads="false" dumpServiceResult="auto" />
+    <dump payloads="false" dumpServiceResult="full" />
     
     <auths default="admin@collectionspace.org">
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
@@ -77,7 +77,11 @@
     <!-- TODO: this almost works now:
     <run controlFile="./security.xml" testGroup="security" />
     --> 
-   
+    
+    
+    <!-- TODO: make this an override: autoDeletePOSTS="true"-->
+
+    
     <!--  These all work with POX:
     <run controlFile="./security.xml" testGroup="deleteBug" />
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
@@ -86,8 +90,9 @@
 	<run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
+    <run controlFile="loanout/loanout.xml" testGroup="makeone" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
     --> 
-    <!-- TODO: make this an override: autoDeletePOSTS="true"-->
     
         
     

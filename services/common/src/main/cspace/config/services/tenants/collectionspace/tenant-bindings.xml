@@ -181,8 +181,8 @@
                      <service:SchemaName>blobs</service:SchemaName>
                      <service:DublinCoreTitle>blobs</service:DublinCoreTitle>
                      <service:SummaryFields>name|mimeType|encoding|length|uri|csid</service:SummaryFields>
-                     <service:AbstractCommonListClassname>org.collectionspace.services.blob.BlobsCommonList</service:AbstractCommonListClassname>
-                     <service:CommonListItemClassname>org.collectionspace.services.blob.BlobsCommonList$BlobListItem</service:CommonListItemClassname>
+                     <service:AbstractCommonListClassname></service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname></service:CommonListItemClassname>
                      <service:ListResultsItemMethodName>getBlobListItem</service:ListResultsItemMethodName>
                      <service:ListResultsFields>
                          <service:ListResultField>
@@ -192,7 +192,7 @@
 
                         <service:ListResultField>
                             <service:element>mimeType</service:element>
-														<service:xpath>mimeType</service:xpath>
+							<service:xpath>mimeType</service:xpath>
                         </service:ListResultField>
 
                         <service:ListResultField>
@@ -200,11 +200,11 @@
                             <service:xpath>encoding</service:xpath>
                         </service:ListResultField>
 
-                        <service:ListResultField>
-                            <service:element>length</service:element>
-                            <service:xpath>length</service:xpath>
-												</service:ListResultField>
-											</service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:element>length</service:element>
+                             <service:xpath>length</service:xpath>
+                         </service:ListResultField>
+                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
@@ -327,8 +327,8 @@
                      <service:SchemaName>loansin</service:SchemaName>
                      <service:DublinCoreTitle>loansin</service:DublinCoreTitle>
                      <service:SummaryFields>loanInNumber|lenderList|loanReturnDate|uri|csid</service:SummaryFields>
-                     <service:AbstractCommonListClassname>org.collectionspace.services.loanin.LoansinCommonList</service:AbstractCommonListClassname>
-                     <service:CommonListItemClassname>org.collectionspace.services.loanin.LoansinCommonList$LoaninListItem</service:CommonListItemClassname>
+                     <service:AbstractCommonListClassname></service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname></service:CommonListItemClassname>
                      <service:ListResultsItemMethodName>getLoaninListItem</service:ListResultsItemMethodName>
                      <service:ListResultsFields>
                          <service:ListResultField>
@@ -337,7 +337,7 @@
                          </service:ListResultField>
                         <service:ListResultField>
                             <service:element>lender</service:element>
-														<service:xpath>lenderGroupList/[0]/lender</service:xpath>
+  						    <service:xpath>lenderGroupList/[0]/lender</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>loanReturnDate</service:element>
@@ -504,30 +504,40 @@
             <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:classname>org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:classname>
                 <service:params>
-                     <service:SchemaName>objectexit</service:SchemaName>
-                     <service:DublinCoreTitle>objectexit</service:DublinCoreTitle>
-                     <service:SummaryFields>exitNumber|currentOwner|uri|csid</service:SummaryFields>
-                     <service:AbstractCommonListClassname>org.collectionspace.services.objectexit.ObjectexitCommonList</service:AbstractCommonListClassname>
-                     <service:CommonListItemClassname>org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem</service:CommonListItemClassname>
-                     <service:ListResultsItemMethodName>getObjectexitListItem</service:ListResultsItemMethodName>
-                     <service:ListResultsFields>
-                         <service:ListResultField>
-                             <service:element>exitNumber</service:element>
-                             <service:xpath>exitNumber</service:xpath>
-                         </service:ListResultField>
+                    <service:SchemaName>objectexit</service:SchemaName>
+                    <service:DublinCoreTitle>objectexit</service:DublinCoreTitle>
+                    <service:SummaryFields>exitNumber|currentOwner|uri|csid</service:SummaryFields>
+                    <service:AbstractCommonListClassname>org.collectionspace.services.objectexit.ObjectexitCommonList
+                    </service:AbstractCommonListClassname>
+                    <service:CommonListItemClassname>org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem
+                    </service:CommonListItemClassname>
+                    <service:ListResultsItemMethodName>getObjectexitListItem</service:ListResultsItemMethodName>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>exitNumber</service:element>
+                            <service:xpath>exitNumber</service:xpath>
+                            <service:setter>setExitNumber</service:setter>
+                        </service:ListResultField>
                         <service:ListResultField>
                             <service:element>currentOwner</service:element>
-														<service:xpath>currentOwner</service:xpath>
+                            <service:xpath>currentOwner</service:xpath>
+                            <service:setter>setCurrentOwner</service:setter>
                         </service:ListResultField>
-											</service:ListResultsFields>
+                    </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.objectexit.nuxeo.ObjectExitValidatorHandler
             </service:validatorHandler>
             <service:properties xmlns:service='http://collectionspace.org/services/common/service'>
-                <types:item><types:key>objectNameProperty</types:key><types:value>currentOwner</types:value></types:item>
-                <types:item><types:key>objectNumberProperty</types:key><types:value>exitNumber</types:value></types:item>
+                <types:item>
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>currentOwner</types:value>
+                </types:item>
+                <types:item>
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>exitNumber</types:value>
+                </types:item>
             </service:properties>
             <service:object name="ObjectExit" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
@@ -536,8 +546,8 @@
                               label="objectexit-system" updated="" order="0">
                     <service:content contentType="application/xml">
                         <service:xmlContent
-                            namespaceURI="http://collectionspace.org/services/common/system"
-                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                                namespaceURI="http://collectionspace.org/services/common/system"
+                                schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -545,13 +555,19 @@
                               versionable="true" auditable="false"
                               label="objectexit_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
+                        <types:item>
+                            <types:key>authRef</types:key>
+                            <types:value>currentOwner</types:value>
+                        </types:item>
+                        <types:item>
+                            <types:key>authRef</types:key>
+                            <types:value>depositor</types:value>
+                        </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
-                            namespaceURI="http://collectionspace.org/services/objectexit"
-                            schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
+                                namespaceURI="http://collectionspace.org/services/objectexit"
+                                schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -560,8 +576,8 @@
                               label="collectionspace_core" updated="" order="2">
                     <service:content contentType="application/xml">
                         <service:xmlContent
-                            namespaceURI="http://collectionspace.org/collectionspace_core/"
-                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                                namespaceURI="http://collectionspace.org/collectionspace_core/"
+                                schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -569,7 +585,7 @@
         </tenant:serviceBindings>
         <!-- end objectexit service meta-data -->
 
-       <!-- begin group service meta-data -->
+        <!-- begin group service meta-data -->
         <tenant:serviceBindings name="Groups" type="procedure" version="0.1">
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /groups/*/workflow/
@@ -586,15 +602,15 @@
                      <service:SchemaName>groups</service:SchemaName>
                      <service:DublinCoreTitle>groups</service:DublinCoreTitle>
                      <service:SummaryFields>title|uri|csid</service:SummaryFields>
-                     <service:AbstractCommonListClassname>org.collectionspace.services.group.GroupCommonList</service:AbstractCommonListClassname>
-                     <service:CommonListItemClassname>org.collectionspace.services.group.GroupCommonList$GroupListItem</service:CommonListItemClassname>
+                     <service:AbstractCommonListClassname></service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname></service:CommonListItemClassname>
                      <service:ListResultsItemMethodName>getGroupListItem</service:ListResultsItemMethodName>
                      <service:ListResultsFields>
                          <service:ListResultField>
                              <service:element>title</service:element>
                              <service:xpath>title</service:xpath>
                          </service:ListResultField>
-											</service:ListResultsFields>
+						</service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
@@ -658,13 +674,13 @@
                     <service:DublinCoreTitle>imports</service:DublinCoreTitle>
                     <service:SummaryFields>importsField|uri|csid</service:SummaryFields>
                     <service:AbstractCommonListClassname>org.collectionspace.services.imports.ImportsCommonList</service:AbstractCommonListClassname>
-                    <service:CommonListItemClassname>org.collectionspace.services.imports.ImportsCommonList$ImportsListItem
-                    </service:CommonListItemClassname>
+                    <service:CommonListItemClassname>org.collectionspace.services.imports.ImportsCommonList$ImportsListItem</service:CommonListItemClassname>
                     <service:ListResultsItemMethodName>getImportsListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>importsField</service:element>
                             <service:xpath>importsField</service:xpath>
+                            <service:setter>setImportsField</service:setter>
                         </service:ListResultField>
                     </service:ListResultsFields>
                 </service:params>
@@ -722,8 +738,8 @@
                      <service:SchemaName>media</service:SchemaName>
                      <service:DublinCoreTitle>media</service:DublinCoreTitle>
                      <service:SummaryFields>title|source|filename|identificationNumber|uri|csid</service:SummaryFields>
-                     <service:AbstractCommonListClassname>org.collectionspace.services.media.MediaCommonList</service:AbstractCommonListClassname>
-                     <service:CommonListItemClassname>org.collectionspace.services.media.MediaCommonList$MediaListItem</service:CommonListItemClassname>
+                     <service:AbstractCommonListClassname></service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname></service:CommonListItemClassname>
                      <service:ListResultsItemMethodName>getMediaListItem</service:ListResultsItemMethodName>
                      <service:ListResultsFields>
                          <service:ListResultField>
@@ -732,7 +748,7 @@
                          </service:ListResultField>
                         <service:ListResultField>
                             <service:element>source</service:element>
-														<service:xpath>source</service:xpath>
+							<service:xpath>source</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>filename</service:element>
@@ -741,8 +757,8 @@
                         <service:ListResultField>
                             <service:element>identificationNumber</service:element>
                             <service:xpath>identificationNumber</service:xpath>
-												</service:ListResultField>
-											</service:ListResultsFields>
+                        </service:ListResultField>
+                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
@@ -1541,8 +1557,8 @@
                      <service:SchemaName>acquisition</service:SchemaName>
                      <service:DublinCoreTitle>acquisition</service:DublinCoreTitle>
                      <service:SummaryFields>acquisitionReferenceNumber|acquisitionSources|owners|uri|csid</service:SummaryFields>
-                     <service:AbstractCommonListClassname>org.collectionspace.services.acquisition.AcquisitionsCommonList</service:AbstractCommonListClassname>
-                     <service:CommonListItemClassname>org.collectionspace.services.acquisition.AcquisitionsCommonList$AcquisitionListItem</service:CommonListItemClassname>
+                     <service:AbstractCommonListClassname></service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname></service:CommonListItemClassname>
                      <service:ListResultsItemMethodName>getAcquisitionListItem</service:ListResultsItemMethodName>
                      <service:ListResultsFields>
                          <service:ListResultField>
@@ -1551,7 +1567,7 @@
                          </service:ListResultField>
                         <service:ListResultField>
                             <service:element>acquisitionSource</service:element>
-														<service:xpath>acquisitionSources/[0]</service:xpath>
+							<service:xpath>acquisitionSources/[0]</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>owner</service:element>

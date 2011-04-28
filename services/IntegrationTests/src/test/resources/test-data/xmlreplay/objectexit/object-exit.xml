@@ -73,6 +73,33 @@
              </response>
         </test>
     </testGroup>
+    
+    <testGroup ID="checkList" autoDeletePOSTS="true">
+        <test ID="oe35"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <vars>
+            	<var ID="exitNumber">checkList-1234</var>
+            </vars>
+            <filename>objectexit/oe35.xml</filename>
+        </test>
+        <test ID="o36">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>objectexit/res/oe35.res.xml</filename>
+                <vars>
+					<var ID="CSID">${oe35.CSID}</var>
+				</vars>
+				<!-- Look for one <objectexit-list-item> with the <exitNumber> that we 
+				     set in the POST, and see if it is in the response
+				-->
+                <startElement>//objectexit-list-item[./exitNumber='checkList-1234']</startElement>
+             </response>
+        </test>
+    </testGroup>
+
      
          
              
@@ -373,6 +400,7 @@
              </response>
         </test>
     </testGroup>
+    
 
 </xmlReplay>
         

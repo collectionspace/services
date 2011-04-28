@@ -9,6 +9,8 @@ import javax.ws.rs.QueryParam;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.objectexit.ObjectexitCommonList;
+
 
 /**
  * @version $Revision: 2108 $
@@ -16,21 +18,21 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 @Path(ObjectExitClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface ObjectExitProxy extends CollectionSpacePoxProxy<AbstractCommonList> {
+public interface ObjectExitProxy extends CollectionSpacePoxProxy<ObjectexitCommonList> {
     // List
     @GET
-    ClientResponse<AbstractCommonList> readList();
+    ClientResponse<ObjectexitCommonList> readList();
     
     @Override
 	@GET
     @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> readIncludeDeleted(
+    ClientResponse<ObjectexitCommonList> readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 
     @Override
     @GET
     @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> keywordSearchIncludeDeleted(
+    ClientResponse<ObjectexitCommonList> keywordSearchIncludeDeleted(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 }

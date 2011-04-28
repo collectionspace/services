@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ns3:objectexit-common-list xmlns:ns2="http://collectionspace.org/services/jaxb" xmlns:ns3="http://collectionspace.org/services/objectexit">
+  <pageNum>0</pageNum>
+  <pageSize>40</pageSize>
+  <itemsInPage>1</itemsInPage>
+  <totalItems>1</totalItems>
+  <fieldsReturned>exitNumber|currentOwner|uri|csid</fieldsReturned>
+  <objectexit-list-item>
+    <exitNumber>${exitNumber}</exitNumber>
+    <uri>/objectexit/${CSID}</uri>
+    <csid>${CSID}</csid>
+  </objectexit-list-item>
+</ns3:objectexit-common-list>

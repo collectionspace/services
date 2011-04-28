@@ -17,6 +17,8 @@
 package org.collectionspace.services.client;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.objectexit.ObjectexitCommonList;
+
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
@@ -26,7 +28,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class ObjectExitClient extends AbstractPoxServiceClientImpl<AbstractCommonList, ObjectExitProxy> {
+public class ObjectExitClient extends AbstractPoxServiceClientImpl<ObjectexitCommonList, ObjectExitProxy> {
 	public static final String SERVICE_NAME = "objectexit";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -53,7 +55,12 @@ public class ObjectExitClient extends AbstractPoxServiceClientImpl<AbstractCommo
 	 * 
 	 */
 	
-    public ClientResponse<AbstractCommonList> readList() {
+    public ClientResponse<ObjectexitCommonList> readList() {
         return getProxy().readList();
+    }
+
+    public ObjectexitCommonList readList2(){
+        ObjectexitCommonList list = readList().getEntity(ObjectexitCommonList.class);
+        return list;
     }
 }

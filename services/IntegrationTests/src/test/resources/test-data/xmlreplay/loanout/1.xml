@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="loansout">
+  <ns2:loansout_common xmlns:ns2="http://collectionspace.org/services/loanout" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <loanOutNumber>loanoutNumber-1303941414596</loanOutNumber>
+    <borrower>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</borrower>
+    <borrowersContact>urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Chris Contact)'Chris Contact'</borrowersContact>
+    <loanedObjectStatusGroupList>
+      <loanedObjectStatusGroup>
+        <loanedObjectStatus>returned</loanedObjectStatus>
+        <loanedObjectStatusNote>Left under the front mat.</loanedObjectStatusNote>
+      </loanedObjectStatusGroup>
+    </loanedObjectStatusGroupList>
+    <loanReturnDate>returnDate-1303941414596</loanReturnDate>
+    <loanOutNote>utf-8-data-fragment:ΔӁŴΩ</loanOutNote>
+    <loanPurpose>Allow people in cold climes to share the magic of Surfboards of the 1960s.</loanPurpose>
+  </ns2:loansout_common>
+</document>
+

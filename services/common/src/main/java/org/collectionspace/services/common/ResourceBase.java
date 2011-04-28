@@ -231,7 +231,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
         
         return result;
     }
-    
+
 
     /** subclasses may override this method, which is called from #get(String)
      *  which handles setup of ServiceContext and DocumentHandler, and Exception handling.*/
@@ -245,23 +245,26 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     //======================= GET without csid. List, search, etc. =====================================
 
-	@GET
-	public AbstractCommonList getList(@Context UriInfo ui) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
-		if (keywords != null) {
-			return search(queryParams, keywords);
-		} else {
-			return getList(queryParams);
-		}
-	}
+    @GET
+    public AbstractCommonList getList(@Context UriInfo ui) {
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+        AbstractCommonList list;
+        if (keywords != null) {
+            list = search(queryParams, keywords);
+        } else {
+            list = getList(queryParams);
+        }
+        return list;
+    }
 
     protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            return (AbstractCommonList)handler.getCommonPartList();
+            AbstractCommonList list = (AbstractCommonList)handler.getCommonPartList();
+            return list;
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
