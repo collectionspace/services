@@ -27,6 +27,27 @@
     <xs:element name="name" type="xs:string" />
     <xs:element name="length" type="xs:string" />
     <xs:element name="digest" type="xs:string" />
+    <xs:element name="dimensionGroupList" type="dimensionGroupList"/>
     <xs:element name="uri" type="xs:string" />
     <xs:element name="repositoryId" type="xs:string" />
+    
+    <xs:complexType name="dimensionGroupList">
+        <xs:sequence>
+            <xs:element name="dimensionGroup" type="dimensionGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="dimensionGroup"> <!-- //FIXME: The "dimensionGroup" type should be declared in one place since other services use it -->
+        <xs:sequence>
+            <xs:element name="measuredPart" type="xs:string"/>
+            <xs:element name="dimension" type="xs:string"/>
+            <xs:element name="measuredBy" type="xs:string"/>
+            <xs:element name="measurementUnit" type="xs:string"/>
+            <xs:element name="measurementMethod" type="xs:string"/>
+            <xs:element name="value" type="xs:string"/>
+            <xs:element name="valueDate" type="xs:string"/>
+            <xs:element name="valueQualifier" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
 </xs:schema>

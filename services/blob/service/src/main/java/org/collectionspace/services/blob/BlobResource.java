@@ -121,7 +121,7 @@ public class BlobResource extends ResourceBase {
     	blobInput.setDerivativeListRequested(true);
     	BlobUtil.setBlobInput(ctx, blobInput);
 
-    	PoxPayloadOut response = this.get(csid, ctx);
+    	PoxPayloadOut response = this.get(csid, ctx);  //FIXME: Derivatives should get their own document handler -something like DerivativeDocumentModelHandler.
     	if (logger.isDebugEnabled() == true) {
     		logger.debug(response.toString());
     	}

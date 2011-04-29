@@ -11,5 +11,6 @@ public interface BlobJAXBSchema {
     final static String length = "length";
     final static String digest = "digest";
     final static String uri = "uri";
+    final static String dimensionGroupList = "dimensionGroupList";
     final static String repositoryId = "repositoryId";
 }

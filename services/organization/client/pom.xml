@@ -29,7 +29,6 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authority</artifactId>
-            <optional>true</optional>
             <version>${project.version}</version>
         </dependency>        
         <dependency>
@@ -50,8 +49,7 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.contact.client</artifactId>
-            
+            <artifactId>org.collectionspace.services.contact.client</artifactId>            
             <version>${project.version}</version>
         </dependency>
         <dependency>

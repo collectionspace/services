@@ -25,10 +25,16 @@ package org.collectionspace.services.blob.nuxeo;
 
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.client.BlobClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobOutput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.common.service.ListResultField;
@@ -36,14 +42,20 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.schema.types.Schema;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.dom4j.Element;
 
 /**
  * The Class BlobDocumentModelHandler.
@@ -87,15 +99,15 @@ extends DocHandlerBase<BlobsCommon> {
 	
 	private void setCommonPartProperties(DocumentModel documentModel,
 			BlobsCommon blobsCommon) throws ClientException {
-		String label = getServiceContext().getCommonPartLabel();
-		documentModel.setProperty(label, BlobJAXBSchema.data, blobsCommon.getData());
-		documentModel.setProperty(label, BlobJAXBSchema.digest,	blobsCommon.getDigest());
-		documentModel.setProperty(label, BlobJAXBSchema.encoding, blobsCommon.getEncoding());
-		documentModel.setProperty(label, BlobJAXBSchema.length, blobsCommon.getLength());
-		documentModel.setProperty(label, BlobJAXBSchema.mimeType, blobsCommon.getMimeType());
-		documentModel.setProperty(label, BlobJAXBSchema.name, blobsCommon.getName());
-		documentModel.setProperty(label, BlobJAXBSchema.uri, blobsCommon.getUri());
-		documentModel.setProperty(label, BlobJAXBSchema.repositoryId, blobsCommon.getRepositoryId());
+		try {
+			String schemaName = getServiceContext().getCommonPartLabel();
+			PayloadOutputPart outputPart = new PayloadOutputPart(schemaName, blobsCommon);
+			Element element = outputPart.asElement();
+			Map<String, Object> propertyMap = DocumentUtils.parseProperties(schemaName, element, getServiceContext());
+			documentModel.setProperties(schemaName, propertyMap);
+		} catch (Exception e) {
+			throw new ClientException(e);
+		}		
 	}
 
 	/* (non-Javadoc)
@@ -110,35 +122,47 @@ extends DocHandlerBase<BlobsCommon> {
 		DocumentModel docModel = wrapDoc.getWrappedObject();
 		BlobsCommon blobsCommon = this.getCommonPartProperties(docModel);		
 		String blobRepositoryId = blobsCommon.getRepositoryId(); //cache the value to pass to the blob retriever
-		
+		//
+		// We're being asked for a list of blob derivatives, not the payload for a blob record.  FIXME: REM - This should be handled in a class called DerivativeDocumentHandler (need to create).
+		//
 		if (blobInput.isDerivativeListRequested() == true) {
 	        List<ListResultField> resultsFields = getListItemsArray();
-			CommonList blobsCommonList = NuxeoImageUtils.getBlobDerivatives(
+			CommonList blobsCommonList = NuxeoImageUtils.getBlobDerivatives( //FIXME: REM - Need to replace "NuxeoImageUtils" with something more general like "BlobUtils" since we may support other blob types.
 					repoSession, blobRepositoryId, resultsFields, getDerivativePathBase(docModel));
 //			ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, blobsCommonList);
 			blobInput.setDerivativeList(blobsCommonList);
-			return;  //FIXME: Don't like this exit point.  Perhaps derivatives should be a sub-resource?
+			return;  //FIXME: REM - Don't like this exit point.  Perhaps derivatives should be a sub-resource with its own DerivativeDocumentHandler doc handler?
 		}		
 
 		String derivativeTerm = blobInput.getDerivativeTerm();
 		Boolean getContentFlag = blobInput.isContentRequested();
-		BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession,
-				blobRepositoryId, derivativeTerm, getContentFlag);
-		if (getContentFlag == true) {
-			blobInput.setContentStream(blobOutput.getBlobInputStream());
-//			ctx.setProperty(BlobInput.BLOB_CONTENT_KEY, blobOutput.getBlobInputStream());
-		}
-
-		if (derivativeTerm != null) {
-			// reset 'blobsCommon' if we have a derivative request
-			blobsCommon = blobOutput.getBlobsCommon();
-			blobsCommon.setUri(getDerivativePathBase(docModel) +
-					derivativeTerm + "/" + BlobInput.URI_CONTENT_PATH);
+		//
+		// If we're being asked for either the content of the blob, the content of a derivative, or the payload for a derivative then
+		// fall into this block of code.  Otherwise, we'll just call our parent to deal with a plain-old-blob payload.
+		//
+		if (derivativeTerm != null || getContentFlag == true) {
+			BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession,
+					blobRepositoryId, derivativeTerm, getContentFlag);
+			if (getContentFlag == true) {
+				blobInput.setContentStream(blobOutput.getBlobInputStream());
+			}
+	
+			if (derivativeTerm != null) {
+				// reset 'blobsCommon' if we have a derivative request
+				blobsCommon = blobOutput.getBlobsCommon();
+				blobsCommon.setUri(getDerivativePathBase(docModel) +
+						derivativeTerm + "/" + BlobInput.URI_CONTENT_PATH);
+			}
+			
+			blobsCommon.setRepositoryId(null); //hide the repository id from the GET results payload since it is private
+			this.setCommonPartProperties(docModel, blobsCommon);
+			// finish extracting the other parts by calling the parent
 		}
 		
-		blobsCommon.setRepositoryId(null); //hide the repository id from the GET results payload since it is private
-		this.setCommonPartProperties(docModel, blobsCommon);
-		// finish extracting the other parts by calling the parent
+		//
+		// Hide the Nuxeo repository ID of the Nuxeo blob since this is private
+		//
+		docModel.setProperty(ctx.getCommonPartLabel(), BlobJAXBSchema.repositoryId, null);		
 		super.extractAllParts(wrapDoc);
 	}
 
@@ -153,11 +177,24 @@ extends DocHandlerBase<BlobsCommon> {
 			DocumentModel documentModel = wrapDoc.getWrappedObject();
 			RepositoryInstance repoSession = this.getRepositorySession();    	
 			BlobsCommon blobsCommon = NuxeoImageUtils.createPicture(ctx, repoSession, blobInput);
-			this.setCommonPartProperties(documentModel, blobsCommon);
+	        PoxPayloadIn input = (PoxPayloadIn)ctx.getInput();
+	        //
+	        // If the input payload is null, then we're creating a new blob from a post or a uri.  This means there
+	        // is no "input" payload for our framework to process.  Therefore we need to synthesize a payload from
+	        // the BlobsCommon instance we just filled out.
+	        //
+	        if (input == null) {
+	        	PoxPayloadOut output = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
+		        PayloadOutputPart commonPart = new PayloadOutputPart(BlobClient.SERVICE_COMMON_PART_NAME, blobsCommon);
+		        output.addPart(commonPart);
+		        input = new PoxPayloadIn(output.toXML());
+		        ctx.setInput(input);
+	        }
+//			this.setCommonPartProperties(documentModel, blobsCommon);
 			blobInput.setBlobCsid(documentModel.getName());
-		} else {
-			super.fillAllParts(wrapDoc, action);
 		}
+
+		super.fillAllParts(wrapDoc, action);
 	}    
 }
 

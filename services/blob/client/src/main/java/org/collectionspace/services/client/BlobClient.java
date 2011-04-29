@@ -34,6 +34,7 @@ public class BlobClient extends AbstractPoxServiceClientImpl<AbstractCommonList,
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+	public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
 	//HTTP query param string for specifying a URI source to blob bits.
 	public static final String BLOB_URI_PARAM = "blobUri";

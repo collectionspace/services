@@ -1112,6 +1112,13 @@ public class DocumentUtils {
 		return result;
 	}
 	
+	public static Map<String, Object> parseProperties(String schemaName, org.dom4j.Element element, ServiceContext ctx) throws Exception {
+		Map<String, Object> result = null;
+		Schema schema = getSchemaFromName(schemaName);
+		result = DocumentUtils.loadSchema(schema, element, ctx);
+		return result;
+	}
+	
 	/**
 	 * Load schema.
 	 *

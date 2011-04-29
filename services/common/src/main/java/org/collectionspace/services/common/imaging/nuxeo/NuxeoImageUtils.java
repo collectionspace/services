@@ -51,6 +51,8 @@ import org.nuxeo.runtime.services.streaming.FileSource;
 
 import org.nuxeo.ecm.platform.picture.api.adapters.MultiviewPictureAdapter;
 import org.nuxeo.ecm.platform.picture.api.adapters.MultiviewPictureAdapterFactory; 
+import org.nuxeo.ecm.platform.picture.api.ImageInfo;
+import org.nuxeo.ecm.platform.picture.api.ImagingService;
 import org.nuxeo.ecm.platform.picture.api.PictureView;
 
 import org.nuxeo.ecm.platform.picture.api.adapters.PictureResourceAdapter;
@@ -113,6 +115,8 @@ import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.blob.BlobsCommon;
+import org.collectionspace.services.blob.DimensionGroup;
+import org.collectionspace.services.blob.DimensionGroupList;
 //import org.collectionspace.services.blob.BlobsCommonList;
 //import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -146,6 +150,16 @@ public class NuxeoImageUtils {
 	public static final String DERIVATIVE_THUMBNAIL_TAG = DERIVATIVE_THUMBNAIL + "_";
 
 	public static final String DERIVATIVE_UNKNOWN = "_UNKNOWN_DERIVATIVE_NAME_";
+	
+	//
+	// Image Dimension fields
+	//
+	public static final String PART_IMAGE = "digitalImage";
+	public static final String WIDTH = "width";
+	public static final String HEIGHT = "height";
+	public static final String DEPTH = "depth";
+	public static final String UNIT_PIXELS = "pixels";
+	public static final String UNIT_BITS = "bits";
 
 	//	static DefaultBinaryManager binaryManager = new DefaultBinaryManager(); //can we get this from Nuxeo? i.e., Framework.getService(BinaryManger.class)
 
@@ -260,15 +274,73 @@ public class NuxeoImageUtils {
 
 		return commonList;
 	}
+	
+	static private DimensionGroupList getDimensions(DocumentModel documentModel, Blob nuxeoBlob) {
+		DimensionGroupList result = null;
+		try {
+		    ImagingService service = Framework.getService(ImagingService.class);			
+		    ImageInfo imageInfo = service.getImageInfo(nuxeoBlob);
+		    
+		    if (imageInfo != null) {
+		    	DimensionGroupList dimensionGroupList = new DimensionGroupList();
+		    	List<DimensionGroup> dgList = dimensionGroupList.getDimensionGroup();
+		    	//
+		    	// Set the width
+		    	//
+		    	DimensionGroup widthDimension = new DimensionGroup();
+		    	widthDimension.setMeasuredPart(PART_IMAGE);
+		    	widthDimension.setDimension(WIDTH);
+		    	widthDimension.setMeasurementUnit(UNIT_PIXELS);
+		    	widthDimension.setValue(Integer.toString(imageInfo.getWidth()));
+		    	dgList.add(widthDimension);
+		    	//
+		    	// Set the height
+		    	//
+		    	DimensionGroup heightDimension = new DimensionGroup();
+		    	heightDimension.setMeasuredPart(PART_IMAGE);
+		    	heightDimension.setDimension(HEIGHT);
+		    	heightDimension.setMeasurementUnit(UNIT_PIXELS);
+		    	heightDimension.setValue(Integer.toString(imageInfo.getHeight()));
+		    	dgList.add(heightDimension);
+		    	//
+		    	// Set the depth
+		    	//
+		    	DimensionGroup depthDimension = new DimensionGroup();
+		    	depthDimension.setMeasuredPart(PART_IMAGE);
+		    	depthDimension.setDimension(DEPTH);
+		    	depthDimension.setMeasurementUnit(UNIT_BITS);
+		    	depthDimension.setValue(Integer.toString(imageInfo.getDepth()));
+		    	dgList.add(depthDimension);
+		    	//
+		    	// Now set out result
+		    	//
+		    	result = dimensionGroupList;
+		    } else {
+		    	if (logger.isWarnEnabled() == true) {
+		    		logger.warn("Could not synthesize a dimension list of the blob: " + documentModel.getName());
+		    	}
+		    }		    
+		} catch (Exception e) {
+			logger.warn("Could not extract image information for blob: " + documentModel.getName());
+		}
+		
+		return result;
+	}
 
 	static private BlobsCommon createBlobsCommon(DocumentModel documentModel, Blob nuxeoBlob) {
 		BlobsCommon result = new BlobsCommon();
+
 		if (documentModel != null) {
 			result.setMimeType(nuxeoBlob.getMimeType());
 			result.setName(nuxeoBlob.getFilename());
 			result.setLength(Long.toString(nuxeoBlob.getLength()));
 			result.setRepositoryId(documentModel.getId());
+			DimensionGroupList dimensionGroupList = getDimensions(documentModel, nuxeoBlob);
+			if (dimensionGroupList != null) {
+				result.setDimensionGroupList(dimensionGroupList);
+			}
 		}
+				
 		return result;
 	}
 
@@ -615,6 +687,24 @@ public class NuxeoImageUtils {
 		return result;
 	}
 
+//	/*
+//	 * This is an alternate approach to getting information about an image
+//	 * and its corresponding derivatives.
+//	 */
+//	//			MultiviewPictureAdapter multiviewPictureAdapter = documentModel.getAdapter(MultiviewPictureAdapter.class);
+//	MultiviewPictureAdapterFactory multiviewPictureAdapterFactory = new MultiviewPictureAdapterFactory();
+//	MultiviewPictureAdapter multiviewPictureAdapter =
+//		(MultiviewPictureAdapter)multiviewPictureAdapterFactory.getAdapter(documentModel, null);
+//	if (multiviewPictureAdapter != null) {
+//		PictureView[] pictureViewArray = multiviewPictureAdapter.getViews();
+//		for (PictureView pictureView : pictureViewArray) {
+//			if (logger.isDebugEnabled() == true) {
+//				logger.debug("-------------------------------------");
+//				logger.debug(toStringPictureView(pictureView));
+//			}
+//		}
+//	}
+	
 	/**
 	 * Gets the image.
 	 *
@@ -630,28 +720,10 @@ public class NuxeoImageUtils {
 			Boolean getContentFlag) {
 		BlobOutput result = new BlobOutput();
 
-		try {
+		if (repositoryId != null && repositoryId.isEmpty() == false) try {
 			IdRef documentRef = new IdRef(repositoryId);
 			DocumentModel documentModel = repoSession.getDocument(documentRef);
-
-			/*
-			 * This is a second, and better, approach to getting information about an image
-			 * and its corresponding derivatives.
-			 */
-			//			MultiviewPictureAdapter multiviewPictureAdapter = documentModel.getAdapter(MultiviewPictureAdapter.class);
-			MultiviewPictureAdapterFactory multiviewPictureAdapterFactory = new MultiviewPictureAdapterFactory();
-			MultiviewPictureAdapter multiviewPictureAdapter =
-				(MultiviewPictureAdapter)multiviewPictureAdapterFactory.getAdapter(documentModel, null);
-			if (multiviewPictureAdapter != null) {
-				PictureView[] pictureViewArray = multiviewPictureAdapter.getViews();
-				for (PictureView pictureView : pictureViewArray) {
-					if (logger.isDebugEnabled() == true) {
-						logger.debug("-------------------------------------");
-						logger.debug(toStringPictureView(pictureView));
-					}
-				}
-			}
-
+			
 			Blob docBlob = null;
 			DocumentBlobHolder docBlobHolder = (DocumentBlobHolder)documentModel.getAdapter(BlobHolder.class);
 			if (docBlobHolder instanceof PictureBlobHolder) { // if it is a PictureDocument then it has these Nuxeo schemas: [dublincore, uid, picture, iptc, common, image_metadata]
@@ -667,7 +739,7 @@ public class NuxeoImageUtils {
 			} else {
 				docBlob = docBlobHolder.getBlob();
 			}
-
+			
 			//
 			// Create the result instance that will contain the blob metadata
 			// and an InputStream with the bits if the 'getContentFlag' is set
@@ -676,7 +748,7 @@ public class NuxeoImageUtils {
 			result.setBlobsCommon(blobsCommon);
 			if (getContentFlag == true) {
 				InputStream remoteStream = docBlob.getStream();
-				BufferedInputStream bufferedInputStream = new BufferedInputStream(remoteStream);
+				BufferedInputStream bufferedInputStream = new BufferedInputStream(remoteStream); //FIXME: REM - To improve performance, try BufferedInputStream(InputStream in, int size) 
 				result.setBlobInputStream(bufferedInputStream); // the input stream of blob bits
 			}
 
