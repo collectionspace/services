@@ -21,7 +21,10 @@
     <bioNote>born Marion Robert Morrison and betterknown by his stage name John Wayne, was an American film actor, director and producer. He epitomized rugged masculinity and has become an enduring American icon. He is famous for his distinctive
     voice, walk and height. He was also known for his conservative political views and his support in the 1950s for anti-communist positions.</bioNote>
   </ns2:persons_common>
-  
+  <!-- 
+       WARNING: ${itemCSID} does NOT get expanded by XmlReplay. 
+	   It passes through and then the service deals with it.
+  -->
   <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
     <pageNum>0</pageNum>
     <pageSize>40</pageSize>
@@ -48,7 +51,7 @@
 		  <csid>${childCSID}</csid>
 		  <uri>${childUri}</uri>
 		  <documentType>Person</documentType>
-		  <name>John Wayne 2, the evil twin, child</name>
+		  <name>John Wayne 1, the evil twin, child</name>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
@@ -63,6 +66,20 @@
 		  <csid>${child2CSID}</csid>
 		  <documentType>Person</documentType>
 		  <name>John Wayne 2, the evil twin, child</name>
+		</subject>
+		<object>
+		  <csid>${itemCSID}</csid>
+		  <documentType>Person</documentType>
+		  <name>John Wayne</name>
+		</object>
+	</relation-list-item>
+	<relation-list-item>
+		<predicate>hasBroader</predicate>
+		<subject>
+		  <uri>${child3Uri}</uri>
+		  <csid>${child3CSID}</csid>
+		  <documentType>Person</documentType>
+		  <name>John Wayne 3, the evil twin, child</name>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>

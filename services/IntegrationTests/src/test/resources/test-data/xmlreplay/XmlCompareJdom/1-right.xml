@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="persons">
+  <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <surName>Wayne</surName>
+    <birthPlace>Winterset, Iowa</birthPlace>
+    <deathDate>June 11, 1979</deathDate>
+    <nationalities />
+    <shortIdentifier>johnWayneActorChild</shortIdentifier>
+    <shortDisplayName>JohnWayne</shortDisplayName>
+    <schoolsOrStyles />
+    <gender>male</gender>
+    <birthDate>May 26, 1907</birthDate>
+    <foreName>John</foreName>
+    <groups>
+      <group>Irish</group>
+      <group>Scottish</group>
+    </groups>
+    <occupations />
+    <bioNote>born Marion Robert Morrison and betterknown by his stage name John Wayne, was an American film actor, director and producer. He epitomized rugged masculinity and has become an enduring American icon. He is famous for his distinctive
+    voice, walk and height. He was also known for his conservative political views and his support in the 1950s for anti-communist positions.</bioNote>
+    <displayNameComputed>false</displayNameComputed>
+    <csid>28d949e9-794b-457a-93fe</csid>
+    <shortDisplayNameComputed>false</shortDisplayNameComputed>
+    <inAuthority>53ef7d20-4154-4ce9-952d</inAuthority>
+    <refName>urn:cspace:org.collectionspace.demo:personauthority:name(CSPACE3739PersonAuthority):person:name(johnWayneActorChild)'John Wayne'</refName>
+    <displayName>John Wayne</displayName>
+  </ns2:persons_common>
+  <ns2:collectionspace_core xmlns:ns2="http://collectionspace.org/collectionspace_core/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <tenantId>1</tenantId>
+    <updatedAt>2011-04-28T23:46:08Z</updatedAt>
+    <createdAt>2011-04-28T23:46:08Z</createdAt>
+  </ns2:collectionspace_core>
+  <ns2:account_permission xmlns:ns2="http://collectionspace.org/services/authorization">
+    <account>
+      <accountId>74bb3d58-a8cb-4367-86da-d48f8fa5aece</accountId>
+      <userId>admin@collectionspace.org</userId>
+    </account>
+    <permission>
+      <permRelationshipId>71</permRelationshipId>
+      <permissionId>c5509eda-9e3f-4cad-91ea-4efeedc650c4</permissionId>
+      <resourceName>persons</resourceName>
+      <actionGroup>CRUDL</actionGroup>
+    </permission>
+    <permission>
+      <permRelationshipId>70</permRelationshipId>
+      <permissionId>fcfec805-ee00-4888-8196-0389d30ca5fa</permissionId>
+      <resourceName>/personauthorities/*/items/*/workflow/</resourceName>
+      <actionGroup>CRUDL</actionGroup>
+    </permission>
+  </ns2:account_permission>
+  <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <pageSize>40</pageSize>
+    <itemsInPage>2</itemsInPage>
+    <totalItems>2</totalItems>
+    <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
+    <relation-list-item>
+      <uri>/relations/2f1bacd7-6fc6-41bf-a8d6</uri>
+      <csid>2f1bacd7-6fc6-41bf-a8d6</csid>
+      <subjectCsid>1deda741-3b08-41ca-9681</subjectCsid>
+      <relationshipType>hasBroader</relationshipType>
+      <predicate>hasBroader</predicate>
+      <objectCsid>d19bf94c-53c3-4295-8e5c</objectCsid>
+      <subject>
+        <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/1deda741-3b08-41ca-9681</uri>
+        <csid>1deda741-3b08-41ca-9681</csid>
+        <service>Person</service>
+        <name>John Wayne</name>
+        <number>johnWayneActorChild2</number>
+        <documentType>Person</documentType>
+        <documentTypeFromModel>Person</documentTypeFromModel>
+      </subject>
+      <object>
+        <uri>/persons/53ef7d20-4154-4ce9-952d/items/d19bf94c-53c3-4295-8e5c</uri>
+        <csid>d19bf94c-53c3-4295-8e5c</csid>
+        <service>Person</service>
+        <name>John Wayne</name>
+        <number>johnWayneActor</number>
+        <documentType>Person</documentType>
+        <documentTypeFromModel>Person</documentTypeFromModel>
+      </object>
+    </relation-list-item>
+    <relation-list-item>
+      <uri>/relations/46aa804f-53e0-4c42-aa2b</uri>
+      <csid>46aa804f-53e0-4c42-aa2b</csid>
+      <subjectCsid>6e951b58-2087-4eea-a6b1</subjectCsid>
+      <relationshipType>hasBroader</relationshipType>
+      <predicate>hasBroader</predicate>
+      <objectCsid>d19bf94c-53c3-4295-8e5c</objectCsid>
+      <subject>
+        <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/6e951b58-2087-4eea-a6b1</uri>
+        <csid>6e951b58-2087-4eea-a6b1</csid>
+        <service>Person</service>
+        <name>John Wayne</name>
+        <number>johnWayneActorChild3</number>
+        <documentType>Person</documentType>
+        <documentTypeFromModel>Person</documentTypeFromModel>
+      </subject>
+      <object>
+        <uri>/persons/53ef7d20-4154-4ce9-952d/items/d19bf94c-53c3-4295-8e5c</uri>
+        <csid>d19bf94c-53c3-4295-8e5c</csid>
+        <service>Person</service>
+        <name>John Wayne</name>
+        <number>johnWayneActor</number>
+        <documentType>Person</documentType>
+        <documentTypeFromModel>Person</documentTypeFromModel>
+      </object>
+    </relation-list-item>
+  </ns2:relations-common-list>
+</document>
+

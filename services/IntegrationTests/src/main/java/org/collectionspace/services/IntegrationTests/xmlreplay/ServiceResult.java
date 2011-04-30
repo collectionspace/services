@@ -59,6 +59,10 @@ public class ServiceResult {
     public String failureReason = "";
     public Header[] responseHeaders = new Header[0];
     public List<Integer> expectedCodes = new ArrayList<Integer>();
+    public Map<String,String>  vars = new HashMap<String,String>();
+    public void addVars(Map<String,String> newVars){
+        vars.putAll(newVars);
+    }
     private Map<String, TreeWalkResults> partSummaries = new HashMap<String, TreeWalkResults>();
     public void addPartSummary(String label, TreeWalkResults list){
         partSummaries.put(label, list);
@@ -220,7 +224,7 @@ public class ServiceResult {
                 + ( Tools.notEmpty(location) ? "; location.CSID:"+location : "" )
                 + ( Tools.notEmpty(error) ? "; ERROR:"+error : "" )
                 + "; gotExpected:"+gotExpectedResult()
-                +";result:"+result+";"
+                //+";result:"+result+";"
                 + ( partsSummary(true))
                 +"}"
                 + ( includePayloads && Tools.notBlank(requestPayload) ? LINE+"requestPayload:"+LINE+CRLF+requestPayload+LINE : "" )
@@ -294,4 +298,29 @@ public class ServiceResult {
             return "ERROR reading request value: "+e;
         }
     }
+
+    public String get(String what){
+        if ("CSID".equals(what)){
+            return CSID;
+        } else if ("location".equals(what)){
+            return location;
+        } else if ("testID".equals(what)){
+            return testID;
+        } else if ("testGroupID".equals(what)){
+            return testGroupID;
+        } else if ("fullURL".equals(what)){
+            return fullURL;
+        } else if ("deleteURL".equals(what)){
+            return deleteURL;
+        } else if ("responseCode".equals(what)){
+            return ""+responseCode;
+        } else if ("method".equals(what)){
+            return method;
+        }
+        if (vars.containsKey(what)){
+            return vars.get(what);
+        }
+        return "";
+    }
+
 }

@@ -7,7 +7,7 @@
   <fieldsReturned>exitNumber|currentOwner|uri|csid</fieldsReturned>
   <objectexit-list-item>
     <exitNumber>${exitNumber}</exitNumber>
-    <uri>/objectexit/${CSID}</uri>
-    <csid>${CSID}</csid>
+    <uri>/objectexit/${targetCSID}</uri>
+    <csid>${targetCSID}</csid>
   </objectexit-list-item>
 </ns3:objectexit-common-list>

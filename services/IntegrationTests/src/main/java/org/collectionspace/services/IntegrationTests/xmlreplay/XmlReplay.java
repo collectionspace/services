@@ -379,12 +379,14 @@ public class XmlReplay {
             if (Tools.notBlank(partLabel))
             startElement = "/document/*[local-name()='"+partLabel+"']";
         }
+        TreeWalkResults.MatchSpec matchSpec = TreeWalkResults.MatchSpec.createDefault();
         TreeWalkResults list =
             XmlCompareJdom.compareParts(expectedPartContent,
                                         leftID,
                                         serviceResult.result,
                                         rightID,
-                                        startElement);
+                                        startElement,
+                                        matchSpec);
         serviceResult.addPartSummary(label, list);
         return OK;
     }
@@ -541,12 +543,16 @@ public class XmlReplay {
                         } else if (isPUT) {
                             uri = fromTestID(uri, testNode, serviceResultsMap);
                         }
+                        //vars only make sense in two contexts: POST/PUT, because you are submitting another file with internal expressions,
+                        // and in <response> nodes. For GET, DELETE, there is no payload, so all the URLs with potential expressions are right there in the testNode.
                         Map<String,String> vars = null;
                         if (parts.varsList.size()>0){
                             vars = parts.varsList.get(0);
                         }
                         serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.responseFilename, vars, protoHostPort, uri, method, XmlReplayTransport.APPLICATION_XML, evalStruct, authForTest, testIDLabel);
-
+                        if (vars!=null) {
+                            serviceResult.addVars(vars);
+                        }
                         results.add(serviceResult);
                         //if (isPOST){
                             serviceResultsMap.put(testID, serviceResult);      //PUTs do not return a Location, so don't add PUTs to serviceResultsMap.

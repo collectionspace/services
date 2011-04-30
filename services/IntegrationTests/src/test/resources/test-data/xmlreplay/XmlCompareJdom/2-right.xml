@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="persons">
+  <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <itemsInPage>2</itemsInPage>
+    <totalItems>2</totalItems>
+    <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
+    <relation-list-item ID="1R">
+      <subjectCsid>AA</subjectCsid>
+      
+      <subject>
+        <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/6e951b58-2087-4eea-a6b1</uri>
+      </subject>
+
+    </relation-list-item>
+    <relation-list-item ID="2R">
+      <subjectCsid>BB</subjectCsid>
+      
+      <subject>
+        <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/6e951b58-2087-4eea-a6b1</uri>
+      </subject>
+
+      
+    </relation-list-item>
+  </ns2:relations-common-list>
+</document>
+

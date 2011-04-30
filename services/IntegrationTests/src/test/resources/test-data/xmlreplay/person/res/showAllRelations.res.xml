@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="persons">  
+  <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <totalItems>4</totalItems>
+    <!-- 
+    This file represents the expected response from test case
+    	person.xml :: 
+    These are the vars that are available from the time Person1 is created.
+    Person1.CSID       ${Person1.CSID}
+    PersonParent.CSID  ${PersonParent.CSID}
+	PersonChild.CSID   ${PersonChild.CSID}
+	PersonChild2.CSID  ${PersonChild2.CSID}
+	PersonChild3.CSID  ${PersonChild3.CSID}
+	-->
+
+
+    <relation-list-item>
+      <subjectCsid>${Person1.CSID}</subjectCsid>
+      <objectCsid>${PersonParent.CSID}</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>${Person1.CSID}</csid>
+      </subject>
+      <object>
+        <csid>${PersonParent.CSID}</csid>
+      </object>
+    </relation-list-item>
+    
+    <relation-list-item>
+      <subjectCsid>${PersonChild.CSID}</subjectCsid>
+      <objectCsid>${Person1.CSID}</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>${PersonChild.CSID}</csid>
+      </subject>
+      <object>
+        <csid>${Person1.CSID}</csid>
+      </object>
+    </relation-list-item>
+    
+    <relation-list-item>
+      <subjectCsid>${PersonChild2.CSID}</subjectCsid>
+      <objectCsid>${Person1.CSID}</objectCsid>
+      <predicate>hasBroader</predicate>
+      
+      <subject>
+        <csid>${PersonChild2.CSID}</csid>
+      </subject>
+      <object>
+        <csid>${Person1.CSID}</csid>
+      </object>
+    </relation-list-item>
+    
+    <relation-list-item>
+      <subjectCsid>${PersonChild3.CSID}</subjectCsid>
+      <objectCsid>${Person1.CSID}</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>${PersonChild3.CSID}</csid>
+      </subject>
+      <object>
+        <csid>${Person1.CSID}</csid>
+      </object>
+    </relation-list-item>
+  </ns2:relations-common-list>
+</document>

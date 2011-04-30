@@ -1,0 +1,37 @@
+<document name="persons">
+  <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <shortIdentifier>johnWayneActorChild</shortIdentifier>
+  </ns2:persons_common>
+  <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <itemsInPage>2</itemsInPage>
+    <totalItems>2</totalItems>
+    <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
+    <relation-list-item>
+      <subjectCsid>1deda741-3b08-41ca-9681</subjectCsid>
+      <predicate>hasBroader</predicate>
+      <objectCsid>d19bf94c-53c3-4295-8e5c</objectCsid>
+      <subject>
+        <csid>1deda741-3b08-41ca-9681</csid>
+        <number>johnWayneActorChild2</number>
+      </subject>
+      <object>
+        <csid>d19bf94c-53c3-4295-8e5c</csid>
+        <number>johnWayneActor</number>
+      </object>
+    </relation-list-item>
+    <relation-list-item>
+      <subjectCsid>6e951b58-2087-4eea-a6b1</subjectCsid>
+      <predicate>hasBroader</predicate>
+      <objectCsid>d19bf94c-53c3-4295-8e5c</objectCsid>
+      <subject>
+        <csid>6e951b58-2087-4eea-a6b1</csid>
+        <number>johnWayneActorChild3</number>
+      </subject>
+      <object>
+        <csid>d19bf94c-53c3-4295-8e5c</csid>
+        <number>johnWayneActor</number>
+      </object>
+    </relation-list-item>
+  </ns2:relations-common-list>
+</document>

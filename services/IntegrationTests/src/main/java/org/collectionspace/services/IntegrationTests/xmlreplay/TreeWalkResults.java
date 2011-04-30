@@ -26,6 +26,8 @@ package org.collectionspace.services.IntegrationTests.xmlreplay;
 import org.collectionspace.services.common.api.Tools;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * User: laramie
@@ -33,6 +35,56 @@ import java.util.ArrayList;
  * $LastChangedDate:  $
  */
 public class TreeWalkResults extends ArrayList<TreeWalkResults.TreeWalkEntry> {
+      public String toString(String LEAD){
+          StringBuffer res = new StringBuffer();
+          for (TreeWalkResults.TreeWalkEntry entry: this) {
+              res.append(entry.toString(LEAD));
+          }
+          return  res.toString();
+      }
+
+    /** This cllass has two public Lists: you can construct your own to set the acceptable and unacceptable STATUS codes.
+     *   They are defaulted to R_ADDED being acceptable. */
+    public static class MatchSpec {
+        public static final TreeWalkEntry.STATUS[]  defaultAcceptableStatiArray = {TreeWalkEntry.STATUS.INFO,
+                                                                                         TreeWalkEntry.STATUS.MATCHED,
+                                                                                         TreeWalkEntry.STATUS.R_ADDED};
+
+        public static final TreeWalkEntry.STATUS[] defaultErrorStatiArray =           {TreeWalkEntry.STATUS.R_MISSING,
+                                                                                          TreeWalkEntry.STATUS.NESTED_ERROR,
+                                                                                          TreeWalkEntry.STATUS.TEXT_DIFFERENT,
+                                                                                          TreeWalkEntry.STATUS.DOC_ERROR};
+        public List<TreeWalkEntry.STATUS> errorStati;
+
+        public static MatchSpec createDefault(){
+            MatchSpec result = new MatchSpec();
+            result.errorStati = Arrays.asList(defaultErrorStatiArray);
+            return result;
+        }
+        public static MatchSpec create(TreeWalkEntry.STATUS[] statiArray){
+            MatchSpec result = new MatchSpec();
+            result.errorStati = Arrays.asList(statiArray);
+            return result;
+        }
+        public void removeErrorFromSpec(TreeWalkEntry.STATUS status){
+            ArrayList arrayList = new ArrayList(errorStati);
+            arrayList.remove(status);
+            errorStati = arrayList;
+        }
+        public String toString(){
+            StringBuffer buff = new StringBuffer("{");
+            int i = 0;
+            for (TreeWalkEntry.STATUS status : errorStati){
+                 if (i>0) buff.append(",");
+                String foo = status.toString();
+                buff.append(foo);
+                i++;
+            }
+            buff.append("}");
+            return buff.toString();
+        }
+
+    }
 
     public static class TreeWalkEntry {
         public String lpath = "";
@@ -43,24 +95,28 @@ public class TreeWalkResults extends ArrayList<TreeWalkResults.TreeWalkEntry> {
         public String actual = "";
         public String message = "";
         public String errmessage = "";
-        public static enum STATUS {INFO, MATCHED, R_MISSING, R_ADDED, DOC_ERROR, TEXT_DIFFERENT};
+        public TreeWalkResults nested;
+        public static enum STATUS {INFO, MATCHED, R_MISSING, R_ADDED, DOC_ERROR, TEXT_DIFFERENT, NESTED_ERROR};
         public STATUS status;
         public String toString(){
+            return toString("\r\n");
+        }
+        public String toString(String LEAD){
+            String INDENT = "    ";
             return
-                 "{"
+                 LEAD + "{"
                  +status.name()
                  +(Tools.notEmpty(lpath) ? ", L.path:"+lpath : "")
                  +(Tools.notEmpty(rpath) ? ", R.path:"+rpath : "")
                  +(Tools.notEmpty(message) ? ", message:"+message : "")
                  +(Tools.notEmpty(errmessage) ? ", errmessage:"+errmessage : "")
                  +", status:"+status
-                 +((status != STATUS.MATCHED) && Tools.notEmpty(ltextTrimmed) ? ",\r\n    L.trimmed:"+ltextTrimmed : "")
-                 +((status != STATUS.MATCHED) && Tools.notEmpty(rtextTrimmed) ? ",\r\n    R.trimmed:"+rtextTrimmed : "")
-                 +((status != STATUS.MATCHED) && Tools.notEmpty(expected) ? "\r\nEXPECTED:\r\n------------------\r\n"+expected.trim()+"\r\n------------------" : "")
-                 +((status != STATUS.MATCHED) && Tools.notEmpty(actual) ? "\r\nACTUAL:\r\n------------------\r\n"+actual.trim()+"\r\n------------------\r\n" : "")
-
+                 +((status != STATUS.MATCHED) && Tools.notEmpty(ltextTrimmed) ? ","+LEAD+"    L.trimmed:"+ltextTrimmed : "")
+                 +((status != STATUS.MATCHED) && Tools.notEmpty(rtextTrimmed) ? ","+LEAD+"    R.trimmed:"+rtextTrimmed : "")
+                 +((status != STATUS.MATCHED) && Tools.notEmpty(expected) ? LEAD+"EXPECTED:"+LEAD+"------------------"+LEAD+expected.trim()+LEAD+"------------------" : "")
+                 +((status != STATUS.MATCHED) && Tools.notEmpty(actual) ? LEAD+"ACTUAL:"+LEAD+"------------------"+LEAD+actual.trim()+LEAD+"------------------"+LEAD : "")
+                 +((status != STATUS.MATCHED) && (nested != null) ? LEAD+"NESTED:"+LEAD+"------------------"+LEAD+nested.toString(LEAD+INDENT)+LEAD+"------------------"+LEAD : "")
                  +"}";
-
         }
     }
 
@@ -121,6 +177,15 @@ public class TreeWalkResults extends ArrayList<TreeWalkResults.TreeWalkEntry> {
             if (entry.status == TreeWalkEntry.STATUS.DOC_ERROR
                 || entry.status == TreeWalkEntry.STATUS.R_MISSING
                 || entry.status == TreeWalkEntry.STATUS.R_ADDED  ){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean treesMatch(MatchSpec matchSpec) {
+        for (TreeWalkEntry entry : this) {
+            if (matchSpec.errorStati.contains(entry.status)) {
                 return false;
             }
         }

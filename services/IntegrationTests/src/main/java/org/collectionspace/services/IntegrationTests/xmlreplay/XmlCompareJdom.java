@@ -60,7 +60,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
         return doc;
     }
 
-    public static TreeWalkResults compareParts(String expectedContent, String leftID, String actualPartContent, String rightID, String startElement){
+    public static TreeWalkResults compareParts(String expectedContent, String leftID, String actualPartContent, String rightID, String startElement, TreeWalkResults.MatchSpec matchSpec){
         TreeWalkResults list = new TreeWalkResults();
         try {
 
@@ -85,7 +85,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
             } else {
                 Document expected = getDocumentFromContent(expectedContent);
                 Document actual = getDocumentFromContent(actualPartContent);
-                treeWalk(expected, actual, list, startElement);
+                treeWalk(expected, actual, list, startElement, matchSpec);
             }
         } catch (Throwable t){
             String msg = "ERROR in XmlReplay.compareParts(): "+t;
@@ -135,7 +135,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
 
     xpath.addNamespace("x", d.getRootElement().getNamespaceUri());
     */
-    public static boolean treeWalk(Document left, Document right, TreeWalkResults list, String startElement) throws Exception {
+    public static boolean treeWalk(Document left, Document right, TreeWalkResults list, String startElement, TreeWalkResults.MatchSpec matchSpec) throws Exception {
         Element leftElement = left.getRootElement();
         Element rightElement = right.getRootElement();
         if (Tools.notBlank(startElement)) {
@@ -149,11 +149,11 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
                 rightElement = (Element)rtest;
             }
         }
-        boolean res = treeWalk(leftElement, rightElement, "/", list);
+        boolean res = treeWalk(leftElement, rightElement, "/", list, matchSpec);
         return res;
     }
 
-    public static boolean treeWalk(Element left, Element right, String parentPath, TreeWalkResults msgList) throws Exception {
+    public static boolean treeWalk(Element left, Element right, String parentPath, TreeWalkResults msgList, TreeWalkResults.MatchSpec matchSpec) throws Exception {
         String SPACE = "     ";
         if (left == null && right == null){
             return true;
@@ -191,7 +191,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
                 //System.out.println("-----------------doRepeating------"+leftChildPath);
                 foundRepeatingList.add(leftChildPath);
                 boolean repeatingIdentical =
-                    doRepeatingFieldComparison(leftlist, leftChildPath, leftChildName, left, right, msgList, namespace) ; //todo: deal with foundRightMap in this repeating field block.
+                    doRepeatingFieldComparison(leftlist, leftChildPath, leftChildName, left, right, msgList, namespace, matchSpec) ; //todo: deal with foundRightMap in this repeating field block.
                 if ( ! repeatingIdentical ){
                     //System.out.println("\r\n\r\n\r\n*****************************\r\nOne repeating field failed: "+msgList);
                     return false;
@@ -223,7 +223,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
                     msgList.add(entry);
                 }
                 //============ DIVE !! =====================================================
-                result = result && treeWalk( leftChild, rightChild, leftChildPath, msgList);
+                result = result && treeWalk( leftChild, rightChild, leftChildPath, msgList, matchSpec);
             }
         }
         for (Object r : right.getChildren()){
@@ -253,7 +253,14 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
         return outputter.outputString(el);
     }
 
-    public static boolean doRepeatingFieldComparison(List leftList, String leftChildPath, String leftChildName, Element left, Element right, TreeWalkResults msgList, Namespace namespace)
+    public static boolean doRepeatingFieldComparison(List leftList,
+                                                                                     String leftChildPath,
+                                                                                     String leftChildName,
+                                                                                     Element left,
+                                                                                     Element right,
+                                                                                     TreeWalkResults msgList,
+                                                                                     Namespace namespace,
+                                                                                     TreeWalkResults.MatchSpec matchSpec)
     throws Exception {
         //todo: deal with foundRightMap in this repeating field block.
         List rightList = select(right, leftChildName, namespace);
@@ -274,7 +281,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
             twe.status = TreeWalkEntry.STATUS.R_ADDED;
             twe.message = "Repeating field count not matched. Field: "+leftChildPath+" Left: "+leftList.size()+" Right: "+rightList.size();
             msgList.add(twe);
-            return false;
+            //LC 20110429 return false;
         }
 
         for (Object le : leftList){
@@ -285,18 +292,28 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
                 Element rightEl = (Element)re;
                 //pl("right", rightEl);
                 TreeWalkResults msgListInner = new TreeWalkResults();
-                treeWalk(leftEl, rightEl, leftChildPath, msgListInner);
-                if (msgListInner.isStrictMatch()){
+                //========== DIVE !!! =======================
+                treeWalk(leftEl, rightEl, leftChildPath, msgListInner, matchSpec);
+                //========================================
+
+                if (msgListInner.treesMatch(matchSpec)){   //if (msgListInner.isStrictMatch()){
                     found = true;
                     TreeWalkEntry twe = new TreeWalkEntry();
                     twe.lpath = leftChildPath;
                     twe.status = TreeWalkEntry.STATUS.MATCHED;
                     msgList.add(twe);
-                    //System.out.println("===========================\r\nfound match for "+leftEl+"\r\n===========================\r\n");
                     rightList.remove(re); //found it, don't need to inspect this element again.  Since we are breaking from loop, removing element won't mess up iterator--we get a new one on the next loop.
                     break;
+                } else {
+                    TreeWalkEntry twe = new TreeWalkEntry();
+                    twe.lpath = leftChildPath;
+                    twe.status = TreeWalkEntry.STATUS.NESTED_ERROR;
+                    twe.nested = msgListInner;
+                    msgList.add(twe);
+                    //String line = "\r\n\r\n*********************************\r\n";
+                    //System.out.println(line+"TreeWalkResults: from walking rightEl: "+rightEl+" leftEl: "+leftEl + " msgListInner:"+ msgListInner+line);
                 }
-            }
+            }  // END for(rightList)
             if ( ! found){
                 TreeWalkEntry twe = new TreeWalkEntry();
                 twe.lpath = leftChildPath;
@@ -305,7 +322,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
                 msgList.add(twe);
                 return false;
             }
-        }
+        }  // END for(leftLlist)
         return true;
     }
 

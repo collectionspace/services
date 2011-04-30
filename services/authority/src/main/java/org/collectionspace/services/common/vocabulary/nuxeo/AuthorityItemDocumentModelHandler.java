@@ -202,16 +202,52 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
     	objectProps.remove(AuthorityItemJAXBSchema.CSID);
     }
 
-     @Override
-    public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
-            throws Exception {
+    @Override
+    public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         super.extractAllParts(wrapDoc);
-         String showRelations = ctx.getQueryParams().getFirst(CommonAPI.showRelations_QP);
-         if (!Tools.isTrue(showRelations)){
-             return;
-         }
-         String thisCSID = NuxeoUtils.getCsid(wrapDoc.getWrappedObject());
+
+        String showSiblings = ctx.getQueryParams().getFirst(CommonAPI.showSiblings_QP);
+        if (Tools.isTrue(showSiblings)) {
+            showSiblings(wrapDoc, ctx);
+            return;   // actual result is returned on ctx.addOutputPart();
+        }
+
+        String showRelations = ctx.getQueryParams().getFirst(CommonAPI.showRelations_QP);
+        if (Tools.isTrue(showRelations)) {
+            showRelations(wrapDoc, ctx);
+            return;   // actual result is returned on ctx.addOutputPart();
+        }
+
+        String showAllRelations = ctx.getQueryParams().getFirst(CommonAPI.showAllRelations_QP);
+        if (Tools.isTrue(showAllRelations)) {
+            showAllRelations(wrapDoc, ctx);
+            return;   // actual result is returned on ctx.addOutputPart();
+        }
+    }
+
+    /** @return null on parent not found
+     */
+    protected String getParentCSID(String thisCSID) throws Exception {
+        String parentCSID = null;
+        try {
+            String predicate = RelationshipType.HAS_BROADER.value();
+            RelationsCommonList parentListOuter = getRelations(thisCSID, null, predicate);
+            List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
+            if (parentList != null) {
+                RelationsCommonList.RelationListItem relationListItem = parentList.get(0);
+                parentCSID = relationListItem.getObjectCsid();
+            }
+            return parentCSID;
+        } catch (Exception e) {
+            logger.error("Could not find parent for this: "+thisCSID, e);
+            return null;
+        }
+    }
+
+    public void showRelations(DocumentWrapper<DocumentModel> wrapDoc,
+                                              MultipartServiceContext ctx)   throws Exception {
+        String thisCSID = NuxeoUtils.getCsid(wrapDoc.getWrappedObject());
 
          String predicate = RelationshipType.HAS_BROADER.value();
          RelationsCommonList parentListOuter = getRelations(thisCSID, null, predicate);
@@ -233,6 +269,62 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         childrenListOuter.setItemsInPage(childrenListOuter.getItemsInPage()+added);
 
         PayloadOutputPart relationsPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, childrenListOuter);
+        ctx.addOutputPart(relationsPart);
+    }
+
+    public void showSiblings(DocumentWrapper<DocumentModel> wrapDoc,
+                                              MultipartServiceContext ctx)   throws Exception {
+        String thisCSID = NuxeoUtils.getCsid(wrapDoc.getWrappedObject());
+         String parentCSID = getParentCSID(thisCSID);
+        if (parentCSID == null){
+            logger.warn("~~~~~\r\n~~~~ Could not find parent for this: "+thisCSID);
+            return;
+        }
+
+         String predicate = RelationshipType.HAS_BROADER.value();
+         RelationsCommonList siblingListOuter = getRelations(null, parentCSID, predicate);
+         List<RelationsCommonList.RelationListItem> siblingList = siblingListOuter.getRelationListItem();
+
+        List<RelationsCommonList.RelationListItem> toRemoveList = newList();
+
+
+        RelationsCommonList.RelationListItem item = null;
+        for (RelationsCommonList.RelationListItem sibling : siblingList) {
+            if (thisCSID.equals(sibling.getSubjectCsid())){
+                toRemoveList.add(sibling);   //IS_A copy of the main item, i.e. I have a parent that is my parent, so I'm in the list from the above query.
+            }
+        }
+        //rather than create an immutable iterator, I'm just putting the items to remove on a separate list, then looping over that list and removing.
+        for (RelationsCommonList.RelationListItem self : toRemoveList) {
+            removeFromList(siblingList, self);
+        }
+
+        long siblingSize = siblingList.size();
+        siblingListOuter.setTotalItems(siblingSize);
+        siblingListOuter.setItemsInPage(siblingSize);
+
+        PayloadOutputPart relationsPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME,siblingListOuter);
+        ctx.addOutputPart(relationsPart);
+    }
+
+    public void showAllRelations(DocumentWrapper<DocumentModel> wrapDoc, MultipartServiceContext ctx)   throws Exception {
+        String thisCSID = NuxeoUtils.getCsid(wrapDoc.getWrappedObject());
+
+        RelationsCommonList subjectListOuter = getRelations(thisCSID, null, null);   //  nulls are wildcards:  predicate=*, and object=*
+        List<RelationsCommonList.RelationListItem> subjectList = subjectListOuter.getRelationListItem();
+
+        RelationsCommonList objectListOuter = getRelations(null, thisCSID, null);   //  nulls are wildcards:  subject=*, and predicate=*
+        List<RelationsCommonList.RelationListItem> objectList = objectListOuter.getRelationListItem();
+
+        //  MERGE LISTS:
+        subjectList.addAll(objectList);
+
+        //now subjectList actually has records BOTH where thisCSID is subject and object.
+        long relatedSize = subjectList.size();
+        subjectListOuter.setTotalItems(relatedSize);
+        subjectListOuter.setItemsInPage(relatedSize);
+
+        PayloadOutputPart relationsPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME,subjectListOuter);
         ctx.addOutputPart(relationsPart);
     }
 

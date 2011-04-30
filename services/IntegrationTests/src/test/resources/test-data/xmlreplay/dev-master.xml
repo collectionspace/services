@@ -12,7 +12,7 @@
     <protoHostPort>http://localhost:8180</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
-    <dump payloads="false" dumpServiceResult="full" />
+    <dump payloads="false" dumpServiceResult="detailed" />
     
     <auths default="admin@collectionspace.org">
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
@@ -92,6 +92,7 @@
     <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
     <run controlFile="loanout/loanout.xml" testGroup="makeone" />
     <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
+    <run controlFile="person/person.xml" testGroup="postPerson" />
     --> 
     
         

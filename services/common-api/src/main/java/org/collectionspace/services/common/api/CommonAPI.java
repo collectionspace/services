@@ -11,6 +11,9 @@ public class CommonAPI {
         return COMMON_API;
     }
     public static String AuthorityItemCSID_REPLACE="${itemCSID}";
+
     public static String showRelations_QP = "showRelations";
+    public static String showSiblings_QP = "showSiblings";
+    public static String showAllRelations_QP = "showAllRelations";
 }
 

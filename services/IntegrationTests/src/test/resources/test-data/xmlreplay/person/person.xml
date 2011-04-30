@@ -172,6 +172,12 @@
             <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}?showRelations=true</uri>
         </test>
         
+        <test ID="GETPersonPUT_siblings">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${PersonChild.CSID}?showSiblings=true</uri>
+        </test>
+         
+        
 	    <test ID="PersonPUT_1p">
             <method>PUT</method>
             <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${Person1.CSID}</uri>
@@ -275,6 +281,17 @@
             </vars>
         </test>
         
+        <test ID="PersonChild3">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/</uri>
+            <filename>person/persons_common.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${PersonAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+            	<var ID="shortIdentifier">johnWayneActorChild3</var>
+            </vars>
+        </test>
+        
         <test ID="Person1">
             <method>POST</method>
             <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/</uri>
@@ -283,13 +300,15 @@
             	<var ID="inAuthority">${PersonAuth1.CSID}</var>
             	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
             	<var ID="shortIdentifier">johnWayneActor</var>
-            	<var ID="CSID">${itemCSID}</var>
+            	<!--var ID="targetCSID">${itemCSID}</var-->
             	<var ID="parentCSID">${PersonParent.CSID}</var>
             	<var ID="parentUri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonParent.CSID}</var>
             	<var ID="childCSID">${PersonChild.CSID}</var>
             	<var ID="childUri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonChild.CSID}</var>
             	<var ID="child2CSID">${PersonChild2.CSID}</var>
             	<var ID="child2Uri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonChild2.CSID}</var>
+            	<var ID="child3CSID">${PersonChild3.CSID}</var>
+            	<var ID="child3Uri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonChild3.CSID}</var>
             </vars>
         </test>
         
@@ -297,6 +316,55 @@
             <method>GET</method>
             <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}?showRelations=true</uri>
         </test>
+        
+        <test ID="GETpostPerson_siblings">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${PersonChild.CSID}?showSiblings=true</uri>
+            <response>
+				<expected level="ADDOK" />
+				<filename>person/res/GETpostPerson_siblings.res.xml</filename>
+				<vars>
+					<var ID="personCSID">${Person1.CSID}</var>
+					<var ID="childCSID">${PersonChild.CSID}</var>
+					<var ID="child2CSID">${PersonChild2.CSID}</var>
+					<var ID="child3CSID">${PersonChild3.CSID}</var>
+				</vars>
+				<startElement>/document/*[local-name()='relations-common-list']</startElement>
+		 </response>
+		</test>
+        
+        <test ID="GETpostPerson_allRelations">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}?showAllRelations=true</uri>
+            <response>
+				<expected level="ADDOK" />
+				<filename>person/res/showAllRelations.res.xml</filename>
+				<!-- NOTE: vars are referenced in showAllRelations.res.xml
+				     from tests in this test group, e.g. 
+				     PersonParent.CSID :: ${PersonParent.CSID} 
+				     These vars are all in the expression context while this group is active,
+				     because we hang onto all ServiceResult objects for the duration of the group,
+				     and ServiceObjects keep their vars.
+				-->
+				<startElement>/document/*[local-name()='relations-common-list']</startElement>
+			 </response>
+			 
+		</test>
+		
+         <test ID="relationsGET">
+             <method>GET</method>
+             <uri>/cspace-services/relations/</uri>
+         </test>
+         
+         <test ID="relations_sbj">
+             <method>GET</method>
+             <uri>/cspace-services/relations?sbj=${PersonAuth1.CSID}</uri>
+         </test>
+         
+         <test ID="relations_obj">
+             <method>GET</method>
+             <uri>/cspace-services/relations?obj=${PersonAuth1.CSID}</uri>
+         </test>
         
 	</testGroup>
 </xmlReplay>

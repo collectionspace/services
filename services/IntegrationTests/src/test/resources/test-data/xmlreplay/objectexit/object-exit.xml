@@ -90,9 +90,9 @@
                 <expected level="ADDOK" />
                 <filename>objectexit/res/oe35.res.xml</filename>
                 <vars>
-					<var ID="CSID">${oe35.CSID}</var>
+					<var ID="targetCSID">${oe35.CSID}</var>
 				</vars>
-				<!-- Look for one <objectexit-list-item> with the <exitNumber> that we 
+				<!-- Look for one <objectexit-list-item> with the <exitNumber> that	 we 
 				     set in the POST, and see if it is in the response
 				-->
                 <startElement>//objectexit-list-item[./exitNumber='checkList-1234']</startElement>

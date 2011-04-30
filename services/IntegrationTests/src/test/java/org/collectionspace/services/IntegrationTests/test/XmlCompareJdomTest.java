@@ -39,53 +39,54 @@ public class XmlCompareJdomTest {
         String BANNER ="-------------------------------------------------------";
         System.out.println(BANNER+"\r\n"+this.getClass().getName()+"\r\n"+msg+"\r\n"+BANNER);
     }
-    private void printTreeWalkResults(TreeWalkResults list){
+    public static void printTreeWalkResults(TreeWalkResults list){
         for (TreeWalkResults.TreeWalkEntry entry : list){
             System.out.println(entry.toString());
         }
     }
 
-    private void assertTreeWalkResults(TreeWalkResults results,
-                                       int addedRight,
-                                       int missingRight,
-                                       int textMismatches,
-                                       boolean strictMatch,
-                                       boolean treesMatch){
-        System.out.println("assertTreeWalkResults: ");
+    static void assertTrue(boolean stmt, String msg, TreeWalkResults results){
+        if (!stmt){
+            System.out.println("=====> Assertion Failed: "+msg);
+            printTreeWalkResults(results);
+        }
+        Assert.assertTrue(stmt, msg);
+    }
+    static void assertEquals(Object o1, Object o2, String msg, TreeWalkResults results){
+        if ( ! o1.equals(o2)) {
+            System.out.println("=====> Assertion Equals Failed: "+" o1: {"+o1+"} o2: {"+o2+"}"+"\r\n        "+msg);
+            printTreeWalkResults(results);
+        }
+       Assert.assertEquals(o1, o2, msg);
+    }
 
+    public  static void assertTreeWalkResults(TreeWalkResults results,
+                                                                      int addedRight,
+                                                                      int missingRight,
+                                                                      int textMismatches,
+                                                                      boolean strictMatch,
+                                                                      TreeWalkResults.MatchSpec matchSpec){
         int addedr = results.countFor(TreeWalkResults.TreeWalkEntry.STATUS.R_ADDED);
         int missingr = results.countFor(TreeWalkResults.TreeWalkEntry.STATUS.R_MISSING);
         int tdiff = results.countFor(TreeWalkResults.TreeWalkEntry.STATUS.TEXT_DIFFERENT);
         int badCount = results.getMismatchCount();
         boolean strict = results.isStrictMatch();
-        boolean treeOK = results.treesMatch();
+        boolean treeOK = results.treesMatch(matchSpec);
 
-        String expected = "    expected: addedRight:"+addedRight+",missingRight:"+missingRight+",textMismatches:"+textMismatches
-                              +",strictMatch:"+strictMatch+",treesMatch:"+treesMatch;
+        String expected = "\r\n        expected: addedRight:"+addedRight+",missingRight:"+missingRight+",textMismatches:"+textMismatches
+                              +",strictMatch:"+strictMatch+",matchSpec:"+matchSpec;
 
-        String actual   = "    actual:   addedRight:"+addedr+",missingRight:"+missingr+",textMismatches:"+tdiff
-                              +",strictMatch:"+strict+",treesMatch:"+treeOK;
-
+        String actual   = "\r\n        actual:   addedRight:"+addedr+",missingRight:"+missingr+",textMismatches:"+tdiff
+                              +",strictMatch:"+strict+",matchSpec:"+matchSpec;
         String exp_act = expected +"\r\n"+actual+"\r\n";
-        System.out.print(exp_act);
-
-        printTreeWalkResults(results);
-
-
         boolean done = false;
         try {
-            Assert.assertEquals(addedr, addedRight, "assertTreeWalkResults:R_ADDED mismatch."+exp_act);
-
-            Assert.assertEquals(missingr, missingRight, "assertTreeWalkResults:R_MISSING mismatch."+exp_act);
-
-            Assert.assertEquals(tdiff, textMismatches, "assertTreeWalkResults:TEXT_DIFFERENT mismatch."+exp_act);
-
-
-            Assert.assertTrue((strict==strictMatch), "assertTreeWalkResults:strictMatch mismatch."+exp_act);
-
-            Assert.assertTrue((treeOK==treesMatch), "assertTreeWalkResults:treesMatch mismatch."+exp_act);
-
-            System.out.println("SUCCESS: assertTreeWalkResults done.\r\n");
+           assertEquals(addedr, addedRight, "assertTreeWalkResults:R_ADDED mismatch." + exp_act, results);
+            assertEquals(missingr, missingRight, "assertTreeWalkResults:R_MISSING mismatch." + exp_act, results);
+            assertEquals(tdiff, textMismatches, "assertTreeWalkResults:TEXT_DIFFERENT mismatch." + exp_act, results);
+            assertTrue((strict == strictMatch), "assertTreeWalkResults:strictMatch mismatch." + exp_act, results);
+            assertTrue((treeOK), "assertTreeWalkResults:treesMatch("+matchSpec+") returned false."+exp_act, results);
+            //System.out.println("SUCCESS: assertTreeWalkResults done.\r\n");
             done = true;
         } finally {
             if (!done) System.out.println("FAILURE: assertTreeWalkResults failed an assertion. See surefire report.\r\n");
@@ -95,26 +96,31 @@ public class XmlCompareJdomTest {
     @Test
     public void testXmlCompareJdom(){
         testBanner("testXmlCompareJdom");
+        TreeWalkResults.MatchSpec matchSpec = TreeWalkResults.MatchSpec.createDefault();
         TreeWalkResults results =
                     XmlCompareJdom.compareParts(expectedPartContent,
                                         "expected",
                                         partFromServer,
                                         "from-server",
-                                        exPARTNAME);
-        assertTreeWalkResults(results,0,0,0,true,true);
+                                        exPARTNAME,
+                                        matchSpec);
+        assertTreeWalkResults(results,0,0,0,true,matchSpec);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
     }
 
     @Test
     public void testTextContentDifferent(){
         testBanner("testTextContentDifferent");
+        TreeWalkResults.MatchSpec matchSpec = TreeWalkResults.MatchSpec.createDefault();
+        matchSpec.removeErrorFromSpec(TreeWalkResults.TreeWalkEntry.STATUS.TEXT_DIFFERENT);
         TreeWalkResults results =
             XmlCompareJdom.compareParts(expectedPartContent,
                                         "expected",
                                         srvHEAD+srvEN2+srvDEPOSITOR+srvFOOT,
                                         "from-server",
-                                        exPARTNAME);
-        assertTreeWalkResults(results,0,0,1,false,true);
+                                        exPARTNAME,
+                                        matchSpec);
+        assertTreeWalkResults(results,0,0,1,false,matchSpec);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
     }
 
@@ -122,13 +128,15 @@ public class XmlCompareJdomTest {
     @Test
     public void testAddedR(){
         testBanner("testAddedR");
+        TreeWalkResults.MatchSpec matchSpec = TreeWalkResults.MatchSpec.createDefault();
         TreeWalkResults results =
             XmlCompareJdom.compareParts(expectedPartContent,
                                         "expected",
                                         srvHEAD+srvEN+exNEWTREE+srvDEPOSITOR+exNEW+srvFOOT,
                                         "from-server",
-                                        exPARTNAME);
-        assertTreeWalkResults(results,2,0,0,false,false);
+                                        exPARTNAME,
+                                        matchSpec);
+        assertTreeWalkResults(results,2,0,0,false,matchSpec);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
 
     }
@@ -136,26 +144,32 @@ public class XmlCompareJdomTest {
     @Test
     public void testAddedL(){
         testBanner("testAddedL");
+        TreeWalkResults.MatchSpec matchSpec = TreeWalkResults.MatchSpec.createDefault();
+        matchSpec.removeErrorFromSpec(TreeWalkResults.TreeWalkEntry.STATUS.R_MISSING);
+
         TreeWalkResults results =
             XmlCompareJdom.compareParts(exHEAD + exEN_WCH + exNEWTREE + exDEP  + exNEW + exFOOT,
                                     "expected",
                                     partFromServer,
                                     "from-server",
-                                    exPARTNAME);
-        assertTreeWalkResults(results,0,3,0,false,false);
+                                    exPARTNAME,
+                                    matchSpec);
+        assertTreeWalkResults(results,0,3,0,false,matchSpec);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
     }
 
     @Test
     public void testChildrenReordered(){
         testBanner("testChildrenReordered");
+        TreeWalkResults.MatchSpec matchSpec = TreeWalkResults.MatchSpec.createDefault();
         TreeWalkResults results =
             XmlCompareJdom.compareParts(exHEAD  + exDEP + exEN + exFOOT,
                                     "expected",
                                     partFromServer,
                                     "from-server",
-                                    exPARTNAME);
-        assertTreeWalkResults(results,0,0,0,true,true);
+                                    exPARTNAME,
+                                    matchSpec);
+        assertTreeWalkResults(results,0,0,0,true,matchSpec);
                                    // addedRight,missingRight,textMismatches,strictMatch,treesMatch
     }
 
