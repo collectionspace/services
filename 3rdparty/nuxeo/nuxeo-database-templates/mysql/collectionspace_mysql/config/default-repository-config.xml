@@ -6,6 +6,7 @@
       factory="org.nuxeo.ecm.core.storage.sql.coremodel.SQLRepositoryFactory">
       <repository name="default">
         <schema>
+          <field type="largetext">imd:user_comment</field> <!-- Needed for large image metadata (image_metadata) that gets inserted here. -->
           <field type="largetext">note</field>
           <field type="largetext">webp:content</field>
           <field type="largetext">webc:welcomeText</field>

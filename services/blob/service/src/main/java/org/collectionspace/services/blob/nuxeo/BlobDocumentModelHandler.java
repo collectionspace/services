@@ -38,6 +38,7 @@ import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.common.service.ListResultField;
+import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -45,6 +46,7 @@ import org.collectionspace.services.nuxeo.client.java.CommonList;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.schema.types.Schema;
 
@@ -109,6 +111,28 @@ extends DocHandlerBase<BlobsCommon> {
 			throw new ClientException(e);
 		}		
 	}
+	
+	private void extractMetadata(String nuxeoImageID, String metadataLabel) {		
+		PayloadOutputPart result = null;
+        Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
+        ObjectPartType partMeta = partsMetaMap.get(metadataLabel);
+
+        if (partMeta != null) {
+			RepositoryInstance repoSession = this.getRepositorySession();
+			if (nuxeoImageID != null && nuxeoImageID.isEmpty() == false) try {
+				IdRef documentRef = new IdRef(nuxeoImageID);
+				DocumentModel docModel = repoSession.getDocument(documentRef);
+	            Map<String, Object> unQObjectProperties = extractPart(docModel, metadataLabel);
+	            if (unQObjectProperties != null) {
+	            	addOutputPart(unQObjectProperties, metadataLabel, partMeta);
+	            }
+			} catch (Exception e) {
+				logger.warn("Metadata extraction failed: " + e.getMessage());
+			}
+        } else {
+        	logger.warn("Metadata extraction failed: Could not find tenant binding for schema type = " + metadataLabel);
+        }
+	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractAllParts(org.collectionspace.services.common.document.DocumentWrapper)
@@ -151,18 +175,21 @@ extends DocHandlerBase<BlobsCommon> {
 				// reset 'blobsCommon' if we have a derivative request
 				blobsCommon = blobOutput.getBlobsCommon();
 				blobsCommon.setUri(getDerivativePathBase(docModel) +
-						derivativeTerm + "/" + BlobInput.URI_CONTENT_PATH);
+						derivativeTerm + "/" + BlobInput.URI_CONTENT_PATH);				
 			}
 			
 			blobsCommon.setRepositoryId(null); //hide the repository id from the GET results payload since it is private
 			this.setCommonPartProperties(docModel, blobsCommon);
 			// finish extracting the other parts by calling the parent
+		} else {
+			extractMetadata(blobRepositoryId, NuxeoImageUtils.SCHEMA_IMAGE_METADATA);
+			extractMetadata(blobRepositoryId, NuxeoImageUtils.SCHEMA_IPTC);
 		}
 		
 		//
 		// Hide the Nuxeo repository ID of the Nuxeo blob since this is private
 		//
-		docModel.setProperty(ctx.getCommonPartLabel(), BlobJAXBSchema.repositoryId, null);		
+		docModel.setProperty(ctx.getCommonPartLabel(), BlobJAXBSchema.repositoryId, null);	
 		super.extractAllParts(wrapDoc);
 	}
 

@@ -232,6 +232,36 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>                
+                <service:part id="3" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="image_metadata" updated="" order="3">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/image_metadata/"
+                            schemaLocation="http://collectionspace.org/image_metadata/ http://services.collectionspace.org/image_metadata.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>                
+                <service:part id="4" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="iptc" updated="" order="4">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/iptc/"
+                            schemaLocation="http://collectionspace.org/iptc/ http://services.collectionspace.org/iptc.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>                
             </service:object>
         </tenant:serviceBindings>
         <!-- end blob service meta-data -->

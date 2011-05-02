@@ -160,6 +160,11 @@ public class NuxeoImageUtils {
 	public static final String DEPTH = "depth";
 	public static final String UNIT_PIXELS = "pixels";
 	public static final String UNIT_BITS = "bits";
+	//
+	// Image Metadata schemas - These are Nuxeo defined schemas
+	//
+	public static final String SCHEMA_IPTC = "iptc";
+	public static final String SCHEMA_IMAGE_METADATA = "image_metadata";
 
 	//	static DefaultBinaryManager binaryManager = new DefaultBinaryManager(); //can we get this from Nuxeo? i.e., Framework.getService(BinaryManger.class)
 
@@ -275,11 +280,21 @@ public class NuxeoImageUtils {
 		return commonList;
 	}
 	
+	/*
+	 * [dublincore, uid, picture, iptc, common, image_metadata]
+	 */
+	static private Map<String, Object> getMetadata(Blob nuxeoBlob) throws Exception {
+	    ImagingService service = Framework.getService(ImagingService.class);			
+	    Map<String, Object> metadataMap = service.getImageMetadata(nuxeoBlob);
+	    return metadataMap;
+	}
+		
 	static private DimensionGroupList getDimensions(DocumentModel documentModel, Blob nuxeoBlob) {
 		DimensionGroupList result = null;
 		try {
 		    ImagingService service = Framework.getService(ImagingService.class);			
 		    ImageInfo imageInfo = service.getImageInfo(nuxeoBlob);
+		    Map<String, Object> metadataMap = getMetadata(nuxeoBlob);
 		    
 		    if (imageInfo != null) {
 		    	DimensionGroupList dimensionGroupList = new DimensionGroupList();

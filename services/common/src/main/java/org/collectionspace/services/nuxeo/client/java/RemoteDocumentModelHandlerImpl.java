@@ -139,6 +139,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param schema the schema
      * @param partMeta the part meta
      * @throws Exception the exception
+     * MediaType.APPLICATION_XML_TYPE
      */
     protected void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
             throws Exception {
@@ -150,7 +151,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
     }
-
+    
     /**
      * Extract paging info.
      *
@@ -297,10 +298,23 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param partMeta metadata for the object to extract
      * @throws Exception
      */
+    protected Map<String, Object> extractPart(DocumentModel docModel, String schema)
+            throws Exception {
+        return extractPart(docModel, schema, (Map<String, Object>)null);
+    }
+    
+    /**
+     * extractPart extracts an XML object from given DocumentModel
+     * @param docModel
+     * @param schema of the object to extract
+     * @param partMeta metadata for the object to extract
+     * @throws Exception
+     */
+    @Deprecated
     protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
             throws Exception {
         return extractPart(docModel, schema, partMeta, null);
-    }
+    }    
 
     /**
      * extractPart extracts an XML object from given DocumentModel
@@ -310,28 +324,48 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @throws Exception
      */
     protected Map<String, Object> extractPart(
+            DocumentModel docModel, 
+            String schema,
+            Map<String, Object> addToMap)
+            throws Exception {
+        Map<String, Object> result = null;
+
+        Map<String, Object> objectProps = docModel.getProperties(schema);
+        if (objectProps != null) {
+	        //unqualify properties before sending the doc over the wire (to save bandwidh)
+	        //FIXME: is there a better way to avoid duplication of a Map/Collection?
+	        Map<String, Object> unQObjectProperties =
+	                (addToMap != null) ? addToMap : (new HashMap<String, Object>());
+	        Set<Entry<String, Object>> qualifiedEntries = objectProps.entrySet();
+	        for (Entry<String, Object> entry : qualifiedEntries) {
+	            String unqProp = getUnQProperty(entry.getKey());
+	            unQObjectProperties.put(unqProp, entry.getValue());
+	        }
+	        result = unQObjectProperties;
+        }
+
+        return result;
+    }
+    
+    /**
+     * extractPart extracts an XML object from given DocumentModel
+     * @param docModel
+     * @param schema of the object to extract
+     * @param partMeta metadata for the object to extract
+     * @throws Exception
+     */
+    @Deprecated
+    protected Map<String, Object> extractPart(
             DocumentModel docModel, String schema, ObjectPartType partMeta,
             Map<String, Object> addToMap)
             throws Exception {
         Map<String, Object> result = null;
 
-        MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType()); //FIXME: REM - This is no longer needed.  Everything is POX
-        if (mt.equals(MediaType.APPLICATION_XML_TYPE)) {
-            Map<String, Object> objectProps = docModel.getProperties(schema);
-            //unqualify properties before sending the doc over the wire (to save bandwidh)
-            //FIXME: is there a better way to avoid duplication of a Map/Collection?
-            Map<String, Object> unQObjectProperties =
-                    (addToMap != null) ? addToMap : (new HashMap<String, Object>());
-            Set<Entry<String, Object>> qualifiedEntries = objectProps.entrySet();
-            for (Entry<String, Object> entry : qualifiedEntries) {
-                String unqProp = getUnQProperty(entry.getKey());
-                unQObjectProperties.put(unqProp, entry.getValue());
-            }
-            result = unQObjectProperties;
-        } //TODO: handle other media types
+        result = this.extractPart(docModel, schema, addToMap);
 
         return result;
     }
+    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getAuthorityRefs(org.collectionspace.services.common.document.DocumentWrapper, java.util.List)
