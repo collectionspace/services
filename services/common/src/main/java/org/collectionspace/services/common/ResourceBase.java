@@ -82,7 +82,7 @@ public abstract class ResourceBase
         }
         if (csid == null || "".equals(csid)) {
             logger.error(crudType + " for " + getClass().getName() + " missing csid!");
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity("update failed on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(crudType + " failed on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
