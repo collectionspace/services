@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="organizations">  
+  <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <totalItems>4</totalItems>
+    <!-- 
+    This file represents the expected response from test case
+    	organization.xml :: 
+    These are the vars that are available from the time Organization1 is created.
+    Organization1.CSID       ${Organization1.CSID}
+    OrganizationParent.CSID  ${OrganizationParent.CSID}
+	OrganizationChild1.CSID  ${OrganizationChild1.CSID}
+	OrganizationChild2.CSID  ${OrganizationChild2.CSID}
+	OrganizationChild3.CSID  ${OrganizationChild3.CSID}
+	-->
+
+
+    <relation-list-item>
+      <subjectCsid>${Organization1.CSID}</subjectCsid>
+      <objectCsid>${OrganizationParent.CSID}</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>${Organization1.CSID}</csid>
+      </subject>
+      <object>
+        <csid>${OrganizationParent.CSID}</csid>
+      </object>
+    </relation-list-item>
+    
+    <relation-list-item>
+      <subjectCsid>${OrganizationChild1.CSID}</subjectCsid>
+      <objectCsid>${Organization1.CSID}</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>${OrganizationChild1.CSID}</csid>
+      </subject>
+      <object>
+        <csid>${Organization1.CSID}</csid>
+      </object>
+    </relation-list-item>
+    
+    <relation-list-item>
+      <subjectCsid>${OrganizationChild2.CSID}</subjectCsid>
+      <objectCsid>${Organization1.CSID}</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>${OrganizationChild2.CSID}</csid>
+      </subject>
+      <object>
+        <csid>${Organization1.CSID}</csid>
+      </object>
+    </relation-list-item>
+    
+    <relation-list-item>
+      <subjectCsid>${OrganizationChild3.CSID}</subjectCsid>
+      <objectCsid>${Organization1.CSID}</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>${OrganizationChild3.CSID}</csid>
+      </subject>
+      <object>
+        <csid>${Organization1.CSID}</csid>
+      </object>
+    </relation-list-item>
+    
+  </ns2:relations-common-list>
+</document>

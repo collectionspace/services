@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="locationauthorities">
+  <ns2:locationauthorities_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <displayName>${displayName}</displayName>
+    <shortIdentifier>${shortIdentifier}</shortIdentifier>
+    <refName>urn:cspace:org.collectionspace.demo:locationauthority:name(${shortIdentifier})'${displayName}'</refName>
+    <vocabType>LocationAuthority</vocabType>
+  </ns2:locationauthorities_common>
+</document>
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="organizations">
+  <ns3:organizations_common xmlns:ns3="http://collectionspace.org/services/organization" xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <shortIdentifier>${shortIdentifier}</shortIdentifier>
+    <refName>urn:cspace:org.collectionspace.demo:orgauthority:name(${authShortIdentifier}):organization:name(${shortIdentifier})</refName>
+    <displayNameComputed>true</displayNameComputed>
+    <shortDisplayNameComputed>true</shortDisplayNameComputed>
+    <mainBodyGroupList>
+      <mainBodyGroup>
+        <longName>Test Organization Name</longName>
+        <shortName>Test Organization-1304380224057</shortName>
+      </mainBodyGroup>
+    </mainBodyGroupList>
+    <foundingPlace>Anytown, USA</foundingPlace>
+  </ns3:organizations_common>
+</document>
+
+

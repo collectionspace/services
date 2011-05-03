@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="locations">
+  <ns2:locations_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <shortIdentifier>${shortIdentifier}</shortIdentifier>
+    <refName>urn:cspace:org.collectionspace.demo:locationauthority:name(${authShortIdentifier}):location:name(${shortIdentifier})</refName>
+    <termStatus>Approved</termStatus>
+    <displayNameComputed>true</displayNameComputed>
+    <shortDisplayNameComputed>false</shortDisplayNameComputed>
+    <name>${name}</name>
+    <conditionGroupList>
+      <conditionGroup>
+        <conditionNote>Basically clean</conditionNote>
+        <conditionNoteDate>June 11, 1979</conditionNoteDate>
+      </conditionGroup>
+    </conditionGroupList>
+    <securityNote>Kind of safe</securityNote>
+    <accessNote>Only right-thinkers may see</accessNote>
+    <address>123 Main Street, Anytown USA</address>
+    <locationType>Shelf</locationType>
+  </ns2:locations_common>
+</document>
+

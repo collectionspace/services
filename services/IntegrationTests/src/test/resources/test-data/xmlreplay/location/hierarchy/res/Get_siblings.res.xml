@@ -1,0 +1,34 @@
+<document name="locations">
+  <ns2:locations_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <shortIdentifier>johnWayneActorChild</shortIdentifier>
+  </ns2:locations_common>
+  <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <itemsInPage>2</itemsInPage>
+    <totalItems>2</totalItems>
+    <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
+    <relation-list-item>
+      <subjectCsid>${child2CSID}</subjectCsid>
+      <predicate>hasBroader</predicate>
+      <objectCsid>${locationCSID}</objectCsid>
+      <subject>
+        <csid>${child2CSID}</csid>
+      </subject>
+      <object>
+        <csid>${locationCSID}</csid>
+      </object>
+    </relation-list-item>
+    <relation-list-item>
+      <subjectCsid>${child3CSID}</subjectCsid>
+      <predicate>hasBroader</predicate>
+      <objectCsid>${locationCSID}</objectCsid>
+      <subject>
+        <csid>${child3CSID}</csid>
+      </subject>
+      <object>
+        <csid>${locationCSID}</csid>
+      </object>
+    </relation-list-item>
+  </ns2:relations-common-list>
+</document>
+

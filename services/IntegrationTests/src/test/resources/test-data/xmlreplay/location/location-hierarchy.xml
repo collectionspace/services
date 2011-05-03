@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+	<testGroup ID="HierarchicLocation" autoDeletePOSTS="true">
+	
+	    <test ID="LocationAuth1" auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/</uri>
+            <filename>location/hierarchy/1-authority.xml</filename>
+            <vars>
+            	<var ID="shortIdentifier">CSPACE3739LocationAuthority</var>
+            </vars>
+        </test>
+        <test ID="LocationChild1">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}/items/</uri>
+            <filename>location/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${LocationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
+            	<var ID="shortIdentifier">Shelf1</var>
+            	<var ID="name">Shelf 1</var>
+            </vars>
+        </test>
+        <test ID="LocationChild2">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}/items/</uri>
+            <filename>location/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${LocationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
+            	<var ID="shortIdentifier">Shelf2</var>
+            	<var ID="name">Shelf 2</var>
+            </vars>
+        </test>
+        <test ID="LocationChild3">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}/items/</uri>
+            <filename>location/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${LocationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
+            	<var ID="shortIdentifier">Shelf3</var>
+            	<var ID="name">Shelf 3</var>
+            </vars>
+        </test>
+        
+        <test ID="LocationParent">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
+            <filename>location/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${LocationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
+            	<var ID="shortIdentifier">Aisle3</var>
+            	<var ID="name">Aisle 3</var>
+            </vars>
+        </test>
+        
+        <test ID="Location1">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
+            <filename>location/hierarchy/3-locations_w_relations.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${LocationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
+            	<var ID="shortIdentifier">Cabinet1</var>
+            	<var ID="name">Cabinet 1</var>
+            	<var ID="parentCSID">${LocationParent.CSID}</var>
+            	<var ID="parentUri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/${LocationParent.CSID}</var>
+            	<var ID="childCSID">${LocationChild1.CSID}</var>
+            	<var ID="childUri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/${LocationChild1.CSID}</var>
+            	<var ID="child2CSID">${LocationChild2.CSID}</var>
+            	<var ID="child2Uri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/${LocationChild2.CSID}</var>
+            	<var ID="child3CSID">${LocationChild3.CSID}</var>
+            	<var ID="child3Uri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/${LocationChild3.CSID}</var>
+            </vars>
+        </test>
+        
+	    <test ID="GetLocation">
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}/items/${Location1.CSID}?showRelations=true</uri>
+        </test>
+        
+        <!-- NOTE: item  on url is .../items/${LocationChild1.CSID} so this looks for
+                   siblings of Child1, which would be child2 and child3.
+        -->
+        <test ID="Get_siblings">
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}/items/${LocationChild1.CSID}?showSiblings=true</uri>
+            <response>
+				<expected level="ADDOK" />
+				<filename>location/hierarchy/res/Get_siblings.res.xml</filename>
+				<vars>
+					<var ID="locationCSID">${Location1.CSID}</var>
+					<var ID="child1CSID">${LocationChild1.CSID}</var>
+					<var ID="child2CSID">${LocationChild2.CSID}</var>
+				</vars>
+				<startElement>/document/*[local-name()='relations-common-list']</startElement>
+		 </response>
+		</test>
+        
+        <test ID="Get_allRelations">
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}/items/${Location1.CSID}?showAllRelations=true</uri>
+            <response>
+				<expected level="ADDOK" />
+				<filename>location/hierarchy/res/Get_allRelations.res.xml</filename>
+				<!-- NOTE: vars are referenced in showAllRelations.res.xml
+				     from tests in this test group, e.g. 
+				     LocationParent.CSID :: ${LocationParent.CSID} 
+				     These vars are all in the expression context while this group is active,
+				     because we hang onto all ServiceResult objects for the duration of the group,
+				     and ServiceObjects keep their vars.
+				-->
+				<startElement>/document/*[local-name()='relations-common-list']</startElement>
+			 </response>
+			 
+		</test>
+		
+         <test ID="relationsGET">
+             <method>GET</method>
+             <uri>/cspace-services/relations/</uri>
+         </test>
+         
+         <test ID="relations_sbj">
+             <method>GET</method>
+             <uri>/cspace-services/relations?sbj=${Location1.CSID}</uri>
+         </test>
+         
+         <test ID="relations_obj">
+             <method>GET</method>
+             <uri>/cspace-services/relations?obj=${Location1.CSID}</uri>
+         </test>
+        
+	</testGroup>
+</xmlReplay>

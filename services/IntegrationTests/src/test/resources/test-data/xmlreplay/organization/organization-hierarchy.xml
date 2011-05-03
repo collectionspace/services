@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+	<testGroup ID="HierarchicOrganization" autoDeletePOSTS="true">
+	
+	    <test ID="OrganizationAuth1" auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/orgauthorities/</uri>
+            <filename>organization/hierarchy/1-authority.xml</filename>
+            <vars>
+            	<var ID="shortIdentifier">CSPACE3739OrganizationAuthority</var>
+            </vars>
+        </test>
+        <test ID="OrganizationChild1">
+            <method>POST</method>
+            <uri>/cspace-services/orgauthorities/${OrganizationAuth1.CSID}/items/</uri>
+            <filename>organization/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${OrganizationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739OrganizationAuthority</var>
+            	<var ID="shortIdentifier">Shelf1</var>
+            	<var ID="name">Shelf 1</var>
+            </vars>
+        </test>
+        <test ID="OrganizationChild2">
+            <method>POST</method>
+            <uri>/cspace-services/orgauthorities/${OrganizationAuth1.CSID}/items/</uri>
+            <filename>organization/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${OrganizationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739OrganizationAuthority</var>
+            	<var ID="shortIdentifier">Shelf2</var>
+            	<var ID="name">Shelf 2</var>
+            </vars>
+        </test>
+        <test ID="OrganizationChild3">
+            <method>POST</method>
+            <uri>/cspace-services/orgauthorities/${OrganizationAuth1.CSID}/items/</uri>
+            <filename>organization/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${OrganizationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739OrganizationAuthority</var>
+            	<var ID="shortIdentifier">Shelf3</var>
+            	<var ID="name">Shelf 3</var>
+            </vars>
+        </test>
+        
+        <test ID="OrganizationParent">
+            <method>POST</method>
+            <uri>/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/</uri>
+            <filename>organization/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${OrganizationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739OrganizationAuthority</var>
+            	<var ID="shortIdentifier">Aisle3</var>
+            	<var ID="name">Aisle 3</var>
+            </vars>
+        </test>
+        
+        <test ID="Organization1">
+            <method>POST</method>
+            <uri>/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/</uri>
+            <filename>organization/hierarchy/3-organizations_w_relations.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${OrganizationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739OrganizationAuthority</var>
+            	<var ID="shortIdentifier">Cabinet1</var>
+            	<var ID="name">Cabinet 1</var>
+            	<var ID="parentCSID">${OrganizationParent.CSID}</var>
+            	<var ID="parentUri">/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/${OrganizationParent.CSID}</var>
+            	<var ID="childCSID">${OrganizationChild1.CSID}</var>
+            	<var ID="childUri">/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/${OrganizationChild1.CSID}</var>
+            	<var ID="child2CSID">${OrganizationChild2.CSID}</var>
+            	<var ID="child2Uri">/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/${OrganizationChild2.CSID}</var>
+            	<var ID="child3CSID">${OrganizationChild3.CSID}</var>
+            	<var ID="child3Uri">/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/${OrganizationChild3.CSID}</var>
+            </vars>
+        </test>
+        
+	    <test ID="GetOrganization">
+            <method>GET</method>
+            <uri>/cspace-services/orgauthorities/${OrganizationAuth1.CSID}/items/${Organization1.CSID}?showRelations=true</uri>
+        </test>
+        
+        <!-- NOTE: item  on url is .../items/${OrganizationChild1.CSID} so this looks for
+                   siblings of Child1, which would be child2 and child3.
+        -->
+        <test ID="GetOrganization_siblings">
+            <method>GET</method>
+            <uri>/cspace-services/orgauthorities/${OrganizationAuth1.CSID}/items/${OrganizationChild1.CSID}?showSiblings=true</uri>
+            <response>
+				<expected level="ADDOK" />
+				<filename>organization/hierarchy/res/Get_siblings.res.xml</filename>
+				<vars>
+					<var ID="organizationCSID">${Organization1.CSID}</var>
+					<var ID="child1CSID">${OrganizationChild1.CSID}</var>
+					<var ID="child2CSID">${OrganizationChild2.CSID}</var>
+				</vars>
+				<startElement>/document/*[local-name()='relations-common-list']</startElement>
+		 </response>
+		</test>
+        
+        <test ID="GetOrganization_allRelations">
+            <method>GET</method>
+            <uri>/cspace-services/orgauthorities/${OrganizationAuth1.CSID}/items/${Organization1.CSID}?showAllRelations=true</uri>
+            <response>
+				<expected level="ADDOK" />
+				<filename>organization/hierarchy/res/Get_allRelations.res.xml</filename>
+				<!-- NOTE: vars are referenced in showAllRelations.res.xml
+				     from tests in this test group, e.g. 
+				     OrganizationParent.CSID :: ${OrganizationParent.CSID} 
+				     These vars are all in the expression context while this group is active,
+				     because we hang onto all ServiceResult objects for the duration of the group,
+				     and ServiceObjects keep their vars.
+				-->
+				<startElement>/document/*[local-name()='relations-common-list']</startElement>
+			 </response>
+			 
+		</test>
+		
+         <test ID="relationsGET">
+             <method>GET</method>
+             <uri>/cspace-services/relations/</uri>
+         </test>
+         
+         <test ID="relations_sbj">
+             <method>GET</method>
+             <uri>/cspace-services/relations?sbj=${Organization1.CSID}</uri>
+         </test>
+         
+         <test ID="relations_obj">
+             <method>GET</method>
+             <uri>/cspace-services/relations?obj=${Organization1.CSID}</uri>
+         </test>
+        
+	</testGroup>
+</xmlReplay>
