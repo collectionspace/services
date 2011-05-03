@@ -149,6 +149,7 @@ public class TenantRepository {
 
         RepositoryClient repositoryClient = getRepositoryClient(repositoryDomain);
 
+        boolean createdNewWorkspace = false;
         //retrieve all workspace ids for a domain
         //domain specific table of workspace name and id
         Hashtable<String, String> workspaceIds =
@@ -185,8 +186,8 @@ public class TenantRepository {
                 workspaceId = workspaceIds.get(workspace);
                 if (workspaceId == null) {
                     if (logger.isWarnEnabled()) {
-                        logger.warn("Failed to retrieve workspace ID for " + workspace
-                                + " from repository, creating a new workspace ...");
+                        logger.warn("Could not find workspace for " + workspace
+                                + " in repository.  Creating new workspace ...");
                     }
                     workspaceId = repositoryClient.createWorkspace(
                             repositoryDomain.getName(),
@@ -199,9 +200,11 @@ public class TenantRepository {
                         }
                         continue;
                     }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Successfully created workspace in repository"
-                                + " id=" + workspaceId + " for service=" + workspace
+                    createdNewWorkspace = true;
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Successfully created repository workspace="
+                                + workspace + " id=" + workspaceId
+                                + " for service=" + serviceName
                                 + " for tenant=" + tenantBinding.getName());
                     }
                 }
@@ -211,11 +214,15 @@ public class TenantRepository {
                         TenantBindingConfigReaderImpl.getTenantQualifiedServiceName(
                         tenantBinding.getId(), serviceName);
                 serviceWorkspaces.put(tenantService, workspaceId);
-                if (logger.isInfoEnabled()) {
-                    logger.info("Created/retrieved repository workspace="
-                            + workspace + " id=" + workspaceId
-                            + " for service=" + serviceName
-                            + " for tenant=" + tenantBinding.getName());
+                if (createdNewWorkspace) {
+                    createdNewWorkspace = false;
+                } else {
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Retrieved repository workspace="
+                                + workspace + " id=" + workspaceId
+                                + " for service=" + serviceName
+                                + " for tenant=" + tenantBinding.getName());
+                    }
                 }
             }
         }//rof for service binding
