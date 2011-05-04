@@ -53,6 +53,8 @@ public class InitHandler implements IInitHandler {
     @Override
     public void onRepositoryInitialized(ServiceBindingType sbt, List<Field> fields, List<Property> properties) throws Exception {
 
+        // For debugging.
+        /*
         for (Field field : fields) {
             System.out.println("InitHandler.fields:"
                     + "\r\n    col: " + field.getCol()
@@ -66,6 +68,8 @@ public class InitHandler implements IInitHandler {
                     + "   value: " + prop.getValue());
 
         }
+         *
+         */
     }
 
 }
