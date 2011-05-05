@@ -23,6 +23,7 @@
 package org.collectionspace.services.client.test;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -157,7 +158,8 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
 	        		logger.debug("Processing file URI: " + blobFile.getAbsolutePath());
 	        		logger.debug("MIME type is: " + mimeType);
 	        		if (fromUri == true) {
-	        			res = client.createBlobFromUri(mediaCsid, blobFile.getAbsolutePath());
+	        			URL childUrl = blobFile.toURI().toURL();
+	        			res = client.createBlobFromUri(mediaCsid, childUrl.toString());
 	        		} else {
 			            MultipartFormDataOutput formData = new MultipartFormDataOutput();
 			            OutputPart outputPart = formData.addFormData("file", blobFile, MediaType.valueOf(mimeType));

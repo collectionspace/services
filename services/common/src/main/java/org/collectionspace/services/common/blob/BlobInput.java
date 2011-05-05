@@ -2,15 +2,26 @@ package org.collectionspace.services.common.blob;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 
 //import org.collectionspace.services.blob.BlobsCommonList; 
-import org.collectionspace.services.jaxb.AbstractCommonList;
+//import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
-import org.collectionspace.services.common.FileUtils;
+//import org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler;
+//import org.collectionspace.services.common.FileUtils;
+import org.collectionspace.services.common.Download;
+import org.slf4j.LoggerFactory;
+import org.apache.commons.io.FileUtils;
 
 public class BlobInput {
+	private final Logger logger = LoggerFactory.getLogger(BlobInput.class);
+	
 	private String blobCsid = null;
 	private File blobFile = null;
 	private String blobUri = null;
@@ -117,14 +128,35 @@ public class BlobInput {
 	 * End of setters and getters
 	 */
 	
+	//
+	// FIXME: REM - The callers of this method are sending us a multipart form-data post, so why
+	// are we also receiving the blobUri?
+	//
 	public void createBlobFile(HttpServletRequest req, String blobUri) {
-    	File tmpFile = FileUtils.createTmpFile(req);
+    	File tmpFile = org.collectionspace.services.common.FileUtils.createTmpFile(req);
     	this.setBlobFile(tmpFile);
     	this.setBlobUri(blobUri);
 	}
 	
-	public void createBlobFile(String theBlobUri) {
-    	File theBlobFile = new File(theBlobUri);
+	public void createBlobFile(String theBlobUri) throws MalformedURLException, Exception {
+		URL blobUrl = new URL(theBlobUri);
+    	File theBlobFile = null;
+
+		if (blobUrl.getProtocol().equalsIgnoreCase("http")) {
+			Download fetchedFile = new Download(blobUrl);
+			while (fetchedFile.getStatus() == Download.DOWNLOADING) {
+				// Do nothing while we wait for the file to download
+			}
+			int status = fetchedFile.getStatus();
+			if (status == Download.COMPLETE) {
+				theBlobFile = fetchedFile.getFile();
+			}
+		} else if (blobUrl.getProtocol().equalsIgnoreCase("file")) {
+			theBlobFile = FileUtils.toFile(blobUrl);
+//			theBlobFile = new File(theBlobUri);
+		} else {
+			
+		}
     	this.setBlobFile(theBlobFile);
     	this.setBlobUri(blobUri);
 	}	

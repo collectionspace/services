@@ -50,6 +50,7 @@
                 maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
+    
     <xs:complexType name="dimensionGroup"> <!-- //FIXME: The "dimensionGroup" type should be declared in one place since other services use it -->
         <xs:sequence>
             <xs:element name="measuredPart" type="xs:string"/>

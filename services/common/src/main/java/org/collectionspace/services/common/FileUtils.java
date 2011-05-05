@@ -34,9 +34,9 @@ import java.util.UUID;
 
 //import java.io.IOException;
 
-import java.util.UUID;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+//import java.util.UUID;
+//import java.util.regex.Pattern;
+//import java.util.regex.Matcher;
 
 //import javax.servlet.ServletException;
 //import javax.servlet.http.HttpServlet;
@@ -129,13 +129,30 @@ public class FileUtils {
 					if (fileName == null) {
 						fileName = DEFAULT_BLOB_NAME; //if there's no file name then set it to an empty string
 						logger.warn("File was posted to the services without a file name.");
-					}					
+					}
+					//
+					// To avoid name collisions and to preserve the posted file name, create a temp directory for the
+					// file.
+					//
 					File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-					File savedFile = File.createTempFile(TMP_BLOB_PREFIX, fileName, tmpDir);
-
-					item.write(savedFile);
+					String fileTmpDirPath = tmpDir.getPath() + File.separatorChar + UUID.randomUUID();
+					File fileTmpDir = new File(fileTmpDirPath);
+					File savedFile = null;
+					if (fileTmpDir.mkdir() == true) {
+						savedFile = new File(fileTmpDirPath + File.separatorChar + fileName);
+						if (savedFile.createNewFile() == false) {
+							savedFile = null;
+						}
+					}
+					
+					if (savedFile != null) {
+						item.write(savedFile);
 //						item.getInputStream();//FIXME: REM - We should make a version of this method that returns the input stream
-					result = savedFile;
+						result = savedFile;
+					} else {
+						logger.error("Could not create temporary file: " + fileTmpDirPath +
+								File.separatorChar + fileName);						
+					}
 				}
 			}
 		} catch (Exception e) {

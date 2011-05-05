@@ -23,6 +23,7 @@
 package org.collectionspace.services.client.test;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -125,7 +126,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
      * @param fromUri - if 'false' then send the service a multipart/form-data POST from which to create the blob.
      * @throws Exception the exception
      */
-    protected void createBlob(String testName, boolean fromUri) throws Exception {
+    protected void createBlob(String testName, boolean fromUri, String uri) throws Exception {
         setupCreate();
         BlobClient client = new BlobClient();
         
@@ -142,7 +143,13 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 		        		logger.debug("Processing file URI: " + child.getAbsolutePath());
 		        		logger.debug("MIME type is: " + mimeType);
 		        		if (fromUri == true) {
-		        			res = client.createBlobFromURI(child.getAbsolutePath());
+		        			if (uri != null) {
+			        			res = client.createBlobFromURI(uri);
+			        			break;
+		        			} else {
+			        			URL childUrl = child.toURI().toURL();
+			        			res = client.createBlobFromURI(childUrl.toString());
+		        			}
 		        		} else {
 				            MultipartFormDataOutput form = new MultipartFormDataOutput();
 				            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
@@ -165,14 +172,20 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
     public void createBlobWithURI(String testName) throws Exception {
         logger.debug(testBanner(testName, CLASS_NAME));
-    	createBlob(testName, true /*with URI*/);
+    	createBlob(testName, true /*with URI*/, null);
     }
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
+    public void createBlobWithURL(String testName) throws Exception {
+        logger.debug(testBanner(testName, CLASS_NAME));
+    	createBlob(testName, true /*with URI*/, "http://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");
+    }    
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"createBlobWithURI"})
     public void createBlobWithPost(String testName) throws Exception {
         logger.debug(testBanner(testName, CLASS_NAME));
-    	createBlob(testName, false /*with POST*/);
+    	createBlob(testName, false /*with POST*/, null);
     }
 
     @Override
