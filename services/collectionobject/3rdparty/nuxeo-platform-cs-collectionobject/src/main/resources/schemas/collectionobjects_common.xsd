@@ -547,7 +547,7 @@
 
     <xs:complexType name="objectProductionDateGroup">
         <xs:sequence>
-            <xs:element name="displayDate" type="xs:string"/>
+            <xs:element name="dateDisplayDate" type="xs:string"/>
             <xs:element name="dateAssociation" type="xs:string"/>
             <xs:element name="dateEarliestSingleYear" type="xs:string"/>
             <xs:element name="dateEarliestSingleMonth" type="xs:string"/>
