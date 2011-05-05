@@ -485,17 +485,26 @@
 
     <xs:complexType name="objectProductionDateGroup">
         <xs:sequence>
-            <xs:element name="dateText" type="xs:string"/>
+            <xs:element name="displayDate" type="xs:string"/>
             <xs:element name="dateAssociation" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:string"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:string"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:string"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+            <xs:element name="dateLatestYear" type="xs:string"/>
+            <xs:element name="dateLatestMonth" type="xs:string"/>
+            <xs:element name="dateLatestDay" type="xs:string"/>
+            <xs:element name="dateLatestEra" type="xs:string"/>
+            <xs:element name="dateLatestCertainty" type="xs:string"/>
+            <xs:element name="dateLatestQualifier" type="xs:string"/>
+            <xs:element name="dateLatestQualifierValue" type="xs:string"/>
+            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
             <xs:element name="datePeriod" type="xs:string"/>
-            <xs:element name="dateSingleOrRangeStart" type="xs:string"/>
-            <xs:element name="dateSingleOrRangeStartCertainty" type="xs:string"/>
-            <xs:element name="dateSingleOrRangeStartQualifier" type="xs:string"/>
-            <xs:element name="dateSingleOrRangeStartQualifierValue" type="xs:string"/>
-            <xs:element name="dateRangeEnd" type="xs:string"/>
-            <xs:element name="dateRangeEndCertainty" type="xs:string"/>
-            <xs:element name="dateRangeEndQualifier" type="xs:string"/>
-            <xs:element name="dateRangeEndQualifierValue" type="xs:string"/>
+            <xs:element name="dateNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
