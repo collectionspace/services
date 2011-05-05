@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.ecm.platform.location.LifeCycleManagerExtensions">
+
+  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
+             point="types">
+    <types>
+      <type name="Taxonomyauthority">default</type>
+      <type name="Taxonomyitem">default</type>
+    </types>
+  </extension>
+
+</component>

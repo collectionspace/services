@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.taxonomy.ecm.types">
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Taxonomyauthority" coretype="Taxonomyauthority">
+      <label>org.collectionspace.taxonomyauthority</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>cstaxonomyauthority</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Taxonomyauthority</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Taxonomyauthority</type>
+      </subtypes>
+    </type>
+
+  </extension>
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Taxonomyitem" coretype="Taxonomyitem">
+      <label>org.collectionspace.taxonomy</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>taxonomy</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Taxonomy</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Taxonomy</type>
+      </subtypes>
+    </type>
+
+  </extension>
+</component>

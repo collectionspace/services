@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    TaxonomyAuthority schema (XSD)
+    
+    Entity  : TaxonomyAuthority
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+    
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
+    xmlns:ns="http://collectionspace.org/services/taxonomy"
+    xmlns="http://collectionspace.org/services/taxonomy"
+    targetNamespace="http://collectionspace.org/services/taxonomy"
+    version="0.1"
+    >
+    
+    <!--
+        Avoid XmlRootElement nightmare:
+        See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+    -->
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Taxonomy+Service+Home -->    
+    
+    <!-- TaxonomyAuthority  -->
+    <xs:element name="taxonomyauthority_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Common identifier -->
+                <xs:element name="csid" type="xs:string" />
+                
+                <!--  TaxonomyAuthority Information Group -->
+                <xs:element name="displayName" type="xs:string"/>
+                <xs:element name="shortIdentifier" type="xs:string"/>
+                <xs:element name="refName" type="xs:string"/>
+                <xs:element name="vocabType" type="xs:string"/>
+                
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonList">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+    
+    
+    <!-- TaxonomyAuthority instances, as in nuxeo repository -->
+    <xs:element name="taxonomyauthority-common-list">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">                    
+                    <xs:sequence>
+                        <xs:element name="taxonomyauthority-list-item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="displayName" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="refName" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="shortIdentifier" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="vocabType" type="xs:string"
+                                        minOccurs="1" />
+                                    <!-- uri to retrieve taxonomyauthority details -->
+                                    <xs:element name="uri" type="xs:anyURI"
+                                        minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string"
+                                        minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>                    
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+
