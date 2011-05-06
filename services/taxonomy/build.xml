@@ -9,7 +9,7 @@
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
-    <property name="src" taxonomy="src"/>
+    <property name="src" location="src"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
