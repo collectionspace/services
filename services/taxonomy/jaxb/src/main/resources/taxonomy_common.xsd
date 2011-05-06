@@ -14,7 +14,7 @@
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Taxonomy+Service+Home -->    
     
     <!-- Taxonomy -->
-    <xs:element name="taxonomies_common">
+    <xs:element name="taxonomy_common">
         <xs:complexType>
             <xs:sequence>
                 <!--  Common identifier -->
@@ -75,7 +75,7 @@
     </xs:complexType>
     
     <!-- Taxonomy instances, as in nuxeo repository -->
-    <xs:element name="taxonomies-common-list">
+    <xs:element name="taxonomy-common-list">
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="abstractCommonListItem">                    

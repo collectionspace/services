@@ -32,7 +32,7 @@ import javax.ws.rs.core.Response;
 //import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.contact.ContactsCommonList;
-import org.collectionspace.services.taxonomy.TaxonomyauthoritiesCommonList;
+import org.collectionspace.services.taxonomy.TaxonomyauthorityCommonList;
 import org.collectionspace.services.taxonomy.TaxonomyCommonList;
 import org.collectionspace.services.client.TaxonomyAuthorityProxy;
 
@@ -45,8 +45,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 /**
  * The Class TaxonomyAuthorityClient.
  */
-public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyauthoritiesCommonList, TaxonomyCommonList, TaxonomyAuthorityProxy> {
-	public static final String SERVICE_NAME = "taxonomyauthorities";
+public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyauthorityCommonList, TaxonomyCommonList, TaxonomyAuthorityProxy> {
+	public static final String SERVICE_NAME = "Taxonomyauthority";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
@@ -91,7 +91,7 @@ public class TaxonomyAuthorityClient extends AuthorityClientImpl<Taxonomyauthori
      * @return list
      * @see org.collectionspace.services.client.TaxonomyAuthorityProxy#readList()
      */
-    public ClientResponse<TaxonomyauthoritiesCommonList> readList() {
+    public ClientResponse<TaxonomyauthorityCommonList> readList() {
         return getProxy().readList();
     }
 }
