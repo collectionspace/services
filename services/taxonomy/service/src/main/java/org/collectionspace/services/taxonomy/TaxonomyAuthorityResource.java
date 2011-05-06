@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
 @Consumes("application/xml")
 @Produces("application/xml")
 public class TaxonomyAuthorityResource 
-	extends AuthorityResource<TaxonomyauthoritiesCommon, TaxonomyauthoritiesCommonList, 
+	extends AuthorityResource<TaxonomyauthorityCommon, TaxonomyauthorityCommonList, 
 							TaxonomyCommon, TaxonomyDocumentModelHandler> {
 
     private final static String taxonomyAuthorityServiceName = "taxonomyauthorities";
@@ -98,7 +98,7 @@ public class TaxonomyAuthorityResource
      * Instantiates a new taxonomy authority resource.
      */
     public TaxonomyAuthorityResource() {
-		super(TaxonomyauthoritiesCommon.class, TaxonomyAuthorityResource.class,
+		super(TaxonomyauthorityCommon.class, TaxonomyAuthorityResource.class,
 				LOCATIONAUTHORITIES_COMMON, LOCATIONS_COMMON);
     }
 
@@ -120,7 +120,7 @@ public class TaxonomyAuthorityResource
     }
 
     @Override
-    public Class<TaxonomyauthoritiesCommon> getCommonPartClass() {
-    	return TaxonomyauthoritiesCommon.class;
+    public Class<TaxonomyauthorityCommon> getCommonPartClass() {
+    	return TaxonomyauthorityCommon.class;
     }
 }

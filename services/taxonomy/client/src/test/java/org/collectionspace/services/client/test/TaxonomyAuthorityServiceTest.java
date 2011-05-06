@@ -83,7 +83,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         return AuthorityClient.ITEMS;
     }
     
-    final String TEST_FULL_NAME = "Centaurus pleurexanthemus Green 1832-";
+    final String TEST_NAME = "Centaurus pleurexanthemus Green 1832-";
     final String TEST_SHORTID = "CentauruspleurexanthemusGreen1832";
     // TODO Make rank be a controlled vocab term, assuming that's how we'll implement it.
     final String TEST_RANK = "5";
@@ -249,8 +249,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         Map<String, String> shelf1Map = new HashMap<String,String>();
         // TODO Make loc type and status be controlled vocabs.
-        shelf1Map.put(TaxonomyJAXBSchema.FULL_NAME, TEST_FULL_NAME);
-        shelf1Map.put(TaxonomyJAXBSchema.TAXON_RANK, TEST_RANK);
+        shelf1Map.put(TaxonomyJAXBSchema.NAME, TEST_NAME);
+        shelf1Map.put(TaxonomyJAXBSchema.RANK, TEST_RANK);
         shelf1Map.put(TaxonomyJAXBSchema.TERM_STATUS, TEST_STATUS);
         
         String newID = TaxonomyAuthorityClientUtils.createItemInAuthority(vcsid,
@@ -512,15 +512,15 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        String displayName = taxonomy.getDisplayName();
 	        // Make sure displayName matches computed form
 	        String expectedDisplayName = 
-	            TaxonomyAuthorityClientUtils.prepareDefaultDisplayName(TEST_FULL_NAME);
+	            TaxonomyAuthorityClientUtils.prepareDefaultDisplayName(TEST_NAME);
 	        Assert.assertNotNull(displayName, expectedDisplayName);
 	        
 	        // Update the shortName and verify the computed name is updated.
 	        taxonomy.setCsid(null);
 	        taxonomy.setDisplayNameComputed(true);
-	        taxonomy.setTaxonFullName("updated-" + TEST_FULL_NAME);
+	        taxonomy.setTaxonFullName("updated-" + TEST_NAME);
 	        expectedDisplayName = 
-	            TaxonomyAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_FULL_NAME);
+	            TaxonomyAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_NAME);
 	
 	        // Submit the updated resource to the service and store the response.
 	        PoxPayloadOut output = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
@@ -1120,7 +1120,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // The only relevant ID may be the one used in update(), below.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         Map<String, String> nonexMap = new HashMap<String,String>();
-        nonexMap.put(TaxonomyJAXBSchema.FULL_NAME, TEST_FULL_NAME);
+        nonexMap.put(TaxonomyJAXBSchema.NAME, TEST_NAME);
         nonexMap.put(TaxonomyJAXBSchema.SHORT_IDENTIFIER, "nonEx");
         nonexMap.put(TaxonomyJAXBSchema.TERM_STATUS, TEST_STATUS);
         PoxPayloadOut multipart = 

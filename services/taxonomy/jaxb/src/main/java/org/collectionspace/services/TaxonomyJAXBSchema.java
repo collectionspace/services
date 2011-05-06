@@ -10,8 +10,8 @@ import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
  */
 public interface TaxonomyJAXBSchema extends AuthorityItemJAXBSchema {
 	final static String TAXONOMY_COMMON = "taxonomy_common";
-	final static String FULL_NAME = "fullName";
-	final static String TAXON_RANK = "taxonRank";
+	final static String NAME = "fullName";
+	final static String RANK = "taxonRank";
 
 }
 

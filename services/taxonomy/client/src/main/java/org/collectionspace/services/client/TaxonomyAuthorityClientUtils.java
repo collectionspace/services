@@ -72,9 +72,9 @@ public class TaxonomyAuthorityClientUtils {
     	value = taxonomyInfo.get(TaxonomyJAXBSchema.DISPLAY_NAME_COMPUTED);
     	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
     	taxonomy.setDisplayNameComputed(displayNameComputed);
-        if((value = (String)taxonomyInfo.get(TaxonomyJAXBSchema.FULL_NAME))!=null)
+        if((value = (String)taxonomyInfo.get(TaxonomyJAXBSchema.NAME))!=null)
         	taxonomy.setTaxonFullName(value);
-        if((value = (String)taxonomyInfo.get(TaxonomyJAXBSchema.TAXON_RANK))!=null)
+        if((value = (String)taxonomyInfo.get(TaxonomyJAXBSchema.RANK))!=null)
         	taxonomy.setTaxonRank(value);
         if((value = (String)taxonomyInfo.get(TaxonomyJAXBSchema.TERM_STATUS))!=null)
         	taxonomy.setTermStatus(value);
@@ -116,7 +116,7 @@ public class TaxonomyAuthorityClientUtils {
     		}
         	displayName = 
         		prepareDefaultDisplayName(
-    		    	taxonomyMap.get(TaxonomyJAXBSchema.FULL_NAME));
+    		    	taxonomyMap.get(TaxonomyJAXBSchema.NAME));
     	}
     	
     	if(logger.isDebugEnabled()){
