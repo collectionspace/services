@@ -40,8 +40,8 @@ import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.taxonomy.TaxonomyauthoritiesCommon;
-import org.collectionspace.services.taxonomy.TaxonomyauthoritiesCommonList;
+import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
+import org.collectionspace.services.taxonomy.TaxonomyauthorityCommonList;
 import org.collectionspace.services.taxonomy.TaxonomyCommon;
 import org.collectionspace.services.taxonomy.TaxonomyCommonList;
 
@@ -81,28 +81,12 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     
     public String getItemServicePathComponent() {
         return AuthorityClient.ITEMS;
-    }	
+    }
     
-    // Instance variables specific to this test.
-    
-//    /** The SERVICE path component. */
-//    final String SERVICE_PATH_COMPONENT = "taxonomyauthorities";
-//    
-//    /** The ITEM service path component. */
-//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-//    
-//    /** The CONTACT service path component. */
-//    final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
-    
-    final String TEST_NAME = "Shelf 1";
-    final String TEST_SHORTID = "shelf1";
-    final String TEST_CONDITION_NOTE = "Basically clean";
-    final String TEST_CONDITION_NOTE_DATE = "June 11, 1979";
-    final String TEST_SECURITY_NOTE = "Kind of safe";
-    final String TEST_ACCESS_NOTE = "Only right-thinkers may see";
-    final String TEST_ADDRESS = "123 Main Street, Anytown USA";
-    // TODO Make loc type be a controlled vocab term.
-    final String TEST_LOCATION_TYPE = "Shelf";
+    final String TEST_FULL_NAME = "Centaurus pleurexanthemus Green 1832-";
+    final String TEST_SHORTID = "CentauruspleurexanthemusGreen1832";
+    // TODO Make rank be a controlled vocab term, assuming that's how we'll implement it.
+    final String TEST_RANK = "5";
     // TODO Make status type be a controlled vocab term.
     final String TEST_STATUS = "Approved";
     
@@ -265,14 +249,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         Map<String, String> shelf1Map = new HashMap<String,String>();
         // TODO Make loc type and status be controlled vocabs.
-        shelf1Map.put(TaxonomyJAXBSchema.NAME, TEST_NAME);
-        shelf1Map.put(TaxonomyJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
-        shelf1Map.put(TaxonomyJAXBSchema.CONDITION_NOTE, TEST_CONDITION_NOTE);
-        shelf1Map.put(TaxonomyJAXBSchema.CONDITION_NOTE_DATE, TEST_CONDITION_NOTE_DATE);
-        shelf1Map.put(TaxonomyJAXBSchema.SECURITY_NOTE, TEST_SECURITY_NOTE);
-        shelf1Map.put(TaxonomyJAXBSchema.ACCESS_NOTE, TEST_ACCESS_NOTE);
-        shelf1Map.put(TaxonomyJAXBSchema.ADDRESS, TEST_ADDRESS);
-        shelf1Map.put(TaxonomyJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
+        shelf1Map.put(TaxonomyJAXBSchema.FULL_NAME, TEST_FULL_NAME);
+        shelf1Map.put(TaxonomyJAXBSchema.TAXON_RANK, TEST_RANK);
         shelf1Map.put(TaxonomyJAXBSchema.TERM_STATUS, TEST_STATUS);
         
         String newID = TaxonomyAuthorityClientUtils.createItemInAuthority(vcsid,
@@ -390,9 +368,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
 	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	            TaxonomyauthoritiesCommon taxonomyAuthority = 
-	            	(TaxonomyauthoritiesCommon) extractPart(input,
-	                    client.getCommonPartName(), TaxonomyauthoritiesCommon.class);
+	            TaxonomyauthorityCommon taxonomyAuthority = 
+	            	(TaxonomyauthorityCommon) extractPart(input,
+	                    client.getCommonPartName(), TaxonomyauthorityCommon.class);
 	            Assert.assertNotNull(taxonomyAuthority);
 	        } catch (Exception e) {
 	            throw new RuntimeException(e);
@@ -435,8 +413,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
 	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	            TaxonomyauthoritiesCommon taxonomyAuthority = (TaxonomyauthoritiesCommon) extractPart(input,
-	                    client.getCommonPartName(), TaxonomyauthoritiesCommon.class);
+	            TaxonomyauthorityCommon taxonomyAuthority = (TaxonomyauthorityCommon) extractPart(input,
+	                    client.getCommonPartName(), TaxonomyauthorityCommon.class);
 	            Assert.assertNotNull(taxonomyAuthority);
 	        } catch (Exception e) {
 	            throw new RuntimeException(e);
@@ -534,15 +512,15 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        String displayName = taxonomy.getDisplayName();
 	        // Make sure displayName matches computed form
 	        String expectedDisplayName = 
-	            TaxonomyAuthorityClientUtils.prepareDefaultDisplayName(TEST_NAME);
+	            TaxonomyAuthorityClientUtils.prepareDefaultDisplayName(TEST_FULL_NAME);
 	        Assert.assertNotNull(displayName, expectedDisplayName);
 	        
 	        // Update the shortName and verify the computed name is updated.
 	        taxonomy.setCsid(null);
 	        taxonomy.setDisplayNameComputed(true);
-	        taxonomy.setName("updated-" + TEST_NAME);
+	        taxonomy.setTaxonFullName("updated-" + TEST_FULL_NAME);
 	        expectedDisplayName = 
-	            TaxonomyAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_NAME);
+	            TaxonomyAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_FULL_NAME);
 	
 	        // Submit the updated resource to the service and store the response.
 	        PoxPayloadOut output = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
@@ -568,7 +546,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        Assert.assertNotNull(updatedTaxonomy);
 	
 	        // Verify that the updated resource received the correct data.
-	        Assert.assertEquals(updatedTaxonomy.getName(), taxonomy.getName(),
+	        Assert.assertEquals(updatedTaxonomy.getTaxonFullName(), taxonomy.getTaxonFullName(),
 	            "Updated ForeName in Taxonomy did not match submitted data.");
 	        // Verify that the updated resource computes the right displayName.
 	        Assert.assertEquals(updatedTaxonomy.getDisplayName(), expectedDisplayName,
@@ -766,9 +744,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 
         // Submit the request to the service and store the response.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-        ClientResponse<TaxonomyauthoritiesCommonList> res = client.readList();
+        ClientResponse<TaxonomyauthorityCommonList> res = client.readList();
         try {
-	        TaxonomyauthoritiesCommonList list = res.getEntity();
+	        TaxonomyauthorityCommonList list = res.getEntity();
 	        int statusCode = res.getStatus();
 	
 	        // Check the status code of the response: does it match
@@ -783,10 +761,10 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        // Optionally output additional data about list members for debugging.
 	        boolean iterateThroughList = false;
 	        if (iterateThroughList && logger.isDebugEnabled()) {
-	            List<TaxonomyauthoritiesCommonList.TaxonomyauthorityListItem> items =
+	            List<TaxonomyauthorityCommonList.TaxonomyauthorityListItem> items =
 	                    list.getTaxonomyauthorityListItem();
 	            int i = 0;
-	            for (TaxonomyauthoritiesCommonList.TaxonomyauthorityListItem item : items) {
+	            for (TaxonomyauthorityCommonList.TaxonomyauthorityListItem item : items) {
 	                String csid = item.getCsid();
 	                logger.debug(testName + ": list-item[" + i + "] csid=" +
 	                        csid);
@@ -937,8 +915,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	            logger.debug("got TaxonomyAuthority to update with ID: " + knownResourceId);
 	        }
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        TaxonomyauthoritiesCommon taxonomyAuthority = (TaxonomyauthoritiesCommon) extractPart(input,
-	                client.getCommonPartName(), TaxonomyauthoritiesCommon.class);
+	        TaxonomyauthorityCommon taxonomyAuthority = (TaxonomyauthorityCommon) extractPart(input,
+	                client.getCommonPartName(), TaxonomyauthorityCommon.class);
 	        Assert.assertNotNull(taxonomyAuthority);
 	
 	        // Update the contents of this resource.
@@ -946,7 +924,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        taxonomyAuthority.setVocabType("updated-" + taxonomyAuthority.getVocabType());
 	        if(logger.isDebugEnabled()){
 	            logger.debug("to be updated TaxonomyAuthority");
-	            logger.debug(objectAsXmlString(taxonomyAuthority, TaxonomyauthoritiesCommon.class));
+	            logger.debug(objectAsXmlString(taxonomyAuthority, TaxonomyauthorityCommon.class));
 	        }
 	
 	        // Submit the updated resource to the service and store the response.
@@ -967,9 +945,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
-	        TaxonomyauthoritiesCommon updatedTaxonomyAuthority =
-	                (TaxonomyauthoritiesCommon) extractPart(input,
-	                        client.getCommonPartName(), TaxonomyauthoritiesCommon.class);
+	        TaxonomyauthorityCommon updatedTaxonomyAuthority =
+	                (TaxonomyauthorityCommon) extractPart(input,
+	                        client.getCommonPartName(), TaxonomyauthorityCommon.class);
 	        Assert.assertNotNull(updatedTaxonomyAuthority);
 	
 	        // Verify that the updated resource received the correct data.
@@ -1019,7 +997,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	
 	        // Update the contents of this resource.
 	        taxonomy.setCsid(null);
-	        taxonomy.setName("updated-" + taxonomy.getName());
+	        taxonomy.setTaxonFullName("updated-" + taxonomy.getTaxonFullName());
 	        if(logger.isDebugEnabled()){
 	            logger.debug("to be updated Taxonomy");
 	            logger.debug(objectAsXmlString(taxonomy,
@@ -1050,7 +1028,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        Assert.assertNotNull(updatedTaxonomy);
 	
 	        // Verify that the updated resource received the correct data.
-	        Assert.assertEquals(updatedTaxonomy.getName(), taxonomy.getName(),
+	        Assert.assertEquals(updatedTaxonomy.getTaxonFullName(), taxonomy.getTaxonFullName(),
 	                "Data in updated Taxonomy did not match submitted data.");
 	    } finally {
 	    	res.releaseConnection();
@@ -1100,7 +1078,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // Note: The ID(s) used when creating the request payload may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-   	String displayName = "displayName-NON_EXISTENT_ID";
+        String displayName = "displayName-NON_EXISTENT_ID";
     	PoxPayloadOut multipart = TaxonomyAuthorityClientUtils.createTaxonomyAuthorityInstance(
     				displayName, "nonEx", client.getCommonPartName());
         ClientResponse<String> res =
@@ -1142,9 +1120,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // The only relevant ID may be the one used in update(), below.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         Map<String, String> nonexMap = new HashMap<String,String>();
-        nonexMap.put(TaxonomyJAXBSchema.NAME, TEST_NAME);
+        nonexMap.put(TaxonomyJAXBSchema.FULL_NAME, TEST_FULL_NAME);
         nonexMap.put(TaxonomyJAXBSchema.SHORT_IDENTIFIER, "nonEx");
-        nonexMap.put(TaxonomyJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
         nonexMap.put(TaxonomyJAXBSchema.TERM_STATUS, TEST_STATUS);
         PoxPayloadOut multipart = 
     	TaxonomyAuthorityClientUtils.createTaxonomyInstance(

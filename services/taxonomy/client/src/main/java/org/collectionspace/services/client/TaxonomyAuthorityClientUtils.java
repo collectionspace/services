@@ -32,7 +32,7 @@ public class TaxonomyAuthorityClientUtils {
      * @param headerLabel	The common part label
      * @return	The PoxPayloadOut payload for the create call
      */
-    public static PoxPayloadOut createTaxonomyauthorityInstance(
+    public static PoxPayloadOut createTaxonomyAuthorityInstance(
     		String displayName, String shortIdentifier, String headerLabel ) {
         TaxonomyauthorityCommon Taxonomyauthority = new TaxonomyauthorityCommon();
         Taxonomyauthority.setDisplayName(displayName);
