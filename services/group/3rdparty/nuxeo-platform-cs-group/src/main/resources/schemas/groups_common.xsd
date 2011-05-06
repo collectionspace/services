@@ -24,4 +24,5 @@
     <xs:element name="title" type="xs:string"/>
     <xs:element name="scopeNote" type="xs:string"/>
     <xs:element name="responsibleDepartment" type="xs:string"/>
+    <xs:element name="owner" type="xs:string"/>
 </xs:schema>

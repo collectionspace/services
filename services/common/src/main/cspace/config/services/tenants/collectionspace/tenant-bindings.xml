@@ -664,7 +664,9 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="groups_common" updated="" order="1">
-                    <service:properties></service:properties>
+                    <service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>owner</types:value></types:item>
+                   </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/group"

@@ -21,12 +21,6 @@
   version="0.1"
 >
 
-<!--
-    Avoid XmlRootElement nightmare:
-    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
--->
-<!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->    
-    
     <!-- group -->
     <xs:element name="groups_common">
         <xs:complexType>
@@ -35,6 +29,7 @@
                 <xs:element name="title" type="xs:string"/>
                 <xs:element name="scopeNote" type="xs:string"/>
                 <xs:element name="responsibleDepartment" type="xs:string"/>
+                <xs:element name="owner" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
