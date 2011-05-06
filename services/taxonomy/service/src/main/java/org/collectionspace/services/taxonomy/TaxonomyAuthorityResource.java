@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
 @Produces("application/xml")
 public class TaxonomyAuthorityResource 
 	extends AuthorityResource<TaxonomyauthorityCommon, TaxonomyauthorityCommonList, 
-							TaxonomyCommon, TaxonomyDocumentModelHandler> {
+							TaxonCommon, TaxonomyDocumentModelHandler> {
 
     private final static String taxonomyAuthorityServiceName = "taxonomyauthorities";
 	private final static String LOCATIONAUTHORITIES_COMMON = "taxonomyauthority_common";

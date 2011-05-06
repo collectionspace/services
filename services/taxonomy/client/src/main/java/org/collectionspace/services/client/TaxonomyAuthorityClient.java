@@ -33,7 +33,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommonList;
-import org.collectionspace.services.taxonomy.TaxonomyCommonList;
+import org.collectionspace.services.taxonomy.TaxonCommonList;
 import org.collectionspace.services.client.TaxonomyAuthorityProxy;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -45,7 +45,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 /**
  * The Class TaxonomyAuthorityClient.
  */
-public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyauthorityCommonList, TaxonomyCommonList, TaxonomyAuthorityProxy> {
+public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyauthorityCommonList, TaxonCommonList, TaxonomyAuthorityProxy> {
 	public static final String SERVICE_NAME = "Taxonomyauthority";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

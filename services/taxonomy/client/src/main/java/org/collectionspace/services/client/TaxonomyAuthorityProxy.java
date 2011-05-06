@@ -10,7 +10,7 @@ import javax.ws.rs.QueryParam;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommonList;
-import org.collectionspace.services.taxonomy.TaxonomyCommonList;
+import org.collectionspace.services.taxonomy.TaxonCommonList;
 
 /**
  * @version $Revision$
@@ -20,7 +20,7 @@ import org.collectionspace.services.taxonomy.TaxonomyCommonList;
 @Path(TaxonomyAuthorityClient.SERVICE_PATH + "/")
 @Produces("application/xml")
 @Consumes("application/xml")
-public interface TaxonomyAuthorityProxy extends AuthorityProxy<TaxonomyauthorityCommonList, TaxonomyCommonList> {
+public interface TaxonomyAuthorityProxy extends AuthorityProxy<TaxonomyauthorityCommonList, TaxonCommonList> {
 
     // List Taxonomyauthority
     @GET
@@ -35,7 +35,7 @@ public interface TaxonomyAuthorityProxy extends AuthorityProxy<Taxonomyauthority
 	@GET
     @Produces({"application/xml"})
     @Path("/{csid}/items/")
-    ClientResponse<TaxonomyCommonList> readItemList(
+    ClientResponse<TaxonCommonList> readItemList(
     		@PathParam("csid") String vcsid,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
@@ -46,7 +46,7 @@ public interface TaxonomyAuthorityProxy extends AuthorityProxy<Taxonomyauthority
 	@GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
-    ClientResponse<TaxonomyCommonList> readItemListForNamedAuthority(
+    ClientResponse<TaxonCommonList> readItemListForNamedAuthority(
     		@PathParam("specifier") String specifier,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,

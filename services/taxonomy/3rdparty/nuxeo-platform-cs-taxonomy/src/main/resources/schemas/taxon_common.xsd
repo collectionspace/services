@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    Taxonomy schema (XSD)
+    Taxon schema (XSD)
     
-    Entity  : Taxonomy
+    Entity  : Taxon (item child of a TaxonomyAuthority) 
     Part    : Common
     Used for: Nuxeo EP core document type
     
-    $LastChangedRevision$
-    $LastChangedDate$
+    $LastChangedRevision: 4622 $
+    $LastChangedDate: 2011-05-05 16:51:51 -0700 (Thu, 05 May 2011) $
 -->
 
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:ns="http://collectionspace.org/services/taxonomy"
-  xmlns="http://collectionspace.org/services/taxonomy"
-  targetNamespace="http://collectionspace.org/services/taxonomy"
+  xmlns:ns="http://collectionspace.org/services/taxon"
+  xmlns="http://collectionspace.org/services/taxon"
+  targetNamespace="http://collectionspace.org/services/taxon"
   version="0.1"
 >
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Taxonomy+Service+Home -->    
 
-    <!--  Taxonomy Information Group -->
+    <!--  Taxonomic Identifier Information Group -->
     <!--  inAuthority is the csid of the owning TaxonomyAuthority -->
     <xs:element name="inAuthority" type="xs:string" />
     <xs:element name="shortIdentifier" type="xs:string"/>

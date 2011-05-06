@@ -42,8 +42,8 @@ import org.collectionspace.services.client.TaxonomyAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommonList;
-import org.collectionspace.services.taxonomy.TaxonomyCommon;
-import org.collectionspace.services.taxonomy.TaxonomyCommonList;
+import org.collectionspace.services.taxonomy.TaxonCommon;
+import org.collectionspace.services.taxonomy.TaxonCommonList;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -135,7 +135,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     @Override
 	protected AbstractCommonList getAbstractCommonList(
 			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(TaxonomyCommonList.class);
+        return response.getEntity(TaxonCommonList.class);
     }
 
     @Override
@@ -458,13 +458,13 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	
 	        // Check whether we've received a taxonomy.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        TaxonomyCommon taxonomy = (TaxonomyCommon) extractPart(input,
-	                client.getItemCommonPartName(), TaxonomyCommon.class);
+	        TaxonCommon taxonomy = (TaxonCommon) extractPart(input,
+	                client.getItemCommonPartName(), TaxonCommon.class);
 	        Assert.assertNotNull(taxonomy);
 	        boolean showFull = true;
 	        if(showFull && logger.isDebugEnabled()){
 	            logger.debug(testName + ": returned payload:");
-	            logger.debug(objectAsXmlString(taxonomy, TaxonomyCommon.class));
+	            logger.debug(objectAsXmlString(taxonomy, TaxonCommon.class));
 	        }
 	        Assert.assertEquals(taxonomy.getInAuthority(), knownResourceId);
 	    } finally {
@@ -506,8 +506,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	
 	        // Check whether taxonomy has expected displayName.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        TaxonomyCommon taxonomy = (TaxonomyCommon) extractPart(input,
-	                client.getItemCommonPartName(), TaxonomyCommon.class);
+	        TaxonCommon taxonomy = (TaxonCommon) extractPart(input,
+	                client.getItemCommonPartName(), TaxonCommon.class);
 	        Assert.assertNotNull(taxonomy);
 	        String displayName = taxonomy.getDisplayName();
 	        // Make sure displayName matches computed form
@@ -540,9 +540,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
-	        TaxonomyCommon updatedTaxonomy =
-	                (TaxonomyCommon) extractPart(input,
-	                        client.getItemCommonPartName(), TaxonomyCommon.class);
+	        TaxonCommon updatedTaxonomy =
+	                (TaxonCommon) extractPart(input,
+	                        client.getItemCommonPartName(), TaxonCommon.class);
 	        Assert.assertNotNull(updatedTaxonomy);
 	
 	        // Verify that the updated resource received the correct data.
@@ -576,8 +576,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
 	        updatedTaxonomy =
-	                (TaxonomyCommon) extractPart(input,
-	                        client.getItemCommonPartName(), TaxonomyCommon.class);
+	                (TaxonCommon) extractPart(input,
+	                        client.getItemCommonPartName(), TaxonCommon.class);
 	        Assert.assertNotNull(updatedTaxonomy);
 	
 	        // Verify that the updated resource received the correct data.
@@ -626,8 +626,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	
 	        // Check whether Taxonomy has expected displayName.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        TaxonomyCommon taxonomy = (TaxonomyCommon) extractPart(input,
-	                client.getItemCommonPartName(), TaxonomyCommon.class);
+	        TaxonCommon taxonomy = (TaxonCommon) extractPart(input,
+	                client.getItemCommonPartName(), TaxonCommon.class);
 	        Assert.assertNotNull(taxonomy);
 	        // Try to Update with computed false and no displayName
 	        taxonomy.setDisplayNameComputed(false);
@@ -820,7 +820,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         
         // Submit the request to the service and store the response.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-        ClientResponse<TaxonomyCommonList> res = null;
+        ClientResponse<TaxonCommonList> res = null;
         if(vcsid!= null) {
 	        res = client.readItemList(vcsid, null, null);
         } else if(shortId!= null) {
@@ -829,7 +829,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         	Assert.fail("readItemList passed null csid and name!");
         }
         try {
-	        TaxonomyCommonList list = res.getEntity();
+	        TaxonCommonList list = res.getEntity();
 	        int statusCode = res.getStatus();
 	
 	        // Check the status code of the response: does it match
@@ -841,8 +841,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
-	        List<TaxonomyCommonList.TaxonomyListItem> items =
-	            list.getTaxonomyListItem();
+	        List<TaxonCommonList.TaxonListItem> items =
+	            list.getTaxonListItem();
 	        int nItemsReturned = items.size();
 	        // There will be one item created, associated with a
 	        // known parent resource, by the createItem test.
@@ -858,7 +858,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        Assert.assertEquals(nItemsReturned, nExpectedItems);
 	
 	        int i = 0;
-	        for (TaxonomyCommonList.TaxonomyListItem item : items) {
+	        for (TaxonCommonList.TaxonListItem item : items) {
 	        	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
 	        	Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
 	        	// Optionally output additional data about list members for debugging.
@@ -991,8 +991,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	                " in TaxonomyAuthority: " + knownResourceId );
 	        }
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        TaxonomyCommon taxonomy = (TaxonomyCommon) extractPart(input,
-	                client.getItemCommonPartName(), TaxonomyCommon.class);
+	        TaxonCommon taxonomy = (TaxonCommon) extractPart(input,
+	                client.getItemCommonPartName(), TaxonCommon.class);
 	        Assert.assertNotNull(taxonomy);
 	
 	        // Update the contents of this resource.
@@ -1001,7 +1001,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        if(logger.isDebugEnabled()){
 	            logger.debug("to be updated Taxonomy");
 	            logger.debug(objectAsXmlString(taxonomy,
-	                TaxonomyCommon.class));
+	                TaxonCommon.class));
 	        }        
 	
 	        // Submit the updated resource to the service and store the response.
@@ -1022,9 +1022,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
-	        TaxonomyCommon updatedTaxonomy =
-	                (TaxonomyCommon) extractPart(input,
-	                        client.getItemCommonPartName(), TaxonomyCommon.class);
+	        TaxonCommon updatedTaxonomy =
+	                (TaxonCommon) extractPart(input,
+	                        client.getItemCommonPartName(), TaxonCommon.class);
 	        Assert.assertNotNull(updatedTaxonomy);
 	
 	        // Verify that the updated resource received the correct data.

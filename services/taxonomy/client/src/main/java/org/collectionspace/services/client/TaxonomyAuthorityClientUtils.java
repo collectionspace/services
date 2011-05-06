@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.TaxonomyJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.taxonomy.TaxonomyCommon;
+import org.collectionspace.services.taxonomy.TaxonCommon;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
@@ -62,7 +62,7 @@ public class TaxonomyAuthorityClientUtils {
     public static PoxPayloadOut createTaxonomyInstance( 
     		String taxonomyAuthRefName, Map<String, String> taxonomyInfo, 
 				String headerLabel){
-        TaxonomyCommon taxonomy = new TaxonomyCommon();
+        TaxonCommon taxonomy = new TaxonCommon();
     	String shortId = taxonomyInfo.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER);
     	String displayName = taxonomyInfo.get(TaxonomyJAXBSchema.DISPLAY_NAME);
     	taxonomy.setShortIdentifier(shortId);
@@ -85,7 +85,7 @@ public class TaxonomyAuthorityClientUtils {
         commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
-        	logger.debug("to be created, taxonomy common ", taxonomy, TaxonomyCommon.class);
+        	logger.debug("to be created, taxonomy common ", taxonomy, TaxonCommon.class);
         }
 
         return multipart;

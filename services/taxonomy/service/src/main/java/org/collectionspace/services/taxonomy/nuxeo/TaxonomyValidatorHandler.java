@@ -23,7 +23,7 @@
  */
 package org.collectionspace.services.taxonomy.nuxeo;
 
-import org.collectionspace.services.taxonomy.TaxonomyCommon;
+import org.collectionspace.services.taxonomy.TaxonCommon;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
@@ -48,8 +48,8 @@ public class TaxonomyValidatorHandler implements ValidatorHandler {
         }
         try {
             MultipartServiceContext mctx = (MultipartServiceContext) ctx;
-            TaxonomyCommon taxonomy = (TaxonomyCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
-                    TaxonomyCommon.class);
+            TaxonCommon taxonomy = (TaxonCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
+                    TaxonCommon.class);
             String msg = "";
             boolean invalid = false;
             if(!taxonomy.isDisplayNameComputed() && (taxonomy.getDisplayName()==null)) {

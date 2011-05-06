@@ -38,9 +38,9 @@ import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumen
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.taxonomy.TaxonomyCommon;
-import org.collectionspace.services.taxonomy.TaxonomyCommonList;
-import org.collectionspace.services.taxonomy.TaxonomyCommonList.TaxonomyListItem;
+import org.collectionspace.services.taxonomy.TaxonCommon;
+import org.collectionspace.services.taxonomy.TaxonCommonList;
+import org.collectionspace.services.taxonomy.TaxonCommonList.TaxonListItem;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class TaxonomyDocumentModelHandler
-        extends AuthorityItemDocumentModelHandler<TaxonomyCommon, TaxonomyCommonList> {
+        extends AuthorityItemDocumentModelHandler<TaxonCommon, TaxonCommonList> {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(TaxonomyDocumentModelHandler.class);
@@ -143,18 +143,18 @@ public class TaxonomyDocumentModelHandler
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-	public TaxonomyCommonList extractCommonPartList(
+	public TaxonCommonList extractCommonPartList(
 			DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-		TaxonomyCommonList coList = extractPagingInfo(new TaxonomyCommonList(), wrapDoc);
+		TaxonCommonList coList = extractPagingInfo(new TaxonCommonList(), wrapDoc);
         AbstractCommonList commonList = (AbstractCommonList) coList;
         commonList.setFieldsReturned("displayName|refName|shortIdentifier|uri|csid");
-		List<TaxonomyCommonList.TaxonomyListItem> list = coList.getTaxonomyListItem();
+		List<TaxonCommonList.TaxonListItem> list = coList.getTaxonListItem();
 		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
 		String commonPartLabel = getServiceContext().getCommonPartLabel(
 				"taxonomy");
 		while (iter.hasNext()) {
 			DocumentModel docModel = iter.next();
-			TaxonomyListItem ilistItem = new TaxonomyListItem();
+			TaxonListItem ilistItem = new TaxonListItem();
 			ilistItem.setDisplayName((String) docModel.getProperty(
 					commonPartLabel, AuthorityItemJAXBSchema.DISPLAY_NAME));
 			ilistItem.setShortIdentifier((String) docModel.getProperty(commonPartLabel,

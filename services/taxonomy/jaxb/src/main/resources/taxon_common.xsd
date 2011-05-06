@@ -9,12 +9,11 @@
     version="0.1"
     >
     
-    
     <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Taxonomy+Service+Home -->    
     
-    <!-- Taxonomy -->
-    <xs:element name="taxonomy_common">
+    <!-- Taxon (item child of a TaxonomyAuthority) -->
+    <xs:element name="taxon_common">
         <xs:complexType>
             <xs:sequence>
                 <!--  Common identifier -->
@@ -75,19 +74,19 @@
     </xs:complexType>
     
     <!-- Taxonomy instances, as in nuxeo repository -->
-    <xs:element name="taxonomy-common-list">
+    <xs:element name="taxon-common-list">
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="abstractCommonListItem">                    
                     <xs:sequence>
-                        <xs:element name="taxonomy_list_item" maxOccurs="unbounded">
+                        <xs:element name="taxon_list_item" maxOccurs="unbounded">
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:element name="displayName" type="xs:string"
                                         minOccurs="1" />
 									<xs:element name="shortIdentifier" type="xs:string"
                                         minOccurs="1" />
-                                    <!-- uri to retrieve taxonomy details -->
+                                    <!-- uri to retrieve taxon details -->
                                     <xs:element name="uri" type="xs:anyURI"
                                         minOccurs="1" />
                                     <xs:element name="refName" type="xs:string"
