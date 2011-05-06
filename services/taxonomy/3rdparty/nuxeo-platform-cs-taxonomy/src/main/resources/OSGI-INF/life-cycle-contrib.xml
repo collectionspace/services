@@ -5,7 +5,7 @@
              point="types">
     <types>
       <type name="Taxonomyauthority">default</type>
-      <type name="Taxonomyitem">default</type>
+      <type name="Taxon">default</type>
     </types>
   </extension>
 

@@ -93,7 +93,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="taxonomy_common">inAuthority</field>
+          <field schema="taxon_common">inAuthority</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -106,7 +106,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="taxonomy_common">shortIdentifier</field>
+          <field schema="taxon_common">shortIdentifier</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -119,7 +119,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="taxonomy_common">refName</field>
+          <field schema="taxon_common">refName</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -159,7 +159,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="taxonomy_common">taxonFullName</field>
+          <field schema="taxon_common">taxonFullName</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -172,7 +172,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="taxonomy_common">taxonRank</field>
+          <field schema="taxon_common">taxonRank</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
