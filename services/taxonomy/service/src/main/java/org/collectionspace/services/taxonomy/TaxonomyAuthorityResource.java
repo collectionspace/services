@@ -43,7 +43,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
-import org.collectionspace.services.TaxonomyJAXBSchema;
+import org.collectionspace.services.TaxonJAXBSchema;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -78,30 +78,25 @@ import org.slf4j.LoggerFactory;
 @Path(TaxonomyAuthorityClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class TaxonomyAuthorityResource 
-	extends AuthorityResource<TaxonomyauthorityCommon, TaxonomyauthorityCommonList, 
-							TaxonCommon, TaxonDocumentModelHandler> {
+public class TaxonomyAuthorityResource
+        extends AuthorityResource<TaxonomyauthorityCommon, TaxonomyauthorityCommonList, TaxonCommon, TaxonDocumentModelHandler> {
 
     private final static String taxonomyAuthorityServiceName = "taxonomyauthorities";
-	private final static String TAXONOMYAUTHORITY_COMMON = "taxonomyauthority_common";
-    
-    // FIXME: May be desirable to change this to the plural form 'taxa',
-    // both here and in related config.
+    private final static String TAXONOMYAUTHORITY_COMMON = "taxonomyauthority_common";
     private final static String taxonomyItemServiceName = "taxon";
-	private final static String TAXON_COMMON = "taxon_common";
-    
+    private final static String TAXONOMYITEM_COMMON = "taxon_common";
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(TaxonomyAuthorityResource.class);
     //FIXME retrieve client type from configuration
     /** The Constant CLIENT_TYPE. */
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
-    
+
     /**
      * Instantiates a new taxonomy authority resource.
      */
     public TaxonomyAuthorityResource() {
-		super(TaxonomyauthorityCommon.class, TaxonomyAuthorityResource.class,
-				TAXONOMYAUTHORITY_COMMON, TAXON_COMMON);
+        super(TaxonomyauthorityCommon.class, TaxonomyAuthorityResource.class,
+                TAXONOMYAUTHORITY_COMMON, TAXONOMYITEM_COMMON);
     }
 
     /* (non-Javadoc)
@@ -124,6 +119,6 @@ public class TaxonomyAuthorityResource
 
     @Override
     public Class<TaxonomyauthorityCommon> getCommonPartClass() {
-    	return TaxonomyauthorityCommon.class;
+        return TaxonomyauthorityCommon.class;
     }
 }

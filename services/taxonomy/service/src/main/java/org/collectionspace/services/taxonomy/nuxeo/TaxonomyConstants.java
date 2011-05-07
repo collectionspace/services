@@ -29,7 +29,7 @@ package org.collectionspace.services.taxonomy.nuxeo;
  */
 public class TaxonomyConstants {
 
-    public final static String NUXEO_DOCTYPE = "Taxonomy";
-    public final static String NUXEO_SCHEMA_NAME = "taxonomy";
-    public final static String NUXEO_DC_TITLE = "CollectionSpace-Taxonomy";
+    public final static String NUXEO_DOCTYPE = "Taxon";
+    public final static String NUXEO_SCHEMA_NAME = "taxon";
+    public final static String NUXEO_DC_TITLE = "CollectionSpace-Taxon";
 }

@@ -31,7 +31,6 @@ import javax.ws.rs.core.Response;
 
 //import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommonList;
 import org.collectionspace.services.taxonomy.TaxonCommonList;
 import org.collectionspace.services.client.TaxonomyAuthorityProxy;
@@ -81,7 +80,7 @@ public class TaxonomyAuthorityClient extends AuthorityClientImpl<Taxonomyauthori
 
     @Override
     public String getItemCommonPartName() {
-        return getCommonPartName(SERVICE_ITEM_NAME);
+        return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
     }
 
     @Override

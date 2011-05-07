@@ -11,7 +11,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FileUtils;
-import org.collectionspace.services.TaxonomyJAXBSchema;
+import org.collectionspace.services.TaxonJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.taxonomy.TaxonCommon;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
@@ -64,22 +64,22 @@ public class TaxonomyAuthorityClientUtils {
             String taxonomyAuthRefName, Map<String, String> taxonInfo,
             String headerLabel) {
         TaxonCommon taxon = new TaxonCommon();
-        String shortId = taxonInfo.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER);
-        String displayName = taxonInfo.get(TaxonomyJAXBSchema.DISPLAY_NAME);
+        String shortId = taxonInfo.get(TaxonJAXBSchema.SHORT_IDENTIFIER);
+        String displayName = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME);
         taxon.setShortIdentifier(shortId);
         String taxonomyRefName = createTaxonomyRefName(taxonomyAuthRefName, shortId, displayName);
         taxon.setRefName(taxonomyRefName);
         String value = null;
-        value = taxonInfo.get(TaxonomyJAXBSchema.DISPLAY_NAME_COMPUTED);
+        value = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME_COMPUTED);
         boolean displayNameComputed = (value == null) || value.equalsIgnoreCase("true");
         taxon.setDisplayNameComputed(displayNameComputed);
-        if ((value = (String) taxonInfo.get(TaxonomyJAXBSchema.NAME)) != null) {
+        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.NAME)) != null) {
             taxon.setTaxonFullName(value);
         }
-        if ((value = (String) taxonInfo.get(TaxonomyJAXBSchema.RANK)) != null) {
+        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.RANK)) != null) {
             taxon.setTaxonRank(value);
         }
-        if ((value = (String) taxonInfo.get(TaxonomyJAXBSchema.TERM_STATUS)) != null) {
+        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TERM_STATUS)) != null) {
             taxon.setTermStatus(value);
         }
         // FIXME: Add additional fields in the Taxon record here.
@@ -99,7 +99,7 @@ public class TaxonomyAuthorityClientUtils {
     /**
      * @param vcsid CSID of the authority to create a new taxon in
      * @param TaxonomyauthorityRefName The refName for the authority
-     * @param taxonMap the properties for the new Taxonomy
+     * @param taxonMap the properties for the new Taxon
      * @param client the service client
      * @return the CSID of the new item
      */
@@ -111,8 +111,8 @@ public class TaxonomyAuthorityClientUtils {
         // Type of service request being tested
         ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
-        String displayName = taxonMap.get(TaxonomyJAXBSchema.DISPLAY_NAME);
-        String displayNameComputedStr = taxonMap.get(TaxonomyJAXBSchema.DISPLAY_NAME_COMPUTED);
+        String displayName = taxonMap.get(TaxonJAXBSchema.DISPLAY_NAME);
+        String displayNameComputedStr = taxonMap.get(TaxonJAXBSchema.DISPLAY_NAME_COMPUTED);
         boolean displayNameComputed = (displayNameComputedStr == null) || displayNameComputedStr.equalsIgnoreCase("true");
         if (displayName == null) {
             if (!displayNameComputed) {
@@ -121,7 +121,7 @@ public class TaxonomyAuthorityClientUtils {
             }
             displayName =
                     prepareDefaultDisplayName(
-                    taxonMap.get(TaxonomyJAXBSchema.NAME));
+                    taxonMap.get(TaxonJAXBSchema.NAME));
         }
 
         if (logger.isDebugEnabled()) {
@@ -138,13 +138,13 @@ public class TaxonomyAuthorityClientUtils {
 
             if (!REQUEST_TYPE.isValidStatusCode(statusCode)) {
                 throw new RuntimeException("Could not create Item: \""
-                        + taxonMap.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER)
+                        + taxonMap.get(TaxonJAXBSchema.SHORT_IDENTIFIER)
                         + "\" in Taxonomyauthority: \"" + TaxonomyauthorityRefName
                         + "\" " + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             }
             if (statusCode != EXPECTED_STATUS_CODE) {
                 throw new RuntimeException("Unexpected Status when creating Item: \""
-                        + taxonMap.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER)
+                        + taxonMap.get(TaxonJAXBSchema.SHORT_IDENTIFIER)
                         + "\" in Taxonomyauthority: \"" + TaxonomyauthorityRefName + "\", Status:" + statusCode);
             }
             newID = extractId(res);
@@ -155,7 +155,7 @@ public class TaxonomyAuthorityClientUtils {
         return newID;
     }
 
-    public static PoxPayloadOut createTaxonomyInstance(
+    public static PoxPayloadOut createTaxonInstance(
             String commonPartXML, String headerLabel) throws DocumentException {
         PoxPayloadOut multipart = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(commonPartXML,
@@ -178,7 +178,7 @@ public class TaxonomyAuthorityClientUtils {
         ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
         PoxPayloadOut multipart =
-                createTaxonomyInstance(commonPartXML, client.getItemCommonPartName());
+                createTaxonInstance(commonPartXML, client.getItemCommonPartName());
         String newID = null;
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         try {

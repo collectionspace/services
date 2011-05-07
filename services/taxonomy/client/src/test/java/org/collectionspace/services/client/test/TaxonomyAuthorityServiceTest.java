@@ -27,16 +27,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.collectionspace.services.TaxonomyJAXBSchema;
+import org.collectionspace.services.TaxonJAXBSchema;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.ContactClient;
-import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.contact.ContactsCommon;
-import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -244,10 +240,10 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         Map<String, String> taxonMap = new HashMap<String, String>();
         // TODO Make loc type and status be controlled vocabs.
-        taxonMap.put(TaxonomyJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
-        taxonMap.put(TaxonomyJAXBSchema.NAME, TEST_NAME);
-        taxonMap.put(TaxonomyJAXBSchema.RANK, TEST_RANK);
-        taxonMap.put(TaxonomyJAXBSchema.TERM_STATUS, TEST_STATUS);
+        taxonMap.put(TaxonJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
+        taxonMap.put(TaxonJAXBSchema.NAME, TEST_NAME);
+        taxonMap.put(TaxonJAXBSchema.RANK, TEST_RANK);
+        taxonMap.put(TaxonJAXBSchema.TERM_STATUS, TEST_STATUS);
         // FIXME: Add additional fields in the Taxon record here.
 
         String newID = TaxonomyAuthorityClientUtils.createItemInAuthority(vcsid,
@@ -258,7 +254,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         if (knownItemResourceId == null) {
             setKnownItemResource(newID, TEST_SHORTID);
             if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownItemResourceId=" + newID);
+                logger.debug(testName + ": knownItemResourceId=" + newID + " inAuthority=" + vcsid);
             }
         }
 
@@ -1112,9 +1108,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // The only relevant ID may be the one used in update(), below.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         Map<String, String> nonexMap = new HashMap<String, String>();
-        nonexMap.put(TaxonomyJAXBSchema.NAME, TEST_NAME);
-        nonexMap.put(TaxonomyJAXBSchema.SHORT_IDENTIFIER, "nonEx");
-        nonexMap.put(TaxonomyJAXBSchema.TERM_STATUS, TEST_STATUS);
+        nonexMap.put(TaxonJAXBSchema.NAME, TEST_NAME);
+        nonexMap.put(TaxonJAXBSchema.SHORT_IDENTIFIER, "nonEx");
+        nonexMap.put(TaxonJAXBSchema.TERM_STATUS, TEST_STATUS);
         PoxPayloadOut multipart =
                 TaxonomyAuthorityClientUtils.createTaxonInstance(
                 TaxonomyAuthorityClientUtils.createTaxonomyRefName(knownResourceRefName, "nonEx", "Non Existent"),
