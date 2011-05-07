@@ -66,7 +66,7 @@ import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonomyDocumentModelHandler;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonDocumentModelHandler;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
 @Produces("application/xml")
 public class TaxonomyAuthorityResource 
 	extends AuthorityResource<TaxonomyauthorityCommon, TaxonomyauthorityCommonList, 
-							TaxonCommon, TaxonomyDocumentModelHandler> {
+							TaxonCommon, TaxonDocumentModelHandler> {
 
     private final static String taxonomyAuthorityServiceName = "taxonomyauthorities";
 	private final static String TAXONOMYAUTHORITY_COMMON = "taxonomyauthority_common";
@@ -118,7 +118,7 @@ public class TaxonomyAuthorityResource
      * @return the item service name
      */
     public String getItemServiceName() {
-        return taxononomyItemServiceName;
+        return taxonomyItemServiceName;
     }
 
     @Override

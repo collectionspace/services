@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author 
  */
-public class TaxonomyValidatorHandler implements ValidatorHandler {
+public class TaxonValidatorHandler implements ValidatorHandler {
 
-    final Logger logger = LoggerFactory.getLogger(TaxonomyValidatorHandler.class);
+    final Logger logger = LoggerFactory.getLogger(TaxonValidatorHandler.class);
 
     @Override
     public void validate(Action action, ServiceContext ctx)

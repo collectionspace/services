@@ -56,17 +56,17 @@ import org.slf4j.LoggerFactory;
  * @author pschmitz
  *
  */
-public class TaxonomyDocumentModelHandler
+public class TaxonDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<TaxonCommon, TaxonCommonList> {
 
     /** The logger. */
-    private final Logger logger = LoggerFactory.getLogger(TaxonomyDocumentModelHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(TaxonDocumentModelHandler.class);
     /**
      * Common part schema label
      */
     private static final String COMMON_PART_LABEL = "taxonomy_common";
     
-    public TaxonomyDocumentModelHandler() {
+    public TaxonDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
     }
 	

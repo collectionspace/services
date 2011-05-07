@@ -1,11 +1,10 @@
-
 <project name="taxonomy" default="package" basedir=".">
     <description>
         Taxonomy Authority service
     </description>
-  <!-- set global properties for this build -->
+    <!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
-        <!-- enviornment should be declared before reading build.properties -->
+    <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />

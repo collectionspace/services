@@ -46,7 +46,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * The Class TaxonomyAuthorityClient.
  */
 public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyauthorityCommonList, TaxonCommonList, TaxonomyAuthorityProxy> {
-	public static final String SERVICE_NAME = "Taxonomyauthority";
+	public static final String SERVICE_NAME = "taxonomyauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;

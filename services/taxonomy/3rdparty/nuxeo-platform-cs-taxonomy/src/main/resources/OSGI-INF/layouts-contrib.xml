@@ -73,7 +73,7 @@
   <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
     point="layouts">
 
-    <layout name="taxonomy">
+    <layout name="taxon">
       <templates>
         <template mode="any">/layouts/layout_default_template.xhtml</template>
       </templates>
