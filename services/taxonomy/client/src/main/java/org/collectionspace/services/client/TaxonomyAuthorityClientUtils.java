@@ -22,8 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 public class TaxonomyAuthorityClientUtils {
+
     private static final Logger logger =
-        LoggerFactory.getLogger(TaxonomyAuthorityClientUtils.class);
+            LoggerFactory.getLogger(TaxonomyAuthorityClientUtils.class);
 
     /**
      * Creates a new Taxonomy Authority
@@ -33,7 +34,7 @@ public class TaxonomyAuthorityClientUtils {
      * @return	The PoxPayloadOut payload for the create call
      */
     public static PoxPayloadOut createTaxonomyAuthorityInstance(
-    		String displayName, String shortIdentifier, String headerLabel ) {
+            String displayName, String shortIdentifier, String headerLabel) {
         TaxonomyauthorityCommon Taxonomyauthority = new TaxonomyauthorityCommon();
         Taxonomyauthority.setDisplayName(displayName);
         Taxonomyauthority.setShortIdentifier(shortIdentifier);
@@ -44,9 +45,9 @@ public class TaxonomyAuthorityClientUtils {
         PayloadOutputPart commonPart = multipart.addPart(Taxonomyauthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, Taxonomyauthority common ", 
-        				Taxonomyauthority, TaxonomyauthorityCommon.class);
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be created, Taxonomyauthority common ",
+                    Taxonomyauthority, TaxonomyauthorityCommon.class);
         }
 
         return multipart;
@@ -54,148 +55,152 @@ public class TaxonomyAuthorityClientUtils {
 
     /**
      * @param taxonomyRefName  The proper refName for this authority
-     * @param taxonomyInfo the properties for the new Taxonomy. Can pass in one condition
+     * @param taxonInfo the properties for the new Taxonomy. Can pass in one condition
      * 						note and date string.
      * @param headerLabel	The common part label
      * @return	The PoxPayloadOut payload for the create call
      */
-    public static PoxPayloadOut createTaxonomyInstance( 
-    		String taxonomyAuthRefName, Map<String, String> taxonomyInfo, 
-				String headerLabel){
-        TaxonCommon taxonomy = new TaxonCommon();
-    	String shortId = taxonomyInfo.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER);
-    	String displayName = taxonomyInfo.get(TaxonomyJAXBSchema.DISPLAY_NAME);
-    	taxonomy.setShortIdentifier(shortId);
-    	String taxonomyRefName = createTaxonomyRefName(taxonomyAuthRefName, shortId, displayName);
-       	taxonomy.setRefName(taxonomyRefName);
-       	String value = null;
-    	value = taxonomyInfo.get(TaxonomyJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
-    	taxonomy.setDisplayNameComputed(displayNameComputed);
-        if((value = (String)taxonomyInfo.get(TaxonomyJAXBSchema.NAME))!=null)
-        	taxonomy.setTaxonFullName(value);
-        if((value = (String)taxonomyInfo.get(TaxonomyJAXBSchema.RANK))!=null)
-        	taxonomy.setTaxonRank(value);
-        if((value = (String)taxonomyInfo.get(TaxonomyJAXBSchema.TERM_STATUS))!=null)
-        	taxonomy.setTermStatus(value);
+    public static PoxPayloadOut createTaxonInstance(
+            String taxonomyAuthRefName, Map<String, String> taxonInfo,
+            String headerLabel) {
+        TaxonCommon taxon = new TaxonCommon();
+        String shortId = taxonInfo.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER);
+        String displayName = taxonInfo.get(TaxonomyJAXBSchema.DISPLAY_NAME);
+        taxon.setShortIdentifier(shortId);
+        String taxonomyRefName = createTaxonomyRefName(taxonomyAuthRefName, shortId, displayName);
+        taxon.setRefName(taxonomyRefName);
+        String value = null;
+        value = taxonInfo.get(TaxonomyJAXBSchema.DISPLAY_NAME_COMPUTED);
+        boolean displayNameComputed = (value == null) || value.equalsIgnoreCase("true");
+        taxon.setDisplayNameComputed(displayNameComputed);
+        if ((value = (String) taxonInfo.get(TaxonomyJAXBSchema.NAME)) != null) {
+            taxon.setTaxonFullName(value);
+        }
+        if ((value = (String) taxonInfo.get(TaxonomyJAXBSchema.RANK)) != null) {
+            taxon.setTaxonRank(value);
+        }
+        if ((value = (String) taxonInfo.get(TaxonomyJAXBSchema.TERM_STATUS)) != null) {
+            taxon.setTermStatus(value);
+        }
+        // FIXME: Add additional fields in the Taxon record here.
 
         PoxPayloadOut multipart = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(taxonomy,
-            MediaType.APPLICATION_XML_TYPE);
+        PayloadOutputPart commonPart = multipart.addPart(taxon,
+                MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, taxon common ", taxonomy, TaxonCommon.class);
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be created, taxon common ", taxon, TaxonCommon.class);
         }
 
         return multipart;
     }
-    
+
     /**
-     * @param vcsid CSID of the authority to create a new taxonomy in
+     * @param vcsid CSID of the authority to create a new taxon in
      * @param TaxonomyauthorityRefName The refName for the authority
-     * @param taxonomyMap the properties for the new Taxonomy
+     * @param taxonMap the properties for the new Taxonomy
      * @param client the service client
      * @return the CSID of the new item
      */
-    public static String createItemInAuthority(String vcsid, 
-    		String TaxonomyauthorityRefName, Map<String,String> taxonomyMap,
-    		TaxonomyAuthorityClient client ) {
-    	// Expected status code: 201 Created
-    	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
-    	// Type of service request being tested
-    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-    	
-    	String displayName = taxonomyMap.get(TaxonomyJAXBSchema.DISPLAY_NAME);
-    	String displayNameComputedStr = taxonomyMap.get(TaxonomyJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (displayNameComputedStr==null) || displayNameComputedStr.equalsIgnoreCase("true");
-    	if( displayName == null ) {
-    		if(!displayNameComputed) {
-	    		throw new RuntimeException(
-	    		"CreateItem: Must supply a displayName if displayNameComputed is set to false.");
-    		}
-        	displayName = 
-        		prepareDefaultDisplayName(
-    		    	taxonomyMap.get(TaxonomyJAXBSchema.NAME));
-    	}
-    	
-    	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create Item: \""+displayName
-    				+"\" in Taxonomyauthority: \"" + TaxonomyauthorityRefName +"\"");
-    	}
-    	PoxPayloadOut multipart = 
-    		createTaxonomyInstance( TaxonomyauthorityRefName,
-    			taxonomyMap, client.getItemCommonPartName() );
-    	String newID = null;
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
-        try {
-	    	int statusCode = res.getStatus();
-	
-	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-	    		throw new RuntimeException("Could not create Item: \""
-	    				+taxonomyMap.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER)
-	    				+"\" in Taxonomyauthority: \"" + TaxonomyauthorityRefName
-	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	    	}
-	    	if(statusCode != EXPECTED_STATUS_CODE) {
-	    		throw new RuntimeException("Unexpected Status when creating Item: \""
-	    				+taxonomyMap.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER)
-	    				+"\" in Taxonomyauthority: \"" + TaxonomyauthorityRefName +"\", Status:"+ statusCode);
-	    	}
-	        newID = extractId(res);
-        } finally {
-        	res.releaseConnection();
+    public static String createItemInAuthority(String vcsid,
+            String TaxonomyauthorityRefName, Map<String, String> taxonMap,
+            TaxonomyAuthorityClient client) {
+        // Expected status code: 201 Created
+        int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
+        // Type of service request being tested
+        ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+
+        String displayName = taxonMap.get(TaxonomyJAXBSchema.DISPLAY_NAME);
+        String displayNameComputedStr = taxonMap.get(TaxonomyJAXBSchema.DISPLAY_NAME_COMPUTED);
+        boolean displayNameComputed = (displayNameComputedStr == null) || displayNameComputedStr.equalsIgnoreCase("true");
+        if (displayName == null) {
+            if (!displayNameComputed) {
+                throw new RuntimeException(
+                        "CreateItem: Must supply a displayName if displayNameComputed is set to false.");
+            }
+            displayName =
+                    prepareDefaultDisplayName(
+                    taxonMap.get(TaxonomyJAXBSchema.NAME));
         }
 
-    	return newID;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Import: Create Item: \"" + displayName
+                    + "\" in Taxonomyauthority: \"" + TaxonomyauthorityRefName + "\"");
+        }
+        PoxPayloadOut multipart =
+                createTaxonInstance(TaxonomyauthorityRefName,
+                taxonMap, client.getItemCommonPartName());
+        String newID = null;
+        ClientResponse<Response> res = client.createItem(vcsid, multipart);
+        try {
+            int statusCode = res.getStatus();
+
+            if (!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+                throw new RuntimeException("Could not create Item: \""
+                        + taxonMap.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER)
+                        + "\" in Taxonomyauthority: \"" + TaxonomyauthorityRefName
+                        + "\" " + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            }
+            if (statusCode != EXPECTED_STATUS_CODE) {
+                throw new RuntimeException("Unexpected Status when creating Item: \""
+                        + taxonMap.get(TaxonomyJAXBSchema.SHORT_IDENTIFIER)
+                        + "\" in Taxonomyauthority: \"" + TaxonomyauthorityRefName + "\", Status:" + statusCode);
+            }
+            newID = extractId(res);
+        } finally {
+            res.releaseConnection();
+        }
+
+        return newID;
     }
 
     public static PoxPayloadOut createTaxonomyInstance(
-    		String commonPartXML, String headerLabel)  throws DocumentException {
+            String commonPartXML, String headerLabel) throws DocumentException {
         PoxPayloadOut multipart = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(commonPartXML,
-            MediaType.APPLICATION_XML_TYPE);
+                MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, Taxon common ", commonPartXML);
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be created, Taxon common ", commonPartXML);
         }
 
         return multipart;
     }
-    
+
     public static String createItemInAuthority(String vcsid,
-    		String commonPartXML,
-    		TaxonomyAuthorityClient client ) throws DocumentException {
-    	// Expected status code: 201 Created
-    	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
-    	// Type of service request being tested
-    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-    	
-    	PoxPayloadOut multipart = 
-    		createTaxonomyInstance(commonPartXML, client.getItemCommonPartName());
-    	String newID = null;
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+            String commonPartXML,
+            TaxonomyAuthorityClient client) throws DocumentException {
+        // Expected status code: 201 Created
+        int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
+        // Type of service request being tested
+        ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+
+        PoxPayloadOut multipart =
+                createTaxonomyInstance(commonPartXML, client.getItemCommonPartName());
+        String newID = null;
+        ClientResponse<Response> res = client.createItem(vcsid, multipart);
         try {
-	    	int statusCode = res.getStatus();
-	
-	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-	    		throw new RuntimeException("Could not create Item: \""+commonPartXML
-	    				+"\" in Taxonomyauthority: \"" + vcsid
-	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	    	}
-	    	if(statusCode != EXPECTED_STATUS_CODE) {
-	    		throw new RuntimeException("Unexpected Status when creating Item: \""+commonPartXML
-	    				+"\" in Taxonomyauthority: \"" + vcsid +"\", Status:"+ statusCode);
-	    	}
-	        newID = extractId(res);
+            int statusCode = res.getStatus();
+
+            if (!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+                throw new RuntimeException("Could not create Item: \"" + commonPartXML
+                        + "\" in Taxonomyauthority: \"" + vcsid
+                        + "\" " + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            }
+            if (statusCode != EXPECTED_STATUS_CODE) {
+                throw new RuntimeException("Unexpected Status when creating Item: \"" + commonPartXML
+                        + "\" in Taxonomyauthority: \"" + vcsid + "\", Status:" + statusCode);
+            }
+            newID = extractId(res);
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
         }
 
-    	return newID;
+        return newID;
     }
-    
+
     /**
      * Creates the from xml file.
      *
@@ -203,12 +208,12 @@ public class TaxonomyAuthorityClientUtils {
      * @return new CSID as string
      * @throws Exception the exception
      */
-    private String createItemInAuthorityFromXmlFile(String vcsid, String commonPartFileName, 
-    		TaxonomyAuthorityClient client) throws Exception {
+    private String createItemInAuthorityFromXmlFile(String vcsid, String commonPartFileName,
+            TaxonomyAuthorityClient client) throws Exception {
         byte[] b = FileUtils.readFileToByteArray(new File(commonPartFileName));
         String commonPartXML = new String(b);
-    	return createItemInAuthority(vcsid, commonPartXML, client );
-    }    
+        return createItemInAuthority(vcsid, commonPartXML, client);
+    }
 
     /**
      * Creates the Taxonomyauthority ref name.
@@ -218,11 +223,12 @@ public class TaxonomyAuthorityClientUtils {
      * @return the string
      */
     public static String createTaxonomyAuthRefName(String shortId, String displaySuffix) {
-    	String refName = "urn:cspace:org.collectionspace.demo:taxonomyauthority:name("
-			+shortId+")";
-		if(displaySuffix!=null&&!displaySuffix.isEmpty())
-			refName += "'"+displaySuffix+"'";
-    	return refName;
+        String refName = "urn:cspace:org.collectionspace.demo:taxonomyauthority:name("
+                + shortId + ")";
+        if (displaySuffix != null && !displaySuffix.isEmpty()) {
+            refName += "'" + displaySuffix + "'";
+        }
+        return refName;
     }
 
     /**
@@ -234,27 +240,28 @@ public class TaxonomyAuthorityClientUtils {
      * @return the string
      */
     public static String createTaxonomyRefName(
-    						String taxonomyAuthRefName, String shortId, String displaySuffix) {
-    	String refName = taxonomyAuthRefName+":taxon:name("+shortId+")";
-		if(displaySuffix!=null&&!displaySuffix.isEmpty())
-			refName += "'"+displaySuffix+"'";
-    	return refName;
+            String taxonomyAuthRefName, String shortId, String displaySuffix) {
+        String refName = taxonomyAuthRefName + ":taxon:name(" + shortId + ")";
+        if (displaySuffix != null && !displaySuffix.isEmpty()) {
+            refName += "'" + displaySuffix + "'";
+        }
+        return refName;
     }
 
     public static String extractId(ClientResponse<Response> res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
-        if(logger.isDebugEnabled()){
-        	logger.debug("extractId:uri=" + uri);
+        if (logger.isDebugEnabled()) {
+            logger.debug("extractId:uri=" + uri);
         }
         String[] segments = uri.split("/");
         String id = segments[segments.length - 1];
-        if(logger.isDebugEnabled()){
-        	logger.debug("id=" + id);
+        if (logger.isDebugEnabled()) {
+            logger.debug("id=" + id);
         }
         return id;
     }
-    
+
     /**
      * Returns an error message indicating that the status code returned by a
      * specific call to a service does not fall within a set of valid status
@@ -268,12 +275,10 @@ public class TaxonomyAuthorityClientUtils {
      * @return An error message.
      */
     public static String invalidStatusCodeMessage(ServiceRequestType requestType, int statusCode) {
-        return "Status code '" + statusCode + "' in response is NOT within the expected set: " +
-                requestType.validStatusCodesAsString();
+        return "Status code '" + statusCode + "' in response is NOT within the expected set: "
+                + requestType.validStatusCodesAsString();
     }
 
-
-    
     /**
      * Produces a default displayName from the basic name and dates fields.
      * @see TaxonomyDocumentModelHandler.prepareDefaultDisplayName() which
@@ -283,12 +288,9 @@ public class TaxonomyAuthorityClientUtils {
      * @return
      */
     public static String prepareDefaultDisplayName(
-    		String name ) {
-    	StringBuilder newStr = new StringBuilder();
-			newStr.append(name);
-		return newStr.toString();
+            String name) {
+        StringBuilder newStr = new StringBuilder();
+        newStr.append(name);
+        return newStr.toString();
     }
-    
-
-
 }

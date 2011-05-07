@@ -117,6 +117,7 @@ public class TaxonomyAuthorityResource
      * 
      * @return the item service name
      */
+    @Override
     public String getItemServiceName() {
         return taxonomyItemServiceName;
     }
