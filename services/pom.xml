@@ -49,6 +49,7 @@
         <module>objectexit</module>
         <module>imports</module>
         <module>location</module>
+        <module>taxonomy</module>
         <module>movement</module>
         <module>report</module>
         <module>dimension</module>

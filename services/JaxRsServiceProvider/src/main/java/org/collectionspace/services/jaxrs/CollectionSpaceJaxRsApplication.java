@@ -35,6 +35,7 @@ import org.collectionspace.services.loanout.LoanoutResource;
 import org.collectionspace.services.objectexit.ObjectExitResource;
 import org.collectionspace.services.imports.ImportsResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
+import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.report.ReportResource;
@@ -101,6 +102,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new MovementResource());
         singletons.add(new ReportResource());
         singletons.add(new LocationAuthorityResource());
+        singletons.add(new TaxonomyAuthorityResource());
         singletons.add(new IDResource());
         /*
         singletons.add(new WorkflowResource());
