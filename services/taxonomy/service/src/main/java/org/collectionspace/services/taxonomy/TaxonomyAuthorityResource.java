@@ -83,10 +83,12 @@ public class TaxonomyAuthorityResource
 							TaxonCommon, TaxonomyDocumentModelHandler> {
 
     private final static String taxonomyAuthorityServiceName = "taxonomyauthorities";
-	private final static String LOCATIONAUTHORITIES_COMMON = "taxonomyauthority_common";
+	private final static String TAXONOMYAUTHORITY_COMMON = "taxonomyauthority_common";
     
-    private final static String taxonomyServiceName = "taxonomy";
-	private final static String LOCATIONS_COMMON = "taxonomy_common";
+    // FIXME: May be desirable to change this to the plural form 'taxa',
+    // both here and in related config.
+    private final static String taxonomyItemServiceName = "taxon";
+	private final static String TAXON_COMMON = "taxon_common";
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(TaxonomyAuthorityResource.class);
@@ -99,7 +101,7 @@ public class TaxonomyAuthorityResource
      */
     public TaxonomyAuthorityResource() {
 		super(TaxonomyauthorityCommon.class, TaxonomyAuthorityResource.class,
-				LOCATIONAUTHORITIES_COMMON, LOCATIONS_COMMON);
+				TAXONOMYAUTHORITY_COMMON, TAXON_COMMON);
     }
 
     /* (non-Javadoc)
@@ -116,7 +118,7 @@ public class TaxonomyAuthorityResource
      * @return the item service name
      */
     public String getItemServiceName() {
-        return taxonomyServiceName;
+        return taxononomyItemServiceName;
     }
 
     @Override
