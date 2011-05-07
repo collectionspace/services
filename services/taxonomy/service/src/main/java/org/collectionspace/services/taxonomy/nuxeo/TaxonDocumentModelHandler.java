@@ -64,7 +64,7 @@ public class TaxonDocumentModelHandler
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "taxonomy_common";
+    private static final String COMMON_PART_LABEL = "taxon_common";
     
     public TaxonDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
@@ -96,7 +96,7 @@ public class TaxonDocumentModelHandler
      * @throws Exception the exception
      */
     private void handleDisplayNames(DocumentModel docModel) throws Exception {
-    	String commonPartLabel = getServiceContext().getCommonPartLabel("taxonomy");
+    	String commonPartLabel = getServiceContext().getCommonPartLabel("taxon");
     	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
     			TaxonomyJAXBSchema.DISPLAY_NAME_COMPUTED);
     	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
@@ -150,8 +150,7 @@ public class TaxonDocumentModelHandler
         commonList.setFieldsReturned("displayName|refName|shortIdentifier|uri|csid");
 		List<TaxonCommonList.TaxonListItem> list = coList.getTaxonListItem();
 		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-		String commonPartLabel = getServiceContext().getCommonPartLabel(
-				"taxonomy");
+		String commonPartLabel = getServiceContext().getCommonPartLabel("taxon");
 		while (iter.hasNext()) {
 			DocumentModel docModel = iter.next();
 			TaxonListItem ilistItem = new TaxonListItem();

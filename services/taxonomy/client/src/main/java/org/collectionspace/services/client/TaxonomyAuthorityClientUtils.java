@@ -85,7 +85,7 @@ public class TaxonomyAuthorityClientUtils {
         commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
-        	logger.debug("to be created, taxonomy common ", taxonomy, TaxonCommon.class);
+        	logger.debug("to be created, taxon common ", taxonomy, TaxonCommon.class);
         }
 
         return multipart;
@@ -158,7 +158,7 @@ public class TaxonomyAuthorityClientUtils {
         commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
-        	logger.debug("to be created, taxonomy common ", commonPartXML);
+        	logger.debug("to be created, Taxon common ", commonPartXML);
         }
 
         return multipart;
@@ -226,16 +226,16 @@ public class TaxonomyAuthorityClientUtils {
     }
 
     /**
-     * Creates the taxonomy ref name.
+     * Creates the taxon ref name.
      *
      * @param taxonomyAuthRefName the Taxonomyauthority ref name
-     * @param shortId the taxonomy shortIdentifier
+     * @param shortId the taxon shortIdentifier
      * @param displaySuffix displayName to be appended, if non-null
      * @return the string
      */
     public static String createTaxonomyRefName(
     						String taxonomyAuthRefName, String shortId, String displaySuffix) {
-    	String refName = taxonomyAuthRefName+":taxonomy:name("+shortId+")";
+    	String refName = taxonomyAuthRefName+":taxon:name("+shortId+")";
 		if(displaySuffix!=null&&!displaySuffix.isEmpty())
 			refName += "'"+displaySuffix+"'";
     	return refName;
@@ -243,7 +243,7 @@ public class TaxonomyAuthorityClientUtils {
 
     public static String extractId(ClientResponse<Response> res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
-        String uri = (String) ((ArrayList<Object>) mvm.get("Taxonomy")).get(0);
+        String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isDebugEnabled()){
         	logger.debug("extractId:uri=" + uri);
         }
