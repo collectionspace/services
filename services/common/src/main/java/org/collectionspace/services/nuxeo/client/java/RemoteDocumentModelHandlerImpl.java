@@ -145,8 +145,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             throws Exception {
         Element doc = DocumentUtils.buildDocument(partMeta, schema,
                 unQObjectProperties);
-        if (logger.isDebugEnabled() == true) {
-            logger.debug(doc.asXML());
+        if (logger.isTraceEnabled() == true) {
+            logger.trace(doc.asXML());
         }
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());

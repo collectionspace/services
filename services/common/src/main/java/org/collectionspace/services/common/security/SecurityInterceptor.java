@@ -91,24 +91,18 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 		checkActive();
 		
 		//
-		// All active users are allowed to the their current list of permissions.  If this is not
+		// All active users are allowed to the *their* (we enforce this) current list of permissions.  If this is not
 		// the request, then we'll do a full AuthZ check.
 		//
-		if (resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS) != true) {
+		if (resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS) != true) { //see comment immediately above
 			AuthZ authZ = AuthZ.get();
 			CSpaceResource res = new URIResourceImpl(resName, httpMethod);
-			if (!authZ.isAccessAllowed(res)) {
-				//
-				// They failed the first check, but let's see if they're try to access the Blob service
-				// with a GET method.   If so they are allow, see http://issues.collectionspace.org/browse/CSPACE-3797
-				//
-				if (resName.contains("blobs") == false) { //FIXME : REM - Yuk!  Remove this ASAP -see http://issues.collectionspace.org/browse/CSPACE-3797
+			if (authZ.isAccessAllowed(res) == false) {
 					logger.error("Access to " + res.getId() + " is NOT allowed to "
 							+ " user=" + AuthN.get().getUserId());
 					Response response = Response.status(
 							Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
 					throw new WebApplicationException(response);
-				}
 			} else {
 				//
 				// They passed the first round of security checks, so now let's check to see if they're trying
@@ -117,7 +111,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 				if (uriPath.endsWith(WorkflowClient.SERVICE_PATH_COMPONENT) == true) {
 					String workflowSubResName = SecurityUtils.getResourceName(request.getUri());
 					res = new URIResourceImpl(workflowSubResName, httpMethod);
-					if (!authZ.isAccessAllowed(res)) {
+					if (authZ.isAccessAllowed(res) == false) {
 						logger.error("Access to " + resName + ":" + res.getId() + " is NOT allowed to "
 								+ " user=" + AuthN.get().getUserId());
 						Response response = Response.status(
@@ -129,9 +123,9 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 			//
 			// We've passed all the checks.  Now just log the results
 			//
-			if (logger.isDebugEnabled()) {
-				logger.debug("Access to " + res.getId() + " is allowed to "
-						+ " user=" + AuthN.get().getUserId() +
+			if (logger.isTraceEnabled()) {
+				logger.trace("Access to " + res.getId() + " is allowed to " +
+						" user=" + AuthN.get().getUserId() +
 						" for tenant id=" + AuthN.get().getCurrentTenantName());
 			}
 		}
