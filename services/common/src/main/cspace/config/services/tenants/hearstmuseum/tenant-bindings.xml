@@ -1320,6 +1320,140 @@
         </tenant:serviceBindings>
         <!-- end location service meta-data -->
 
+        <!-- begin taxonomyauthority service meta-data -->
+        <tenant:serviceBindings name="Taxonomyauthorities" version="0.1">
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /taxonomyauthorities/*/workflow/
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /taxonomyauthorities/*/taxon/*/workflow/
+            </service:uriPath>
+            <!-- other URI paths using which this service could be accessed -->
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /taxonomyauthorities/*/items/
+            </service:uriPath>-->
+            <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
+                default-domain
+            </service:repositoryDomain>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityDocumentModelHandler
+            </service:documentHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.taxonomyauthority_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.taxonomyauthority_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
+            <service:object id="1" name="Taxonomyauthority" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="taxonomyauthority-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="taxonomyauthority_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/taxonomy"
+                            schemaLocation="http://collectionspace.org/services/taxonomy http://services.collectionspace.org/location/taxonomyauthority_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end taxonomyauthority service meta-data -->
+
+        <!-- begin Taxon (the 'item' child of TaxonomyAuthority) service meta-data.
+             Note there is no Taxon service, but there is a
+             Repository workspace so we have to configure that.
+        -->
+        <tenant:serviceBindings name="Taxon" version="0.1">
+            <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
+                default-domain
+            </service:repositoryDomain>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.taxonomy.nuxeo.TaxonDocumentModelHandler
+            </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.taxonomy.nuxeo.TaxonValidatorHandler
+            </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.taxon_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.taxon_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.taxon_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
+            <service:object id="1" name="Taxon" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="taxon-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="taxon_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/taxonomy"
+                            schemaLocation="http://collectionspace.org/services/taxonomy http://services.collectionspace.org/taxonomy/taxon_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end taxon service meta-data -->
+
         <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings name="Acquisitions" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
