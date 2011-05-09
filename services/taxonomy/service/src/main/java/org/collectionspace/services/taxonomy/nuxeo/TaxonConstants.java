@@ -24,10 +24,10 @@
 package org.collectionspace.services.taxonomy.nuxeo;
 
 /**
- * TaxonomyConstants provides constants for Taxonomy documents
+ * TaxonConstants provides constants for Taxonomy documents
  *
  */
-public class TaxonomyConstants {
+public class TaxonConstants {
 
     public final static String NUXEO_DOCTYPE = "Taxon";
     public final static String NUXEO_SCHEMA_NAME = "taxon";

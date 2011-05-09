@@ -446,11 +446,6 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 
             // Check whether we've received a taxon.
             PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-            String xml = input.getXmlPayload(); // for debugging
-            if (logger.isDebugEnabled()) { // for debugging
-                logger.debug(testName + "#########" + xml);
-            }
-            String cpn = client.getItemCommonPartName(); // for debugging
             TaxonCommon taxon = (TaxonCommon) extractPart(input,
                     client.getItemCommonPartName(), TaxonCommon.class);
             Assert.assertNotNull(taxon);

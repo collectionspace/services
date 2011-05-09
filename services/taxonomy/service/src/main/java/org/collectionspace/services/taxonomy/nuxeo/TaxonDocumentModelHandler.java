@@ -175,7 +175,7 @@ public class TaxonDocumentModelHandler
      */
     @Override
     public String getQProperty(String prop) {
-        return TaxonomyConstants.NUXEO_SCHEMA_NAME + ":" + prop;
+        return TaxonConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
 }
 
