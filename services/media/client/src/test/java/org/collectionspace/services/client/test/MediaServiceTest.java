@@ -24,6 +24,7 @@ package org.collectionspace.services.client.test;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -34,7 +35,9 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.media.LanguageList;
 import org.collectionspace.services.media.MediaCommon;
+import org.collectionspace.services.media.SubjectList;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
@@ -381,6 +384,19 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         String identifier = "media.title-" + title;
         MediaCommon media = new MediaCommon();
         media.setTitle(identifier);
+        media.setContributor("Joe-bob briggs");
+        media.setCoverage("Lots of stuff");
+        media.setPublisher("Ludicrum Enterprises");
+        SubjectList subjects = new SubjectList();
+        List<String> subjList = subjects.getSubject();
+        subjList.add("Pints of blood");
+        subjList.add("Much skin");
+        media.setSubjectList(subjects);
+        LanguageList languages = new LanguageList();
+        List<String> langList = languages.getLanguage();
+        langList.add("English");
+        langList.add("German");
+        media.setLanguageList(languages);
         PoxPayloadOut multipart = new PoxPayloadOut(MediaClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(media, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(new MediaClient().getCommonPartName());

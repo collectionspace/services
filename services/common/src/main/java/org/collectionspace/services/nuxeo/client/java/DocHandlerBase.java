@@ -168,35 +168,6 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     public AbstractCommonList extractCommonPartListPATRICK(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         //String label = getServiceContext().getCommonPartLabel();
         
-        /*
-        AbstractCommonList commonList = createAbstractCommonListImpl();
-        extractPagingInfo(((TL)commonList), wrapDoc);
-        commonList.setFieldsReturned(getSummaryFields(commonList));
-        List list = createItemsList(commonList);
-        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-        while(iter.hasNext()){
-            DocumentModel docModel = iter.next();
-            String id = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
-            Object item = createItemForCommonList(docModel, label, id);
-            list.add(item);
-        }
-        */
-        /* Rewrite
-         * Create the CommonList
-         * List<ListResultField> resultsFields = getListItemsArray();
-         * Construct array of strings of resultsFields
-         *   add csid and uri
-         * Set the fieldNames for CommonList
-         * For each doc in list:
-         *   Create HashMap of values
-         *   get csid, set csid hashmap value
-         *   get uri, set uri hashmap value
-         *   for (ListResultField field : resultsFields ){
-         *	   get String value from Xpath
-         *	   set hashMap value
-         *   AddItem to CommonList
-         * 
-         */
     	String commonSchema = getServiceContext().getCommonPartLabel();
     	CommonList commonList = new CommonList();
         extractPagingInfo(commonList, wrapDoc);
@@ -273,7 +244,6 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     }
 
     //================== UTILITY METHODS ================================================
-
     public static ReflectionMapper.STATUS callPropertySetterWithXPathValue(DocumentModel docModel,
                            Object listItem,
                            String setterName,

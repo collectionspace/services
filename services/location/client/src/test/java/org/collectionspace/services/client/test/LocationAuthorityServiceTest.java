@@ -394,6 +394,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	            	(LocationauthoritiesCommon) extractPart(input,
 	                    client.getCommonPartName(), LocationauthoritiesCommon.class);
 	            Assert.assertNotNull(locationAuthority);
+	            Assert.assertNotNull(locationAuthority.getDisplayName());
+	            Assert.assertNotNull(locationAuthority.getShortIdentifier());
+	            Assert.assertNotNull(locationAuthority.getRefName());
 	        } catch (Exception e) {
 	            throw new RuntimeException(e);
 	        }

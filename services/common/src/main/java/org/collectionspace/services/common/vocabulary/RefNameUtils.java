@@ -70,7 +70,7 @@ public class RefNameUtils {
         public String name;
         public String displayName;
         
-        public AuthorityInfo(String refNameTokens[]) throws Exception {
+        public AuthorityInfo(String refNameTokens[]) throws IllegalArgumentException {
         	try {
 	        	if(refNameTokens.length < MIN_TOKENS) {
 	        		throw new IllegalArgumentException("Malformed refName for Authority (too few tokens)");
@@ -94,7 +94,7 @@ public class RefNameUtils {
 	    		this.displayName = 
 	    			((idTokens.length<INSTANCE_TOKENS_MAX)||(idTokens[INSTANCE_DISPLAYNAME_TOKEN].length()<3))? null:
 	    			idTokens[INSTANCE_DISPLAYNAME_TOKEN].substring(1, idTokens[INSTANCE_DISPLAYNAME_TOKEN].length()-1);
-        	} catch (Exception e) {
+        	} catch (IllegalArgumentException e) {
 	            if (logger.isDebugEnabled()) {
 	            	logger.debug("Problem Building AuthorityInfo from tokens: " 
 	            			+ RefNameUtils.implodeStringArray(refNameTokens, ", "));
@@ -134,7 +134,7 @@ public class RefNameUtils {
     	public String name;
     	public String displayName;
         
-        public AuthorityTermInfo(String refNameTokens[]) throws Exception {
+        public AuthorityTermInfo(String refNameTokens[]) throws IllegalArgumentException {
         	try {
 	        	if(refNameTokens.length < MIN_TOKENS) {
 	        		throw new IllegalArgumentException("Malformed refName for AuthorityTerm (too few tokens)");
@@ -160,7 +160,7 @@ public class RefNameUtils {
 	        	this.displayName = 
 	        		((idTokens.length<INSTANCE_TOKENS_MAX)||(idTokens[INSTANCE_DISPLAYNAME_TOKEN].length()<3))? null:
 	    			idTokens[INSTANCE_DISPLAYNAME_TOKEN].substring(1, idTokens[INSTANCE_DISPLAYNAME_TOKEN].length()-1);
-        	} catch (Exception e) {
+        	} catch (IllegalArgumentException e) {
 	            if (logger.isDebugEnabled()) {
 	            	logger.debug("Problem Building AuthorityTermInfo from tokens: " 
 	            			+ RefNameUtils.implodeStringArray(refNameTokens, ", "));
@@ -183,16 +183,16 @@ public class RefNameUtils {
     };
 
     public static AuthorityInfo parseAuthorityInfo(String refName)
-            throws Exception {
+            throws IllegalArgumentException {
     	if(refName==null || !refName.startsWith(URN_PREFIX))
-    		throw new RuntimeException( "Null or invalid refName syntax");
+    		throw new IllegalArgumentException( "Null or invalid refName syntax");
     	return new AuthorityInfo(refName.substring(URN_PREFIX_LEN).split(SEPARATOR));
     }
 
     public static AuthorityTermInfo parseAuthorityTermInfo(String refName)
-            throws Exception {
+            throws IllegalArgumentException {
     	if(refName==null || !refName.startsWith(URN_PREFIX))
-    		throw new RuntimeException( "Null or invalid refName syntax");
+    		throw new IllegalArgumentException( "Null or invalid refName syntax");
     	return new AuthorityTermInfo(refName.substring(URN_PREFIX_LEN).split(SEPARATOR));
     }
 

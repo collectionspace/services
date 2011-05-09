@@ -38,6 +38,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 //import org.collectionspace.services.common.authority.AuthorityItemRelations;
 import org.collectionspace.services.common.api.CommonAPI;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -89,6 +90,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
      * inVocabulary is the parent Authority for this context
      */
     protected String inAuthority;
+    protected String authorityRefNameBase;
     
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
     	this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
@@ -108,6 +110,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
     }
 
 
+    public String getAuthorityRefNameBase(){
+        return this.authorityRefNameBase;
+    }
+
+    public void setAuthorityRefNameBase(String value){
+        this.authorityRefNameBase = value;
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
      */
@@ -116,8 +126,34 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
     	// first fill all the parts of the document
     	super.handleCreate(wrapDoc);    	
     	handleInAuthority(wrapDoc.getWrappedObject());
+        // Uncomment once debugged and App layer is read to integrate
+        //handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
+        //updateRefnameForAuthorityItem(wrapDoc, authorityItemCommonSchemaName, getAuthorityRefNameBase());  //CSPACE-3178
     }
     
+    private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
+        String shortIdentifier = (String)docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+        String displayName =     (String)docModel.getProperty(schemaName, AuthorityItemJAXBSchema.DISPLAY_NAME);
+        if (Tools.isEmpty(shortIdentifier) && Tools.notEmpty(displayName)){
+            String cookedShortIdentifier = Tools.squeeze(displayName)+'-'+Tools.now().toString();
+            docModel.setProperty(schemaName , AuthorityItemJAXBSchema.SHORT_IDENTIFIER, cookedShortIdentifier);
+        }
+    }
+
+    protected void updateRefnameForAuthorityItem(DocumentWrapper<DocumentModel> wrapDoc,
+            String schemaName,
+            String authorityRefBaseName) throws Exception {
+    	DocumentModel docModel = wrapDoc.getWrappedObject();
+    	String shortIdentifier = (String)docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+    	String displayName =     (String)docModel.getProperty(schemaName, AuthorityItemJAXBSchema.DISPLAY_NAME);
+    	if (Tools.isEmpty(authorityRefBaseName)){
+    		throw new Exception("updateRefnameForAuthorityItem requires an authorityRefBaseName, but none was supplied.");
+    	}
+    	RefName.Authority authority = RefName.Authority.parse(authorityRefBaseName);
+    	String refName = RefName.buildAuthorityItem(authority, shortIdentifier, displayName).toString();
+    	docModel.setProperty(schemaName , AuthorityItemJAXBSchema.REF_NAME, refName);
+    }
+
     /**
      * Check the logic around the parent pointer. Note that we only need do this on
      * create, since we have logic to make this read-only on update. 

@@ -57,12 +57,14 @@ import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.JaxRsContext;
@@ -72,6 +74,7 @@ import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -80,6 +83,7 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
@@ -110,6 +114,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	final static int URN_NAME_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_NAME.length();
 	final static String URN_PREFIX_ID = "id(";
 	final static int URN_ID_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_ID.length();
+	final static String FETCH_SHORT_ID = "_fetch_";
 	
     final Logger logger = LoggerFactory.getLogger(AuthorityResource.class);
     
@@ -196,19 +201,67 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 * 
 	 * @throws Exception the exception
 	 */
-	public DocumentHandler createItemDocumentHandler(
+	protected DocumentHandler createItemDocumentHandler(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-			String inAuthority)
+			String inAuthority, String parentShortIdentifier)
 	throws Exception {
-		AuthItemHandler docHandler;
+		String authorityRefNameBase;
+		AuthorityItemDocumentModelHandler<?,?> docHandler;
+		
+		if(parentShortIdentifier==null) {
+			authorityRefNameBase = null;
+		} else {
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = 
+				createServiceContext(getServiceName());
+			if(parentShortIdentifier.equals(FETCH_SHORT_ID)) {
+				// Get from parent document
+				parentShortIdentifier = getAuthShortIdentifier(parentCtx, inAuthority);
+			}
+			authorityRefNameBase = buildAuthorityRefNameBase(parentCtx, parentShortIdentifier);
+		}
 
-		docHandler = (AuthItemHandler)createDocumentHandler(ctx,
+		docHandler = (AuthorityItemDocumentModelHandler<?,?>)createDocumentHandler(ctx,
 				ctx.getCommonPartLabel(getItemServiceName()),
 				authCommonClass);  	
-		((AuthorityItemDocumentModelHandler<?,?>)docHandler).setInAuthority(inAuthority);
+		docHandler.setInAuthority(inAuthority);
+		docHandler.setAuthorityRefNameBase(authorityRefNameBase);
 
 		return (DocumentHandler)docHandler;
 	}
+	
+    public String getAuthShortIdentifier(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String authCSID)
+            throws DocumentNotFoundException, DocumentException {
+        String shortIdentifier = null;
+        try {
+            DocumentWrapper<DocumentModel> wrapDoc = getRepositoryClient(ctx).getDocFromCsid(ctx, authCSID);
+            AuthorityDocumentModelHandler<?,?> handler = 
+            	(AuthorityDocumentModelHandler<?,?>)createDocumentHandler(ctx);
+            shortIdentifier = handler.getShortIdentifier(wrapDoc, authorityCommonSchemaName);
+        } catch (DocumentNotFoundException dnfe) {
+            throw dnfe;
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        }
+        return shortIdentifier;
+    }
+
+	
+	protected String buildAuthorityRefNameBase(
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String shortIdentifier) {
+        RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
+                ctx.getServiceName(), shortIdentifier, null);
+        return authority.toString();
+	}
+
+
 
 	/**
 	 * Creates the authority.
@@ -435,16 +488,22 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 			Specifier spec = getSpecifier(specifier, "createAuthorityItem", "CREATE_ITEM");
 			String parentcsid;
+			String parentShortIdentifier;
 			if(spec.form==SpecifierForm.CSID) {
 				parentcsid = spec.value;
+				// Uncomment when app layer is ready to integrate
+				// parentShortIdentifier = FETCH_SHORT_ID;
+				parentShortIdentifier = null;
 			} else {
+				parentShortIdentifier = spec.value;
 				String whereClause = buildWhereForAuthByName(spec.value);
 	            ctx = createServiceContext(getServiceName());
 				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
 			}
 			ctx = createServiceContext(getItemServiceName(), input);
             ctx.setUriInfo(ui);    //Laramie
-			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+			// Note: must have the parentShortId, to do the create.
+			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid, parentShortIdentifier);
 			String itemcsid = getRepositoryClient(ctx).create(ctx, handler);
 			UriBuilder path = UriBuilder.fromResource(resourceClass);
 			path.path(parentcsid + "/items/" + itemcsid);
@@ -458,7 +517,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
 		}
 	}
-
+	
     @GET
     @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH)
     public byte[] getItemWorkflow(
@@ -540,14 +599,11 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			ctx = (RemoteServiceContext)createServiceContext(getItemServiceName(), queryParams);
 			ctx.setJaxRsContext(jaxRsContext);
 
+			ctx.setUriInfo(ui); //ARG!   must pass this or subsequent calls will not have a ui.
 
-
-            // NEW laramie
-            ctx.setUriInfo(ui); //ARG!   must pass this or subsequent calls will not have a ui.
-            // NEW
-
-
-			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+			// We omit the parentShortId, only needed when doing a create...
+			DocumentHandler handler = createItemDocumentHandler(ctx, 
+											parentcsid, null);
 			if(itemSpec.form==SpecifierForm.CSID) {
     				getRepositoryClient(ctx).get(ctx, itemSpec.value, handler);
 			} else {
@@ -605,7 +661,9 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
 			}
 			ctx = createServiceContext(getItemServiceName(), queryParams);
-			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+			// We omit the parentShortId, only needed when doing a create...
+			DocumentHandler handler = createItemDocumentHandler(ctx, 
+										parentcsid, null);
 			DocumentFilter myFilter = handler.getDocumentFilter();
 			myFilter.appendWhereClause(authorityItemCommonSchemaName + ":" +
 					AuthorityItemJAXBSchema.IN_AUTHORITY + "=" + 
@@ -679,7 +737,8 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
 			}
     		// Note that we have to create the service context for the Items, not the main service
-    		DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+			// We omit the parentShortId, only needed when doing a create...
+    		DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid, null);
     		RepositoryClient repoClient = getRepositoryClient(ctx); 
     		DocumentFilter myFilter = handler.getDocumentFilter();
     		String serviceType = ServiceBindingUtils.SERVICE_TYPE_PROCEDURE;
@@ -740,8 +799,10 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
 			}
             ctx = createServiceContext(getItemServiceName(), queryParams);
+			// We omit the parentShortId, only needed when doing a create...
             RemoteDocumentModelHandlerImpl handler =
-                (RemoteDocumentModelHandlerImpl) createItemDocumentHandler(ctx, parentcsid);
+                (RemoteDocumentModelHandlerImpl) createItemDocumentHandler(ctx, 
+                								parentcsid, null);
             String itemcsid;
 			if(itemSpec.form==SpecifierForm.CSID) {
 				itemcsid = itemSpec.value;
@@ -803,7 +864,9 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause);
 			}
 			// Note that we have to create the service context for the Items, not the main service
-			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+			// We omit the parentShortId, only needed when doing a create...
+			DocumentHandler handler = createItemDocumentHandler(ctx, 
+											parentcsid, null);
             ctx.setUriInfo(ui);
 			getRepositoryClient(ctx).update(ctx, itemcsid, handler);
 			result = ctx.getOutput();

@@ -25,11 +25,22 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import java.util.Map;
 
+import javax.management.RuntimeErrorException;
+
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
+import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
@@ -128,5 +139,37 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon, AuthCommonList>
     	return unQObjectProperties;
     }
     
+    @Override
+    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	super.handleCreate(wrapDoc);
+        // Uncomment once debugged and App layer is read to integrate
+    	//updateRefnameForAuthority(wrapDoc, authorityCommonSchemaName);//CSPACE-3178
+    }
+
+    protected void updateRefnameForAuthority(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) throws Exception {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
+        String shortIdentifier = (String)docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+        String displayName =     (String)docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
+        MultipartServiceContext ctx = (MultipartServiceContext)getServiceContext();
+        RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
+                                                             ctx.getServiceName(),
+                                                             shortIdentifier,
+                                                             displayName);
+        String refName = authority.toString();
+        docModel.setProperty(schemaName , AuthorityJAXBSchema.REF_NAME, refName);
+    }
+    
+
+    public String getShortIdentifier(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
+        String shortIdentifier = null;
+        try {
+        	shortIdentifier = (String)docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+        } catch (ClientException ce) {
+        	throw new RuntimeException("AuthorityDocHandler Internal Error: cannot get shortId!", ce);
+        }
+        return shortIdentifier;
+    }
+
 }
 
