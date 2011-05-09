@@ -37,6 +37,9 @@ import org.apache.log4j.BasicConfigurator;
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
@@ -134,8 +137,7 @@ public class Sample {
     	logger.info("Import: Create Item: \""+shortName+
     			"\" in orgAuthority: \"" + orgAuthorityRefName +"\"");
         PoxPayloadOut multipart = 
-        	OrgAuthorityClientUtils.createOrganizationInstance( vcsid, 
-				refName, orgInfo, client.getItemCommonPartName() );
+        	OrgAuthorityClientUtils.createOrganizationInstance(refName, orgInfo, client.getItemCommonPartName() );
 
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
@@ -205,7 +207,7 @@ public class Sample {
         // Submit the request to the service and store the response.
         OrgauthoritiesCommon orgAuthority = null;
         try {
-            ClientResponse<PoxPayloadIn> res = client.read(orgAuthId);
+            ClientResponse<String> res = client.read(orgAuthId);
             int statusCode = res.getStatus();
             if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
                 throw new RuntimeException("Could not read orgAuthority"
@@ -215,9 +217,9 @@ public class Sample {
                 throw new RuntimeException("Unexpected Status when reading " +
                     "orgAuthority, Status:"+ statusCode);
             }
-            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
-            orgAuthority = (OrgauthoritiesCommon) extractPart(input,
-                    client.getCommonPartName(), OrgauthoritiesCommon.class);
+            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PayloadInputPart orgAuthorityPart = input.getPart(client.getCommonPartName());
+            orgAuthority = (OrgauthoritiesCommon) orgAuthorityPart.getBody();
         } catch (Exception e) {
             throw new RuntimeException("Could not read orgAuthority: ", e);
         }
@@ -375,25 +377,25 @@ public class Sample {
         return sb.toString();
     }
 
-    private Object extractPart(PoxPayloadIn input, String label,
-        Class clazz) throws Exception {
-        Object obj = null;
-        for(InputPart part : input.getParts()){
-            String partLabel = part.getHeaders().getFirst("label");
-            if(label.equalsIgnoreCase(partLabel)){
-                String partStr = part.getBodyAsString();
-                if(logger.isDebugEnabled()){
-                    logger.debug("extracted part str=\n" + partStr);
-                }
-                obj = part.getBody(clazz, null);
-                if(logger.isDebugEnabled()){
-                    logger.debug("extracted part obj=\n", obj, clazz);
-                }
-                break;
-            }
-        }
-        return obj;
-    }
+//    private Object extractPart(PoxPayloadIn input, String label,
+//        Class clazz) throws Exception {
+//        Object obj = null;
+//        for(PayloadInputPart part : input.getParts()){
+//            String partLabel = part.getHeaders().getFirst("label");
+//            if(label.equalsIgnoreCase(partLabel)){
+//                String partStr = part.getBodyAsString();
+//                if(logger.isDebugEnabled()){
+//                    logger.debug("extracted part str=\n" + partStr);
+//                }
+//                obj = part.getBody(clazz, null);
+//                if(logger.isDebugEnabled()){
+//                    logger.debug("extracted part obj=\n", obj, clazz);
+//                }
+//                break;
+//            }
+//        }
+//        return obj;
+//    }
 
 	public static void main(String[] args) {
 
