@@ -68,8 +68,11 @@ public class BatchAuthRefsTest extends BaseServiceTest {
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
     private String depositorRefName = null;
-    private String exitDate = null;
-    private String exitNumber = null;
+
+    private String name = null;
+    private String className = null;
+    private String forDocType = null;
+    private String notes = null;
 
     @Override
 	public String getServicePathComponent() {
@@ -91,14 +94,15 @@ public class BatchAuthRefsTest extends BaseServiceTest {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    private PoxPayloadOut createBatchInstance(String depositorRefName, String exitNumber, String exitDate) {
-        this.exitDate = exitDate;
-        this.exitNumber = exitNumber;
-        this.depositorRefName = depositorRefName;
+    private PoxPayloadOut createBatchInstance(String className, String forDocType, String notes) {
+        this.className = className;
+        this.forDocType = forDocType;
+        this.notes = notes;
+
         BatchCommon batch = new BatchCommon();
-        batch.setDepositor(depositorRefName);
-        batch.setExitNumber(exitNumber);
-        batch.setExitDate(exitDate);
+        batch.setClassName(className);
+        batch.setForDocType(forDocType);
+        batch.setNotes(notes);
 
         PoxPayloadOut multipart = new PoxPayloadOut(BatchClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(batch, MediaType.APPLICATION_XML_TYPE);
@@ -170,9 +174,10 @@ public class BatchAuthRefsTest extends BaseServiceTest {
         logger.debug(objectAsXmlString(batch, BatchCommon.class));
 
         // Check a couple of fields
-        Assert.assertEquals(batch.getDepositor(), depositorRefName);
-        Assert.assertEquals(batch.getExitDate(), exitDate);
-        Assert.assertEquals(batch.getExitNumber(), exitNumber);
+        Assert.assertEquals(batch.getClassName(), className);
+        Assert.assertEquals(batch.getForDocType(), forDocType);
+        Assert.assertEquals(batch.getName(), name);
+        Assert.assertEquals(batch.getNotes(), notes);
 
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = batchClient.getAuthorityRefs(knownResourceId);

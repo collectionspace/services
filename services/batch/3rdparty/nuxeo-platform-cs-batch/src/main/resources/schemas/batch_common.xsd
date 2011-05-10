@@ -21,18 +21,11 @@
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->
 
     <!--  Batch Information Group -->
-    <xs:element name="currentOwner" type="xs:string"/>
-    <xs:element name="depositor" type="xs:string"/>
-    <xs:element name="exitDate" type="xs:string"/>
-    <xs:element name="exitMethods">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="exitMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-   </xs:element>
-    <xs:element name="exitNote" type="xs:string"/>
-    <xs:element name="exitNumber" type="xs:string"/>
-    <xs:element name="exitReason" type="xs:string"/>
-    <xs:element name="packingNote" type="xs:string"/>    
+    
+    <xs:element name="name" type="xs:string"/>
+	<xs:element name="notes" type="xs:string"/>
+	<xs:element name="forDocType" type="xs:string"/>
+	<xs:element name="forSingleDoc" type="xs:boolean"/>
+	<xs:element name="createsNewFocus" type="xs:boolean"/>
+	<xs:element name="className" type="xs:string"/>
 </xs:schema>

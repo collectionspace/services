@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<!--
-    Loan Out schema (XSD)
-    
-    Entity  : Batch
-    Part    : Common
-    Used for: JAXB binding between XML and Java objects
-
-    $LastChangedRevision: 2316 $
-    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
--->
-
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
@@ -32,23 +21,15 @@
         <xs:complexType>
             <xs:sequence>
                 <!--  Batch Information Group -->
-                <xs:element name="currentOwner" type="xs:string"/>
-                <xs:element name="depositor" type="xs:string"/>
-                <xs:element name="exitDate" type="xs:string"/>
-                <xs:element name="exitMethods" type="exitMethods"/>
-                <xs:element name="exitNote" type="xs:string"/>
-                <xs:element name="exitNumber" type="xs:string"/>
-                <xs:element name="exitReason" type="xs:string"/>
-                <xs:element name="packingNote" type="xs:string"/>
+                <xs:element name="name" type="xs:string"/>
+                <xs:element name="notes" type="xs:string"/>
+                <xs:element name="forDocType" type="xs:string"/>
+                <xs:element name="forSingleDoc" type="xs:boolean"/>
+                <xs:element name="createsNewFocus" type="xs:boolean"/>
+                <xs:element name="className" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    
-    <xs:complexType name="exitMethods">
-        <xs:sequence>
-            <xs:element name="exitMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
 
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonList">
@@ -69,17 +50,10 @@
                         <xs:element name="batch-list-item" maxOccurs="unbounded">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="exitNumber" type="xs:string"
-                                        minOccurs="1" />
-                                    <xs:element name="currentOwner" type="xs:string"
-                                        minOccurs="1" />
-                                    <xs:element name="uri" type="xs:anyURI"
-                                        minOccurs="1" />
-                                    <xs:element name="csid" type="xs:string"
-                                        minOccurs="1" />
-
-
-
+                                    <xs:element name="name" type="xs:string" minOccurs="1" />
+                                    <xs:element name="forDocType" type="xs:string" minOccurs="1" />
+                                    <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string" minOccurs="1" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>

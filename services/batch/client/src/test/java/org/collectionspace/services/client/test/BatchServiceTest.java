@@ -172,7 +172,7 @@ public class BatchServiceTest extends AbstractServiceTestImpl {
         BatchCommon batch = (BatchCommon) extractPart(input, client.getCommonPartName(), BatchCommon.class);
         Assert.assertNotNull(batch);
 
-        batch.setExitNumber("updated-" + batch.getExitNumber());
+        batch.setName("updated-" + batch.getName());
         logger.debug("Object to be updated:"+objectAsXmlString(batch, BatchCommon.class));
         PoxPayloadOut output = new PoxPayloadOut(BatchClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(batch, MediaType.APPLICATION_XML_TYPE);
@@ -288,8 +288,7 @@ public class BatchServiceTest extends AbstractServiceTestImpl {
     private PoxPayloadOut createBatchInstance(String exitNumber) {
         String identifier = "batchNumber-" + exitNumber;
         BatchCommon batch = new BatchCommon();
-        batch.setExitNumber(identifier);
-        batch.setDepositor("urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'");
+        batch.setName(identifier);
         PoxPayloadOut multipart = new PoxPayloadOut(BatchClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(batch, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(new BatchClient().getCommonPartName());
