@@ -8,6 +8,7 @@
             <filename>organization/hierarchy/1-authority.xml</filename>
             <vars>
             	<var ID="shortIdentifier">CSPACE3739OrganizationAuthority</var>
+            	<var ID="displayName">OrganizationAuth1-displayName</var>
             </vars>
         </test>
         <test ID="OrganizationChild1">

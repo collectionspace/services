@@ -246,7 +246,7 @@ public class ServiceResult {
                 + (expectedCodes.size()>0 ? "; expected:"+expectedCodes : "")
                 + ( Tools.notEmpty(responseMessage) ? "; msg:"+responseMessage : "" )
                 +"; URL:"+fullURL
-                +"; auth: "+auth
+                //for auth, see detail()   +"; auth: "+auth
                 + ( Tools.notEmpty(error) ? "; ERROR:"+error : "" )
                 + (verbosePartsSummary ? partsSummary(true) : partsSummary(false) )
                 +"}";

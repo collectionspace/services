@@ -60,6 +60,7 @@ public class XmlReplayEval {
         //System.out.println("\r\n---- REPLACE.init-uri:        "+inputJexlExpression);
         String result;
         try {
+             jc.set("itemCSID", "${itemCSID}"); //noiseless passthru.
             //System.out.println("eval :: serviceResultsMap "+serviceResultsMap.size());
             for (ServiceResult serviceResult : serviceResultsMap.values()) {
                 jc.set(serviceResult.testID, serviceResult);

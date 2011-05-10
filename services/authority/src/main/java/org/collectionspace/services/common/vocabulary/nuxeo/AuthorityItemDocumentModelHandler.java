@@ -25,6 +25,7 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -104,9 +105,28 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
 		this.inAuthority = inAuthority;
 	}
 
+   // Laramie20110510 CSPACE-3932
+   public static final String HACK_VOCABULARIES = "vocabularies"; //TODO: get rid of these.
+    //public static final String HACK_ORGANIZATIONS = "Organizations"; //TODO: get rid of these.
+    public static final String HACK_ORGAUTHORITIES = "orgauthorities";  //TODO: get rid of these.
+    public static final String HACK_PERSONAUTHORITIES = "personauthorities";  //TODO: get rid of these.
+    public static final String HACK_LOCATIONAUTHORITIES = "locationauthorities";  //TODO: get rid of these.
+    private final static Map<String,String> hackMap = new HashMap<String,String>();
+    static {
+        hackMap.put("persons", HACK_PERSONAUTHORITIES);
+        hackMap.put("organizations", HACK_ORGAUTHORITIES);
+        hackMap.put("vocabularies", HACK_VOCABULARIES);
+        hackMap.put("locations", HACK_LOCATIONAUTHORITIES);
+    }
     @Override
     public String getUri(DocumentModel docModel) {
-        return getServiceContextPath()+inAuthority+"/"+ AuthorityClient.ITEMS+"/"+getCsid(docModel);
+        // Laramie20110510 CSPACE-3932
+        String serviceContextName = getServiceContext().getServiceName().toLowerCase();
+        String displayContextPath = hackMap.get(serviceContextName);
+        if (Tools.isEmpty(displayContextPath)){
+            displayContextPath = serviceContextName;
+        }
+        return "/"+displayContextPath+'/'+inAuthority+'/'+ AuthorityClient.ITEMS+'/'+getCsid(docModel);
     }
 
 

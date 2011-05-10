@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="organizations">
+
+
+<!-- 
+This test was generated from actual CSIDs created on the server.
+		This test then compares to 3-left.xml which was also generated.
+		These CSIDs are long gone, but these two files are just used to 
+        test XmlCompareJdom statically.
+    
+TODO: this file looks compatible with 3-left.xml, 
+execept that it shows NESTED_ERRORs in the log.
+But the test succeeds, so somehow that nested item is not removed when they are in a different order 
+when received from the server.
+-->
+
+
+  <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <pageSize>40</pageSize>
+    <itemsInPage>4</itemsInPage>
+    <totalItems>4</totalItems>
+    <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
+    <relation-list-item>
+      <uri>/relations/9fb18981-01b8-486f-8cf6</uri>
+      <csid>9fb18981-01b8-486f-8cf6</csid>
+      <subjectCsid>e6ee870c-0846-4f02-af9f</subjectCsid>
+      <relationshipType>hasBroader</relationshipType>
+      <predicate>hasBroader</predicate>
+      <objectCsid>e65d0867-3d10-4d2e-8eed</objectCsid>
+      <subject>
+        <uri>/organizations/e0a427ce-c8b5-4727-8077/items/e6ee870c-0846-4f02-af9f</uri>
+        <csid>e6ee870c-0846-4f02-af9f</csid>
+        <service>Organization</service>
+        <documentType>Organization</documentType>
+        <documentTypeFromModel>Organization</documentTypeFromModel>
+      </subject>
+      <object>
+        <uri>/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/e65d0867-3d10-4d2e-8eed</uri>
+        <csid>e65d0867-3d10-4d2e-8eed</csid>
+        <service>Organization</service>
+        <documentType>Organization</documentType>
+        <documentTypeFromModel>Organization</documentTypeFromModel>
+      </object>
+    </relation-list-item>
+    
+    
+    
+    <relation-list-item>
+      <uri>/relations/a9c7f9f0-6cc6-4eaf-9b41</uri>
+      <csid>a9c7f9f0-6cc6-4eaf-9b41</csid>
+      <subjectCsid>ba0c9e5f-0c00-4deb-b29d</subjectCsid>
+      <relationshipType>hasBroader</relationshipType>
+      <predicate>hasBroader</predicate>
+      <objectCsid>e6ee870c-0846-4f02-af9f</objectCsid>
+      <subject>
+        <uri>/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/ba0c9e5f-0c00-4deb-b29d</uri>
+        <csid>ba0c9e5f-0c00-4deb-b29d</csid>
+        <service>Organization</service>
+        <documentType>Organization</documentType>
+        <documentTypeFromModel>Organization</documentTypeFromModel>
+      </subject>
+      <object>
+        <uri>/organizations/e0a427ce-c8b5-4727-8077/items/e6ee870c-0846-4f02-af9f</uri>
+        <csid>e6ee870c-0846-4f02-af9f</csid>
+        <service>Organization</service>
+        <documentType>Organization</documentType>
+        <documentTypeFromModel>Organization</documentTypeFromModel>
+      </object>
+    </relation-list-item>
+    
+    
+    
+    
+    
+    <relation-list-item>
+      <uri>/relations/c882dfc1-1b72-4038-88f3</uri>
+      <csid>c882dfc1-1b72-4038-88f3</csid>
+      <subjectCsid>6884ecdc-e205-4407-b3f3</subjectCsid>
+      <relationshipType>hasBroader</relationshipType>
+      <predicate>hasBroader</predicate>
+      <objectCsid>e6ee870c-0846-4f02-af9f</objectCsid>
+      <subject>
+        <uri>/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/6884ecdc-e205-4407-b3f3</uri>
+        <csid>6884ecdc-e205-4407-b3f3</csid>
+        <service>Organization</service>
+        <documentType>Organization</documentType>
+        <documentTypeFromModel>Organization</documentTypeFromModel>
+      </subject>
+      <object>
+        <uri>/organizations/e0a427ce-c8b5-4727-8077/items/e6ee870c-0846-4f02-af9f</uri>
+        <csid>e6ee870c-0846-4f02-af9f</csid>
+        <service>Organization</service>
+        <documentType>Organization</documentType>
+        <documentTypeFromModel>Organization</documentTypeFromModel>
+      </object>
+    </relation-list-item>
+    <relation-list-item>
+      <uri>/relations/0793210a-a48c-4d26-a47b</uri>
+      <csid>0793210a-a48c-4d26-a47b</csid>
+      <subjectCsid>73487157-5110-4292-9cf8</subjectCsid>
+      <relationshipType>hasBroader</relationshipType>
+      <predicate>hasBroader</predicate>
+      <objectCsid>e6ee870c-0846-4f02-af9f</objectCsid>
+      <subject>
+        <uri>/cspace-services/orgauthorities/urn:cspace:name(CSPACE3739OrganizationAuthority)/items/73487157-5110-4292-9cf8</uri>
+        <csid>73487157-5110-4292-9cf8</csid>
+        <service>Organization</service>
+        <documentType>Organization</documentType>
+        <documentTypeFromModel>Organization</documentTypeFromModel>
+      </subject>
+      <object>
+        <uri>/organizations/e0a427ce-c8b5-4727-8077/items/e6ee870c-0846-4f02-af9f</uri>
+        <csid>e6ee870c-0846-4f02-af9f</csid>
+        <service>Organization</service>
+        <documentType>Organization</documentType>
+        <documentTypeFromModel>Organization</documentTypeFromModel>
+      </object>
+    </relation-list-item>
+  </ns2:relations-common-list>
+</document>
+

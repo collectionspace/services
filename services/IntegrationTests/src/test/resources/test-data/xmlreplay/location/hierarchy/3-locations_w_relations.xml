@@ -17,12 +17,12 @@
 		<predicate>hasBroader</predicate>
 		<subject>
 		  <csid>${itemCSID}</csid>
-		  <documentType>Location</documentType>
+		  <documentType>Locationitem</documentType>
 		</subject>
 		<object>
 		  <csid>${parentCSID}</csid>
 		  <uri>${parentUri}</uri>
-		  <documentType>Location</documentType>
+		  <documentType>Locationitem</documentType>
 		</object>
 	</relation-list-item>
 	<relation-list-item>
@@ -30,11 +30,11 @@
 		<subject>
 		  <csid>${childCSID}</csid>
 		  <uri>${childUri}</uri>
-		  <documentType>Location</documentType>
+		  <documentType>Locationitem</documentType>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
-		  <documentType>Location</documentType>
+		  <documentType>Locationitem</documentType>
 		</object>
 	</relation-list-item>
 	<relation-list-item>
@@ -42,11 +42,11 @@
 		<subject>
 		  <uri>${child2Uri}</uri>
 		  <csid>${child2CSID}</csid>
-		  <documentType>Location</documentType>
+		  <documentType>Locationitem</documentType>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
-		  <documentType>Location</documentType>
+		  <documentType>Locationitem</documentType>
 		</object>
 	</relation-list-item>
 	<relation-list-item>
@@ -54,11 +54,11 @@
 		<subject>
 		  <uri>${child3Uri}</uri>
 		  <csid>${child3CSID}</csid>
-		  <documentType>Location</documentType>
+		  <documentType>Locationitem</documentType>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
-		  <documentType>Location</documentType>
+		  <documentType>Locationitem</documentType>
 		</object>
 	</relation-list-item>
   </ns3:relations-common-list>

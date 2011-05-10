@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TODO: see note at top of 3.right.xml -->
+
+<document name="organizations">  
+  <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <totalItems>4</totalItems>
+    <!-- 
+    This test was generated from actual CSIDs created on the server.
+		This test then compares to 3-right.xml which was also generated.
+		These CSIDs are long gone, but these two files are just used to 
+        test XmlCompareJdom statically.
+        
+    This file represents the expected response from test case
+        organization.xml :: 
+    These are the vars that are available from the time Organization1 is created.
+    Organization1.CSID       e6ee870c-0846-4f02-af9f
+    OrganizationParent.CSID  e65d0867-3d10-4d2e-8eed
+        OrganizationChild1.CSID  ba0c9e5f-0c00-4deb-b29d
+        OrganizationChild2.CSID  73487157-5110-4292-9cf8
+        OrganizationChild3.CSID  6884ecdc-e205-4407-b3f3
+        -->
+
+
+    <relation-list-item>
+      <subjectCsid>e6ee870c-0846-4f02-af9f</subjectCsid>
+      <objectCsid>e65d0867-3d10-4d2e-8eed</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>e6ee870c-0846-4f02-af9f</csid>
+      </subject>
+      <object>
+        <csid>e65d0867-3d10-4d2e-8eed</csid>
+      </object>
+    </relation-list-item>
+    
+    <relation-list-item>
+      <subjectCsid>ba0c9e5f-0c00-4deb-b29d</subjectCsid>
+      <objectCsid>e6ee870c-0846-4f02-af9f</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>ba0c9e5f-0c00-4deb-b29d</csid>
+      </subject>
+      <object>
+        <csid>e6ee870c-0846-4f02-af9f</csid>
+      </object>
+    </relation-list-item>
+    
+    
+    
+    
+    
+    
+    
+    <relation-list-item>
+      <subjectCsid>73487157-5110-4292-9cf8</subjectCsid>
+      <objectCsid>e6ee870c-0846-4f02-af9f</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>73487157-5110-4292-9cf8</csid>
+      </subject>
+      <object>
+        <csid>e6ee870c-0846-4f02-af9f</csid>
+      </object>
+    </relation-list-item>
+    
+    <relation-list-item>
+      <subjectCsid>6884ecdc-e205-4407-b3f3</subjectCsid>
+      <objectCsid>e6ee870c-0846-4f02-af9f</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>6884ecdc-e205-4407-b3f3</csid>
+      </subject>
+      <object>
+        <csid>e6ee870c-0846-4f02-af9f</csid>
+      </object>
+    </relation-list-item>
+    
+  </ns2:relations-common-list>
+</document>

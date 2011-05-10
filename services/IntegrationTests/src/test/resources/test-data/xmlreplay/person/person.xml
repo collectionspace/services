@@ -238,7 +238,7 @@
 	
 	!-- ========================= POST a person ===================================================== -->
 	
-	<testGroup ID="postPerson" autoDeletePOSTS="true">
+	<testGroup ID="postPerson" autoDeletePOSTS="false">
 	    <test ID="PersonAuth1" auth="admin@collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/personauthorities/</uri>

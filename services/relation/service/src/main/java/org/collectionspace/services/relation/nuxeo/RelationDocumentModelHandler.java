@@ -28,6 +28,7 @@ import java.util.Iterator;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
@@ -168,8 +169,8 @@ public class RelationDocumentModelHandler
         relationListItem.setSubject(subject);
 
         String objectCsid = relationListItem.getObjectCsid();
-        documentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_2);
-        RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, documentType);
+        String documentType2 = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_2);
+        RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, documentType2);
 
         String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.objectUri);
         object.setUri(objectUri);
@@ -195,6 +196,22 @@ public class RelationDocumentModelHandler
             String itemDocType = itemDocModel.getDocumentType().getName();
             item.setDocumentTypeFromModel(itemDocType);           //this one comes from the nuxeo documentType
 
+            System.out.println("\r\n******** AuthorityItemDocumentModelHandlder documentType **************\r\n\tdocModel: "+itemDocType+"\r\n\tpayload: "+documentType);
+            boolean usedDocumentTypeFromPayload = true;
+            if ( ! Tools.isBlank(documentType)){
+                if (documentType.equals(itemDocType)){
+                    usedDocumentTypeFromPayload = true;
+                }  else {
+                    // Laramie20110510 CSPACE-3739  throw the exception for 3739, otherwise, don't throw it.
+                    //throw new Exception("documentType supplied was wrong.  supplied: "+documentType+" required: "+itemDocType+ " itemCsid: "+itemCsid );
+                }
+            } else {
+                usedDocumentTypeFromPayload = false;
+                item.setDocumentType(itemDocType);
+
+            }
+
+
             //TODO: ensure that itemDocType is really the entry point, i.e. servicename==doctype
             //ServiceBindingType itemSbt2 = tReader.getServiceBinding(ctx.getTenantId(), itemDocType);
             ServiceBindingType itemSbt = tReader.getServiceBindingForDocType(ctx.getTenantId(), itemDocType);
@@ -214,6 +231,8 @@ public class RelationDocumentModelHandler
             }
         } else {
             item.setError("INVALID: related object is absent");
+            // Laramie20110510 CSPACE-3739  throw the exception for 3739, otherwise, don't throw it.
+            //throw new Exception("INVALID: related object is absent "+itemCsid);
         }
         return item;
     }
