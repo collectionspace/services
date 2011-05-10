@@ -120,7 +120,8 @@ public class BatchAuthRefsTest extends BaseServiceTest {
         // Create a new Loans In resource. One or more fields in this resource will be PersonAuthority
         //    references, and will refer to Person resources by their refNames.
         BatchClient batchClient = new BatchClient();
-        PoxPayloadOut multipart = createBatchInstance(depositorRefName, "exitNumber-" + identifier, "exitDate-" + identifier);
+        //private PoxPayloadOut createBatchInstance(String className, String forDocType, String notes) {
+        PoxPayloadOut multipart = createBatchInstance("className", "docType-"+identifier, "Notes-" + identifier);
         ClientResponse<Response> res = batchClient.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
