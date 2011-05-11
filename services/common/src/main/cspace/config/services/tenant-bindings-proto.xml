@@ -536,35 +536,25 @@
         <service:params>
           <service:SchemaName>batch</service:SchemaName>
           <service:DublinCoreTitle>batch</service:DublinCoreTitle>
-          <service:SummaryFields>exitNumber|currentOwner|uri|csid</service:SummaryFields>
+          <service:SummaryFields>name|forDocType|uri|csid</service:SummaryFields>
           <service:AbstractCommonListClassname>org.collectionspace.services.batch.BatchCommonList</service:AbstractCommonListClassname>
           <service:CommonListItemClassname>org.collectionspace.services.batch.BatchCommonList$BatchListItem</service:CommonListItemClassname>
           <service:ListResultsItemMethodName>getBatchListItem</service:ListResultsItemMethodName>
           <service:ListResultsFields>
             <service:ListResultField>
-              <service:element>exitNumber</service:element>
-              <service:xpath>exitNumber</service:xpath>
-              <service:setter>setExitNumber</service:setter>
+              <service:element>name</service:element>
+              <service:xpath>name</service:xpath>
+              <service:setter>setName</service:setter>
             </service:ListResultField>
             <service:ListResultField>
-              <service:element>currentOwner</service:element>
-              <service:xpath>currentOwner</service:xpath>
-              <service:setter>setCurrentOwner</service:setter>
+              <service:element>forDocType</service:element>
+              <service:xpath>forDocType</service:xpath>
+              <service:setter>setForDocType</service:setter>
             </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.batch.nuxeo.BatchValidatorHandler</service:validatorHandler>
-      <service:properties xmlns:service="http://collectionspace.org/services/common/service">
-        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-          <types:key>objectNameProperty</types:key>
-          <types:value>currentOwner</types:value>
-        </types:item>
-        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-          <types:key>objectNumberProperty</types:key>
-          <types:value>exitNumber</types:value>
-        </types:item>
-      </service:properties>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Batch" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="batch-system" updated="" order="0">
           <service:content contentType="application/xml">
@@ -572,16 +562,6 @@
           </service:content>
         </service:part>
         <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="batch_common" updated="" order="1">
-          <service:properties>
-            <types:item xmlns:types="http://collectionspace.org/services/common/types">
-              <types:key>authRef</types:key>
-              <types:value>currentOwner</types:value>
-            </types:item>
-            <types:item xmlns:types="http://collectionspace.org/services/common/types">
-              <types:key>authRef</types:key>
-              <types:value>depositor</types:value>
-            </types:item>
-          </service:properties>
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/batch" schemaLocation="http://collectionspace.org/services/batch http://services.collectionspace.org/batch/batch_common.xsd" />
           </service:content>
