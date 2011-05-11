@@ -65,6 +65,7 @@
         </xs:annotation>
         <xs:sequence/>
         <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="storageName" type="xs:string" use="required"/>
         <xs:attribute name="repositoryClient" type="xs:string" use="optional" default="nuxeo-java"/>
     </xs:complexType>
 

@@ -8,7 +8,7 @@
 <tenant:TenantBindingConfig xmlns:tenant="http://collectionspace.org/services/common/tenant" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/common/tenant http://collectionspace.org/services/common/tenant.xsd">
   <!-- begin hearstmuseum.berkeley.edu tenant meta-data -->
   <tenant:tenantBinding id="2" name="hearstmuseum.berkeley.edu" displayName="Phoebe A. Hearst Museum of Anthropology" version="0.1">
-    <tenant:repositoryDomain name="default-domain" repositoryClient="nuxeo-java" />
+    <tenant:repositoryDomain name="default-domain" storageName="hearst-domain" repositoryClient="nuxeo-java" />
     <tenant:properties>
       <types:item xmlns:types="http://collectionspace.org/services/common/types">
         <types:key>datePattern</types:key>

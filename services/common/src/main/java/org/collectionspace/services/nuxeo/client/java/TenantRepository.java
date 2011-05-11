@@ -122,9 +122,9 @@ public class TenantRepository {
             RepositoryDomainType repositoryDomain) throws Exception {
         String domainName = repositoryDomain.getName();
         RepositoryClient repositoryClient = getRepositoryClient(repositoryDomain);
-        String domainId = repositoryClient.getDomainId(domainName);
+        String domainId = repositoryClient.getDomainId(repositoryDomain.getStorageName());
         if (domainId == null) {
-            domainId = repositoryClient.createDomain(domainName);
+            domainId = repositoryClient.createDomain(repositoryDomain.getStorageName());
             if (logger.isDebugEnabled()) {
                 logger.debug("created repository domain for " + domainName
                         + " id=" + domainId);
@@ -153,7 +153,7 @@ public class TenantRepository {
         //retrieve all workspace ids for a domain
         //domain specific table of workspace name and id
         Hashtable<String, String> workspaceIds =
-                repositoryClient.retrieveWorkspaceIds(repositoryDomain.getName());
+                repositoryClient.retrieveWorkspaceIds(repositoryDomain.getStorageName());
         //verify if workspace exists for each service from the tenant binding
         for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
             String serviceName = serviceBinding.getName();
@@ -190,7 +190,7 @@ public class TenantRepository {
                                 + " in repository.  Creating new workspace ...");
                     }
                     workspaceId = repositoryClient.createWorkspace(
-                            repositoryDomain.getName(),
+                            repositoryDomain.getStorageName(),
                             serviceBinding.getName());
                     if (workspaceId == null) {
                         if (logger.isWarnEnabled()) {

@@ -158,7 +158,9 @@ public class TenantBindingConfigReaderImpl
     
     private void readDomains(TenantBindingType tenantBinding) throws Exception {
         for (RepositoryDomainType domain : tenantBinding.getRepositoryDomain()) {
-            domains.put(domain.getName(), domain);
+        	String key = getTenantQualifiedIdentifier(tenantBinding.getId(),
+        			domain.getName());
+            domains.put(key, domain);
         }
     }
 
@@ -239,7 +241,8 @@ public class TenantBindingConfigReaderImpl
             */
             return null;
         }
-        return domains.get(repoDomain.trim());
+        String key = this.getTenantQualifiedIdentifier(tenantId, repoDomain.trim());
+        return domains.get(key);
     }
 
     /**
@@ -295,7 +298,8 @@ public class TenantBindingConfigReaderImpl
      */
     public static String getTenantQualifiedServiceName(
             String tenantId, String serviceName) {
-        return tenantId + "." + serviceName.toLowerCase();
+//        return tenantId + "." + serviceName.toLowerCase();
+        return getTenantQualifiedIdentifier(tenantId, serviceName.toLowerCase());
     }
 
     public static String getTenantQualifiedIdentifier(String tenantId, String identifier) {

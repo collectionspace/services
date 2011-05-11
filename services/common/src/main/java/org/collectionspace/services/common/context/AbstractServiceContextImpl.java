@@ -284,6 +284,17 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     }
 
     /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getRepositoryDomainName()
+     */
+    @Override
+    public String getRepositoryDomainStorageName() {
+        if (repositoryDomain == null) {
+            return null;
+        }
+        return repositoryDomain.getStorageName();
+    }
+
+    /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getRepositoryWorkspaceId()
      */
     @Override

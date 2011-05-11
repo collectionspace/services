@@ -111,6 +111,11 @@ public interface ServiceContext<IT, OT> {
      * @return repository domain for the tenant
      */
     public String getRepositoryDomainName();
+    
+    /*
+     * Get's the name/label used to create the storage container (folder or directory name)
+     */
+    public String getRepositoryDomainStorageName();    
 
     /**
      * getRepositoryClientName returns the repository client name as

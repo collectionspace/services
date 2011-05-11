@@ -431,7 +431,7 @@ public class NuxeoUtils {
      * @return PathRef
      */
     public static DocumentRef createPathRef(ServiceContext ctx, String id) {
-        return new PathRef("/" + ctx.getRepositoryDomainName() +
+        return new PathRef("/" + ctx.getRepositoryDomainStorageName() +
                 "/" + "workspaces" +
                 "/" + ctx.getRepositoryWorkspaceName() +
                 "/" + id);

@@ -836,24 +836,28 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     public String getDomainId(String domainName) throws Exception {
         String domainId = null;
         RepositoryInstance repoSession = null;
-        try {
-            repoSession = getRepositorySession();
-            DocumentRef docRef = new PathRef(
-                    "/" + domainName);
-            DocumentModel domain = repoSession.getDocument(docRef);
-            domainId = domain.getId();
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
-            }
-            //there is no way to identify if document does not exist due to
-            //lack of typed exception for getDocument method
-            return null;
-        } finally {
-            if (repoSession != null) {
-                releaseRepositorySession(repoSession);
-            }
+        
+        if (domainName != null && !domainName.isEmpty()) {
+	        try {
+	            repoSession = getRepositorySession();
+	            DocumentRef docRef = new PathRef(
+	                    "/" + domainName);
+	            DocumentModel domain = repoSession.getDocument(docRef);
+	            domainId = domain.getId();
+	        } catch (Exception e) {
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("Caught exception ", e);
+	            }
+	            //there is no way to identify if document does not exist due to
+	            //lack of typed exception for getDocument method
+	            return null;
+	        } finally {
+	            if (repoSession != null) {
+	                releaseRepositorySession(repoSession);
+	            }
+	        }
         }
+        
         return domainId;
     }
 

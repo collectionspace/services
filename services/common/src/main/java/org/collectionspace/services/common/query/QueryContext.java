@@ -43,7 +43,7 @@ public class QueryContext {
             throw new DocumentNotFoundException(
                     "Unable to find DocumentType for service " + ctx.getServiceName());
         }
-        domain = ctx.getRepositoryDomainName();
+        domain = ctx.getRepositoryDomainStorageName();
         tenantId = ctx.getTenantId();
         if (tenantId == null) {
             throw new IllegalArgumentException(

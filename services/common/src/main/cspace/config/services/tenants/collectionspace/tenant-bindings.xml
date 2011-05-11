@@ -8,7 +8,7 @@
 <tenant:TenantBindingConfig xmlns:tenant="http://collectionspace.org/services/common/tenant" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/common/tenant http://collectionspace.org/services/common/tenant.xsd">
   <!-- begin movingimages.us tenant meta-data -->
   <tenant:tenantBinding id="1" name="collectionspace.org" displayName="CollectionSpace Demo" version="0.1">
-    <tenant:repositoryDomain name="default-domain" repositoryClient="nuxeo-java" />
+    <tenant:repositoryDomain name="default-domain" storageName="default-domain" repositoryClient="nuxeo-java" />
     <tenant:properties>
       <types:item xmlns:types="http://collectionspace.org/services/common/types">
         <types:key>datePattern</types:key>
