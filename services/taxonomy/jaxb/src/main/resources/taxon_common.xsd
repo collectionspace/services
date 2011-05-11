@@ -33,6 +33,7 @@
                 <xs:element name="taxonRank" type="xs:string"/>
                 <xs:element name="taxonCurrency" type="xs:string"/>
                 <xs:element name="taxonAuthorGroupList" type="taxonAuthorGroupList"/>
+                <xs:element name="taxonYear" type="xs:string"/>
                 <xs:element name="taxonCitationList" type="taxonCitationList"/>
                 <xs:element name="taxonomicStatus" type="xs:string"/>
                 <xs:element name="taxonNameSource" type="xs:string"/>

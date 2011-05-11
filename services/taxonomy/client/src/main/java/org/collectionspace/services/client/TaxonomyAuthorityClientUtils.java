@@ -54,9 +54,8 @@ public class TaxonomyAuthorityClientUtils {
     }
 
     /**
-     * @param taxonomyRefName  The proper refName for this authority
-     * @param taxonInfo the properties for the new Taxonomy. Can pass in one condition
-     * 						note and date string.
+     * @param taxonomyAuthRefName  The proper refName for this authority.
+     * @param taxonInfo the properties for the new instance of a term in this authority.
      * @param headerLabel	The common part label
      * @return	The PoxPayloadOut payload for the create call
      */
@@ -73,16 +72,33 @@ public class TaxonomyAuthorityClientUtils {
         value = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME_COMPUTED);
         boolean displayNameComputed = (value == null) || value.equalsIgnoreCase("true");
         taxon.setDisplayNameComputed(displayNameComputed);
-        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.NAME)) != null) {
-            taxon.setTaxonFullName(value);
-        }
-        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.RANK)) != null) {
-            taxon.setTaxonRank(value);
-        }
         if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TERM_STATUS)) != null) {
             taxon.setTermStatus(value);
         }
-        // FIXME: Add additional fields in the Taxon record here.
+
+        // Fields specific to this authority record type.
+        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.NAME)) != null) {
+            taxon.setTaxonFullName(value);
+        }
+        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXON_RANK)) != null) {
+            taxon.setTaxonRank(value);
+        }
+        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXON_CURRENCY)) != null) {
+            taxon.setTaxonCurrency(value);
+        }
+        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXON_YEAR)) != null) {
+            taxon.setTaxonYear(value);
+        }
+        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXONOMIC_STATUS)) != null) {
+            taxon.setTaxonomicStatus(value);
+        }
+
+        // FIXME: Add additional fields in the Taxon record here,
+        // including at least one each of:
+        // * a repeatable field
+        // * a repeatable group of fields
+        // * a Boolean field
+        // * an authref field (when implemented)
 
         PoxPayloadOut multipart = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(taxon,
