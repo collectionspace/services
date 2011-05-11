@@ -140,23 +140,6 @@ public class BatchServiceTest extends AbstractServiceTestImpl {
                 i++;
             }
         }
-
-        /*
-        List<AbstractCommonList.ListItem> items = list.getListItem();
-        int i = 0;
-        for(AbstractCommonList.ListItem item : items){
-            List<Element> elList = item.getAny();
-            StringBuilder elementStrings = new StringBuilder();
-            for(Element el : elList) {
-                Node textEl = el.getFirstChild();
-                if (textEl != null){
-                    elementStrings.append("["+el.getNodeName()+":"+textEl.getNodeValue()+"] ");
-                }
-            }
-            System.out.println("\r\n\r\n\r\n~~~~~~~~~~~~~~~~~~~~~~~~~~~"+testName + ": list-item[" + i + "]: "+elementStrings.toString());
-            i++;
-        }
-        */
     }
 
     @Override
