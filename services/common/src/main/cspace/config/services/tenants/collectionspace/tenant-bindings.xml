@@ -632,7 +632,7 @@
         <service:params>
           <service:SchemaName>media</service:SchemaName>
           <service:DublinCoreTitle>media</service:DublinCoreTitle>
-          <service:SummaryFields>title|source|filename|identificationNumber|uri|csid</service:SummaryFields>
+          <service:SummaryFields>title|source|filename|identificationNumber|blobCsid|uri|csid</service:SummaryFields>
           <service:AbstractCommonListClassname />
           <service:CommonListItemClassname />
           <service:ListResultsItemMethodName>getMediaListItem</service:ListResultsItemMethodName>
@@ -652,6 +652,10 @@
             <service:ListResultField>
               <service:element>identificationNumber</service:element>
               <service:xpath>identificationNumber</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>blobCsid</service:element>
+              <service:xpath>blobCsid</service:xpath>
             </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
