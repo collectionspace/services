@@ -26,6 +26,7 @@ package org.collectionspace.services.vocabulary.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
+import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
@@ -54,6 +55,11 @@ public class VocabularyItemDocumentModelHandler
     
     public VocabularyItemDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
+    }
+
+    @Override
+    public String getAuthorityServicePath(){
+        return VocabularyClient.SERVICE_PATH_COMPONENT;    // CSPACE-3932
     }
 	
     

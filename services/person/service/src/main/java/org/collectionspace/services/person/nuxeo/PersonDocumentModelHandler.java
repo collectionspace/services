@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -66,6 +67,11 @@ public class PersonDocumentModelHandler
     
     public PersonDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
+    }
+
+    @Override
+    public String getAuthorityServicePath(){
+        return PersonAuthorityClient.SERVICE_PATH_COMPONENT;    // CSPACE-3932
     }
 	
     /* (non-Javadoc)
