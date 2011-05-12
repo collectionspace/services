@@ -552,6 +552,7 @@
             <xs:element name="dateEarliestSingleYear" type="xs:string"/>
             <xs:element name="dateEarliestSingleMonth" type="xs:string"/>
             <xs:element name="dateEarliestSingleDay" type="xs:string"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
             <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
             <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
             <xs:element name="dateEarliestSingleQualifierValue" type="xs:string"/>
@@ -559,6 +560,7 @@
             <xs:element name="dateLatestYear" type="xs:string"/>
             <xs:element name="dateLatestMonth" type="xs:string"/>
             <xs:element name="dateLatestDay" type="xs:string"/>
+            <xs:element name="dateLatestEra" type="xs:string"/>
             <xs:element name="dateLatestCertainty" type="xs:string"/>
             <xs:element name="dateLatestQualifier" type="xs:string"/>
             <xs:element name="dateLatestQualifierValue" type="xs:string"/>
