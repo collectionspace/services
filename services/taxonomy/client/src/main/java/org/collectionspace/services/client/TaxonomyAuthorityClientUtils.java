@@ -13,6 +13,8 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.TaxonJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.taxonomy.TaxonAuthorGroupList;
+import org.collectionspace.services.taxonomy.TaxonCitationList;
 import org.collectionspace.services.taxonomy.TaxonCommon;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 import org.dom4j.DocumentException;
@@ -56,11 +58,14 @@ public class TaxonomyAuthorityClientUtils {
     /**
      * @param taxonomyAuthRefName  The proper refName for this authority.
      * @param taxonInfo the properties for the new instance of a term in this authority.
+     * @param taxonAuthorGroupList an author group list (values of a repeatable group in the term record).
+     * @param taxonCitationList a citation list (values of a repeatable scalar in the term record).
      * @param headerLabel	The common part label
      * @return	The PoxPayloadOut payload for the create call
      */
     public static PoxPayloadOut createTaxonInstance(
             String taxonomyAuthRefName, Map<String, String> taxonInfo,
+            TaxonAuthorGroupList taxonAuthorGroupList, TaxonCitationList taxonCitationList,
             String headerLabel) {
         TaxonCommon taxon = new TaxonCommon();
         String shortId = taxonInfo.get(TaxonJAXBSchema.SHORT_IDENTIFIER);
@@ -93,12 +98,15 @@ public class TaxonomyAuthorityClientUtils {
             taxon.setTaxonomicStatus(value);
         }
 
-        // FIXME: Add additional fields in the Taxon record here,
-        // including at least one each of:
-        // * a repeatable field
-        // * a repeatable group of fields
-        // * a Boolean field
-        // * an authref field (when implemented)
+        if (taxonCitationList != null) {
+            taxon.setTaxonCitationList(taxonCitationList);
+        }
+
+        if (taxonAuthorGroupList != null) {
+            taxon.setTaxonAuthorGroupList(taxonAuthorGroupList);
+        }
+
+        // FIXME: Add the Boolean field isNamedHybrid in sample instances.
 
         PoxPayloadOut multipart = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(taxon,
@@ -121,7 +129,8 @@ public class TaxonomyAuthorityClientUtils {
      */
     public static String createItemInAuthority(String vcsid,
             String TaxonomyauthorityRefName, Map<String, String> taxonMap,
-            TaxonomyAuthorityClient client) {
+            TaxonAuthorGroupList taxonAuthorGroupList,
+            TaxonCitationList taxonCitationList, TaxonomyAuthorityClient client) {
         // Expected status code: 201 Created
         int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
         // Type of service request being tested
@@ -146,7 +155,7 @@ public class TaxonomyAuthorityClientUtils {
         }
         PoxPayloadOut multipart =
                 createTaxonInstance(TaxonomyauthorityRefName,
-                taxonMap, client.getItemCommonPartName());
+                taxonMap, taxonAuthorGroupList, taxonCitationList, client.getItemCommonPartName());
         String newID = null;
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         try {
