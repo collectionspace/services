@@ -29,11 +29,6 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.common.vocabulary</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.taxonomy.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
