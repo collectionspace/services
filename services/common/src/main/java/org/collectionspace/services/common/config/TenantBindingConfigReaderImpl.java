@@ -24,19 +24,39 @@
 package org.collectionspace.services.common.config;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.ServiceObjectType;
 import org.collectionspace.services.common.tenant.RepositoryDomainType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingConfig;
 import org.collectionspace.services.common.types.PropertyItemType;
+
+import ch.elca.el4j.util.codingsupport.Reject;
+import ch.elca.el4j.services.xmlmerge.AbstractXmlMergeException;
+import ch.elca.el4j.services.xmlmerge.ConfigurationException;
+import ch.elca.el4j.services.xmlmerge.Configurer;
+import ch.elca.el4j.services.xmlmerge.XmlMerge;
+import ch.elca.el4j.services.xmlmerge.config.AttributeMergeConfigurer;
+import ch.elca.el4j.services.xmlmerge.config.ConfigurableXmlMerge;
+import ch.elca.el4j.services.xmlmerge.config.PropertyXPathConfigurer;
+import ch.elca.el4j.services.xmlmerge.merge.DefaultXmlMerge;
+
+import org.apache.commons.io.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.elca.el4j.services.xmlmerge.Configurer;
+import ch.elca.el4j.services.xmlmerge.config.AttributeMergeConfigurer;
+import ch.elca.el4j.services.xmlmerge.config.ConfigurableXmlMerge;
 
 /**
  * ServicesConfigReader reads service layer specific configuration
@@ -47,8 +67,11 @@ import org.slf4j.LoggerFactory;
 public class TenantBindingConfigReaderImpl
         extends AbstractConfigReaderImpl<List<TenantBindingType>> {
     final private static String TENANT_BINDINGS_ERROR = "Tenant bindings error: ";
-    final private static String TENANT_BINDINGS_FILENAME = "tenant-bindings.xml";
     final private static String TENANT_BINDINGS_ROOTDIRNAME = "tenants";
+    final private static String TENANT_BINDINGS_FILENAME_PREFIX = "tenant-bindings";
+    final private static String TENANT_BINDINGS_PROTOTYPE_FILENAME = TENANT_BINDINGS_FILENAME_PREFIX + "-proto.xml";
+    final private static String TENANT_BINDINGS_DELTA_FILENAME = TENANT_BINDINGS_FILENAME_PREFIX + ".delta.xml";
+    final private static String MERGED_SUFFIX = ".merged.xml";
     
     final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReaderImpl.class);
     private List<TenantBindingType> tenantBindingTypeList;
@@ -73,7 +96,7 @@ public class TenantBindingConfigReaderImpl
 
     @Override
     public String getFileName() {
-        return TENANT_BINDINGS_FILENAME;
+        return TENANT_BINDINGS_DELTA_FILENAME;
     }
     
 	protected File getTenantsRootDir() {
@@ -88,7 +111,45 @@ public class TenantBindingConfigReaderImpl
 		}
 		return result;
 	}
-    
+    /*
+     * Take the directory of the prototype bindings and the directory of the delta bindings.  Merge the two and create (replace) a file
+     * named "tenant-bindings.xml"
+     */
+
+	private InputStream merge(File srcFile, File deltaFile) throws IOException {
+		InputStream result = null;
+		try {						
+			FileInputStream srcStream = new FileInputStream(srcFile);
+			FileInputStream deltaStream = new FileInputStream(deltaFile);
+			InputStream[] inputStreamArray = {srcStream, deltaStream};			
+			
+			Configurer configurer = new AttributeMergeConfigurer();
+			result = new ConfigurableXmlMerge(configurer).merge(inputStreamArray);
+		} catch (Exception e) {
+			logger.error("Could not merge tenant configuration delta file: " +
+					deltaFile.getAbsolutePath(), e);
+		}
+		//
+		// Try to save the merge output to a file that is suffixed with ".merged.xml" in the same directory
+		// as the delta file.
+		//
+		if (result != null) {
+			File outputDir = deltaFile.getParentFile();
+			String mergedFileName = outputDir.getAbsolutePath() + File.separator +
+				this.TENANT_BINDINGS_FILENAME_PREFIX + MERGED_SUFFIX;			
+			File mergedOutFile = new File(mergedFileName);
+			try {
+				FileUtils.copyInputStreamToFile(result, mergedOutFile);
+			} catch (IOException e) {
+				logger.warn("Could not create a copy of the merged tenant configuration at: " +
+						mergedFileName, e);
+			}
+			result.reset(); //reset the stream even if the file create failed.
+		}
+
+		return result;
+	}
+
     @Override
     public void read() throws Exception {
     	String tenantsRootPath = getTenantsRootDir().getAbsolutePath();
@@ -102,8 +163,11 @@ public class TenantBindingConfigReaderImpl
         	throw new Exception("Cound not find tenant bindings root directory: " +
         			tenantRootDirPath);
         }
+        File protoBindingsFile = new File(tenantRootDirPath + File.separator +
+        		TENANT_BINDINGS_PROTOTYPE_FILENAME);
+        
         List<File> tenantDirs = getDirectories(tenantsRootDir);
-        tenantBindingTypeList = readTenantConfigs(tenantDirs);
+        tenantBindingTypeList = readTenantConfigs(protoBindingsFile, tenantDirs);
         
         for (TenantBindingType tenantBinding : tenantBindingTypeList) {
             tenantBindings.put(tenantBinding.getId(), tenantBinding);
@@ -115,8 +179,49 @@ public class TenantBindingConfigReaderImpl
             }
         }
     }
+    
+    /*
+     * Take the directory of the prototype bindings and the directory of the delta bindings.  Merge the two and create (replace) a file
+     * named "tenant-bindings.xml"
+     *
+	private static String merge(String original, String patch) {
+		InputStream result = null;
+		try {
+			Configurer configurer = new AttributeMergeConfigurer();
+			
+			
+			FileInputStream ins1 = new FileInputStream(".\\src\\main\\resources\\File1.xml");
+			FileInputStream ins2 = new FileInputStream(".\\src\\main\\resources\\File2.xml");
+			InputStream[] inputStreamArray = {ins1, ins2};			
+			
+			result = new ConfigurableXmlMerge(configurer).merge(inputStreamArray);
+//			result = new ConfigurableXmlMerge(configurer).merge(new String[] {original, patch});
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		File mergedOutFile = new File(".\\target\\merged.xml");
+		try {
+			FileUtils.copyInputStreamToFile(result, mergedOutFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-	List<TenantBindingType> readTenantConfigs(List<File> tenantDirList) throws IOException {
+		return null;
+	}
+	*/
+    
+	/**
+     * Merge and read the prototype bindsings with each tenant specific bindings delta to create the final
+     * tenant bindings.
+     *
+     * @param protoBindingsFile - The prototypical bindings file.
+     * @param tenantDirList - The list of tenant directories containing tenant specific bindings
+     * @return A list of tenant bindings.
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    List<TenantBindingType> readTenantConfigs(File protoBindingsFile, List<File> tenantDirList) throws IOException {
 		List<TenantBindingType> result = new ArrayList<TenantBindingType>();		
 		//
 		// Iterate through a list of directories.
@@ -124,10 +229,16 @@ public class TenantBindingConfigReaderImpl
 		for (File tenantDir : tenantDirList) {
 			boolean found = false;
 			String errMessage = null;
-			File configFile = new File(tenantDir.getAbsoluteFile() + File.separator + TENANT_BINDINGS_FILENAME);
+			File configFile = new File(tenantDir.getAbsoluteFile() + File.separator + getFileName());
 			if (configFile.exists() == true) {
-				TenantBindingConfig tenantBindingConfig = (TenantBindingConfig) parse(
-						configFile, TenantBindingConfig.class);
+		        InputStream tenantBindingsStream = this.merge(protoBindingsFile, configFile);
+		        TenantBindingConfig tenantBindingConfig = null;
+		        try {
+					tenantBindingConfig = (TenantBindingConfig) parse(tenantBindingsStream,
+							TenantBindingConfig.class);
+		        } catch (Exception e) {
+		        	logger.error("Could not parse the merged tenant bindings.", e);
+		        }
 				if (tenantBindingConfig != null) {
 					TenantBindingType binding = tenantBindingConfig.getTenantBinding();
 					if (binding != null) {

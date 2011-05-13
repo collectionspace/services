@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.authorization-mgt</artifactId>
-        <version>1.7-SNAPSHOT</version>
+        <version>1.8-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -122,6 +122,11 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ch.elca.el4j.modules</groupId>
+            <artifactId>module-xml_merge-common</artifactId>
+            <version>3.1</version>
+        </dependency>		
     </dependencies>
     <!-- use profile as this task is not needed for every build and test -->
 

@@ -24,7 +24,10 @@
 package org.collectionspace.services.common.config;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,29 +110,34 @@ public abstract class AbstractConfigReaderImpl<T>
 		return getFileChildren(rootDir, true);
 	}
     
+    protected Object parse(File configFile, Class<?> clazz) throws FileNotFoundException, JAXBException {
+    	Object result = null;
+    	
+    	InputStream inputStream = new FileInputStream(configFile);
+    	result = parse(inputStream, clazz);
+        if (logger.isDebugEnabled()) {
+            logger.debug("read() read file " + configFile.getAbsolutePath());
+        }
+    	
+    	return result;
+    }
+    
     /**
      * parse parses given configuration file from the disk based on given class
      * definition
      * @param configFile
      * @param clazz
      * @return A JAXB object
+     * @throws JAXBException 
      * @throws Exception
      */
-    protected Object parse(File configFile, Class clazz) {
+    protected Object parse(InputStream configFileStream, Class<?> clazz) throws JAXBException {
     	Object result = null;
-    	try {
+
 	        JAXBContext jc = JAXBContext.newInstance(clazz);
 	        Unmarshaller um = jc.createUnmarshaller();
-	        result = um.unmarshal(configFile);
-	        if (logger.isDebugEnabled()) {
-	            logger.debug("read() read file " + configFile.getAbsolutePath());
-	        }
-    	} catch (JAXBException e) {
-    		if (logger.isErrorEnabled() == true) {
-    			logger.error("Could not unmarshal CollectionSpace config file: " +
-    					configFile.getAbsolutePath(), e);
-    		}
-    	}
+	        result = um.unmarshal(configFileStream);
+
         return result;
     }
 

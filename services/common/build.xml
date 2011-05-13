@@ -145,6 +145,14 @@
             <fileset dir="${basedir}/lib/slf4j"/>
         </copy>
     </target>
+	
+    <target name="deploy_xmlmerge"
+            description="deploy XMLMerge binaries in ${jboss.server.cspace}">
+        <copy todir="${jboss.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/xmlmerge"/>
+        </copy>
+    </target>
+	
 
     <target name="deploy" depends="install"
             description="deploy common elements in ${jboss.server.cspace}">
@@ -161,6 +169,7 @@
         <antcall target="deploy_jpa" />
         <antcall target="deploy_spring" />
         <antcall target="deploy_slf4j" />
+        <antcall target="deploy_xmlmerge" />
     	
         <copy todir="${jboss.server.cspace}/cspace/config/services">
             <fileset dir="${basedir}/src/main/cspace/config/services"/>

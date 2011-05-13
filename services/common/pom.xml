@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.main</artifactId>
-        <version>1.7-SNAPSHOT</version>
+        <version>1.8-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -288,8 +288,31 @@
 		    <artifactId>commons-fileupload</artifactId>
 		    <version>1.2</version>
 		</dependency>
-        
+        <dependency>
+            <groupId>ch.elca.el4j.modules</groupId>
+            <artifactId>module-xml_merge-common</artifactId>
+            <version>3.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <id>el4jReleaseRepositoryExternal</id>
+            <name>External release repository of the EL4J project</name>
+            <url>http://public-el4.elca-services.ch/el4j/maven2repository</url>
+        </repository>
+    </repositories>
 
     <build>
         <finalName>collectionspace-services-common</finalName>

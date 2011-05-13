@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tenant:TenantBindingConfig
+	xmlns:merge='http://xmlmerge.el4j.elca.ch'
+	xmlns:tenant='http://collectionspace.org/services/common/tenant'>
+	    	 
+    <tenant:tenantBinding id="1" name="collectionspace.org" displayName="CollectionSpace Demo" version="0.1">
+		<tenant:repositoryDomain name="default-domain" storageName="default-domain" repositoryClient="nuxeo-java" />	
+    </tenant:tenantBinding>
+	    	       
+</tenant:TenantBindingConfig>

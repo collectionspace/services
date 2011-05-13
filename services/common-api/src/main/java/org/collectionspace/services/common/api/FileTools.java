@@ -33,7 +33,6 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-
 /**
  * @author Laramie Crocker
  * $LastChangedRevision:  $
@@ -119,6 +118,4 @@ public class FileTools {
 		File result = new File(tmpDir, filePrefix + UUID.randomUUID().toString());
 		return result;
     }
-
-
 }
