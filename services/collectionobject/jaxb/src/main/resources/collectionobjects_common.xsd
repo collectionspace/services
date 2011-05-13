@@ -134,18 +134,6 @@
 
                 <!-- Object Production Information -->
 
-                <!--
-                    The Object Production Date field is being transitioned to be a
-                    structured date, per CSPACE-3756.
-
-                    The original multivalued / repeating text field, objectProductionDates,
-                    is being retained here for backwards compatibility, for now.  When the
-                    objectProductionDateGroup is implemented across layers, and is additionally
-                    made multivalued - in the services schemae, by wrapping it in a parent
-                    objectProductionDateGroupList element - the legacy objectProductionDates
-                    element can then be removed.
-                -->
-                <xs:element name="objectProductionDates" type="objectProductionDateList"/>
                 <xs:element name="objectProductionDateGroup" type="objectProductionDateGroup"/>
 
                 <xs:element name="objectProductionNote" type="xs:string"/>
@@ -219,18 +207,6 @@
                 <xs:element name="fieldCollectionSources" type="fieldCollectionSourceList"/>
                 <xs:element name="fieldCollectors" type="fieldCollectorList"/>
                 <xs:element name="fieldColEventNames" type="fieldColEventNameList"/>
-				
-                <!-- Object Description Date Information -->
-                <!-- This appears to be a placeholder structured date -->
-                <xs:element name="dateAssociation" type="xs:string"/>
-                <xs:element name="dateEarliestSingle" type="xs:string"/>
-                <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
-                <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
-                <xs:element name="dateLatest" type="xs:string"/>
-                <xs:element name="dateLatestCertainty" type="xs:string"/>
-                <xs:element name="dateLatestQualifier" type="xs:string"/>
-                <xs:element name="datePeriod" type="xs:string"/>
-                <xs:element name="dateText" type="xs:string"/>
                 
             </xs:sequence>
         </xs:complexType>

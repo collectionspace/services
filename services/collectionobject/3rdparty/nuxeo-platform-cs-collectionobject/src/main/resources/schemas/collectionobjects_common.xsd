@@ -216,24 +216,6 @@
 
     <!-- Object Production Information -->
 
-    <!--
-        The Object Production Date field is being transitioned to be a
-        structured date, per CSPACE-3756.
-
-        The original multivalued / repeating text field, objectProductionDates,
-        is being retained here for backwards compatibility, for now.  When the
-        objectProductionDateGroup is implemented across layers, and is additionally
-        made multivalued - in the services schemae, by wrapping it in a parent
-        objectProductionDateGroupList element - the legacy objectProductionDates
-        element can then be removed.
-    -->
-    <xs:element name="objectProductionDates">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="objectProductionDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
     <xs:element name="objectProductionDateGroup" type="objectProductionDateGroup"/>
 
     <xs:element name="objectProductionNote" type="xs:string"/>
