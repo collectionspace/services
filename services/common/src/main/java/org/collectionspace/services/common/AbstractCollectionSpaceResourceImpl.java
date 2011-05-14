@@ -28,17 +28,25 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.jboss.resteasy.client.ClientResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Class AbstractCollectionSpaceResourceImpl.
@@ -48,6 +56,9 @@ import org.jboss.resteasy.client.ClientResponse;
  */
 public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         implements CollectionSpaceResource<IT, OT> {
+
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     // Fields for default client factory and client
     /** The repository client factory. */
@@ -192,10 +203,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      * Creates the service context.
      * 
      * @param serviceName the service name
-     * @param input the input
-     * 
      * @return the service context< i t, o t>
-     * 
      * @throws Exception the exception
      */
     protected ServiceContext<IT, OT> createServiceContext(String serviceName,
@@ -329,5 +337,87 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     	result.setVersionString(getVersionString());
     	
     	return result;
+    }
+
+    public void checkResult(Object resultToCheck, String csid, String serviceMessage) throws WebApplicationException {
+        if (resultToCheck == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    serviceMessage + "csid=" + csid
+                    + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+    }
+
+    protected void ensureCSID(String csid, String crudType) throws WebApplicationException {
+           if (logger.isDebugEnabled()) {
+               logger.debug(crudType + " for " + getClass().getName() + " with csid=" + csid);
+           }
+           if (csid == null || "".equals(csid)) {
+               logger.error(crudType + " for " + getClass().getName() + " missing csid!");
+               Response response = Response.status(Response.Status.BAD_REQUEST).entity(crudType + " failed on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
+               throw new WebApplicationException(response);
+           }
+       }
+
+    protected WebApplicationException bigReThrow(Exception e, String serviceMsg) throws WebApplicationException {
+        return bigReThrow(e, serviceMsg, "");
+    }
+
+    protected WebApplicationException bigReThrow(Exception e, String serviceMsg, String csid) throws WebApplicationException {
+        Response response;
+        if (logger.isDebugEnabled()) {
+            logger.debug(getClass().getName(), e);
+        }
+        /*    ===== how RoleResource does it: =======
+        } catch (BadRequestException bre) {
+            response = Response.status(
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
+                    + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentException bre) {
+            response = Response.status(
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
+                    + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (UnauthorizedException ue) {
+            response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+         */
+
+        if (e instanceof UnauthorizedException) {
+            response = Response.status(Response.Status.UNAUTHORIZED).entity(serviceMsg + e.getMessage()).type("text/plain").build();
+            return new WebApplicationException(response);
+
+        } else if (e instanceof DocumentNotFoundException) {
+            response = Response.status(Response.Status.NOT_FOUND).entity(serviceMsg + " on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
+            return new WebApplicationException(response);
+
+        } else if (e instanceof BadRequestException) {
+            int code = ((BadRequestException) e).getErrorCode();
+            if (code == 0){
+                code = Response.Status.BAD_REQUEST.getStatusCode();
+            }
+            return new WebApplicationException(e, code);
+
+        } else if (e instanceof DocumentException){
+            int code = ((DocumentException) e).getErrorCode();
+            if (code == 0){
+               code = Response.Status.BAD_REQUEST.getStatusCode();
+            }
+            return new WebApplicationException(e, code);
+
+        } else if (e instanceof WebApplicationException) {
+            // subresource may have already thrown this exception
+            // so just pass it on
+            return (WebApplicationException) e;
+
+        } else { // e is now instanceof Exception
+            String detail = Tools.errorToString(e, true);
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(serviceMsg + " detail: " + detail).type("text/plain").build();
+            return new WebApplicationException(response);
+        }
     }
 }

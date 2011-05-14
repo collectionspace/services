@@ -30,6 +30,11 @@
             <artifactId>org.collectionspace.services.dimension.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.dimension.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- External dependencies -->
         <dependency>
             <groupId>junit</groupId>

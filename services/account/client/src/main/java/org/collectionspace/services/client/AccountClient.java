@@ -38,6 +38,8 @@ import org.jboss.resteasy.client.ClientResponse;
  */
 public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList, AccountProxy> {
     public static final String SERVICE_NAME = "accounts";
+    public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
+    public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 
 	@Override
 	public String getServiceName() {

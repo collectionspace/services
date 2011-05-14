@@ -23,37 +23,18 @@
  */
 package org.collectionspace.services.blob;
 
-import java.util.Map;
-import java.util.UUID;
-
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
-//import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler; //FIXEME: A resource class should not have a dependency on a specific DocumentHandler
-import org.collectionspace.services.blob.BlobsCommon;
-//import org.collectionspace.services.blob.BlobsCommonList;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-
-//FIXME: REM - We should not have Nuxeo dependencies in our resource classes.
-import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -65,16 +46,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.MediaType;
-
-
-import java.io.File;
+import javax.ws.rs.core.UriInfo;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
+
+//FIXME: REM - We should not have Nuxeo dependencies in our resource classes.
 
 @Path(BlobClient.SERVICE_PATH)
 @Consumes("application/xml")

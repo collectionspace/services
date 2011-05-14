@@ -21,6 +21,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authorization-mgt.client</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- utilities -->
 

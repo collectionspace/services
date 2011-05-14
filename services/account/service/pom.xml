@@ -49,7 +49,12 @@
             <artifactId>org.collectionspace.services.account.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.account.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- External dependencies -->
         
         <dependency>

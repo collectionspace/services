@@ -36,7 +36,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 public class NoteClient extends AbstractServiceClientImpl<NotesCommonList, NoteProxy> {
 
     public static final String SERVICE_NAME = "notes";
-    public static final String SERVICE_PATH_COMPONENT = "notes";
+    public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
+    public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 
     @Override
     public String getServiceName() {

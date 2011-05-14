@@ -39,7 +39,8 @@ import org.jboss.resteasy.client.ClientResponse;
 public class ReportClient extends AbstractPoxServiceClientImpl<ReportsCommonList, ReportProxy> {
 
     public static final String SERVICE_NAME = "reports";
-    public static final String SERVICE_PATH_COMPONENT = "reports";
+    public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
+    public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 
     @Override
     public String getServiceName() {

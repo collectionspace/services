@@ -29,6 +29,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 public class LoaninClient extends AbstractPoxServiceClientImpl<AbstractCommonList, LoaninProxy> {
     public static final String SERVICE_NAME = "loansin";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
+    public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()

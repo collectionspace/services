@@ -66,37 +66,8 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
         return MultipartServiceContextFactory.get();
     }
 
-    protected WebApplicationException bigReThrow(Exception e, String serviceMsg)
-            throws WebApplicationException {
-        return bigReThrow(e, serviceMsg, "");
-    }
 
-    protected WebApplicationException bigReThrow(Exception e,
-            String serviceMsg, String csid) throws WebApplicationException {
-        Response response;
-        if (logger.isDebugEnabled()) {
-            logger.debug(getClass().getName(), e);
-        }
-        if (e instanceof UnauthorizedException) {
-            response = Response.status(Response.Status.UNAUTHORIZED).entity(serviceMsg + e.getMessage()).type("text/plain").build();
-            return new WebApplicationException(response);
-        } else if (e instanceof DocumentNotFoundException) {
-            response = Response.status(Response.Status.NOT_FOUND).entity(serviceMsg + " on " + getClass().getName()
-                    + " csid=" + csid).type("text/plain").build();
-            return new WebApplicationException(response);
-        } else if (e instanceof BadRequestException) {
-            return new WebApplicationException(e, ((BadRequestException) e).getErrorCode());
-        } else if (e instanceof WebApplicationException) {
-            //
-            // subresource may have already thrown this exception
-            // so just pass it on
-            return (WebApplicationException) e;
-        } else { // e is now instanceof Exception
-            String detail = Tools.errorToString(e, true);
-            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(serviceMsg + " detail: " + detail).type("text/plain").build();
-            return new WebApplicationException(response);
-        }
-    }
+
 
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {

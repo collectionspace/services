@@ -487,8 +487,7 @@ public class MovementSortByTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // FIXME: Ultimately, this should return a BAD_REQUEST status.
-        testSetup(STATUS_INTERNAL_SERVER_ERROR, ServiceRequestType.READ);
+        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
@@ -517,8 +516,7 @@ public class MovementSortByTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // FIXME: Ultimately, this should return a BAD_REQUEST status.
-        testSetup(STATUS_INTERNAL_SERVER_ERROR, ServiceRequestType.READ);
+        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();

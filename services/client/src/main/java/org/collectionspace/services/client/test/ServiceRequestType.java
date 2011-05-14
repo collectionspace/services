@@ -83,6 +83,7 @@ public enum ServiceRequestType {
         public int[] validStatusCodes() {
             final int[] STATUS_CODES = {
                 Response.Status.OK.getStatusCode(),
+                Response.Status.BAD_REQUEST.getStatusCode(),
                 Response.Status.UNAUTHORIZED.getStatusCode(),
                 Response.Status.FORBIDDEN.getStatusCode(),
                 Response.Status.NOT_FOUND.getStatusCode(),

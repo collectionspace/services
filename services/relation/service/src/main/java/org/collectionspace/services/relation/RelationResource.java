@@ -26,30 +26,26 @@
  */
 package org.collectionspace.services.relation;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
-
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.relation.IRelationsManager;
-import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
-
-import org.collectionspace.services.jaxb.AbstractCommonList;
-
+import org.collectionspace.services.common.relation.IRelationsManager;
+import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 @Path("/relations")
 @Consumes("application/xml")

@@ -57,10 +57,6 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, RoleProxy> 
         return SERVICE_PATH_COMPONENT;
     }
 
-    /**
-     * @return
-     * @see org.collectionspace.hello.client.RoleProxy#readList()
-     */
     public ClientResponse<RolesList> readList() {
         return getProxy().readList();
 
@@ -71,11 +67,6 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, RoleProxy> 
 
     }
 
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.hello.client.RoleProxy#getAccount(java.lang.String)
-     */
     public ClientResponse<Role> read(String csid) {
         return getProxy().read(csid);
     }
@@ -94,7 +85,6 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, RoleProxy> 
      * @param csid
      * @param role
      * @return
-     * @see org.collectionspace.hello.client.RoleProxy#updateAccount(java.lang.Long, org.collectionspace.services.role.Role)
      */
     public ClientResponse<Role> update(String csid, Role role) {
         return getProxy().update(csid, role);

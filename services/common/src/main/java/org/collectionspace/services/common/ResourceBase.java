@@ -76,16 +76,6 @@ public abstract class ResourceBase
         }
     }
 
-    protected void ensureCSID(String csid, String crudType) throws WebApplicationException {
-        if (logger.isDebugEnabled()) {
-            logger.debug(crudType + " for " + getClass().getName() + " with csid=" + csid);
-        }
-        if (csid == null || "".equals(csid)) {
-            logger.error(crudType + " for " + getClass().getName() + " missing csid!");
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(crudType + " failed on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
-            throw new WebApplicationException(response);
-        }
-    }
 
     //======================= CREATE ====================================================
     @POST

@@ -26,6 +26,11 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.movement.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>

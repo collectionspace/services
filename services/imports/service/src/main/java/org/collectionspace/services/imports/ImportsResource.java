@@ -23,8 +23,6 @@
  */
 package org.collectionspace.services.imports;
 
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMain;
@@ -32,10 +30,7 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.api.ZipTools;
-
-// The modified Nuxeo ImportCommand from nuxeo's shell:
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.imports.nuxeo.ImportCommand;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -57,6 +52,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+
+// The modified Nuxeo ImportCommand from nuxeo's shell:
 
 /**
  * @author Laramie Crocker

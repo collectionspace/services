@@ -23,20 +23,16 @@
  */
 package org.collectionspace.services.person;
 
+import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.contact.AuthorityResourceWithContacts;
+import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.collectionspace.services.client.PersonAuthorityClient;
-import org.collectionspace.services.contact.AuthorityResourceWithContacts;
-import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-/**
- * The Class PersonAuthorityResource.
- */
 @Path(PersonAuthorityClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
@@ -44,35 +40,18 @@ public class PersonAuthorityResource extends
 	AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonList, PersonsCommon,
 		PersonDocumentModelHandler> {
 
-//    private final static String personAuthorityServiceName = "personauthorities";
-//	private final static String PERSONAUTHORITIES_COMMON = "personauthorities_common";
-	
-//    private final static String personServiceName = "persons";
-//	private final static String PERSONS_COMMON = "persons_common";
-    
     final Logger logger = LoggerFactory.getLogger(PersonAuthorityResource.class);
 
-    /**
-     * Instantiates a new person authority resource.
-     */
     public PersonAuthorityResource() {
 		super(PersonauthoritiesCommon.class, PersonAuthorityResource.class,
 				PersonAuthorityClient.SERVICE_COMMON_PART_NAME, PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
-     */
     @Override
     public String getServiceName() {
         return PersonAuthorityClient.SERVICE_NAME;
     }
 
-    /**
-     * Gets the item service name.
-     * 
-     * @return the item service name
-     */
     @Override
     public String getItemServiceName() {
         return PersonAuthorityClient.SERVICE_ITEM_NAME;

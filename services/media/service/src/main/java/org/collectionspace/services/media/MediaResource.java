@@ -23,22 +23,21 @@
  */
 package org.collectionspace.services.media;
 
+import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ClientType;
+import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.jboss.resteasy.util.HttpResponseCodes;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,14 +50,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
 import java.io.InputStream;
-import java.util.List;
 
 @Path(MediaClient.SERVICE_PATH)
 @Consumes("application/xml")
