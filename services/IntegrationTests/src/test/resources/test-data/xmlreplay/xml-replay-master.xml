@@ -43,6 +43,7 @@
     <run controlFile="relation/relation.xml" testGroup="r2only" />
     <run controlFile="person/person.xml" testGroup="postPerson" />
     <run controlFile="person/person.xml" testGroup="updatePerson" />
+    <run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
     <run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
     <run controlFile="organization/organization-hierarchy.xml" testGroup="HierarchicOrganization" />
         

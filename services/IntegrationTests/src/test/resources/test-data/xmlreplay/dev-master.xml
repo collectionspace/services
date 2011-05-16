@@ -2,108 +2,32 @@
 <xmlReplayMaster>
 <!-- Use this file to drive local testing.  
      To run this file, do: 
-          cd C:\src\trunk\services\IntegrationTests
+          cd trunk/services/IntegrationTests
           mvn test -Dtest=XmlReplayDevTest
-     Maven surefire will kick off XmlReplayDevTest, so see the note
-     below about not leaving any active testGroups enabled in this file
-     when you check it in.
+     Maven surefire will kick off XmlReplayDevTest.
+     
+     IMPORTANT :: DO NOT CHECK THIS FILE IN WITH ANY TESTS ACTIVE BELOW.
+		  Make sure all tests are commented out, or better yet, moved to dev-all.xml .
+		  This file should be modified locally and used instead of xml-replay-master.xml
+		  when you are developing.  This file can be used to point at a controlFile 
+		  and a testGroup, so you can test just one thing at a time, or a limited suite.
+     
+     You can find other tests to run in two places:
+       The tests that get run on nightly: 
+     	 xml-replay-master.xml
+       The set of possible tests, including ones that don't work:
+         dev-all.xml
 -->
-    <!--<protoHostPort>http://173.45.245.189:8180</protoHostPort>-->
-    <protoHostPort>http://localhost:8180</protoHostPort>
+    <protoHostPort>http://localhost:8280</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
-    <dump payloads="false" dumpServiceResult="auto" />
+    <dump payloads="false" dumpServiceResult="detailed" />
     
     <auths default="admin@collectionspace.org">
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
-
-    <!-- IMPORTANT :: DO NOT CHECK THIS FILE IN WITH ANY TESTS ACTIVE BELOW.
-                      Make sure all tests are commented out.
-                      This file should be modified locally and used instead of xml-replay-master.xml
-                      when you are developing.  This file can be used to point at a controlFile 
-                      and a testGroup, so you can test just one thing at a time, or a limited suite.
-    -->
     
-    <!--
-    <run controlFile="loanin/loanin.xml" testGroup="makeone" />
-    
-    <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />   
-    <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="repeat" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="domlist" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="cleanup" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
-    
-    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
-    <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
-    
-    <run controlFile="media/media.xml" testGroup="authrefs" />
-    
-    <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
-    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
-    -->
-    
-    
-    <!--
-      Used to verify CSPACE-3178
-    <run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
-    -->
-    
-    <!--
-      Used to measure timings of 1000 records for  CSPACE-3553
-    <run controlFile="objectexit/object-exit-LOOP.xml" testGroup="LOOP" />
-    -->
-     
-    <!--
-    <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
-    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
-    <run controlFile="person/person.xml" testGroup="person" />
-    <run controlFile="person/person.xml" testGroup="addOnePerson" />
-    
-    <run controlFile="person/person.xml" testGroup="updatePerson" />
-    <run controlFile="person/person.xml" testGroup="updatePerson" />
-    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
-   
-    <run controlFile="person/person.xml" testGroup="updatePerson" autoDeletePOSTS="true"  />
-    <run controlFile="person/person.xml" testGroup="updatePerson" autoDeletePOSTS="true"  />
-     
-    <run controlFile="person/person.xml" testGroup="postPerson" />
-    <run controlFile="relation/relation.xml" testGroup="makeRelationsNested" />
-    -->
-    
-    <!-- TODO: this almost works now:
-    <run controlFile="./security.xml" testGroup="security" />
-    --> 
-    
-    
-    <!-- TODO: make this an override: autoDeletePOSTS="true"-->
-
-    
-    <!--  These all work with POX:
-    <run controlFile="./security.xml" testGroup="deleteBug" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
-    <run controlFile="relation/relation.xml" testGroup="r2only" />
-    <run controlFile="person/person.xml" testGroup="postPerson" />
-	<run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
-    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
-    <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
-    <run controlFile="loanout/loanout.xml" testGroup="makeone" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
-    <run controlFile="person/person.xml" testGroup="postPerson" />
-    
-    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
-    <run controlFile="relation/relation.xml" testGroup="r2only" />
-    <run controlFile="person/person.xml" testGroup="postPerson" />
-    <run controlFile="person/person.xml" testGroup="updatePerson" />
-    <run controlFile="organization/organization-hierarchy.xml" testGroup="HierarchicOrganization" />
-    <run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
-    --> 
-    
-    
-        
+    <run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
     
 
 </xmlReplayMaster>

@@ -367,4 +367,101 @@
          </test>
         
 	</testGroup>
+	
+	<testGroup ID="PersonAddRelsDeleteRels" autoDeletePOSTS="true">
+	    <test ID="PersonAuth1" auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <filename>person/personauthorities_common.xml</filename>
+            <vars>
+            	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+            </vars>
+        </test>
+        
+        <test ID="PersonChild">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/</uri>
+            <filename>person/persons_common.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${PersonAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+            	<var ID="shortIdentifier">johnWayneActorChild</var>
+            </vars>
+        </test>
+        
+        <test ID="PersonChild2">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/</uri>
+            <filename>person/persons_common.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${PersonAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+            	<var ID="shortIdentifier">johnWayneActorChild2</var>
+            </vars>
+        </test>
+        
+        <test ID="Person1">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/</uri>
+            <filename>person/persons_common_w_relations_POST.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${PersonAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+            	<var ID="shortIdentifier">johnWayneActor</var>
+            	<var ID="childCSID">${PersonChild.CSID}</var>
+            	<var ID="childUri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonChild.CSID}</var>
+            	<var ID="child2CSID">${PersonChild2.CSID}</var>
+            	<var ID="child2Uri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonChild2.CSID}</var>
+            </vars>
+        </test>
+        
+	    <test ID="GETpostPerson">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${Person1.CSID}?showRelations=true</uri>
+        </test>
+    
+		<test ID="GETPersonAuthorityList">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/</uri>
+        </test>
+    
+		<test ID="Person1DeleteRels">
+			<method>PUT</method>
+			<uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${Person1.CSID}</uri>
+			<filename>person/persons_common_delete_relations_PUT.xml</filename>
+			<vars>
+				<var ID="inAuthority">${PersonAuth1.CSID}</var>
+				<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+				<var ID="shortIdentifier">johnWayneActor</var>
+				<var ID="childCSID">${PersonChild.CSID}</var>
+				<var ID="childUri">/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${PersonChild.CSID}</var>
+			</vars>
+		</test>
+		
+		<test ID="GETPerson_afterDeleteOneChild">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${Person1.CSID}?showRelations=true</uri>
+        </test>
+    
+		
+		<test ID="Person1DeleteAllRels">
+			<method>PUT</method>
+			<uri>/cspace-services/personauthorities/urn:cspace:name(CSPACE3739PersonAuthority)/items/${Person1.CSID}</uri>
+			<filename>person/persons_common_delete_all_relations_PUT.xml</filename>
+			<vars>
+				<var ID="inAuthority">${PersonAuth1.CSID}</var>
+				<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
+				<var ID="shortIdentifier">johnWayneActor</var>
+			</vars>
+		</test>
+		
+		<test ID="GETPerson_afterDeleteAllRelations">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}?showRelations=true</uri>
+        </test>
+    
+		
+
+    </testGroup>
+    
 </xmlReplay>
