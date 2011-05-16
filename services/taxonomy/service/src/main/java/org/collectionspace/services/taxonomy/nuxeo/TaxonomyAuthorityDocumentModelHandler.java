@@ -60,6 +60,10 @@ public class TaxonomyAuthorityDocumentModelHandler
     public TaxonomyAuthorityDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
     }
+    
+    public String getCommonPartLabel() {
+        return COMMON_PART_LABEL;
+    }
 	
     @Override
     public TaxonomyauthorityCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
@@ -71,7 +75,15 @@ public class TaxonomyAuthorityDocumentModelHandler
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
         List<TaxonomyauthorityCommonList.TaxonomyauthorityListItem> list = coList.getTaxonomyauthorityListItem();
-        String label = getServiceContext().getCommonPartLabel();
+        // FIXME: This workaround - for the discrepancy between plural service
+        // name / path ("taxonomyauthorities") and singular common part name
+        // ("taxonomyauthority ... _common") in this service might be handled
+        // in a cleaner way than below.  Absent this workaround, values of fields
+        // (other than URI and CSID) could not be obtained via the document model.
+        // Perhaps this will be moot when we switch to the model of Person, et al.,
+        // where SERVICE_PAYLOAD_NAME can be distinct from SERVICE_NAME.
+        // String label = getServiceContext().getCommonPartLabel();
+        String label = getCommonPartLabel();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();

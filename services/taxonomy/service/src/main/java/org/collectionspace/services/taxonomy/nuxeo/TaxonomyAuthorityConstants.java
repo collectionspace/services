@@ -24,8 +24,7 @@
 package org.collectionspace.services.taxonomy.nuxeo;
 
 /**
- * TaxonomyAuthorityConstants processes CollectionObject document
- *
+ * TaxonomyAuthorityConstants
  */
 public class TaxonomyAuthorityConstants {
 
