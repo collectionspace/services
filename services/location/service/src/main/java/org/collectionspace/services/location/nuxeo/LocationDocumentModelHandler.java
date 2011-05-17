@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.collectionspace.services.LocationJAXBSchema;
+import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
@@ -68,6 +69,11 @@ public class LocationDocumentModelHandler
     
     public LocationDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
+    }
+
+    @Override
+    public String getAuthorityServicePath(){
+        return LocationAuthorityClient.SERVICE_PATH_COMPONENT;    //  CSPACE-3932
     }
 	
     /* (non-Javadoc)

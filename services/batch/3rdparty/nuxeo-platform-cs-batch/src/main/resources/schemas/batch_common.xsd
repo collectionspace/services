@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Loan Out schema (XSD)
+    
+    Entity  : Batch
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/batch/"
+    xmlns="http://collectionspace.org/batch/"
+    targetNamespace="http://collectionspace.org/batch/"
+    version="0.1">
+    
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->
+
+    <!--  Batch Information Group -->
+    
+    <xs:element name="name" type="xs:string"/>
+	<xs:element name="notes" type="xs:string"/>
+	<xs:element name="forDocType" type="xs:string"/>
+	<xs:element name="forSingleDoc" type="xs:boolean"/>
+	<xs:element name="createsNewFocus" type="xs:boolean"/>
+	<xs:element name="className" type="xs:string"/>
+</xs:schema>

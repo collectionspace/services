@@ -526,6 +526,54 @@
       </service:object>
     </tenant:serviceBindings>
     <!-- end objectexit service meta-data -->
+    <!-- begin batch service meta-data -->
+    <tenant:serviceBindings name="Batch" type="procedure" version="0.1">
+      <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/batch/*/workflow/</service:uriPath>
+      <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
+      <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:classname>org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler</service:classname>
+        <service:params>
+          <service:SchemaName>batch</service:SchemaName>
+          <service:DublinCoreTitle>batch</service:DublinCoreTitle>
+          <service:SummaryFields>name|forDocType|uri|csid</service:SummaryFields>
+          <service:AbstractCommonListClassname>org.collectionspace.services.batch.BatchCommonList</service:AbstractCommonListClassname>
+          <service:CommonListItemClassname>org.collectionspace.services.batch.BatchCommonList$BatchListItem</service:CommonListItemClassname>
+          <service:ListResultsItemMethodName>getBatchListItem</service:ListResultsItemMethodName>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>name</service:element>
+              <service:xpath>name</service:xpath>
+              <service:setter>setName</service:setter>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>forDocType</service:element>
+              <service:xpath>forDocType</service:xpath>
+              <service:setter>setForDocType</service:setter>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
+      <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.batch.nuxeo.BatchValidatorHandler</service:validatorHandler>
+      <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Batch" version="0.1">
+        <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="batch-system" updated="" order="0">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/services/common/system" schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd" />
+          </service:content>
+        </service:part>
+        <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="batch_common" updated="" order="1">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/services/batch" schemaLocation="http://collectionspace.org/services/batch http://services.collectionspace.org/batch/batch_common.xsd" />
+          </service:content>
+        </service:part>
+        <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+          </service:content>
+        </service:part>
+      </service:object>
+    </tenant:serviceBindings>
+    <!-- end batch service meta-data -->
     <!-- begin group service meta-data -->
     <tenant:serviceBindings name="Groups" type="procedure" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/groups/*/workflow/</service:uriPath>

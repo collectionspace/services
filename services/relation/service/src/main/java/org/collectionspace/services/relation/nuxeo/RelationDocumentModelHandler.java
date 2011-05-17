@@ -196,7 +196,7 @@ public class RelationDocumentModelHandler
             String itemDocType = itemDocModel.getDocumentType().getName();
             item.setDocumentTypeFromModel(itemDocType);           //this one comes from the nuxeo documentType
 
-            System.out.println("\r\n******** AuthorityItemDocumentModelHandlder documentType **************\r\n\tdocModel: "+itemDocType+"\r\n\tpayload: "+documentType);
+            //DEBUG: System.out.println("\r\n******** AuthorityItemDocumentModelHandlder documentType **************\r\n\tdocModel: "+itemDocType+"\r\n\tpayload: "+documentType);
             boolean usedDocumentTypeFromPayload = true;
             if ( ! Tools.isBlank(documentType)){
                 if (documentType.equals(itemDocType)){

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.ecm.platform.batch.LifeCycleManagerExtensions">
+
+  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
+             point="types">
+    <types>
+      <type name="Batch">default</type>
+    </types>
+  </extension>
+
+</component>

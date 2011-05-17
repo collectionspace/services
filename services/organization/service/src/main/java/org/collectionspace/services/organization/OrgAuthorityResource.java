@@ -40,7 +40,7 @@ public class OrgAuthorityResource extends
 	AuthorityResourceWithContacts<OrgauthoritiesCommon, OrgauthoritiesCommonList, OrganizationsCommon,
 	OrganizationDocumentModelHandler> {
 
-    private final static String orgAuthorityServiceName = "orgauthorities";
+    private final static String orgAuthorityServiceName = OrgAuthorityClient.SERVICE_NAME;
 	private final static String ORGAUTHORITIES_COMMON = "orgauthorities_common";
     
     private final static String organizationServiceName = "organizations";

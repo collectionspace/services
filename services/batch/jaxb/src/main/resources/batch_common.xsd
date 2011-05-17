@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/batch"
+  xmlns="http://collectionspace.org/services/batch"
+  targetNamespace="http://collectionspace.org/services/batch"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->    
+    
+    <!-- batch -->
+    <xs:element name="batch_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Batch Information Group -->
+                <xs:element name="name" type="xs:string"/>
+                <xs:element name="notes" type="xs:string"/>
+                <xs:element name="forDocType" type="xs:string"/>
+                <xs:element name="forSingleDoc" type="xs:boolean"/>
+                <xs:element name="createsNewFocus" type="xs:boolean"/>
+                <xs:element name="className" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonList">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+
+
+    <!-- batch records, as in nuxeo repository -->
+    <xs:element name="batch-common-list">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">
+                    <xs:sequence>
+                        <xs:element name="batch-list-item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="name" type="xs:string" minOccurs="1" />
+                                    <xs:element name="forDocType" type="xs:string" minOccurs="1" />
+                                    <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string" minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
+
