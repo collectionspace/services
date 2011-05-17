@@ -27,8 +27,9 @@
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
     
-    <run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
-    
+    <!--
+    	<run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
+    -->
 
 </xmlReplayMaster>
 
