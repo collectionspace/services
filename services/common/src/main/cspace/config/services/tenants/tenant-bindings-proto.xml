@@ -28,7 +28,7 @@
         <types:value>en</types:value>
       </types:item>
       <!-- <types:item><types:key>localeLanguage</types:key><types:value>da</types:value></types:item> -->
-    </tenant:properties>
+    </tenant:properties>		
     <!-- begin idgenerators service meta-data -->
     <tenant:serviceBindings name="idgenerators" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
@@ -40,10 +40,10 @@
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /idgenerators/*/ids
             </service:uriPath> -->
-    </tenant:serviceBindings>
+    </tenant:serviceBindings>	
     <!-- end id service meta-data -->
     <!-- begin collectionobject service meta-data -->
-    <tenant:serviceBindings name="CollectionObjects" type="object" version="0.1">
+    <tenant:serviceBindings id="CollectionObjects" name="CollectionObjects" type="object" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/collectionobjects/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
@@ -148,12 +148,7 @@
             <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject" schemaLocation="http://collectionspace.org/services/collectionobject http://services.collectionspace.org/collectionobject/collectionobjects_common.xsd" />
           </service:content>
         </service:part>
-        <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_naturalhistory" updated="" order="2">
-          <service:content contentType="application/xml">
-            <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd" />
-          </service:content>
-        </service:part>
-        <service:part id="3" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="3">
+        <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
           </service:content>

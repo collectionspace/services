@@ -633,6 +633,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(dimensionsGroups.get(0));
         Assert.assertNotNull(dimensionsGroups.get(0).getMeasuredPart());
 
+        /* No longer part of the "default" domain service tests for the CollectionObject record.
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Reading Natural History part ...");
         }
@@ -641,6 +642,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // can add specific field-level checks as warranted.
         Object conh = extractPartValue(testName, res, getNHPartName());
         Assert.assertNotNull(conh);
+        */
     }
 
     // Failure outcomes

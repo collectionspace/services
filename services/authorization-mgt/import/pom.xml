@@ -13,6 +13,7 @@
     <artifactId>org.collectionspace.services.authorization-mgt.import</artifactId>
     <name>services.authorization-mgt.import</name>
     <properties>
+        <generate_only>false</generate_only>
         <spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.2.RELEASE</spring.security.version>
     </properties>
@@ -146,6 +147,8 @@
                 <configuration>
                     <mainClass>org.collectionspace.ImportAuthz</mainClass>
                     <arguments>
+                        <argument>-g</argument>
+                        <argument>${generate_only}</argument>
                         <argument>-u</argument>
                         <argument>SPRING_ADMIN</argument>
                         <argument>-p</argument>

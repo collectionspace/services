@@ -41,6 +41,7 @@ import org.collectionspace.services.authorization.driver.AuthorizationSeedDriver
  */
 public class ImportAuthz {
 
+	final private static String OPTIONS_GENERATE_ONLY = "generate only";
     final private static String OPTIONS_USERNAME = "username";
     final private static String OPTIONS_PASSWORD = "password";
     final private static String OPTIONS_TENANT_BINDING = "tenant binding file";
@@ -50,6 +51,13 @@ public class ImportAuthz {
 
     final private static String MSG_SEPARATOR = "--";
 
+    final private static boolean generateOnly(String param) {
+    	boolean result = false;
+    	if (param != null) {
+    		result = Boolean.parseBoolean(param);
+    	}
+    	return result;
+    }
     public static void main(String[] args) {
 
         Options options = createOptions();
@@ -62,6 +70,7 @@ public class ImportAuthz {
                 printUsage();
                 System.exit(1);
             }
+            String generate_only = line.getOptionValue("g");
             String user = line.getOptionValue("u");
             String password = line.getOptionValue("p");
             String tenantBinding = line.getOptionValue("b");
@@ -73,7 +82,15 @@ public class ImportAuthz {
             AuthorizationSeedDriver driver = new AuthorizationSeedDriver(
                     user, password, tenantBinding, exportDir);
             driver.generate();
-            driver.seed();
+            //
+            // If the "-g" option was set, then we will NOT seed the AuthZ tables.  Instead, we'll
+            // just merge the prototypical tenant bindings and generate the permissions XML output
+            //
+            if (generateOnly(generate_only) == false) {
+            	driver.seed();
+            } {
+            	System.out.println("WARNING: '-g' was set to 'true' so AuthZ tables were not seeded.");
+            }
         } catch (ParseException exp) {
             // oops, something went wrong
             System.err.println("Parsing failed.  Reason: " + exp.getMessage());
@@ -101,6 +118,7 @@ public class ImportAuthz {
 
     private static Options createOptions() {
         Options options = new Options();
+        options.addOption("g", true, OPTIONS_GENERATE_ONLY);
         options.addOption("u", true, OPTIONS_USERNAME);
         options.addOption("p", true, OPTIONS_PASSWORD);
         options.addOption("b", true, OPTIONS_TENANT_BINDING);
@@ -113,6 +131,7 @@ public class ImportAuthz {
         StringBuilder sb = new StringBuilder();
         sb.append("\nUsage : java -cp <classpath> " + ImportAuthz.class.getName() + " <options>");
         sb.append("\nOptions :");
+        sb.append("\n   -g  <" + OPTIONS_GENERATE_ONLY + "> generate only, do not seed AuthZ values in the security tables");        
         sb.append("\n   -u  <" + OPTIONS_USERNAME + "> cspace username");
         sb.append("\n   -p  <" + OPTIONS_PASSWORD + "> password");
         sb.append("\n   -b  <" + OPTIONS_TENANT_BINDING + "> tenant binding file (fully qualified path)");
