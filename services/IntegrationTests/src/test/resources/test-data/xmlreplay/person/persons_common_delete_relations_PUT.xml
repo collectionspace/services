@@ -26,27 +26,6 @@
 	   It passes through and then the service deals with it.
   -->
   <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
-    <pageNum>0</pageNum>
-    <pageSize>40</pageSize>
-    <itemsInPage>1</itemsInPage>
-    <totalItems>1</totalItems>
-    <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
-    <relation-list-item>
-		<predicate>hasBroader</predicate>
-		<subject>
-		  <csid>${itemCSID}</csid>
-		  <documentType>Person</documentType>
-		  <name>John Wayne, Me</name>
-		  <number>1111</number>
-		</subject>
-		<object>
-		  <csid>${parentCSID}</csid>
-		  <uri>${parentUri}</uri>
-		  <documentType>Person</documentType>
-		  <name>John Wayne 2, the evil twin, Parent</name>
-		  <number>0000</number>
-		</object>
-	</relation-list-item>
 	<relation-list-item>
 		<predicate>hasBroader</predicate>
 		<subject>
@@ -54,22 +33,6 @@
 		  <uri>${childUri}</uri>
 		  <documentType>Person</documentType>
 		  <name>John Wayne 1, the evil twin, child</name>
-		  <number>1100</number>
-		</subject>
-		<object>
-		  <csid>${itemCSID}</csid>
-		  <documentType>Person</documentType>
-		  <name>John Wayne</name>
-		  <number>1111</number>
-		</object>
-	</relation-list-item>
-	<relation-list-item>
-		<predicate>hasBroader</predicate>
-		<subject>
-		  <uri>${child2Uri}</uri>
-		  <csid>${child2CSID}</csid>
-		  <documentType>Person</documentType>
-		  <name>John Wayne 2, the evil twin, child</name>
 		  <number>2222</number>
 		</subject>
 		<object>
@@ -77,23 +40,6 @@
 		  <documentType>Person</documentType>
 		  <name>John Wayne</name>
 		  <number>1111</number>
-		</object>
-	</relation-list-item>
-	<relation-list-item>
-		<predicate>hasBroader</predicate>
-		<subject>
-		  <uri>${child3Uri}</uri>
-		  <csid>${child3CSID}</csid>
-		  <documentType>Person</documentType>
-		  <name>John Wayne 3, the evil twin, child</name>
-		  <number>3333</number>
-		</subject>
-		<object>
-		  <csid>${itemCSID}</csid>
-		  <documentType>Person</documentType>
-		  <name>John Wayne</name>
-		  <number>1111</number>
-		  
 		</object>
 	</relation-list-item>
   </ns3:relations-common-list>

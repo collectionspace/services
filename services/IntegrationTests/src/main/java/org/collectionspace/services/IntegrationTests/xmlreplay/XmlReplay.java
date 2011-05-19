@@ -4,10 +4,12 @@ import org.apache.commons.cli.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.jexl2.JexlEngine;
+import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 
+import java.awt.image.DirectColorModel;
 import java.io.*;
 import java.util.*;
 
@@ -424,6 +426,9 @@ public class XmlReplay {
         //  the second is the serviceResultsMap, which is used for keeping track of CSIDs created by POSTs, for later reference by DELETE, etc.
         List<ServiceResult> results = new ArrayList<ServiceResult>();
 
+        XmlReplayReport report = new XmlReplayReport();
+        report.init();
+
         String controlFile = Tools.glue(xmlReplayBaseDir, "/", controlFileName);
         org.dom4j.Document document;
         document = getDocument(controlFile); //will check full path first, then checks relative to PWD.
@@ -631,6 +636,8 @@ public class XmlReplay {
                     String serviceResultRow = serviceResult.dump(dump.dumpServiceResult, hasError)+"; time:"+(System.currentTimeMillis()-startTime);
                     String leader = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed) ? "XmlReplay:"+testIDLabel+": ": "";
 
+                    report.addTestResult(serviceResult);
+
                     if (   (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed)
                         || (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.full)         ){
                         System.out.println("\r\n#---------------------#");
@@ -664,6 +671,15 @@ public class XmlReplay {
                 autoDelete(serviceResultsMap, "default");
             }
         }
+
+        //=== Now spit out the HTML report file ===
+        report.finish();
+        File m = new File(controlFileName);
+        String localName = m.getName();//don't instantiate, just use File to extract name.
+        String reportName = "XmlReplayReport-"+testGroupID+localName+".html";
+        FileTools.saveFile(xmlReplayBaseDir, reportName, report.getPage(), false); //todo: move from xmlReplayBaseDir to "target/xmlReplayReports" dir.
+        //================================
+
         return results;
     }
 

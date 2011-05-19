@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplayMaster>
+    <!-- 
+    This file contains all possible tests, in various stages of readiness, 
+       as noted below in comments.  Files not commented out should work.
+     
+     Important.  You can't run or source this file.  It is just for reference 
+        and a storage place to put these tests, so they can be copied into dev-master.xml
+        
+     Keep this file updated with all possible tests, so that dev-master.xml can be clean.
+     
+     Keep xml-replay-master.xml updated with all tests that should run on nightly.
+   -->
+   <!--
+    <run controlFile="loanin/loanin.xml" testGroup="makeone" />
+    
+    <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />   
+    <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="repeat" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="domlist" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="cleanup" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
+    
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
+    
+    <run controlFile="media/media.xml" testGroup="authrefs" />
+    
+    <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
+    -->
+    
+    
+    <!--
+      Used to verify CSPACE-3178
+    <run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
+    -->
+    
+    <!--
+      Used to measure timings of 1000 records for  CSPACE-3553
+    <run controlFile="objectexit/object-exit-LOOP.xml" testGroup="LOOP" />
+    -->
+     
+    <!--
+    <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
+    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
+    <run controlFile="person/person.xml" testGroup="person" />
+    <run controlFile="person/person.xml" testGroup="addOnePerson" />
+    
+    <run controlFile="person/person.xml" testGroup="updatePerson" />
+    <run controlFile="person/person.xml" testGroup="updatePerson" />
+    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
+   
+    <run controlFile="person/person.xml" testGroup="updatePerson" autoDeletePOSTS="true"  />
+    <run controlFile="person/person.xml" testGroup="updatePerson" autoDeletePOSTS="true"  />
+     
+    <run controlFile="person/person.xml" testGroup="postPerson" />
+    <run controlFile="relation/relation.xml" testGroup="makeRelationsNested" />
+    -->
+    
+    <!-- TODO: this almost works now:
+    <run controlFile="./security.xml" testGroup="security" />
+    --> 
+    
+    
+    <!-- TODO: make this an override: autoDeletePOSTS="true"-->
+
+    
+    <!--  These all work with POX: -->
+    <run controlFile="./security.xml" testGroup="deleteBug" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
+    <run controlFile="relation/relation.xml" testGroup="r2only" />
+    <run controlFile="person/person.xml" testGroup="postPerson" />
+	<run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
+    <run controlFile="loanout/loanout.xml" testGroup="makeone" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
+    <run controlFile="person/person.xml" testGroup="postPerson" />
+    
+    <run controlFile="relation/relation.xml" testGroup="makeRelations" />
+    <run controlFile="relation/relation.xml" testGroup="r2only" />
+    <run controlFile="person/person.xml" testGroup="postPerson" />
+    <run controlFile="person/person.xml" testGroup="updatePerson" />
+    <run controlFile="organization/organization-hierarchy.xml" testGroup="HierarchicOrganization" />
+    <run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
+    <run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
+    
+</xmlReplayMaster>
+
