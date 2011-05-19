@@ -18,11 +18,15 @@
 		<subject>
 		  <csid>${itemCSID}</csid>
 		  <documentType>Locationitem</documentType>
+		  <name>Item</name>
+		  <number>1111</number>
 		</subject>
 		<object>
 		  <csid>${parentCSID}</csid>
 		  <uri>${parentUri}</uri>
 		  <documentType>Locationitem</documentType>
+		  <number>0000</number>
+		  <name>Parent</name>
 		</object>
 	</relation-list-item>
 	<relation-list-item>
@@ -31,10 +35,14 @@
 		  <csid>${childCSID}</csid>
 		  <uri>${childUri}</uri>
 		  <documentType>Locationitem</documentType>
+		  <name>Child1</name>
+		  <number>2200</number>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
 		  <documentType>Locationitem</documentType>
+		  <name>Item</name>
+		  <number>1111</number>
 		</object>
 	</relation-list-item>
 	<relation-list-item>
@@ -43,10 +51,14 @@
 		  <uri>${child2Uri}</uri>
 		  <csid>${child2CSID}</csid>
 		  <documentType>Locationitem</documentType>
+		  <name>Child2</name>
+		  <number>2222</number>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
 		  <documentType>Locationitem</documentType>
+		  <name>Item</name>
+		  <number>1111</number>
 		</object>
 	</relation-list-item>
 	<relation-list-item>
@@ -55,10 +67,14 @@
 		  <uri>${child3Uri}</uri>
 		  <csid>${child3CSID}</csid>
 		  <documentType>Locationitem</documentType>
+		  <name>Child3</name>
+		  <number>3333</number>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
 		  <documentType>Locationitem</documentType>
+		  <name>Item</name>
+		  <number>1111</number>
 		</object>
 	</relation-list-item>
   </ns3:relations-common-list>

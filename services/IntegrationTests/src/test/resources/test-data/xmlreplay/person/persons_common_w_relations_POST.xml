@@ -37,12 +37,14 @@
 		  <csid>${itemCSID}</csid>
 		  <documentType>Person</documentType>
 		  <name>John Wayne, Me</name>
+		  <number>1111</number>
 		</subject>
 		<object>
 		  <csid>${parentCSID}</csid>
 		  <uri>${parentUri}</uri>
 		  <documentType>Person</documentType>
 		  <name>John Wayne 2, the evil twin, Parent</name>
+		  <number>0000</number>
 		</object>
 	</relation-list-item>
 	<relation-list-item>
@@ -52,11 +54,13 @@
 		  <uri>${childUri}</uri>
 		  <documentType>Person</documentType>
 		  <name>John Wayne 1, the evil twin, child</name>
+		  <number>1100</number>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
 		  <documentType>Person</documentType>
 		  <name>John Wayne</name>
+		  <number>1111</number>
 		</object>
 	</relation-list-item>
 	<relation-list-item>
@@ -66,11 +70,13 @@
 		  <csid>${child2CSID}</csid>
 		  <documentType>Person</documentType>
 		  <name>John Wayne 2, the evil twin, child</name>
+		  <number>2222</number>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
 		  <documentType>Person</documentType>
 		  <name>John Wayne</name>
+		  <number>1111</number>
 		</object>
 	</relation-list-item>
 	<relation-list-item>
@@ -80,11 +86,14 @@
 		  <csid>${child3CSID}</csid>
 		  <documentType>Person</documentType>
 		  <name>John Wayne 3, the evil twin, child</name>
+		  <number>3333</number>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
 		  <documentType>Person</documentType>
 		  <name>John Wayne</name>
+		  <number>1111</number>
+		  
 		</object>
 	</relation-list-item>
   </ns3:relations-common-list>

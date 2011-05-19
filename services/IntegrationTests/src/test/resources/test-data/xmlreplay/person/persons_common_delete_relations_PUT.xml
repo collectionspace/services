@@ -33,11 +33,13 @@
 		  <uri>${childUri}</uri>
 		  <documentType>Person</documentType>
 		  <name>John Wayne 1, the evil twin, child</name>
+		  <number>2222</number>
 		</subject>
 		<object>
 		  <csid>${itemCSID}</csid>
 		  <documentType>Person</documentType>
 		  <name>John Wayne</name>
+		  <number>1111</number>
 		</object>
 	</relation-list-item>
   </ns3:relations-common-list>
