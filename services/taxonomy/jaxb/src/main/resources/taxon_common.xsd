@@ -40,7 +40,7 @@
                 <xs:element name="taxonNameSourceCode" type="xs:string"/>
                 <xs:element name="taxonGUID" type="xs:string"/>
                 <xs:element name="taxonNote" type="xs:string"/>
-                <xs:element name="taxonIsNamedHybrid" type="xs:boolean"/>
+                <xs:element name="taxonIsNamedHybrid" type="xs:string"/>
 
             </xs:sequence>
         </xs:complexType>

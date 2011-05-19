@@ -97,7 +97,9 @@ public class TaxonomyAuthorityClientUtils {
         if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXONOMIC_STATUS)) != null) {
             taxon.setTaxonomicStatus(value);
         }
-
+        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXON_IS_NAMED_HYBRID)) != null) {
+            taxon.setTaxonIsNamedHybrid(value);
+        }
         if (taxonCitationList != null) {
             taxon.setTaxonCitationList(taxonCitationList);
         }
@@ -106,7 +108,7 @@ public class TaxonomyAuthorityClientUtils {
             taxon.setTaxonAuthorGroupList(taxonAuthorGroupList);
         }
 
-        // FIXME: Add the Boolean field isNamedHybrid in sample instances.
+        // FIXME: When the field isNamedHybrid becomes Boolean, add it as such to sample instances.
 
         PoxPayloadOut multipart = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(taxon,

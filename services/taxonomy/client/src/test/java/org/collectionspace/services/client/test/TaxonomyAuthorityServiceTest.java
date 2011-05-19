@@ -93,7 +93,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     final String TEST_TAXON_CURRENCY = "current";
     final String TEST_TAXON_YEAR = "1832";
     final String TEST_TAXONOMIC_STATUS = "valid";
-    final boolean TEST_TAXON_IS_NAMED_HYBRID = false;
+    final String TEST_TAXON_IS_NAMED_HYBRID = "false";
     final TaxonAuthorGroupList NULL_TAXON_AUTHOR_GROUP_LIST = null;
     final TaxonCitationList NULL_TAXON_CITATION_LIST = null;
     /** The known resource id. */
@@ -262,7 +262,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         taxonMap.put(TaxonJAXBSchema.TAXON_CURRENCY, TEST_TAXON_CURRENCY);
         taxonMap.put(TaxonJAXBSchema.TAXON_YEAR, TEST_TAXON_YEAR);
         taxonMap.put(TaxonJAXBSchema.TAXONOMIC_STATUS, TEST_TAXONOMIC_STATUS);
-        
+        taxonMap.put(TaxonJAXBSchema.TAXON_IS_NAMED_HYBRID, TEST_TAXON_IS_NAMED_HYBRID);
+
         TaxonCitationList taxonCitationList = new TaxonCitationList();
         List<String> taxonCitations = taxonCitationList.getTaxonCitation();
         taxonCitations.add(TEST_TAXON_CITATION);
@@ -276,9 +277,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 
         // FIXME: Add additional fields in the Taxon record here,
         // including at least one each of:
-        // * a repeatable field
-        // * a repeatable group of fields
-        // * a Boolean field
+        // * a Boolean field (when implemented)
         // * an authref field (when implemented)
 
         String newID = TaxonomyAuthorityClientUtils.createItemInAuthority(vcsid,
