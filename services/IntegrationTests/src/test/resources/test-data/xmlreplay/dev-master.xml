@@ -26,9 +26,9 @@
     <auths default="admin@collectionspace.org">
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
-    
+    <!--
 	<run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
 	<run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
-
+-->
 </xmlReplayMaster>
 
