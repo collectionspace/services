@@ -214,20 +214,37 @@ public class RelationDocumentModelHandler
 
             //TODO: ensure that itemDocType is really the entry point, i.e. servicename==doctype
             //ServiceBindingType itemSbt2 = tReader.getServiceBinding(ctx.getTenantId(), itemDocType);
+            String propName = "ERROR-FINDING-PROP-VALUE";
             ServiceBindingType itemSbt = tReader.getServiceBindingForDocType(ctx.getTenantId(), itemDocType);
             try {
+                propName = ServiceBindingUtils.getPropertyValue(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP);
                 String itemDocname = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP, itemDocModel);
-                item.setName(itemDocname);
-                //System.out.println("\r\n\r\n\r\n=================\r\n~~found prop : "+ServiceBindingUtils.OBJ_NAME_PROP+" in :"+itemDocname);
+                if (propName==null || itemDocname==null){
+                    System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
+                }  else{
+                    item.setName(itemDocname);
+                    System.out.println("=== found prop : "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
+                }
             } catch (Throwable t){
-                 System.out.println("\r\n\r\n\r\n=================\r\n NOTE: "+itemDocModel+" field "+ServiceBindingUtils.OBJ_NAME_PROP+" not found in DocModel: "+itemDocModel.getName()+" inner: "+t.getMessage());
+                 System.out.println("====Error finding objectNameProperty: "+itemDocModel+" field "+ServiceBindingUtils.OBJ_NAME_PROP+"="+propName
+                                            +" not found in itemDocType: "+itemDocType+" inner: "+t.getMessage());
             }
+            propName = "ERROR-FINDING-PROP-VALUE";
             try {
+                propName = ServiceBindingUtils.getPropertyValue(itemSbt, ServiceBindingUtils.OBJ_NUMBER_PROP);
                 String itemDocnumber = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NUMBER_PROP, itemDocModel);
-                item.setNumber(itemDocnumber);
-                //System.out.println("\r\n\r\n\r\n=================\r\n~~found prop : "+ServiceBindingUtils.OBJ_NUMBER_PROP+" in :"+itemDocnumber);
+
+                 if (propName==null || itemDocnumber==null){
+                     System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
+                                                +" documentType: "+documentType);
+                 } else {
+                     item.setNumber(itemDocnumber);
+                     System.out.println("============ found prop : "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
+                                                +" documentType: "+documentType);
+                 }
             } catch (Throwable t){
-                System.out.println("\r\n\r\n\r\n=================\r\n NOTE:  field "+ServiceBindingUtils.OBJ_NUMBER_PROP+" not found in DocModel: "+itemDocModel.getName()+" inner: "+t.getMessage());
+                System.out.println("====Error finding objectNumberProperty: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"="+propName
+                                           +" not found in itemDocType: "+itemDocType+" inner: "+t.getMessage());
             }
         } else {
             item.setError("INVALID: related object is absent");
