@@ -32,8 +32,13 @@ public class XmlReplayDevTest extends XmlReplayTest {
             System.out.println("Using default masterFile: "+masterFile);
         }
         XmlReplay replay = createXmlReplayUsingIntegrationTestsModule("..");
-        List<List<ServiceResult>> list = replay.runMaster(masterFile);
-        logTestForGroup(list, "XmlReplayMasterTest");
+        if (replay.masterConfigFileExists(masterFile)){           // CSPACE-4027
+             List<List<ServiceResult>> list = replay.runMaster(masterFile);
+             logTestForGroup(list, "XmlReplayMasterTest");
+        } else {
+            System.out.println("XmlReplayDevTest skipping local dev test "+masterFile+" because it doesn't exist in "+replay.getBaseDir()+".  This is expected behavior on a production installation.");
+        }
+
 
        //used for testing load.
        // bigLoop(masterFile);

@@ -184,9 +184,9 @@ public class XmlReplayTransport {
     throws Exception {
         byte[] b = FileUtils.readFileToByteArray(new File(fileName));
         String xmlString = new String(b);
+        String contentRaw = xmlString;
         xmlString = evalStruct.eval(xmlString, evalStruct.serviceResultsMap, vars, evalStruct.jexl, evalStruct.jc);
         String urlString = protoHostPort+uri;
-        String contentRaw = xmlString;
         return doPOST_PUT(urlString, xmlString, contentRaw, BOUNDARY, method, contentType, authForTest, fromTestID); //method is POST or PUT.
     }
 

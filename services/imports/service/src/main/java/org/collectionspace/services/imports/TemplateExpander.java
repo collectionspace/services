@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import org.collectionspace.services.common.IFragmentHandler;
 import org.collectionspace.services.common.XmlSaxFragmenter;
+import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.Document;
@@ -137,7 +138,7 @@ public class TemplateExpander {
             }
         }
         public void onEndDocument(Document document, int fragmentCount){
-            System.out.println("====TemplateExpander DONE============\r\n"+ XmlSaxFragmenter.prettyPrint(document)+"================");
+            System.out.println("====TemplateExpander DONE============\r\n"+ XmlTools.prettyPrint(document)+"================");
         }
         //============helper methods==============================================================
         public FragmentHandlerImpl(String templateDir, String outputDir){
@@ -157,7 +158,7 @@ public class TemplateExpander {
         }
         private void dump(Document context, String currentPath, int fragmentIndex, String fragment){
             System.out.println("====Path============\r\n"+currentPath+'['+fragmentIndex+']');
-            System.out.println("====Context=========\r\n"+ XmlSaxFragmenter.prettyPrint(context));
+            System.out.println("====Context=========\r\n"+ XmlTools.prettyPrint(context));
             System.out.println("====Fragment========\r\n"+fragment+"\r\n===================\r\n");
         }
     }

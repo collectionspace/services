@@ -261,25 +261,6 @@ public class XmlSaxFragmenter implements ContentHandler, ErrorHandler {
         }
     }
 
-    public static String prettyPrint(Document document) {
-        String prettyHTML;
-        try {
-            StringWriter swriter = new StringWriter();
-            OutputFormat format = OutputFormat.createPrettyPrint();
-            format.setNewlines(true);
-            format.setTrimText(true);
-            format.setIndent(false);
-            format.setXHTML(true);
-            format.setLineSeparator(System.getProperty("line.separator")) ;
-            HTMLWriter writer = new HTMLWriter(swriter, format);
-            writer.write(document);
-            writer.flush();
-            prettyHTML = swriter.toString();
-        } catch (Exception e){
-            prettyHTML = "<?xml?><error>"+e+"</error>";
-        }
-        return prettyHTML;
-    }
 
     /** This method takes a filename of a local file only; InputSource is not implemented yet.
      *

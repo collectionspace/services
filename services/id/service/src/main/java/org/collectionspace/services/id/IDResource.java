@@ -38,6 +38,7 @@ import javax.ws.rs.core.UriBuilder;
 
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
+import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 
@@ -84,9 +85,6 @@ public class IDResource {
     final static String ID_GENERATOR_LIST_NAME = "idgenerator-list";
     final static String ID_GENERATOR_LIST_ITEM_NAME = "idgenerator-list-item";
 
-    // Output format for XML pretty printing.
-    final static OutputFormat PRETTY_PRINT_OUTPUT_FORMAT =
-        defaultPrettyPrintOutputFormat();
 
     // Base URL path for REST-based requests to the ID Service.
     //
@@ -193,8 +191,6 @@ public class IDResource {
     /**
      * Creates a new ID generator instance.
      *
-     * @param  generatorRepresentation
-     *         A representation of an ID generator instance.
      */
     @POST
     @Path("")
@@ -272,7 +268,7 @@ public class IDResource {
             // Append detailed information for this ID generator instance.
             root = appendDetailedIDGeneratorInformation(root, instance);
 
-            resourceRepresentation = prettyPrintXML(doc);
+            resourceRepresentation = XmlTools.prettyPrintXML(doc);
             response =
                 Response.status(Response.Status.OK)
                     .entity(resourceRepresentation)
@@ -510,7 +506,7 @@ public class IDResource {
             listitem = appendSummaryIDGeneratorInformation(listitem, csid);
        }
 
-       return prettyPrintXML(doc);
+       return XmlTools.prettyPrintXML(doc);
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -545,7 +541,7 @@ public class IDResource {
                 generators.get(csid));
         }
 
-        return prettyPrintXML(doc);
+        return XmlTools.prettyPrintXML(doc);
     }
     
     //////////////////////////////////////////////////////////////////////
@@ -657,7 +653,7 @@ public class IDResource {
         // components to a new XML document, copy its root element, and
         // append it to the relevant location within the current element.
         try {
-            Document generatorDoc = textToXMLDocument(generatorStr);
+            Document generatorDoc = XmlTools.textToXMLDocument(generatorStr);
             Element generatorRoot = generatorDoc.getRootElement();
             generator.add(generatorRoot.createCopy());
         // If an error occurs parsing the XML string representation,
@@ -671,104 +667,6 @@ public class IDResource {
         return instanceElement;
     }
 
-
-    // @TODO Refactoring opportunity: the utility methods below
-    // could potentially be moved into the 'common' module,
-    // and made static and public.
-
-    //////////////////////////////////////////////////////////////////////
-    /**
-     * Returns a default output format for pretty printing an XML document.
-     *
-     * Uses the default settings for indentation, whitespace, etc.
-     * of a pre-defined dom4j output format.
-     *
-     * @return  A default output format for pretty printing an XML document.
-     */
-    private static OutputFormat defaultPrettyPrintOutputFormat() {
-
-        // Use the default pretty print output format in dom4j.
-        OutputFormat outformat = OutputFormat.createPrettyPrint();
-        // Supress the extra newline added after the XML declaration
-        // in that output format.
-        outformat.setNewLineAfterDeclaration(false);
-        return outformat;
-    }
-
-    //////////////////////////////////////////////////////////////////////
-    /**
-     * Returns a pretty printed String representation of an XML document.
-     *
-     * @param   doc        A dom4j XML Document.
-     *
-     * @return  A pretty printed String representation of an XML document.
-     */
-    private String prettyPrintXML(Document doc) {
-
-        String xmlStr = "";
-        try {
-          xmlStr = formatXML(doc, PRETTY_PRINT_OUTPUT_FORMAT);
-        // If an error occurs during pretty printing, fall back to
-        // returning a default String representation of the XML document.
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Error pretty-printing XML: " + e.getMessage());
-            }
-            xmlStr = doc.asXML();
-        }
-
-        return xmlStr;
-    }
-
-    //////////////////////////////////////////////////////////////////////
-    /**
-     * Returns a String representation of an XML document,
-     * formatted according to a specified output format.
-     *
-     * @param   doc        A dom4j XML Document.
-     *
-     * @param   outformat  A dom4j output format.
-     *
-     * @return  A String representation of an XML document,
-     *          formatted according to the specified output format.
-     *
-     * @throws  An Exception if an error occurs in printing
-     *          the XML document to a String.
-     */
-    private String formatXML(Document doc, OutputFormat outformat)
-       throws Exception {
-
-        StringWriter sw = new StringWriter();
-        try {
-            final XMLWriter writer = new XMLWriter(sw, outformat);
-            // Print the document to the current writer.
-            writer.write(doc);
-        }
-        catch (Exception e) {
-            throw e;
-        }
-        return sw.toString();
-    }
-
-     //////////////////////////////////////////////////////////////////////
-    /**
-     * Returns an XML document, when provided with a String
-     * representation of that XML document.
-     *
-     * @param   xmlStr  A String representation of an XML document.
-     *
-     * @return  A dom4j XML document.
-     */
-    private Document textToXMLDocument(String xmlStr) throws Exception {
-        
-        Document doc = null;
-        try {
-         doc = DocumentHelper.parseText(xmlStr);
-        } catch (DocumentException e) {
-          throw e;
-        }
-        return doc;
-    }
 
     //////////////////////////////////////////////////////////////////////
     /**

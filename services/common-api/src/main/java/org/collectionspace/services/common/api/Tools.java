@@ -57,6 +57,13 @@ public class Tools {
         return new Long((new java.util.Date()).getTime());
     }
 
+     public static String nowLocale(){
+        java.util.Date date = new java.util.Date();
+        String result = java.text.DateFormat.getDateTimeInstance().format(date);
+        date = null;
+        return result;
+    }
+
     /** Handles null strings as empty.  */
     public static boolean isEmpty(String str){
         return !notEmpty(str);

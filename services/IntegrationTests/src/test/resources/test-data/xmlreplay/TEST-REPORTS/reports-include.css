@@ -1,0 +1,25 @@
+.REPORTTIME       {background-color: white; color: black; text-decoration: none; font-family: Tahoma; font-size:10pt;
+                             border-width:  1px; border-color: black; border-style: solid; padding:  8px; margin-bottom: 20px;}
+.TESTGROUP       {background-color: lightblue; color: black; text-decoration: none; font-family: Tahoma; font-size:14pt;}
+.RUNINFO       {background-color: lightyellow; color: black; text-decoration: none; font-family: "Courier New", Courier, mono;
+                            font-size:10pt; white-space: pre; padding: 5px; }
+.LABEL                 {font-size: 9pt; color: gray;}
+.OK                 {font-size: 9pt; color: green;}
+.ERROR                 {font-size: 14pt; color: red; font-weight: bold;}
+.PAYLOAD           {background-color: white;}
+.TOPLINKS          { font-size: 14pt;  padding: 20px;}
+.DETAIL_TABLE {
+    font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 12pt;
+    width:100%;
+    border-collapse:collapse;
+    border:2px solid #98bf21;
+    padding: 7px;
+}
+
+body {
+    background-color: #87cefa;
+    font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    }
+td          {background-color: #e0ffff;}

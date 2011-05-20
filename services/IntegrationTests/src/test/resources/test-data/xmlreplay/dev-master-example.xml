@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplayMaster>
 <!-- Use this file to drive local testing.  
-     To run this file, do: 
+
+     To run this file, copy the checked-in file to your own local version of the correct name
+     in the same location.  If it is named dev-master.xml, then XmlReplayDevTest will pick it up.
+     If it is not there, XmlReplayDevTest will skip it, which is what we want for production, since 
+     production runs XmlReplayMasterTest which calls xml-replay-master.xml
+     
+     	  cd trunk/services/IntegrationTests/src/test/resources/test-data/xmlreplay/
+     	  cp dev-master-example.xml dev-master.xml
+
+     IMPORTANT :: DO NOT CHECK IN YOUR LOCAL COPY, CALLED dev-master.xml
+                  EITHER LEAVE IT AROUND AND IGNORE THE SVN UNVERSIONED FILE MESSAGE, 
+                    OR DELETE IT IF IT BOTHERS YOU.
+     
+     Then, to run this file, you can execute the following: 
+     
           cd trunk/services/IntegrationTests
           mvn test -Dtest=XmlReplayDevTest
+
      Maven surefire will kick off XmlReplayDevTest.
      
-     IMPORTANT :: DO NOT CHECK THIS FILE IN WITH ANY TESTS ACTIVE BELOW.
-		  Make sure all tests are commented out, or better yet, moved to dev-all.xml .
-		  This file should be modified locally and used instead of xml-replay-master.xml
-		  when you are developing.  This file can be used to point at a controlFile 
+                  
+     This file can be used to point at a controlFile 
 		  and a testGroup, so you can test just one thing at a time, or a limited suite.
      
      You can find other tests to run in two places:
@@ -18,7 +31,7 @@
        The set of possible tests, including ones that don't work:
          dev-all.xml
 -->
-    <protoHostPort>http://localhost:8280</protoHostPort>
+    <protoHostPort>http://localhost:8180</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
     <dump payloads="false" dumpServiceResult="detailed" />
@@ -27,9 +40,9 @@
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
     
-	<!--
+	<!-- EXAMPLES. JUST UNCOMMENT THEM, AND RUN AS SHOWN ABOVE.
 	<run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
 	<run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
-     -->
+    -->
 </xmlReplayMaster>
 

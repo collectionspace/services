@@ -4,7 +4,9 @@ import org.apache.commons.cli.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.jexl2.JexlEngine;
+import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.service.ServiceBindingType;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 
@@ -21,6 +23,7 @@ public class XmlReplay {
     public XmlReplay(String basedir){
         this.basedir = basedir;
         this.serviceResultsMap = createResultsMap();
+        this.reportsList = new ArrayList<String>();
     }
 
     public static final String DEFAULT_CONTROL = "xml-replay-control.xml";
@@ -80,6 +83,10 @@ public class XmlReplay {
         return new HashMap<String, ServiceResult>();
     }
 
+    private List<String> reportsList;
+    public  List<String> getReportsList(){
+        return reportsList;
+    }
 
     public String toString(){
         return "XmlReplay{"+this.basedir+", "+this.defaultAuthsMap+", "+this.dump+'}';
@@ -87,8 +94,30 @@ public class XmlReplay {
 
     // ============== METHODS ===========================================================
 
+    /** Optional information method: call this method after instantiating this class using the constructor XmlReplay(String), which sets the basedir.  Then you
+     *   pass in your relative masterFilename to that basedir to this method, which will return true if the file is readable, valid xml, etc.
+     *   Do this in preference to  just seeing if File.exists(), because there are rules to finding the file relative to the maven test dir, yada, yada.
+     *   This method makes it easy to have a development test file that you don't check in, so that dev tests can be missing gracefully, etc.
+     */
+    public boolean masterConfigFileExists(String masterFilename){
+        try {
+            org.dom4j.Document doc = openMasterConfigFile(masterFilename);
+            if (doc == null){
+                return false;
+            }
+            return true;
+        } catch (Throwable t){
+            return false;
+        }
+    }
+
     public org.dom4j.Document openMasterConfigFile(String masterFilename) throws FileNotFoundException {
-        org.dom4j.Document document = getDocument(Tools.glue(basedir, "/", masterFilename)); //will check full path first, then checks relative to PWD.
+        String fullPath = Tools.glue(basedir, "/", masterFilename);
+        File f = new File(fullPath);
+        if (!f.exists()){
+            return null;
+        }
+        org.dom4j.Document document = getDocument(fullPath); //will check full path first, then checks relative to PWD.
         if (document == null){
             throw new FileNotFoundException("XmlReplay master control file ("+masterFilename+") not found in basedir: "+basedir+". Exiting test.");
         }
@@ -100,6 +129,9 @@ public class XmlReplay {
      */
     public org.dom4j.Document readOptionsFromMasterConfigFile(String masterFilename) throws FileNotFoundException {
         org.dom4j.Document document = openMasterConfigFile(masterFilename);
+        if (document == null){
+            throw new FileNotFoundException(masterFilename);
+        }
         protoHostPort = document.selectSingleNode("/xmlReplayMaster/protoHostPort").getText().trim();
         AuthsMap authsMap = readAuths(document);
         setDefaultAuthsMap(authsMap);
@@ -122,6 +154,9 @@ public class XmlReplay {
         } else {
             document = openMasterConfigFile(masterFilename);
         }
+        if (document==null){
+            throw new FileNotFoundException(masterFilename);
+        }
         String controlFile, testGroup, test;
         List<Node> runNodes;
         runNodes = document.selectNodes("/xmlReplayMaster/run");
@@ -141,7 +176,16 @@ public class XmlReplay {
             //Now run *that* instance.
             List<ServiceResult> results = replay.runTests(testGroup, test);
             list.add(results);
+            this.reportsList.addAll(replay.getReportsList());   //Add all the reports from the inner replay, to our master replay's reportsList, to generate the index.html file.
         }
+        StringBuffer sb = new StringBuffer(XmlReplayReport.HTML_PAGE_START);
+        String dateStr = Tools.nowLocale();
+        sb.append("<div class='REPORTTIME'>XmlReplay run  "+dateStr+" master: "+masterFilename+"</div>");
+        for (String oneToc: this.reportsList){
+            sb.append(oneToc).append("<hr />");
+        }
+        sb.append(XmlReplayReport.HTML_PAGE_END);
+        FileTools.saveFile(getReportsDir(this.basedir),"index."+masterFilename+".html", sb.toString(), false);
         return list;
     }
 
@@ -155,7 +199,8 @@ public class XmlReplay {
                                 this.autoDeletePOSTS,
                                 dump,
                                 this.protoHostPort,
-                                this.defaultAuthsMap);
+                                this.defaultAuthsMap,
+                                this.reportsList);
         return result;
     }
 
@@ -169,7 +214,8 @@ public class XmlReplay {
                                 this.autoDeletePOSTS,
                                 dump,
                                 this.protoHostPort,
-                                this.defaultAuthsMap);
+                                this.defaultAuthsMap,
+                                this.reportsList);
         if (result.size()>1){
             throw new IndexOutOfBoundsException("Multiple ("+result.size()+") tests with ID='"+testID+"' were found within test group '"+testGroupID+"', but there should only be one test per ID attribute.");
         }
@@ -352,7 +398,7 @@ public class XmlReplay {
             document = reader.read(xmlFileName);
         } catch (DocumentException e) {
             System.out.println("ERROR reading document: "+e);
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return document;
     }
@@ -417,12 +463,15 @@ public class XmlReplay {
                                           boolean param_autoDeletePOSTS,
                                           Dump dump,
                                           String protoHostPortParam,
-                                          AuthsMap defaultAuths)
+                                          AuthsMap defaultAuths,
+                                          List<String> reportsList)
                                           throws Exception {
         //Internally, we maintain two collections of ServiceResult:
         //  the first is the return value of this method.
         //  the second is the serviceResultsMap, which is used for keeping track of CSIDs created by POSTs, for later reference by DELETE, etc.
         List<ServiceResult> results = new ArrayList<ServiceResult>();
+
+        XmlReplayReport report = new XmlReplayReport();
 
         String controlFile = Tools.glue(xmlReplayBaseDir, "/", controlFileName);
         org.dom4j.Document document;
@@ -449,7 +498,9 @@ public class XmlReplay {
         } else {
             authsMapINFO = "Using AuthsMap from control file: "+authsMap;
         }
-        System.out.println("========================================================================"
+
+        report.addTestGroup(testGroupID, controlFileName);   //controlFileName is just the short name, without the full path.
+        String xmlReplayHeader = "========================================================================"
                           +"\r\nXmlReplay running:"
                           +"\r\n   controlFile: "+ (new File(controlFile).getCanonicalPath())
                           +"\r\n   protoHostPort: "+protoHostPort
@@ -459,7 +510,10 @@ public class XmlReplay {
                           +"\r\n   param_autoDeletePOSTS: "+param_autoDeletePOSTS
                           +"\r\n   Dump info: "+dump
                           +"\r\n========================================================================"
-                          +"\r\n");
+                          +"\r\n";
+        report.addRunInfo(xmlReplayHeader);
+
+        System.out.println(xmlReplayHeader);
 
         String autoDeletePOSTS = "";
         List<Node> testgroupNodes;
@@ -631,6 +685,8 @@ public class XmlReplay {
                     String serviceResultRow = serviceResult.dump(dump.dumpServiceResult, hasError)+"; time:"+(System.currentTimeMillis()-startTime);
                     String leader = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed) ? "XmlReplay:"+testIDLabel+": ": "";
 
+                    report.addTestResult(serviceResult);
+
                     if (   (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed)
                         || (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.full)         ){
                         System.out.println("\r\n#---------------------#");
@@ -664,7 +720,26 @@ public class XmlReplay {
                 autoDelete(serviceResultsMap, "default");
             }
         }
+
+        //=== Now spit out the HTML report file ===
+        File m = new File(controlFileName);
+        String localName = m.getName();//don't instantiate, just use File to extract file name without directory.
+        String reportName = localName+'-'+testGroupID+".html";
+        File resultFile = FileTools.saveFile(getReportsDir(xmlReplayBaseDir), reportName, report.getPage(), true);
+        if (resultFile!=null) {
+            System.out.println("XmlReplay summary reports saved to directory: "+resultFile.getParent());
+            System.out.println("XmlReplay summary report: "+resultFile.getCanonicalPath());
+            String toc = report.getTOC(reportName);
+            reportsList.add(toc);
+        }
+        //================================
+
         return results;
+    }
+
+    //todo: move from xmlReplayBaseDir to "target/xmlReplayReports" dir.
+    public static String getReportsDir(String basename){
+        return Tools.glue(basename,"/","TEST-REPORTS");
     }
 
     //======================== MAIN ===================================================================
@@ -775,7 +850,9 @@ public class XmlReplay {
             } else {
                 Dump dump = getDumpConfig();
                 dump.payloads = Tools.isTrue(dumpResults);
-                runXmlReplayFile(xmlReplayBaseDirResolved, controlFilename, testGroupID, testID, createResultsMap(), bAutoDeletePOSTS, dump, "", null);
+                List<String> reportsList = new ArrayList<String>();
+                runXmlReplayFile(xmlReplayBaseDirResolved, controlFilename, testGroupID, testID, createResultsMap(), bAutoDeletePOSTS, dump, "", null, reportsList);
+                System.out.println("DEPRECATED: reportsList is generated, but not dumped: "+reportsList.toString());
             }
         } catch (ParseException exp) {
             // oops, something went wrong
