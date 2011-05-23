@@ -31,6 +31,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 
@@ -102,7 +103,9 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
     public DocumentWrapper<DocumentModel> getDocFromCsid(ServiceContext<IT, OT> ctx,
     		String csid)
             throws Exception;
-    
+
+    public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws ClientException;
+
     /**
      * Find wrapped documentModel from the Nuxeo repository
      * @param ctx service context under which this method is invoked

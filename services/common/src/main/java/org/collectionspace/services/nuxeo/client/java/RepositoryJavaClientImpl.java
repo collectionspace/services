@@ -109,58 +109,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     }
     
     /**
-     * Sets the collection space core values.
-     *
-     * @param ctx the ctx
-     * @param documentModel the document model
-     * @throws ClientException the client exception	//FIXME: REM - This behavior needs to be part of the base DocumentHandler classes, so our JPA services get this behavior as well
-     */
-    private void setCollectionSpaceCoreValues(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            DocumentModel documentModel,
-            Action action) throws ClientException {
-    	//
-    	// Add the CSID to the DublinCore title so we can see the CSID in the default
-    	// Nuxeo webapp.
-    	//
-    	try {
-	        documentModel.setProperty("dublincore",
-	                "title",
-	                documentModel.getName());
-    	} catch (Exception x) {
-    		if (logger.isWarnEnabled() == true) {
-    			logger.warn("Could not set the Dublin Core 'title' field on document CSID:" +
-    					documentModel.getName());
-    		}
-    	}
-        //
-        // Add the tenant ID value to the new entity
-        //
-        documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
-                DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID,
-                ctx.getTenantId());
-
-        String now = GregorianCalendarDateTimeUtils.timestampUTC();
-        
-        switch (action) {
-            case CREATE:
-                documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
-                                DocumentModelHandler.COLLECTIONSPACE_CORE_CREATED_AT,
-                                now);
-                documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
-                                                DocumentModelHandler.COLLECTIONSPACE_CORE_UPDATED_AT,
-                                                now);
-                break;
-            case UPDATE:
-                documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
-                                DocumentModelHandler.COLLECTIONSPACE_CORE_UPDATED_AT,
-                                now);
-
-                break;
-            default:
-        }
-    }
-
-    /**
      * create document in the Nuxeo repository
      *
      * @param ctx service context under which this method is invoked
@@ -205,7 +153,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.CREATE, wrapDoc);
             // create document with documentmodel
-            setCollectionSpaceCoreValues(ctx, doc, Action.CREATE);
             doc = repoSession.createDocument(doc);
             repoSession.save();
 // TODO for sub-docs need to call into the handler to let it deal with subitems. Pass in the id,
@@ -625,6 +572,20 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         return result;
     }
 
+    /**
+     * find doc and return CSID from the Nuxeo repository
+     * @param ctx service context under which this method is invoked
+     * @param whereClause where NXQL where clause to get the document
+     * @throws DocumentException
+     */
+    @Override
+    public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws ClientException {
+    	DocumentModel docModel = wrappedDoc.getWrappedObject();
+        String uri = (String)docModel.getProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
+        			DocumentModelHandler.COLLECTIONSPACE_CORE_URI);
+        return uri;
+    }
+
 
     /**
      * getFiltered get all documents for an entity service from the Document repository,
@@ -723,7 +684,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.UPDATE, wrapDoc);
-            setCollectionSpaceCoreValues(ctx, doc, Action.UPDATE);
             repoSession.saveDocument(doc);
             repoSession.save();
             handler.complete(Action.UPDATE, wrapDoc);

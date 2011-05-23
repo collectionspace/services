@@ -25,8 +25,11 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.List;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -35,6 +38,7 @@ import org.collectionspace.services.nuxeo.client.*;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
 
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -58,6 +62,7 @@ public abstract class DocumentModelHandler<T, TL>
 
     public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
     public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
+    public final static String COLLECTIONSPACE_CORE_URI = "uri";
     public final static String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
     public final static String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
 
@@ -72,6 +77,8 @@ public abstract class DocumentModelHandler<T, TL>
     public String getUri(DocumentModel docModel) {
         return getServiceContextPath()+getCsid(docModel);
     }
+    
+    
     /**
      * getRepositorySession returns Nuxeo Repository Session
      * @return
@@ -93,6 +100,7 @@ public abstract class DocumentModelHandler<T, TL>
     	// TODO for sub-docs - check to see if the current service context is a multipart input, 
     	// OR a docfragment, and call a variant to fill the DocModel.
         fillAllParts(wrapDoc, Action.CREATE);
+        handleCoreValues(wrapDoc, Action.CREATE);
     }
     
     // TODO for sub-docs - Add completeCreate in which we look for set-aside doc fragments 
@@ -105,6 +113,7 @@ public abstract class DocumentModelHandler<T, TL>
     	// TODO for sub-docs - check to see if the current service context is a multipart input, 
     	// OR a docfragment, and call a variant to fill the DocModel.
         fillAllParts(wrapDoc, Action.UPDATE);
+        handleCoreValues(wrapDoc, Action.UPDATE);
     }
 
     @Override
@@ -167,5 +176,44 @@ public abstract class DocumentModelHandler<T, TL>
     abstract public AuthorityRefList getAuthorityRefs(
             DocumentWrapper<DocumentModel> docWrapper,
 		List<String> authRefFields) throws PropertyException;    
+
+    private void handleCoreValues(DocumentWrapper<DocumentModel> docWrapper, 
+    		Action action)  throws ClientException {
+    	DocumentModel documentModel = docWrapper.getWrappedObject();
+        String now = GregorianCalendarDateTimeUtils.timestampUTC();
+    	if(action==Action.CREATE) {
+        	String tenantId = getServiceContext().getTenantId();
+            //
+            // Add the tenant ID value to the new entity
+            //
+            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
+                    COLLECTIONSPACE_CORE_TENANTID,
+                    getServiceContext().getTenantId());
+            //
+            // Add the uri value to the new entity
+            //
+            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
+                    COLLECTIONSPACE_CORE_URI, getUri(documentModel));
+        	//
+        	// Add the CSID to the DublinCore title so we can see the CSID in the default
+        	// Nuxeo webapp.
+        	//
+        	try {
+    	        documentModel.setProperty("dublincore", "title",
+    	                documentModel.getName());
+        	} catch (Exception x) {
+        		if (logger.isWarnEnabled() == true) {
+        			logger.warn("Could not set the Dublin Core 'title' field on document CSID:" +
+        					documentModel.getName());
+        		}
+        	}
+            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
+                    COLLECTIONSPACE_CORE_CREATED_AT, now);
+    	}
+    	if(action==Action.CREATE || action==Action.UPDATE) {
+            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
+                    COLLECTIONSPACE_CORE_UPDATED_AT, now);
+    	}
+    }
 
 }
