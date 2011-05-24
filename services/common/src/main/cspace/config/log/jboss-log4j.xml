@@ -1,14 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- ===================================================================== --><!--                                                                       --><!--  Log4j Configuration                                                  --><!--                                                                       --><!-- ===================================================================== --><!-- $Id: jboss-log4j.xml 75507 2008-07-08 20:15:07Z stan.silvert@jboss.com $ --><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!--  Log4j Configuration                                                  -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+<!-- $Id: jboss-log4j.xml 75507 2008-07-08 20:15:07Z stan.silvert@jboss.com $ -->
+<!--
    | For more configuration infromation and examples see the Jakarta Log4j
    | owebsite: http://jakarta.apache.org/log4j
- --><!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+-->
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false" threshold="null">
 
    <!-- ================================= -->
    <!-- Preserve messages in a local file -->
    <!-- ================================= -->
 
-   <!-- A time/date based rolling appender -->
+   <!-- A time/date based rolling appender
    <appender name="FILE"
    class="org.jboss.logging.appender.DailyRollingFileAppender">
      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
@@ -20,21 +28,22 @@
        <param name="ConversionPattern" value="%d %-5p [%c] %m%n"/>
      </layout>
    </appender>
+   -->
 
-
-   <!-- A size based file rolling appender
-   <appender name="FILE" class="org.jboss.logging.appender.RollingFileAppender">
+   <!-- A size based file rolling appender -->
+   <!-- Set max-size and number of saved server.log files -->
+   <appender name="FILE"
+             class="org.jboss.logging.appender.RollingFileAppender">
      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
      <param name="File" value="${jboss.server.log.dir}/server.log"/>
      <param name="Append" value="false"/>
      <param name="MaxFileSize" value="500KB"/>
-     <param name="MaxBackupIndex" value="1"/>
+     <param name="MaxBackupIndex" value="5"/>
 
      <layout class="org.apache.log4j.PatternLayout">
        <param name="ConversionPattern" value="%d %-5p [%c] %m%n"/>
      </layout>	    
    </appender>
-   -->
 
    <!-- ============================== -->
    <!-- Append messages to the console -->
@@ -134,7 +143,7 @@
    </appender>
    -->
 
-   <!-- collectionspace appender -->
+   <!-- collectionspace appender
    <appender name="CSLOG" class="org.jboss.logging.appender.DailyRollingFileAppender">
       <errorHandler  class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
      <param name="Append" value="false"/>
@@ -144,32 +153,50 @@
       <layout class="org.apache.log4j.PatternLayout">
          <param name="ConversionPattern" value="%d %-5p [%t] [%c:%L] %m%n"/>
       </layout>
-            <!--filter class="org.jboss.logging.filter.TCLFilter">
-         <param name="AcceptOnMatch" value="true"/>
-         <param name="DeployURL" value="cspace-services.war"/>
-      </filter> 
-      <filter class="org.apache.log4j.varia.DenyAllFilter"></filter-->
- 
+   </appender>
+   -->
+
+   <!-- A size based file rolling appender -->
+   <!-- Set max-size and number of saved server.log files -->
+   <appender name="CSLOG"
+             class="org.jboss.logging.appender.RollingFileAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="File" value="${jboss.server.log.dir}/collectionspace.log"/>
+     <param name="Append" value="false"/>
+     <param name="MaxFileSize" value="500KB"/>
+     <param name="MaxBackupIndex" value="5"/>
+
+     <layout class="org.apache.log4j.PatternLayout">
+       <param name="ConversionPattern" value="%d %-5p [%c] %m%n"/>
+     </layout>
    </appender>
 
-   <!-- collectionspace performance appender -->
+   <!-- collectionspace performance appender
    <appender name="CSLOG_PERF" class="org.jboss.logging.appender.DailyRollingFileAppender">
       <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
       <param name="Append" value="false"/>
       <param name="DatePattern" value="'.'yyyy-MM-dd"/>
       <param name="File" value="${jboss.server.log.dir}/collectionspace-perf.log"/>
       <layout class="org.apache.log4j.PatternLayout">
-         <!-- Change to accommodate interleaved CSV log entries -->
-         <!-- param name="ConversionPattern" value="%d [%t] %m%n"/ -->
          <param name="ConversionPattern" value="&quot;%d&quot;,%m%n"/>
       </layout>
-            <!--filter class="org.jboss.logging.filter.TCLFilter">
-         <param name="AcceptOnMatch" value="true"/>
-         <param name="DeployURL" value="cspace-services.war"/>
-      </filter> 
-      <filter class="org.apache.log4j.varia.DenyAllFilter"></filter-->
    </appender>
-   
+   -->  
+
+   <!-- A size based file rolling appender -->
+   <appender name="CSLOG_PERF"
+             class="org.jboss.logging.appender.RollingFileAppender">
+     <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="File" value="${jboss.server.log.dir}/collectionspace-perf.log"/>
+     <param name="Append" value="false"/>
+     <param name="MaxFileSize" value="500KB"/>
+     <param name="MaxBackupIndex" value="5"/>
+
+     <layout class="org.apache.log4j.PatternLayout">
+       <param name="ConversionPattern" value="%d %-5p [%c] %m%n"/>
+     </layout>
+   </appender>
+
    <!-- ================ -->
    <!-- Limit categories -->
    <!-- ================ -->
@@ -328,7 +355,8 @@
    <!-- Uncomment the following to redirect the org.jgroups and
       org.jboss.ha categories to a cluster.log file.
 
-   <appender name="CLUSTER" class="org.jboss.logging.appender.RollingFileAppender">
+   <appender name="CLUSTER"
+             class="org.jboss.logging.appender.RollingFileAppender">
      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
      <param name="File" value="${jboss.server.log.dir}/cluster.log"/>
      <param name="Append" value="false"/>

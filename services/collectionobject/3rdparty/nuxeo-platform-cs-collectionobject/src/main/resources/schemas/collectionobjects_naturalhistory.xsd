@@ -41,10 +41,12 @@
   <xs:element name="fieldLocElevation" type="xs:string"/>
 
   <!-- These will become contolled lists -->
+  <xs:element name="fieldLocGeodeticDatum" type="xs:string"/>
+  <xs:element name="fieldLocCoordinateSystem" type="xs:string"/>
   <xs:element name="fieldLocCounty" type="xs:string"/>
   <xs:element name="fieldLocState" type="xs:string"/>
   <xs:element name="fieldLocCountry" type="xs:string"/>
-  <xs:element name="fieldHigherGeography" type="xs:string"/>
+  <xs:element name="fieldLocHigherGeography" type="xs:string"/>
 
   <xs:element name="taxonomicIdentGroupList" type="taxonomicIdentGroupList"/>
   <xs:element name="typeSpecimenGroupList" type="typeSpecimenGroupList"/>
