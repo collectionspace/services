@@ -20,7 +20,9 @@
 >
     <!-- collection-object for museum of natural history  -->
     <xs:element name="collectionobjects_naturalhistory">
-    
+        <xs:complexType>
+                    <xs:sequence>
+
         <!--
             <xs:complexType>
                 <xs:sequence>
@@ -52,7 +54,11 @@
         <xs:element name="fieldCollDepthGroupList" type="fieldCollDepthGroupList"/>
         <xs:element name="associatedTaxaGroupList" type="associatedTaxaGroupList"/>
 
-        <xs:complexType name="taxonomicIdentGroupList">
+    </xs:sequence>
+   </xs:complexType>
+   </xs:element>
+
+    <xs:complexType name="taxonomicIdentGroupList">
                 <xs:sequence>
                         <xs:element name="taxonomicIdentGroup" type="taxonomicIdentGroup" minOccurs="0"
                                 maxOccurs="unbounded"/>
@@ -134,8 +140,8 @@
                         <xs:element name="interaction" type="xs:integer"/>
                  </xs:sequence>
         </xs:complexType>
-            
-    </xs:element>
+
+
     
 </xs:schema>
 

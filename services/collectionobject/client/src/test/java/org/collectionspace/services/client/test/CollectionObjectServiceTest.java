@@ -852,7 +852,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      *
      * @param testName the test name
      * @param id the id
-     * @param collectionObject the collection object
      * @return the client response
      */
     private ClientResponse<String> updateSend(String testName, String id,
@@ -1311,9 +1310,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // Add instances of fields from an extension schema
 
         CollectionobjectsNaturalhistory conh = new CollectionobjectsNaturalhistory();
-        conh.setNhString("test-string");
-        conh.setNhInt(999);
-        conh.setNhLong(9999);
+      // Laramie20110524 removed for build:   conh.setNhString("test-string");
+      // Laramie20110524 removed for build:   conh.setNhInt(999);
+      // Laramie20110524 removed for build:   conh.setNhLong(9999);
 
         PoxPayloadOut multipart = createCollectionObjectInstance(commonPartName, collectionObject, conh);
         return multipart;
