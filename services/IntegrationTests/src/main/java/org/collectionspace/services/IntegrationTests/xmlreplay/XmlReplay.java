@@ -178,14 +178,7 @@ public class XmlReplay {
             list.add(results);
             this.reportsList.addAll(replay.getReportsList());   //Add all the reports from the inner replay, to our master replay's reportsList, to generate the index.html file.
         }
-        StringBuffer sb = new StringBuffer(XmlReplayReport.HTML_PAGE_START);
-        String dateStr = Tools.nowLocale();
-        sb.append("<div class='REPORTTIME'>XmlReplay run  "+dateStr+" master: "+masterFilename+"</div>");
-        for (String oneToc: this.reportsList){
-            sb.append(oneToc).append("<hr />");
-        }
-        sb.append(XmlReplayReport.HTML_PAGE_END);
-        FileTools.saveFile(getReportsDir(this.basedir),"index."+masterFilename+".html", sb.toString(), false);
+        XmlReplayReport.saveIndexForMaster(basedir, masterFilename, this.reportsList);
         return list;
     }
 
@@ -725,10 +718,9 @@ public class XmlReplay {
         File m = new File(controlFileName);
         String localName = m.getName();//don't instantiate, just use File to extract file name without directory.
         String reportName = localName+'-'+testGroupID+".html";
-        File resultFile = FileTools.saveFile(getReportsDir(xmlReplayBaseDir), reportName, report.getPage(), true);
+
+        File resultFile = report.saveReport(xmlReplayBaseDir, reportName);
         if (resultFile!=null) {
-            System.out.println("XmlReplay summary reports saved to directory: "+resultFile.getParent());
-            System.out.println("XmlReplay summary report: "+resultFile.getCanonicalPath());
             String toc = report.getTOC(reportName);
             reportsList.add(toc);
         }
@@ -737,10 +729,7 @@ public class XmlReplay {
         return results;
     }
 
-    //todo: move from xmlReplayBaseDir to "target/xmlReplayReports" dir.
-    public static String getReportsDir(String basename){
-        return Tools.glue(basename,"/","TEST-REPORTS");
-    }
+
 
     //======================== MAIN ===================================================================
 

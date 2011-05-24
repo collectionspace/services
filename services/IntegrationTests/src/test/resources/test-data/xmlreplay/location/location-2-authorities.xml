@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+	<testGroup ID="HierarchicLocation" autoDeletePOSTS="true">
+	
+	    <test ID="LocationAuth1" auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/</uri>
+            <filename>location/hierarchy/1-authority.xml</filename>
+            <vars>
+            	<var ID="shortIdentifier">CSPACE3739LocationAuthority</var>
+            	<var ID="displayName">LocationAuth1-displayName</var>
+            </vars>
+        </test>
+        <test ID="GETLocationAuth1" auth="admin@collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}</uri>
+        </test>
+        
+	
+	    <test ID="LocationAuth2" auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/</uri>
+            <filename>location/hierarchy/1-authority.xml</filename>
+            <vars>
+            	<var ID="shortIdentifier">CSPACE3739LocationAuthority</var>
+            	<var ID="displayName">LocationAuth1-displayName</var>
+            </vars>
+        </test>
+        <test ID="GETLocationAuth2" auth="admin@collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth2.CSID}</uri>
+        </test>
+        
+	</testGroup>
+</xmlReplay>

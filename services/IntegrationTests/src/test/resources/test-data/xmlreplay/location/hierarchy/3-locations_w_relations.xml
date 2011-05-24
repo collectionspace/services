@@ -25,7 +25,7 @@
 		  <csid>${parentCSID}</csid>
 		  <uri>${parentUri}</uri>
 		  <documentType>Locationitem</documentType>
-		  <number>0000</number>
+		  <number>0000-setting-error</number>
 		  <name>Parent</name>
 		</object>
 	</relation-list-item>

@@ -73,11 +73,9 @@
         <xs:sequence>
             <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
             <xs:element name="csid" type="xs:string" minOccurs="1"/>
-            <xs:element name="service" type="xs:string" minOccurs="1"/>
             <xs:element name="name" type="xs:string" minOccurs="1"/>
             <xs:element name="number" type="xs:string" minOccurs="1"/>
             <xs:element name="documentType" type="xs:string" minOccurs="1"/>
-            <xs:element name="documentTypeFromModel" type="xs:string" minOccurs="1"/>
             <!-- order is for potential use by app/gui.  services won't do anything with it.-->
             <xs:element name="order" type="xs:string" minOccurs="0"/>
             <!-- key is for things like -which predicate type search did this list come from-->

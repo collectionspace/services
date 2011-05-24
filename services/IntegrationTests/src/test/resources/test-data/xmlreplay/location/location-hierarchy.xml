@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplay>
-	<testGroup ID="HierarchicLocation" autoDeletePOSTS="false">
+	<testGroup ID="HierarchicLocation" autoDeletePOSTS="true">
 	
 	    <test ID="LocationAuth1" auth="admin@collectionspace.org">
             <method>POST</method>
@@ -11,6 +11,11 @@
             	<var ID="displayName">LocationAuth1-displayName</var>
             </vars>
         </test>
+        <test ID="GETLocationAuth1" auth="admin@collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}</uri>
+        </test>
+        
         <test ID="LocationChild1">
             <method>POST</method>
             <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}/items/</uri>
@@ -67,7 +72,7 @@
             	<var ID="shortIdentifier">Cabinet1</var>
             	<var ID="name">Cabinet 1</var>
             	<var ID="parentCSID">${LocationParent.CSID}</var>
-            	<var ID="parentUri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/${LocationParent.CSID}</var>
+            	<var ID="parentUri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority-setting-error-parent)/items/${LocationParent.CSID}</var>
             	<var ID="childCSID">${LocationChild1.CSID}</var>
             	<var ID="childUri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/${LocationChild1.CSID}</var>
             	<var ID="child2CSID">${LocationChild2.CSID}</var>

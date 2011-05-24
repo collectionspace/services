@@ -188,30 +188,32 @@ public class RelationDocumentModelHandler
                                                                                                  String documentType) throws Exception {
         RelationsDocListItem item = new RelationsDocListItem();
         item.setDocumentType(documentType);//this one comes from the record, as documentType1, documentType2.
-        item.setService(documentType);//this one comes from the record, as documentType1, documentType2.   Current app seems to use servicename for this.
+        // CSPACE-4037 REMOVING: item.setService(documentType);//this one comes from the record, as documentType1, documentType2.   Current app seems to use servicename for this.
         item.setCsid(itemCsid);
 
         DocumentModel itemDocModel =  NuxeoUtils.getDocFromCsid(getRepositorySession(), ctx, itemCsid);    //null if not found.
         if (itemDocModel!=null){
             String itemDocType = itemDocModel.getDocumentType().getName();
-            item.setDocumentTypeFromModel(itemDocType);           //this one comes from the nuxeo documentType
+            // CSPACE-4037 REMOVING: item.setDocumentTypeFromModel(itemDocType);           //this one comes from the nuxeo documentType
 
             //DEBUG: System.out.println("\r\n******** AuthorityItemDocumentModelHandlder documentType **************\r\n\tdocModel: "+itemDocType+"\r\n\tpayload: "+documentType);
-            boolean usedDocumentTypeFromPayload = true;
-            if ( ! Tools.isBlank(documentType)){
+            //boolean usedDocumentTypeFromPayload = true;
+            /*if ( ! Tools.isBlank(documentType)){
                 if (documentType.equals(itemDocType)){
-                    usedDocumentTypeFromPayload = true;
+                    //usedDocumentTypeFromPayload = true;
                 }  else {
                     // Laramie20110510 CSPACE-3739  throw the exception for 3739, otherwise, don't throw it.
                     //throw new Exception("documentType supplied was wrong.  supplied: "+documentType+" required: "+itemDocType+ " itemCsid: "+itemCsid );
                 }
             } else {
-                usedDocumentTypeFromPayload = false;
+                //usedDocumentTypeFromPayload = false;
                 item.setDocumentType(itemDocType);
+            }   */
+             if (Tools.isBlank(documentType)){
+               item.setDocumentType(itemDocType);
+             }
 
-            }
-
-
+            // TODO: clean all the output statements out of here when CSPACE-4037 is done.
             //TODO: ensure that itemDocType is really the entry point, i.e. servicename==doctype
             //ServiceBindingType itemSbt2 = tReader.getServiceBinding(ctx.getTenantId(), itemDocType);
             String propName = "ERROR-FINDING-PROP-VALUE";
