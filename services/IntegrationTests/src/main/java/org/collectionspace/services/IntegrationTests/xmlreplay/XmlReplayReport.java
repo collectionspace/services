@@ -1,6 +1,5 @@
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
-import com.sun.tools.internal.ws.processor.model.Service;
 import org.collectionspace.services.common.XmlSaxFragmenter;
 import org.collectionspace.services.common.api.Tools;
 import org.dom4j.Document;
