@@ -9,7 +9,6 @@ import org.collectionspace.services.common.api.Tools;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 
-import java.awt.image.DirectColorModel;
 import java.io.*;
 import java.util.*;
 
@@ -88,6 +87,23 @@ public class XmlReplay {
     }
 
     // ============== METHODS ===========================================================
+
+    /** Optional information method: call this method after instantiating this class using the constructor XmlReplay(String), which sets the basedir.  Then you
+     *   pass in your relative masterFilename to that basedir to this method, which will return true if the file is readable, valid xml, etc.
+     *   Do this in preference to  just seeing if File.exists(), because there are rules to finding the file relative to the maven test dir, yada, yada.
+     *   This method makes it easy to have a development test file that you don't check in, so that dev tests can be missing gracefully, etc.
+     */
+    public boolean masterConfigFileExists(String masterFilename){
+        try {
+            org.dom4j.Document doc = openMasterConfigFile(masterFilename);
+            if (doc == null){
+                return false;
+            }
+            return true;
+        } catch (Throwable t){
+            return false;
+        }
+    }
 
     public org.dom4j.Document openMasterConfigFile(String masterFilename) throws FileNotFoundException {
         org.dom4j.Document document = getDocument(Tools.glue(basedir, "/", masterFilename)); //will check full path first, then checks relative to PWD.
@@ -454,7 +470,7 @@ public class XmlReplay {
         } else {
             authsMapINFO = "Using AuthsMap from control file: "+authsMap;
         }
-        System.out.println("========================================================================"
+        String xmlReplayHeader = "========================================================================"
                           +"\r\nXmlReplay running:"
                           +"\r\n   controlFile: "+ (new File(controlFile).getCanonicalPath())
                           +"\r\n   protoHostPort: "+protoHostPort
@@ -464,7 +480,9 @@ public class XmlReplay {
                           +"\r\n   param_autoDeletePOSTS: "+param_autoDeletePOSTS
                           +"\r\n   Dump info: "+dump
                           +"\r\n========================================================================"
-                          +"\r\n");
+                          +"\r\n";
+        report.addText("<pre>"+xmlReplayHeader+"</pre>\r\n");
+        System.out.println(xmlReplayHeader);
 
         String autoDeletePOSTS = "";
         List<Node> testgroupNodes;
@@ -677,7 +695,9 @@ public class XmlReplay {
         File m = new File(controlFileName);
         String localName = m.getName();//don't instantiate, just use File to extract name.
         String reportName = "XmlReplayReport-"+testGroupID+localName+".html";
-        FileTools.saveFile(xmlReplayBaseDir, reportName, report.getPage(), false); //todo: move from xmlReplayBaseDir to "target/xmlReplayReports" dir.
+        File resultFile = FileTools.saveFile(xmlReplayBaseDir+"/TEST-REPORTS", reportName, report.getPage(), true); //todo: move from xmlReplayBaseDir to "target/xmlReplayReports" dir.
+        if (resultFile!=null) System.out.println("XmlReplay summary reports saved to directory: "+resultFile.getParent());
+        if (resultFile!=null) System.out.println("XmlReplay summary report: "+resultFile.getCanonicalPath());
         //================================
 
         return results;

@@ -261,14 +261,21 @@ public class XmlSaxFragmenter implements ContentHandler, ErrorHandler {
         }
     }
 
+    //This is an override for how import service calls us.  TODO: move this to a new class, XmlTools, and find the other pretty print in the system and consolidate that one, too.
     public static String prettyPrint(Document document) {
+        return prettyPrint(document, false);
+    }
+    public static String prettyPrint(Document document, boolean indent) {
         String prettyHTML;
         try {
             StringWriter swriter = new StringWriter();
             OutputFormat format = OutputFormat.createPrettyPrint();
             format.setNewlines(true);
             format.setTrimText(true);
-            format.setIndent(false);
+            format.setIndent(indent);
+            if (indent){
+                format.setIndent("  ");
+            }
             format.setXHTML(true);
             format.setLineSeparator(System.getProperty("line.separator")) ;
             HTMLWriter writer = new HTMLWriter(swriter, format);
