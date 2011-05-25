@@ -369,23 +369,9 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         if (logger.isDebugEnabled()) {
             logger.debug(getClass().getName(), e);
         }
-        /*    ===== how RoleResource does it: =======
-        } catch (BadRequestException bre) {
-            response = Response.status(
-                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
-                    + bre.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (DocumentException bre) {
-            response = Response.status(
-                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
-                    + bre.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (UnauthorizedException ue) {
-            response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED
-                    + ue.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-         */
+        String detail = Tools.errorToString(e, true);
+        String detailNoTrace = Tools.errorToString(e, true, 3);
+        logger.error(getClass().getName()+" detail: "+detailNoTrace, e);
 
         if (e instanceof UnauthorizedException) {
             response = Response.status(Response.Status.UNAUTHORIZED).entity(serviceMsg + e.getMessage()).type("text/plain").build();
@@ -415,8 +401,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
             return (WebApplicationException) e;
 
         } else { // e is now instanceof Exception
-            String detail = Tools.errorToString(e, true);
-            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(serviceMsg + " detail: " + detail).type("text/plain").build();
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(serviceMsg + " detail: " + detailNoTrace).type("text/plain").build();
             return new WebApplicationException(response);
         }
     }

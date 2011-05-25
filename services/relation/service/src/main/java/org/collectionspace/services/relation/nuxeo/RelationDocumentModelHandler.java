@@ -222,10 +222,10 @@ public class RelationDocumentModelHandler
                 propName = ServiceBindingUtils.getPropertyValue(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP);
                 String itemDocname = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP, itemDocModel);
                 if (propName==null || itemDocname==null){
-                    System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
+                    //System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
                 }  else{
                     item.setName(itemDocname);
-                    System.out.println("=== found prop : "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
+                    //System.out.println("=== found prop : "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
                 }
             } catch (Throwable t){
                  System.out.println("====Error finding objectNameProperty: "+itemDocModel+" field "+ServiceBindingUtils.OBJ_NAME_PROP+"="+propName
@@ -237,15 +237,15 @@ public class RelationDocumentModelHandler
                 String itemDocnumber = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NUMBER_PROP, itemDocModel);
 
                  if (propName==null || itemDocnumber==null){
-                     System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
-                                                +" documentType: "+documentType);
+                     //System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
+                      //                          +" documentType: "+documentType);
                  } else {
                      item.setNumber(itemDocnumber);
-                     System.out.println("============ found prop : "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
-                                                +" documentType: "+documentType);
+                     //System.out.println("============ found prop : "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
+                      //                          +" documentType: "+documentType);
                  }
             } catch (Throwable t){
-                System.out.println("====Error finding objectNumberProperty: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"="+propName
+                logger.error("====Error finding objectNumberProperty: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"="+propName
                                            +" not found in itemDocType: "+itemDocType+" inner: "+t.getMessage());
             }
         } else {
