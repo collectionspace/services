@@ -39,7 +39,6 @@ import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
-import  org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
@@ -292,6 +291,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
             RelationsCommonList parentListOuter = getRelations(thisCSID, null, predicate);
             List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
             if (parentList != null) {
+                if (parentList.size()==0){
+                    return null;
+                }
                 RelationsCommonList.RelationListItem relationListItem = parentList.get(0);
                 parentCSID = relationListItem.getObjectCsid();
             }
@@ -457,22 +459,27 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         List<RelationsCommonList.RelationListItem> childList = childListOuter.getRelationListItem();
         List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
 
-        DocumentModel docModel = wrapDoc.getWrappedObject();
+        if (parentList.size()>1){
+            throw new Exception("Too many parents for object: "+itemCSID+" list: "+dumpList(parentList, "parentList"));
+        }
 
+        DocumentModel docModel = wrapDoc.getWrappedObject();
         //Do magic replacement of ${itemCSID} and fix URI's.
         fixupInboundListItems(ctx, inboundList, docModel, itemCSID);
 
         for (RelationsCommonList.RelationListItem inboundItem : inboundList) {
             if (inboundItem.getObject().getCsid().equals(itemCSID) && inboundItem.getPredicate().equals(HAS_BROADER)) {
-                //then this is an item that says we have a child.
+                //then this is an item that says we have a child.  That child is inboundItem
                 RelationsCommonList.RelationListItem childItem = findInList(childList, inboundItem);
                 if (childItem != null){
                     removeFromList(childList,  childItem);    //exists, just take it off delete list
                 } else {
                     actionList.add(inboundItem);   //doesn't exist as a child, but is a child.  Add to additions list
                 }
+                ensureChildHasNoOtherParents(ctx, queryParams, inboundItem.getSubject().getCsid());
+
             } else if  (inboundItem.getSubject().getCsid().equals(itemCSID) && inboundItem.getPredicate().equals(HAS_BROADER)) {
-                //then this is an item that says we have a parent
+                //then this is an item that says we have a parent.  inboundItem is that parent.
                 RelationsCommonList.RelationListItem parentItem = findInList(parentList, inboundItem);
                 if (parentItem != null){
                     removeFromList(parentList,  parentItem);    //exists, just take it off delete list
@@ -484,12 +491,60 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
                 //not dealing with: hasNarrower or any other predicate.
             }
         }
-        deleteRelations(parentList, ctx);               //todo: there are items appearing on both lists....april 20.
-        deleteRelations(childList, ctx);
+        String dump = dumpLists(itemCSID, parentList, childList, actionList);
+        //System.out.println("====dump====="+CR+dump);
+        logger.info("~~~~~~~~~~~~~~~~~~~~~~dump~~~~~~~~~~~~~~~~~~~~~~~~"+CR+dump);
+        deleteRelations(parentList, ctx, "parentList");               //todo: there are items appearing on both lists....april 20.
+        deleteRelations(childList, ctx, "childList");
         createRelations(actionList, ctx);
         //We return all elements on the inbound list, since we have just worked to make them exist in the system
         // and be non-redundant, etc.  That list came from relationsCommonListBody, so it is still attached to it, just pass that back.
         return relationsCommonListBody;
+    }
+
+    private void ensureChildHasNoOtherParents(ServiceContext ctx, MultivaluedMap queryParams, String childCSID){
+        queryParams.putSingle(IRelationsManager.SUBJECT_QP, childCSID);
+        queryParams.putSingle(IRelationsManager.PREDICATE_QP, RelationshipType.HAS_BROADER.value());
+        queryParams.putSingle(IRelationsManager.OBJECT_QP, null);  //null means ANY
+        RelationsCommonList parentListOuter = (new RelationResource()).getList(ctx.getUriInfo());
+        List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
+        //logger.warn("ensureChildHasNoOtherParents preparing to delete relations on "+childCSID+"\'s parent list: \r\n"+dumpList(parentList, "duplicate parent list"));
+         deleteRelations(parentList, ctx, "parentList-delete");
+    }
+
+    private String dumpLists(String itemCSID,
+                                         List <RelationsCommonList.RelationListItem> parentList,
+                                         List<RelationsCommonList.RelationListItem> childList,
+                                         List<RelationsCommonList.RelationListItem> actionList){
+        StringBuffer sb = new StringBuffer();
+        sb.append("itemCSID: "+itemCSID+CR);
+        sb.append(dumpList(parentList, "parentList"));
+        sb.append(dumpList(childList, "childList"));
+        sb.append(dumpList(actionList, "actionList"));
+        return sb.toString();
+    }
+
+    private final static String CR="\r\n";
+    private final static String T = " ";
+    private final static String T4 = "    ";
+
+    private String dumpList(List <RelationsCommonList.RelationListItem> list, String label){
+        StringBuffer sb = new StringBuffer();
+        String s;
+        if (list.size()>0) sb.append("=========== "+label+" =========="+CR);
+        for (RelationsCommonList.RelationListItem item : list) {
+            s =
+             T + item.getSubject().getCsid()    //+T4 + item.getSubject().getUri()
+                + T + item.getPredicate()
+                + T + item.getObject().getCsid()    //+T4  + item.getObject().getUri()
+                + CR
+                //+"subject:{"+item.getSubject()+"}\r\n object:{"+item.getObject()+"}"
+                //+ CR + "relation-record: {"+item+"}"
+                ;
+            sb.append(s);
+
+         }
+        return sb.toString();
     }
 
     /** Performs substitution for ${itemCSID} (see CommonAPI.AuthorityItemCSID_REPLACE for constant)
@@ -577,12 +632,13 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
             Object res = relationResource.create(ctx.getUriInfo(), payloadOut.toXML());    //NOTE ui recycled from above to pass in unknown query params.
         }
     }
-     private void deleteRelations(List<RelationsCommonList.RelationListItem> list,ServiceContext ctx){
+     private void deleteRelations(List<RelationsCommonList.RelationListItem> list,ServiceContext ctx, String listName){
           try {
-              for (RelationsCommonList.RelationListItem inboundItem : list) {
+              if (list.size()>0){ logger.info("==== deleteRelations from : "+listName); }
+              for (RelationsCommonList.RelationListItem item : list) {
                   RelationResource relationResource = new RelationResource();
-                  //System.out.println("\r\n==== TO DELETE: "+inboundItem.getCsid());
-                  Object res = relationResource.delete(inboundItem.getCsid());
+                  logger.info("==== TO DELETE: "+item.getCsid() +": " +item.getSubject().getCsid() +"--"+item.getPredicate()+"-->"+ item.getObject().getCsid());
+                  Object res = relationResource.delete(item.getCsid());
               }
           } catch (Throwable t){
               String msg = "Unable to deleteRelations: "+ Tools.errorToString(t, true);

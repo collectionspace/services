@@ -74,9 +74,11 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     protected WebApplicationException bigReThrow(Exception e,
             String serviceMsg, String csid) throws WebApplicationException {
         Response response;
-        if (logger.isDebugEnabled()) {
-            logger.debug(getClass().getName(), e);
-        }
+        String detail = Tools.errorToString(e, true);
+        String detailNoTrace = Tools.errorToString(e, true, 3);
+
+        logger.error(getClass().getName()+" detail: "+detailNoTrace, e);
+
         if (e instanceof UnauthorizedException) {
             response = Response.status(Response.Status.UNAUTHORIZED).entity(serviceMsg + e.getMessage()).type("text/plain").build();
             return new WebApplicationException(response);
@@ -92,7 +94,6 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
             // so just pass it on
             return (WebApplicationException) e;
         } else { // e is now instanceof Exception
-            String detail = Tools.errorToString(e, true);
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(serviceMsg + " detail: " + detail).type("text/plain").build();
             return new WebApplicationException(response);
         }
@@ -149,8 +150,8 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
      * Creates the contact document handler.
      * 
      * @param ctx the ctx
-     * @param inAuthority the in authority
-     * @param inItem the in item
+     * //@param inAuthority the in authority
+     * //@param inItem the in item
      * 
      * @return the document handler
      * 

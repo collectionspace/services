@@ -141,6 +141,12 @@ public class Tools {
     }
 
     public static String getStackTrace(Throwable e){
+        return getStackTrace(e, -1);
+    }
+
+
+    /** @param includeLines if zero, returns all lines */
+    public static String getStackTrace(Throwable e, int includeLines){
         if (e==null){
             return "";
         }
@@ -153,14 +159,33 @@ public class Tools {
             else System.out.println("bos was null, not closing");
         } catch (Exception e2)  {System.out.println("ERROR: couldn't reset() bos in Tools "+e2);}
 
-        return result;
+        if (includeLines == 0){
+            return result;   //return all.
+        }
+        StringBuffer sb = new StringBuffer();
+        int i = 0;
+        String[] foo = result.split("\n");
+        for (String line: foo){
+            i++;
+            if (i>includeLines){
+                sb.append("  ...first "+i+" lines. "+(foo.length-i)+" more.\r\n");
+                return sb.toString();
+            }
+            sb.append(line).append("\r\n");
+        }
+        return sb.toString();
+    }
+
+    public static String errorToString(Throwable e, boolean stackTraceOnException){
+        return errorToString(e, stackTraceOnException, 0);
     }
 
     /** Takes an Exception object and formats a message that provides more debug information
       * suitable for developers for printing to System.out or for logging.  Not suitable for
       * presentation of error messages to clients.
+     * @param includeLines if zero, return all lines of stack trace, otherwise return number of lines from top.
       */
-    public static String errorToString(Throwable e, boolean stackTraceOnException){
+    public static String errorToString(Throwable e, boolean stackTraceOnException, int includeLines){
         if (e==null){
             return "";
         }
@@ -175,7 +200,7 @@ public class Tools {
         if (causeBuffer.length()>0) s = s + "\r\n  -- Causes: "+causeBuffer.toString();
 
 
-        s = s + "\r\n  -- Stack Trace: \r\n  --      " + getStackTrace(e);
+        s = s + "\r\n  -- Stack Trace: \r\n  --      " + getStackTrace(e, includeLines);
         return s;
     }
 
