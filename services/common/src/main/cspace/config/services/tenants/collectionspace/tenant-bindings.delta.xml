@@ -4,7 +4,18 @@
 	xmlns:tenant='http://collectionspace.org/services/common/tenant'>
 	    	 
     <tenant:tenantBinding id="1" name="collectionspace.org" displayName="CollectionSpace Demo" version="0.1">
-		<tenant:repositoryDomain name="default-domain" storageName="default-domain" repositoryClient="nuxeo-java" />	
+		<tenant:repositoryDomain name="default-domain" storageName="default-domain" repositoryClient="nuxeo-java" />
+        
+        <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+            <service:object xmlns:service="http://collectionspace.org/services/common/service" >
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_naturalhistory" updated="" order="3">
+                  <service:content contentType="application/xml">
+                    <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd" />
+                  </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+    	
     </tenant:tenantBinding>
 	    	       
 </tenant:TenantBindingConfig>
