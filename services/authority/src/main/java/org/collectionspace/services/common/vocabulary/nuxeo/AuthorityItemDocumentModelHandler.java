@@ -93,7 +93,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
      */
     protected String inAuthority;
     protected String authorityRefNameBase;
-    
+
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
     	this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
     }
@@ -493,7 +493,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         }
         String dump = dumpLists(itemCSID, parentList, childList, actionList);
         //System.out.println("====dump====="+CR+dump);
-        logger.info("~~~~~~~~~~~~~~~~~~~~~~dump~~~~~~~~~~~~~~~~~~~~~~~~"+CR+dump);
+        logger.info("~~~~~~~~~~~~~~~~~~~~~~dump~~~~~~~~~~~~~~~~~~~~~~~~"+CR+ dump);
         deleteRelations(parentList, ctx, "parentList");               //todo: there are items appearing on both lists....april 20.
         deleteRelations(childList, ctx, "childList");
         createRelations(actionList, ctx);
@@ -634,10 +634,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
     }
      private void deleteRelations(List<RelationsCommonList.RelationListItem> list,ServiceContext ctx, String listName){
           try {
-              if (list.size()>0){ logger.info("==== deleteRelations from : "+listName); }
+              //if (list.size()>0){ logger.info("==== deleteRelations from : "+listName); }
               for (RelationsCommonList.RelationListItem item : list) {
                   RelationResource relationResource = new RelationResource();
-                  logger.info("==== TO DELETE: "+item.getCsid() +": " +item.getSubject().getCsid() +"--"+item.getPredicate()+"-->"+ item.getObject().getCsid());
+                  //logger.info("==== TO DELETE: " + item.getCsid() + ": " + item.getSubject().getCsid() + "--" + item.getPredicate() + "-->" + item.getObject().getCsid());
                   Object res = relationResource.delete(item.getCsid());
               }
           } catch (Throwable t){
