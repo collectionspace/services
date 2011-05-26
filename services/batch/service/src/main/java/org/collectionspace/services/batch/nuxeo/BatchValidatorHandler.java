@@ -11,8 +11,7 @@ public class BatchValidatorHandler implements ValidatorHandler {
 	public void validate(Action action, ServiceContext ctx)
 			throws InvalidDocumentException {
 		// TODO Auto-generated method stub
-		System.out.println("BatchValidatorHandler executed.");
-
+		//System.out.println("BatchValidatorHandler executed.");
 	}
 
 }

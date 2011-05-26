@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Invocation Results schema (XSD)
+    
+    Entity  : Invocation
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
+-->
+<xs:schema 
+		xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+		xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+		jaxb:version="1.0" elementFormDefault="unqualified" 
+		xmlns:ns="http://collectionspace.org/services/common/invocable" 
+		xmlns="http://collectionspace.org/services/common/invocable" 
+		targetNamespace="http://collectionspace.org/services/common/invocable" version="0.1">
+	
+	<xs:element name="invocationResults">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="primaryURICreated" type="xs:string"/>
+				<xs:element name="userNote" type="xs:string"/>
+				<xs:element name="numAffected" type="xs:unsignedInt"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+

@@ -51,13 +51,22 @@ import org.collectionspace.services.workflow.WorkflowResource;
 //import org.collectionspace.services.query.QueryResource;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 //import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
+import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ResourceMapHolder;
+import org.collectionspace.services.common.ResourceMapImpl;
 import org.collectionspace.services.common.security.SecurityInterceptor;
+import org.jboss.resteasy.core.Dispatcher;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 //import org.collectionspace.services.common.document.DocumentUtils;
 //import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 //import org.collectionspace.services.common.profile.Profiler;
@@ -70,41 +79,48 @@ import org.collectionspace.services.common.security.SecurityInterceptor;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class CollectionSpaceJaxRsApplication extends Application {
+public class CollectionSpaceJaxRsApplication extends Application
+					implements ResourceMapHolder {
 
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
+    private ResourceMap resourceMap = new ResourceMapImpl();
 
     public CollectionSpaceJaxRsApplication() {    	
     	//
     	// Instantiate all our JaxRS resources
     	//
+    	ResourceBase resource;
         singletons.add(new SecurityInterceptor());
         singletons.add(new AccountResource());
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
+
         singletons.add(new VocabularyResource());
-        singletons.add(new ContactResource());
         singletons.add(new PersonAuthorityResource());
         singletons.add(new OrgAuthorityResource());
-        singletons.add(new CollectionObjectResource());
-        singletons.add(new GroupResource());
-        singletons.add(new IntakeResource());
-        singletons.add(new DimensionResource());
-        singletons.add(new RelationResource());
-        singletons.add(new NoteResource());
-        singletons.add(new LoaninResource());
-        singletons.add(new LoanoutResource());
-        singletons.add(new AcquisitionResource());
-        singletons.add(new ObjectExitResource());
-        singletons.add(new BatchResource());
-        singletons.add(new ImportsResource());
-        singletons.add(new MediaResource());
-        singletons.add(new BlobResource());
-        singletons.add(new MovementResource());
-        singletons.add(new ReportResource());
         singletons.add(new LocationAuthorityResource());
         singletons.add(new TaxonomyAuthorityResource());
+
+        singletons.add(new AcquisitionResource());
+        
+        addResourceToMapAndSingletons(new ContactResource());
+        addResourceToMapAndSingletons(new CollectionObjectResource());
+        addResourceToMapAndSingletons(new GroupResource());
+        addResourceToMapAndSingletons(new IntakeResource());
+        addResourceToMapAndSingletons(new DimensionResource());
+        addResourceToMapAndSingletons(new RelationResource());
+        addResourceToMapAndSingletons(new NoteResource());
+        addResourceToMapAndSingletons(new LoaninResource());
+        addResourceToMapAndSingletons(new LoanoutResource());
+        addResourceToMapAndSingletons(new ObjectExitResource());
+        addResourceToMapAndSingletons(new BatchResource());
+        addResourceToMapAndSingletons(new ImportsResource());
+        addResourceToMapAndSingletons(new MediaResource());
+        addResourceToMapAndSingletons(new BlobResource());
+        addResourceToMapAndSingletons(new MovementResource());
+        addResourceToMapAndSingletons(new ReportResource());
+
         singletons.add(new IDResource());
         /*
         singletons.add(new WorkflowResource());
@@ -112,6 +128,11 @@ public class CollectionSpaceJaxRsApplication extends Application {
 //        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());
+    }
+    
+    private void addResourceToMapAndSingletons(ResourceBase resource) {
+        singletons.add(resource);
+        resourceMap.put(resource.getClass().getName(), resource);
     }
 
     @Override
@@ -122,6 +143,10 @@ public class CollectionSpaceJaxRsApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         return singletons;
+    }
+
+    public ResourceMap getResourceMap() {
+        return resourceMap;
     }
 }
 

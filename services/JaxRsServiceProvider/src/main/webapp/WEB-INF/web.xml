@@ -82,7 +82,7 @@
 
     <listener>
         <listener-class>
-            org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
+            org.collectionspace.services.jaxrs.CSpaceResteasyBootstrap
         </listener-class>
     </listener>
 

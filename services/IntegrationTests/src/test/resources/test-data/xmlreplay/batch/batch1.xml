@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="batch">
+	<ns2:batch_common
+	xmlns:ns2="http://collectionspace.org/services/batch"
+	xmlns:ns3="http://collectionspace.org/services/jaxb">
+		<name>TestCreateAndLinkLoanOutBatchJob</name>
+		<notes>This should be interesting</notes>
+		<forDocType>CollectionObject</forDocType>
+		<forSingleDoc>true</forSingleDoc>
+		<createsNewFocus>true</createsNewFocus>
+		<className>org.collectionspace.services.batch.nuxeo.CreateAndLinkLoanOutBatchJob</className>
+	</ns2:batch_common>
+</document>
