@@ -178,11 +178,11 @@ public class Hierarchy {
         sb.append("</parents>\r\n");
 
 
-        if (name.length()>0)sbOuter.append("  <name>" +name + "</name>\r\n");
-        if (otherNames.length()>0)    sbOuter.append("  <name-mismatches-by-parents>" +otherNames + "</name-mismatches-by-parents>\r\n");
+        if (Tools.notBlank(name))sbOuter.append("  <name>" +name + "</name>\r\n");
+        if (Tools.notBlank(otherNames))    sbOuter.append("  <name-mismatches-by-parents>" +otherNames + "</name-mismatches-by-parents>\r\n");
 
-        if (number.length()>0) sbOuter.append("<number>" +number + "</number>\r\n");
-        if (otherNumbers.length()>0) sbOuter.append("  <number-mismatches-by-parents>" +otherNumbers + "</number-mismatches-by-parents>\r\n");
+        if (Tools.notBlank(number)) sbOuter.append("<number>" +number + "</number>\r\n");
+        if (Tools.notBlank(otherNumbers)) sbOuter.append("  <number-mismatches-by-parents>" +otherNumbers + "</number-mismatches-by-parents>\r\n");
 
         sbOuter.append(sb);
 
