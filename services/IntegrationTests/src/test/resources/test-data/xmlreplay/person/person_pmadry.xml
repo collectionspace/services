@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="persons">
+  <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
+	<shortIdentifier>pmadry</shortIdentifier>
+	<refName>urn:cspace:org.collectionspace.demo:personauthority:name(testpersonauth):person:name(pmadry)'Penelope Madry'</refName>
+	<displayNameComputed>false</displayNameComputed>
+	<shortDisplayNameComputed>false</shortDisplayNameComputed>
+	<shortDisplayName>Penelope Madry</shortDisplayName>
+	<displayName>Penelope Madry, New York</displayName>
+	<bioNote>Project Manager for CollectionSpace</bioNote>
+  </ns2:persons_common>
+</document>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="personauthorities">
+<ns2:personauthorities_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <shortIdentifier>testpersonauth</shortIdentifier>
+  <displayName>Test Person Authority</displayName>
+  <refName>urn:cspace:org.collectionspace.demo:personauthority:name(testpersonauth)'Test Person Authority'</refName>
+  <vocabType>PersonAuthority</vocabType>
+</ns2:personauthorities_common>
+</document>
+

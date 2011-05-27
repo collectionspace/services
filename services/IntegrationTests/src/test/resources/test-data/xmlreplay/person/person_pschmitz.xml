@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="persons">
+  <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
+	<shortIdentifier>pschmitz</shortIdentifier>
+	<refName>urn:cspace:org.collectionspace.demo:personauthority:name(testpersonauth):person:name(pschmitz)'Patrick Schmitz'</refName>
+	<displayNameComputed>false</displayNameComputed>
+	<shortDisplayNameComputed>false</shortDisplayNameComputed>
+	<shortDisplayName>Patrick Schmitz</shortDisplayName>
+	<displayName>Patrick Schmitz, Berkeley</displayName>
+	<bioNote>Technical Lead for CollectionSpace</bioNote>
+  </ns2:persons_common>
+</document>

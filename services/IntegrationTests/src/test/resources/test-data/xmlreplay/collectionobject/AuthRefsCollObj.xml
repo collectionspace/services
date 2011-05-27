@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="collectionobjects">
+<ns2:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/collectionobject" >
+	<objectNumber>1-1001</objectNumber>
+	<catalogNumber>PLS-2011.1</catalogNumber>
+	<responsibleDepartments>
+		<responsibleDepartment>ethnography</responsibleDepartment>
+	</responsibleDepartments>
+	<ownershipAccess>open</ownershipAccess>
+	<objectProductionOrganizationGroupList>
+		<objectProductionOrganizationGroup>
+			<objectProductionOrganizationRole>Sponsor</objectProductionOrganizationRole>
+			<objectProductionOrganization>urn:cspace:org.collectionspace.demo:orgauthority:name(organization):organization:name(ucberkeley)'UC Berkeley'</objectProductionOrganization>
+		</objectProductionOrganizationGroup>
+		<objectProductionOrganizationGroup>
+			<objectProductionOrganizationRole>Coding</objectProductionOrganizationRole>
+			<objectProductionOrganization>urn:cspace:org.collectionspace.demo:orgauthority:name(organization):organization:name(ucberkeleyist)'UCB IST'</objectProductionOrganization>
+		</objectProductionOrganizationGroup>
+	</objectProductionOrganizationGroupList>
+	<objectProductionPersonGroupList>
+		<objectProductionPersonGroup>
+			<objectProductionPersonRole/>
+			<objectProductionPerson>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(pschmitz)'Patrick Schmitz'</objectProductionPerson>
+		</objectProductionPersonGroup>
+	</objectProductionPersonGroupList>
+	<comments>
+		<comment>A virtual object to check authRefs</comment>
+	</comments>
+	<inscriptionDescriptionInscriber>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(pmadry)'Penelope Madry'</inscriptionDescriptionInscriber>
+</ns2:collectionobjects_common>
+</document>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="organizations">
+<ns2:organizations_common xmlns:ns2="http://collectionspace.org/services/organization" xmlns:ns3="http://collectionspace.org/services/jaxb">
+	<shortIdentifier>ucberkeley</shortIdentifier>
+	<refName>urn:cspace:org.collectionspace.demo:orgauthority:name(testorgauth):organization:name(ucberkeleyist)'UCB IST'</refName>
+	<displayNameComputed>false</displayNameComputed>
+	<shortDisplayNameComputed>false</shortDisplayNameComputed>
+	<shortName>U.C. Berkeley IST</shortName>
+	<longName>University of California, Berkeley Information Systems and Technology</longName>
+	<foundingPlace>Berkeley, CA</foundingPlace>
+</ns2:organizations_common>
+</document>
+
