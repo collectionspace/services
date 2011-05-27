@@ -15,6 +15,8 @@ import java.util.List;
  * @author  laramie
  */
 public class XmlReplayReport {
+    public static final String INCLUDES_DIR =  "_includes";
+
     protected static final String HTML_PAGE_END = "</body></html>";
     protected static final String TOPLINKS = "<a class='TOPLINKS' href='javascript:openAll();'>Show All Payloads</a>" + "<a class='TOPLINKS' href='javascript:closeAll();'>Hide All Payloads</a>";
 
@@ -40,6 +42,14 @@ public class XmlReplayReport {
 
     private static final String SP = "&nbsp;&nbsp;&nbsp;";
 
+    public XmlReplayReport(String reportsDir){
+        this.reportsDir = reportsDir;
+    }
+
+    private String reportsDir = "";
+    public String getReportsDir(){
+        return reportsDir;
+    }
 
     protected static String formatCollapse(String myDivID, String linkText){
         return  "<a href='javascript:;' onmousedown=\"toggleDiv('"+myDivID+"');\">"+linkText+"</a>"
@@ -115,8 +125,8 @@ public class XmlReplayReport {
     private List<TOC> tocList = new ArrayList<TOC>();
 
     public static String formatPageStart(String xmlReplayBaseDir){
-            String script = FileTools.readFile(xmlReplayBaseDir, "TEST-REPORTS/reports-include.js");
-            String style =  FileTools.readFile(xmlReplayBaseDir, "TEST-REPORTS/reports-include.css");
+            String script = FileTools.readFile(xmlReplayBaseDir, INCLUDES_DIR+"/reports-include.js");
+            String style =  FileTools.readFile(xmlReplayBaseDir, INCLUDES_DIR+"/reports-include.css");
             return "<html><head><script type='text/javascript'>\r\n"
                      +script
                      +"\r\n</script>\r\n<style>\r\n"
@@ -124,9 +134,9 @@ public class XmlReplayReport {
                      +"\r\n</style></head><body>";
     }
 
-    public File saveReport(String xmlReplayBaseDir, String reportName)  {
+    public File saveReport(String xmlReplayBaseDir, String reportsDir, String reportName)  {
         try {
-            File resultFile = FileTools.saveFile(getReportsDir(xmlReplayBaseDir), reportName, this.getPage(xmlReplayBaseDir), true);
+            File resultFile = FileTools.saveFile(reportsDir, reportName, this.getPage(xmlReplayBaseDir), true);
             if (resultFile!=null) {
                 String resultFileName =  resultFile.getCanonicalPath();
                 //System.out.println("XmlReplay summary reports saved to directory: "+resultFile.getParent());
@@ -134,21 +144,21 @@ public class XmlReplayReport {
                 return resultFile;
             }
         } catch (Exception e){
-            System.out.println("ERROR saving XmlReplay report in basedir: "+xmlReplayBaseDir+" reportName: "+reportName+" error: "+e);
+            System.out.println("ERROR saving XmlReplay report in basedir: "+reportsDir+" reportName: "+reportName+" error: "+e);
         }
         return null;
     }
 
-    public static String getReportsDir(String basename){
-        return Tools.glue(basename,"/","TEST-REPORTS");
-    }
+    //public static String getReportsDir(String basename){
+    //    return Tools.glue(basename,"/","TEST-REPORTS");
+    //}
 
     /** @param localMasterFilename should be a local filename for the index of each xmlReplay master control file, e.g. objectexit.xml
      *               so what gets written to disk will be something like index.objectexit.xml.html . The actual filename will be available from
      *               the returned File object if successful.
      *   @return File if successful, else returns null.
      */
-    public static File saveIndexForMaster(String xmlReplayBaseDir, String localMasterFilename, List<String> reportsList){
+    public static File saveIndexForMaster(String xmlReplayBaseDir, String reportsDir, String localMasterFilename, List<String> reportsList){
         String masterFilename =  "index."+localMasterFilename+".html";
         try{
             StringBuffer sb = new StringBuffer(formatPageStart(xmlReplayBaseDir));
@@ -160,9 +170,9 @@ public class XmlReplayReport {
             }
             sb.append(HTML_PAGE_END);
 
-            return FileTools.saveFile(getReportsDir(xmlReplayBaseDir),masterFilename, sb.toString(), false);
+            return FileTools.saveFile(reportsDir,masterFilename, sb.toString(), false);
         } catch (Exception e){
-            System.out.println("ERROR saving XmlReplay report index: in  xmlReplayBaseDir: "+xmlReplayBaseDir+"localMasterFilename: "+localMasterFilename+" masterFilename: "+masterFilename+" list: "+reportsList+" error: "+e);
+            System.out.println("ERROR saving XmlReplay report index: in  xmlReplayBaseDir: "+reportsDir+"localMasterFilename: "+localMasterFilename+" masterFilename: "+masterFilename+" list: "+reportsList+" error: "+e);
             return null;
         }
     }

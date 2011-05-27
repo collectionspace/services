@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+	<testGroup ID="HierarchicLocation" autoDeletePOSTS="true">
+	
+	    <test ID="LocationAuth1" auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/</uri>
+            <filename>location/hierarchy/1-authority.xml</filename>
+            <vars>
+            	<var ID="shortIdentifier">CSPACE4042LocationAuthority</var>
+            	<var ID="displayName">LocationAuth1-displayName</var>
+            </vars>
+        </test>
+        
+        <test ID="LocationAuth2" auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/</uri>
+            <filename>location/hierarchy/1-authority.xml</filename>
+            <vars>
+            	<var ID="shortIdentifier">CSPACE4042LocationAuthoritySecond</var>
+            	<var ID="displayName">LocationAuth1-Second-Instance</var>
+            </vars>
+        </test>
+        
+        <test ID="GETLocationAuth1" auth="admin@collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}</uri>
+        </test>
+        
+        <test ID="GETLocationAuth2" auth="admin@collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth2.CSID}</uri>
+        </test>
+        
+        <test ID="LocationChild1">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}/items/</uri>
+            <filename>location/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${LocationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE4042LocationAuthority</var>
+            	<var ID="shortIdentifier">Shelf1</var>
+            	<var ID="name">Shelf 1 in LocationAuth1</var>
+            </vars>
+        </test>
+        
+        <!-- Dig this test: 
+                  LocationChild1 is in LocationAuth1
+                  LocationChild2 is in LocationAuth2
+             This should be illegal per CSPACE-4042
+             
+             TODO: This fails with a 500, (that's good) but we don't get the right error message.
+             
+        -->          
+                  
+        <test ID="LocationChild2">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth2.CSID}/items/</uri>
+            <filename>location/hierarchy/2-item.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${LocationAuth2.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE4042LocationAuthoritySecond</var>
+            	<var ID="shortIdentifier">Shelf2</var>
+            	<var ID="name">Shelf 2 in LocationAuth2</var>
+            </vars>
+        </test>
+        
+        <test ID="Location1">
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(CSPACE4042LocationAuthority)/items/</uri>
+            <filename>location/hierarchy/4-locations_w_relations_mixed.xml</filename>
+            <vars>
+            	<var ID="inAuthority">${LocationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE4042LocationAuthority</var>
+            	<var ID="shortIdentifier">Cabinet1</var>
+            	<var ID="name">Cabinet 1</var>
+            	<var ID="childCSID">${LocationChild1.CSID}</var>
+            	<var ID="child2CSID">${LocationChild2.CSID}</var>
+            </vars>
+        </test>
+        
+	    <test ID="GetLocation">
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}/items/${Location1.CSID}?showRelations=true</uri>
+        </test>
+        
+        	</testGroup>
+</xmlReplay>

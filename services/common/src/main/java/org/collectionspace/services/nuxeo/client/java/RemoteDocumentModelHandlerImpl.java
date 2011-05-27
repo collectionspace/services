@@ -121,7 +121,11 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                     Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
                     addOutputPart(unQObjectProperties, partLabel, partMeta);
                 } catch (Throwable t){
-                    System.out.println("===============================\r\nUnable to addOutputPart: "+partLabel+" error: "+t);
+
+                    System.out.println("===============================\r\nUnable to addOutputPart: "+partLabel
+                                               +" in serviceContextPath: "+this.getServiceContextPath()
+                                               +" with URI: "+this.getServiceContext().getUriInfo().getPath()
+                                               +" error: "+t);
                 }
 	        }
         } else {

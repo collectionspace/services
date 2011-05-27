@@ -101,9 +101,14 @@ public class XmlTools {
         return doc;
     }
 
+    public static String prettyPrint(String xml) throws Exception {
+        Document doc = textToXMLDocument(xml);
+        return prettyPrint(doc,  "    ");
+    }
+
     public static String prettyPrint(Document document) {
-            return prettyPrint(document, null);
-        }
+        return prettyPrint(document, null);
+    }
 
     public static String prettyPrint(Document document, String indentString) {
         String prettyHTML;

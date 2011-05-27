@@ -34,6 +34,7 @@ public interface AuthorityItemJAXBSchema {
 	final static String SHORT_DISPLAY_NAME_COMPUTED = "shortDisplayNameComputed";
 	final static String IN_AUTHORITY = "inAuthority";
 	final static String REF_NAME = "refName";
+	final static String ORDER = "order";
 	final static String SHORT_IDENTIFIER = "shortIdentifier";
 	final static String TERM_STATUS = "termStatus";
 	final static String CSID = "csid";

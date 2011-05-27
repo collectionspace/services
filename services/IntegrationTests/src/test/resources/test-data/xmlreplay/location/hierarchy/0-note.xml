@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="dimensions">
+  <ns2:dimensions_common xmlns:ns2="http://collectionspace.org/services/dimension" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <dimension>XmlReplay NOTE</dimension>
+    <value>${content}</value>
+    <valueDate>entryDate-1306297181479</valueDate>
+  </ns2:dimensions_common>
+</document>
+

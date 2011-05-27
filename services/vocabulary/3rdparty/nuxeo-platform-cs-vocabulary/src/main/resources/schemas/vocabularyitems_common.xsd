@@ -27,6 +27,6 @@
 		<xs:element name="shortIdentifier" type="xs:string"/>
 		<xs:element name="termStatus" type="xs:string"/>
 		<xs:element name="displayName" type="xs:string"/>
-
+		<xs:element name="order" type="xs:string"/>
 </xs:schema>
 

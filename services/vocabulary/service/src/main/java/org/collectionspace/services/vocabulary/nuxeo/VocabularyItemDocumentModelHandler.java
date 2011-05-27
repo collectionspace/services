@@ -68,7 +68,7 @@ public class VocabularyItemDocumentModelHandler
 			DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
 		VocabularyitemsCommonList coList = extractPagingInfo(new VocabularyitemsCommonList(), wrapDoc);
         AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("displayName|refName|shortIdentifier|uri|csid");
+        commonList.setFieldsReturned("displayName|refName|shortIdentifier|order|uri|csid");
 		
 		List<VocabularyitemsCommonList.VocabularyitemListItem> list = coList.getVocabularyitemListItem();
 		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
@@ -80,8 +80,10 @@ public class VocabularyItemDocumentModelHandler
 					AuthorityItemJAXBSchema.DISPLAY_NAME));
 			ilistItem.setShortIdentifier((String) docModel.getProperty(commonPartLabel,
 					AuthorityItemJAXBSchema.SHORT_IDENTIFIER));
-			ilistItem.setRefName((String) docModel.getProperty(commonPartLabel, 
-					AuthorityItemJAXBSchema.REF_NAME));
+            ilistItem.setRefName((String) docModel.getProperty(commonPartLabel,
+                                AuthorityItemJAXBSchema.REF_NAME));
+            ilistItem.setOrder((String) docModel.getProperty(commonPartLabel,
+                              AuthorityItemJAXBSchema.ORDER));
 			String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
 			ilistItem.setUri("/vocabularies/" + inAuthority + "/items/" + id);
 			ilistItem.setCsid(id);

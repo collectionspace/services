@@ -38,6 +38,8 @@ import java.util.List;
 public class XmlReplayTest {
 
     public static final String XMLREPLAY_REL_DIR_TO_MODULE = "/src/test/resources/test-data/xmlreplay";
+    public static final String REPORTS_DIRNAME = "xml-replay-reports";
+    public static final String XMLREPLAY_REL_DIR_REPORTS_TO_MODULE= "/target/"+REPORTS_DIRNAME;
 
     /** To use this method, you should have a test repository of xml files in the path
      *  defined by XMLREPLAY_REL_DIR_TO_MODULE, relative to your pom.xml file, but normally
@@ -47,7 +49,8 @@ public class XmlReplayTest {
     public static XmlReplay createXmlReplayForModule() throws Exception {
         String pwd = (new File(".")).getCanonicalPath();
         System.out.println("createXmlReplayForModule.pwd: "+pwd);
-        XmlReplay replay = new XmlReplay(pwd+XMLREPLAY_REL_DIR_TO_MODULE);
+        XmlReplay replay = new XmlReplay(pwd+XMLREPLAY_REL_DIR_TO_MODULE,
+                                                              pwd+XMLREPLAY_REL_DIR_REPORTS_TO_MODULE);
         System.out.println("XmlReplay: "+replay);
         return replay;
     }
@@ -70,7 +73,8 @@ public class XmlReplayTest {
         String thisDir = Tools.glue(relToServicesRoot, "/", "IntegrationTests");
         String pwd = (new File(thisDir)).getCanonicalPath();
         //System.out.println("createXmlReplayUsingIntegrationTestsModule.pwd: "+pwd);
-        XmlReplay replay = new XmlReplay(pwd+XMLREPLAY_REL_DIR_TO_MODULE);
+        XmlReplay replay = new XmlReplay(pwd+XMLREPLAY_REL_DIR_TO_MODULE,
+                                                             pwd+XMLREPLAY_REL_DIR_REPORTS_TO_MODULE);
         //System.out.println("XmlReplay: "+replay);
         return replay;
     }
