@@ -25,12 +25,6 @@
  * $LastChangedDate$
  */
 
-/*
- * Note: due to the use of the FLUSH PRIVILEGES command, below,
- * this script must be executed by a database user (such as
- * the root user) who has RELOAD privileges.
-*/
-
 CREATE DATABASE IF NOT EXISTS `cspace`;
 USE `cspace`;
 
