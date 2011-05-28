@@ -34,6 +34,32 @@ import java.util.List;
  * $LastChangedDate: $
  */
 public interface Invocable {
+	
+	public class InvocationError {
+		int responseCode;
+		String message;
+		
+		public InvocationError(int responseCode, String message) {
+			this.responseCode = responseCode;
+			this.message = message;
+		}
+
+		public int getResponseCode() {
+			return responseCode;
+		}
+
+		public void setResponseCode(int responseCode) {
+			this.responseCode = responseCode;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public void setMessage(String message) {
+			this.message = message;
+		}
+	}
 
 	public String INVOCATION_MODE_SINGLE = "single";
 	public String INVOCATION_MODE_GROUP = "group";
@@ -77,6 +103,6 @@ public interface Invocable {
 	 * @return a user-presentable note when an error occurs in batch processing. Will only
 	 * be called if getCompletionStatus() returns STATUS_ERROR.
 	 */
-	public String getErrorInfo();
+	public InvocationError getErrorInfo();
 
 }

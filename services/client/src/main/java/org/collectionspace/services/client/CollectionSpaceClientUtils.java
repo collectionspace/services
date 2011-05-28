@@ -79,7 +79,23 @@ public class CollectionSpaceClientUtils {
      */
     static public String extractId(ClientResponse<Response> res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
-        String uri = (String) ((List<Object>) mvm.get("Location")).get(0);
+        return extractIdFromResponseMetadata(mvm);
+    }
+ 
+    /**
+     * Extract id.
+     *
+     * @param res the res
+     * @return the string
+     */
+    static public String extractId(Response res) {
+        MultivaluedMap<String, Object> mvm = res.getMetadata();
+        return extractIdFromResponseMetadata(mvm);
+    }
+ 
+    static protected String extractIdFromResponseMetadata(MultivaluedMap<String, Object> mvm) {
+    	// mvm may return a java.net.URI which complains about casting to String...
+    	String uri = ((List<Object>) mvm.get("Location")).get(0).toString();
         if (logger.isDebugEnabled()) {
             logger.debug("extractId:uri=" + uri);
         }

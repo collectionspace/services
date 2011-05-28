@@ -33,10 +33,12 @@ import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.invocable.Invocable;
+import org.collectionspace.services.common.invocable.Invocable.InvocationError;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -48,14 +50,18 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path(BatchClient.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public class BatchResource extends ResourceBase {
+	
+	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
 
     @Override
     public String getServiceName(){
@@ -90,6 +96,23 @@ public class BatchResource extends ResourceBase {
             DocumentWrapper<DocumentModel> wrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
     		DocumentModel docModel = wrapper.getWrappedObject();
+    		String invocationMode = invContext.getMode();
+    		String modeProperty = null;
+    		if(BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
+    			modeProperty = BatchJAXBSchema.BATCH_SUPPORTS_SINGLE_DOC;
+    		} else if(BatchInvocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
+    			modeProperty = BatchJAXBSchema.BATCH_SUPPORTS_DOC_LIST;
+    		} else if(BatchInvocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
+    			modeProperty = BatchJAXBSchema.BATCH_SUPPORTS_GROUP;
+    		} else {
+    			throw new BadRequestException("BatchResource: unknown Invocation Mode: "
+            			+invocationMode);
+    		}
+    		Boolean supports = (Boolean)docModel.getPropertyValue(modeProperty);
+    		if(!supports) {
+    			throw new BadRequestException("BatchResource: This Batch Job does not support Invocation Mode: "
+            			+invocationMode);
+    		}
     		String className = 
     			(String)docModel.getPropertyValue(BatchJAXBSchema.BATCH_CLASS_NAME);
     		className = className.trim();
@@ -103,15 +126,15 @@ public class BatchResource extends ResourceBase {
             } else {
             	BatchInvocable batchInstance = (BatchInvocable)c.newInstance();
             	List<String> modes = batchInstance.getSupportedInvocationModes();
-            	if(!modes.contains(invContext.getMode())) {
-            		throw new RuntimeException(
+            	if(!modes.contains(invocationMode)) {
+            		throw new BadRequestException(
             				"BatchResource: Invoked with unsupported context mode: "
-            				+invContext.getMode());
+            				+invocationMode);
             	}
         		String forDocType = 
         			(String)docModel.getPropertyValue(BatchJAXBSchema.BATCH_FOR_DOC_TYPE);
             	if(!forDocType.equalsIgnoreCase(invContext.getDocType())) {
-            		throw new RuntimeException(
+            		throw new BadRequestException(
             				"BatchResource: Invoked with unsupported document type: "
             				+invContext.getDocType());
             	}
@@ -130,9 +153,17 @@ public class BatchResource extends ResourceBase {
             	batchInstance.run();
             	int status = batchInstance.getCompletionStatus();
             	if(status == Invocable.STATUS_ERROR) {
-            		throw new RuntimeException(
+            		InvocationError error = batchInstance.getErrorInfo();
+            		if(error.getResponseCode() == BAD_REQUEST_STATUS) {
+            			throw new BadRequestException(
             				"BatchResouce: batchProcess encountered error: "
             				+batchInstance.getErrorInfo());
+            		} else {
+            			throw new RuntimeException(
+                				"BatchResouce: batchProcess encountered error: "
+                				+batchInstance.getErrorInfo());
+
+            		}
             	}
             	InvocationResults results = batchInstance.getResults();
             	return results;

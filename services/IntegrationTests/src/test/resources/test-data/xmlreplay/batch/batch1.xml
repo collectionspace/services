@@ -6,7 +6,8 @@
 		<name>TestCreateAndLinkLoanOutBatchJob</name>
 		<notes>This should be interesting</notes>
 		<forDocType>CollectionObject</forDocType>
-		<forSingleDoc>true</forSingleDoc>
+		<supportsSingleDoc>true</supportsSingleDoc>
+		<supportsDocList>true</supportsDocList>
 		<createsNewFocus>true</createsNewFocus>
 		<className>org.collectionspace.services.batch.nuxeo.CreateAndLinkLoanOutBatchJob</className>
 	</ns2:batch_common>
