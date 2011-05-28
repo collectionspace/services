@@ -55,6 +55,14 @@
 				<var ID="CollObj1">${createBatch.CSID}</var>
 			</vars>
 		</test>
+		<test ID="testFilteredList1" auth="test">
+			<method>GET</method>
+			<uri>/cspace-services/batch?doctype=CollectionObject&amp;inv=single</uri>
+		</test>
+		<test ID="testFilteredList2" auth="test">
+			<method>GET</method>
+			<uri>/cspace-services/batch?doctype=Intake&amp;inv=group</uri>
+		</test>
 	</testGroup>
 	<!-- 
      <testGroup ID="cleanup" autoDeletePOSTS="true">
