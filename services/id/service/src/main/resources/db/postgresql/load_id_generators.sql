@@ -53,7 +53,7 @@ INSERT INTO id_generators
      'Identifies accession activities, in which a lot of
 one or more collection objects is acquired by the institution.',
      '9',
-     NULL,
+     '',
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>
     <org.collectionspace.services.id.YearIDGeneratorPart>
