@@ -33,8 +33,8 @@ import java.util.List;
  *  some action on the event onRepositoryInitialized(), such as sending JDBC
  *  calls to the repository to add indices, etc.
  * @author Laramie
- * $LastChangedRevision:  $
- * $LastChangedDate:  $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class InitHandler implements IInitHandler {
 

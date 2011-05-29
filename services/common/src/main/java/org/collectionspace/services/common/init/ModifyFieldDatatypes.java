@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
  * ModifyFieldDatatypes, post-init action to configure the database
  * datatypes of individual fields.
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
 
@@ -112,6 +112,10 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
 
     private boolean fieldHasDesiredDatatype(DatabaseProductType databaseProductType,
             Field field, String datatype) {
+        
+        // FIXME: Consider instead using the database-agnostic
+        // JDBC DatabaseMetaData class to extract metadata, as per
+        // http://www.java2s.com/Code/Java/Database-SQL-JDBC/GetColumnType.htm
 
         boolean fieldHasDesiredDatatype = false;
         int rows = 0;
@@ -127,7 +131,10 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                     + " AND TABLE_NAME = '" + getTableName(field) + "'"
                     + " AND COLUMN_NAME = '" + field.getCol() + "'";
         } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-            // FIXME: Add comparable SQL statement for PostgreSQL.
+            sql = "SELECT data_type FROM information_schema.columns "
+                    + "WHERE table_catalog = '" + getDatabaseName(field) + "'"
+                    + " AND table_name = '" + getTableName(field) + "'"
+                    + " AND column_name = '" + field.getCol() + "'";
         }
 
         try {

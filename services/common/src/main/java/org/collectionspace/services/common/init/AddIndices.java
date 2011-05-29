@@ -72,8 +72,8 @@ import org.slf4j.LoggerFactory;
                 &lt;/s:params>
             &lt;/s:initHandler>
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class AddIndices extends InitHandler implements IInitHandler {
 
@@ -143,6 +143,20 @@ public class AddIndices extends InitHandler implements IInitHandler {
 
     private boolean indexExists(DatabaseProductType databaseProductType,
             String tableName, String indexName) {
+        
+        // FIXME: May need to qualify table name by database/catalog,
+        // as table names likely will not be globally unique across same
+        // (although index names *may* be unique within scope).
+        // - Pass in database name as parameter, retrieved via
+        //   getDatabaseName(field) in onRepositoryInitialized, above.
+        // - Add 'IN databaseName' after tableName in MySQL variant, below.
+        //   (PostgreSQL variant, below, uses a view that doesn't include
+        //   a foreign key for associating a database/catalog to the index.)
+        
+        // FIXME: Consider instead substituting a database-agnostic
+        // JDBC mechanism for retrieving indexes; e.g.
+        // java.sql.DatabaseMetaData.getIndexInfo()
+        
         boolean indexExists = false;
         int rows = 0;
         String sql = "";
@@ -153,7 +167,9 @@ public class AddIndices extends InitHandler implements IInitHandler {
         if (databaseProductType == DatabaseProductType.MYSQL) {
             sql = "SHOW INDEX FROM " + tableName + " WHERE key_name='" + indexName + "'";
         } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-            // FIXME: Add comparable SQL statement for PostgreSQL.
+            sql = "SELECT indexname FROM pg_catalog.pg_indexes "
+                    + "WHERE indexname = '" + indexName + "'"
+                    + " AND tablename = '" + tableName + "'";
         }
 
         try {

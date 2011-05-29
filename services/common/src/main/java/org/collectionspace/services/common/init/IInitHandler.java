@@ -8,8 +8,8 @@ import java.util.List;
 
 /**
  * User: laramie
- * $LastChangedRevision:  $
- * $LastChangedDate:  $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 
 public interface IInitHandler {
