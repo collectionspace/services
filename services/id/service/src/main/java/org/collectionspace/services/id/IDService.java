@@ -14,22 +14,15 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
- 
 package org.collectionspace.services.id;
 
-// May at some point instead use
-// org.jboss.resteasy.spi.NotFoundException
 import java.util.Map;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.BadRequestException;
-
 
 /**
  * IDService
  *
  * Interface for the ID Service.
  *
- * $LastChangedBy$
  * $LastChangedRevision$
  * $LastChangedDate$
  */
@@ -38,45 +31,38 @@ public interface IDService {
     // ----------------------------------------
     // IDs
     // ----------------------------------------
-
     // Create
-
     // Read single object
-    
     // Generates and returns a new ID from the specified ID generator.
-    public String createID(String csid) throws DocumentNotFoundException,
-      BadRequestException, IllegalStateException;
-    
+    public String createID(String csid) throws Exception;
+
     // Returns the last-generated ID associated with the specified ID generator.
     public String readLastID(String csid)
-        throws DocumentNotFoundException, IllegalStateException;
+            throws Exception;
 
     // Read a list of objects (aka read multiple)
-    
     // ----------------------------------------
     // ID Generators
     // ----------------------------------------
-    
     // Create
-    
     // Adds a new ID generator.
     public void createIDGenerator(String csid, String serializedIDGenerator)
-        throws BadRequestException, IllegalStateException;
-    
+            throws Exception;
+
     // Read single object
     public IDGeneratorInstance readIDGenerator(String csid)
-        throws DocumentNotFoundException, IllegalStateException;
-    
+            throws Exception;
+
     // Read a list of objects (aka read multiple)
     // and return a list (map) of those objects and their identifiers.
-    public Map<String,IDGeneratorInstance> readIDGeneratorsList()
-        throws IllegalStateException;
+    public Map<String, IDGeneratorInstance> readIDGeneratorsList()
+            throws Exception;
 
     // Update
-     public void updateIDGenerator(String csid, String serializedIDGenerator)
-        throws DocumentNotFoundException, BadRequestException,
-        IllegalArgumentException, IllegalStateException;
-    
-    // Delete (possibly not permitted - deactivate instead?)
+    public void updateIDGenerator(String csid, String serializedIDGenerator)
+            throws Exception;
 
+    // Delete (possibly not permitted - deactivate instead?)
+    public void deleteIDGenerator(String csid)
+            throws Exception;
 }

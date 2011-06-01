@@ -22,12 +22,19 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IdClient;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.id.IDGeneratorSerializer;
+import org.collectionspace.services.id.NumericIDGeneratorPart;
+import org.collectionspace.services.id.SettableIDGenerator;
+import org.collectionspace.services.id.StringIDGeneratorPart;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -52,7 +59,7 @@ public class IdServiceTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     String knownResourceId = "";
-
+    private List<String> allResourceIdsCreated = new ArrayList<String>();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -77,12 +84,54 @@ public class IdServiceTest extends BaseServiceTest {
     // ---------------------------------------------------------------
 
     // Success outcomes
+    
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    public void create(String testName) throws Exception {
 
-    // Uncomment when getIDGeneratorCSID() no longer returns a hard-coded value.
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        };
 
-/*
+        // Perform setup.
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
+
+        // Submit the request to the service and store the response.
+        IdClient client = new IdClient();
+        
+        String xmlPayload = getSampleSerializedIdGenerator();
+        logger.debug("payload=\n" + xmlPayload);
+        ClientResponse<Response> res = client.create(xmlPayload);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        
+        String newID = extractId(res);
+        
+        // Store the ID returned from the first resource created
+        // for additional tests below.
+        if (knownResourceId.isEmpty()){
+        	knownResourceId = newID;
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownResourceId=" + knownResourceId);
+            }
+        }
+        
+        // Store the IDs from every resource created by tests,
+        // so they can be deleted after tests have been run.
+        allResourceIdsCreated.add(newID);
+
+    }
+
+
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"readList", "read"})
+        dependsOnMethods = {"create"})
     public void createId(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -112,14 +161,28 @@ public class IdServiceTest extends BaseServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        String entity = res.getEntity();
-        Assert.assertNotNull(entity);
+        String generatedId = res.getEntity();
+        Assert.assertNotNull(generatedId);
+        Assert.assertFalse(generatedId.isEmpty());
         if (logger.isDebugEnabled()) {
-            logger.debug("entity body=\r" + entity);
+            logger.debug("generated ID=" + generatedId);
         }
+                        
+        // Create a second ID.  Verify that it is different from the first.
+        // Assumes that the last part in the ID pattern generates values
+        // that will always differ at each generation.
+        res = client.createId(knownResourceId);
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        String secondGeneratedId = res.getEntity();
+        Assert.assertNotNull(secondGeneratedId);
+        Assert.assertFalse(secondGeneratedId.isEmpty());
+        Assert.assertFalse(secondGeneratedId.equals(generatedId));
+        if (logger.isDebugEnabled()) {
+            logger.debug("second generated ID=" + secondGeneratedId);
+        }
+        
     }
- *
- */
 
     // Failure outcomes
     // None at present.
@@ -131,7 +194,7 @@ public class IdServiceTest extends BaseServiceTest {
     // Success outcomes
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"readList"})
+        dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -140,6 +203,10 @@ public class IdServiceTest extends BaseServiceTest {
 
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
+        
+        if(logger.isDebugEnabled()){
+            logger.debug("Reading ID Generator at CSID " + knownResourceId + " ...");
+        }
 
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
@@ -171,7 +238,8 @@ public class IdServiceTest extends BaseServiceTest {
     // Success outcomes
 
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create"})
     public void readList(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -210,11 +278,36 @@ public class IdServiceTest extends BaseServiceTest {
             logger.debug("entity body=\r" + entity);
         }
 
-        knownResourceId = getOneIDGeneratorCSID(entity);
     }
 
     // Failure outcomes
     // None at present.
+    
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "createId", "read", "readList"})
+    public void delete(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+
+        // Perform setup.
+        testSetup(STATUS_OK, ServiceRequestType.DELETE);
+
+        // Submit the request to the service and store the response.
+        IdClient client = new IdClient();
+        ClientResponse<Response> res = client.delete(knownResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
@@ -227,18 +320,28 @@ public class IdServiceTest extends BaseServiceTest {
         return new IdClient().getServicePathComponent();
     }
 
-    private String getOneIDGeneratorCSID(String entity) {
-        // FIXME: Temporarliy uses a hard-coded, known ID.
-        //
-        // Instead get this from the entity body, for now via XPath,
-        // and later, when we've declared an XSD for ID Generator payloads,
-        // via the appropriate JAXB-generated method.
-        return "4b984865-f93d-4481-b874-3dba863ec589";
-    }
-
     @Override
     protected String getServiceName() { 
     	throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498 }
+    }
+    
+    /**
+     * Returns a serialized ID generator, based on the SPECTRUM entry number pattern,
+     * as a sample ID generator to be used in tests.
+     * 
+     * This is a minimal ID Generator, containing only ID Generator Parts,
+     * and lacking a display name, description etc.
+     * 
+     * @return a serialized ID Generator
+     * @throws BadRequestException 
+     */
+    public String getSampleSerializedIdGenerator() throws BadRequestException {
+        
+        SettableIDGenerator generator = new SettableIDGenerator();
+        generator.add(new StringIDGeneratorPart("E"));
+        generator.add(new NumericIDGeneratorPart("1"));       
+        return IDGeneratorSerializer.serialize(generator);
+
     }
 }
 

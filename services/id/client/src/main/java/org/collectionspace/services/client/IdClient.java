@@ -1,11 +1,13 @@
 package org.collectionspace.services.client;
 
+import javax.ws.rs.core.Response;
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
- * An AcquisitionClient.
-
- * @version $Revision:$
+ * IDClient.
+ *
+ * $LastChangedRevision:  $
+ * $LastChangedDate:  $
  */
 public class IdClient extends AbstractServiceClientImpl<String, IdProxy> {
 
@@ -13,31 +15,44 @@ public class IdClient extends AbstractServiceClientImpl<String, IdProxy> {
      * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
      */
     @Override
-	public String getServicePathComponent() {
+    public String getServicePathComponent() {
         return "idgenerators";
     }
 
-	@Override
-	public String getServiceName() {
-		return null; //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3497
-	}
+    @Override
+    public String getServiceName() {
+        return null; //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3497
+    }
 
-	@Override
-	public Class<IdProxy> getProxyClass() {
-		return IdProxy.class;
-	}
+    @Override
+    public Class<IdProxy> getProxyClass() {
+        return IdProxy.class;
+    }
 
-	/*
+    /*
      * Proxied service calls
      */
     
-    public ClientResponse<String> readList() {
-        return getProxy().readList();
+    // Operations on ID Generators
+    
+    public ClientResponse<Response> create(String xmlPayload) {
+        return getProxy().create(xmlPayload);
     }
 
     public ClientResponse<String> read(String csid) {
         return getProxy().read(csid);
     }
+    
+    public ClientResponse<String> readList() {
+        return getProxy().readList();
+    }
+    
+    @Override
+    public ClientResponse<Response> delete(String csid) {
+        return getProxy().delete(csid);
+    }
+    
+    // Operations on IDs
 
     public ClientResponse<String> createId(String csid) {
         return getProxy().createId(csid);

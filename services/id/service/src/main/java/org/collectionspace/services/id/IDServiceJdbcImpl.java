@@ -26,9 +26,6 @@
 //
 // We're currently overloading existing core and extension Java Exceptions
 // in ways that are not consistent with their original semantic meaning.
-// @TODO Get the JDBC driver classname and database URL from configuration;
-// better yet, substitute JPA or Hibernate for JDBC for accessing
-// database-managed persistence.
 // @TODO Remove any hard-coded dependencies on MySQL.
 // @TODO Determine how to restrict access to ID-related tables by role.
 // @TODO Retrieve IDGenerators from the database (via JDBC or
@@ -72,13 +69,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-
-// May at some point instead use
-// org.jboss.resteasy.spi.NotFoundException
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.security.auth.login.LoginException;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.storage.JDBCTools;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,11 +91,6 @@ import org.slf4j.LoggerFactory;
 public class IDServiceJdbcImpl implements IDService {
 
     final Logger logger = LoggerFactory.getLogger(IDServiceJdbcImpl.class);
-    final String JDBC_DRIVER_CLASSNAME = "com.mysql.jdbc.Driver";
-    final String DATABASE_NAME = "cspace";
-    final String DATABASE_URL = "jdbc:mysql://localhost:3306/" + DATABASE_NAME;
-    final String DATABASE_USERNAME = "test";
-    final String DATABASE_PASSWORD = "test";
     final String TABLE_NAME = "id_generator";
     boolean jdbcDriverInstantiated = false;
     boolean hasPreconditions = true;
@@ -108,54 +99,7 @@ public class IDServiceJdbcImpl implements IDService {
     /**
      * Constructor (no-argument).
      */
-    public void IDServiceJdbcImpl() throws IllegalStateException {
-
-        // @TODO Decide when and how to fail at startup, or else to correct
-        // failure conditions automatically, when preconditions are not met.
-        //
-        // Currently, errors at initialization are merely informative and
-        // result in exceptions that can be persistently logged.
-
-        try {
-            init();
-        } catch (IllegalStateException e) {
-            throw e;
-        }
-
-    }
-
-    // @TODO init() is currently UNTESTED as of 2009-08-11T13:00-0700.
-    //////////////////////////////////////////////////////////////////////
-    /**
-     * Initializes the service.
-     *
-     * @throws  IllegalStateException if one or more of the required preconditions
-     *          for the service is not present, or is not in its required state.
-     */
-    public void init() throws IllegalStateException {
-
-        logger.debug("> in init");
-
-        try {
-            instantiateJdbcDriver(JDBC_DRIVER_CLASSNAME);
-        } catch (IllegalStateException e) {
-            throw e;
-        }
-
-        try {
-            boolean hasTable = hasTable(TABLE_NAME);
-            if (!hasTable) {
-                String msg =
-                        "Required table "
-                        + "\'" + TABLE_NAME + "\'"
-                        + " could not be found in the database.";
-                logger.warn(msg);
-                throw new IllegalStateException(msg);
-            }
-        } catch (IllegalStateException e) {
-            throw e;
-        }
-
+    public void IDServiceJdbcImpl() {
     }
 
     // -----------------
@@ -178,8 +122,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public String createID(String csid) throws DocumentNotFoundException,
-            BadRequestException, IllegalArgumentException, IllegalStateException {
+    public String createID(String csid) throws Exception {
 
         logger.debug("> in createID");
 
@@ -276,7 +219,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  DocumentNotFoundException if the requested ID generator could not be found.
      */
     public void updateLastID(String csid, String lastId)
-            throws IllegalStateException, DocumentNotFoundException {
+            throws IllegalStateException, DocumentNotFoundException, LoginException, SQLException {
 
         logger.debug("> in updateLastID");
 
@@ -376,8 +319,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public String readLastID(String csid) throws DocumentNotFoundException,
-            IllegalStateException {
+    public String readLastID(String csid) throws Exception {
 
         logger.debug("> in readLastID");
 
@@ -402,8 +344,7 @@ public class IDServiceJdbcImpl implements IDService {
                 throw new DocumentNotFoundException(
                         "ID generator " + "\'" + csid + "\'" + " could not be found.");
             }
-
-            lastId = rs.getString(1);
+            lastId = (rs.getString(1) != null ? rs.getString(1) : "");
             logger.debug("> retrieved ID: " + lastId);
 
             rs.close();
@@ -448,7 +389,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     public void createIDGenerator(String csid, SettableIDGenerator generator)
-            throws BadRequestException, IllegalStateException {
+            throws Exception {
 
         logger.debug("> in createIDGenerator(String, SettableIDGenerator)");
 
@@ -498,7 +439,7 @@ public class IDServiceJdbcImpl implements IDService {
      */
     @Override
     public void createIDGenerator(String csid, String serializedGenerator)
-            throws BadRequestException, IllegalStateException {
+            throws Exception {
 
         logger.debug("> in createIDGenerator(String, String)");
 
@@ -605,8 +546,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public IDGeneratorInstance readIDGenerator(String csid) throws
-            DocumentNotFoundException, IllegalStateException {
+    public IDGeneratorInstance readIDGenerator(String csid) throws Exception {
 
         logger.debug("> in readIDGenerator");
 
@@ -632,10 +572,10 @@ public class IDServiceJdbcImpl implements IDService {
             }
 
             instance = new IDGeneratorInstance();
-            instance.setDisplayName(rs.getString(2));
-            instance.setDescription(rs.getString(3));
-            instance.setGeneratorState(rs.getString(4));
-            instance.setLastGeneratedID(rs.getString(5));
+            instance.setDisplayName(rs.getString(2) != null ? rs.getString(2) : "");
+            instance.setDescription(rs.getString(3) != null ? rs.getString(3) : "");
+            instance.setGeneratorState(rs.getString(4) != null ? rs.getString(4) : "");
+            instance.setLastGeneratedID(rs.getString(5) != null ? rs.getString(5) : "");
 
             rs.close();
 
@@ -675,7 +615,7 @@ public class IDServiceJdbcImpl implements IDService {
      */
     @Override
     public Map<String, IDGeneratorInstance> readIDGeneratorsList()
-            throws IllegalStateException {
+            throws Exception {
 
         logger.debug("> in readIDGeneratorsList");
 
@@ -701,10 +641,10 @@ public class IDServiceJdbcImpl implements IDService {
             IDGeneratorInstance instance = null;
             while (moreRows = rs.next()) {
                 instance = new IDGeneratorInstance();
-                instance.setDisplayName(rs.getString(2));
-                instance.setDescription(rs.getString(3));
-                instance.setGeneratorState(rs.getString(4));
-                instance.setLastGeneratedID(rs.getString(5));
+                instance.setDisplayName(rs.getString(2) != null ? rs.getString(2) : "[No display name]");
+                instance.setDescription(rs.getString(3) != null ? rs.getString(3) : "[No description]");
+                instance.setGeneratorState(rs.getString(4) != null ? rs.getString(4) : "[No generator state]");
+                instance.setLastGeneratedID(rs.getString(5) != null ? rs.getString(5) : "[No last generated ID]");
                 generators.put(rs.getString(1), instance);
             }
 
@@ -748,8 +688,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     public void updateIDGenerator(String csid, SettableIDGenerator generator)
-            throws BadRequestException, DocumentNotFoundException,
-            IllegalStateException {
+            throws Exception {
 
         logger.debug("> in updateIDGenerator(String, SettableIDGenerator)");
 
@@ -805,8 +744,7 @@ public class IDServiceJdbcImpl implements IDService {
      */
     @Override
     public void updateIDGenerator(String csid, String serializedGenerator)
-            throws DocumentNotFoundException, BadRequestException,
-            IllegalStateException {
+            throws Exception {
 
         logger.debug("> in updateIDGenerator(String, String)");
 
@@ -914,8 +852,9 @@ public class IDServiceJdbcImpl implements IDService {
      *
      * @throws  IllegalStateException if a storage-related error occurred.
      */
+    @Override
     public void deleteIDGenerator(String csid)
-            throws DocumentNotFoundException, IllegalStateException {
+            throws Exception {
 
         logger.debug("> in deleteIDGenerator");
 
@@ -986,42 +925,6 @@ public class IDServiceJdbcImpl implements IDService {
     // -------------------
     // Database operations
     // -------------------
-    //////////////////////////////////////////////////////////////////////
-    /**
-     * Creates a new instance of the specified JDBC driver class.
-     *
-     * @param   jdbcDriverClassname  The name of a JDBC driver class.
-     *
-     * @throws  IllegalStateException if a new instance of the specified
-     *          JDBC driver class cannot be created.
-     */
-    public void instantiateJdbcDriver(String jdbcDriverClassname)
-            throws IllegalStateException {
-
-        logger.debug("> in instantiateJdbcDriver(String)");
-
-        try {
-            Class.forName(jdbcDriverClassname).newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(
-                    "Error finding JDBC driver class '"
-                    + JDBC_DRIVER_CLASSNAME
-                    + "' to set up database connection.");
-        } catch (InstantiationException e) {
-            throw new IllegalStateException(
-                    "Error instantiating JDBC driver class '"
-                    + JDBC_DRIVER_CLASSNAME
-                    + "' to set up database connection.");
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(
-                    "Error accessing JDBC driver class '"
-                    + JDBC_DRIVER_CLASSNAME
-                    + "' to set up database connection.");
-        }
-
-        jdbcDriverInstantiated = true;
-
-    }
 
     //////////////////////////////////////////////////////////////////////
     /**
@@ -1029,27 +932,22 @@ public class IDServiceJdbcImpl implements IDService {
      *
      * @return  A JDBC database Connection object.
      *
+     * @throws  LoginException
      * @throws  SQLException if a storage-related error occurred.
-     *
-     * @throws IllegalStateException if the attempt to instantiate the
-     *     JDBC driver fails.
      */
-    public Connection getJdbcConnection() throws SQLException {
+    public Connection getJdbcConnection() throws LoginException, SQLException {
 
         logger.debug("> in getJdbcConnection");
-
-        if (! jdbcDriverInstantiated) {
-            try {
-                instantiateJdbcDriver(JDBC_DRIVER_CLASSNAME);
-            } catch (IllegalStateException e) {
-                throw e;
-            }
-        }
+        
+        // Providing an empty repository name to getConnection() will cause the
+        // default repository name to be used.
+        final String EMPTY_REPOSITORY_NAME = "";
 
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(DATABASE_URL,
-                    DATABASE_USERNAME, DATABASE_PASSWORD);
+            conn = JDBCTools.getConnection(EMPTY_REPOSITORY_NAME);
+        } catch (LoginException e) {
+            throw e;
         } catch (SQLException e) {
             throw e;
         }
@@ -1069,7 +967,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if an error occurs while checking for the
      *          existence of the specified table.
      */
-    public boolean hasTable(String tablename) throws IllegalStateException {
+    public boolean hasTable(String tablename) throws Exception {
 
         logger.debug("> in hasTable");
 
@@ -1084,7 +982,7 @@ public class IDServiceJdbcImpl implements IDService {
 
             // Retrieve a list of tables in the current database.
             final String CATALOG_NAME = null;
-            final String SCHEMA_NAME_PATTERN = null;
+            final String SCHEMA_NAME_PATTERN = "cspace";
             final String[] TABLE_TYPES = null;
             ResultSet tablesMatchingTableName =
                     conn.getMetaData().getTables(

@@ -33,10 +33,9 @@
   <packaging>pom</packaging>
   
   <modules>
+    <!--module>3rdparty</module-->
     <!--module>jaxb</module-->
     <module>service</module>
-    <!--module>3rdparty</module-->
-    <!-- Uncomment the following when/if we'll be creating a client library for this service. -->
     <module>client</module>
   </modules>
 
