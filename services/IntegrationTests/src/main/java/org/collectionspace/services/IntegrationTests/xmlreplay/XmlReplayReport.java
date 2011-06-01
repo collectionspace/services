@@ -196,6 +196,7 @@ public class XmlReplayReport {
         appendPayload(fb, serviceResult.requestPayload, "REQUEST", "REQUEST" + tocID);
         appendPayload(fb, serviceResult.requestPayloadsRaw, "REQUEST (RAW)", "REQUESTRAW" + tocID);
         appendPayload(fb, serviceResult.result, "RESPONSE", "RESPONSE" + tocID);
+        appendPayload(fb, serviceResult.expectedContentExpanded, "EXPECTED", "EXPECTED" + tocID);
         fb.append(BR);
 
         return fb.toString();

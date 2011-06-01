@@ -87,6 +87,10 @@
     <run controlFile="organization/organization-hierarchy.xml" testGroup="HierarchicOrganization" />
     <run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
     <run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
+    <run controlFile="location/location-2-authorities.xml" testGroup="HierarchicLocation" />
+    <run controlFile="location/location-mixed-hierarchy.xml" testGroup="HierarchicLocation" />
+    <run controlFile="batch/batch.xml" />
+    <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
     
 </xmlReplayMaster>
 

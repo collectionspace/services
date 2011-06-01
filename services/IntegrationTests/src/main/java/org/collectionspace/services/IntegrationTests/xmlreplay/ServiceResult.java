@@ -57,6 +57,7 @@ public class ServiceResult {
     public String payloadStrictness = "";
     public long contentLength = 0;
     public String failureReason = "";
+    public String expectedContentExpanded = "";
     public Header[] responseHeaders = new Header[0];
     public List<Integer> expectedCodes = new ArrayList<Integer>();
     public Map<String,String>  vars = new HashMap<String,String>();

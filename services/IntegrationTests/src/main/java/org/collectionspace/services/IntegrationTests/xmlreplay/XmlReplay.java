@@ -413,6 +413,7 @@ public class XmlReplay {
         String expectedPartContent = new String(b);
         Map<String,String> vars = expectedResponseParts.varsList.get(0);  //just one part, so just one varsList.  Must be there, even if empty.
         expectedPartContent = evalStruct.eval(expectedPartContent, serviceResultsMap, vars, evalStruct.jexl, evalStruct.jc);
+        serviceResult.expectedContentExpanded = expectedPartContent;
         String label = "NOLABEL";
         String leftID  = "{from expected part, label:"+label+" filename: "+expectedResponseParts.responseFilename+"}";
         String rightID = "{from server, label:"+label

@@ -1,0 +1,31 @@
+<ns3:vocabularyitems-common-list xmlns:ns3="http://collectionspace.org/services/vocabulary" xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <!-- This test result is dependent on test group vocabulary/vocabulary.xml::TestOrder
+         and the vars defined there.  
+         Do not use this expected result with any other tests.
+    -->
+	<pageNum>0</pageNum>
+    <itemsInPage>3</itemsInPage>
+    <totalItems>3</totalItems>
+    <fieldsReturned>displayName|refName|shortIdentifier|order|uri|csid</fieldsReturned>
+    <vocabularyitem_list_item>
+        <displayName>${Item3DupeOrder.displayName}</displayName>
+        <shortIdentifier>${Item3DupeOrder.itemID}</shortIdentifier>
+        <order>${Item3DupeOrder.order}</order>
+        <uri>/vocabularies/${Vocabulary1.CSID}/items/${Item3DupeOrder.CSID}</uri>
+        <csid>${Item3DupeOrder.CSID}</csid>
+    </vocabularyitem_list_item>
+    <vocabularyitem_list_item>
+        <displayName>${Item2.displayName}</displayName>
+        <shortIdentifier>${Item2.itemID}</shortIdentifier>
+        <order>${Item2.order}</order>
+        <uri>/vocabularies/${Vocabulary1.CSID}/items/${Item2.CSID}</uri>
+        <csid>${Item2.CSID}</csid>
+    </vocabularyitem_list_item>
+    <vocabularyitem_list_item>
+        <displayName>${Item1.displayName}</displayName>
+        <shortIdentifier>${Item1.itemID}</shortIdentifier>
+        <order>${Item1.order}</order>
+        <uri>/vocabularies/${Vocabulary1.CSID}/items/${Item1.CSID}</uri>
+        <csid>${Item1.CSID}</csid>
+    </vocabularyitem_list_item>
+</ns3:vocabularyitems-common-list>

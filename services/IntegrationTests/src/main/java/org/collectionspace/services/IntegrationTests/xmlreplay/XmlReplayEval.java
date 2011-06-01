@@ -72,6 +72,7 @@ public class XmlReplayEval {
                     String key = entry.getKey();
                     try {
                         value = parse(value, jexl, jc);
+                        vars.put(key, value); //replace template value with actual value.
                     } catch (Exception e){
                         value = "ERROR: "+e;
                     }

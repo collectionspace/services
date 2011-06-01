@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+	<auths>
+		<!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+		<auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+		<auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+	</auths>
+	<testGroup ID="TestOrder" autoDeletePOSTS="true">
+        <!-- The purpose of this testGroup is to test the new "order" field
+	      that was added in http://issues.collectionspace.org/browse/CSPACE-573
+	      and to ensure that this order field is returned in list results, 
+	      and that duplicate values for the order field is accepted.
+	    -->
+		<test ID="Vocabulary1" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/vocabularies/</uri>
+			<filename>vocabulary/1-vocab.xml</filename>
+		</test>
+		<test ID="Item1" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
+			<filename>vocabulary/2-item.xml</filename>
+			<vars>
+				<var ID="itemID">VocabItem1</var>
+				<var ID="order">1</var>
+				<var ID="displayName">TestOrder item ${itemID} order ${order}</var>
+			</vars>
+		</test>
+		<test ID="Item2" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
+			<filename>vocabulary/2-item.xml</filename>
+			<vars>
+				<var ID="itemID">VocabItem2</var>
+				<var ID="order">2</var>
+				<var ID="displayName">TestOrder item ${itemID} order ${order}</var>
+			</vars>
+		</test>
+		<test ID="Item3DupeOrder" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
+			<filename>vocabulary/2-item.xml</filename>
+			<vars>
+				<var ID="itemID">VocabItem3</var>
+				<var ID="order">1</var>
+				<var ID="displayName">TestOrder item ${itemID} order ${order}</var>
+			</vars>
+		</test>
+		
+		<test ID="GetVocabularies" auth="admin@collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/</uri>
+        </test>
+        
+        <test ID="GetVocabularyItems" auth="admin@collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>vocabulary/res/GetVocabularyItems.res.xml</filename>
+                <vars>
+					<var ID="I3displayName">${Item3DupeOrder.displayName}</var>
+				</vars>
+                <!--<startElement>//vocabulary-list-item[./exitNumber='checkList-1234']</startElement>-->
+             </response>
+        </test>
+		
+	</testGroup>
+</xmlReplay>
+
