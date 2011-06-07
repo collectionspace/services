@@ -33,6 +33,9 @@
   <xs:element name="catalogDate" type="xs:string"/>
   -->
 
+  <xs:element name="labelHeader" type="xs:string"/>
+  <xs:element name="labelFooter" type="xs:string"/>
+
   <xs:element name="fieldLocVerbatim" type="xs:string"/>
   <xs:element name="fieldCollectionDateEarliest" type="xs:string"/>
   <xs:element name="fieldCollectionDateLatest" type="xs:string"/>
