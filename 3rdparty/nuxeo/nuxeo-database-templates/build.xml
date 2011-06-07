@@ -45,6 +45,8 @@
         <echo message="Setting the Nuxeo database templates directory ..."/>
         <propertyfile file="${nuxeo.active.config.file}">
              <entry key="nuxeo.templates" operation="=" value="${collectionspace.template.dir}"/>
+             <entry key="nuxeo.db.user" operation="=" value="${db.nuxeo.user}"/>
+             <entry key="nuxeo.db.password" operation="=" value="${db.nuxeo.user.password}"/>
         </propertyfile>
     </target>
     

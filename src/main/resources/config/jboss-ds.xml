@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $Id: mysql-ds.xml 71535 2008-04-01 07:05:03Z adrian@jboss.org $ -->
+<!--  Datasource config for MySQL using 3.0.9 available from:
+http://www.mysql.com/downloads/api-jdbc-stable.html
+-->
+
+<datasources>
+  <local-tx-datasource>
+    <jndi-name>DefaultDS</jndi-name>
+    <connection-url>@DB_URL@</connection-url>
+    <driver-class>@DB_DRIVER_CLASS@</driver-class>
+    <user-name>@DB_USER@</user-name>
+    <password>@DB_PASSWORD@</password>
+		<!--
+			If and when there is a reliable Postgres exception sorter, can enable this
+			and remove the new-connect-sql
+    <exception-sorter-class-name>@DB_EXCEPTION_SORTER@</exception-sorter-class-name>
+		<new-connection-sql>select 1</new-connection-sql>
+		<check-valid-connection-sql>select 1</check-valid-connection-sql>
+		-->
+    <metadata>
+       <type-mapping>@DB_TYPE_MAPPING@</type-mapping>
+    </metadata>
+  </local-tx-datasource>
+</datasources>
+

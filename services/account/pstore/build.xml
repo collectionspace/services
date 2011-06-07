@@ -114,10 +114,10 @@
         <property name="src.hibernate.cfg" value="${basedir}/src/test/resources/hibernate.cfg.xml"/>
         <property name="dest.hibernate.cfg" value="${basedir}/target/test-classes/hibernate.cfg.xml"/>
         <delete file="${dest.hibernate.cfg}" verbose="true" />
-        <filter token="DB_URL" value="${db.jdbc.url}" />
+        <filter token="DB_URL" value="${db.jdbc.cspace.url}" />
         <filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
-        <filter token="DB_USER" value="${env.DB_USER}" /> <!-- double-sub from ${db.user} fails -->
-        <filter token="DB_PASSWORD" value="${env.DB_PASSWORD}" /> <!-- double-sub from ${db.user.password} fails -->
+        <filter token="DB_USER" value="${db.cspace.user}" />
+        <filter token="DB_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" /> <!-- double-sub from ${db.user.password} fails -->
         <filter token="DB_DIALECT" value="${db.dialect}" />
         <copy todir="${basedir}/target/test-classes" filtering="true">
             <fileset dir="${basedir}/src/test/resources">
@@ -153,27 +153,26 @@
 
     <target name="create_db"
             description="create tables(s), indices for account service">
-        <sql driver="com.mysql.jdbc.Driver"
-             url="jdbc:mysql://${db.host}:${db.port}/cspace"
-             userid="${db.user}"
-             password="${db.user.password}"
+				<sql driver="${db.jdbc.driver.class}"
+             url="${db.jdbc.cspace.url}"
+             userid="${db.cspace.user}"
+             password="${db.cspace.user.password}"
              src="${db.script.dir}/account.sql"
-             onerror="continue"
-             >
+             onerror="continue" >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
-        <sql driver="com.mysql.jdbc.Driver"
-             url="jdbc:mysql://${db.host}:${db.port}/cspace"
-             userid="${db.user}"
-             password="${db.user.password}"
-             src="${db.script.dir}/account_index.sql"
-             >
+						<sql driver="${db.jdbc.driver.class}"
+             url="${db.jdbc.cspace.url}"
+             userid="${db.cspace.user}"
+             password="${db.cspace.user.password}"
+             src="${db.script.dir}/account_index.sql" >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
-        </sql>
+					</sql>
+				<!-- No longer used.
         <sql driver="com.mysql.jdbc.Driver"
              url="jdbc:mysql://${db.host}:${db.port}/cspace"
              userid="${db.user}"
@@ -183,7 +182,7 @@
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
-        </sql>
+					</sql> -->
     </target>
     <target name="deploy" depends="install"
             description="deploy account service in ${jboss.server.cspace}">

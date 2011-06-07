@@ -109,22 +109,20 @@
 
     <target name="create_db"
     description="create tables(s), indices for id service">
-        <sql driver="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://${db.host}:${db.port}/cspace"
-        userid="${db.user}"
-        password="${db.user.password}"
-        src="${db.script.dir}/create_id_generators_table.sql"
-        >
+				<sql driver="${db.jdbc.driver.class}"
+            url="${db.jdbc.cspace.url}"
+            userid="${db.cspace.user}"
+            password="${db.cspace.user.password}"
+						src="${db.script.dir}/create_id_generators_table.sql" >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
-        <sql driver="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://${db.host}:${db.port}/cspace"
-        userid="${db.user}"
-        password="${db.user.password}"
-        src="${db.script.dir}/load_id_generators.sql"
-        >
+				<sql driver="${db.jdbc.driver.class}"
+            url="${db.jdbc.cspace.url}"
+            userid="${db.cspace.user}"
+            password="${db.cspace.user.password}"
+            src="${db.script.dir}/load_id_generators.sql" >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>

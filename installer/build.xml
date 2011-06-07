@@ -8,7 +8,7 @@
     <property file="build.properties" />
     <property name="src" location="src"/>
 
-    <property name="db" value="mysql"/>
+		<!-- <property name="db" value="mysql"/> -->
     <property name="db.script.dir" location="${basedir}/db/${db}"/>
 
     <condition property="osfamily-unix">
@@ -59,13 +59,13 @@
         <exec executable="echo">
         		<arg value="Installer: Creating necessary databases and associated users and privileges." />
 				</exec>
-        <sql driver="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://localhost:3306/cspace"
-        userid="root"
-        password="admin"
+        <sql driver="${db.jdbc.driver.class}"
+        url="${db.jdbc.baseurl}"
+        userid="${db.user}"
+        password="${db.user.password}"
         src="${db.script.dir}/init_db.sql">
             <classpath>
-                <pathelement path="${jboss.lib.cspace}/mysql-connector-java-5.1.7-bin.jar"/>
+                <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
 				

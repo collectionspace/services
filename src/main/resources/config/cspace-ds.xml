@@ -9,11 +9,11 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
   <local-tx-datasource>
     <jndi-name>CspaceDS</jndi-name>
     <use-java-context>false</use-java-context>
-    <connection-url>jdbc:mysql://localhost:3306/cspace</connection-url>
-    <driver-class>com.mysql.jdbc.Driver</driver-class>
-    <user-name>test</user-name>
-    <password>test</password>
-    <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter</exception-sorter-class-name>
+    <connection-url>@DB_CSPACE_URL@</connection-url>
+    <driver-class>@DB_DRIVER_CLASS@</driver-class>
+    <user-name>@DB_CSPACE_USER@</user-name>
+    <password>@DB_CSPACE_PASSWORD@</password>
+    <exception-sorter-class-name>@DB_EXCEPTION_SORTER@</exception-sorter-class-name>
     <!-- should only be used on drivers after 3.22.1 with "ping" support
     <valid-connection-checker-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker</valid-connection-checker-class-name>
     -->
@@ -26,17 +26,17 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
 
     <!-- corresponding type-mapping in the standardjbosscmp-jdbc.xml (optional) -->
     <metadata>
-       <type-mapping>mySQL</type-mapping>
+       <type-mapping>@DB_TYPE_MAPPING@</type-mapping>
     </metadata>
   </local-tx-datasource>
   <local-tx-datasource>
     <jndi-name>NuxeoDS</jndi-name>
     <use-java-context>false</use-java-context>
-    <connection-url>jdbc:mysql://localhost:3306/nuxeo</connection-url>
-    <driver-class>com.mysql.jdbc.Driver</driver-class>
-    <user-name>test</user-name>
-    <password>test</password>
-    <exception-sorter-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter</exception-sorter-class-name>
+    <connection-url>@DB_NUXEO_URL@</connection-url>
+    <driver-class>@DB_DRIVER_CLASS@</driver-class>
+    <user-name>@DB_NUXEO_USER@</user-name>
+    <password>@DB_NUXEO_PASSWORD@</password>
+    <exception-sorter-class-name>@DB_EXCEPTION_SORTER@</exception-sorter-class-name>
     <!-- should only be used on drivers after 3.22.1 with "ping" support
     <valid-connection-checker-class-name>org.jboss.resource.adapter.jdbc.vendor.MySQLValidConnectionChecker</valid-connection-checker-class-name>
     -->
@@ -49,7 +49,7 @@ http://www.mysql.com/downloads/api-jdbc-stable.html
 
     <!-- corresponding type-mapping in the standardjbosscmp-jdbc.xml (optional) -->
     <metadata>
-       <type-mapping>mySQL</type-mapping>
+       <type-mapping>@DB_TYPE_MAPPING@</type-mapping>
     </metadata>
   </local-tx-datasource>
 </datasources>

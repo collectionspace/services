@@ -34,7 +34,7 @@
 
         <!-- copy datasources -->
         <copy todir="${basedir}/${dist.deploy.cspace}">
-            <fileset dir="${src}/main/resources/config"/>
+					<fileset dir="${src}/main/resources/config/${db}"/>
         </copy>
         <ant antfile="3rdparty/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="services/build.xml" target="dist" inheritAll="false"/>
@@ -207,10 +207,10 @@
         <ant antfile="services/build.xml" target="gen_ddl" inheritAll="false"/>
     </target>
 
-    <target name="create_db"
+    <target name="create_db" 
             description="create database(s), grant privileges to test users">
-        <sql driver="com.mysql.jdbc.Driver"
-             url="jdbc:mysql://${db.host}:${db.port}"
+			<sql driver="${db.jdbc.driver.class}"
+             url="${db.jdbc.baseurl}"
              userid="${db.user}"
              password="${db.user.password}"
              src="${db.script.dir}/init_db.sql"
@@ -227,26 +227,70 @@
         <ant antfile="services/build.xml" target="import" inheritAll="false"/>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="install,setup_jbossds.cfg,setup_cspaceds.cfg"
             description="deploy services in ${jboss.server.cspace}">
         <!-- copy db scripts, etc. -->
-        <copy todir="${jboss.server.cspace}/cspace/services">
-            <fileset dir="${src}/main/resources/"/>
+				<copy todir="${jboss.server.cspace}/cspace/services/scripts">
+					<fileset dir="${src}/main/resources/scripts/"/>
         </copy>
-        <!-- copy datasources -->
+        <!-- copy datasources, including default jboss ds -->
+				<!--
+				Now handled in dependent targets
         <copy todir="${jboss.deploy.cspace}">
-            <fileset dir="${src}/main/resources/config"/>
-        </copy>
+					<fileset dir="${src}/main/resources/config/${db}"/>
+				</copy>
+				-->
         <ant antfile="3rdparty/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="services/build.xml" target="deploy" inheritAll="false"/>
 
     </target>
 
+		<target name="setup_jbossds.cfg"
+					 description="copy jboss-ds.xml, replacing keywords">
+			<property name="src.jbossds.cfg" value="${src}/main/resources/config/jboss-ds.xml"/>
+			<delete file="${jboss.deploy.cspace}/jboss-ds.xml" failonerror="false" />
+			<copy file="${src.jbossds.cfg}" todir="${jboss.deploy.cspace}">
+				<filterset>
+					<filter token="DB_URL" value="${db.jdbc.jboss.url}" />
+					<filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
+					<filter token="DB_USER" value="${db.jboss.user}" /> <!-- double-sub from ${db.user} fails -->
+					<filter token="DB_PASSWORD" value="${env.DB_PASSWORD_JBOSS}" /> <!-- double-sub from ${db.user.password} fails -->
+					<filter token="DB_DIALECT" value="${db.dialect}" />
+					<filter token="DB_TYPE_MAPPING" value="${db.typemapping}" />
+ 					<filter token="DB_EXCEPTION_SORTER" value="${db.exceptionsorter}" />
+				</filterset>
+			</copy>
+    </target>
+
+		<target name="setup_cspaceds.cfg"
+					 description="copy cspace-ds.xml, replacing keywords">
+			<property name="src.cspaceds.cfg" value="${src}/main/resources/config/cspace-ds.xml"/>
+			<delete file="${jboss.deploy.cspace}/cspace-ds.xml" failonerror="false" />
+			<copy file="${src.cspaceds.cfg}" todir="${jboss.deploy.cspace}">
+				<filterset>
+					<filter token="DB_CSPACE_URL" value="${db.jdbc.cspace.url}" />
+					<filter token="DB_NUXEO_URL" value="${db.jdbc.nuxeo.url}" />
+					<filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
+					<filter token="DB_CSPACE_USER" value="${db.cspace.user}" />
+					<filter token="DB_NUXEO_USER" value="${db.nuxeo.user}" />
+					<filter token="DB_CSPACE_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" /> <!-- double-sub from ${db.user.password} fails -->
+					<filter token="DB_NUXEO_PASSWORD" value="${env.DB_PASSWORD_NUXEO}" /> <!-- double-sub from ${db.user.password} fails -->
+					<filter token="DB_DIALECT" value="${db.dialect}" />
+					<filter token="DB_TYPE_MAPPING" value="${db.typemapping}" />
+ 					<filter token="DB_EXCEPTION_SORTER" value="${db.exceptionsorter}" />
+				</filterset>
+			</copy>
+    </target>
+
+
     <target name="undeploy"
             description="undeploy services from ${jboss.server.cspace}">
         <ant antfile="services/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritAll="false"/>
-        <delete failonerror="false"  file="${jboss.deploy.cspace}/cspace-ds.xml"/>
+				<!-- Delete mysql-ds.xml to clean up pre-1.8 bundles -->
+				<delete failonerror="false" file="${jboss.deploy.cspace}/mysql-ds.xml"/>
+				<delete failonerror="false" file="${jboss.deploy.cspace}/jboss-ds.xml"/>
+        <delete failonerror="false" file="${jboss.deploy.cspace}/cspace-ds.xml"/>
         <delete failonerror="false" dir="${jboss.server.cspace}/cspace/services"/>
         <delete failonerror="false" dir="${jboss.server.cspace}/cspace/config/services"/>
     </target>
