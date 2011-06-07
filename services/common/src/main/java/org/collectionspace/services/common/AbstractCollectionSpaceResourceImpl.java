@@ -31,6 +31,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -224,13 +225,25 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      * 
      * @throws Exception the exception
      */
-    protected ServiceContext<IT, OT> createServiceContext(MultivaluedMap<String, String> queryParams) throws Exception {    	
+    protected ServiceContext<IT, OT> createServiceContext(MultivaluedMap<String, String> queryParams) throws Exception {
         ServiceContext<IT, OT> ctx = createServiceContext(
         		(IT)null, /*input*/
         		queryParams,
         		(Class<?>)null  /*input type's Class*/);
         return ctx;
-    }    
+    }
+
+    protected ServiceContext<IT, OT> createServiceContext(UriInfo ui) throws Exception {
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        ServiceContext<IT, OT> ctx = createServiceContext(
+        		(IT)null, /*input*/
+        		queryParams,
+        		(Class<?>)null  /*input type's Class*/);
+        return ctx;
+    }
+
+
+
         
     /**
      * Creates the service context.
@@ -350,12 +363,16 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     }
 
     protected void ensureCSID(String csid, String crudType) throws WebApplicationException {
+        ensureCSID(csid, crudType, "csid");
+    }
+
+    protected void ensureCSID(String csid, String crudType, String whichCsid) throws WebApplicationException {
            if (logger.isDebugEnabled()) {
                logger.debug(crudType + " for " + getClass().getName() + " with csid=" + csid);
            }
            if (csid == null || "".equals(csid)) {
                logger.error(crudType + " for " + getClass().getName() + " missing csid!");
-               Response response = Response.status(Response.Status.BAD_REQUEST).entity(crudType + " failed on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
+               Response response = Response.status(Response.Status.BAD_REQUEST).entity(crudType + " failed on " + getClass().getName() + ' '+whichCsid+'=' + csid).type("text/plain").build();
                throw new WebApplicationException(response);
            }
        }

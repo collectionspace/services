@@ -87,14 +87,10 @@ import org.slf4j.LoggerFactory;
 public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, AuthItemCommonList, AuthItemHandler> extends //FIXME: REM - Why is this resource in this package instead of somewhere in 'common'?
      AuthorityResource<AuthCommon, AuthCommonList, AuthItemCommonList, AuthItemHandler> {
 
-    /** The contact resource. */
     private ContactResource contactResource = new ContactResource(); // Warning: ContactResource is a singleton.
 
     final Logger logger = LoggerFactory.getLogger(AuthorityResourceWithContacts.class);
 
-    /**
-	 * Instantiates a new Authority resource.
-	 */
 	public AuthorityResourceWithContacts(
 			Class<AuthCommon> authCommonClass, Class<?> resourceClass,
 			String authorityCommonSchemaName, String authorityItemCommonSchemaName) {
@@ -104,37 +100,19 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
 
 	public abstract String getItemServiceName();
 
-    /**
-     * Gets the contact service name.
-     * 
-     * @return the contact service name
-     */
     public String getContactServiceName() {
         return contactResource.getServiceName();
     }
 
-    /**
-     * Creates the contact document handler.
-     * 
-     * @param ctx the ctx
-     * @param inAuthority the in authority
-     * @param inItem the in item
-     * 
-     * @return the document handler
-     * 
-     * @throws Exception the exception
-     */
     private DocumentHandler createContactDocumentHandler(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String inAuthority,
             String inItem) throws Exception {
-    	
     	ContactDocumentModelHandler docHandler = (ContactDocumentModelHandler)createDocumentHandler(
     			ctx,
     			ctx.getCommonPartLabel(getContactServiceName()),
     			ContactsCommon.class);        	
         docHandler.setInAuthority(inAuthority);
         docHandler.setInItem(inItem);
-    	
         return docHandler;
     }
 
@@ -142,7 +120,6 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
      * Contact parts - this is a sub-resource of the AuthorityItem
 	 * @param parentspecifier either a CSID or one of the urn forms
 	 * @param itemspecifier either a CSID or one of the urn forms
-     * @param input 
      * @return contact
      *************************************************************************/
     @POST
@@ -153,66 +130,26 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
             String xmlPayload) {
         try {
         	PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-   			Specifier parentSpec = getSpecifier(parentspecifier, 
-   					"createContact(authority)", "CREATE_ITEM_CONTACT");
-			Specifier itemSpec = getSpecifier(itemspecifier, 
-					"createContact(item)", "CREATE_ITEM_CONTACT");
-			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-			String parentcsid;
-			if(parentSpec.form==SpecifierForm.CSID) {
-				parentcsid = parentSpec.value;
-			} else {
-				String whereClause = buildWhereForAuthByName(parentSpec.value);
-	            ctx = createServiceContext(getServiceName());
-				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
-			}
-            String itemcsid;
-			if(itemSpec.form==SpecifierForm.CSID) {
-				itemcsid = itemSpec.value;
-			} else {
-				String itemWhereClause = 
-					buildWhereForAuthItemByName(itemSpec.value, parentcsid);
-	            ctx = createServiceContext(getItemServiceName());
-				itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause);
-			}
+            String parentcsid = lookupParentCSID(parentspecifier, "createContact(authority)", "CREATE_ITEM_CONTACT", null);
+
+            ServiceContext itemCtx = createServiceContext(getItemServiceName());
+            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "createContact(item)", "CREATE_ITEM_CONTACT", itemCtx);
+
             // Note that we have to create the service context and document
             // handler for the Contact service, not the main service.
-        	ctx = createServiceContext(getContactServiceName(), input);
+        	ServiceContext ctx = createServiceContext(getContactServiceName(), input);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(resourceClass);
             path.path("" + parentcsid + "/items/" + itemcsid + "/contacts/" + csid);
             Response response = Response.created(path.build()).build();
             return response;
-        } catch (BadRequestException bre) {
-            Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (UnauthorizedException ue) {
-            Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (DocumentNotFoundException dnfe) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("createContact", dnfe);
-            }
-            Response response = Response.status(Response.Status.NOT_FOUND)
-                .entity("Create Contact failed; one of the requested specifiers for authority:"
-                		+parentspecifier+": and item:"+itemspecifier+": was not found.")
-                .type("text/plain").build();
-            throw new WebApplicationException(response);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in createContact", e);
-            }
-            Response response = Response.status(
-                Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Attempt to create Contact failed.")
-                .type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw bigReThrow(e,
+                                        "Create Contact failed; one of the requested specifiers for authority:"
+                		                       +parentspecifier+": and item:"+itemspecifier+": was not found.",
+                                        itemspecifier);
         }
-
     }
 
     /**
@@ -233,31 +170,13 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
             @Context UriInfo ui) {
         ContactsCommonList contactObjectList = new ContactsCommonList();
         try {
-   			Specifier parentSpec = getSpecifier(parentspecifier, 
-   					"getContactList(parent)", "GET_CONTACT_LIST");
-			Specifier itemSpec = getSpecifier(itemspecifier, 
-					"getContactList(item)", "GET_CONTACT_LIST");
-			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-			String parentcsid;
-			if(parentSpec.form==SpecifierForm.CSID) {
-				parentcsid = parentSpec.value;
-			} else {
-				String whereClause = buildWhereForAuthByName(parentSpec.value);
-	            ctx = createServiceContext(getServiceName());
-				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
-			}
-            String itemcsid;
-			if(itemSpec.form==SpecifierForm.CSID) {
-				itemcsid = itemSpec.value;
-			} else {
-				String itemWhereClause = 
-					buildWhereForAuthItemByName(itemSpec.value, parentcsid);
-	            ctx = createServiceContext(getItemServiceName());
-				itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause);
-			}
+            String parentcsid = lookupParentCSID(parentspecifier, "getContactList(parent)", "GET_CONTACT_LIST", null);
+
+            ServiceContext itemCtx = createServiceContext(getItemServiceName());
+            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getContactList(item)", "GET_CONTACT_LIST", itemCtx);
+
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        	ctx = createServiceContext(getContactServiceName(), queryParams);
+        	ServiceContext ctx = createServiceContext(getContactServiceName(), queryParams);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             DocumentFilter myFilter = handler.getDocumentFilter(); //new DocumentFilter();
             myFilter.appendWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
@@ -270,26 +189,11 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
                 IQueryManager.SEARCH_QUALIFIER_AND);  // "AND" this clause to any existing
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
-        } catch (UnauthorizedException ue) {
-            Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (DocumentNotFoundException dnfe) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("getContactList", dnfe);
-            }
-            Response response = Response.status(Response.Status.NOT_FOUND)
-                .entity("Get ContactList failed; one of the requested specifiers for authority:"
-                		+parentspecifier+": and item:"+itemspecifier+": was not found.")
-                .type("text/plain").build();
-            throw new WebApplicationException(response);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in getContactsList", e);
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw bigReThrow(e,
+                                        "Get ContactList failed; one of the requested specifiers for authority:"
+                		                    +parentspecifier+": and item:"+itemspecifier+": was not found.",
+                                        itemspecifier);
         }
         return contactObjectList;
     }
@@ -311,57 +215,21 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
             @PathParam("csid") String csid) {
     	PoxPayloadOut result = null;
         try {
-   			Specifier parentSpec = getSpecifier(parentspecifier, 
-   					"getContact(parent)", "GET_ITEM_CONTACT");
-			Specifier itemSpec = getSpecifier(itemspecifier, 
-					"getContact(item)", "GET_ITEM_CONTACT");
-			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-			String parentcsid;
-			if(parentSpec.form==SpecifierForm.CSID) {
-				parentcsid = parentSpec.value;
-			} else {
-				String whereClause = buildWhereForAuthByName(parentSpec.value);
-	            ctx = createServiceContext(getServiceName());
-				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
-			}
-            String itemcsid;
-			if(itemSpec.form==SpecifierForm.CSID) {
-				itemcsid = itemSpec.value;
-			} else {
-				String itemWhereClause = 
-					buildWhereForAuthItemByName(itemSpec.value, parentcsid);
-	            ctx = createServiceContext(getItemServiceName());
-				itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause);
-			}
-            // Note that we have to create the service context and document
-            // handler for the Contact service, not the main service.
-        	ctx = createServiceContext(getContactServiceName());
+            String parentcsid = lookupParentCSID(parentspecifier, "getContact(parent)", "GET_ITEM_CONTACT", null);
+
+            ServiceContext itemCtx = createServiceContext(getItemServiceName());
+            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getContact(item)", "GET_ITEM_CONTACT", itemCtx);
+
+            // Note that we have to create the service context and document handler for the Contact service, not the main service.
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getContactServiceName());
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();
-        } catch (UnauthorizedException ue) {
-            Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (DocumentNotFoundException dnfe) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("getContact", dnfe);
-            }
-            Response response = Response.status(Response.Status.NOT_FOUND)
-                .entity("Get failed, the requested Contact CSID:" + csid + 
-                		": or one of the specifiers for authority:"+parentspecifier+
-                		": and item:"+itemspecifier+": was not found.")
-                .type("text/plain").build();
-            throw new WebApplicationException(response);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("getContact", e);
-            }
-            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Get contact failed")
-                .type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw bigReThrow(e, "Get failed, the requested Contact CSID:" + csid +
+                                            ": or one of the specifiers for authority:"+parentspecifier+
+                                            ": and item:"+itemspecifier+": was not found.",
+                                        csid);
         }
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND)
@@ -370,7 +238,6 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
             throw new WebApplicationException(response);
         }
         return result.toXML();
-
     }
 
     /**
@@ -379,8 +246,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
 	 * @param parentspecifier either a CSID or one of the urn forms
 	 * @param itemspecifier either a CSID or one of the urn forms
      * @param csid the csid
-     * @param theUpdate the the update
-     * 
+     *
      * @return the multipart output
      */
     @PUT
@@ -393,57 +259,22 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
     	PoxPayloadOut result = null;
         try {
         	PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
-   			Specifier parentSpec = getSpecifier(parentspecifier, 
-   					"updateContact(authority)", "UPDATE_CONTACT");
-			Specifier itemSpec = getSpecifier(itemspecifier, 
-					"updateContact(item)", "UPDATE_CONTACT");
-			// Note that we have to create the service context for the Items, not the main service
+   			String parentcsid = lookupParentCSID(parentspecifier, "updateContact(authority)", "UPDATE_CONTACT", null);
+
+            ServiceContext itemCtx = createServiceContext(getItemServiceName());
+            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "updateContact(item)", "UPDATE_CONTACT", itemCtx);
+
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-			String parentcsid;
-			if(parentSpec.form==SpecifierForm.CSID) {
-				parentcsid = parentSpec.value;
-			} else {
-				String whereClause = buildWhereForAuthByName(parentSpec.value);
-	            ctx = createServiceContext(getServiceName());
-				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
-			}
-            String itemcsid;
-			if(itemSpec.form==SpecifierForm.CSID) {
-				itemcsid = itemSpec.value;
-			} else {
-				String itemWhereClause = 
-					buildWhereForAuthItemByName(itemSpec.value, parentcsid);
-	            ctx = createServiceContext(getItemServiceName());
-				itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause);
-			}
-            // Note that we have to create the service context and document
-            // handler for the Contact service, not the main service.
+            // Note that we have to create the service context and document handler for the Contact service, not the main service.
         	ctx = createServiceContext(getContactServiceName(), theUpdate);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
-        } catch (BadRequestException bre) {
-            Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (UnauthorizedException ue) {
-            Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (DocumentNotFoundException dnfe) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("caught exception in updateContact", dnfe);
-            }
-            Response response = Response.status(Response.Status.NOT_FOUND)
-                    .entity("Update failed, the requested Contact CSID:" + csid + 
-                    		": or one of the specifiers for authority:"+parentspecifier+
-                    		": and item:"+itemspecifier+": was not found.")
-                    .type("text/plain").build();
-            throw new WebApplicationException(response);
         } catch (Exception e) {
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
-            throw new WebApplicationException(response);
+           throw bigReThrow(e, "Update failed, the requested Contact CSID:" + csid +
+                    		": or one of the specifiers for authority:"+parentspecifier+
+                    		": and item:"+itemspecifier+": was not found.",
+                            csid);
         }
         return result.toXML();
     }
@@ -464,52 +295,21 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
             @PathParam("itemcsid") String itemspecifier,
             @PathParam("csid") String csid) {
         try {
-   			Specifier parentSpec = getSpecifier(parentspecifier, 
-   					"deleteContact(authority)", "DELETE_CONTACT");
-			Specifier itemSpec = getSpecifier(itemspecifier, 
-					"deleteContact(item)", "DELETE_CONTACT");
-			// Note that we have to create the service context for the Items, not the main service
+   			String parentcsid = lookupParentCSID(parentspecifier, "deleteContact(authority)", "DELETE_CONTACT", null);
+
+            ServiceContext itemCtx = createServiceContext(getItemServiceName());
+            String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "deleteContact(item)", "DELETE_CONTACT", itemCtx);
+            //NOTE: itemcsid is not used below.  Leaving the above call in for possible side effects???       CSPACE-3175
+
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-			String parentcsid;
-			if(parentSpec.form==SpecifierForm.CSID) {
-				parentcsid = parentSpec.value;
-			} else {
-				String whereClause = buildWhereForAuthByName(parentSpec.value);
-	            ctx = createServiceContext(getServiceName());
-				parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
-			}
-            String itemcsid;
-			if(itemSpec.form==SpecifierForm.CSID) {
-				itemcsid = itemSpec.value;
-			} else {
-				String itemWhereClause = 
-					buildWhereForAuthItemByName(itemSpec.value, parentcsid);
-	            ctx = createServiceContext(getItemServiceName());
-				itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause);
-			}
-            // Note that we have to create the service context for the
-            // Contact service, not the main service.
+            // Note that we have to create the service context for the Contact service, not the main service.
         	ctx = createServiceContext(getContactServiceName());
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
-         } catch (UnauthorizedException ue) {
-            Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-         } catch (DocumentNotFoundException dnfe) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in deleteContact", dnfe);
-            }
-            Response response = Response.status(Response.Status.NOT_FOUND)
-                .entity("Delete failed, the requested Contact CSID:" + csid + 
-                		": or one of the specifiers for authority:"+parentspecifier+
-                		": and item:"+itemspecifier+": was not found.")
-                .type("text/plain").build();
-            throw new WebApplicationException(response);
-       } catch (Exception e) {
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
-            throw new WebApplicationException(response);
+         } catch (Exception e) {
+            throw bigReThrow(e, "DELETE failed, the requested Contact CSID:" + csid +
+                    		": or one of the specifiers for authority:"+parentspecifier+
+                    		": and item:"+itemspecifier+": was not found.", csid);
         }
     }
     
