@@ -32,11 +32,11 @@ CREATE database nuxeo DEFAULT CHARACTER SET utf8;
 --
 -- grant privileges to test user on nuxeo and jbossdb databases
 --
-GRANT ALL PRIVILEGES ON jbossdb.* TO 'jboss'@'localhost' IDENTIFIED BY 'jbpw' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON jbossdb.* TO '@DB_JBOSS_USER@'@'localhost' IDENTIFIED BY '@DB_JBOSS_PASSWORD@' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
-GRANT ALL PRIVILEGES ON cspace.* TO 'cspace'@'localhost' IDENTIFIED BY 'cspw' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON cspace.* TO '@DB_CSPACE_USER@'@'localhost' IDENTIFIED BY '@DB_CSPACE_PASSWORD@' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
-GRANT ALL PRIVILEGES ON nuxeo.* TO 'nuxeo'@'localhost' IDENTIFIED BY 'nuxpw' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON nuxeo.* TO '@DB_NUXEO_USER@'@'localhost' IDENTIFIED BY '@DB_NUXEO_PASSWORD@' WITH GRANT OPTION;
 --
 -- Grant privileges to read-only user on Nuxeo, for reporting. 
 --

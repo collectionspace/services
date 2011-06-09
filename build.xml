@@ -207,7 +207,12 @@
         <ant antfile="services/build.xml" target="gen_ddl" inheritAll="false"/>
     </target>
 
-    <target name="create_db" 
+    <target name="create_db" depends="create_base_db"
+            description="create database(s), invoke subtasks for indexes, etc.">
+        <ant antfile="services/build.xml" target="create_db" inheritAll="false"/>
+    </target>
+
+    <target name="create_base_db" 
             description="create database(s), grant privileges to test users">
 			<sql driver="${db.jdbc.driver.class}"
              url="${db.jdbc.baseurl}"
@@ -219,7 +224,6 @@
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
-        <ant antfile="services/build.xml" target="create_db" inheritAll="false"/>
     </target>
 
     <target name="import"
@@ -227,7 +231,7 @@
         <ant antfile="services/build.xml" target="import" inheritAll="false"/>
     </target>
 
-    <target name="deploy" depends="install,setup_jbossds.cfg,setup_cspaceds.cfg"
+    <target name="deploy" depends="install,setup_jbossds.cfg,setup_cspaceds.cfg,setup_initdb.sql"
             description="deploy services in ${jboss.server.cspace}">
         <!-- copy db scripts, etc. -->
 				<copy todir="${jboss.server.cspace}/cspace/services/scripts">
@@ -282,6 +286,22 @@
 			</copy>
     </target>
 
+		<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
+			<copy todir="${jboss.server.cspace}/cspace/services/db">
+        <fileset dir="${src}/main/resources/db"/>
+				<filterset>
+					 <!-- Note: double-subs from ${db.xyz.password} fail -->
+					<filter token="DB_CSPACE_USER" value="${db.cspace.user}" />
+					<filter token="DB_NUXEO_USER" value="${db.nuxeo.user}" />
+					<filter token="DB_JBOSS_USER" value="${db.jboss.user}" />
+				  <filter token="DB_CSPACE_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" />
+					<filter token="DB_NUXEO_PASSWORD" value="${env.DB_PASSWORD_NUXEO}" />
+					<filter token="DB_JBOSS_PASSWORD" value="${env.DB_PASSWORD_JBOSS}" />
+				</filterset>
+			</copy>
+    </target>
+ 		
+ 
 
     <target name="undeploy"
             description="undeploy services from ${jboss.server.cspace}">

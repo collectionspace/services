@@ -8,9 +8,6 @@
     <property file="build.properties" />
     <property name="src" location="src"/>
 
-		<!-- <property name="db" value="mysql"/> -->
-    <property name="db.script.dir" location="${basedir}/db/${db}"/>
-
     <condition property="osfamily-unix">
         <os family="unix" />
     </condition>
