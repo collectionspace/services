@@ -30,6 +30,12 @@ public class QueryContext {
     /** The tenant id. */
     String tenantId;
 
+    static public final String getTenantQualifiedDoctype(QueryContext queryContext, String docType) {
+//    	return queryContext.getTenantId() + "_" + docType;
+    	return docType; //FIXME: Need to use the line above to get a qualified doctype name 
+
+    }
+    
     /**
      * Instantiates a new query context.
      *
@@ -133,6 +139,10 @@ public class QueryContext {
     public String getDocType() {
     	return this.docType;
     }
+    
+    public final String getTenantQualifiedDoctype() {
+    	return QueryContext.getTenantQualifiedDoctype(this, docType);
+    }    
 
     /**
      * Gets the doc type.

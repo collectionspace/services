@@ -52,6 +52,7 @@
             <xs:element name="accountId" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="screenName" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="userId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="tenantId" type="xs:string" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
 

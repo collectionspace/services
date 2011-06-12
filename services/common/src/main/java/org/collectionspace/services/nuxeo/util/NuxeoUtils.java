@@ -351,12 +351,12 @@ public class NuxeoUtils {
      */
     static public final String buildNXQLQuery(QueryContext queryContext) throws Exception {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
-        query.append(queryContext.getDocType());
+        query.append(queryContext.getTenantQualifiedDoctype()); // Nuxeo doctype must be tenant qualified.
         appendNXQLWhere(query, queryContext);
         appendNXQLOrderBy(query, queryContext);
         return query.toString();
     }
-
+    
     /**
      * Builds an NXQL SELECT query across multiple document types.
      *
@@ -365,7 +365,7 @@ public class NuxeoUtils {
      * @return an NXQL query
      */
     static public final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) {
-        StringBuilder query = new StringBuilder("SELECT * FROM ");
+        StringBuilder query = new StringBuilder("SELECT * FROM "); 
         boolean fFirst = true;
         for (String docType : docTypes) {
             if (fFirst) {
@@ -373,7 +373,8 @@ public class NuxeoUtils {
             } else {
                 query.append(",");
             }
-            query.append(docType);
+            String tqDocType = QueryContext.getTenantQualifiedDoctype(queryContext, docType);
+            query.append(tqDocType); // Nuxeo doctype must be tenant qualified.
         }
         appendNXQLWhere(query, queryContext);
         // FIXME add 'order by' clause here, if appropriate

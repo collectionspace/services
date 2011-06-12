@@ -268,7 +268,12 @@ public class JpaStorageUtils {
                 releaseEntityManagerFactory(emf);
             }
         }
-        
+        /*
+         * Add the currentTenantId to the payload so the client knows the current
+         * tenancy.
+         */
+        AccountValue av = result.getAccounts().get(0);
+        av.setTenantId(AuthN.get().getCurrentTenantId());
         return result;
     }
 
