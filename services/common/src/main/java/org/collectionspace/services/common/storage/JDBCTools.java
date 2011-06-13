@@ -26,6 +26,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
 import javax.sql.DataSource;
+import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,7 +43,7 @@ public class JDBCTools {
     final static Logger logger = LoggerFactory.getLogger(JDBCTools.class);
 
     public static Connection getConnection(String repositoryName) throws LoginException, SQLException {
-        if (Tools.isEmpty(repositoryName)) {
+        if (Tools.isBlank(repositoryName)) {
             repositoryName = getDefaultRepositoryName();
         }
         InitialContext ctx = null;
@@ -59,21 +60,31 @@ public class JDBCTools {
             LoginException le = new LoginException("Error looking up DataSource from: " + repositoryName);
             le.initCause(ex);
             throw le;
+        } catch (SQLException e) {
+            throw e;
         } finally {
             if (ctx != null) {
                 try {
                     ctx.close();
                 } catch (Exception e) {
+                    // Do nothing with exception in 'finally' clause.
                 }
             }
         }
     }
-
+    
     public static ResultSet executeQuery(String sql) throws Exception {
+        return executeQuery(sql, getDefaultRepositoryName());
+    }
+
+    public static ResultSet executeQuery(String sql, String repositoryName) throws Exception {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = getConnection(getDefaultRepositoryName());
+            if (Tools.isBlank(repositoryName)) {
+                repositoryName = getDefaultRepositoryName();
+            }
+            conn = getConnection(repositoryName);
             stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             stmt.close();
@@ -99,12 +110,19 @@ public class JDBCTools {
             }
         }
     }
-
+    
     public static int executeUpdate(String sql) throws Exception {
+        return executeUpdate(sql, getDefaultRepositoryName());
+    }
+
+    public static int executeUpdate(String sql, String repositoryName) throws Exception {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = getConnection(getDefaultRepositoryName());
+            if (Tools.isBlank(repositoryName)) {
+                repositoryName = getDefaultRepositoryName();
+            }
+            conn = getConnection(repositoryName);
             stmt = conn.createStatement();
             int rows = stmt.executeUpdate(sql);
             stmt.close();
@@ -140,6 +158,16 @@ public class JDBCTools {
         }
     }
 
+    /**
+     * Returns the database product name, from the metadata for a
+     * JDBC connection to the default repository.
+     * 
+     * Assumes that the database product name will be the same for the
+     * default repository and for all other repositories to which JDBC
+     * connections will be made, through the methods of this class.
+     * 
+     * @return the database product name
+     */
     public static String getDatabaseProductName() {
         String productName = "";
         Connection conn = null;
@@ -160,6 +188,13 @@ public class JDBCTools {
         return productName;
     }
 
+    /**
+     * Returns an enumerated value uniquely identifying the database product type;
+     * e.g. MySQL, PostgreSQL, based on the database product name.
+     * 
+     * @return an enumerated value identifying the database product type
+     * @throws Exception 
+     */
     public static DatabaseProductType getDatabaseProductType() throws Exception {
         DatabaseProductType productType = DatabaseProductType.UNRECOGNIZED;
         String productName = getDatabaseProductName();
@@ -175,5 +210,27 @@ public class JDBCTools {
 
     public static String getDefaultRepositoryName() {
         return ServiceMain.DEFAULT_REPOSITORY_NAME;
+    }
+    
+    public static String getNuxeoRepositoryName() {
+        return ServiceMain.NUXEO_REPOSITORY_NAME;
+    }
+
+    /**
+     * Prints metadata, such as database username and connection URL,
+     * for an open JDBC connection.  This is a utility method for use
+     * during debugging.
+     * 
+     * @param conn an open JDBC Connection
+     * @throws SQLException 
+     */
+    private static void printConnectionMetaData(Connection conn) throws SQLException {
+        if (conn != null) {
+            DatabaseMetaData metadata = conn.getMetaData();
+            // FIXME: Outputs via System.out, rather than Logger, for
+            // cases where this may be called during server startup.
+            System.out.println("username=" + metadata.getUserName());
+            System.out.println("database url=" + metadata.getURL());
+        }
     }
 }

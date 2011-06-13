@@ -56,7 +56,9 @@ public class ServiceMain {
     private static final String DEFAULT_ADMIN_PASSWORD = "Administrator";
     private static final String DEFAULT_READER_PASSWORD = "reader";
     
-    public static String DEFAULT_REPOSITORY_NAME = "CspaceDS";
+    public static final String NUXEO_REPOSITORY_NAME = "NuxeoDS";
+    public static final String CSPACE_REPOSITORY_NAME = "CspaceDS";
+    public static final String DEFAULT_REPOSITORY_NAME = CSPACE_REPOSITORY_NAME;
 
     private ServiceMain() {
     	//empty

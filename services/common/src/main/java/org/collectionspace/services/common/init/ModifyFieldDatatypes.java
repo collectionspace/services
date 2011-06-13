@@ -82,7 +82,16 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                 } else {
                     throw new Exception("Unrecognized database system.");
                 }
-                rows = JDBCTools.executeUpdate(sql);
+                // Assumes field datatypes will only be modified at post-init
+                // time for the Nuxeo repository.
+                // 
+                // To date, for the CSpace repository, field datatypes have
+                // typically been specified during the build process, via
+                // manual or generated DDL SQL scripts.
+                //
+                // If this assumption is no longer valid, we might instead
+                // identify the relevant repository from the table name here.
+                rows = JDBCTools.executeUpdate(sql, JDBCTools.getNuxeoRepositoryName());
             }
         } catch (Exception e) {
             throw e;
@@ -138,7 +147,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         }
 
         try {
-            conn = JDBCTools.getConnection(JDBCTools.getDefaultRepositoryName());
+            conn = JDBCTools.getConnection(JDBCTools.getNuxeoRepositoryName());
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {

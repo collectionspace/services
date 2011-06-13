@@ -131,7 +131,16 @@ public class AddIndices extends InitHandler implements IInitHandler {
                 throw new Exception("Unrecognized database system " + databaseProductType);
             }
             if (sql != null && ! sql.trim().isEmpty()) {
-                rows = JDBCTools.executeUpdate(sql);
+                // Assumes indicies will only be created at post-init time
+                // for the Nuxeo repository.
+                // 
+                // To date, for the CSpace repository, indices have typically been
+                // created during the build process, via manual or generated
+                // DDL SQL scripts.
+                //
+                // If this assumption is no longer valid, we might instead
+                // identify the relevant repository from the table name here.
+                rows = JDBCTools.executeUpdate(sql, JDBCTools.getNuxeoRepositoryName());
                 logger.trace("Index added to column ("+columnName+") on table ("+tableName+")");
             }
             return rows;
@@ -147,8 +156,10 @@ public class AddIndices extends InitHandler implements IInitHandler {
         // FIXME: May need to qualify table name by database/catalog,
         // as table names likely will not be globally unique across same
         // (although index names *may* be unique within scope).
-        // - Pass in database name as parameter, retrieved via
-        //   getDatabaseName(field) in onRepositoryInitialized, above.
+        //
+        // If we do need to do this, we might:
+        // - Pass in the database name as a parameter to this method, retrieved
+        //   via getDatabaseName(field) in onRepositoryInitialized, above.
         // - Add 'IN databaseName' after tableName in MySQL variant, below.
         //   (PostgreSQL variant, below, uses a view that doesn't include
         //   a foreign key for associating a database/catalog to the index.)
@@ -173,7 +184,16 @@ public class AddIndices extends InitHandler implements IInitHandler {
         }
 
         try {
-            conn = JDBCTools.getConnection(JDBCTools.getDefaultRepositoryName());
+            // Assumes indicies will only be created at post-init time
+            // for the Nuxeo repository.
+            // 
+            // To date, for the CSpace repository, indices have typically been
+            // created during the build process, via manual or generated
+            // DDL SQL scripts.
+            //
+            // If this assumption is no longer valid, we might instead
+            // identify the relevant repository from the table name here.
+            conn = JDBCTools.getConnection(JDBCTools.getNuxeoRepositoryName());
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if (rs.last()) {
