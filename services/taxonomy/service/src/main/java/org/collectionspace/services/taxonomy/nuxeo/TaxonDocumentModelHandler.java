@@ -71,11 +71,6 @@ public class TaxonDocumentModelHandler
         super(COMMON_PART_LABEL);
     }
 
-    @Override
-    public String getAuthorityServicePath(){
-        return TaxonomyAuthorityClient.SERVICE_PATH_COMPONENT;    // CSPACE-3932
-    }
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
      */
