@@ -6,7 +6,7 @@
     <dump payloads="false" dumpServiceResult="auto" />
     
     <auths default="admin@core.collectionspace.org">
-       <auth ID="admin@core.collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+       <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
 
     <!-- commenting out... I think this runs from test code anyway...  
