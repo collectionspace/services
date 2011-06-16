@@ -2,7 +2,7 @@
 <xmlReplay>
 	<testGroup ID="HierarchicOrganization" autoDeletePOSTS="true">
 	
-	    <test ID="OrganizationAuth1" auth="admin@collectionspace.org">
+	    <test ID="OrganizationAuth1" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/orgauthorities/</uri>
             <filename>organization/hierarchy/1-authority.xml</filename>

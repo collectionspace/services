@@ -5,8 +5,8 @@
     <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
     <dump payloads="false" dumpServiceResult="auto" />
     
-    <auths default="admin@collectionspace.org">
-       <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+    <auths default="admin@core.collectionspace.org">
+       <auth ID="admin@core.collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
 
     

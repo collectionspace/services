@@ -2,7 +2,7 @@
 <xmlReplay>
 	<testGroup ID="HierarchicLocationTooManyParents" autoDeletePOSTS="true">
 	
-	    <test ID="LocationAuth1" auth="admin@collectionspace.org">
+	    <test ID="LocationAuth1" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/locationauthorities/</uri>
             <filename>location/hierarchy/1-authority.xml</filename>

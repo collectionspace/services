@@ -5,7 +5,7 @@
          For now, use ID="updatePerson"
     -->
     <testGroup ID="person" autoDeletePOSTS="true">
-        <test ID="PersonAuth1" auth="admin@collectionspace.org">
+        <test ID="PersonAuth1" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/personauthorities/</uri>
             <filename>person/personauthorities_common.xml</filename>
@@ -99,7 +99,7 @@
 	</testGroup>
 	
 	<testGroup ID="updatePerson" autoDeletePOSTS="true">
-	    <test ID="PersonAuth1" auth="admin@collectionspace.org">
+	    <test ID="PersonAuth1" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/personauthorities/</uri>
             <filename>person/personauthorities_common.xml</filename>
@@ -239,7 +239,7 @@
 	!-- ========================= POST a person ===================================================== -->
 	
 	<testGroup ID="postPerson" autoDeletePOSTS="true">
-	    <test ID="PersonAuth1" auth="admin@collectionspace.org">
+	    <test ID="PersonAuth1" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/personauthorities/</uri>
             <filename>person/personauthorities_common.xml</filename>
@@ -369,7 +369,7 @@
 	</testGroup>
 	
 	<testGroup ID="PersonAddRelsDeleteRels" autoDeletePOSTS="true">
-	    <test ID="PersonAuth1" auth="admin@collectionspace.org">
+	    <test ID="PersonAuth1" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/personauthorities/</uri>
             <filename>person/personauthorities_common.xml</filename>

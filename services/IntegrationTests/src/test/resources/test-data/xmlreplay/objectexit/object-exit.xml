@@ -2,7 +2,7 @@
 <xmlReplay>
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
-        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
         <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
    
@@ -142,7 +142,7 @@
 
 
     <testGroup ID="repeat" autoDeletePOSTS="true">
-        <test ID="oeRepeat"  auth="admin@collectionspace.org">
+        <test ID="oeRepeat"  auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/objectexit/</uri>
             <part>
@@ -155,7 +155,7 @@
     <!-- ================================================================================ -->
 
      <testGroup ID="CRUDL" autoDeletePOSTS="true">
-         <test ID="oe1"  auth="admin@collectionspace.org">
+         <test ID="oe1"  auth="admin@core.collectionspace.org">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
              <part>
@@ -359,7 +359,7 @@
     <!-- =========== domlist Walk a DOM ================================================ -->
 
     <testGroup ID="domlist" autoDeletePOSTS="true">
-         <test ID="oe1"  auth="admin@collectionspace.org">
+         <test ID="oe1"  auth="admin@core.collectionspace.org">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
              <part>

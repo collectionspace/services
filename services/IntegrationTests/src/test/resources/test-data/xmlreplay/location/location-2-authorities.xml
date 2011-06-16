@@ -2,7 +2,7 @@
 <xmlReplay>
 	<testGroup ID="HierarchicLocation" autoDeletePOSTS="true">
 	
-	    <test ID="LocationAuth1" auth="admin@collectionspace.org">
+	    <test ID="LocationAuth1" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/locationauthorities/</uri>
             <filename>location/hierarchy/1-authority.xml</filename>
@@ -11,13 +11,13 @@
             	<var ID="displayName">LocationAuth1-displayName</var>
             </vars>
         </test>
-        <test ID="GETLocationAuth1" auth="admin@collectionspace.org">
+        <test ID="GETLocationAuth1" auth="admin@core.collectionspace.org">
             <method>GET</method>
             <uri>/cspace-services/locationauthorities/${LocationAuth1.CSID}</uri>
         </test>
         
 	
-	    <test ID="LocationAuth2" auth="admin@collectionspace.org">
+	    <test ID="LocationAuth2" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/locationauthorities/</uri>
             <filename>location/hierarchy/1-authority.xml</filename>
@@ -26,7 +26,7 @@
             	<var ID="displayName">LocationAuth1-displayName</var>
             </vars>
         </test>
-        <test ID="GETLocationAuth2" auth="admin@collectionspace.org">
+        <test ID="GETLocationAuth2" auth="admin@core.collectionspace.org">
             <method>GET</method>
             <uri>/cspace-services/locationauthorities/${LocationAuth2.CSID}</uri>
         </test>

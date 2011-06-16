@@ -33,7 +33,7 @@
   <ns2:account_permission xmlns:ns2="http://collectionspace.org/services/authorization">
     <account>
       <accountId>74bb3d58-a8cb-4367-86da-d48f8fa5aece</accountId>
-      <userId>admin@collectionspace.org</userId>
+      <userId>admin@core.collectionspace.org</userId>
     </account>
     <permission>
       <permRelationshipId>71</permRelationshipId>

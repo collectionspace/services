@@ -2,7 +2,7 @@
 <xmlReplay>
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
-        <auth ID="admin@collectionspace.org">59PnafP1k9rcuGNMxbCfyQ3TphxKBqecsJI2Yv5vrms=</auth>
+        <auth ID="admin@core.collectionspace.org">59PnafP1k9rcuGNMxbCfyQ3TphxKBqecsJI2Yv5vrms=</auth>
         <auth ID="bigbird2010">YmlnYmlyZDIwMTA6YmlnYmlyZDIwMTA=</auth>
     </auths>
     
@@ -21,7 +21,7 @@
         </test>
 
         <!-- should succeed on auth="test" since test is admin user. -->
-        <test ID="dimension2"  auth="admin@collectionspace.org">
+        <test ID="dimension2"  auth="admin@core.collectionspace.org">
             <!-- actually, this one should succeed since "test" is admin, but it fails now. -->
             <expectedCodes>201,403</expectedCodes>
             <method>POST</method>
@@ -37,7 +37,7 @@
 
     <testGroup ID="dimensionCRUDGroup" autoDeletePOSTS="true">
          <!-- should succeed on auth="test" since test is admin user. -->
-         <test ID="dimPOST"  auth="admin@collectionspace.org">
+         <test ID="dimPOST"  auth="admin@core.collectionspace.org">
              <!-- actually, this one should succeed since "test" is admin, but it fails now. -->
              <expectedCodes>201</expectedCodes>
              <method>POST</method>
@@ -48,13 +48,13 @@
              </part>
          </test>
 
-        <test ID="dimGET"  auth="admin@collectionspace.org">
+        <test ID="dimGET"  auth="admin@core.collectionspace.org">
             <!-- actually, this one should succeed since "test" is admin, but it fails now. -->
             <method>GET</method>
             <uri>/cspace-services/dimensions/${dimPOST.CSID}</uri>
         </test>
 
-        <test ID="dimPUT"  auth="admin@collectionspace.org">
+        <test ID="dimPUT"  auth="admin@core.collectionspace.org">
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimPOST.CSID}</uri>
             <part>
@@ -63,7 +63,7 @@
             </part>
         </test>
 
-        <test ID="dimGET2"  auth="admin@collectionspace.org">
+        <test ID="dimGET2"  auth="admin@core.collectionspace.org">
             <method>GET</method>
             <uri>/cspace-services/dimensions/${dimPOST.CSID}</uri>
         </test>
