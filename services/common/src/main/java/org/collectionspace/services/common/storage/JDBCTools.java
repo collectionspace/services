@@ -38,12 +38,17 @@ import java.sql.Statement;
  * $LastChangedDate:  $
  */
 public class JDBCTools {
+    public static String CSPACE_REPOSITORY_NAME = "CspaceDS";
+    public static String NUXEO_REPOSITORY_NAME = "NuxeoDS";
+    public static String DEFAULT_REPOSITORY_NAME = NUXEO_REPOSITORY_NAME;
+    private static String DBProductName = null;
+    private static DatabaseProductType DBProductType = DatabaseProductType.UNRECOGNIZED;
 
     //todo: make sure this will get instantiated in the right order
     final static Logger logger = LoggerFactory.getLogger(JDBCTools.class);
 
     public static Connection getConnection(String repositoryName) throws LoginException, SQLException {
-        if (Tools.isBlank(repositoryName)) {
+        if (Tools.isEmpty(repositoryName)) {
             repositoryName = getDefaultRepositoryName();
         }
         InitialContext ctx = null;
@@ -72,19 +77,13 @@ public class JDBCTools {
             }
         }
     }
-    
-    public static ResultSet executeQuery(String sql) throws Exception {
-        return executeQuery(sql, getDefaultRepositoryName());
-    }
 
-    public static ResultSet executeQuery(String sql, String repositoryName) throws Exception {
+
+    public static ResultSet executeQuery(String repoName, String sql) throws Exception {
         Connection conn = null;
         Statement stmt = null;
         try {
-            if (Tools.isBlank(repositoryName)) {
-                repositoryName = getDefaultRepositoryName();
-            }
-            conn = getConnection(repositoryName);
+            conn = getConnection(repoName);	// If null, uses default
             stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             stmt.close();
@@ -110,19 +109,12 @@ public class JDBCTools {
             }
         }
     }
-    
-    public static int executeUpdate(String sql) throws Exception {
-        return executeUpdate(sql, getDefaultRepositoryName());
-    }
 
-    public static int executeUpdate(String sql, String repositoryName) throws Exception {
+    public static int executeUpdate(String repoName, String sql) throws Exception {
         Connection conn = null;
         Statement stmt = null;
         try {
-            if (Tools.isBlank(repositoryName)) {
-                repositoryName = getDefaultRepositoryName();
-            }
-            conn = getConnection(repositoryName);
+            conn = getConnection(repoName);	// If null, uses default
             stmt = conn.createStatement();
             int rows = stmt.executeUpdate(sql);
             stmt.close();
@@ -169,23 +161,24 @@ public class JDBCTools {
      * @return the database product name
      */
     public static String getDatabaseProductName() {
-        String productName = "";
-        Connection conn = null;
-        try {
-            conn = getConnection(getDefaultRepositoryName());
-            productName = conn.getMetaData().getDatabaseProductName();
-        } catch (Exception e) {
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException sqle) {
-                logger.debug("SQL Exception closing statement/connection in getDatabaseProductName: " + sqle.getLocalizedMessage());
-                return productName;
-            }
-        }
-        return productName;
+    	if(DBProductName==null) {
+	        Connection conn = null;
+	        try {
+	            conn = getConnection(getDefaultRepositoryName());
+	            DBProductName = conn.getMetaData().getDatabaseProductName();
+	        } catch (Exception e) {
+	        } finally {
+	            try {
+	                if (conn != null) {
+	                    conn.close();
+	                }
+	            } catch (SQLException sqle) {
+	                logger.debug("SQL Exception closing statement/connection in getDatabaseProductName: "
+	                		+ sqle.getLocalizedMessage());
+	            }
+	        }
+    	}
+        return DBProductName;
     }
 
     /**
@@ -196,24 +189,22 @@ public class JDBCTools {
      * @throws Exception 
      */
     public static DatabaseProductType getDatabaseProductType() throws Exception {
-        DatabaseProductType productType = DatabaseProductType.UNRECOGNIZED;
-        String productName = getDatabaseProductName();
-        if (productName.matches("(?i).*mysql.*")) {
-            productType = DatabaseProductType.MYSQL;
-        } else if (productName.matches("(?i).*postgresql.*")) {
-            productType = DatabaseProductType.POSTGRESQL;
-        } else {
-            throw new Exception("Unrecognized database system " + productName);
-        }
-        return productType;
+    	if(DBProductType == DatabaseProductType.UNRECOGNIZED) {
+	        String productName = getDatabaseProductName();
+	        if (productName.matches("(?i).*mysql.*")) {
+	        	DBProductType = DatabaseProductType.MYSQL;
+	        } else if (productName.matches("(?i).*postgresql.*")) {
+	        	DBProductType = DatabaseProductType.POSTGRESQL;
+	        } else {
+	            throw new Exception("Unrecognized database system " 
+	            					+ productName);
+	        }
+    	}
+        return DBProductType;
     }
 
     public static String getDefaultRepositoryName() {
-        return ServiceMain.DEFAULT_REPOSITORY_NAME;
-    }
-    
-    public static String getNuxeoRepositoryName() {
-        return ServiceMain.NUXEO_REPOSITORY_NAME;
+        return DEFAULT_REPOSITORY_NAME;
     }
 
     /**
@@ -233,4 +224,5 @@ public class JDBCTools {
             System.out.println("database url=" + metadata.getURL());
         }
     }
+		
 }

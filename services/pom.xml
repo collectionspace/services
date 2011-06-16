@@ -97,6 +97,12 @@
                         </systemProperties>
                     </configuration>
                 </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>properties-maven-plugin</artifactId>
+          <version>1.0-alpha-2</version>
+        </plugin>
+								
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
@@ -342,6 +348,11 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.5</version>
             </dependency>
+						<dependency>
+								<groupId>postgresql</groupId>
+								<artifactId>postgresql</artifactId>
+								<version>8.4-702.jdbc4</version>
+						</dependency>
         </dependencies>
     </dependencyManagement>
 </project>

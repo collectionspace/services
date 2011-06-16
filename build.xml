@@ -218,6 +218,7 @@
              url="${db.jdbc.baseurl}"
              userid="${db.user}"
              password="${db.user.password}"
+						 autocommit="true"
              src="${db.script.dir}/init_db.sql"
              >
             <classpath>

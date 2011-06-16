@@ -162,6 +162,7 @@
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
+				<!-- No longer used
 				<sql driver="${db.jdbc.driver.class}"
              url="${db.jdbc.cspace.url}"
              userid="${db.cspace.user}"
@@ -171,7 +172,6 @@
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
-				<!-- No longer used
 				<sql driver="${db.jdbc.driver.class}"
              url="${db.jdbc.cspace.url}"
              userid="${db.cspace.user}"

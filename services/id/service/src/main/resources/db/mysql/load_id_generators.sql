@@ -40,8 +40,6 @@
  * initial value is '1').
  */
 
-USE `cspace`;
-
 -- ACCESSION_LOT_NUMBER
 
 INSERT INTO `id_generators`

@@ -56,31 +56,31 @@
         <service:classname>org.collectionspace.services.common.init.ModifyFieldDatatypes</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.collectionobjects_common_briefdescriptions</service:table>
+            <service:table>collectionobjects_common_briefdescriptions</service:table>
             <service:col>item</service:col>
             <service:type>LARGETEXT</service:type>
             <service:param />
           </service:field>
           <service:field>
-            <service:table>nuxeo.collectionobjects_common_comments</service:table>
+            <service:table>collectionobjects_common_comments</service:table>
             <service:col>item</service:col>
             <service:type>LARGETEXT</service:type>
             <service:param />
           </service:field>
           <service:field>
-            <service:table>nuxeo.collectionobjects_common_objectproductionreasons</service:table>
+            <service:table>collectionobjects_common_objectproductionreasons</service:table>
             <service:col>item</service:col>
             <service:type>LARGETEXT</service:type>
             <service:param />
           </service:field>
           <service:field>
-            <service:table>nuxeo.collectionobjects_common_ownersreferences</service:table>
+            <service:table>collectionobjects_common_ownersreferences</service:table>
             <service:col>item</service:col>
             <service:type>LARGETEXT</service:type>
             <service:param />
           </service:field>
           <service:field>
-            <service:table>nuxeo.collectionobjects_common_viewersreferences</service:table>
+            <service:table>collectionobjects_common_viewersreferences</service:table>
             <service:col>item</service:col>
             <service:type>LARGETEXT</service:type>
             <service:param />

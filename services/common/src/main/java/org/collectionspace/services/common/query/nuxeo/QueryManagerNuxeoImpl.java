@@ -39,9 +39,15 @@ import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.common.storage.DatabaseProductType;
+import org.collectionspace.services.common.storage.JDBCTools;
 
 public class QueryManagerNuxeoImpl implements IQueryManager {
 	
+	private static String ECM_FULLTEXT_LIKE = 
+		"ecm:fulltext" + SEARCH_TERM_SEPARATOR + IQueryManager.SEARCH_LIKE;
+	private static String SEARCH_LIKE_FORM = null;
+
 	private final Logger logger = LoggerFactory
 			.getLogger(QueryManagerNuxeoImpl.class);
 	
@@ -49,6 +55,22 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern nonWordChars = Pattern.compile("[^\\p{L}\\p{M}\\p{N}_']");
 	private static Pattern unescapedDblQuotes = Pattern.compile("(?<!\\\\)\"");
 	private static Pattern unescapedSingleQuote = Pattern.compile("(?<!\\\\)'");
+	
+	private static String getLikeForm() {
+		if(SEARCH_LIKE_FORM == null) {
+			try {
+				DatabaseProductType type = JDBCTools.getDatabaseProductType();
+				if(type == DatabaseProductType.MYSQL) {
+					SEARCH_LIKE_FORM = IQueryManager.SEARCH_LIKE;
+				} else if(type == DatabaseProductType.POSTGRESQL) {
+					SEARCH_LIKE_FORM = IQueryManager.SEARCH_ILIKE;
+				}
+			} catch (Exception e) {
+				SEARCH_LIKE_FORM = IQueryManager.SEARCH_LIKE;
+			}
+		}
+		return SEARCH_LIKE_FORM;
+	}
 
 	//TODO: This is currently just an example fixed query.  This should eventually be
 	// removed or replaced with a more generic method.
@@ -153,7 +175,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 			throw new RuntimeException("No match field specified.");
 		}
 		String ptClause = field
-			+ IQueryManager.SEARCH_LIKE
+			+ getLikeForm()
 			+ "'%" + unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'") + "%'";
 		return ptClause;
 	}

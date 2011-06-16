@@ -146,6 +146,8 @@
         <filter token="DB_USER" value="${db.cspace.user}" /> <!-- double-sub from ${db.user} fails -->
         <filter token="DB_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" /> <!-- double-sub from ${db.jboss.user.password} fails -->
         <filter token="DB_DIALECT" value="${db.dialect}" />
+        <filter token="CLASS_ID_QUERY" value="${db.spring.acl.classIdentityQuery}" />
+        <filter token="SID_ID_QUERY" value="${db.spring.acl.sidIdentityQuery}" />
         <copy tofile="${dest.hibernate.cfg}" file="${src.hibernate.cfg}" filtering="true"/>
         <copy tofile="${dest.appContext.cfg}" file="${src.appContext.cfg}" filtering="true"/>
     </target>

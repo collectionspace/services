@@ -31,9 +31,9 @@
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="lookupStrategy"/>
         <constructor-arg ref="aclCache"/>
-        <property name="classIdentityQuery" value="SELECT @@IDENTITY"/>
-        <property name="sidIdentityQuery" value="SELECT @@IDENTITY"/>
-    </bean>
+        <property name="classIdentityQuery" value="@CLASS_ID_QUERY@"/>
+        <property name="sidIdentityQuery" value="@SID_ID_QUERY@"/>
+     </bean>
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="@DB_DRIVER_CLASS@"/>

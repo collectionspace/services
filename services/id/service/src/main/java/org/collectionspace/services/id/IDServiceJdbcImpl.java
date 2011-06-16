@@ -939,13 +939,9 @@ public class IDServiceJdbcImpl implements IDService {
 
         logger.debug("> in getJdbcConnection");
         
-        // Providing an empty repository name to getConnection() will cause the
-        // default repository name to be used.
-        final String EMPTY_REPOSITORY_NAME = "";
-
         Connection conn = null;
         try {
-            conn = JDBCTools.getConnection(EMPTY_REPOSITORY_NAME);
+            conn = JDBCTools.getConnection(JDBCTools.NUXEO_REPOSITORY_NAME);
         } catch (LoginException e) {
             throw e;
         } catch (SQLException e) {

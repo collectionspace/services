@@ -30,8 +30,9 @@
         <constructor-arg ref="dataSource"/>
         <constructor-arg ref="lookupStrategy"/>
         <constructor-arg ref="aclCache"/>
-        <property name="classIdentityQuery" value="SELECT @@IDENTITY"/>
-        <property name="sidIdentityQuery" value="SELECT @@IDENTITY"/>
+        <!-- Set query properties for the ${db} db variant -->
+        <property name="classIdentityQuery" value="${db.spring.acl.classIdentityQuery}"/>
+        <property name="sidIdentityQuery" value="${db.spring.acl.sidIdentityQuery}"/>
     </bean>
 
     <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">

@@ -125,7 +125,11 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-        <dependency>
+				<dependency>
+						<groupId>postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+				</dependency>
+         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
         </dependency>

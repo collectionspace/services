@@ -25,14 +25,6 @@
  * $LastChangedDate$
  */
 
--- Will return non-fatal failure result code and error message
--- if this database already exists.
-CREATE DATABASE cspace WITH ENCODING = 'UTF8';
-
--- Explicitly use this database before creating a table within it
--- (only works with scripts executed by the 'psql' client).
-\c cspace;
-
 DROP TABLE IF EXISTS id_generators;
 CREATE TABLE id_generators
 (
@@ -49,10 +41,10 @@ CREATE TABLE id_generators
 );
 
 -- CREATE UNIQUE INDEX csid_idx ON id_generators USING btree (csid);
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS 'BEGIN NEW.modified = now(); RETURN NEW; END;' language 'plpgsql';
 
--- Update the timestamp in the 'modified' field when the record is updated.
-CREATE OR REPLACE RULE update_idgenerators_timestamp AS
-  ON UPDATE TO id_generators
-  DO INSERT INTO id_generators (modified)
-  VALUES (now());
+CREATE TRIGGER update_customer_modtime BEFORE UPDATE
+        ON id_generators FOR EACH ROW EXECUTE PROCEDURE 
+        update_modified_column();
 

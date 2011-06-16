@@ -21,6 +21,7 @@ import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.service.*;
 import org.collectionspace.services.common.storage.JDBCTools;
+import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.types.PropertyItemType;
 import org.collectionspace.services.common.types.PropertyType;
@@ -56,10 +57,6 @@ public class ServiceMain {
     private static final String DEFAULT_ADMIN_PASSWORD = "Administrator";
     private static final String DEFAULT_READER_PASSWORD = "reader";
     
-    public static final String NUXEO_REPOSITORY_NAME = "NuxeoDS";
-    public static final String CSPACE_REPOSITORY_NAME = "CspaceDS";
-    public static final String DEFAULT_REPOSITORY_NAME = CSPACE_REPOSITORY_NAME;
-
     private ServiceMain() {
     	//empty
     }
@@ -176,7 +173,7 @@ public class ServiceMain {
         	conn = getConnection();
         	// First find or create the tenants
         	String queryTenantSQL = 
-        		"SELECT `id`,`name` FROM `tenants`";
+        		"SELECT id,name FROM tenants";
         	stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(queryTenantSQL);
 	        ArrayList<String> existingTenants = new ArrayList<String>();
@@ -195,7 +192,7 @@ public class ServiceMain {
 			rs.close();
 
         	String insertTenantSQL = 
-        		"INSERT INTO `tenants` (`id`,`name`,`created_at`) VALUES (?,?, now())";
+        		"INSERT INTO tenants (id,name,created_at) VALUES (?,?, now())";
         	pstmt = conn.prepareStatement(insertTenantSQL); // create a statement
         	for(String tId : tenantInfo.keySet()) {
         		if(existingTenants.contains(tId)) {
@@ -215,8 +212,8 @@ public class ServiceMain {
         	pstmt.close();
         	// Second find or create the users
         	String queryUserSQL = 
-        		"SELECT `username` FROM `users` WHERE `username` LIKE '"
-        			+TENANT_ADMIN_ACCT_PREFIX+"%' OR `username` LIKE '"
+        		"SELECT username FROM users WHERE username LIKE '"
+        			+TENANT_ADMIN_ACCT_PREFIX+"%' OR username LIKE '"
         			+TENANT_READER_ACCT_PREFIX+"%'";
 			rs = stmt.executeQuery(queryUserSQL);
 	        ArrayList<String> usersInRepo = new ArrayList<String>();
@@ -226,7 +223,7 @@ public class ServiceMain {
 			}
 			rs.close();
         	String insertUserSQL = 
-        		"INSERT INTO `users` (`username`,`passwd`, `created_at`)"
+        		"INSERT INTO users (username,passwd, created_at)"
         		+" VALUES (?,?, now())";
         	pstmt = conn.prepareStatement(insertUserSQL); // create a statement
         	for(String tName : tenantInfo.values()) {
@@ -267,8 +264,8 @@ public class ServiceMain {
         	// Third, create the accounts. Assume that if the users were already there,
         	// then the accounts were as well
             String insertAccountSQL = 
-            	"INSERT INTO `accounts_common` "
-            	+ "(`csid`, `email`, `userid`, `status`, `screen_name`, `created_at`) "
+            	"INSERT INTO accounts_common "
+            	+ "(csid, email, userid, status, screen_name, created_at) "
             	+ "VALUES (?,?,?,'ACTIVE',?, now())";
             Hashtable<String, String> tenantAdminAcctCSIDs = new Hashtable<String, String>();
             Hashtable<String, String> tenantReaderAcctCSIDs = new Hashtable<String, String>();
@@ -314,9 +311,19 @@ public class ServiceMain {
         	pstmt.close();
         	// Fourth, bind accounts to tenants. Assume that if the users were already there,
         	// then the accounts were bound to tenants correctly
-            String insertAccountTenantSQL =
-            	"INSERT INTO `accounts_tenants` (`TENANTS_ACCOUNTSCOMMON_CSID`,`tenant_id`) "
-            	+ "VALUES (?, ?)";
+        	String insertAccountTenantSQL;
+        	DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType();
+        	if (databaseProductType == DatabaseProductType.MYSQL) {
+        		insertAccountTenantSQL =
+        			"INSERT INTO accounts_tenants (TENANTS_ACCOUNTSCOMMON_CSID,tenant_id) "
+        			+ " VALUES(?, ?)";
+        	} else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+        		insertAccountTenantSQL =
+        			"INSERT INTO accounts_tenants (HJID, TENANTS_ACCOUNTSCOMMON_CSID,tenant_id) "
+        			+ " VALUES(nextval('hibernate_sequence'), ?, ?)";
+        	} else {
+        		throw new Exception("Unrecognized database system.");
+        	}
         	pstmt = conn.prepareStatement(insertAccountTenantSQL); // create a statement
         	for(String tId : tenantInfo.keySet()) {
         		String tName = tenantInfo.get(tId);
@@ -345,7 +352,7 @@ public class ServiceMain {
         	// Fifth, fetch and save the default roles
 			String springAdminRoleCSID = null;
         	String querySpringRole = 
-        		"SELECT `csid` from `roles` WHERE `rolename`='"+SPRING_ADMIN_ROLE+"'";
+        		"SELECT csid from roles WHERE rolename='"+SPRING_ADMIN_ROLE+"'";
 			rs = stmt.executeQuery(querySpringRole);
     		if(rs.next()) {
     			springAdminRoleCSID = rs.getString(1);
@@ -355,7 +362,7 @@ public class ServiceMain {
             	}
     		} else {
                 String insertSpringAdminRoleSQL =
-                	"INSERT INTO `roles` (`csid`, `rolename`, `displayName`, `rolegroup`, `created_at`, `tenant_id`) "
+                	"INSERT INTO roles (csid, rolename, displayName, rolegroup, created_at, tenant_id) "
                 	+ "VALUES ('-1', 'ROLE_SPRING_ADMIN', 'SPRING_ADMIN', 'Spring Security Administrator', now(), '0')";
     			stmt.executeUpdate(insertSpringAdminRoleSQL);
     			springAdminRoleCSID = "-1";
@@ -366,7 +373,7 @@ public class ServiceMain {
     		}
         	rs.close();
         	String getRoleCSIDSql =
-        		"SELECT `csid` from `roles` WHERE `tenant_id`=? and `rolename`=?";
+        		"SELECT csid from roles WHERE tenant_id=? and rolename=?";
         	pstmt = conn.prepareStatement(getRoleCSIDSql); // create a statement
         	rs = null;
             Hashtable<String, String> tenantAdminRoleCSIDs = new Hashtable<String, String>();
@@ -408,9 +415,18 @@ public class ServiceMain {
         	pstmt.close();
         	// Sixth, bind the accounts to roles. If the users already existed,
         	// we'll assume they were set up correctly.
-            String insertAccountRoleSQL =
-            	"INSERT INTO `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`)"
-            	+ " VALUES(?, ?, ?, ?, now())";
+					String insertAccountRoleSQL;
+					if (databaseProductType == DatabaseProductType.MYSQL) {
+						insertAccountRoleSQL =
+						"INSERT INTO accounts_roles(account_id, user_id, role_id, role_name, created_at)"
+							+" VALUES(?, ?, ?, ?, now())";
+					} else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+						insertAccountRoleSQL =
+						"INSERT INTO accounts_roles(HJID, account_id, user_id, role_id, role_name, created_at)"
+							+" VALUES(nextval('hibernate_sequence'), ?, ?, ?, ?, now())";
+					} else {
+							throw new Exception("Unrecognized database system.");
+					}
         	if (logger.isDebugEnabled()) {
         		logger.debug("createDefaultAccounts binding accounts to roles with SQL:\n"
         				+insertAccountRoleSQL);
@@ -563,7 +579,7 @@ public class ServiceMain {
     }
 
     private Connection getConnection() throws LoginException, SQLException {
-        return JDBCTools.getConnection(DEFAULT_REPOSITORY_NAME);
+        return JDBCTools.getConnection(JDBCTools.CSPACE_REPOSITORY_NAME);
     }
 
     void retrieveAllWorkspaceIds() throws Exception {

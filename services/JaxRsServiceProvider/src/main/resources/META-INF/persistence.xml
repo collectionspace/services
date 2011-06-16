@@ -15,7 +15,7 @@
         <class>org.collectionspace.services.authorization.Role</class>
         <class>org.collectionspace.services.authorization.AccountRoleRel</class>
         <properties>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+					<property name="hibernate.dialect" value="${db.dialect}"/>
             <property name="hibernate.max_fetch_depth" value="3"/>
             <!--property name="hibernate.hbm2ddl.auto" value="create-drop"/-->
         </properties>

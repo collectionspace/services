@@ -166,6 +166,43 @@ public class JpaStorageUtils {
     	return result;
     }
     
+    private static AccountValue getAccountValue(String csid)
+    	throws DocumentNotFoundException  {
+
+    	try {
+        	//
+        	// If the CSID is null then return the currently logged in user's ID
+        	//
+    		String whereClause;
+    		HashMap<String, Object> params = new HashMap<String, Object>();
+        	if (csid.equals(CS_CURRENT_USER) == true) {
+        		whereClause = "where userId = :userId";
+        		params.put("userId", AuthN.get().getUserId());
+        	} else {
+        		whereClause = "where csid = :csid";
+        		params.put("csid", csid);
+        	}
+
+        	Object account = JpaStorageUtils.getEntity(
+    				"org.collectionspace.services.account.AccountsCommon", whereClause, params);
+    		if (account == null) {
+    			String msg = "User's account not found, csid=" + csid;
+    			throw new DocumentNotFoundException(msg);
+    		}
+        	AccountValue av = new AccountValue();
+        	av.setAccountId((String)JaxbUtils.getValue(account, "getCsid"));
+        	av.setScreenName((String)JaxbUtils.getValue(account, "getScreenName"));
+        	av.setUserId((String)JaxbUtils.getValue(account, "getUserId"));
+            // Add the currentTenantId to the payload so the client knows the current tenancy.
+        	av.setTenantId(AuthN.get().getCurrentTenantId());
+
+    		return av;
+    	} catch (Exception e) {
+    		String msg = "User's account is in invalid state, csid=" + csid;
+    		throw new DocumentNotFoundException(msg);    		
+    	}
+    }
+
     //FIXME: REM - This method should probably be moved to the AccountPermissionDocumemntHandler
     /*
      * This is a prototype for the /accounts/{csid}/permissions GET service call.
@@ -186,7 +223,8 @@ public class JpaStorageUtils {
         // permission -that is, the csid's userId match the currently logged in userId or
     	// that they have read access to the "accounts" resource.
         //
-    	String userId = getUserId(csid);
+    	AccountValue account = getAccountValue(csid);
+    	String userId = account.getUserId();
     	String currentUserId = AuthN.get().getUserId(); 
         if (currentUserId.equalsIgnoreCase(userId) == false) {
 			CSpaceResource res = new URIResourceImpl("accounts", "GET");
@@ -203,49 +241,36 @@ public class JpaStorageUtils {
         AccountPermission result = new AccountPermission();
     	EntityManagerFactory emf = null;
         EntityManager em = null;
-        Iterator<Object[]> tuples = null;
+        Iterator<Object> resultList = null;
         try {
-            StringBuilder queryStrBldr = new StringBuilder("SELECT ar, pr FROM " + AccountRoleRel.class.getName() +
-            		" ar, " + PermissionRoleRel.class.getName() + " pr" +
-            		" WHERE ar.roleId = pr.roleId and ar.userId=" + "'" + userId + "'");
+        	List<AccountValue> accountValues = new ArrayList<AccountValue>();
+        	accountValues.add(account);
+            result.setAccounts(accountValues);
+
+            emf = getEntityManagerFactory();
+            em = emf.createEntityManager();
+           
+            StringBuilder permQueryStrBldr = new StringBuilder(
+            		"SELECT DISTINCT pr FROM " + AccountRoleRel.class.getName() + " ar, " 
+            		+ PermissionRoleRel.class.getName() + " pr"
+            		+ " WHERE ar.roleId = pr.roleId and ar.userId=" + "'" + userId + "'");
             //
             // Filter by the permissionResource param if it is set to something
             //
             if (permissionResource != null && currentResource != null) {
-            	queryStrBldr.append(" and (pr.permissionResource = " + "'" + currentResource + "'" +
+            	permQueryStrBldr.append(" and (pr.permissionResource = " + "'" + currentResource + "'" +
             			" or pr.permissionResource = " + "'" + permissionResource + "'" + ")");
             }
-            //
-            // Add group by clause
-            //
-            queryStrBldr.append(" group by pr.permissionId");
-
-            emf = getEntityManagerFactory();
-            em = emf.createEntityManager();
-            String queryStr = queryStrBldr.toString(); //for debugging
+            String queryStr = permQueryStrBldr.toString(); //for debugging
             Query q = em.createQuery(queryStr);            
-            tuples = q.getResultList().iterator();
-            if (tuples.hasNext()) {
-            	//
-            	// get the first tuple, extract the AccountRoleRel and set the Account value for the result list
-            	//
-            	Object[] tuple = tuples.next();
-            	List<AccountValue> accountValues = new ArrayList<AccountValue>();
-            	accountValues.add(AuthorizationRoleRel.buildAccountValue((AccountRoleRel)tuple[0]));
-            	//
-            	// Since we extracted the first tuple, we need to store the first perm value as well
-            	// before iterating over the rest of the tuples.
-            	//
+            resultList = q.getResultList().iterator();
+
+            if (resultList.hasNext()) {
             	List<PermissionValue> permissionValues = new ArrayList<PermissionValue>();
-            	permissionValues.add(AuthorizationRoleRel.buildPermissionValue((PermissionRoleRel)tuple[1]));
-            	//
-            	// Now finish add the permission values.
-            	//
-	            while (tuples.hasNext()) {
-	            	tuple = tuples.next();
-	            	permissionValues.add(AuthorizationRoleRel.buildPermissionValue((PermissionRoleRel)tuple[1]));
+	            while (resultList.hasNext()) {
+	            	PermissionRoleRel permRolRel = (PermissionRoleRel)resultList.next();
+	            	permissionValues.add(AuthorizationRoleRel.buildPermissionValue(permRolRel));
 	            }
-	            result.setAccounts(accountValues);
 	            result.setPermissions(permissionValues);
             }
         } catch (NoResultException nre) {
@@ -268,12 +293,6 @@ public class JpaStorageUtils {
                 releaseEntityManagerFactory(emf);
             }
         }
-        /*
-         * Add the currentTenantId to the payload so the client knows the current
-         * tenancy.
-         */
-        AccountValue av = result.getAccounts().get(0);
-        av.setTenantId(AuthN.get().getCurrentTenantId());
         return result;
     }
 

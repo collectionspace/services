@@ -15,7 +15,7 @@
 
     <properties>
         <sql.file>account.sql</sql.file>
-        <sql.dir>${basedir}/src/main/resources/db/mysql</sql.dir>
+				<sql.dir>${basedir}/src/main/resources/db</sql.dir>
     </properties>
 
     <dependencies>
@@ -36,7 +36,11 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-        <!-- CollectionSpace dependencies -->
+				<dependency>
+						<groupId>postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+				</dependency>
+         <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.account.jaxb</artifactId>
@@ -74,6 +78,24 @@
             <id>ddl</id>
             <build>
                 <plugins>
+										<plugin>
+											<groupId>org.codehaus.mojo</groupId>
+											<artifactId>properties-maven-plugin</artifactId>
+											<version>1.0-alpha-2</version>
+											<executions>
+												<execution>
+													<phase>initialize</phase>
+													<goals>
+														<goal>read-project-properties</goal>
+													</goals>
+													<configuration>
+														<files>
+															<file>${basedir}/../../../build.properties</file>
+														</files>
+													</configuration>
+												</execution>
+											</executions>
+										</plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>hibernate3-maven-plugin</artifactId>
@@ -107,8 +129,13 @@
                             <dependency>
                                 <groupId>mysql</groupId>
                                 <artifactId>mysql-connector-java</artifactId>
-                                <version>5.1.5</version>
+																<version>5.1.5</version>
                             </dependency>
+														<dependency>
+																<groupId>postgresql</groupId>
+																<artifactId>postgresql</artifactId>
+																<version>8.4-702.jdbc4</version>
+														</dependency>
                         </dependencies>
                     </plugin>
                     <plugin>
@@ -118,7 +145,7 @@
                                 <phase>process-test-resources</phase>
                                 <configuration>
                                     <tasks>
-                                        <copy file="${basedir}/target/hibernate3/sql/${sql.file}" tofile="${sql.dir}/${sql.file}"/>
+																			<copy file="${basedir}/target/hibernate3/sql/${sql.file}" tofile="${sql.dir}/${db}/${sql.file}"/>
                                     </tasks>
                                 </configuration>
                                 <goals>

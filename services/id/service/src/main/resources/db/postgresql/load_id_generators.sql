@@ -40,9 +40,6 @@
  * initial value is '1').
  */
 
--- (Only works with scripts executed by the 'psql' client.)
-\c cspace;
-
 -- ACCESSION_LOT_NUMBER
 
 INSERT INTO id_generators

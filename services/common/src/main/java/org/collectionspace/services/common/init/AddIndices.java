@@ -140,7 +140,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
                 //
                 // If this assumption is no longer valid, we might instead
                 // identify the relevant repository from the table name here.
-                rows = JDBCTools.executeUpdate(sql, JDBCTools.getNuxeoRepositoryName());
+                rows = JDBCTools.executeUpdate(JDBCTools.NUXEO_REPOSITORY_NAME, sql);
                 logger.trace("Index added to column ("+columnName+") on table ("+tableName+")");
             }
             return rows;
@@ -184,7 +184,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
         }
 
         try {
-            // Assumes indicies will only be created at post-init time
+            // Assumes indices will only be created at post-init time
             // for the Nuxeo repository.
             // 
             // To date, for the CSpace repository, indices have typically been
@@ -193,7 +193,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
             //
             // If this assumption is no longer valid, we might instead
             // identify the relevant repository from the table name here.
-            conn = JDBCTools.getConnection(JDBCTools.getNuxeoRepositoryName());
+            conn = JDBCTools.getConnection(JDBCTools.NUXEO_REPOSITORY_NAME);
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if (rs.last()) {

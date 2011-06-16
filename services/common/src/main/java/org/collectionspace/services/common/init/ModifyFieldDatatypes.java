@@ -74,11 +74,13 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                 if (databaseProductType == DatabaseProductType.MYSQL) {
                     logger.info("Modifying field " + field.getTable() + "."
                             + field.getCol() + " to datatype " + datatype);
-                    sql = "ALTER TABLE " + field.getTable() + " MODIFY COLUMN " + field.getCol() + " " + datatype;
+                    sql = "ALTER TABLE " + field.getTable() + " MODIFY COLUMN " 
+                    		+ field.getCol() + " " + datatype;
                 } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
                     logger.info("Modifying field " + field.getTable() + "."
                             + field.getCol() + " to datatype " + datatype);
-                    sql = "ALTER TABLE " + field.getTable() + " ALTER COLUMN " + field.getCol() + " " + datatype;
+                    sql = "ALTER TABLE " + field.getTable() + " ALTER COLUMN " 
+                    		+ field.getCol() + " TYPE " + datatype;
                 } else {
                     throw new Exception("Unrecognized database system.");
                 }
@@ -91,7 +93,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                 //
                 // If this assumption is no longer valid, we might instead
                 // identify the relevant repository from the table name here.
-                rows = JDBCTools.executeUpdate(sql, JDBCTools.getNuxeoRepositoryName());
+                rows = JDBCTools.executeUpdate(JDBCTools.NUXEO_REPOSITORY_NAME, sql);
             }
         } catch (Exception e) {
             throw e;
@@ -147,7 +149,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         }
 
         try {
-            conn = JDBCTools.getConnection(JDBCTools.getNuxeoRepositoryName());
+            conn = JDBCTools.getConnection(JDBCTools.NUXEO_REPOSITORY_NAME);
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {

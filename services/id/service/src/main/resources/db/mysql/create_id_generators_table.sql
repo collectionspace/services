@@ -25,9 +25,6 @@
  * $LastChangedDate$
  */
 
-CREATE DATABASE IF NOT EXISTS `cspace`;
-USE `cspace`;
-
 DROP TABLE IF EXISTS `id_generators`;
 CREATE TABLE `id_generators` (
   `csid`                varchar(80) PRIMARY KEY,

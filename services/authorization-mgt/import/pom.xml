@@ -123,6 +123,10 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+				<dependency>
+						<groupId>postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+				</dependency>
         <dependency>
             <groupId>ch.elca.el4j.modules</groupId>
             <artifactId>module-xml_merge-common</artifactId>
@@ -133,7 +137,29 @@
 
     <build>
         <finalName>cspace-services-authorization-mgt-import</finalName>
+				<filters>
+					<filter>../../../build.properties</filter>
+				</filters>
+				<resources>
+					<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
         <plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>2.5</version>
+						<executions>
+							<execution>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>resources</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -154,6 +180,9 @@
                         <argument>-p</argument>
                         <argument>does_not_matter</argument>
                         <argument>-b</argument>
+												<!-- This should be (Needs testing):
+												<argument>${jboss.server.cspace}</argument>
+												-->
                         <argument>${basedir}/../../common/src/main</argument>
                         <argument>-edir</argument>
                         <argument>${basedir}/target</argument>
@@ -165,8 +194,13 @@
                     <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
-                        <version>5.1.5</version>
+												<version>5.1.5</version>
                     </dependency>
+										<dependency>
+												<groupId>postgresql</groupId>
+												<artifactId>postgresql</artifactId>
+												<version>8.4-702.jdbc4</version>
+										</dependency>
                 </dependencies>
             </plugin>
         </plugins>

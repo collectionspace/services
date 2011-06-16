@@ -32,12 +32,12 @@ public interface IQueryManager {
 	final static String SEARCH_GROUP_CLOSE = ")";
 	final static String SEARCH_TERM_SEPARATOR = " ";
 	final static String SEARCH_LIKE = " LIKE ";
+	final static String SEARCH_ILIKE = " ILIKE ";
     final static String SEARCH_TYPE_KEYWORDS = "keywords";
     final static String SEARCH_TYPE_KEYWORDS_KW = "kw";
     final static String SEARCH_TYPE_PARTIALTERM = "pt";
     final static String SEARCH_TYPE_DOCTYPE = "doctype";
     final static String SEARCH_TYPE_INVOCATION = "inv";
-	final static String ECM_FULLTEXT_LIKE = "ecm:fulltext" + SEARCH_TERM_SEPARATOR + SEARCH_LIKE;
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
 

@@ -366,8 +366,8 @@ public class AuthorizationGen {
 	            rv.setRoleId(role.getCsid());
 	            roleValues.add(rv);
         	} else {
-        		if (logger.isDebugEnabled() == true) {
-        			logger.debug("Role and Permission tenant ID did not match."); //FIXME: REM - Remove this debug statement.
+        		if (logger.isTraceEnabled() == true) {
+        			logger.trace("Role and Permission tenant ID did not match."); //FIXME: REM - Remove this debug statement.
         		}
         	}
         }

@@ -54,7 +54,12 @@
             <artifactId>mysql-connector-java</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- <dependency>
+				<dependency>
+						<groupId>postgresql</groupId>
+						<artifactId>postgresql</artifactId>
+            <scope>test</scope>
+				</dependency>
+         <!-- <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>${project.version}</version>
