@@ -33,6 +33,7 @@
          File below this line have been ported. -->
     <!-- ============================================= -->
     
+    <!--
     <run controlFile="./security.xml" testGroup="deleteBug" />
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
     <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
@@ -48,7 +49,7 @@
     <run controlFile="organization/organization-hierarchy.xml" testGroup="HierarchicOrganization" />
     <run controlFile="batch/batch.xml" />
     <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
-    
+    -->
     
 </xmlReplayMaster>
 
