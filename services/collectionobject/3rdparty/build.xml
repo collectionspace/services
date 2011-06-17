@@ -9,7 +9,6 @@
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
 	<property name="nuxeo-platform-collectionobject" value="nuxeo-platform-collectionobject"/>
-	<property name="nuxeo-platform-collectionobject-core" value="nuxeo-platform-collectionobject-core"/>
 	<property name="nuxeo-platform-collectionobject-hearst" value="nuxeo-platform-collectionobject-hearst"/>
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
@@ -116,28 +115,24 @@
     <target name="deploy" depends="install"
     description="deploy collectionobject in ${jboss.server.nuxeo}">
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="${nuxeo-platform-collectionobject-core}/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="${nuxeo-platform-collectionobject-hearst}/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy collectionobject from ${jboss.server.nuxeo}">
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="${nuxeo-platform-collectionobject-core}/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="${nuxeo-platform-collectionobject-hearst}/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="${nuxeo-platform-collectionobject-core}/build.xml" target="dist" inheritall="false"/>
         <ant antfile="${nuxeo-platform-collectionobject-hearst}/build.xml" target="dist" inheritall="false"/>
     </target>
 
     <target name="dist_installer"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="${nuxeo-platform-collectionobject}/build.xml" target="dist_installer" inheritall="false"/>
-        <ant antfile="${nuxeo-platform-collectionobject-core}/build.xml" target="dist_installer" inheritall="false"/>
         <ant antfile="${nuxeo-platform-collectionobject-hearst}/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 

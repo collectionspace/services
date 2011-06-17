@@ -19,7 +19,6 @@
 
     <modules>
     	<module>nuxeo-platform-collectionobject</module>
-		<module>nuxeo-platform-collectionobject-core</module>
         <module>nuxeo-platform-collectionobject-hearst</module>
     </modules>
 
