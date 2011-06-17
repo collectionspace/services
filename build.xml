@@ -232,7 +232,7 @@
         <ant antfile="services/build.xml" target="import" inheritAll="false"/>
     </target>
 
-    <target name="deploy" depends="install,setup_jbossds.cfg,setup_cspaceds.cfg,setup_initdb.sql"
+    <target name="deploy" depends="install,setup_nuxeo.conf,setup_cspaceds.cfg,setup_initdb.sql"
             description="deploy services in ${jboss.server.cspace}">
         <!-- copy db scripts, etc. -->
 				<copy todir="${jboss.server.cspace}/cspace/services/scripts">
@@ -250,19 +250,13 @@
 
     </target>
 
-		<target name="setup_jbossds.cfg"
-					 description="copy jboss-ds.xml, replacing keywords">
-			<property name="src.jbossds.cfg" value="${src}/main/resources/config/jboss-ds.xml"/>
-			<delete file="${jboss.deploy.cspace}/jboss-ds.xml" failonerror="false" />
-			<copy file="${src.jbossds.cfg}" todir="${jboss.deploy.cspace}">
+		<target name="setup_nuxeo.conf"
+					 description="copy nuxeo.conf, replacing keyword to set DB dialect">
+			<property name="src.nuxeo.conf" value="${src}/main/resources/config/nuxeo.conf"/>
+			<delete file="${jboss.bin}/nuxeo.conf" failonerror="false" />
+			<copy file="${src.nuxeo.conf}" todir="${jboss.bin}">
 				<filterset>
-					<filter token="DB_URL" value="${db.jdbc.jboss.url}" />
-					<filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
-					<filter token="DB_USER" value="${db.jboss.user}" /> <!-- double-sub from ${db.user} fails -->
-					<filter token="DB_PASSWORD" value="${env.DB_PASSWORD_JBOSS}" /> <!-- double-sub from ${db.user.password} fails -->
-					<filter token="DB_DIALECT" value="${db.dialect}" />
-					<filter token="DB_TYPE_MAPPING" value="${db.typemapping}" />
- 					<filter token="DB_EXCEPTION_SORTER" value="${db.exceptionsorter}" />
+					<filter token="DB" value="${db}" />
 				</filterset>
 			</copy>
     </target>

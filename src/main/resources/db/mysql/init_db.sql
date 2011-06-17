@@ -11,12 +11,6 @@ DELETE FROM mysql.user WHERE User = '';
 FLUSH PRIVILEGES;
 
 --
--- recreate jbossdb database
---
-DROP database IF EXISTS jbossdb;
-CREATE database jbossdb;
-
---
 -- recreate cspace database
 --
 DROP database IF EXISTS cspace;
@@ -30,10 +24,8 @@ CREATE database nuxeo DEFAULT CHARACTER SET utf8;
 
 
 --
--- grant privileges to test user on nuxeo and jbossdb databases
+-- grant privileges to users on nuxeo and cspace databases
 --
-GRANT ALL PRIVILEGES ON jbossdb.* TO '@DB_JBOSS_USER@'@'localhost' IDENTIFIED BY '@DB_JBOSS_PASSWORD@' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
 GRANT ALL PRIVILEGES ON cspace.* TO '@DB_CSPACE_USER@'@'localhost' IDENTIFIED BY '@DB_CSPACE_PASSWORD@' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 GRANT ALL PRIVILEGES ON nuxeo.* TO '@DB_NUXEO_USER@'@'localhost' IDENTIFIED BY '@DB_NUXEO_PASSWORD@' WITH GRANT OPTION;
