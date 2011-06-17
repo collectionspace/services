@@ -13,9 +13,9 @@
     <property name="build" location="build"/>
     <property name="dist"  location="dist"/>
     <property name="nuxeo.collectionobject.jar"
-        value="org.collectionspace.services.collectionobject.CollectionObjectTenant1.nuxeo-${cspace.release}.jar"/>
+        value="org.collectionspace.services.collectionobject.3rdparty.CollectionObjectTenant1.nuxeo-${cspace.release}.jar"/>
     <property name="nuxeo.collectionobject.jars.all"
-        value="org.collectionspace.services.collectionobject.CollectionObjectTenant1.nuxeo-*.jar"/>
+        value="org.collectionspace.services.collectionobject.3rdparty.CollectionObjectTenant1.nuxeo-*.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
