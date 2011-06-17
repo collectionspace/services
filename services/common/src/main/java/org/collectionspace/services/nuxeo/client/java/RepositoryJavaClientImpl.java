@@ -19,6 +19,7 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,6 +59,8 @@ import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.client.NuxeoClient;
+import org.nuxeo.ecm.core.schema.SchemaManager;
+import org.nuxeo.runtime.api.Framework;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,10 +126,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
 
-        if (ctx.getDocumentType() == null) {
+    	String docType = NuxeoUtils.getTenantQualifiedDocType(ctx); //ctx.getDocumentType();
+        if (docType == null) {
             throw new IllegalArgumentException(
                     "RepositoryJavaClient.create: docType is missing");
         }
+    	
         if (handler == null) {
             throw new IllegalArgumentException(
                     "RepositoryJavaClient.create: handler is missing");
@@ -147,8 +152,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             //give our own ID so PathRef could be constructed later on
             String id = IdUtils.generateId(UUID.randomUUID().toString());
             // create document model
-            DocumentModel doc = repoSession.createDocumentModel(wspacePath, id,
-                    ctx.getDocumentType());
+            DocumentModel doc = repoSession.createDocumentModel(wspacePath, id, docType);
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.CREATE, wrapDoc);
@@ -248,7 +252,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
-            String query = NuxeoUtils.buildNXQLQuery(queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
             docList = repoSession.query(query, null, 1, 0, false);
             if (docList.size() != 1) {
                 throw new DocumentNotFoundException("No document found matching filter params.");
@@ -343,7 +347,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             repoSession = getRepositorySession();
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
-            String query = NuxeoUtils.buildNXQLQuery(queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
             docList = repoSession.query(query,
                     null, //Filter
                     1, //limit
@@ -610,7 +614,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             handler.prepare(Action.GET_ALL);
             repoSession = getRepositorySession();
             DocumentModelList docList = null;
-            String query = NuxeoUtils.buildNXQLQuery(queryContext);
+            String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Executing NXQL query: " + query.toString());

@@ -32,6 +32,7 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
+import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.security.SecurityContext;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.service.ObjectPartType;
@@ -51,6 +52,8 @@ public interface ServiceContext<IT, OT> {
     public static final String PART_LABEL_SEPARATOR = "_";
     /** The Constant PART_COMMON_LABEL. */
     public static final String PART_COMMON_LABEL = "common";
+    /** Used to qualify document types **/
+	public static final String TENANT_SUFFIX = "Tenant";    
 
     /**
      * getSecurityContext is contains security info. for the service layer
@@ -92,6 +95,18 @@ public interface ServiceContext<IT, OT> {
      * @return service name
      */
     public String getDocumentType();
+    
+    /**
+     * Returns a tenant qualified document type.
+     * 
+     */
+    public String getTenantQualifiedDoctype();
+    
+    /**
+     * Returns a tenant qualified document type.
+     * 
+     */
+    public String getTenantQualifiedDoctype(String docType);
 
     /**
      * setDocumentType sets the name of the Document Type for this service

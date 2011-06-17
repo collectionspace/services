@@ -336,6 +336,21 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         // object.
         return (overrideDocumentType != null) ? overrideDocumentType : serviceBinding.getObject().getName();
     }
+    
+    @Override
+    public String getTenantQualifiedDoctype(String docType) {
+        // If they have not overridden the setting, use the type of the service
+        // object.
+        String result = docType + ServiceContext.TENANT_SUFFIX + this.getTenantId();
+        
+        return result;
+    }
+    
+    @Override
+    public String getTenantQualifiedDoctype() {
+        String docType = (overrideDocumentType != null) ? overrideDocumentType : serviceBinding.getObject().getName();
+    	return getTenantQualifiedDoctype(docType);
+    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#setDocumentType(java.lang.String)

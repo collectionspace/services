@@ -1,7 +1,7 @@
 Manifest-Version: 1.0 
 Bundle-ManifestVersion: 1 
-Bundle-Name: org.collectionspace.collectionobjecttenant1
-Bundle-SymbolicName: org.collectionspace.collectionobjecttenant1;singleton:=true 
+Bundle-Name: org.collectionspace.collectionobject
+Bundle-SymbolicName: org.collectionspace.collectionobject;singleton:=true 
 Bundle-Version: 1.0.0
 Bundle-Localization: plugin
 Bundle-Vendor: Nuxeo 
@@ -9,9 +9,8 @@ Require-Bundle: org.nuxeo.runtime,
  org.nuxeo.ecm.core.api,
  org.nuxeo.ecm.core,
  org.nuxeo.ecm.webapp.core,
- org.collectionspace.collectionspace_core,
- org.collectionspace.collectionobject
-Provide-Package: org.collectionspace.collectionobjecttenant1
+ org.collectionspace.collectionspace_core
+Provide-Package: org.collectionspace.collectionobject
 Nuxeo-Component: OSGI-INF/core-types-contrib.xml,
  OSGI-INF/life-cycle-contrib.xml,
  OSGI-INF/ecm-types-contrib.xml,

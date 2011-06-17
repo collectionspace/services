@@ -18,7 +18,9 @@
     </description>
 
     <modules>
-        <module>nuxeo-platform-cs-collectionobject</module>
+    	<module>nuxeo-platform-collectionobjects_common</module>
+		<module>nuxeo-platform-cs-collectionobject</module>
+        <module>nuxeo-platform-collectionobject-hearst</module>
     </modules>
 
 </project>

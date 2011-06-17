@@ -9,11 +9,11 @@
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <artifactId>org.collectionspace.services.collectionobject.CollectionObjectTenant1.nuxeo</artifactId>
-    <name>services.collectionobject.CollectionObjectTenant1.nuxeo</name>
+    <artifactId>org.collectionspace.services.collectionobject.collectionobjects_common.nuxeo</artifactId>
+    <name>org.collectionspace.services.collectionobject.collectionobjects_common.nuxeo</name>
     <packaging>jar</packaging>
     <description>
-        CollectionObject Nuxeo document type for Tenant ID = "1"
+        CollectionObject Common Nuxeo document type
     </description>
 
     <build>

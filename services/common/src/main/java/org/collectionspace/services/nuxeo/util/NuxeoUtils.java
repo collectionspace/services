@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +35,7 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
@@ -62,9 +64,11 @@ import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
 import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
 
+import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.search.api.client.querymodel.descriptor.QueryModelDescriptor;
 import org.nuxeo.ecm.core.storage.sql.jdbc.ResultSetQueryResult;
 import org.nuxeo.ecm.core.query.sql.NXQL;
+import org.nuxeo.runtime.api.Framework;
 
 
 import org.slf4j.Logger;
@@ -349,9 +353,9 @@ public class NuxeoUtils {
      * @return an NXQL query
      * @throws Exception if supplied values in the query are invalid.
      */
-    static public final String buildNXQLQuery(QueryContext queryContext) throws Exception {
+    static public final String buildNXQLQuery(ServiceContext ctx, QueryContext queryContext) throws Exception {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
-        query.append(queryContext.getTenantQualifiedDoctype()); // Nuxeo doctype must be tenant qualified.
+        query.append(NuxeoUtils.getTenantQualifiedDocType(queryContext)); // Nuxeo doctype must be tenant qualified.
         appendNXQLWhere(query, queryContext);
         appendNXQLOrderBy(query, queryContext);
         return query.toString();
@@ -364,7 +368,7 @@ public class NuxeoUtils {
      * @param queryContext the query context
      * @return an NXQL query
      */
-    static public final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) {
+    static public final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) throws Exception {
         StringBuilder query = new StringBuilder("SELECT * FROM "); 
         boolean fFirst = true;
         for (String docType : docTypes) {
@@ -373,7 +377,7 @@ public class NuxeoUtils {
             } else {
                 query.append(",");
             }
-            String tqDocType = QueryContext.getTenantQualifiedDoctype(queryContext, docType);
+            String tqDocType = getTenantQualifiedDocType(queryContext, docType);
             query.append(tqDocType); // Nuxeo doctype must be tenant qualified.
         }
         appendNXQLWhere(query, queryContext);
@@ -396,7 +400,7 @@ public class NuxeoUtils {
         //
         // Since we're doing a query, we get back a list so we need to make sure there is only
         // a single result since CSID values are supposed to be unique.
-        String query = buildNXQLQuery(queryContext);
+        String query = buildNXQLQuery(ctx, queryContext);
         docModelList = repoSession.query(query);
         long resultSize = docModelList.totalSize();
         if (resultSize == 1) {
@@ -510,5 +514,61 @@ public class NuxeoUtils {
 		}
 			
 		return result;
+    }
+    
+    public static String getTenantQualifiedDocType(ServiceContext ctx, String docType) throws Exception {
+    	String result = docType;
+    	
+		String tenantQualifiedDocType = ctx.getTenantQualifiedDoctype(docType);
+		if (docTypeExists(tenantQualifiedDocType) == true) {
+			result = tenantQualifiedDocType;
+		}
+		
+    	return result;
+    }
+
+    public static String getTenantQualifiedDocType(ServiceContext ctx) {
+    	String result = null;
+    	try {
+    		String docType = ctx.getDocumentType();
+    		result = getTenantQualifiedDocType(ctx, docType);
+    	} catch (Exception e) {
+    		logger.error("Could not get tentant qualified doctype.", e);
+    	}
+    	return result;
+    }
+    
+    public static String getTenantQualifiedDocType(QueryContext queryCtx, String docType) throws Exception {
+    	String result = docType;
+    	
+    	String tenantQualifiedDocType = queryCtx.getTenantQualifiedDoctype();
+		if (docTypeExists(tenantQualifiedDocType) == true) {
+			result = tenantQualifiedDocType;
+		}
+		
+    	return result;
+    }
+    
+    public static String getTenantQualifiedDocType(QueryContext queryCtx) throws Exception {		
+    	return getTenantQualifiedDocType(queryCtx, queryCtx.getDocType());
+    }
+    
+    static private boolean docTypeExists(String docType) throws Exception {
+    	boolean result = false;
+    	
+        SchemaManager schemaManager = null;
+    	try {
+			schemaManager = Framework.getService(org.nuxeo.ecm.core.schema.SchemaManager.class);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			logger.error("Could not get Nuxeo SchemaManager instance.", e1);
+			throw e1;
+		}
+		Set<String> docTypes = schemaManager.getDocumentTypeNamesExtending(docType);
+		if (docTypes != null && docTypes.contains(docType)) {
+			result = true;
+		}
+		
+    	return result;
     }
 }

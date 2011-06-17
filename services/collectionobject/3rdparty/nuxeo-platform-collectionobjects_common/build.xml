@@ -1,7 +1,7 @@
 
-<project name="nuxeo-platform-cs-collectionobject" default="package" basedir=".">
+<project name="nuxeo-platform-collectionobjects_common" default="package" basedir=".">
     <description>
-        collectionobject nuxeo document type
+        CollectionobjectsCommon Nuxeo document type
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>
@@ -13,9 +13,9 @@
     <property name="build" location="build"/>
     <property name="dist"  location="dist"/>
     <property name="nuxeo.collectionobject.jar"
-        value="org.collectionspace.services.collectionobject.CollectionObjectTenant1.nuxeo-${cspace.release}.jar"/>
+        value="org.collectionspace.services.collectionobject.collectionobjects_common.nuxeo-${cspace.release}.jar"/>
     <property name="nuxeo.collectionobject.jars.all"
-        value="org.collectionspace.services.collectionobject.CollectionObjectTenant1.nuxeo-*.jar"/>
+        value="org.collectionspace.services.collectionobject.collectionobjects_common.nuxeo-*.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -117,13 +117,13 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy collectionobject doctype in ${jboss.server.nuxeo}">
+        description="Deploy CollectionObjectsCommon doctype in ${jboss.server.nuxeo}">
         <copy file="${basedir}/target/${nuxeo.collectionobject.jar}"
         todir="${jboss.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy collectionobject doctype from ${jboss.server.nuxeo}">
+        description="Undeploy CollectionObjectsCommon doctype from ${jboss.server.nuxeo}">
         <delete>
             <fileset dir="${jboss.deploy.nuxeo.plugins}">
                 <include name="${nuxeo.collectionobject.jars.all}"/>
@@ -143,7 +143,7 @@
     </target>
 
     <target name="dist_installer"
-    	description="Creates an installer distribution for CollectionObject doctype" depends="package">
+    	description="Creates an installer distribution for CollectionObjectsCommon doctype" depends="package">
         <copy todir="${services.trunk}/${dist.installer.services}/collectionobject/nuxeo">
             <fileset file="${basedir}/target/${nuxeo.collectionobject.jar}"/>
         </copy>
