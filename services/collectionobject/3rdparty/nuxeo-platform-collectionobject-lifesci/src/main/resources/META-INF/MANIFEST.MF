@@ -1,7 +1,7 @@
 Manifest-Version: 1.0 
 Bundle-ManifestVersion: 1 
-Bundle-Name: org.collectionspace.collectionobjecttenant2
-Bundle-SymbolicName: org.collectionspace.collectionobjecttenant2;singleton:=true 
+Bundle-Name: org.collectionspace.collectionobject.lifesci
+Bundle-SymbolicName: org.collectionspace.collectionobject.lifesci;singleton:=true 
 Bundle-Version: 1.0.0
 Bundle-Localization: plugin
 Bundle-Vendor: Nuxeo 
@@ -11,7 +11,7 @@ Require-Bundle: org.nuxeo.runtime,
  org.nuxeo.ecm.webapp.core,
  org.collectionspace.collectionspace_core,
  org.collectionspace.collectionobject
-Provide-Package: org.collectionspace.collectionobjecttenant2
+Provide-Package: org.collectionspace.collectionobject.lifesci
 Nuxeo-Component: OSGI-INF/core-types-contrib.xml,
  OSGI-INF/life-cycle-contrib.xml,
  OSGI-INF/ecm-types-contrib.xml,

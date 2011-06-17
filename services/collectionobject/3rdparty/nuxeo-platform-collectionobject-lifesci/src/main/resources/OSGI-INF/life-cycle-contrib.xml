@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<component name="org.collectionspace.CollectionObjectTenant2.ecm.platform.LifeCycleManagerExtensions">
+<component name="org.collectionspace.collectionobject.lifesci.ecm.platform.LifeCycleManagerExtensions">
 
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">

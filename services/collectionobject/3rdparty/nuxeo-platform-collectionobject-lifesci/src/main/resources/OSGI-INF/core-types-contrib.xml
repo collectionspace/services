@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<component name="org.collectionspace.CollectionObjectTenant2.coreTypes">
+<component name="org.collectionspace.collectionobject.lifesci.coreTypes">
     <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
         <schema name="collectionobjects_naturalhistory" prefix="collectionobjects_naturalhistory" src="schemas/collectionobjects_naturalhistory.xsd"/>
     </extension>

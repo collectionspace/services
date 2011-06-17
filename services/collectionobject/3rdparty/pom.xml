@@ -19,7 +19,7 @@
 
     <modules>
     	<module>nuxeo-platform-collectionobject</module>
-        <module>nuxeo-platform-collectionobject-hearst</module>
+        <module>nuxeo-platform-collectionobject-lifesci</module>
     </modules>
 
 </project>

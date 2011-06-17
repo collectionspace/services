@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 
-<component name="org.collectionspace.CollectionObjectTenant2.layouts.webapp">
+<component name="org.collectionspace.collectionobjects_naturalhistory.layouts.webapp">
 
   <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
     point="layouts">
 
-    <layout name="CollectionObjectTenant2">
+    <layout name="collectionobjects_naturalhistory">
 	<!--
       <templates>
         <template mode="any">/layouts/layout_default_template.xhtml</template>

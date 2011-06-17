@@ -1,7 +1,7 @@
 
-<project name="nuxeo-platform-collectionobject-hearst" default="package" basedir=".">
+<project name="nuxeo-platform-collectionobject-lifesci" default="package" basedir=".">
     <description>
-        Collectionobject nuxeo document type for the Hearst tenant
+        Collectionobject nuxeo document type for the lifesci tenant
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>

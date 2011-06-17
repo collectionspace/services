@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<component name="org.collectionspace.CollectionObjectTenant2.ecm.types">
+<component name="org.collectionspace.collectionobject.lifesci.ecm.types">
   <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
   
     <type id="CollectionObjectTenant2" coretype="CollectionObjectTenant2">
@@ -10,7 +10,7 @@
       <layouts mode="any">
         <layout>heading</layout>
         <layout>collectionspace_core</layout>
-        <layout>CollectionObjectTenant2</layout>
+        <layout>collectionobjects_naturalhistory</layout>
       </layouts>        
     </type>
 
