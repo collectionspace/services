@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+  CollectionObject schema (XSD)
+  
+  Entity  : CollectionObject
+  Part    : Domain - Natural History (example)
+  Used for: Nuxeo EP core document type
+  
+  $LastChangedRevision: 4929 $
+  $LastChangedDate: 2011-06-07 13:26:32 -0700 (Tue, 07 Jun 2011) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/collectionobject/domain/naturalhistory"
+  xmlns="http://collectionspace.org/services/collectionobject/domain/naturalhistory"
+  targetNamespace="http://collectionspace.org/services/collectionobject/domain/naturalhistory"
+  version="0.1">
+
+  <!-- used for testing
+  <xs:element name="nh-string" type="xs:string" />
+  <xs:element name="nh-int" type="xs:int"/>
+  <xs:element name="nh-long" type="xs:long"/>
+  <xs:element name="nh-date" type="xs:dateTime"/>
+  <xs:element name="nh-note" type="xs:string"/>
+  -->
+
+  <!--  These items are being moved to common
+  <xs:element name="fieldCollector" type="xs:string"/>
+  <xs:element name="fieldCollectionDate" type="xs:string"/>
+  <xs:element name="fieldLocPlace" type="xs:string"/>
+  <xs:element name="catalogDate" type="xs:string"/>
+  -->
+
+  <xs:element name="labelHeader" type="xs:string"/>
+  <xs:element name="labelFooter" type="xs:string"/>
+
+  <xs:element name="fieldLocVerbatim" type="xs:string"/>
+  <xs:element name="fieldCollectionDateEarliest" type="xs:string"/>
+  <xs:element name="fieldCollectionDateLatest" type="xs:string"/>
+  <xs:element name="fieldLocLatDecimal" type="xs:string"/>
+  <xs:element name="fieldLocLongDecimal" type="xs:string"/>
+  <xs:element name="fieldLocElevation" type="xs:string"/>
+
+  <!-- These will become contolled lists -->
+  <xs:element name="fieldLocGeodeticDatum" type="xs:string"/>
+  <xs:element name="fieldLocCoordinateSystem" type="xs:string"/>
+  <xs:element name="fieldLocCounty" type="xs:string"/>
+  <xs:element name="fieldLocState" type="xs:string"/>
+  <xs:element name="fieldLocCountry" type="xs:string"/>
+  <xs:element name="fieldLocHigherGeography" type="xs:string"/>
+
+  <xs:element name="taxonomicIdentGroupList" type="taxonomicIdentGroupList"/>
+  <xs:element name="typeSpecimenGroupList" type="typeSpecimenGroupList"/>
+  <xs:element name="fieldCollElevationGroupList" type="fieldCollElevationGroupList"/>
+  <xs:element name="fieldCollDepthGroupList" type="fieldCollDepthGroupList"/>
+  <xs:element name="associatedTaxaGroupList" type="associatedTaxaGroupList"/>
+
+	<xs:complexType name="taxonomicIdentGroupList">
+			<xs:sequence>
+					<xs:element name="taxonomicIdentGroup" type="taxonomicIdentGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+			</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="taxonomicIdentGroup">
+			<xs:sequence>
+					<xs:element name="taxon" type="xs:string"/>
+					<xs:element name="qualifier" type="xs:string"/>
+					<xs:element name="identBy" type="xs:string"/>
+					<xs:element name="identDate" type="xs:string"/>
+					<xs:element name="institution" type="xs:string"/>
+					<xs:element name="identKind" type="xs:string"/>
+					<xs:element name="reference" type="xs:string"/>
+					<xs:element name="refPage" type="xs:string"/>
+					<xs:element name="notes" type="xs:string"/>
+			 </xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="typeSpecimenGroupList">
+			<xs:sequence>
+					<xs:element name="typeSpecimenGroup" type="typeSpecimenGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+			</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="typeSpecimenGroup">
+			<xs:sequence>
+					<xs:element name="kindOfType" type="xs:string"/>
+					<xs:element name="reference" type="xs:string"/>
+					<xs:element name="refPage" type="xs:string"/>
+					<xs:element name="institution" type="xs:string"/>
+					<xs:element name="institutionType" type="xs:string"/>
+					<xs:element name="notes" type="xs:string"/>
+			 </xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="fieldCollElevationGroupList">
+			<xs:sequence>
+					<xs:element name="fieldCollElevationGroup" type="fieldCollElevationGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+			</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="fieldCollElevationGroup">
+			<xs:sequence>
+					<xs:element name="minElevation" type="xs:integer"/>
+					<xs:element name="maxElevation" type="xs:integer"/>
+					<xs:element name="units" type="xs:string"/>
+					<xs:element name="qualifier" type="xs:string"/>
+					<xs:element name="notes" type="xs:string"/>
+			 </xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="fieldCollDepthGroupList">
+			<xs:sequence>
+					<xs:element name="fieldCollDepthGroup" type="fieldCollDepthGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+			</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="fieldCollDepthGroup">
+			<xs:sequence>
+					<xs:element name="minDepth" type="xs:integer"/>
+					<xs:element name="maxDepth" type="xs:integer"/>
+					<xs:element name="units" type="xs:string"/>
+					<xs:element name="qualifier" type="xs:string"/>
+					<xs:element name="notes" type="xs:string"/>
+			 </xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="associatedTaxaGroupList">
+			<xs:sequence>
+					<xs:element name="associatedTaxaGroup" type="associatedTaxaGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+			</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="associatedTaxaGroup">
+			<xs:sequence>
+					<xs:element name="taxon" type="xs:string"/>
+					<xs:element name="commonName" type="xs:integer"/>
+					<xs:element name="interaction" type="xs:integer"/>
+			 </xs:sequence>
+	</xs:complexType>
+
+</xs:schema>
