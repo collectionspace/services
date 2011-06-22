@@ -403,15 +403,21 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
             if (code == 0){
                 code = Response.Status.BAD_REQUEST.getStatusCode();
             }
-            return new WebApplicationException(e, code);
+            // CSPACE-1110
+            response = Response.status(code).entity(serviceMsg + e.getMessage()).type("text/plain").build();
+            // return new WebApplicationException(e, code);
+            return new WebApplicationException(response);
 
         } else if (e instanceof DocumentException){
             int code = ((DocumentException) e).getErrorCode();
             if (code == 0){
                code = Response.Status.BAD_REQUEST.getStatusCode();
             }
-            return new WebApplicationException(e, code);
-
+            // CSPACE-1110
+            response = Response.status(code).entity(serviceMsg + e.getMessage()).type("text/plain").build();
+            // return new WebApplicationException(e, code);
+             return new WebApplicationException(response);
+           
         } else if (e instanceof WebApplicationException) {
             // subresource may have already thrown this exception
             // so just pass it on
