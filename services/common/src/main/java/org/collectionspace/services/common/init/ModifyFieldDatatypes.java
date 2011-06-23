@@ -202,7 +202,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
     private String getTableName(Field field) {
         String tableName = "";
         String[] databaseAndTableNames = field.getTable().split("\\.", 2);
-        if (! databaseAndTableNames[1].isEmpty()) {
+        if (databaseAndTableNames.length>1 && !databaseAndTableNames[1].isEmpty()) {
             tableName = databaseAndTableNames[1];
         } else {
             tableName = field.getTable();

@@ -79,6 +79,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
 
     final Logger logger = LoggerFactory.getLogger(AddIndices.class);
     private final static String INDEX_SUFFIX = "_idx";
+    private final static String INDEX_SEP = "_";
 
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */
@@ -108,10 +109,10 @@ public class AddIndices extends InitHandler implements IInitHandler {
     private int addOneIndex(String tableName, String columnName){
         int rows = 0;
         String sql = "";
-        String indexName = columnName + INDEX_SUFFIX;
+        String indexName = tableName + INDEX_SEP + columnName + INDEX_SUFFIX;
         try {
             DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType();
-            if (indexExists(databaseProductType, tableName, indexName)) {
+            if (indexExists(databaseProductType, tableName, columnName, indexName)) {
                 logger.trace("Index already exists for column " + columnName
                         + " in table " + tableName);
                 // FIXME: Can add the option to drop and re-create an index here.
@@ -121,12 +122,11 @@ public class AddIndices extends InitHandler implements IInitHandler {
             // TODO: Consider refactoring this 'if' statement to a general-purpose
             // mechanism for retrieving and populating catalog/DDL-type SQL statements
             // appropriate to a particular database product.
-            if (databaseProductType == DatabaseProductType.MYSQL) {
-                 logger.info("Creating index for column " + columnName + " in table " + tableName);
-                 sql = "CREATE INDEX " + indexName + " ON " + tableName + " (" + columnName + ")";
-            } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-                 logger.info("Creating index for column " + columnName + " in table " + tableName);
-                 sql = "CREATE INDEX ON " + tableName + " (" + columnName + ")";
+            logger.info("Creating index for column " + columnName + " in table " + tableName);
+            if (databaseProductType == DatabaseProductType.MYSQL
+            		|| databaseProductType == DatabaseProductType.POSTGRESQL) {
+                 sql = "CREATE INDEX " + indexName + " ON " 
+                 		+ tableName + " (" + columnName + ")";
             } else {
                 throw new Exception("Unrecognized database system " + databaseProductType);
             }
@@ -151,7 +151,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
     }
 
     private boolean indexExists(DatabaseProductType databaseProductType,
-            String tableName, String indexName) {
+            String tableName, String colName, String indexName) {
         
         // FIXME: May need to qualify table name by database/catalog,
         // as table names likely will not be globally unique across same
@@ -169,7 +169,6 @@ public class AddIndices extends InitHandler implements IInitHandler {
         // java.sql.DatabaseMetaData.getIndexInfo()
         
         boolean indexExists = false;
-        int rows = 0;
         String sql = "";
         Connection conn = null;
         Statement stmt = null;
@@ -178,9 +177,10 @@ public class AddIndices extends InitHandler implements IInitHandler {
         if (databaseProductType == DatabaseProductType.MYSQL) {
             sql = "SHOW INDEX FROM " + tableName + " WHERE key_name='" + indexName + "'";
         } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+        	// We want to see if any index on that column exists, not just ours...
             sql = "SELECT indexname FROM pg_catalog.pg_indexes "
-                    + "WHERE indexname = '" + indexName + "'"
-                    + " AND tablename = '" + tableName + "'";
+                    + "WHERE tablename = '" + tableName 
+                    + "' AND indexdef ILIKE '%("+colName+")'";
         }
 
         try {
@@ -196,15 +196,12 @@ public class AddIndices extends InitHandler implements IInitHandler {
             conn = JDBCTools.getConnection(JDBCTools.NUXEO_REPOSITORY_NAME);
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
-            if (rs.last()) {
-               rows = rs.getRow();
+            if (rs.next()) {
+                indexExists = true;
             }
             rs.close();
             stmt.close();
             conn.close();
-            if (rows > 0) {
-                indexExists = true;
-            }
         } catch (Exception e) {
             logger.debug("Error when identifying whether index exists in table "
                     + tableName + ":" + e.getMessage());

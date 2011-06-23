@@ -844,11 +844,11 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.vocabularies_common</service:table>
+            <service:table>vocabularies_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.vocabularies_common</service:table>
+            <service:table>vocabularies_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -894,15 +894,15 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.vocabularyitems_common</service:table>
+            <service:table>vocabularyitems_common</service:table>
             <service:col>inauthority</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.vocabularyitems_common</service:table>
+            <service:table>vocabularyitems_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.vocabularyitems_common</service:table>
+            <service:table>vocabularyitems_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -941,11 +941,11 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.orgauthorities_common</service:table>
+            <service:table>orgauthorities_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.orgauthorities_common</service:table>
+            <service:table>orgauthorities_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -988,15 +988,15 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.organizations_common</service:table>
+            <service:table>organizations_common</service:table>
             <service:col>inauthority</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.organizations_common</service:table>
+            <service:table>organizations_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.organizations_common</service:table>
+            <service:table>organizations_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -1048,11 +1048,11 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.personauthorities_common</service:table>
+            <service:table>personauthorities_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.personauthorities_common</service:table>
+            <service:table>personauthorities_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -1092,15 +1092,15 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.persons_common</service:table>
+            <service:table>persons_common</service:table>
             <service:col>inauthority</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.persons_common</service:table>
+            <service:table>persons_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.persons_common</service:table>
+            <service:table>persons_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -1149,11 +1149,11 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.locationauthorities_common</service:table>
+            <service:table>locationauthorities_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.locationauthorities_common</service:table>
+            <service:table>locationauthorities_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -1189,15 +1189,15 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.locations_common</service:table>
+            <service:table>locations_common</service:table>
             <service:col>inauthority</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.locations_common</service:table>
+            <service:table>locations_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.locations_common</service:table>
+            <service:table>locations_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -1245,11 +1245,11 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.taxonomyauthority_common</service:table>
+            <service:table>taxonomyauthority_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.taxonomyauthority_common</service:table>
+            <service:table>taxonomyauthority_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -1285,15 +1285,15 @@
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
           <service:field>
-            <service:table>nuxeo.taxon_common</service:table>
+            <service:table>taxon_common</service:table>
             <service:col>inauthority</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.taxon_common</service:table>
+            <service:table>taxon_common</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
-            <service:table>nuxeo.taxon_common</service:table>
+            <service:table>taxon_common</service:table>
             <service:col>shortidentifier</service:col>
           </service:field>
         </service:params>
@@ -1413,6 +1413,15 @@
           <types:value>predicateDisplayName</types:value>
         </types:item>
       </service:properties>
+      <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
+        <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+        <service:params>
+          <service:field>
+            <service:table>relations_common</service:table>
+            <service:param>documentid1,documentid2</service:param>
+          </service:field>
+        </service:params>
+      </service:initHandler>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Relation" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="relations-system" updated="" order="0">
           <service:content contentType="application/xml">
