@@ -109,7 +109,8 @@
     <target name="deploy" depends="install"
     description="deploy imports service">
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
-        <copy todir="${jboss.server.cspace}/cspace/config/services/resources/templates">
+    	<!-- REM - This logic should be pushed down into the "service" module -->
+    	<copy todir="${jboss.server.cspace}/cspace/config/services/resources/templates">
             <fileset dir="${basedir}/service/src/main/resources/templates"/>
         </copy>
     </target>

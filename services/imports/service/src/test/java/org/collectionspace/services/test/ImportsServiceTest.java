@@ -45,6 +45,7 @@ public class ImportsServiceTest {
     //These paths won't work when deployed in jboss, but they will work in the build in the source tree, which is what this test is for.
     public static final String TEMPLATES_REL_DIR_TO_MODULE = "./src/main/resources/templates";
     public static final String REQUESTS_REL_DIR_TO_MODULE = "./src/test/resources/requests";
+    public static final String BOGUS_TENANT_ID = "-1";
 
     /** this test just attempts to expand a single file upload to nuxeo's import/export file/directory format,
      *   but does not do the import, so that this test may be run without a nuxeo instance running.
@@ -58,7 +59,7 @@ public class ImportsServiceTest {
 
         String xmlPayload = FileTools.readFile(REQUESTS_DIR,"authority-request.xml");
         InputSource inputSource = ImportsResource.payloadToInputSource(xmlPayload);
-        ImportsResource.expandXmlPayloadToDir(inputSource, TEMPLATE_DIR, outputDir);
+        ImportsResource.expandXmlPayloadToDir(BOGUS_TENANT_ID, inputSource, TEMPLATE_DIR, outputDir);
 
         //TODO: inspect dir, then *cleanup*!!
     }

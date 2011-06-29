@@ -32,6 +32,9 @@ import org.collectionspace.services.common.XmlSaxFragmenter;
 import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.hibernate.sql.Template;
@@ -62,7 +65,7 @@ public class TemplateExpander {
         return Tools.searchAndReplace(source, var(theVar), replace);
     }
 
-    public static String doOneService(String outDir, String partTmpl, String wrapperTmpl,
+    public static String doOneService(String tenantId, String outDir, String partTmpl, String wrapperTmpl,
                                       String SERVICE_TYPE, String SERVICE_NAME, String CSID) throws Exception {
         String docID;
         if (Tools.notBlank(CSID)){
@@ -74,9 +77,13 @@ public class TemplateExpander {
 
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("Schema"), part);
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("docID"), docID);
+        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("tenantID"), tenantId);
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("ServiceType"), SERVICE_TYPE);
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("ServiceName"), SERVICE_NAME);
         //TODO: set timestamp via creating a ${created} variable.
+        String nowTime = GregorianCalendarDateTimeUtils.timestampUTC();
+        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("createdDate"), nowTime);
+        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("updatedDate"), nowTime);
 
         String serviceDir = outDir+'/'+docID;
         FileTools.saveFile(serviceDir, "document.xml", wrapperTmpl, true/*true=create parent dirs*/);
@@ -96,24 +103,26 @@ public class TemplateExpander {
      * @param CSID An optional parameter which forces the document CSID, otherwise the CSID is set to a random UUID.
      * @throws Exception
      */
-    public static void createDocInWorkspace(String partTmpl,
-                                            String SERVICE_NAME,
-                                            String SERVICE_TYPE,
-                                            String TEMPLATE_DIR,
-                                            String OUTPUT_DIR,
-                                            String CSID) throws Exception {
+    public static void createDocInWorkspace(
+    		String tenantId,
+            String partTmpl,
+            String SERVICE_NAME,
+            String SERVICE_TYPE,
+            String TEMPLATE_DIR,
+            String OUTPUT_DIR,
+            String CSID) throws Exception {
         String wrapperTmpl = FileTools.readFile(TEMPLATE_DIR,"service-document.xml");
         String outputDir = OUTPUT_DIR+'/'+SERVICE_NAME;
-        doOneService(outputDir, partTmpl, wrapperTmpl, SERVICE_TYPE, SERVICE_NAME, CSID);
+        doOneService(tenantId, outputDir, partTmpl, wrapperTmpl, SERVICE_TYPE, SERVICE_NAME, CSID);
     }
 
-    public static void expand(String TEMPLATE_DIR, String outputDir, String requestFilename, String chopPath){
-        FragmentHandlerImpl callback = new FragmentHandlerImpl(TEMPLATE_DIR, outputDir);
+    public static void expand(String tenantId, String TEMPLATE_DIR, String outputDir, String requestFilename, String chopPath){
+        FragmentHandlerImpl callback = new FragmentHandlerImpl(tenantId, TEMPLATE_DIR, outputDir);
         XmlSaxFragmenter.parse(requestFilename, chopPath, callback, false);
     }
 
-    public static void expandInputSource(String TEMPLATE_DIR, String outputDir, InputSource requestSource, String chopPath){
-        FragmentHandlerImpl callback = new FragmentHandlerImpl(TEMPLATE_DIR, outputDir);
+    public static void expandInputSource(String tenantId, String TEMPLATE_DIR, String outputDir, InputSource requestSource, String chopPath){
+        FragmentHandlerImpl callback = new FragmentHandlerImpl(tenantId, TEMPLATE_DIR, outputDir);
         XmlSaxFragmenter.parse(requestSource, chopPath, callback, false);
     }
 
@@ -124,14 +133,21 @@ public class TemplateExpander {
      *      &lt;import ID="1" service="Personauthorities" type="Personauthority">
      */
     public static class FragmentHandlerImpl implements IFragmentHandler {
+        public String SERVICE_NAME = "";   //You can provide a default.
+        public String SERVICE_TYPE = "";   //You can provide a default.
+        public String TEMPLATE_DIR = "";   //You MUST provide a default via constructor.
+        public String OUPUT_DIR = "";      //You MUST provide a default via constructor.
+        public String TENANT_ID = "";
+
         //============IFragmentHandler===========================================================
         public void onFragmentReady(Document context, Element fragmentParent, String currentPath, int fragmentIndex, String fragment){
             try {
                 dump(context, currentPath, fragmentIndex, fragment);
                 String serviceName = checkAttribute(fragmentParent, "service", SERVICE_NAME);
                 String serviceType = checkAttribute(fragmentParent, "type", SERVICE_TYPE);
+                serviceType = NuxeoUtils.getTenantQualifiedDocType(TENANT_ID, serviceType); //REM - Ensure a tenant qualified Nuxeo doctype
                 String CSID  = fragmentParent.attributeValue("CSID");
-                TemplateExpander.createDocInWorkspace(fragment, serviceName, serviceType, TEMPLATE_DIR, OUPUT_DIR, CSID);
+                TemplateExpander.createDocInWorkspace(TENANT_ID, fragment, serviceName, serviceType, TEMPLATE_DIR, OUPUT_DIR, CSID);
             } catch (Exception e){
                 System.err.println("ERROR calling expandXmlPayloadToDir"+e);
                 e.printStackTrace();
@@ -141,14 +157,11 @@ public class TemplateExpander {
             System.out.println("====TemplateExpander DONE============\r\n"+ XmlTools.prettyPrint(document)+"================");
         }
         //============helper methods==============================================================
-        public FragmentHandlerImpl(String templateDir, String outputDir){
+        public FragmentHandlerImpl(String tenantId, String templateDir, String outputDir){
             TEMPLATE_DIR = templateDir;
             OUPUT_DIR = outputDir;
+            TENANT_ID = tenantId;
         }
-        public String SERVICE_NAME = "";   //You can provide a default.
-        public String SERVICE_TYPE = "";   //You can provide a default.
-        public String TEMPLATE_DIR = "";   //You MUST provide a default via constructor.
-        public String OUPUT_DIR = "";      //You MUST provide a default via constructor.
         private String checkAttribute(Element fragmentParent, String attName, String defaultVal){
             String val = fragmentParent.attributeValue(attName);
             if (Tools.notEmpty(val)){

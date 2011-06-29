@@ -836,7 +836,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             repoSession = getRepositorySession();
             DocumentRef parentDocRef = new PathRef(
                     "/" + domainName
-                    + "/" + "workspaces");
+                    + "/" + NuxeoUtils.WORKSPACES);
             DocumentModel parentDoc = repoSession.getDocument(parentDocRef);
             DocumentModel doc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
                     workspaceName, "Workspace");
@@ -874,7 +874,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             repoSession = getRepositorySession();
             DocumentRef docRef = new PathRef(
                     "/" + tenantDomain
-                    + "/" + "workspaces"
+                    + "/" + NuxeoUtils.WORKSPACES
                     + "/" + workspaceName);
             DocumentModel workspace = repoSession.getDocument(docRef);
             workspaceId = workspace.getId();

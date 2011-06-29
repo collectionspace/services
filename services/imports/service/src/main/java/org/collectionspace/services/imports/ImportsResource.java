@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.imports;
 
+import org.collectionspace.services.common.ConfigurationException;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMain;
@@ -31,7 +32,12 @@ import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.api.ZipTools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.tenant.RepositoryDomainType;
+import org.collectionspace.services.common.tenant.TenantBindingType;
+import org.collectionspace.authentication.AuthN;
+
 import org.collectionspace.services.imports.nuxeo.ImportCommand;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.xml.sax.InputSource;
@@ -65,6 +71,29 @@ public class ImportsResource extends ResourceBase {
     
     public static final String SERVICE_PATH = "imports";
     public static final String SERVICE_NAME = "imports";
+    
+    /*
+     * ASSUMPTION: All Nuxeo services of a given tenancy store their stuff in the same repository domain under
+     * the "workspaces" directory.
+     * 
+     * Using the tenant ID of the currently authenticated user, this method returns the repository domain name of the
+     * current tenancy.
+     */
+    private static String getWorkspaces() throws ConfigurationException {
+    	String result = null;
+    	
+    	TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+    	TenantBindingType tenantBinding = tReader.getTenantBinding(AuthN.get().getCurrentTenantId());
+    	List<RepositoryDomainType> repositoryDomainList = tenantBinding.getRepositoryDomain();
+    	if (repositoryDomainList.size() == 1) {
+        	String domainName = repositoryDomainList.get(0).getStorageName().trim();
+        	result = "/" + domainName + "/" + NuxeoUtils.WORKSPACES;    		
+    	} else {
+    		throw new ConfigurationException("Tenant bindings contains 0 or more than 1 repository domains.");
+    	}
+    	
+    	return result;
+    }
     
     @Override
     public String getServiceName(){
@@ -145,15 +174,17 @@ public class ImportsResource extends ResourceBase {
     }
 
     public static String createFromInputSource(InputSource inputSource) throws Exception {
+    	String tenantId = AuthN.get().getCurrentTenantId();
         // We must expand the request and wrap it with all kinds of Nuxeo baggage, which expandXmlPayloadToDir knows how to do.
         String outputDir = FileTools.createTmpDir("imports-").getCanonicalPath();
         File outpd = new File(outputDir);
         outpd.mkdirs();
-        expandXmlPayloadToDir(inputSource, getTemplateDir(), outpd.getCanonicalPath());
+        expandXmlPayloadToDir(tenantId, inputSource, getTemplateDir(), outpd.getCanonicalPath());
 
         // Next, call the nuxeo import service, pointing it to our local directory that has the expanded request.
         ImportCommand importCommand = new ImportCommand();
-        String destWorkspaces = "/default-domain/workspaces";
+//        String destWorkspaces = "/default-domain/workspaces";
+        String destWorkspaces = getWorkspaces();
         String report = "NORESULTS";
         try {
             report = importCommand.run(outputDir, destWorkspaces);
@@ -165,15 +196,17 @@ public class ImportsResource extends ResourceBase {
     }
 
     public static String createFromFilename(String filename) throws Exception {
+    	String tenantId = AuthN.get().getCurrentTenantId();
          // We must expand the request and wrap it with all kinds of Nuxeo baggage, which expandXmlPayloadToDir knows how to do.
          String outputDir = FileTools.createTmpDir("imports-").getCanonicalPath();
          File outpd = new File(outputDir);
          outpd.mkdirs();
-         expandXmlPayloadToDir(filename, getTemplateDir(), outpd.getCanonicalPath());
+         expandXmlPayloadToDir(tenantId, filename, getTemplateDir(), outpd.getCanonicalPath());
 
          // Next, call the nuxeo import service, pointing it to our local directory that has the expanded request.
          ImportCommand importCommand = new ImportCommand();
-         String destWorkspaces = "/default-domain/workspaces";
+//         String destWorkspaces = "/default-domain/workspaces";
+         String destWorkspaces = getWorkspaces();
          String report = importCommand.run(outputDir, destWorkspaces);
          String result = "<?xml ?><import><msg>SUCCESS</msg><report></report>"+report+"</import>";
          return result;
@@ -206,13 +239,13 @@ public class ImportsResource extends ResourceBase {
         return requestFilename;
     }
 
-    public static void expandXmlPayloadToDir(String inputFilename, String templateDir, String outputDir) throws Exception {
+    public static void expandXmlPayloadToDir(String tenantId, String inputFilename, String templateDir, String outputDir) throws Exception {
      System.out.println("############## TEMPLATE_DIR: "+templateDir);
         System.out.println("############## OUTPUT_DIR:"+outputDir);
         File file = new File(inputFilename);
         FileInputStream is = new FileInputStream(file);
         InputSource inputSource = new InputSource(is);
-        TemplateExpander.expandInputSource(templateDir, outputDir, inputSource, "/imports/import");
+        TemplateExpander.expandInputSource(tenantId, templateDir, outputDir, inputSource, "/imports/import");
     }
 
     /** This method may be called statically from outside this class; there is a test call in
@@ -224,10 +257,10 @@ public class ImportsResource extends ResourceBase {
      * @param templateDir  The local directory where templates are to be found at runtime.
      * @param outputDir    The local directory where expanded files and directories are found, ready to be passed to the Nuxeo importer.
      */
-    public static void expandXmlPayloadToDir(InputSource inputSource, String templateDir, String outputDir) throws Exception {
+    public static void expandXmlPayloadToDir(String tenantId, InputSource inputSource, String templateDir, String outputDir) throws Exception {
         System.out.println("############## TEMPLATE_DIR: "+templateDir);
         System.out.println("############## OUTPUT_DIR:"+outputDir);
-        TemplateExpander.expandInputSource(templateDir, outputDir, inputSource, "/imports/import");
+        TemplateExpander.expandInputSource(tenantId, templateDir, outputDir, inputSource, "/imports/import");
         //TemplateExpander.expandInputSource(templateDir, outputDir, inputFilename, "/imports/import");
     }
 

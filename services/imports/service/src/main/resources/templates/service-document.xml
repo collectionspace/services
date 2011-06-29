@@ -36,9 +36,9 @@
     <size/>
   </schema>
   <schema xmlns:collectionspace_core="http://collectionspace.org/collectionspace_core/" name="collectionspace_core">
-    <collectionspace_core:updatedAt>2011-03-05T00:06:17Z</collectionspace_core:updatedAt>
-    <collectionspace_core:createdAt>2011-03-05T00:06:17Z</collectionspace_core:createdAt>
-    <collectionspace_core:tenantId>1</collectionspace_core:tenantId>
+    <collectionspace_core:updatedAt>${updatedDate}</collectionspace_core:updatedAt>
+    <collectionspace_core:createdAt>${createdDate}</collectionspace_core:createdAt>
+    <collectionspace_core:tenantId>${tenantID}</collectionspace_core:tenantId>
   </schema>
   ${Schema}
 </document>
