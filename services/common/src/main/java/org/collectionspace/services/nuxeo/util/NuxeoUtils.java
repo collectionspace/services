@@ -34,6 +34,7 @@ import java.util.regex.PatternSyntaxException;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -85,6 +86,7 @@ public class NuxeoUtils {
     // Base document type in Nuxeo is "Document"
     //
     public static final String BASE_DOCUMENT_TYPE = "Document";
+    public static final String WORKSPACES = "workspaces";
     
     // Regular expressions pattern for identifying valid ORDER BY clauses.
     // FIXME: Currently supports only USASCII word characters in field names.
@@ -437,7 +439,7 @@ public class NuxeoUtils {
      */
     public static DocumentRef createPathRef(ServiceContext ctx, String id) {
         return new PathRef("/" + ctx.getRepositoryDomainStorageName() +
-                "/" + "workspaces" +
+                "/" + WORKSPACES +
                 "/" + ctx.getRepositoryWorkspaceName() +
                 "/" + id);
     }
@@ -515,6 +517,19 @@ public class NuxeoUtils {
 			
 		return result;
     }
+    
+    public static String getTenantQualifiedDocType(String tenantId, String docType) throws Exception {
+    	String result = docType;
+    	
+		String tenantQualifiedDocType = ServiceBindingUtils.getTenantQualifiedDocType(tenantId, docType);
+
+		if (docTypeExists(tenantQualifiedDocType) == true) {
+			result = tenantQualifiedDocType;
+		}
+		
+    	return result;
+    }
+
     
     public static String getTenantQualifiedDocType(ServiceContext ctx, String docType) throws Exception {
     	String result = docType;

@@ -341,7 +341,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     public String getTenantQualifiedDoctype(String docType) {
         // If they have not overridden the setting, use the type of the service
         // object.
-        String result = docType + ServiceContext.TENANT_SUFFIX + this.getTenantId();
+        String result = ServiceBindingUtils.getTenantQualifiedDocType(this.getTenantId(), docType);
         
         return result;
     }

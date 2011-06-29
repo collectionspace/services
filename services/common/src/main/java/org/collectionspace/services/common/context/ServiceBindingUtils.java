@@ -24,6 +24,11 @@ public class ServiceBindingUtils {
 	public static final String SERVICE_TYPE_OBJECT = "object";
 	public static final String SERVICE_TYPE_PROCEDURE = "procedure";
 	
+    public static String getTenantQualifiedDocType(String tenantId, String docType) {
+    	String result = docType + ServiceContext.TENANT_SUFFIX + tenantId;
+    	return result;
+    }
+    	
 	// TODO consider building up a hashTable of the properties for each
 	// service binding. There will be generic properties, as well as
 	// properties on each part. Could build up a key from tenant id, 
