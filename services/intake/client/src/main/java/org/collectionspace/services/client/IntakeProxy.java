@@ -34,7 +34,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.intake.IntakesCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
  * @version $Revision:$
@@ -43,7 +43,7 @@ import org.collectionspace.services.intake.IntakesCommonList;
 @Path(IntakeClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface IntakeProxy extends CollectionSpacePoxProxy<IntakesCommonList> {
+public interface IntakeProxy extends CollectionSpacePoxProxy<AbstractCommonList> {
     /**
      * Read list.
      *
@@ -51,18 +51,18 @@ public interface IntakeProxy extends CollectionSpacePoxProxy<IntakesCommonList> 
      */
     @GET
     @Produces({"application/xml"})
-    ClientResponse<IntakesCommonList> readList();
+    ClientResponse<AbstractCommonList> readList();
     
     @Override
 	@GET
     @Produces({"application/xml"})
-    ClientResponse<IntakesCommonList> readIncludeDeleted(
+    ClientResponse<AbstractCommonList> readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
 
     @Override
     @GET
     @Produces({"application/xml"})
-    ClientResponse<IntakesCommonList> keywordSearchIncludeDeleted(
+    ClientResponse<AbstractCommonList> keywordSearchIncludeDeleted(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 }

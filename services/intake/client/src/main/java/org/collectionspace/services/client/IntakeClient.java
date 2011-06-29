@@ -27,7 +27,7 @@
 package org.collectionspace.services.client;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.collectionspace.services.intake.IntakesCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
  * A IntakeClient.
@@ -35,7 +35,7 @@ import org.collectionspace.services.intake.IntakesCommonList;
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public class IntakeClient extends AbstractPoxServiceClientImpl<IntakesCommonList, IntakeProxy> {
+public class IntakeClient extends AbstractPoxServiceClientImpl<AbstractCommonList, IntakeProxy> {
 	public static final String SERVICE_NAME = "intakes";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -66,7 +66,7 @@ public class IntakeClient extends AbstractPoxServiceClientImpl<IntakesCommonList
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#getIntake()
      */
-    public ClientResponse<IntakesCommonList> readList() {
+    public ClientResponse<AbstractCommonList> readList() {
         return getProxy().readList();
     }    
 }

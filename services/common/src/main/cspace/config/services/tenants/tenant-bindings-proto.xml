@@ -229,6 +229,30 @@
             </service:uriPath> -->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.intake.nuxeo.IntakeDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:classname>org.collectionspace.services.group.nuxeo.IntakeDocumentModelHandler</service:classname>
+        <service:params>
+          <service:SchemaName>intakes</service:SchemaName>
+          <service:DublinCoreTitle>intakes</service:DublinCoreTitle>
+          <service:SummaryFields> entryNumber|depositor|currentOwner|uri|csid</service:SummaryFields>
+          <service:AbstractCommonListClassname />
+          <service:CommonListItemClassname />
+          <service:ListResultsItemMethodName>getIntakeListItem</service:ListResultsItemMethodName>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>entryNumber</service:element>
+              <service:xpath>entryNumber</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>depositor</service:element>
+              <service:xpath>depositor</service:xpath>
+            </service:ListResultField><service:ListResultField>
+              <service:element>currentOwner</service:element>
+              <service:xpath>currentOwner</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams> 
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.intake.nuxeo.IntakeValidatorHandler</service:validatorHandler>
       <service:properties xmlns:service="http://collectionspace.org/services/common/service">
         <!-- What to use for name???

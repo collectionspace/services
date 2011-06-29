@@ -37,7 +37,6 @@ import org.collectionspace.services.intake.FieldCollectionEventNameList;
 import org.collectionspace.services.intake.CurrentLocationGroup;
 import org.collectionspace.services.intake.CurrentLocationGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
-import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -83,7 +82,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
     @Override
 	protected AbstractCommonList getAbstractCommonList(
 			ClientResponse<AbstractCommonList> response) {
-    	return response.getEntity(IntakesCommonList.class);
+    	return response.getEntity(AbstractCommonList.class);
     }
     
     // ---------------------------------------------------------------
@@ -391,8 +390,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         IntakeClient client = new IntakeClient();
-        ClientResponse<IntakesCommonList> res = client.readList();
-        IntakesCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -407,16 +406,12 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
         if(iterateThroughList && logger.isDebugEnabled()){
-            List<IntakesCommonList.IntakeListItem> items =
-                    list.getIntakeListItem();
+            List<AbstractCommonList.ListItem> items =
+                    list.getListItem();
             int i = 0;
-            for(IntakesCommonList.IntakeListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
-                        item.getEntryNumber());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+            for(AbstractCommonList.ListItem item : items){
+                logger.debug(testName + ": list-item[" + i + "] " +
+                        item.toString());
                 i++;
             }
         }
