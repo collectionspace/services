@@ -26,6 +26,7 @@ package org.collectionspace.services.batch;
 import java.util.List;
 
 import org.collectionspace.services.BatchJAXBSchema;
+import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -151,7 +152,7 @@ public class BatchResource extends ResourceBase {
 			throw new RuntimeException("No docType specified.");
 		}
 		String ptClause = COMMON_SCHEMA + ":"
-		+ BatchJAXBSchema.BATCH_FOR_DOC_TYPE
+		+ BatchJAXBSchema.FOR_DOC_TYPE
 			+ "='" + trimmed + "'";
 		return ptClause;
 	}
@@ -163,11 +164,11 @@ public class BatchResource extends ResourceBase {
 		}
 		String ptClause = COMMON_SCHEMA + ":";
 		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(trimmed)) {
-			ptClause += BatchJAXBSchema.BATCH_SUPPORTS_SINGLE_DOC + "!=0";
+			ptClause += BatchJAXBSchema.SUPPORTS_SINGLE_DOC + "!=0";
 		} else if(Invocable.INVOCATION_MODE_LIST.equalsIgnoreCase(trimmed)) {
-			ptClause += BatchJAXBSchema.BATCH_SUPPORTS_DOC_LIST + "!=0";
+			ptClause += BatchJAXBSchema.SUPPORTS_DOC_LIST + "!=0";
 		} else if(Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(trimmed)) {
-			ptClause += BatchJAXBSchema.BATCH_SUPPORTS_GROUP + "!=0";
+			ptClause += BatchJAXBSchema.SUPPORTS_GROUP + "!=0";
 		} else {
 			throw new BadRequestException("No mode specified.");
 		}
@@ -192,11 +193,11 @@ public class BatchResource extends ResourceBase {
     		String invocationMode = invContext.getMode();
     		String modeProperty = null;
     		if(BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
-    			modeProperty = BatchJAXBSchema.BATCH_SUPPORTS_SINGLE_DOC;
+    			modeProperty = BatchJAXBSchema.SUPPORTS_SINGLE_DOC;
     		} else if(BatchInvocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
-    			modeProperty = BatchJAXBSchema.BATCH_SUPPORTS_DOC_LIST;
+    			modeProperty = BatchJAXBSchema.SUPPORTS_DOC_LIST;
     		} else if(BatchInvocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
-    			modeProperty = BatchJAXBSchema.BATCH_SUPPORTS_GROUP;
+    			modeProperty = BatchJAXBSchema.SUPPORTS_GROUP;
     		} else {
     			throw new BadRequestException("BatchResource: unknown Invocation Mode: "
             			+invocationMode);
@@ -225,7 +226,7 @@ public class BatchResource extends ResourceBase {
             				+invocationMode);
             	}
         		String forDocType = 
-        			(String)docModel.getPropertyValue(BatchJAXBSchema.BATCH_FOR_DOC_TYPE);
+        			(String)docModel.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPE);
             	if(!forDocType.equalsIgnoreCase(invContext.getDocType())) {
             		throw new BadRequestException(
             				"BatchResource: Invoked with unsupported document type: "

@@ -27,17 +27,28 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+
+import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.invocable.Invocable;
+import org.collectionspace.services.common.invocable.InvocationContext;
+import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.common.invocable.Invocable.InvocationError;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,24 +59,28 @@ import javax.security.auth.login.LoginException;
 import javax.sql.DataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 
 @Path(ReportClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 //@Produces("application/xml;charset=UTF-8")
 public class ReportResource extends ResourceBase {
-    private static String repositoryName = "NuxeoDS";
-    private static String reportsFolder = "reports";
+    private static String REPOSITORY_NAME = "NuxeoDS";
+    private static String REPORTS_FOLDER = "reports";
+    private static String CSID_LIST_SEPARATOR = ",";
     final Logger logger = LoggerFactory.getLogger(ReportResource.class);
 
     @Override
@@ -83,6 +98,17 @@ public class ReportResource extends ResourceBase {
     public Class<ReportsCommon> getCommonPartClass() {
     	return ReportsCommon.class;
     }
+    
+    /*
+     * TODO: provide a static utility that will load a report, interrogate it
+     * for information about the properties, and return that information.
+     * See: http://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JasperManager.html#loadReport%28java.lang.String%29
+     * to get the report from the file.
+     * Use: http://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/base/JRBaseReport.html#getParameters%28%29 
+     *  to get an array of http://jasperreports.sourceforge.net/api/net/sf/jasperreports/engine/JRParameter.html
+     *  Cast each to JRBaseParameter and use isSystemDefined to filter out 
+     *    the system defined parameters.
+     */
 
     /**
      * Gets the report.
@@ -112,7 +138,7 @@ public class ReportResource extends ResourceBase {
     		String reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
     		String fullPath = ServiceMain.getInstance().getServerRootDir() +
     							File.separator + ConfigReader.CSPACE_DIR_NAME + 
-    							File.separator + reportsFolder +
+    							File.separator + REPORTS_FOLDER +
     							File.separator + reportFileName;
     		Connection conn = getConnection();
     		HashMap params = new HashMap();
@@ -176,20 +202,96 @@ public class ReportResource extends ResourceBase {
         }
         return response;
     }
+    
+    @POST
+    @Path("{csid}")
+    @Produces("application/pdf")
+    public Response invokeReport(
+    		@PathParam("csid") String csid,
+    		InvocationContext invContext) {
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            DocumentHandler handler = createDocumentHandler(ctx);
+            DocumentWrapper<DocumentModel> wrapper = 
+            	getRepositoryClient(ctx).getDoc(ctx, csid);
+    		DocumentModel docModel = wrapper.getWrappedObject();
+    		String invocationMode = invContext.getMode();
+    		String modeProperty = null;
+    		HashMap params = new HashMap();
+    		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
+    			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
+        		params.put("csid", invContext.getSingleCSID());
+    		} else if(Invocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
+    			modeProperty = InvocableJAXBSchema.SUPPORTS_DOC_LIST;
+    			List<String> csids = null;
+    			InvocationContext.ListCSIDs listThing = invContext.getListCSIDs();
+   				if(listThing!=null) {
+   					csids = listThing.getCsid();
+   				}
+   				if(csids==null||csids.isEmpty()){
+   	    			throw new BadRequestException(
+   	    					"ReportResource: Report invoked in list mode, with no csids in list." );
+   				}
+   				StringBuilder sb = new StringBuilder();
+   				boolean first = true;
+   				for(String csidItem : csids) {
+   					if(first)
+   						first = false;
+   					else
+   						sb.append(CSID_LIST_SEPARATOR);
+   	   				sb.append(csidItem);
+   				}
+        		params.put("csidlist", sb.toString());
+    		} else if(Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
+    			modeProperty = InvocableJAXBSchema.SUPPORTS_GROUP;
+        		params.put("groupcsid", invContext.getGroupCSID());
+    		} else {
+    			throw new BadRequestException("ReportResource: unknown Invocation Mode: "
+            			+invocationMode);
+    		}
+    		Boolean supports = (Boolean)docModel.getPropertyValue(modeProperty);
+    		if(!supports) {
+    			throw new BadRequestException(
+    					"ReportResource: This Report does not support Invocation Mode: "
+            			+invocationMode);
+    		}
+    		String reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
+    		String fullPath = ServiceMain.getInstance().getServerRootDir() +
+    							File.separator + ConfigReader.CSPACE_DIR_NAME + 
+    							File.separator + REPORTS_FOLDER +
+    							// File.separator + tenantName +
+    							File.separator + reportFileName;
+    		Connection conn = getConnection();
+
+    		FileInputStream fileStream = new FileInputStream(fullPath);
+
+            // fill the report
+    		JasperPrint jasperprint = JasperFillManager.fillReport(fileStream, params,conn);
+    		// export report to pdf and build a response with the bytes
+    		byte[] pdfasbytes = JasperExportManager.exportReportToPdf(jasperprint);
+    		
+    		// Need to set response type for what is requested...
+            Response response = Response.ok(pdfasbytes, "application/pdf").build();
+
+           	return response;
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.POST_FAILED);
+        }
+    }
 
     private Connection getConnection() throws LoginException, SQLException {
         InitialContext ctx = null;
         Connection conn = null;
         try {
             ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(repositoryName);
+            DataSource ds = (DataSource) ctx.lookup(REPOSITORY_NAME);
             if (ds == null) {
-                throw new IllegalArgumentException("datasource not found: " + repositoryName);
+                throw new IllegalArgumentException("datasource not found: " + REPOSITORY_NAME);
             }
             conn = ds.getConnection();
             return conn;
         } catch (NamingException ex) {
-            LoginException le = new LoginException("Error looking up DataSource from: " + repositoryName);
+            LoginException le = new LoginException("Error looking up DataSource from: " + REPOSITORY_NAME);
             le.initCause(ex);
             throw le;
         } finally {

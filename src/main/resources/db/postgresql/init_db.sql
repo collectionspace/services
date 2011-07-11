@@ -19,7 +19,9 @@ CREATE DATABASE nuxeo ENCODING 'UTF8' OWNER @DB_NUXEO_USER@;
 --
 -- Grant privileges to read-only user on Nuxeo, for reporting. 
 --
--- GRANT SELECT ON ALL TABLES IN DATABASE nuxeo TO reader;
--- Will have to do this with a script after the nuxeo DB has been started,
--- since there is no wildcard syntax for grants (!). If nuxeo used a schema, 
--- it would be easy. Check that.
+GRANT CONNECT ON DATABASE nuxeo TO reader;
+
+-- GRANT SELECT ON ALL TABLES IN SCHEMA public TO reader;
+-- This must be run by hand, after the system has already started up,
+-- so that it gives access to all the tables created on init.
+

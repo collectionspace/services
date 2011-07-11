@@ -32,12 +32,15 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="csid" type="xs:string" />
-								<xs:element name="name" type="xs:string"/>
-								<xs:element name="notes" type="xs:string"/>
-								<xs:element name="forDocType" type="xs:string"/>
-								<xs:element name="forSingleDoc" type="xs:boolean"/>
-								<xs:element name="filename" type="xs:string"/>
-								<xs:element name="outputMIME" type="xs:string"/>
+					<xs:element name="name" type="xs:string"/>
+					<xs:element name="notes" type="xs:string"/>
+				    <xs:element name="forDocType" type="xs:string"/>
+					<xs:element name="supportsSingleDoc" type="xs:boolean"/>
+					<xs:element name="supportsDocList" type="xs:boolean"/>
+					<xs:element name="supportsGroup" type="xs:boolean"/>
+					<!-- NYI <xs:element name="supportsQuery" type="xs:boolean"/>  -->
+				    <xs:element name="filename" type="xs:string"/>
+				    <xs:element name="outputMIME" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -66,7 +69,11 @@
                                         minOccurs="1" />
                                     <xs:element name="forDocType" type="xs:string"
                                         minOccurs="1" />
-                                    <xs:element name="forSingleDoc" type="xs:boolean"
+									<xs:element name="supportsSingleDoc" type="xs:boolean"
+                                        minOccurs="1" />
+									<xs:element name="supportsDocList" type="xs:boolean"
+                                        minOccurs="1" />
+									<xs:element name="supportsGroup" type="xs:boolean"
                                         minOccurs="1" />
                                    <!-- uri to retrive report details -->
                                     <xs:element name="uri" type="xs:anyURI"

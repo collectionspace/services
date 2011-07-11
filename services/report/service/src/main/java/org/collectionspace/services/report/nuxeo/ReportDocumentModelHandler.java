@@ -132,10 +132,14 @@ public class ReportDocumentModelHandler
                     ReportJAXBSchema.NAME));
             ilistItem.setOutputMIME((String) docModel.getProperty(label,
                     ReportJAXBSchema.OUTPUT_MIME));
-            ilistItem.setForSingleDoc((Boolean) docModel.getProperty(label,
-                    ReportJAXBSchema.FOR_SINGLE_DOC));
             ilistItem.setForDocType((String) docModel.getProperty(label,
                     ReportJAXBSchema.FOR_DOC_TYPE));
+            ilistItem.setSupportsSingleDoc((Boolean) docModel.getProperty(label,
+                    ReportJAXBSchema.SUPPORTS_SINGLE_DOC));
+            ilistItem.setSupportsDocList((Boolean) docModel.getProperty(label,
+                    ReportJAXBSchema.SUPPORTS_DOC_LIST));
+            ilistItem.setSupportsGroup((Boolean) docModel.getProperty(label,
+                    ReportJAXBSchema.SUPPORTS_GROUP));
             String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
