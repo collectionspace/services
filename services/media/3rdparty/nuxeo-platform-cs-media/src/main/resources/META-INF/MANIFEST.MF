@@ -1,6 +1,6 @@
 Manifest-Version: 1.0 
 Bundle-ManifestVersion: 1 
-Bundle-Name: NuxeoCS
+Bundle-Name: org.collectionspace.media
 Bundle-SymbolicName: org.collectionspace.media;singleton:=true 
 Bundle-Version: 1.0.0
 Bundle-Localization: plugin

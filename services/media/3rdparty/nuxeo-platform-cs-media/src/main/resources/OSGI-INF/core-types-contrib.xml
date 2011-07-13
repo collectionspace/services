@@ -5,7 +5,7 @@
   </extension>
   
   <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
-    <doctype name="Media" extends="Document">
+    <doctype name="Media" extends="CollectionSpaceDocument">
       <schema name="common"/>
       <schema name="dublincore"/>
       <schema name="collectionspace_core"/>
