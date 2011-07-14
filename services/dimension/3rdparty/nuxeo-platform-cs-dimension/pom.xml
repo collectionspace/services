@@ -15,15 +15,31 @@
     <description>
         Dimension Nuxeo Document Type
     </description>
+	
+	<properties>
+		<ServiceName>dimension</ServiceName>
+		<NuxeoDocTypeName>Dimension</NuxeoDocTypeName>
+		<CommonSchemaName>dimensions_common</CommonSchemaName>
+	</properties>
     
     <build>
+		<resources>
+		  <resource>
+			<directory>src/main/resources</directory>
+			<filtering>true</filtering>
+		  </resource>
+		  <resource>
+			<directory>../../../../3rdparty/nuxeo/nuxeo-doctype/src/main/resources</directory>
+			<filtering>true</filtering>
+		  </resource>
+		</resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <manifestFile> src/main/resources/META-INF/MANIFEST.MF </manifestFile>
+                        <manifestFile>target/classes/META-INF/MANIFEST.MF </manifestFile>
                         <manifestEntries>
                             <Bundle-Version>${eclipseVersion}</Bundle-Version>
                             <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
