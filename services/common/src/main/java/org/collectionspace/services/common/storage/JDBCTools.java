@@ -79,6 +79,7 @@ public class JDBCTools {
     }
 
 
+    /* THIS IS BROKEN - If you close the statement, it closes the ResultSet!!!
     public static ResultSet executeQuery(String repoName, String sql) throws Exception {
         Connection conn = null;
         Statement stmt = null;
@@ -108,7 +109,7 @@ public class JDBCTools {
                 return null;
             }
         }
-    }
+    } */
 
     public static int executeUpdate(String repoName, String sql) throws Exception {
         Connection conn = null;

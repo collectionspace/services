@@ -108,9 +108,18 @@
         </exec>
     </target>
 
+		<target name="deploy_jasper_samples" 
+			description="Copy sample jasper files to ${jboss.server.cspace}/cspace/reports">
+        <copy todir="${jboss.server.cspace}/cspace/reports">
+					<fileset dir="${basedir}/jasper-cs-report/src/main/resources"
+									includes="*.jasper"/>
+        </copy>
+    </target>
+
     <target name="deploy" depends="install"
     description="deploy report in ${jboss.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-report/build.xml" target="deploy" inheritall="false"/>
+				<antcall target="deploy_jasper_samples" />
     </target>
 
     <target name="undeploy"

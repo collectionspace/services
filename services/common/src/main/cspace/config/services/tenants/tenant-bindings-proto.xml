@@ -837,6 +837,15 @@
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler</service:documentHandler>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.report.nuxeo.ReportValidatorHandler</service:validatorHandler>
+      <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
+        <service:classname>org.collectionspace.services.report.nuxeo.ReportPostInitHandler</service:classname>
+        <service:params>
+          <service:property>
+            <service:key>readerRoleName</service:key>
+            <service:value>reader</service:value>
+          </service:property>
+        </service:params>
+      </service:initHandler>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Report" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="reports-system" updated="" order="0">
           <service:content contentType="application/xml">

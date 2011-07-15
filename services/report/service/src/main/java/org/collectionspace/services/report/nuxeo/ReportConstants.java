@@ -31,5 +31,6 @@ public class ReportConstants {
 
     public final static String NUXEO_DOCTYPE = "Report";
     public final static String NUXEO_SCHEMA_NAME = "report";
+    public final static String DB_COMMON_PART_TABLE_NAME = "reports_common";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Report";
 }

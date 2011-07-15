@@ -68,6 +68,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -120,87 +121,26 @@ public class ReportResource extends ResourceBase {
     @Produces("application/pdf")
     public Response invokeReport(
             @PathParam("csid") String csid) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("invokeReport with csid=" + csid);
-        }
-        Response response = null;
         if (csid == null || "".equals(csid)) {
             logger.error("invokeReport: missing csid!");
-            response = Response.status(Response.Status.BAD_REQUEST).entity(
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                     "invoke failed on Report csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
+        }
+        if (logger.isTraceEnabled()) {
+            logger.trace("invokeReport with csid=" + csid);
         }
         try {
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDoc(ctx, csid);
     		DocumentModel docModel = docWrapper.getWrappedObject();
     		String reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
-    		String fullPath = ServiceMain.getInstance().getServerRootDir() +
-    							File.separator + ConfigReader.CSPACE_DIR_NAME + 
-    							File.separator + REPORTS_FOLDER +
-    							File.separator + reportFileName;
-    		Connection conn = getConnection();
     		HashMap params = new HashMap();
-    		FileInputStream fileStream = new FileInputStream(fullPath);
-
-            // fill the report
-    		JasperPrint jasperprint = JasperFillManager.fillReport(fileStream, params,conn);
-    		// export report to pdf and build a response with the bytes
-    		byte[] pdfasbytes = JasperExportManager.exportReportToPdf(jasperprint);
-    		response = Response.ok(pdfasbytes, "application/pdf").build();
-        } catch (UnauthorizedException ue) {
-            response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Invoke failed reason " + ue.getErrorReason()).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (DocumentNotFoundException dnfe) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("invokeReport", dnfe);
-            }
-            response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Invoke failed on Report csid=" + csid).type(
-                    "text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (SQLException sqle) {
-            // SQLExceptions can be chained. We have at least one exception, so
-            // set up a loop to make sure we let the user know about all of them
-            // if there happens to be more than one.
-            if (logger.isDebugEnabled()) {
-	            SQLException tempException = sqle;
-	            while (null != tempException) {
-	                	logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
-	
-	                // loop to the next exception
-	                tempException = tempException.getNextException();
-	            }
-            }
-            response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    		"Invoke failed (SQL problem) on Report csid=" + csid).type("text/plain").build();
-            throw new WebApplicationException(response);
-        } catch (JRException jre) {
-            if (logger.isDebugEnabled()) {
-            	logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: "+jre.getCause());
-            }
-            response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    		"Invoke failed (Jasper problem) on Report csid=" + csid).type("text/plain").build();
-            throw new WebApplicationException(response);
+           	return buildReportResponse(csid, params, reportFileName);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("invokeReport", e);
-            }
-            response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Invoke failed").type("text/plain").build();
-            throw new WebApplicationException(response);
+            throw bigReThrow(e, ServiceMessages.POST_FAILED);
         }
-        if (response == null) {
-            response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Invoke failed, the requested Report CSID:" + csid + ": was not found.").type(
-                    "text/plain").build();
-            throw new WebApplicationException(response);
-        }
-        return response;
     }
     
     @POST
@@ -256,26 +196,92 @@ public class ReportResource extends ResourceBase {
             			+invocationMode);
     		}
     		String reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
-    		String fullPath = ServiceMain.getInstance().getServerRootDir() +
-    							File.separator + ConfigReader.CSPACE_DIR_NAME + 
-    							File.separator + REPORTS_FOLDER +
-    							// File.separator + tenantName +
-    							File.separator + reportFileName;
-    		Connection conn = getConnection();
 
-    		FileInputStream fileStream = new FileInputStream(fullPath);
-
-            // fill the report
-    		JasperPrint jasperprint = JasperFillManager.fillReport(fileStream, params,conn);
-    		// export report to pdf and build a response with the bytes
-    		byte[] pdfasbytes = JasperExportManager.exportReportToPdf(jasperprint);
-    		
-    		// Need to set response type for what is requested...
-            Response response = Response.ok(pdfasbytes, "application/pdf").build();
-
-           	return response;
+           	return buildReportResponse(csid, params, reportFileName);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.POST_FAILED);
+        }
+    }
+    
+    private Response buildReportResponse(String reportCSID, HashMap params, String reportFileName) {
+		Connection conn = null;
+		Response response = null;
+    	try {
+			String fullPath = ServiceMain.getInstance().getServerRootDir() +
+								File.separator + ConfigReader.CSPACE_DIR_NAME + 
+								File.separator + REPORTS_FOLDER +
+								// File.separator + tenantName +
+								File.separator + reportFileName;
+			conn = getConnection();
+	
+            if (logger.isTraceEnabled()) {
+            	logger.trace("ReportResource for Report csid=" + reportCSID
+            			+" opening report file: "+fullPath);
+            }
+			FileInputStream fileStream = new FileInputStream(fullPath);
+	
+	        // fill the report
+			JasperPrint jasperprint = JasperFillManager.fillReport(fileStream, params,conn);
+			// export report to pdf and build a response with the bytes
+			byte[] pdfasbytes = JasperExportManager.exportReportToPdf(jasperprint);
+			
+			// Need to set response type for what is requested...
+	        response = Response.ok(pdfasbytes, "application/pdf").build();
+	
+	       	return response;    	
+        } catch (SQLException sqle) {
+            // SQLExceptions can be chained. We have at least one exception, so
+            // set up a loop to make sure we let the user know about all of them
+            // if there happens to be more than one.
+            if (logger.isDebugEnabled()) {
+	            SQLException tempException = sqle;
+	            while (null != tempException) {
+	                	logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+	
+	                // loop to the next exception
+	                tempException = tempException.getNextException();
+	            }
+            }
+            response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (JRException jre) {
+            if (logger.isDebugEnabled()) {
+            	logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: "+jre.getCause());
+            }
+            response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    		"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (FileNotFoundException fnfe) {
+            if (logger.isDebugEnabled()) {
+            	logger.debug("FileNotFoundException: " + fnfe.getLocalizedMessage());
+            }
+            response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.POST_FAILED);
+		} finally {
+        	if(conn!=null) {
+        		try {
+        		conn.close();
+                } catch (SQLException sqle) {
+                    // SQLExceptions can be chained. We have at least one exception, so
+                    // set up a loop to make sure we let the user know about all of them
+                    // if there happens to be more than one.
+                    if (logger.isDebugEnabled()) {
+   	                	logger.debug("SQL Exception closing connection: " 
+   	                			+ sqle.getLocalizedMessage());
+                    }
+                } catch (Exception e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Exception closing connection", e);
+                    }
+                }
+        	}
         }
     }
 
