@@ -71,7 +71,7 @@
             </condition>
         </fail>
 
-        <tar destfile="${basedir}/dist/${jboss.release}-${domain.cspace}-${cspace.release}.tar.gz" compression="gzip">
+        <tar destfile="${basedir}/dist/${jboss.release}-${domain.cspace}-${release.version}.tar.gz" compression="gzip">
             <tarfileset dir="${jboss.dir}"
                         prefix="${jboss.release}"
                         preserveLeadingSlashes="true">
@@ -100,7 +100,7 @@
             </condition>
         </fail>
 
-        <tar destfile="${basedir}/dist/${jboss.release}-${domain.nuxeo}-${nuxeo.release}.tar.gz" compression="gzip">
+        <tar destfile="${basedir}/dist/${jboss.release}-${domain.nuxeo}-${release.version}.tar.gz" compression="gzip">
             <tarfileset dir="${jboss.dir}"
                         prefix="${jboss.release}"
                         preserveLeadingSlashes="true">
