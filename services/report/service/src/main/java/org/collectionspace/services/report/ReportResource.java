@@ -28,6 +28,7 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -65,6 +66,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
@@ -100,6 +102,19 @@ public class ReportResource extends ResourceBase {
     	return ReportsCommon.class;
     }
     
+    @Override
+    protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
+            return list;
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.LIST_FAILED);
+        }
+    }
+
     /*
      * TODO: provide a static utility that will load a report, interrogate it
      * for information about the properties, and return that information.
@@ -121,6 +136,17 @@ public class ReportResource extends ResourceBase {
     @Produces("application/pdf")
     public Response invokeReport(
             @PathParam("csid") String csid) {
+    	InvocationContext invContext = new InvocationContext();
+    	invContext.setMode(Invocable.INVOCATION_MODE_NO_CONTEXT);
+    	return invokeReport(csid, invContext);
+    }
+    
+    @POST
+    @Path("{csid}")
+    @Produces("application/pdf")
+    public Response invokeReport(
+    		@PathParam("csid") String csid,
+    		InvocationContext invContext) {
         if (csid == null || "".equals(csid)) {
             logger.error("invokeReport: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
@@ -132,24 +158,6 @@ public class ReportResource extends ResourceBase {
             logger.trace("invokeReport with csid=" + csid);
         }
         try {
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDoc(ctx, csid);
-    		DocumentModel docModel = docWrapper.getWrappedObject();
-    		String reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
-    		HashMap params = new HashMap();
-           	return buildReportResponse(csid, params, reportFileName);
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.POST_FAILED);
-        }
-    }
-    
-    @POST
-    @Path("{csid}")
-    @Produces("application/pdf")
-    public Response invokeReport(
-    		@PathParam("csid") String csid,
-    		InvocationContext invContext) {
-        try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             DocumentWrapper<DocumentModel> wrapper = 
@@ -158,6 +166,7 @@ public class ReportResource extends ResourceBase {
     		String invocationMode = invContext.getMode();
     		String modeProperty = null;
     		HashMap params = new HashMap();
+    		boolean checkDocType = true;
     		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
     			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
         		params.put("csid", invContext.getSingleCSID());
@@ -185,16 +194,28 @@ public class ReportResource extends ResourceBase {
     		} else if(Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
     			modeProperty = InvocableJAXBSchema.SUPPORTS_GROUP;
         		params.put("groupcsid", invContext.getGroupCSID());
+    		} else if(Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode)) {
+    			modeProperty = InvocableJAXBSchema.SUPPORTS_NO_CONTEXT;
+    			checkDocType = false;
     		} else {
     			throw new BadRequestException("ReportResource: unknown Invocation Mode: "
             			+invocationMode);
     		}
     		Boolean supports = (Boolean)docModel.getPropertyValue(modeProperty);
-    		if(!supports) {
+    		if(supports == null || !supports) {
     			throw new BadRequestException(
     					"ReportResource: This Report does not support Invocation Mode: "
             			+invocationMode);
     		}
+        	if(checkDocType) {
+        		String forDocType = 
+        			(String)docModel.getPropertyValue(InvocableJAXBSchema.FOR_DOC_TYPE);
+            	if(!forDocType.equalsIgnoreCase(invContext.getDocType())) {
+            		throw new BadRequestException(
+            				"ReportResource: Invoked with unsupported document type: "
+            				+invContext.getDocType());
+            	}
+        	}
     		String reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
 
            	return buildReportResponse(csid, params, reportFileName);

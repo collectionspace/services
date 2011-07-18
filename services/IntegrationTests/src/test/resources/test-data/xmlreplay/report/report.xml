@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+	<auths>
+		<!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+		<auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+	</auths>
+	<testGroup ID="testSingle" autoDeletePOSTS="false">
+		<test ID="createReport1" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/reports/</uri>
+			<filename>report/report1.xml</filename>
+		</test>
+		<test ID="readReport1" auth="test">
+			<method>GET</method>
+			<uri>/cspace-services/reports/${createReport1.CSID}</uri>
+		</test>
+		<test ID="createAcq" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/acquisitions/</uri>
+			<filename>report/ac1.xml</filename>
+		</test>
+		<!-- XmlReplay does not know how to ask for anything except XML, so gets a 406
+		     Even if it could ask for PDF, it could not handle the response...
+		<test ID="testInvokeSingle" auth="test" autoDeletePOSTS="false">
+			<method>POST</method>
+			<uri>/cspace-services/reports/${createReport1.CSID}</uri>
+			<filename>report/report1InvContext.xml</filename>
+			<vars>
+				<var ID="Acq1">${createAcq.CSID}</var>
+			</vars>
+		</test>
+		-->
+		<!--
+		<test ID="testInvokeList" auth="test" autoDeletePOSTS="false">
+			<method>POST</method>
+			<uri>/cspace-services/batch/${createCollObj1.CSID}</uri>
+			<filename>batch/batchInvContextList.xml</filename>
+			<vars>
+				<var ID="CollObj1">${createBatch.CSID}</var>
+			</vars>
+		</test>
+		<test ID="testBadInvoke" auth="test" autoDeletePOSTS="false">
+			<method>POST</method>
+			<expectedCodes>400</expectedCodes>
+			<uri>/cspace-services/batch/${createCollObj1.CSID}</uri>
+			<filename>batch/batchBadInvContext.xml</filename>
+			<vars>
+				<var ID="CollObj1">${createBatch.CSID}</var>
+			</vars>
+		</test>
+		<test ID="testInvokeEmptyList" auth="test" autoDeletePOSTS="false">
+			<method>POST</method>
+			<expectedCodes>400</expectedCodes>
+			<uri>/cspace-services/batch/${createCollObj1.CSID}</uri>
+			<filename>batch/batchBadInvContextList.xml</filename>
+			<vars>
+				<var ID="CollObj1">${createBatch.CSID}</var>
+			</vars>
+		</test>
+		<test ID="testFilteredList1" auth="test">
+			<method>GET</method>
+			<uri>/cspace-services/batch?doctype=CollectionObject&amp;inv=single</uri>
+		</test>
+		<test ID="testFilteredList2" auth="test">
+			<method>GET</method>
+			<uri>/cspace-services/batch?doctype=Intake&amp;inv=group</uri>
+		</test>
+		-->
+	</testGroup>
+	<!-- 
+     <testGroup ID="cleanup" autoDeletePOSTS="true">
+         <test ID="cl1"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/batch/${createCollObj1.CSID}</uri>
+         </test>
+         <test ID="cl2"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/collectionobjects/${createBatch.CSID}</uri>
+         </test>
+			 </testGroup>
+			 -->
+</xmlReplay>
+

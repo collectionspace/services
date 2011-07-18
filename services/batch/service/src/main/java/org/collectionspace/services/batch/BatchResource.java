@@ -192,12 +192,16 @@ public class BatchResource extends ResourceBase {
     		DocumentModel docModel = wrapper.getWrappedObject();
     		String invocationMode = invContext.getMode();
     		String modeProperty = null;
+    		boolean checkDocType = true;
     		if(BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
     			modeProperty = BatchJAXBSchema.SUPPORTS_SINGLE_DOC;
     		} else if(BatchInvocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
     			modeProperty = BatchJAXBSchema.SUPPORTS_DOC_LIST;
     		} else if(BatchInvocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
     			modeProperty = BatchJAXBSchema.SUPPORTS_GROUP;
+    		} else if(Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode)) {
+    			modeProperty = InvocableJAXBSchema.SUPPORTS_NO_CONTEXT;
+    			checkDocType = false;
     		} else {
     			throw new BadRequestException("BatchResource: unknown Invocation Mode: "
             			+invocationMode);
@@ -225,12 +229,14 @@ public class BatchResource extends ResourceBase {
             				"BatchResource: Invoked with unsupported context mode: "
             				+invocationMode);
             	}
-        		String forDocType = 
-        			(String)docModel.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPE);
-            	if(!forDocType.equalsIgnoreCase(invContext.getDocType())) {
-            		throw new BadRequestException(
-            				"BatchResource: Invoked with unsupported document type: "
-            				+invContext.getDocType());
+            	if(checkDocType) {
+	        		String forDocType = 
+	        			(String)docModel.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPE);
+	            	if(!forDocType.equalsIgnoreCase(invContext.getDocType())) {
+	            		throw new BadRequestException(
+	            				"BatchResource: Invoked with unsupported document type: "
+	            				+invContext.getDocType());
+	            	}
             	}
             	batchInstance.setInvocationContext(invContext);
             	//ResourceMapHolder csapp = (ResourceMapHolder)app;

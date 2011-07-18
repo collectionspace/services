@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="acquisitions">
+	<ns2:acquisitions_common xmlns:ns2="http://collectionspace.org/services/acquisition" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<acquisitionReferenceNumber>Ac2011.1.2</acquisitionReferenceNumber>
+		<objectOfferPriceCurrency>usd</objectOfferPriceCurrency>
+		<acquisitionAuthorizerDate>2011-07-04</acquisitionAuthorizerDate>
+		<accessionDate>2011-07-04</accessionDate>
+		<originalObjectPurchasePriceCurrency>usd</originalObjectPurchasePriceCurrency>
+		<acquisitionReason>Bargain</acquisitionReason>
+		<acquisitionMethod>purchase</acquisitionMethod>
+		<originalObjectPurchasePriceValue>1</originalObjectPurchasePriceValue>
+		<objectPurchaseOfferPriceCurrency>usd</objectPurchaseOfferPriceCurrency>
+		<acquisitionAuthorizer>urn:cspace:org.collectionspace.demo:personauthority:id(4c300397-746f-48f0-bc29):person:id(fadd6312-486e-4ada-92c9)'Patrick+Schmitz'</acquisitionAuthorizer>
+	</ns2:acquisitions_common>
+</document>
+

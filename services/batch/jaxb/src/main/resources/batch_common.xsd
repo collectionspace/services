@@ -24,6 +24,7 @@
                 <xs:element name="name" type="xs:string"/>
                 <xs:element name="notes" type="xs:string"/>
                 <xs:element name="forDocType" type="xs:string"/>
+                <xs:element name="supportsNoContext" type="xs:boolean"/>
                 <xs:element name="forSingleDoc" type="xs:boolean"/>
                 <xs:element name="createsNewFocus" type="xs:boolean"/>
                 <xs:element name="className" type="xs:string"/>

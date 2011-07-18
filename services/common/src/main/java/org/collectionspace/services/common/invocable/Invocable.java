@@ -62,8 +62,9 @@ public interface Invocable {
 	}
 
 	public String INVOCATION_MODE_SINGLE = "single";
-	public String INVOCATION_MODE_GROUP = "group";
 	public String INVOCATION_MODE_LIST = "list";
+	public String INVOCATION_MODE_GROUP = "group";
+	public String INVOCATION_MODE_NO_CONTEXT = "nocontext";
 	//public String INVOCATION_MODE_QUERY = "query"; NYI
 
 	public final int	STATUS_ERROR = -1;

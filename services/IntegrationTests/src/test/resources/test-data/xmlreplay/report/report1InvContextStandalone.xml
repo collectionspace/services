@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:invocationContext
+xmlns:ns2="http://collectionspace.org/services/common/invocable"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+  <mode>single</mode>
+	<docType>Acquisition</docType>
+	<singleCSID>605e9252-598d-4459-8380</singleCSID>
+</ns2:invocationContext>
+
+
