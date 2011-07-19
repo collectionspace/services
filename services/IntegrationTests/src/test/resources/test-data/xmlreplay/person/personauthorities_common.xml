@@ -5,6 +5,8 @@
 <shortIdentifier>${authShortIdentifier}</shortIdentifier>
 <refName>urn:cspace:org.collectionspace.demo:personauthority:name(${authShortIdentifier})'${authShortIdentifier}'</refName>
 <vocabType>PersonAuthority</vocabType>
+    <description>This is a test authority</description>
+    <source>Some mythical book</source>
 </ns2:personauthorities_common>
 </document>
 

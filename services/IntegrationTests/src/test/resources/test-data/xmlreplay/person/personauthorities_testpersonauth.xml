@@ -5,6 +5,8 @@
   <displayName>Test Person Authority</displayName>
   <refName>urn:cspace:org.collectionspace.demo:personauthority:name(testpersonauth)'Test Person Authority'</refName>
   <vocabType>PersonAuthority</vocabType>
+    <description>This is a test authority</description>
+    <source>Some mythical book</source>
 </ns2:personauthorities_common>
 </document>
 

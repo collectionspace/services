@@ -30,6 +30,9 @@
     <xs:element name="displayNameComputed" type="xs:boolean"/>
     <xs:element name="shortDisplayName" type="xs:string"/>
     <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
+    <xs:element name="source" type="xs:string"/>
+    <xs:element name="sourcePage" type="xs:string"/>
+    <xs:element name="description" type="xs:string"/>
 
     <!-- FIXME: Currently marked in repeatability spreadsheet as a -->
     <!-- repeatable group.  However, multiple personal names for the -->

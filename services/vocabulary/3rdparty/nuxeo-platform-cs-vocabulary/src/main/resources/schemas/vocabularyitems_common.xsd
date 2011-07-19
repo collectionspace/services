@@ -20,13 +20,16 @@
 >
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Vocabulary+Schema -->    
 
-		<!--  VocabularyItem Information Group -->
-		<!--  inVocabulary is the csid of the owning Vocabulary -->
-		<xs:element name="inAuthority" type="xs:string" />
-		<xs:element name="refName" type="xs:string"/>
-		<xs:element name="shortIdentifier" type="xs:string"/>
-		<xs:element name="termStatus" type="xs:string"/>
-		<xs:element name="displayName" type="xs:string"/>
-		<xs:element name="order" type="xs:string"/>
+    <!--  VocabularyItem Information Group -->
+    <!--  inVocabulary is the csid of the owning Vocabulary -->
+    <xs:element name="inAuthority" type="xs:string" />
+    <xs:element name="refName" type="xs:string"/>
+    <xs:element name="shortIdentifier" type="xs:string"/>
+    <xs:element name="termStatus" type="xs:string"/>
+    <xs:element name="displayName" type="xs:string"/>
+    <xs:element name="order" type="xs:string"/>
+    <xs:element name="source" type="xs:string"/>
+    <xs:element name="sourcePage" type="xs:string"/>
+    <xs:element name="description" type="xs:string"/>
 </xs:schema>
 

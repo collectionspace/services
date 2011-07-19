@@ -8,5 +8,8 @@
 	<shortDisplayName>Patrick Schmitz</shortDisplayName>
 	<displayName>Patrick Schmitz, Berkeley</displayName>
 	<bioNote>Technical Lead for CollectionSpace</bioNote>
+    <description>This is a test PersonAuthority item</description>
+    <source>Some mythical book</source>
+    <sourcePage>Let's say page 39</sourcePage>
   </ns2:persons_common>
 </document>

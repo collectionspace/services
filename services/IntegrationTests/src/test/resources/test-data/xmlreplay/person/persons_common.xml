@@ -20,7 +20,10 @@
     <gender>male</gender>
     <bioNote>born Marion Robert Morrison and betterknown by his stage name John Wayne, was an American film actor, director and producer. He epitomized rugged masculinity and has become an enduring American icon. He is famous for his distinctive
     voice, walk and height. He was also known for his conservative political views and his support in the 1950s for anti-communist positions.</bioNote>
-  </ns2:persons_common>
+    <description>This is a test Authority item</description>
+    <source>Some mythical book</source>
+		<sourcePage>Let's say page 39</sourcePage>
+	</ns2:persons_common>
 </document>
 
 

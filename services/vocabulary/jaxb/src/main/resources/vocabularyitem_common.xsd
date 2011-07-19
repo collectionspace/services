@@ -27,6 +27,9 @@
                 <xs:element name="refName" type="xs:string"/>
                 <xs:element name="termStatus" type="xs:string"/>
                 <xs:element name="order" type="xs:string"/>
+                <xs:element name="source" type="xs:string"/>
+                <xs:element name="sourcePage" type="xs:string"/>
+                <xs:element name="description" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

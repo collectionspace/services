@@ -17,6 +17,9 @@
     <accessNote>Only right-thinkers may see</accessNote>
     <address>123 Main Street, Anytown USA</address>
     <locationType>Shelf</locationType>
+    <description>This is a test Authority item</description>
+    <source>Some mythical book</source>
+		<sourcePage>Let's say page 39</sourcePage>
   </ns2:locations_common>
 </document>
 

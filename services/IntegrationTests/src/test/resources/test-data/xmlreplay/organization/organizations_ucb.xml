@@ -11,6 +11,9 @@
 	<subBodies>
 		<subBody>urn:cspace:org.collectionspace.demo:orgauthority:name(testorgauth):organization:name(ucberkeleyist)'UCB IST'</subBody>
 	</subBodies>
+    <description>This is a test Authority item</description>
+    <source>Some mythical book</source>
+		<sourcePage>Let's say page 39</sourcePage>
 </ns2:organizations_common>
 </document>
 	

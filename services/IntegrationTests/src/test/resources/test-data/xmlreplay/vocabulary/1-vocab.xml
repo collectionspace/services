@@ -7,6 +7,8 @@
     <refName>
     urn:cspace:org.collectionspace.demo:vocabulary:name(TestOrderVocab)'TestOrder Vocabulary'</refName>
     <vocabType>enum</vocabType>
-  </ns3:vocabularies_common>
+    <description>This is a test vocabulary</description>
+    <source>Some mythical book</source>
+ </ns3:vocabularies_common>
 </document>
 

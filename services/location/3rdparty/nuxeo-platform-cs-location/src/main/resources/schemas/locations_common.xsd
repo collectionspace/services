@@ -31,11 +31,14 @@
     <xs:element name="shortDisplayName" type="xs:string"/>
     <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
     <xs:element name="name" type="xs:string"/>
-		<xs:element name="conditionGroupList" type="conditionGroupList"/>
+    <xs:element name="conditionGroupList" type="conditionGroupList"/>
     <xs:element name="securityNote" type="xs:string"/>
     <xs:element name="accessNote" type="xs:string"/>
     <xs:element name="address" type="xs:string"/>
     <xs:element name="locationType" type="xs:string"/>
+    <xs:element name="source" type="xs:string"/>
+    <xs:element name="sourcePage" type="xs:string"/>
+    <xs:element name="description" type="xs:string"/>
 
     <xs:complexType name="conditionGroupList">
         <xs:sequence>

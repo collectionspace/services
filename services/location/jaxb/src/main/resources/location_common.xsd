@@ -21,20 +21,23 @@
                 <xs:element name="csid" type="xs:string" />
                 
                 <!--  Location Information Group -->
-								<xs:element name="inAuthority" type="xs:string" />
-								<xs:element name="shortIdentifier" type="xs:string"/>
-								<xs:element name="refName" type="xs:string"/>
-								<xs:element name="termStatus" type="xs:string"/>
-								<xs:element name="displayName" type="xs:string"/>
-								<xs:element name="displayNameComputed" type="xs:boolean"/>
-							    <xs:element name="shortDisplayName" type="xs:string"/>
-							    <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
-								<xs:element name="name" type="xs:string"/>
-								<xs:element name="conditionGroupList" type="conditionGroupList"/>
-								<xs:element name="securityNote" type="xs:string"/>
-								<xs:element name="accessNote" type="xs:string"/>
-								<xs:element name="address" type="xs:string"/>
-								<xs:element name="locationType" type="xs:string"/>
+                <xs:element name="inAuthority" type="xs:string" />
+                <xs:element name="shortIdentifier" type="xs:string"/>
+                <xs:element name="refName" type="xs:string"/>
+                <xs:element name="termStatus" type="xs:string"/>
+                <xs:element name="displayName" type="xs:string"/>
+                <xs:element name="displayNameComputed" type="xs:boolean"/>
+                <xs:element name="shortDisplayName" type="xs:string"/>
+                <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
+                <xs:element name="source" type="xs:string"/>
+                <xs:element name="sourcePage" type="xs:string"/>
+                <xs:element name="description" type="xs:string"/>
+                <xs:element name="name" type="xs:string"/>
+                <xs:element name="conditionGroupList" type="conditionGroupList"/>
+                <xs:element name="securityNote" type="xs:string"/>
+                <xs:element name="accessNote" type="xs:string"/>
+                <xs:element name="address" type="xs:string"/>
+                <xs:element name="locationType" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

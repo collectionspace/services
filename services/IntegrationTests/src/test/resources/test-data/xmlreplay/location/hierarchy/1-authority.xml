@@ -5,6 +5,8 @@
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
     <refName>urn:cspace:org.collectionspace.demo:locationauthority:name(${shortIdentifier})'${displayName}'</refName>
     <vocabType>LocationAuthority</vocabType>
+    <description>This is a test authority</description>
+    <source>Some mythical book</source>
   </ns2:locationauthorities_common>
 </document>
 

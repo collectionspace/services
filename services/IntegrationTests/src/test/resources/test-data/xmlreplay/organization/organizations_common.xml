@@ -25,6 +25,9 @@ xmlns:ns3="http://collectionspace.org/services/jaxb">
       <group>My second group</group>
       <group>My third group</group>
   </groups>
+    <description>This is a test Authority item</description>
+    <source>Some mythical book</source>
+		<sourcePage>Let's say page 39</sourcePage>
   
 </ns2:organizations_common>
 

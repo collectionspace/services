@@ -28,6 +28,9 @@
                 <xs:element name="displayNameComputed" type="xs:boolean"/>
                 <xs:element name="shortDisplayName" type="xs:string"/>
                 <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
+                <xs:element name="source" type="xs:string"/>
+                <xs:element name="sourcePage" type="xs:string"/>
+                <xs:element name="description" type="xs:string"/>
                 <xs:element name="mainBodyGroupList" type="mainBodyGroupList"/>
                 <xs:element name="contactNames" type="contactNameList"/>
                 <xs:element name="foundingDate" type="xs:string"/>

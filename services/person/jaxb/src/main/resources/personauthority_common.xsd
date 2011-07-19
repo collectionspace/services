@@ -39,7 +39,8 @@
 								<xs:element name="shortIdentifier" type="xs:string"/>
                 <xs:element name="refName" type="xs:string"/>
                 <xs:element name="vocabType" type="xs:string"/>
-                
+                <xs:element name="source" type="xs:string"/>
+                <xs:element name="description" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

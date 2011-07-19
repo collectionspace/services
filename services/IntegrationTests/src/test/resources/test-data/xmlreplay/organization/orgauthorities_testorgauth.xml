@@ -6,5 +6,7 @@ xmlns:ns3="http://collectionspace.org/services/jaxb">
   <displayName>Test Org Authority</displayName>
   <refName>urn:cspace:org.collectionspace.demo:orgauthority:name(testorgauth)'Test Org Authority'</refName>
   <vocabType>OrgAuthority</vocabType>
+    <description>This is a test authority</description>
+    <source>Some mythical book</source>
 </ns2:orgauthorities_common>
 
