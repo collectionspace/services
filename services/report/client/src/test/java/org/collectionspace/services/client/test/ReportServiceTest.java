@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -662,9 +663,11 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
      * @return the multipart output
      */
     private PoxPayloadOut createReportInstance(String identifier) {
+    	List<String> docTypes = new ArrayList<String>();
+    	docTypes.add(testDocType);
         return createReportInstance(
                 "Acquisition Summary", 
-                testDocType, true, false, false, true,
+                docTypes, true, false, false, true,
                 "acq_basic.jasper",
                 "application/pdf");
     }
@@ -678,14 +681,17 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
      * @return the multipart output
      */
     private PoxPayloadOut createReportInstance(String name,
-    		String forDocType,
+    		List<String> forDocTypeList,
     		boolean supportsSingle, boolean supportsList, 
     		boolean supportsGroup, boolean supportsNoContext, 
             String filename,
             String outputMIME) {
         ReportsCommon reportCommon = new ReportsCommon();
         reportCommon.setName(name);
-        reportCommon.setForDocType(forDocType);
+        ReportsCommon.ForDocTypes forDocTypes = new ReportsCommon.ForDocTypes(); 
+        List<String> docTypeList = forDocTypes.getForDocType();
+        docTypeList.addAll(forDocTypeList);
+        reportCommon.setForDocTypes(forDocTypes);
         reportCommon.setSupportsSingleDoc(supportsSingle);
         reportCommon.setSupportsDocList(supportsList);
         reportCommon.setSupportsGroup(supportsGroup);

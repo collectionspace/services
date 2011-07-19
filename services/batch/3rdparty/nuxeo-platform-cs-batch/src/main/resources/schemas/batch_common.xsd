@@ -24,7 +24,13 @@
     
     <xs:element name="name" type="xs:string"/>
     <xs:element name="notes" type="xs:string"/>
-    <xs:element name="forDocType" type="xs:string"/>
+    <xs:element name="forDocTypes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="forDocType" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="supportsNoContext" type="xs:boolean"/>
     <xs:element name="supportsSingleDoc" type="xs:boolean"/>
     <xs:element name="supportsDocList" type="xs:boolean"/>

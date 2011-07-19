@@ -231,9 +231,10 @@ public class ReportResource extends ResourceBase {
             			+invocationMode);
     		}
         	if(checkDocType) {
-        		String forDocType = 
-        			(String)docModel.getPropertyValue(InvocableJAXBSchema.FOR_DOC_TYPE);
-            	if(!forDocType.equalsIgnoreCase(invContext.getDocType())) {
+        		List<String> forDocTypeList = 
+        			(List<String>)docModel.getPropertyValue(InvocableJAXBSchema.FOR_DOC_TYPES);
+        		if(forDocTypeList==null
+        				|| !forDocTypeList.contains(invContext.getDocType())) {
             		throw new BadRequestException(
             				"ReportResource: Invoked with unsupported document type: "
             				+invContext.getDocType());

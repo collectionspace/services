@@ -121,7 +121,7 @@ public class ReportDocumentModelHandler
     public ReportsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         ReportsCommonList coList = this.extractPagingInfo(new ReportsCommonList(), wrapDoc);
         AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("name|outputMIME|forDocType|forSingleDoc|uri|csid");
+        commonList.setFieldsReturned("name|uri|csid");
         List<ReportsCommonList.ReportListItem> list = coList.getReportListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
 				String label = getServiceContext().getCommonPartLabel();
@@ -130,16 +130,6 @@ public class ReportDocumentModelHandler
             ReportListItem ilistItem = new ReportListItem();
             ilistItem.setName((String) docModel.getProperty(label,
                     ReportJAXBSchema.NAME));
-            ilistItem.setOutputMIME((String) docModel.getProperty(label,
-                    ReportJAXBSchema.OUTPUT_MIME));
-            ilistItem.setForDocType((String) docModel.getProperty(label,
-                    ReportJAXBSchema.FOR_DOC_TYPE));
-            ilistItem.setSupportsSingleDoc((Boolean) docModel.getProperty(label,
-                    ReportJAXBSchema.SUPPORTS_SINGLE_DOC));
-            ilistItem.setSupportsDocList((Boolean) docModel.getProperty(label,
-                    ReportJAXBSchema.SUPPORTS_DOC_LIST));
-            ilistItem.setSupportsGroup((Boolean) docModel.getProperty(label,
-                    ReportJAXBSchema.SUPPORTS_GROUP));
             String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);

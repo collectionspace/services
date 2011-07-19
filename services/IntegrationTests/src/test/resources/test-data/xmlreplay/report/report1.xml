@@ -4,7 +4,9 @@
 	xmlns:ns2="http://collectionspace.org/services/report">
 		<name>Acquisition Summary</name>
 		<notes>Just a few fields about a single acquisition</notes>
-		<forDocType>Acquisition</forDocType>
+    <forDocTypes>
+  		<forDocType>Acquisition</forDocType>
+		</forDocTypes>
 		<supportsSingleDoc>true</supportsSingleDoc>
 		<supportsDocList>false</supportsDocList>
 		<supportsGroup>false</supportsGroup>

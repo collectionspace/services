@@ -5,12 +5,12 @@
 		<auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
 	</auths>
 	<testGroup ID="testSingle" autoDeletePOSTS="true">
-		<test ID="createCollObj1" auth="test">
+		<test ID="createBatch1" auth="test">
 			<method>POST</method>
 			<uri>/cspace-services/batch/</uri>
 			<filename>batch/batch1.xml</filename>
 		</test>
-		<test ID="createCollObj2" auth="test">
+		<test ID="createBatch2" auth="test">
 			<method>POST</method>
 			<uri>/cspace-services/batch/</uri>
 			<filename>batch/batch1.xml</filename>
@@ -22,7 +22,7 @@
 		</test>
 		<test ID="testInvokeSingle" auth="test" autoDeletePOSTS="false">
 			<method>POST</method>
-			<uri>/cspace-services/batch/${createCollObj1.CSID}</uri>
+			<uri>/cspace-services/batch/${createBatch1.CSID}</uri>
 			<filename>batch/batchInvContextSingle.xml</filename>
 			<vars>
 				<var ID="CollObj1">${createBatch.CSID}</var>
@@ -30,7 +30,7 @@
 		</test>
 		<test ID="testInvokeList" auth="test" autoDeletePOSTS="false">
 			<method>POST</method>
-			<uri>/cspace-services/batch/${createCollObj1.CSID}</uri>
+			<uri>/cspace-services/batch/${createBatch1.CSID}</uri>
 			<filename>batch/batchInvContextList.xml</filename>
 			<vars>
 				<var ID="CollObj1">${createBatch.CSID}</var>
@@ -39,7 +39,7 @@
 		<test ID="testBadInvoke" auth="test" autoDeletePOSTS="false">
 			<method>POST</method>
 			<expectedCodes>400</expectedCodes>
-			<uri>/cspace-services/batch/${createCollObj1.CSID}</uri>
+			<uri>/cspace-services/batch/${createBatch1.CSID}</uri>
 			<filename>batch/batchBadInvContext.xml</filename>
 			<vars>
 				<var ID="CollObj1">${createBatch.CSID}</var>
@@ -48,7 +48,7 @@
 		<test ID="testInvokeEmptyList" auth="test" autoDeletePOSTS="false">
 			<method>POST</method>
 			<expectedCodes>400</expectedCodes>
-			<uri>/cspace-services/batch/${createCollObj1.CSID}</uri>
+			<uri>/cspace-services/batch/${createBatch1.CSID}</uri>
 			<filename>batch/batchBadInvContextList.xml</filename>
 			<vars>
 				<var ID="CollObj1">${createBatch.CSID}</var>
@@ -67,7 +67,7 @@
      <testGroup ID="cleanup" autoDeletePOSTS="true">
          <test ID="cl1"  auth="test">
              <method>DELETE</method>
-             <uri>/cspace-services/batch/${createCollObj1.CSID}</uri>
+             <uri>/cspace-services/batch/${createBatch1.CSID}</uri>
          </test>
          <test ID="cl2"  auth="test">
              <method>DELETE</method>

@@ -5,7 +5,9 @@
 	xmlns:ns3="http://collectionspace.org/services/jaxb">
 		<name>TestCreateAndLinkLoanOutBatchJob</name>
 		<notes>This should be interesting</notes>
-		<forDocType>CollectionObject</forDocType>
+		<forDocTypes>
+		  <forDocType>CollectionObject</forDocType>
+		</forDocTypes>
 		<supportsSingleDoc>true</supportsSingleDoc>
 		<supportsDocList>true</supportsDocList>
 		<createsNewFocus>true</createsNewFocus>

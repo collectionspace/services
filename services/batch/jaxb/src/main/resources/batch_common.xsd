@@ -17,22 +17,29 @@
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->    
     
     <!-- batch -->
-    <xs:element name="batch_common">
-        <xs:complexType>
-            <xs:sequence>
-                <!--  Batch Information Group -->
-                <xs:element name="name" type="xs:string"/>
-                <xs:element name="notes" type="xs:string"/>
-                <xs:element name="forDocType" type="xs:string"/>
-                <xs:element name="supportsNoContext" type="xs:boolean"/>
-                <xs:element name="forSingleDoc" type="xs:boolean"/>
-                <xs:element name="createsNewFocus" type="xs:boolean"/>
-                <xs:element name="className" type="xs:string"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="batch_common">
+		<xs:complexType>
+			<xs:sequence>
+				<!-- Batch Information Group -->
+				<xs:element name="name" type="xs:string" />
+				<xs:element name="notes" type="xs:string" />
+				<xs:element name="forDocTypes">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="forDocType" type="xs:string"
+								minOccurs="1" maxOccurs="unbounded" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="supportsNoContext" type="xs:boolean" />
+				<xs:element name="forSingleDoc" type="xs:boolean" />
+				<xs:element name="createsNewFocus" type="xs:boolean" />
+				<xs:element name="className" type="xs:string" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
-    <!-- This is the base class for paginated lists -->
+	<!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonList">
         <xs:annotation>
             <xs:appinfo>
@@ -42,7 +49,7 @@
     </xs:complexType>
 
 
-    <!-- batch records, as in nuxeo repository -->
+		<!-- batch records, as in nuxeo repository -->
     <xs:element name="batch-common-list">
         <xs:complexType>
             <xs:complexContent>

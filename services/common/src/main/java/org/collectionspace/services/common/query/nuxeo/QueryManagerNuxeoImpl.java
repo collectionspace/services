@@ -204,7 +204,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		if (schema==null || schema.isEmpty()) {
 			throw new RuntimeException("No match schema specified.");
 		}
-		String wClause = schema+":"+InvocableJAXBSchema.FOR_DOC_TYPE + " = '" + trimmed + "'";
+		String wClause = schema+":"+InvocableJAXBSchema.FOR_DOC_TYPES + " = '" + trimmed + "'";
 		return wClause;
 	}
 	

@@ -152,7 +152,7 @@ public class BatchResource extends ResourceBase {
 			throw new RuntimeException("No docType specified.");
 		}
 		String ptClause = COMMON_SCHEMA + ":"
-		+ BatchJAXBSchema.FOR_DOC_TYPE
+		+ BatchJAXBSchema.FOR_DOC_TYPES
 			+ "='" + trimmed + "'";
 		return ptClause;
 	}
@@ -230,9 +230,10 @@ public class BatchResource extends ResourceBase {
             				+invocationMode);
             	}
             	if(checkDocType) {
-	        		String forDocType = 
-	        			(String)docModel.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPE);
-	            	if(!forDocType.equalsIgnoreCase(invContext.getDocType())) {
+	        		List<String> forDocTypeList = 
+	        			(List<String>)docModel.getPropertyValue(BatchJAXBSchema.FOR_DOC_TYPES);
+	        		if(forDocTypeList==null
+        				|| !forDocTypeList.contains(invContext.getDocType())) {
 	            		throw new BadRequestException(
 	            				"BatchResource: Invoked with unsupported document type: "
 	            				+invContext.getDocType());
