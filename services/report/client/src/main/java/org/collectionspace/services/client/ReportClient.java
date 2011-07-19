@@ -27,6 +27,8 @@
 package org.collectionspace.services.client;
 
 //import org.collectionspace.services.common.context.ServiceContext;
+import javax.ws.rs.QueryParam;
+
 import org.collectionspace.services.report.ReportsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -67,6 +69,15 @@ public class ReportClient extends AbstractPoxServiceClientImpl<ReportsCommonList
      */
     public ClientResponse<ReportsCommonList> readList() {
         return getProxy().readList();
+    }
+    
+    /**
+     * @return
+     * @see org.collectionspace.services.client.ReportProxy#getReport()
+     */
+    public ClientResponse<ReportsCommonList> readListFiltered(
+        		String docType, String mode) {
+        return getProxy().readListFiltered(docType, mode);
     }
     
 }

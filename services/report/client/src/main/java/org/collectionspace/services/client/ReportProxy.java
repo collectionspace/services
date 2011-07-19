@@ -54,6 +54,12 @@ public interface ReportProxy extends CollectionSpacePoxProxy<ReportsCommonList> 
     @Produces({"application/xml"})
     ClientResponse<ReportsCommonList> readList();
     
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<ReportsCommonList> readListFiltered(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_DOCTYPE) String docType,
+    		@QueryParam(IQueryManager.SEARCH_TYPE_INVCOATION_MODE) String mode);
+    
     @Override
 	@GET
     @Produces({"application/xml"})

@@ -59,4 +59,28 @@ public class QueryManager {
 		return queryManager.createWhereClauseForPartialMatch(field, partialTerm);
 	}
 	
+	/**
+	 * Creates a filtering where clause from docType, for invocables.
+	 * 
+	 * @param schema the schema name for this invocable type
+	 * @param docType the docType
+	 * 
+	 * @return the string
+	 */
+	static public String createWhereClauseForInvocableByDocType(String schema, String docType) {
+		return queryManager.createWhereClauseForInvocableByDocType(schema, docType);
+	}
+	
+	/**
+	 * Creates a filtering where clause from invocation mode, for invocables.
+	 * 
+	 * @param schema the schema name for this invocable type
+	 * @param mode the mode
+	 * 
+	 * @return the string
+	 */
+	static public String createWhereClauseForInvocableByMode(String schema, String mode) {
+		return queryManager.createWhereClauseForInvocableByMode(schema, mode);
+	}
+	
 }

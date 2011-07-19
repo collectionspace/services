@@ -37,6 +37,7 @@ public interface IQueryManager {
     final static String SEARCH_TYPE_KEYWORDS_KW = "kw";
     final static String SEARCH_TYPE_PARTIALTERM = "pt";
     final static String SEARCH_TYPE_DOCTYPE = "doctype";
+    final static String SEARCH_TYPE_INVCOATION_MODE = "mode";
     final static String SEARCH_TYPE_INVOCATION = "inv";
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
@@ -62,4 +63,24 @@ public interface IQueryManager {
 	 */
 	public String createWhereClauseForPartialMatch(String field, String partialTerm);
 
+	/**
+	 * Creates a filtering where clause from docType, for invocables.
+	 * 
+	 * @param schema the schema name for this invocable type
+	 * @param docType the docType
+	 * 
+	 * @return the string
+	 */
+	public String createWhereClauseForInvocableByDocType(String schema, String docType);
+	
+	/**
+	 * Creates a filtering where clause from invocation mode, for invocables.
+	 * 
+	 * @param schema the schema name for this invocable type
+	 * @param mode the mode
+	 * 
+	 * @return the string
+	 */
+	public String createWhereClauseForInvocableByMode(String schema, String mode);
+	
 }

@@ -31,6 +31,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.ReportJAXBSchema;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
@@ -41,6 +42,7 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -48,6 +50,7 @@ import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.invocable.Invocable.InvocationError;
+import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -107,6 +110,26 @@ public class ReportResource extends ResourceBase {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
+            String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
+            String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVCOATION_MODE);
+            String whereClause = null;
+            DocumentFilter documentFilter = null;
+            String common_part =ctx.getCommonPartLabel(); 
+            if (docType != null && !docType.isEmpty()) {
+                whereClause = QueryManager.createWhereClauseForInvocableByDocType(
+                		common_part, docType);
+                documentFilter = handler.getDocumentFilter();
+                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            }
+            if (mode != null && !mode.isEmpty()) {
+                whereClause = QueryManager.createWhereClauseForInvocableByMode(
+                		common_part, mode);
+                documentFilter = handler.getDocumentFilter();
+                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            }
+            if (whereClause !=null && logger.isDebugEnabled()) {
+                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+            }
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
             return list;

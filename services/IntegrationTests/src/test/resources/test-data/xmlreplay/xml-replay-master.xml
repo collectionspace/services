@@ -47,6 +47,7 @@
     <run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
     <run controlFile="organization/organization-hierarchy.xml" testGroup="HierarchicOrganization" />
     <run controlFile="batch/batch.xml" />
+    <run controlFile="report/report.xml" />
     <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
     
 </xmlReplayMaster>

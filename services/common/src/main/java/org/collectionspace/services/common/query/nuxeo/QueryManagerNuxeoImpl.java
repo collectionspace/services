@@ -36,9 +36,11 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.client.NuxeoClient;
 
+import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.common.invocable.Invocable;
+import org.collectionspace.services.common.invocable.InvocableUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 
@@ -55,6 +57,8 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern nonWordChars = Pattern.compile("[^\\p{L}\\p{M}\\p{N}_']");
 	private static Pattern unescapedDblQuotes = Pattern.compile("(?<!\\\\)\"");
 	private static Pattern unescapedSingleQuote = Pattern.compile("(?<!\\\\)'");
+	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)]");
+	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
 	
 	private static String getLikeForm() {
 		if(SEARCH_LIKE_FORM == null) {
@@ -135,11 +139,16 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 			// and escaping single quotes. Can return a boolean for anything stripped,
 			// which triggers the back-up search. We can think about whether stripping
 			// short words not in a quoted phrase should trigger the backup.
-			fullTextWhereClause.append(unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'"));
+			trimmed = unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'");
 			// If there are non-word chars in the phrase, we need to match the
 			// phrase exactly against the fulltext table for this object
 			//if(nonWordChars.matcher(trimmed).matches()) {
 			//}
+			// Replace problem chars with spaces. Patches CSPACE-4147, CSPACE-4106 
+			trimmed = kwdSearchProblemChars.matcher(trimmed).replaceAll(" ");
+			trimmed = kwdSearchHyphen.matcher(trimmed).replaceAll(" ");
+
+			fullTextWhereClause.append(trimmed);
 			if (logger.isTraceEnabled() == true) {
 				logger.trace("Current built whereClause is: " + fullTextWhereClause.toString());
 			}
@@ -180,7 +189,46 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		return ptClause;
 	}
 
-
+	/**
+	 * Creates a filtering where clause from docType, for invocables.
+	 * 
+	 * @param docType the docType
+	 * 
+	 * @return the string
+	 */
+	public String createWhereClauseForInvocableByDocType(String schema, String docType) {
+		String trimmed = (docType == null)?"":docType.trim(); 
+		if (trimmed.isEmpty()) {
+			throw new RuntimeException("No docType specified.");
+		}
+		if (schema==null || schema.isEmpty()) {
+			throw new RuntimeException("No match schema specified.");
+		}
+		String wClause = schema+":"+InvocableJAXBSchema.FOR_DOC_TYPE + " = '" + trimmed + "'";
+		return wClause;
+	}
+	
+	/**
+	 * Creates a filtering where clause from invocation mode, for invocables.
+	 * 
+	 * @param mode the mode
+	 * 
+	 * @return the string
+	 */
+	public String createWhereClauseForInvocableByMode(String schema, String mode) {
+		String trimmed = (mode == null)?"":mode.trim(); 
+		if (trimmed.isEmpty()) {
+			throw new RuntimeException("No docType specified.");
+		}
+		if (schema==null || schema.isEmpty()) {
+			throw new RuntimeException("No match schema specified.");
+		}
+		String wClause = 
+			InvocableUtils.getPropertyNameForInvocationMode(schema, trimmed)
+			+ " != 0";
+		return wClause;
+	}
+	
 	
 	/**
 	 * @param input

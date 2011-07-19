@@ -62,6 +62,8 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
+    
+    private String testDocType = "Acquisition";
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -292,11 +294,11 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
+        List<ReportsCommonList.ReportListItem> items =
+            list.getReportListItem();
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            List<ReportsCommonList.ReportListItem> items =
-                    list.getReportListItem();
             int i = 0;
             for (ReportsCommonList.ReportListItem item : items) {
                 logger.debug(testName + ": list-item[" + i + "] csid="
@@ -310,7 +312,87 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
                 i++;
             }
         }
+    }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"readList"})
+    public void readListFiltered(String testName) throws Exception {
+    	if (logger.isDebugEnabled()) {
+    		logger.debug(testBanner(testName, CLASS_NAME));
+    	}
+    	// Perform setup.
+    	setupReadList();
+
+    	// Submit the request to the service and store the response.
+    	ReportClient client = new ReportClient();
+    	ClientResponse<ReportsCommonList> res = client.readListFiltered(
+    			testDocType, "single");
+    	ReportsCommonList list = res.getEntity();
+    	int statusCode = res.getStatus();
+
+    	// Check the status code of the response: does it match
+    	// the expected response(s)?
+    	if (logger.isDebugEnabled()) {
+    		logger.debug(testName + ": status = " + statusCode);
+    	}
+    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+    	List<ReportsCommonList.ReportListItem> items =
+    		list.getReportListItem();
+    	// We must find the basic one we created
+    	boolean fFoundBaseItem = false;
+		for (ReportsCommonList.ReportListItem item : items) {
+			if(knownResourceId.equalsIgnoreCase(item.getCsid())) {
+				fFoundBaseItem = true;
+				break;
+			}
+		}
+		if(!fFoundBaseItem)
+			Assert.fail("readListFiltered failed to return base item");
+		
+		// Now filter for something else, and ensure it is NOT returned
+    	res = client.readListFiltered("Intake", "single");
+    	list = res.getEntity();
+    	statusCode = res.getStatus();
+
+    	// Check the status code of the response: does it match
+    	// the expected response(s)?
+    	if (logger.isDebugEnabled()) {
+    		logger.debug(testName + ": status = " + statusCode);
+    	}
+    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+    	items = list.getReportListItem();
+    	// We must NOT find the basic one we created
+		for (ReportsCommonList.ReportListItem item : items) {
+			Assert.assertNotSame(item.getCsid(), knownResourceId, 
+				"readListFiltered(\"Intake\", \"single\") incorrectly returned base item");
+		}
+		
+		// Now filter for something else, and ensure it is NOT returned
+    	res = client.readListFiltered(testDocType, "group");
+    	list = res.getEntity();
+    	statusCode = res.getStatus();
+
+    	// Check the status code of the response: does it match
+    	// the expected response(s)?
+    	if (logger.isDebugEnabled()) {
+    		logger.debug(testName + ": status = " + statusCode);
+    	}
+    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+    	items = list.getReportListItem();
+    	// We must NOT find the basic one we created
+		for (ReportsCommonList.ReportListItem item : items) {
+			Assert.assertNotSame(item.getCsid(), knownResourceId, 
+				"readListFiltered(\""+testDocType+"\", \"group\") incorrectly returned base item");
+		}
     }
 
     // ---------------------------------------------------------------
@@ -322,7 +404,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+    dependsOnMethods = {"read", "readListFiltered"})
     public void update(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -475,7 +557,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "readWorkflow"})
+    dependsOnMethods = {"create", "readListFiltered", "testSubmitRequest", "update", "readWorkflow"})
     public void delete(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -581,8 +663,9 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
      */
     private PoxPayloadOut createReportInstance(String identifier) {
         return createReportInstance(
-                "name-" + identifier,
-                "persAuthTermCountsTest.jasper",
+                "Acquisition Summary", 
+                testDocType, true, false, false, true,
+                "acq_basic.jasper",
                 "application/pdf");
     }
 
@@ -595,10 +678,18 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
      * @return the multipart output
      */
     private PoxPayloadOut createReportInstance(String name,
+    		String forDocType,
+    		boolean supportsSingle, boolean supportsList, 
+    		boolean supportsGroup, boolean supportsNoContext, 
             String filename,
             String outputMIME) {
         ReportsCommon reportCommon = new ReportsCommon();
         reportCommon.setName(name);
+        reportCommon.setForDocType(forDocType);
+        reportCommon.setSupportsSingleDoc(supportsSingle);
+        reportCommon.setSupportsDocList(supportsList);
+        reportCommon.setSupportsGroup(supportsGroup);
+        reportCommon.setSupportsNoContext(supportsNoContext);
         reportCommon.setFilename(filename);
         reportCommon.setOutputMIME(outputMIME);
         reportCommon.setNotes(getUTF8DataFragment()); // For UTF-8 tests
