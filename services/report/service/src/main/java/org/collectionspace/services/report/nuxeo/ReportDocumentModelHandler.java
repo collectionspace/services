@@ -23,21 +23,8 @@
  */
 package org.collectionspace.services.report.nuxeo;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.collectionspace.services.ReportJAXBSchema;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.report.ReportsCommon;
-import org.collectionspace.services.report.ReportsCommonList;
-import org.collectionspace.services.report.ReportsCommonList.ReportListItem;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 
 /**
  * ReportDocumentModelHandler
@@ -45,109 +32,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class ReportDocumentModelHandler
-        extends RemoteDocumentModelHandlerImpl<ReportsCommon, ReportsCommonList> {
+public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 
-    /** The logger. */
-    private final Logger logger = LoggerFactory.getLogger(ReportDocumentModelHandler.class);
-    /**
-     * report is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
-    private ReportsCommon report;
-    /**
-     * reportList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
-    private ReportsCommonList reportList;
-
-
-    /**
-     * getCommonPart get associated report
-     * @return
-     */
-    @Override
-    public ReportsCommon getCommonPart() {
-        return report;
-    }
-
-    /**
-     * setCommonPart set associated report
-     * @param report
-     */
-    @Override
-    public void setCommonPart(ReportsCommon report) {
-        this.report = report;
-    }
-
-    /**
-     * getCommonPartList get associated report (for index/GET_ALL)
-     * @return
-     */
-    @Override
-    public ReportsCommonList getCommonPartList() {
-        return reportList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
-     */
-    @Override
-    public void setCommonPartList(ReportsCommonList reportList) {
-        this.reportList = reportList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public ReportsCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void fillCommonPart(ReportsCommon reportObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public ReportsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        ReportsCommonList coList = this.extractPagingInfo(new ReportsCommonList(), wrapDoc);
-        AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("name|uri|csid");
-        List<ReportsCommonList.ReportListItem> list = coList.getReportListItem();
-        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-				String label = getServiceContext().getCommonPartLabel();
-        while(iter.hasNext()){
-            DocumentModel docModel = iter.next();
-            ReportListItem ilistItem = new ReportListItem();
-            ilistItem.setName((String) docModel.getProperty(label,
-                    ReportJAXBSchema.NAME));
-            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
-            ilistItem.setUri(getServiceContextPath() + id);
-            ilistItem.setCsid(id);
-            list.add(ilistItem);
-        }
-
-        return coList;
-    }
-
-    /**
-     * getQProperty converts the given property to qualified schema property
-     * @param prop
-     * @return
-     */
-    @Override
-    public String getQProperty(String prop) {
-        return ReportConstants.NUXEO_SCHEMA_NAME + ":" + prop;
-    }
- 
 }
 

@@ -34,7 +34,6 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.report.ReportsCommon;
-import org.collectionspace.services.report.ReportsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -72,15 +71,6 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     @Override
     protected CollectionSpaceClient getClientInstance() {
         return new ReportClient();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-    protected AbstractCommonList getAbstractCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(ReportsCommonList.class);
     }
 
 //    @Override
@@ -282,8 +272,8 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         ReportClient client = new ReportClient();
-        ClientResponse<ReportsCommonList> res = client.readList();
-        ReportsCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -295,23 +285,10 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        List<ReportsCommonList.ReportListItem> items =
-            list.getReportListItem();
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            int i = 0;
-            for (ReportsCommonList.ReportListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid="
-                        + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] name="
-                        + item.getName());
-                logger.debug(testName + ": list-item[" + i + "] outputMIME="
-                        + item.getOutputMIME());
-                logger.debug(testName + ": list-item[" + i + "] URI="
-                        + item.getUri());
-                i++;
-            }
+        	ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
 
@@ -326,9 +303,9 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
 
     	// Submit the request to the service and store the response.
     	ReportClient client = new ReportClient();
-    	ClientResponse<ReportsCommonList> res = client.readListFiltered(
+    	ClientResponse<AbstractCommonList> res = client.readListFiltered(
     			testDocType, "single");
-    	ReportsCommonList list = res.getEntity();
+    	AbstractCommonList list = res.getEntity();
     	int statusCode = res.getStatus();
 
     	// Check the status code of the response: does it match
@@ -340,12 +317,12 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-    	List<ReportsCommonList.ReportListItem> items =
-    		list.getReportListItem();
+    	List<AbstractCommonList.ListItem> items =
+    		list.getListItem();
     	// We must find the basic one we created
     	boolean fFoundBaseItem = false;
-		for (ReportsCommonList.ReportListItem item : items) {
-			if(knownResourceId.equalsIgnoreCase(item.getCsid())) {
+		for (AbstractCommonList.ListItem item : items) {
+			if(knownResourceId.equalsIgnoreCase(ListItemGetCSID(item))) {
 				fFoundBaseItem = true;
 				break;
 			}
@@ -367,10 +344,10 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-    	items = list.getReportListItem();
+    	items = list.getListItem();
     	// We must NOT find the basic one we created
-		for (ReportsCommonList.ReportListItem item : items) {
-			Assert.assertNotSame(item.getCsid(), knownResourceId, 
+		for (AbstractCommonList.ListItem item : items) {
+			Assert.assertNotSame(ListItemGetCSID(item), knownResourceId, 
 				"readListFiltered(\"Intake\", \"single\") incorrectly returned base item");
 		}
 		
@@ -388,10 +365,10 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-    	items = list.getReportListItem();
+    	items = list.getListItem();
     	// We must NOT find the basic one we created
-		for (ReportsCommonList.ReportListItem item : items) {
-			Assert.assertNotSame(item.getCsid(), knownResourceId, 
+		for (AbstractCommonList.ListItem item : items) {
+			Assert.assertNotSame(ListItemGetCSID(item), knownResourceId, 
 				"readListFiltered(\""+testDocType+"\", \"group\") incorrectly returned base item");
 		}
     }

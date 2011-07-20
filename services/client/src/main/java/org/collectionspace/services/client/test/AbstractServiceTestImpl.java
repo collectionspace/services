@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.core.Response;
@@ -93,6 +95,36 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         return result;
 
     }
+    
+    protected void ListItemsInAbstractCommonList(
+    		AbstractCommonList list, Logger logger, String testName) {
+    	List<AbstractCommonList.ListItem> items =
+    		list.getListItem();
+    	int i = 0;
+    	for(AbstractCommonList.ListItem item : items){
+    		List<Element> elList = item.getAny();
+    		StringBuilder elementStrings = new StringBuilder();
+    		for(Element el : elList) {
+    			Node textEl = el.getFirstChild();
+   				elementStrings.append("["+el.getNodeName()+":"+((textEl!=null)?textEl.getNodeValue():"NULL")+"] ");
+    		}
+    		logger.debug(testName + ": list-item[" + i + "]: "+elementStrings.toString());
+    		i++;
+    	}
+    }
+
+    protected static String ListItemGetCSID(AbstractCommonList.ListItem item) {
+		List<Element> elList = item.getAny();
+		for(Element el : elList) {
+			if("csid".equalsIgnoreCase(el.getNodeName())) {
+    			Node textEl = el.getFirstChild();
+    			return textEl.getNodeValue();
+			}
+		}
+		return null;
+	}
+
+
     /* Use this to keep track of resources to delete */
     protected List<String> allResourceIdsCreated = new ArrayList<String>();
     /* Use this to track authority items */
@@ -114,6 +146,15 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         String currentDirectory = System.getProperty("user.dir");
         result = currentDirectory + File.separator + RESOURCE_PATH;
         return result;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
+        return response.getEntity(AbstractCommonList.class);
     }
 
     // ---------------------------------------------------------------

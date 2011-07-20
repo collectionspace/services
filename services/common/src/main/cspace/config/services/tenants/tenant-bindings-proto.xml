@@ -867,6 +867,16 @@
             </service:uriPath>-->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>name</service:element>
+              <service:xpath>name</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+			</service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.report.nuxeo.ReportValidatorHandler</service:validatorHandler>
       <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.report.nuxeo.ReportPostInitHandler</service:classname>
@@ -1575,14 +1585,7 @@
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.acquisition.nuxeo.AcquisitionDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
-        <service:classname>org.collectionspace.services.loanin.nuxeo.AcquisitionDocumentModelHandler</service:classname>
         <service:params>
-          <service:SchemaName>acquisition</service:SchemaName>
-          <service:DublinCoreTitle>acquisition</service:DublinCoreTitle>
-          <service:SummaryFields>acquisitionReferenceNumber|acquisitionSources|owners|uri|csid</service:SummaryFields>
-          <service:AbstractCommonListClassname />
-          <service:CommonListItemClassname />
-          <service:ListResultsItemMethodName>getAcquisitionListItem</service:ListResultsItemMethodName>
           <service:ListResultsFields>
             <service:ListResultField>
               <service:element>acquisitionReferenceNumber</service:element>

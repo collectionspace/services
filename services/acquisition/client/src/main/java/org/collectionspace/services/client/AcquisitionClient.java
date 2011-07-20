@@ -8,7 +8,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
  * @version $Revision:$
  */
-public class AcquisitionClient extends AbstractPoxServiceClientImpl<AbstractCommonList, AcquisitionProxy> {
+public class AcquisitionClient extends AbstractCommonListPoxServiceClientImpl<AcquisitionProxy> {
 	public static final String SERVICE_NAME = "acquisitions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -31,25 +31,4 @@ public class AcquisitionClient extends AbstractPoxServiceClientImpl<AbstractComm
 		return AcquisitionProxy.class;
 	}
 
-	/*
-	 * Proxied service calls.
-	 */
-	
-    /**
-     * @return
-     * @see org.collectionspace.hello.client.IntakeProxy#getIntake()
-     */
-    public ClientResponse<AbstractCommonList> readList() {
-        return getProxy().readList();
-    }
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.hello.client.IntakeProxy#getIntake(java.lang.String)
-     */
-    @Override
-	public ClientResponse<String> read(String csid) {
-        return getProxy().read(csid);
-    }
 }

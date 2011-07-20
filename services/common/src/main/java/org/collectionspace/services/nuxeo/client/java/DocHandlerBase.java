@@ -25,6 +25,7 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.common.service.DocHandlerParams;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -62,6 +64,8 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private AbstractCommonList commonList;
+    
+    protected static final int NUM_STANDARD_LIST_RESULT_FIELDS = 3;
 
     @Override
     public AbstractCommonList getCommonPartList() {
@@ -136,14 +140,9 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         throw new UnsupportedOperationException();
     }
 
-    //Laramie20110427 Restored this method since it correctly grabs all params from DocHandlerParams.
-    @Override
-    public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        String classname = getDocHandlerParams().getAbstractCommonListClassname();
-        if (Tools.isBlank(classname)){
-             return extractCommonPartListPATRICK(wrapDoc);
-        }
-
+    // This is an old hack restored by Laramie in confusion about how the 
+	// replacement model works. Will be removed ASAP.
+    public AbstractCommonList extractCommonPartListLaramieHACK(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         String label = getServiceContext().getCommonPartLabel();
         AbstractCommonList commonList = createAbstractCommonListImpl();
         //LC extractPagingInfo((commonList), wrapDoc);
@@ -160,24 +159,24 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         return commonList;
     }
 
-    // Laramie20110427 I renamed this method, and restored the method of the same name above.
-    //                               this makes the AbstractCommonList descendents as specified in DocHandlerParams
-    //                                get pulled in correctly.  XPath search works.
-    //     And I commented out the @Override annotation:
-    //@Override
-    public AbstractCommonList extractCommonPartListPATRICK(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        //String label = getServiceContext().getCommonPartLabel();
+    @Override
+    public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        String classname = getDocHandlerParams().getAbstractCommonListClassname();
+        if (!Tools.isBlank(classname)){
+             return extractCommonPartListLaramieHACK(wrapDoc);
+        }
         
     	String commonSchema = getServiceContext().getCommonPartLabel();
     	CommonList commonList = new CommonList();
         extractPagingInfo(commonList, wrapDoc);
-        List<ListResultField> resultsFields = getListItemsArray();  //Lookup in tenant-bindings.xml
-        int nFields = resultsFields.size()+2;
+        List<ListResultField> resultsFields = getListItemsArray();
+        int nFields = resultsFields.size()+NUM_STANDARD_LIST_RESULT_FIELDS;
         String fields[] = new String[nFields];
         fields[0] = "csid";
         fields[1] = "uri";
-        for(int i=2;i<nFields;i++) {
-        	ListResultField field = resultsFields.get(i-2); 
+        fields[2] = "updatedAt";
+        for(int i=NUM_STANDARD_LIST_RESULT_FIELDS;i<nFields;i++) {
+        	ListResultField field = resultsFields.get(i-NUM_STANDARD_LIST_RESULT_FIELDS); 
         	fields[i]=field.getElement();
         }
         commonList.setFieldsReturned(fields);
@@ -185,10 +184,16 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 		HashMap<String,String> item = new HashMap<String,String>();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
-            String id = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = NuxeoUtils.getCsid(docModel);
             item.put(fields[0], id);
             String uri = getServiceContextPath() + id;
             item.put(fields[1], uri);
+            GregorianCalendar cal = (GregorianCalendar)
+            					docModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,
+            								COLLECTIONSPACE_CORE_UPDATED_AT);
+            String updatedAt = DateTimeFormatUtils.formatAsISO8601Timestamp(cal);
+            item.put(fields[2], updatedAt);
+
             for (ListResultField field : resultsFields ){
             	String schema = field.getSchema();
             	if(schema==null || schema.trim().isEmpty())
@@ -206,6 +211,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         return commonList;
     }
 
+    // TODO - get rid of this if we can - appears to be unused.
     @Override
     public String getQProperty(String prop) throws DocumentException {
         return getDocHandlerParams().getSchemaName() + ":" + prop;
@@ -226,6 +232,9 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
      * @param wrapDoc the wrap doc
      * @throws Exception the exception
      */
+    // TODO - Remove this? 
+    // This look like it is never used in a sensible way. It just stuffs a static
+    // String that matches the service name into a bogus field.
     protected void fillDublinCoreObject(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	DocHandlerParams.Params docHandlerParams = null;
     	try {

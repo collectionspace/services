@@ -38,8 +38,6 @@ import org.collectionspace.services.acquisition.AcquisitionDateList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -416,23 +414,11 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         if(iterateThroughList && logger.isDebugEnabled()){
-        	List<AbstractCommonList.ListItem> items =
-        		list.getListItem();
-        	int i = 0;
-        	for(AbstractCommonList.ListItem item : items){
-        		List<Element> elList = item.getAny();
-        		StringBuilder elementStrings = new StringBuilder();
-        		for(Element el : elList) {
-        			Node textEl = el.getFirstChild();
-       				elementStrings.append("["+el.getNodeName()+":"+((textEl!=null)?textEl.getNodeValue():"NULL")+"] ");
-        		}
-        		logger.debug(testName + ": list-item[" + i + "]: "+elementStrings.toString());
-        		i++;
-        	}
+        	ListItemsInAbstractCommonList(list, logger, testName);
         }
 
     }
-
+    
     // Failure outcomes
     // None at present.
 

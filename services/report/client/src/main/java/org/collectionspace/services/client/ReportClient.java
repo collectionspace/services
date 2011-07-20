@@ -26,10 +26,7 @@
  */
 package org.collectionspace.services.client;
 
-//import org.collectionspace.services.common.context.ServiceContext;
-import javax.ws.rs.QueryParam;
-
-import org.collectionspace.services.report.ReportsCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
@@ -38,7 +35,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public class ReportClient extends AbstractPoxServiceClientImpl<ReportsCommonList, ReportProxy> {
+public class ReportClient extends AbstractCommonListPoxServiceClientImpl<ReportProxy> {
 
     public static final String SERVICE_NAME = "reports";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -59,23 +56,11 @@ public class ReportClient extends AbstractPoxServiceClientImpl<ReportsCommonList
 		return ReportProxy.class;
 	}
 	
-	/*
-	 * Proxied service calls.
-	 */
-	
     /**
      * @return
      * @see org.collectionspace.services.client.ReportProxy#getReport()
      */
-    public ClientResponse<ReportsCommonList> readList() {
-        return getProxy().readList();
-    }
-    
-    /**
-     * @return
-     * @see org.collectionspace.services.client.ReportProxy#getReport()
-     */
-    public ClientResponse<ReportsCommonList> readListFiltered(
+    public ClientResponse<AbstractCommonList> readListFiltered(
         		String docType, String mode) {
         return getProxy().readListFiltered(docType, mode);
     }

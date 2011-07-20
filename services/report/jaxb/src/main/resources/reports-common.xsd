@@ -53,49 +53,5 @@
 		</xs:complexType>
 	</xs:element>
     
-    <!-- This is the base class for paginated lists -->
-    <xs:complexType name="abstractCommonList">
-        <xs:annotation>
-            <xs:appinfo>
-                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
-            </xs:appinfo>
-        </xs:annotation>
-    </xs:complexType>
-    
-    <!-- report records, as in nuxeo repository -->
-    <xs:element name="reports-common-list">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-                    <xs:sequence>
-                        <xs:element name="report-list-item" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="name" type="xs:string"
-                                        minOccurs="1" />
-                                    <xs:element name="outputMIME" type="xs:string"
-                                        minOccurs="1" />
-                                    <xs:element name="forDocType" type="xs:string"
-                                        minOccurs="1" />
-									<xs:element name="supportsSingleDoc" type="xs:boolean"
-                                        minOccurs="1" />
-									<xs:element name="supportsDocList" type="xs:boolean"
-                                        minOccurs="1" />
-									<xs:element name="supportsGroup" type="xs:boolean"
-                                        minOccurs="1" />
-                                   <!-- uri to retrive report details -->
-                                    <xs:element name="uri" type="xs:anyURI"
-                                        minOccurs="1" />
-                                    <xs:element name="csid" type="xs:string"
-                                        minOccurs="1" />
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:extension>
-            </xs:complexContent>        
-        </xs:complexType>
-    </xs:element>
-    
 </xs:schema>
 
