@@ -975,7 +975,7 @@
                         -->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler</service:documentHandler>
-       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
             <service:ListResultField>
@@ -1109,6 +1109,20 @@
             </service:uriPath>-->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>displayName</service:element>
+              <service:xpath>displayName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>shortIdentifier</service:element>
+              <service:xpath>shortIdentifier</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.organization.nuxeo.OrganizationValidatorHandler</service:validatorHandler>
       <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
@@ -1235,6 +1249,20 @@
             </service:uriPath>-->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>displayName</service:element>
+              <service:xpath>displayName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>shortIdentifier</service:element>
+              <service:xpath>shortIdentifier</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.person.nuxeo.PersonValidatorHandler</service:validatorHandler>
       <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
@@ -1293,6 +1321,28 @@
             </service:uriPath>-->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.location.nuxeo.LocationAuthorityDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>displayName</service:element>
+              <service:xpath>displayName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>refName</service:element>
+              <service:xpath>refName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>shortIdentifier</service:element>
+              <service:xpath>shortIdentifier</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>vocabType</service:element>
+              <service:xpath>vocabType</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
       <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
@@ -1332,6 +1382,20 @@
     <tenant:serviceBindings id="Locations" name="Locations" version="0.1">
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.location.nuxeo.LocationDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>displayName</service:element>
+              <service:xpath>displayName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>shortIdentifier</service:element>
+              <service:xpath>shortIdentifier</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.location.nuxeo.LocationValidatorHandler</service:validatorHandler>
       <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
@@ -1389,6 +1453,28 @@
             </service:uriPath>-->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>displayName</service:element>
+              <service:xpath>displayName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>refName</service:element>
+              <service:xpath>refName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>shortIdentifier</service:element>
+              <service:xpath>shortIdentifier</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>vocabType</service:element>
+              <service:xpath>vocabType</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
       <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
@@ -1428,6 +1514,20 @@
     <tenant:serviceBindings id="Taxon" name="Taxon" version="0.1">
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.taxonomy.nuxeo.TaxonDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>displayName</service:element>
+              <service:xpath>displayName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>shortIdentifier</service:element>
+              <service:xpath>shortIdentifier</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.taxonomy.nuxeo.TaxonValidatorHandler</service:validatorHandler>
       <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
@@ -1547,9 +1647,48 @@
     <tenant:serviceBindings id="Relations" name="Relations" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/relations/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
-      '
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.relation.nuxeo.RelationDocumentModelHandler</service:documentHandler>
+      <!-- Configuration of list results fields for relation items is commented out for now, -->
+      <!-- pending resolution of how to specify nested elements in list results. -->
+      <!--
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>subjectCsid</service:element>
+              <service:xpath>subjectCsid</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>relationshipType</service:element>
+              <service:xpath>relationshipType</service:xpath>
+            </service:ListResultField>
+             <service:ListResultField>
+              <service:element>predicate</service:element>
+              <service:xpath>predicate</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>predicateDisplayName</service:element>
+              <service:xpath>predicateDisplayName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>objectCsid</service:element>
+              <service:xpath>objectCsid</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>relationshipType</service:element>
+              <service:xpath>relationshipType</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
+      -->
+      <!--
+          Relation list items can include two additional fields,
+          'subject' and 'object', each of which are parent elements of,
+          and hence containers for, as many as eight child fields.  See
+          services/jaxb/src/main/resources/relations_common.xsd
+      -->
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.relation.nuxeo.RelationValidatorHandler</service:validatorHandler>
       <service:properties xmlns:service="http://collectionspace.org/services/common/service">
         <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -1593,6 +1732,28 @@
     <tenant:serviceBindings id="Accounts" name="Accounts" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.account.storage.AccountDocumentHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>screenName</service:element>
+              <service:xpath>screenName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>personRefName</service:element>
+              <service:xpath>personRefName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>email</service:element>
+              <service:xpath>email</service:xpath>
+            </service:ListResultField>
+             <service:ListResultField>
+              <service:element>status</service:element>
+              <service:xpath>status</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.account.storage.AccountValidatorHandler</service:validatorHandler>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Acccount" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="accounts_system" updated="" order="0">
