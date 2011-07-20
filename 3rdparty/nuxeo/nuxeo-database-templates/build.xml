@@ -26,7 +26,7 @@
 
     <target name="deploy"
     	description="deploys a database template directory to Nuxeo"
-        depends="deploy-templates-dir, update-nuxeo-config">
+			depends="deploy-templates-dir">
     </target>
     
     <target name="deploy-templates-dir"
@@ -38,10 +38,11 @@
         </copy>
     </target>
 
+		<!-- Set the value of the property pointing to the active templates directory
+		OBSOLETE - this is now handled by a deploy task at the root.
     <target name="update-nuxeo-config"
     	description="updates the active Nuxeo configuration file to specify the database template folder to use for CollectionSpace"
         depends="check-templates-dir-exists, check-propertyfile-task-exists, set-nuxeo-active-config, backup-nuxeo-config" if="has.propertyfile.task">
-        <!-- Set the value of the property pointing to the active templates directory (or directories) -->
         <echo message="Setting the Nuxeo database templates directory ..."/>
         <propertyfile file="${nuxeo.active.config.file}">
              <entry key="nuxeo.templates" operation="=" value="${collectionspace.template.dir}"/>
@@ -49,6 +50,7 @@
              <entry key="nuxeo.db.password" operation="=" value="${db.nuxeo.user.password}"/>
         </propertyfile>
     </target>
+		-->
     
     <!-- Undeploy-related targets -->
 

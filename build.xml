@@ -232,7 +232,7 @@
         <ant antfile="services/build.xml" target="import" inheritAll="false"/>
     </target>
 
-    <target name="deploy" depends="install,setup_nuxeo.conf,setup_cspaceds.cfg,setup_initdb.sql"
+    <target name="deploy" depends="checkvars,install,setup_nuxeo.conf,setup_cspaceds.cfg,setup_initdb.sql"
             description="deploy services in ${jboss.server.cspace}">
         <!-- copy db scripts, etc. -->
 				<copy todir="${jboss.server.cspace}/cspace/services/scripts">
@@ -248,7 +248,19 @@
         <ant antfile="3rdparty/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="services/build.xml" target="deploy" inheritAll="false"/>
 
-    </target>
+			</target>
+
+		<target name="checkvars">
+				<fail unless="env.JBOSS_HOME" 
+							message="Required environment variable JBOSS_HOME has not been set."/>
+				<fail unless="env.DB_PASSWORD_CSPACE" 
+							message="Required environment variable DB_PASSWORD_CSPACE has not been set."/>
+				<fail unless="env.DB_PASSWORD_NUXEO" 
+							message="Required environment variable DB_PASSWORD_NUXEO has not been set."/>
+				<fail unless="env.DB_PASSWORD" 
+							message="Required environment variable DB_PASSWORD has not been set."/>
+		</target>
+
 
 		<target name="setup_nuxeo.conf"
 					 description="copy nuxeo.conf, replacing keyword to set DB dialect">
@@ -257,6 +269,8 @@
 			<copy file="${src.nuxeo.conf}" todir="${jboss.bin}">
 				<filterset>
 					<filter token="DB" value="${db}" />
+					<filter token="NUXEO_USER" value="${db.nuxeo.user}" />
+					<filter token="NUXEO_PW" value="${env.DB_PASSWORD_NUXEO}" />
 				</filterset>
 			</copy>
     </target>
