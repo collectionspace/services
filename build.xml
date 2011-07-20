@@ -269,6 +269,8 @@
 			<copy file="${src.nuxeo.conf}" todir="${jboss.bin}">
 				<filterset>
 					<filter token="DB" value="${db}" />
+					<filter token="NUXEO_USER" value="${db.nuxeo.user}" />
+					<filter token="NUXEO_PW" value="${env.DB_PASSWORD_NUXEO}" />
 				</filterset>
 			</copy>
     </target>
