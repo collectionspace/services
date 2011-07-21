@@ -22,18 +22,15 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ObjectExitClient;
-import org.collectionspace.services.client.ObjectExitProxy;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.objectexit.ObjectexitCommonList;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -75,7 +72,7 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
 
     @Override
     protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(ObjectexitCommonList.class);
+        return response.getEntity(AbstractCommonList.class);
     }
 
     @Override
@@ -122,41 +119,20 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadList();
         ObjectExitClient client = new ObjectExitClient();
-        ClientResponse<ObjectexitCommonList> res = client.readList();
+        ClientResponse<AbstractCommonList> res = client.readList();
         String bar = "\r\n\r\n=================================\r\n\r\n";
         System.out.println(bar+" res: "+res);
-        ObjectexitCommonList  list = res.getEntity();
+        AbstractCommonList list = res.getEntity();
 
         System.out.println(bar+" list: "+list);
         assertStatusCode(res, testName);
 
-        if (logger.isDebugEnabled()) {
-            List<AbstractCommonList.ListItem> items =
-                list.getListItem();
-            int i = 0;
-            for(AbstractCommonList.ListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] " +
-                        item.toString());
-                i++;
-            }
+        // Optionally output additional data about list members for debugging.
+        boolean iterateThroughList = true;
+        if(iterateThroughList && logger.isDebugEnabled()){
+        	ListItemsInAbstractCommonList(list, logger, testName);
         }
-
-        /*
-        List<AbstractCommonList.ListItem> items = list.getListItem();
-        int i = 0;
-        for(AbstractCommonList.ListItem item : items){
-            List<Element> elList = item.getAny();
-            StringBuilder elementStrings = new StringBuilder();
-            for(Element el : elList) {
-                Node textEl = el.getFirstChild();
-                if (textEl != null){
-                    elementStrings.append("["+el.getNodeName()+":"+textEl.getNodeValue()+"] ");
-                }
-            }
-            System.out.println("\r\n\r\n\r\n~~~~~~~~~~~~~~~~~~~~~~~~~~~"+testName + ": list-item[" + i + "]: "+elementStrings.toString());
-            i++;
-        }
-        */
+        
     }
 
     @Override

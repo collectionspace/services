@@ -16,11 +16,6 @@
  */
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.objectexit.ObjectexitCommonList;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 /**
  * ObjectExitClient.java
  *
@@ -28,39 +23,28 @@ import org.jboss.resteasy.client.ClientResponse;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class ObjectExitClient extends AbstractPoxServiceClientImpl<ObjectexitCommonList, ObjectExitProxy> {
-	public static final String SERVICE_NAME = "objectexit";
-	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
-	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
-	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;	
+public class ObjectExitClient extends AbstractCommonListPoxServiceClientImpl<ObjectExitProxy> {
 
-	@Override
-	public String getServiceName() {
-		return SERVICE_NAME;
-	}
-	
-	@Override
+    public static final String SERVICE_NAME = "objectexit";
+    public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
+    public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+    public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
+    public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
+    @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
-	@Override
-	public Class<ObjectExitProxy> getProxyClass() {
-		// TODO Auto-generated method stub
-		return ObjectExitProxy.class;
-	}
-
-	/*
-	 * Proxied service calls.
-	 * 
-	 */
-	
-    public ClientResponse<ObjectexitCommonList> readList() {
-        return getProxy().readList();
+    @Override
+    public Class<ObjectExitProxy> getProxyClass() {
+        // TODO Auto-generated method stub
+        return ObjectExitProxy.class;
     }
 
-    public ObjectexitCommonList readList2(){
-        ObjectexitCommonList list = readList().getEntity(ObjectexitCommonList.class);
-        return list;
-    }
 }

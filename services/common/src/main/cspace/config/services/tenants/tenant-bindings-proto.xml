@@ -503,12 +503,6 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:classname>
         <service:params>
-          <service:SchemaName>objectexit</service:SchemaName>
-          <service:DublinCoreTitle>objectexit</service:DublinCoreTitle>
-          <service:SummaryFields>exitNumber|currentOwner|uri|csid</service:SummaryFields>
-          <service:AbstractCommonListClassname>org.collectionspace.services.objectexit.ObjectexitCommonList</service:AbstractCommonListClassname>
-          <service:CommonListItemClassname>org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem</service:CommonListItemClassname>
-          <service:ListResultsItemMethodName>getObjectexitListItem</service:ListResultsItemMethodName>
           <service:ListResultsFields>
             <service:ListResultField>
               <service:element>exitNumber</service:element>
