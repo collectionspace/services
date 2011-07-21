@@ -29,8 +29,6 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.profile.Profiler;
-import org.collectionspace.services.intake.IntakeResource;
-import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
@@ -76,65 +74,6 @@ public class CollectionObjectResource extends ResourceBase {
     public Class<CollectionobjectsCommon> getCommonPartClass() {
     	return CollectionobjectsCommon.class;
     }
-
-
-    /**
-     * Gets the intakes common list.
-     * 
-     * @param ui the ui
-     * @param csid the csid
-     * 
-     * @return the intakes common list
-     */
-    @GET
-    @Path("{csid}/intakes")
-    @Produces("application/xml")
-    public IntakesCommonList getIntakesCommonList(@Context UriInfo ui,
-    		@PathParam("csid") String csid) {
-        IntakesCommonList result = null;  	
-    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        
-        try {
-        	//
-        	// Find all the intake-related relation records.
-        	//
-        	String subjectCsid = csid;
-        	String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.value();
-        	String objectCsid = null;
-        	RelationResource relationResource = new RelationResource();
-        	RelationsCommonList relationsCommonList = relationResource.getRelationList(queryParams,
-        			subjectCsid,
-        			null, /*subjectType*/
-        			predicate,
-        			objectCsid,
-        			null /*objectType*/);
-        	
-        	//
-        	// Create an array of Intake csid's
-        	//
-        	List<RelationsCommonList.RelationListItem> relationsListItems = relationsCommonList.getRelationListItem();
-        	List<String> intakeCsidList = new ArrayList<String>();
-            for (RelationsCommonList.RelationListItem relationsListItem : relationsListItems) {
-            	intakeCsidList.add(relationsListItem.getObjectCsid());
-        	}
-            
-            //
-            // Get a response list for the Intake records from the Intake resource
-            //
-        	IntakeResource intakeResource = new IntakeResource();
-        	result = intakeResource.getIntakeList(intakeCsidList);
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in getIntakeList", e);
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
-            throw new WebApplicationException(response);
-        }
-        
-        return result;
-    }
-
 
     /**
      * Roundtrip.

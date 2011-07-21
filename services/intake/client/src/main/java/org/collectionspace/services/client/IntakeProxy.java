@@ -1,14 +1,4 @@
-/**	
- * IntakeProxy.java
- *
- * {Purpose of This Class}
- *
- * {Other Notes Relating to This Class (Optional)}
- *
- * $LastChangedBy: $
- * $LastChangedRevision: $
- * $LastChangedDate: $
- *
+/**
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -16,53 +6,34 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright © 2009 {Contributing Institution}
+ * Copyright (c) 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.collectionspace.services.client;
 
-import org.jboss.resteasy.client.ClientResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
-import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
- * @version $Revision:$
- * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
+ * IntakeProxy
+ * 
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
  */
 @Path(IntakeClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface IntakeProxy extends CollectionSpacePoxProxy<AbstractCommonList> {
-    /**
-     * Read list.
-     *
-     * @return the client response
-     */
-    @GET
-    @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> readList();
-    
-    @Override
-	@GET
-    @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> readIncludeDeleted(
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
-
-    @Override
-    @GET
-    @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> keywordSearchIncludeDeleted(
-    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+public interface IntakeProxy extends CollectionSpaceCommonListPoxProxy {
 }

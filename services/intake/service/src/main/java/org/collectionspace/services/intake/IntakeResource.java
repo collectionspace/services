@@ -23,27 +23,14 @@
  */
 package org.collectionspace.services.intake;
 
-import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IntakeClient;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
-import java.util.List;
 
 @Path(IntakeClient.SERVICE_PATH)
 @Consumes("application/xml")
@@ -66,29 +53,6 @@ public class IntakeResource extends ResourceBase {
     @Override
     public Class<IntakesCommon> getCommonPartClass() {
     	return IntakesCommon.class;
-    }
-
-    public IntakesCommonList getIntakeList(List<String> csidList) {
-        IntakesCommonList intakeObjectList = new IntakesCommonList();
-        try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            DocumentHandler handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).get(ctx, csidList, handler);
-            intakeObjectList = (IntakesCommonList) handler.getCommonPartList();
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.LIST_FAILED);
-        }
-        return intakeObjectList;
-    }
-
-    @GET
-    @Path("/search")    
-    @Produces("application/xml")
-    @Deprecated
-    public AbstractCommonList keywordsSearchIntakes(@Context UriInfo ui,
-    		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-    	return search(queryParams, keywords);
     }
 
 }
