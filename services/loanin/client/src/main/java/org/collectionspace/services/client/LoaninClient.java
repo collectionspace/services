@@ -16,9 +16,6 @@
  */
 package org.collectionspace.services.client;
 
-import org.jboss.resteasy.client.ClientResponse;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-
 /**
  * LoaninClient.java
  *
@@ -26,7 +23,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
  * $LastChangedDate$
  *
  */
-public class LoaninClient extends AbstractPoxServiceClientImpl<AbstractCommonList, LoaninProxy> {
+public class LoaninClient extends AbstractCommonListPoxServiceClientImpl<LoaninProxy> {
+
     public static final String SERVICE_NAME = "loansin";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -44,20 +42,9 @@ public class LoaninClient extends AbstractPoxServiceClientImpl<AbstractCommonLis
         return SERVICE_NAME;
     }
 
-	@Override
-	public Class<LoaninProxy> getProxyClass() {
-		return LoaninProxy.class;
-	}
-
-    /*
-     * Proxied service calls
-     */
-
-    /**
-     * @return
-     * @see org.collectionspace.services.client.LoaninProxy#getLoanin()
-     */
-    public ClientResponse<AbstractCommonList> readList() {
-        return getProxy().readList();
+    @Override
+    public Class<LoaninProxy> getProxyClass() {
+        return LoaninProxy.class;
     }
+
 }
