@@ -27,8 +27,8 @@ import javax.ws.rs.Produces;
  * $LastChangedDate$
  *
  */
-@Path("/loansin/")
-@Produces({"application/xml;charset=UTF-8"})
+@Path(LoaninClient.SERVICE_PATH_PROXY)
+@Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface LoaninProxy extends CollectionSpaceCommonListPoxProxy {
 }

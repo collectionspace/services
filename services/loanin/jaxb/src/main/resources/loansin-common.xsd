@@ -62,14 +62,5 @@
        </xs:sequence>
     </xs:complexType>
     
-    <!-- This is the base class for paginated lists -->
-    <xs:complexType name="abstractCommonList">
-        <xs:annotation>
-            <xs:appinfo>
-                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
-            </xs:appinfo>
-        </xs:annotation>
-    </xs:complexType>
-    
 </xs:schema>
 
