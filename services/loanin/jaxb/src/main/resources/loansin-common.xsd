@@ -61,7 +61,7 @@
            <xs:element name="lendersContact" type="xs:string"/>
        </xs:sequence>
     </xs:complexType>
-
+    
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonList">
         <xs:annotation>
