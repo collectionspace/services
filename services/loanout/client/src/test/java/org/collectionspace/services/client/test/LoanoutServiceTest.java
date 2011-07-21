@@ -36,7 +36,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoanedObjectStatusGroup;
 import org.collectionspace.services.loanout.LoanedObjectStatusGroupList;
 import org.collectionspace.services.loanout.LoansoutCommon;
-import org.collectionspace.services.loanout.LoansoutCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -75,7 +74,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
     @Override
     protected AbstractCommonList getAbstractCommonList(
             ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(LoansoutCommonList.class);
+        return response.getEntity(AbstractCommonList.class);
     }
 
     // ---------------------------------------------------------------
@@ -372,8 +371,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<LoansoutCommonList> res = client.readList();
-        LoansoutCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -386,20 +385,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            List<LoansoutCommonList.LoanoutListItem> items =
-                    list.getLoanoutListItem();
-            int i = 0;
-            for (LoansoutCommonList.LoanoutListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid="
-                        + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] loanOutNumber="
-                        + item.getLoanOutNumber());
-                logger.debug(testName + ": list-item[" + i + "] URI="
-                        + item.getUri());
-                i++;
-            }
+        boolean iterateThroughList = true;
+        if(iterateThroughList && logger.isDebugEnabled()){
+        	ListItemsInAbstractCommonList(list, logger, testName);
         }
 
     }
