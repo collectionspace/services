@@ -563,14 +563,7 @@
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
-        <service:classname>org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler</service:classname>
         <service:params>
-          <service:SchemaName>batch</service:SchemaName>
-          <service:DublinCoreTitle>batch</service:DublinCoreTitle>
-          <service:SummaryFields>name|uri|csid</service:SummaryFields>
-          <service:AbstractCommonListClassname>org.collectionspace.services.batch.BatchCommonList</service:AbstractCommonListClassname>
-          <service:CommonListItemClassname>org.collectionspace.services.batch.BatchCommonList$BatchListItem</service:CommonListItemClassname>
-          <service:ListResultsItemMethodName>getBatchListItem</service:ListResultsItemMethodName>
           <service:ListResultsFields>
             <service:ListResultField>
               <service:element>name</service:element>

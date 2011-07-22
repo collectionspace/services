@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -32,8 +31,8 @@ import org.collectionspace.services.client.BatchProxy;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.batch.BatchCommonList;
 import org.collectionspace.services.batch.BatchCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -71,11 +70,6 @@ public class BatchServiceTest extends AbstractServiceTestImpl {
     @Override
     protected CollectionSpaceClient getClientInstance() {
         return new BatchClient();
-    }
-
-    @Override
-    protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(BatchCommonList.class);
     }
 
     @Override
@@ -122,23 +116,16 @@ public class BatchServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadList();
         BatchClient client = new BatchClient();
-        ClientResponse<BatchCommonList> res = client.readList();
+        ClientResponse<AbstractCommonList> res = client.readList();
         String bar = "\r\n\r\n=================================\r\n\r\n";
         System.out.println(bar+" res: "+res);
-        BatchCommonList  list = res.getEntity();
+        AbstractCommonList  list = res.getEntity();
 
         System.out.println(bar+" list: "+list);
         assertStatusCode(res, testName);
 
-        if (logger.isDebugEnabled()) {
-            List<AbstractCommonList.ListItem> items =
-                list.getListItem();
-            int i = 0;
-            for(AbstractCommonList.ListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] " +
-                        item.toString());
-                i++;
-            }
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
 

@@ -16,11 +16,6 @@
  */
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.batch.BatchCommonList;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 /**
  * BatchClient.java
  *
@@ -28,7 +23,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class BatchClient extends AbstractPoxServiceClientImpl<BatchCommonList, BatchProxy> {
+public class BatchClient extends AbstractCommonListPoxServiceClientImpl<BatchProxy> {
 	public static final String SERVICE_NAME = "batch";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -53,14 +48,10 @@ public class BatchClient extends AbstractPoxServiceClientImpl<BatchCommonList, B
 	/*
 	 * Proxied service calls.
 	 * 
-	 */
 	
-    public ClientResponse<BatchCommonList> readList() {
-        return getProxy().readList();
-    }
-
     public BatchCommonList readList2(){
         BatchCommonList list = readList().getEntity(BatchCommonList.class);
         return list;
     }
+	 */
 }
