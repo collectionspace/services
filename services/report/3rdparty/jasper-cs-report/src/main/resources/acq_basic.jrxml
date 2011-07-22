@@ -51,7 +51,7 @@ $P!{where_clause}]]>
 				<staticText>
 					<reportElement style="SubTitle" x="370" y="37" width="316" height="29"/>
 					<textElement textAlignment="Right">
-						<font fontName="Arial" size="22" isBold="false"/>
+						<font fontName="DejaVu Sans" size="22" isBold="false"/>
 					</textElement>
 					<text><![CDATA[Acquisitions]]></text>
 				</staticText>
@@ -65,7 +65,7 @@ $P!{where_clause}]]>
 				<textField pattern="EEEEE dd MMMMM yyyy">
 					<reportElement x="553" y="12" width="144" height="20" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right">
-						<font size="12"/>
+						<font fontName="DejaVu Sans" size="12"/>
 					</textElement>
 					<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
 				</textField>
@@ -80,42 +80,42 @@ $P!{where_clause}]]>
 			<staticText>
 				<reportElement style="Column header" x="141" y="0" width="87" height="18" forecolor="#000000"/>
 				<textElement>
-					<font fontName="Arial" size="13" isBold="true"/>
+					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Orig. Price]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="2" y="0" width="139" height="18" forecolor="#000000"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="13" isBold="true"/>
+					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Ref #]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="228" y="0" width="75" height="18" forecolor="#000000"/>
 				<textElement>
-					<font fontName="Arial" size="13" isBold="true"/>
+					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Auth. Date]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="303" y="0" width="192" height="18" forecolor="#000000"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="13" isBold="true"/>
+					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Authorizer]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="495" y="0" width="169" height="18" forecolor="#000000"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="13" isBold="true"/>
+					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Reason]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="664" y="0" width="72" height="18" forecolor="#000000"/>
 				<textElement textAlignment="Center">
-					<font fontName="Arial" size="13" isBold="true"/>
+					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Method]]></text>
 			</staticText>
@@ -128,28 +128,28 @@ $P!{where_clause}]]>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="141" y="0" width="87" height="18"/>
 					<textElement>
-						<font size="13"/>
+						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_originalobjectpurchasepricevalue}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="2" y="0" width="139" height="18"/>
 					<textElement>
-						<font size="12"/>
+						<font fontName="DejaVu Serif" size="12"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionreferencenumber}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="228" y="0" width="75" height="18"/>
 					<textElement>
-						<font size="13"/>
+						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionauthorizerdate}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="303" y="0" width="192" height="18"/>
 					<textElement textAlignment="Center">
-						<font size="13"/>
+						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[($F{acquisitions_common_acquisitionauthorizer}==null ||
     $F{acquisitions_common_acquisitionauthorizer}.isEmpty())?
@@ -160,14 +160,14 @@ $P!{where_clause}]]>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="495" y="0" width="169" height="18"/>
 					<textElement textAlignment="Center">
-						<font size="13"/>
+						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionreason}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="664" y="0" width="72" height="18"/>
 					<textElement textAlignment="Center">
-						<font size="13"/>
+						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionmethod}]]></textFieldExpression>
 				</textField>
@@ -191,21 +191,21 @@ $P!{where_clause}]]>
 				<textField evaluationTime="Report">
 					<reportElement style="Column header" x="757" y="3" width="40" height="20" forecolor="#FFFFFF"/>
 					<textElement verticalAlignment="Middle">
-						<font size="10" isBold="false"/>
+						<font fontName="DejaVu Serif" size="10" isBold="false"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement style="Column header" x="677" y="3" width="80" height="20" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="10" isBold="false"/>
+						<font fontName="DejaVu Serif" size="10" isBold="false"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
 				</textField>
 				<textField pattern="EEEEE dd MMMMM yyyy">
 					<reportElement style="Column header" x="2" y="3" width="197" height="20" forecolor="#FFFFFF"/>
 					<textElement verticalAlignment="Middle">
-						<font size="10" isBold="false"/>
+						<font fontName="DejaVu Serif" size="10" isBold="false"/>
 					</textElement>
 					<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
 				</textField>
