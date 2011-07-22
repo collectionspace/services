@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ns3:objectexit-common-list xmlns:ns2="http://collectionspace.org/services/jaxb" xmlns:ns3="http://collectionspace.org/services/objectexit">
+<ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
   <pageNum>0</pageNum>
   <pageSize>40</pageSize>
   <itemsInPage>1</itemsInPage>
   <totalItems>1</totalItems>
-  <fieldsReturned>exitNumber|currentOwner|uri|csid</fieldsReturned>
-  <objectexit-list-item>
-    <exitNumber>${exitNumber}</exitNumber>
-    <uri>/objectexit/${targetCSID}</uri>
+  <fieldsReturned>csid|uri|updatedAt|exitNumber|currentOwner</fieldsReturned>
+  <list-item>
     <csid>${targetCSID}</csid>
-  </objectexit-list-item>
-</ns3:objectexit-common-list>
+    <uri>/objectexit/${targetCSID}</uri>
+    <exitNumber>${exitNumber}</exitNumber>
+  </list-item>
+</ns2:abstract-common-list>
