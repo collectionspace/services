@@ -45,13 +45,4 @@ public class BatchClient extends AbstractCommonListPoxServiceClientImpl<BatchPro
 		return BatchProxy.class;
 	}
 
-	/*
-	 * Proxied service calls.
-	 * 
-	
-    public BatchCommonList readList2(){
-        BatchCommonList list = readList().getEntity(BatchCommonList.class);
-        return list;
-    }
-	 */
 }

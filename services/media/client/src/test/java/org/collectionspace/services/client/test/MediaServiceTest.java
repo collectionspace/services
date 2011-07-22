@@ -34,6 +34,7 @@ import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.LanguageList;
 import org.collectionspace.services.media.MediaCommon;
@@ -243,15 +244,9 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         ClientResponse<AbstractCommonList> res = client.readList();
         AbstractCommonList list = res.getEntity();
         assertStatusCode(res, testName);
-        if (logger.isDebugEnabled()) {
-            List<AbstractCommonList.ListItem> items =
-                list.getListItem();
-            int i = 0;
-            for(AbstractCommonList.ListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] " +
-                        item.toString());
-                i++;
-            }
+        // Optionally output additional data about list members for debugging.
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
 

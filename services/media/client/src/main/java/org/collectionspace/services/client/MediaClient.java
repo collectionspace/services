@@ -20,8 +20,6 @@ import javax.ws.rs.core.Response;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.collectionspace.services.jaxb.AbstractCommonList;
-
 /**
  * MediaClient.java
  *
@@ -29,7 +27,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class MediaClient extends AbstractPoxServiceClientImpl<AbstractCommonList, MediaProxy> {
+public class MediaClient extends AbstractCommonListPoxServiceClientImpl<MediaProxy> {
 	public static final String SERVICE_NAME = "media";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -54,14 +52,6 @@ public class MediaClient extends AbstractPoxServiceClientImpl<AbstractCommonList
 	 * Proxied service calls
 	 */
 
-    /**
-     * @return
-     * @see org.collectionspace.services.client.MediaProxy#getMedia()
-     */
-    public ClientResponse<AbstractCommonList> readList() {
-        return getProxy().readList();
-    }
-        
     /**
      * @param media
      * @return

@@ -162,14 +162,7 @@
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
-        <service:classname>org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:classname>
         <service:params>
-          <service:SchemaName>blobs</service:SchemaName>
-          <service:DublinCoreTitle>blobs</service:DublinCoreTitle>
-          <service:SummaryFields>name|mimeType|encoding|length|uri|csid</service:SummaryFields>
-          <service:AbstractCommonListClassname />
-          <service:CommonListItemClassname />
-          <service:ListResultsItemMethodName>getBlobListItem</service:ListResultsItemMethodName>
           <service:ListResultsFields>
             <service:ListResultField>
               <service:element>name</service:element>
@@ -599,14 +592,7 @@
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.group.nuxeo.GroupDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
-        <service:classname>org.collectionspace.services.group.nuxeo.GroupDocumentModelHandler</service:classname>
         <service:params>
-          <service:SchemaName>groups</service:SchemaName>
-          <service:DublinCoreTitle>groups</service:DublinCoreTitle>
-          <service:SummaryFields>title|uri|csid</service:SummaryFields>
-          <service:AbstractCommonListClassname />
-          <service:CommonListItemClassname />
-          <service:ListResultsItemMethodName>getGroupListItem</service:ListResultsItemMethodName>
           <service:ListResultsFields>
             <service:ListResultField>
               <service:element>title</service:element>
@@ -695,14 +681,7 @@
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
-        <service:classname>org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler</service:classname>
         <service:params>
-          <service:SchemaName>media</service:SchemaName>
-          <service:DublinCoreTitle>media</service:DublinCoreTitle>
-          <service:SummaryFields>title|source|filename|identificationNumber|blobCsid|uri|csid</service:SummaryFields>
-          <service:AbstractCommonListClassname />
-          <service:CommonListItemClassname />
-          <service:ListResultsItemMethodName>getMediaListItem</service:ListResultsItemMethodName>
           <service:ListResultsFields>
             <service:ListResultField>
               <service:element>title</service:element>

@@ -16,9 +16,6 @@
  */
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
-
 /**
  * GroupClient.java
  *
@@ -26,7 +23,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class GroupClient extends AbstractPoxServiceClientImpl<AbstractCommonList, GroupProxy> {
+public class GroupClient extends AbstractCommonListPoxServiceClientImpl<GroupProxy> {
 	public static final String SERVICE_NAME = "groups";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -49,12 +46,4 @@ public class GroupClient extends AbstractPoxServiceClientImpl<AbstractCommonList
 		return GroupProxy.class;
 	}
 
-	/*
-	 * Proxied service calls.
-	 * 
-	 */
-	
-    public ClientResponse<AbstractCommonList> readList() {
-        return getProxy().readList();
-    }
 }
