@@ -37,8 +37,8 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.movement.MovementsCommon;
-import org.collectionspace.services.movement.MovementsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -72,6 +72,7 @@ public class MovementSortByTest extends BaseServiceTest {
     private List<String> movementIdsCreated = new ArrayList<String>();
     private final String SORT_FIELD_SEPARATOR = ", ";
     private final Locale LOCALE = Locale.US;
+    private final String LOCATION_DATE_EL_NAME = "locationDate";
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -112,20 +113,20 @@ public class MovementSortByTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Sorting on field name=" + sortFieldName);
         }
-        MovementsCommonList list = readSortedList(sortFieldName);
-        List<MovementsCommonList.MovementListItem> items =
-                list.getMovementListItem();
+        AbstractCommonList list = readSortedList(sortFieldName);
+        List<AbstractCommonList.ListItem> items =
+                list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
         Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         int i = 0;
-        for (MovementsCommonList.MovementListItem item : items) {
+        for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by retrieving full records, using the
             // IDs provided in the summary list items. amd then retriving
             // the value of that field from each of those records.
-            MovementsCommon movement = read(item.getCsid());
+            MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             values.add(i, movement.getMovementNote());
             if (logger.isDebugEnabled()) {
                 logger.debug("list-item[" + i + "] movementNote=" + values.get(i));
@@ -165,20 +166,20 @@ public class MovementSortByTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Sorting on field name=" + sortFieldName);
         }
-        MovementsCommonList list = keywordSearchSortedBy(TEST_SPECIFIC_KEYWORD, sortFieldName);
-        List<MovementsCommonList.MovementListItem> items =
-                list.getMovementListItem();
+        AbstractCommonList list = keywordSearchSortedBy(TEST_SPECIFIC_KEYWORD, sortFieldName);
+        List<AbstractCommonList.ListItem> items =
+                list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
         Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         int i = 0;
-        for (MovementsCommonList.MovementListItem item : items) {
+        for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by retrieving full records, using the
             // IDs provided in the summary list items. amd then retriving
             // the value of that field from each of those records.
-            MovementsCommon movement = read(item.getCsid());
+            MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             values.add(i, movement.getMovementNote());
             if (logger.isDebugEnabled()) {
                 logger.debug("list-item[" + i + "] movementNote=" + values.get(i));
@@ -216,20 +217,20 @@ public class MovementSortByTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Sorting on field name=" + sortFieldName);
         }
-        MovementsCommonList list = readSortedList(sortFieldName);
-        List<MovementsCommonList.MovementListItem> items =
-                list.getMovementListItem();
+        AbstractCommonList list = readSortedList(sortFieldName);
+        List<AbstractCommonList.ListItem> items =
+                list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
         Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         int i = 0;
-        for (MovementsCommonList.MovementListItem item : items) {
+        for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by retrieving full records, using the
             // IDs provided in the summary list items. amd then retriving
             // the value of that field from each of those records.
-            MovementsCommon movement = read(item.getCsid());
+            MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             values.add(i, movement.getMovementNote());
             if (logger.isDebugEnabled()) {
                 logger.debug("list-item[" + i + "] movementNote=" + values.get(i));
@@ -266,15 +267,17 @@ public class MovementSortByTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Sorting on field name=" + sortFieldName);
         }
-        MovementsCommonList list = readSortedList(sortFieldName);
-        List<MovementsCommonList.MovementListItem> items =
-                list.getMovementListItem();
+        AbstractCommonList list = readSortedList(sortFieldName);
+        List<AbstractCommonList.ListItem> items =
+                list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
         Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
-        for (MovementsCommonList.MovementListItem item : items) {
-            values.add(i, item.getLocationDate());
+        for (AbstractCommonList.ListItem item : items) {
+        	String locDate = 
+        		AbstractCommonListUtils.ListItemGetElementValue(item, LOCATION_DATE_EL_NAME);
+        	values.add(i, locDate);
             if (logger.isDebugEnabled()) {
                 logger.debug("list-item[" + i + "] locationDate=" + values.get(i));
             }
@@ -304,15 +307,17 @@ public class MovementSortByTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Sorting on field name=" + sortFieldName);
         }
-        MovementsCommonList list = readSortedList(sortFieldName);
-        List<MovementsCommonList.MovementListItem> items =
-                list.getMovementListItem();
+        AbstractCommonList list = readSortedList(sortFieldName);
+        List<AbstractCommonList.ListItem> items =
+                list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
         Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
-        for (MovementsCommonList.MovementListItem item : items) {
-            values.add(i, item.getLocationDate());
+        for (AbstractCommonList.ListItem item : items) {
+        	String locDate = 
+        		AbstractCommonListUtils.ListItemGetElementValue(item, LOCATION_DATE_EL_NAME);
+        	values.add(i, locDate);
             if (logger.isDebugEnabled()) {
                 logger.debug("list-item[" + i + "] locationDate=" + values.get(i));
             }
@@ -343,22 +348,22 @@ public class MovementSortByTest extends BaseServiceTest {
             logger.debug("Sorting on field names=" + firstSortFieldName + " and " + secondSortFieldName);
         }
         String sortExpression = firstSortFieldName + SORT_FIELD_SEPARATOR + secondSortFieldName;
-        MovementsCommonList list = readSortedList(sortExpression);
-        List<MovementsCommonList.MovementListItem> items =
-                list.getMovementListItem();
+        AbstractCommonList list = readSortedList(sortExpression);
+        List<AbstractCommonList.ListItem> items =
+                list.getListItem();
 
         ArrayList<String> firstFieldValues = new ArrayList<String>();
         ArrayList<String> secondFieldValues = new ArrayList<String>();
         Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
-        for (MovementsCommonList.MovementListItem item : items) {
+        for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by retrieving full records, using the
             // IDs provided in the summary list items. amd then retriving
             // the value of that field from each of those records.
-            MovementsCommon movement = read(item.getCsid());
+            MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             firstFieldValues.add(i, movement.getMovementNote());
             secondFieldValues.add(i, movement.getLocationDate());
             if (logger.isDebugEnabled()) {
@@ -402,22 +407,22 @@ public class MovementSortByTest extends BaseServiceTest {
             logger.debug("Sorting on field names=" + firstSortFieldName + " and " + secondSortFieldName);
         }
         String sortExpression = firstSortFieldName + SORT_FIELD_SEPARATOR + secondSortFieldName;
-        MovementsCommonList list = readSortedList(sortExpression);
-        List<MovementsCommonList.MovementListItem> items =
-                list.getMovementListItem();
+        AbstractCommonList list = readSortedList(sortExpression);
+        List<AbstractCommonList.ListItem> items =
+                list.getListItem();
 
         ArrayList<String> firstFieldValues = new ArrayList<String>();
         ArrayList<String> secondFieldValues = new ArrayList<String>();
         Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
-        for (MovementsCommonList.MovementListItem item : items) {
+        for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by retrieving full records, using the
             // IDs provided in the summary list items. amd then retriving
             // the value of that field from each of those records.
-            MovementsCommon movement = read(item.getCsid());
+            MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             firstFieldValues.add(i, movement.getLocationDate());
             secondFieldValues.add(i, movement.getMovementNote());
             if (logger.isDebugEnabled()) {
@@ -459,7 +464,7 @@ public class MovementSortByTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         final String EMPTY_SORT_FIELD_NAME = "";
-        ClientResponse<MovementsCommonList> res =
+        ClientResponse<AbstractCommonList> res =
                 client.readListSortedBy(EMPTY_SORT_FIELD_NAME);
         int statusCode = res.getStatus();
 
@@ -491,7 +496,7 @@ public class MovementSortByTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
-        ClientResponse<MovementsCommonList> res =
+        ClientResponse<AbstractCommonList> res =
                 client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE);
         int statusCode = res.getStatus();
 
@@ -521,7 +526,7 @@ public class MovementSortByTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         final String INVALID_SORT_ORDER_IDENTIFIER = "NO_DIRECTION";
-        ClientResponse<MovementsCommonList> res =
+        ClientResponse<AbstractCommonList> res =
                 client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE
                 + " " + INVALID_SORT_ORDER_IDENTIFIER);
         int statusCode = res.getStatus();
@@ -749,7 +754,7 @@ public class MovementSortByTest extends BaseServiceTest {
         return multipart;
     }
 
-    private MovementsCommonList readSortedList(String sortFieldName) throws Exception {
+    private AbstractCommonList readSortedList(String sortFieldName) throws Exception {
 
         String testName = "readSortedList";
         testSetup(STATUS_OK, ServiceRequestType.READ);
@@ -757,9 +762,9 @@ public class MovementSortByTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
 
-        ClientResponse<MovementsCommonList> res =
+        ClientResponse<AbstractCommonList> res =
                 client.readListSortedBy(sortFieldName);
-        MovementsCommonList list = res.getEntity();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -775,7 +780,7 @@ public class MovementSortByTest extends BaseServiceTest {
 
     }
 
-    private MovementsCommonList keywordSearchSortedBy(String keywords,
+    private AbstractCommonList keywordSearchSortedBy(String keywords,
             String sortFieldName) throws Exception {
 
         String testName = "keywordSearchSortedBy";
@@ -784,9 +789,9 @@ public class MovementSortByTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
 
-        ClientResponse<MovementsCommonList> res =
+        ClientResponse<AbstractCommonList> res =
                 client.keywordSearchSortedBy(keywords, sortFieldName);
-        MovementsCommonList list = res.getEntity();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match

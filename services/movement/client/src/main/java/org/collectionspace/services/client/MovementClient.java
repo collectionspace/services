@@ -17,8 +17,8 @@
 
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.collectionspace.services.movement.MovementsCommonList;
 
 /**
  * MovementClient.java
@@ -27,7 +27,7 @@ import org.collectionspace.services.movement.MovementsCommonList;
  * $LastChangedDate$
  *
  */
-public class MovementClient extends AbstractPoxServiceClientImpl<MovementsCommonList, MovementProxy> {
+public class MovementClient extends AbstractCommonListPoxServiceClientImpl<MovementProxy> {
     public static final String SERVICE_NAME = "movements";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -49,24 +49,13 @@ public class MovementClient extends AbstractPoxServiceClientImpl<MovementsCommon
 		return MovementProxy.class;
 	}
 
-	/*
-	 * Proxied service calls
-	 */
-	
-    /**
-     * @return
-     * @see org.collectionspace.services.client.MovementProxy#readList()
-     */
-    public ClientResponse<MovementsCommonList> readList() {
-        return getProxy().readList();
-    }
 
     /**
      * @param sortFieldName
      * @return
      * @see org.collectionspace.services.client.MovementProxy#readList(java.lang.String)
      */
-    public ClientResponse<MovementsCommonList> readListSortedBy(String sortFieldName) {
+    public ClientResponse<AbstractCommonList> readListSortedBy(String sortFieldName) {
         return getProxy().readListSortedBy(sortFieldName);
     }
 
@@ -76,7 +65,7 @@ public class MovementClient extends AbstractPoxServiceClientImpl<MovementsCommon
      * @return
      * @see org.collectionspace.services.client.MovementProxy#keywordSearchSortedBy(java.lang.String, java.lang.String)
      */
-    public ClientResponse<MovementsCommonList> keywordSearchSortedBy(String keywords, String sortFieldName) {
+    public ClientResponse<AbstractCommonList> keywordSearchSortedBy(String keywords, String sortFieldName) {
         return getProxy().keywordSearchSortedBy(keywords, sortFieldName);
     }    
 }

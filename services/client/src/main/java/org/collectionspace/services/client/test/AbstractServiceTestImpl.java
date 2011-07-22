@@ -96,35 +96,6 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     }
     
-    protected void ListItemsInAbstractCommonList(
-    		AbstractCommonList list, Logger logger, String testName) {
-    	List<AbstractCommonList.ListItem> items =
-    		list.getListItem();
-    	int i = 0;
-    	for(AbstractCommonList.ListItem item : items){
-    		List<Element> elList = item.getAny();
-    		StringBuilder elementStrings = new StringBuilder();
-    		for(Element el : elList) {
-    			Node textEl = el.getFirstChild();
-   				elementStrings.append("["+el.getNodeName()+":"+((textEl!=null)?textEl.getNodeValue():"NULL")+"] ");
-    		}
-    		logger.debug(testName + ": list-item[" + i + "]: "+elementStrings.toString());
-    		i++;
-    	}
-    }
-
-    protected static String ListItemGetCSID(AbstractCommonList.ListItem item) {
-		List<Element> elList = item.getAny();
-		for(Element el : elList) {
-			if("csid".equalsIgnoreCase(el.getNodeName())) {
-    			Node textEl = el.getFirstChild();
-    			return textEl.getNodeValue();
-			}
-		}
-		return null;
-	}
-
-
     /* Use this to keep track of resources to delete */
     protected List<String> allResourceIdsCreated = new ArrayList<String>();
     /* Use this to track authority items */

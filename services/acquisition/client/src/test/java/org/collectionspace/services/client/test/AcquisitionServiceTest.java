@@ -31,6 +31,7 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
@@ -81,15 +82,6 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     	return new AcquisitionClient();
     }
     
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
-    }
-
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -412,9 +404,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){
-        	ListItemsInAbstractCommonList(list, logger, testName);
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
 
     }

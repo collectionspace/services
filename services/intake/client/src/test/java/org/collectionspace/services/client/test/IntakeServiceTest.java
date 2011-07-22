@@ -32,6 +32,7 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.intake.EntryMethodList;
 import org.collectionspace.services.intake.FieldCollectionEventNameList;
 import org.collectionspace.services.intake.CurrentLocationGroup;
@@ -410,7 +411,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            ListItemsInAbstractCommonList(list, logger, testName);
+            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
 
     }

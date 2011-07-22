@@ -32,7 +32,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.movement.MovementsCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
  * MovementProxy.java
@@ -43,35 +43,30 @@ import org.collectionspace.services.movement.MovementsCommonList;
 @Path("/movements/")
 @Produces("application/xml")
 @Consumes("application/xml")
-public interface MovementProxy extends CollectionSpacePoxProxy<MovementsCommonList> {
+public interface MovementProxy extends CollectionSpaceCommonListPoxProxy {
 
-    // List
-    @GET
-    @Produces({"application/xml"})
-    ClientResponse<MovementsCommonList> readList();
-    
     // Sorted list
     @GET
     @Produces({"application/xml"})
-    ClientResponse<MovementsCommonList> readListSortedBy(
+    ClientResponse<AbstractCommonList> readListSortedBy(
         @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortFieldName);
     
     @Override
 	@GET
     @Produces({"application/xml"})
-    ClientResponse<MovementsCommonList> readIncludeDeleted(
+    ClientResponse<AbstractCommonList> readIncludeDeleted(
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 
     @Override
     @GET
     @Produces({"application/xml"})
-    ClientResponse<MovementsCommonList> keywordSearchIncludeDeleted(
+    ClientResponse<AbstractCommonList> keywordSearchIncludeDeleted(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
             @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<MovementsCommonList> keywordSearchSortedBy(
+    ClientResponse<AbstractCommonList> keywordSearchSortedBy(
         @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
         @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortFieldName);
 }

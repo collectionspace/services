@@ -31,12 +31,12 @@ import java.util.TimeZone;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
-import org.collectionspace.services.movement.MovementsCommonList;
 import org.collectionspace.services.movement.MovementMethodsList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -79,15 +79,6 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
     	return new MovementClient();
     }
     
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(MovementsCommonList.class);
-    }
- 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -383,8 +374,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
-        ClientResponse<MovementsCommonList> res = client.readList();
-        MovementsCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -397,24 +388,9 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){
-            List<MovementsCommonList.MovementListItem> items =
-                    list.getMovementListItem();
-            int i = 0;
-            for(MovementsCommonList.MovementListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] movementReferenceNumber=" +
-                        item.getMovementReferenceNumber());
-                logger.debug(testName + ": list-item[" + i + "] locationDate=" +
-                        item.getLocationDate());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
-                i++;
-            }
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
-
     }
 
     // Failure outcomes

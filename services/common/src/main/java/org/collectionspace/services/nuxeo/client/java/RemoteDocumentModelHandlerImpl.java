@@ -23,8 +23,8 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
-import java.io.InputStream;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,25 +43,20 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.security.SecurityUtils;
-import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.dom4j.Element;
-
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -72,7 +67,6 @@ import org.nuxeo.ecm.core.schema.types.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.dom4j.Document;
 
 /**
  * RemoteDocumentModelHandler
@@ -273,8 +267,6 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             throws Exception {
         //check if this is an xml part
         if (part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)) {
-//                Document document = DocumentUtils.parseDocument(payload, partMeta,
-//                        false /*don't validate*/);
         	Element element = part.getElementBody();
             Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, element, ctx);
                 if (action == Action.UPDATE) {
@@ -681,7 +673,16 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     protected static String getXPathStringValue(DocumentModel docModel, String schema, String xpath) {
     	xpath = schema+":"+xpath;
     	try {
-	    	return (String)docModel.getPropertyValue(xpath);
+    		Object value = docModel.getPropertyValue(xpath);
+    		String returnVal = null;
+    		if(value==null) {
+    			// Nothing to do - leave returnVal null
+    		} else if(value instanceof GregorianCalendar) {
+    			returnVal = DateTimeFormatUtils.formatAsISO8601Timestamp((GregorianCalendar)value);
+    		} else {
+    			returnVal = value.toString();
+    		}
+    		return returnVal;
     	} catch(PropertyException pe) {
     		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Bad XPath spec?"
     				+pe.getLocalizedMessage());

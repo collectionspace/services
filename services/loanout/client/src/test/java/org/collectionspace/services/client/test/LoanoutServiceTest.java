@@ -32,6 +32,7 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoanedObjectStatusGroup;
 import org.collectionspace.services.loanout.LoanedObjectStatusGroupList;
@@ -387,7 +388,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         if(iterateThroughList && logger.isDebugEnabled()){
-        	ListItemsInAbstractCommonList(list, logger, testName);
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
 
     }

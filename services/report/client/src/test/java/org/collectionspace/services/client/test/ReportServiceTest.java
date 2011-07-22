@@ -33,6 +33,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
@@ -286,9 +287,8 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-        	ListItemsInAbstractCommonList(list, logger, testName);
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
 
@@ -322,7 +322,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     	// We must find the basic one we created
     	boolean fFoundBaseItem = false;
 		for (AbstractCommonList.ListItem item : items) {
-			if(knownResourceId.equalsIgnoreCase(ListItemGetCSID(item))) {
+			if(knownResourceId.equalsIgnoreCase(AbstractCommonListUtils.ListItemGetCSID(item))) {
 				fFoundBaseItem = true;
 				break;
 			}
@@ -347,7 +347,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     	items = list.getListItem();
     	// We must NOT find the basic one we created
 		for (AbstractCommonList.ListItem item : items) {
-			Assert.assertNotSame(ListItemGetCSID(item), knownResourceId, 
+			Assert.assertNotSame(AbstractCommonListUtils.ListItemGetCSID(item), knownResourceId, 
 				"readListFiltered(\"Intake\", \"single\") incorrectly returned base item");
 		}
 		
@@ -368,7 +368,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     	items = list.getListItem();
     	// We must NOT find the basic one we created
 		for (AbstractCommonList.ListItem item : items) {
-			Assert.assertNotSame(ListItemGetCSID(item), knownResourceId, 
+			Assert.assertNotSame(AbstractCommonListUtils.ListItemGetCSID(item), knownResourceId, 
 				"readListFiltered(\""+testDocType+"\", \"group\") incorrectly returned base item");
 		}
     }
