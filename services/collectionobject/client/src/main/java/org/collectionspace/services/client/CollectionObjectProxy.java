@@ -26,26 +26,26 @@
  */
 package org.collectionspace.services.client;
 
-import org.jboss.resteasy.client.ClientResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import org.jboss.resteasy.client.ClientResponse;
 
-import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+// FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
 
 /**
- * @version $Revision:$
- * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
+ * CollectionObjectProxy.java
+ * 
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
  */
 @Path(CollectionObjectClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface CollectionObjectProxy extends CollectionSpacePoxProxy<CollectionobjectsCommonList> {
+public interface CollectionObjectProxy extends CollectionSpaceCommonListPoxProxy {
 
     /**
      * Roundtrip.
@@ -57,21 +57,6 @@ public interface CollectionObjectProxy extends CollectionSpacePoxProxy<Collectio
     @Path("/{ms}/roundtrip")
     @Produces({"application/xml"})
     ClientResponse<Response> roundtrip(@PathParam("ms") int ms);
-
-    /**
-     * Read list.
-     *
-     * @return the client response
-     */
-    @GET
-    @Produces({"application/xml"})
-    ClientResponse<CollectionobjectsCommonList> readList();
-    
-    @Override
-	@GET
-    @Produces({"application/xml"})
-    ClientResponse<CollectionobjectsCommonList> readIncludeDeleted(
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
     /**
      * Keyword search.
@@ -79,16 +64,13 @@ public interface CollectionObjectProxy extends CollectionSpacePoxProxy<Collectio
      * @param keywords the keywords
      * @return the client response
      */
+    /*
     @GET
     @Produces({"application/xml"})
     ClientResponse<CollectionobjectsCommonList> keywordSearch(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
+     * 
+     */
 
-    @Override
-    @GET
-    @Produces({"application/xml"})
-    ClientResponse<CollectionobjectsCommonList> keywordSearchIncludeDeleted(
-    	    @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
     
 }

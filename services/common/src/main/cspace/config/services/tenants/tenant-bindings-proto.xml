@@ -51,6 +51,31 @@
             </service:uriPath> -->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:classname>org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:classname>
+        <service:params>
+          <service:DublinCoreTitle>collectionobjects</service:DublinCoreTitle>
+          <service:ListResultsItemMethodName>getCollectionObjectListItem</service:ListResultsItemMethodName>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>objectNumber</service:element>
+              <service:xpath>objectNumber</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>objectName</service:element>
+              <service:xpath>objectNameList/[0]/objectName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>title</service:element>
+              <service:xpath>titleGroupList/[0]/title</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>responsibleDepartment</service:element>
+              <service:xpath>responsibleDepartments/[0]</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.collectionobject.nuxeo.CollectionObjectValidatorHandler</service:validatorHandler>
       <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.common.init.ModifyFieldDatatypes</service:classname>

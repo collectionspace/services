@@ -37,7 +37,6 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.BriefDescriptionList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
-import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
 import org.collectionspace.services.collectionobject.DimensionGroup;
 import org.collectionspace.services.collectionobject.DimensionList;
@@ -47,11 +46,10 @@ import org.collectionspace.services.collectionobject.OtherNumber;
 import org.collectionspace.services.collectionobject.OtherNumberList;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
-
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -107,7 +105,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Override
 	protected AbstractCommonList getAbstractCommonList(
 			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(CollectionobjectsCommonList.class);
+        return response.getEntity(AbstractCommonList.class);
     }
  
     // ---------------------------------------------------------------
@@ -696,8 +694,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<CollectionobjectsCommonList> res = client.readList();
-        CollectionobjectsCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -708,25 +706,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            List<CollectionobjectsCommonList.CollectionObjectListItem> items =
-                    list.getCollectionObjectListItem();
-            int i = 0;
-
-            for (CollectionobjectsCommonList.CollectionObjectListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid="
-                        + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] objectNumber="
-                        + item.getObjectNumber());
-                logger.debug(testName + ": list-item[" + i + "] URI="
-                        + item.getUri());
-                i++;
-
-            }
+        // the expected response(s)?
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
+        
     }
 
     // Failure outcomes

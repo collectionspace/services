@@ -28,50 +28,39 @@ package org.collectionspace.services.client;
 
 import org.jboss.resteasy.client.ClientResponse;
 import javax.ws.rs.core.Response;
-import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+
+// FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
 
 /**
- * The Class CollectionObjectClient.
- * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
+ * CollectionObjectClient.java
+ *
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
  */
-public class CollectionObjectClient extends AbstractPoxServiceClientImpl<CollectionobjectsCommonList, CollectionObjectProxy> {
-	public static final String SERVICE_NAME = "collectionobjects";
-	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
-	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;	
-	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";		
-	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
-	public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
-    
-	@Override
-	public String getServiceName() {
-		return SERVICE_NAME;
-	}
-    
-	@Override
-    public String getServicePathComponent() {
-		return SERVICE_PATH_COMPONENT;
-	}
+public class CollectionObjectClient extends AbstractCommonListPoxServiceClientImpl<CollectionObjectProxy> {
 
-	@Override
-	public Class<CollectionObjectProxy> getProxyClass() {
-		return CollectionObjectProxy.class;
-	}
+    public static final String SERVICE_NAME = "collectionobjects";
+    public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
+    public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+    public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
+    public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+    public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
-	/*
-	 * Proxied service calls
-	 */
-	
-	/**
-     * Read list.
-     * 
-     * @see org.collectionspace.services.client.CollectionObjectProxy#readList()
-     * @return the client response< collectionobjects common list>
-     */
-    public ClientResponse<CollectionobjectsCommonList> readList() {
-    	CollectionObjectProxy proxy = (CollectionObjectProxy)getProxy();
-        return proxy.readList();
-
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
     }
+
+    @Override
+    public String getServicePathComponent() {
+        return SERVICE_PATH_COMPONENT;
+    }
+
+    @Override
+    public Class<CollectionObjectProxy> getProxyClass() {
+        return CollectionObjectProxy.class;
+    }
+
 
     /**
      * Roundtrip.
@@ -83,12 +72,12 @@ public class CollectionObjectClient extends AbstractPoxServiceClientImpl<Collect
      * @return the client response< response>
      */
     public ClientResponse<Response> roundtrip(int ms) {
-    	getLogger().debug(">>>>Roundtrip start.");
-    	ClientResponse<Response> result = getProxy().roundtrip(ms);
-    	getLogger().debug("<<<<Roundtrip stop.");
-    	return result;
+        getLogger().debug(">>>>Roundtrip start.");
+        ClientResponse<Response> result = getProxy().roundtrip(ms);
+        getLogger().debug("<<<<Roundtrip stop.");
+        return result;
     }
-    
+
     /**
      * Keyword search.
      * 
@@ -97,7 +86,10 @@ public class CollectionObjectClient extends AbstractPoxServiceClientImpl<Collect
      * @see org.collectionspace.services.client.CollectionObjectProxy#keywordSearch()
      * @return the client response< collectionobjects common list>
      */
+    /*
     public ClientResponse<CollectionobjectsCommonList> keywordSearch(String keywords) {
         return getProxy().keywordSearch(keywords);
     }
+     * 
+     */
 }

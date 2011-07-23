@@ -108,6 +108,7 @@ public class CollectionObjectResource extends ResourceBase {
      * 
      * @return the collectionobjects common list
      */
+    /*
     @GET
     @Path("/search")
     @Produces("application/xml")
@@ -116,6 +117,8 @@ public class CollectionObjectResource extends ResourceBase {
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
     	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
     	return search(queryParams, keywords);
-    }    
+    }  
+     * 
+     */
 
 }
