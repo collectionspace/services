@@ -1697,6 +1697,13 @@
       <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
         <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
         <service:params>
+          <!-- Index that is to be created for the ubiquitious updatedAt field -->
+          <!-- in collectionspace_core is configured here in the Relation -->
+          <!-- service, as it is a core service that will be reliably present. -->
+          <service:field>
+            <service:table>collectionspace_core</service:table>
+            <service:col>updatedat</service:col>
+          </service:field>
           <service:field>
             <service:table>relations_common</service:table>
             <service:param>documentid1,documentid2</service:param>
