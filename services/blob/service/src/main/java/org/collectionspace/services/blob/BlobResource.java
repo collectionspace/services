@@ -89,10 +89,10 @@ public class BlobResource extends ResourceBase {
         return (CommonList) getList(csidList);
     }
 
-    @Deprecated
-    protected CommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
-         return (CommonList) super.search(queryParams, keywords);
-    }
+//    @Deprecated
+//    protected CommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
+//         return (CommonList) super.search(queryParams, keywords);
+//    }
     
     private CommonList getDerivativeList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		String csid) throws Exception {

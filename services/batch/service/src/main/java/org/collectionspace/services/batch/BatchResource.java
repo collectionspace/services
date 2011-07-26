@@ -114,14 +114,14 @@ public class BatchResource extends ResourceBase {
 			@Context UriInfo ui) {
         AbstractCommonList list;
         if (docType != null && !docType.isEmpty() && mode != null && !mode.isEmpty()) {
-            list = search(ui.getQueryParameters(), docType, mode);
+            list = batchSearch(ui.getQueryParameters(), docType, mode);
         } else {
             list = getList(ui);
         }
         return list;
 	}
 
-    protected AbstractCommonList search(MultivaluedMap<String, String> queryParams, 
+    private AbstractCommonList batchSearch(MultivaluedMap<String, String> queryParams, 
     										String docType, String mode) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);

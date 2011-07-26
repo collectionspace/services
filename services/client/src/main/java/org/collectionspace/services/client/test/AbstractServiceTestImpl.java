@@ -803,7 +803,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     /*
      * Test that searches honor the workflow deleted state.
      */
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void searchWorkflowDeleted(String testName) throws Exception {
 
         // FIXME: Temporarily avoid running test if client is of an authority service
