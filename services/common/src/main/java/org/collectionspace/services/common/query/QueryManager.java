@@ -47,6 +47,10 @@ public class QueryManager {
 		return queryManager.createWhereClauseFromKeywords(keywords);
 	}
 	
+	static public String createWhereClauseFromAdvancedSearch(String keywords) {
+		return queryManager.createWhereClauseFromAdvancedSearch(keywords);
+	}
+	
 	/**
 	 * Creates the where clause for partial term match.
 	 * 

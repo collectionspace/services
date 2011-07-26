@@ -35,6 +35,7 @@ public interface IQueryManager {
 	final static String SEARCH_ILIKE = " ILIKE ";
     final static String SEARCH_TYPE_KEYWORDS = "keywords";
     final static String SEARCH_TYPE_KEYWORDS_KW = "kw";
+    final static String SEARCH_TYPE_KEYWORDS_AS = "as";
     final static String SEARCH_TYPE_PARTIALTERM = "pt";
     final static String SEARCH_TYPE_DOCTYPE = "doctype";
     final static String SEARCH_TYPE_INVCOATION_MODE = "mode";
@@ -52,6 +53,8 @@ public interface IQueryManager {
 	 * @return the string
 	 */
 	public String createWhereClauseFromKeywords(String keywords);
+	
+	public String createWhereClauseFromAdvancedSearch(String advancedSearch);
 
 	/**
 	 * Creates the where clause for partial term match.

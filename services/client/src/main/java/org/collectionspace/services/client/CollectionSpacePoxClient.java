@@ -31,4 +31,6 @@ public interface CollectionSpacePoxClient<LT extends AbstractCommonList, P exten
     public ClientResponse<LT> readIncludeDeleted(Boolean includeDeleted);
 
     public ClientResponse<LT> keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted);
+    
+    public ClientResponse<LT> advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted);
 }

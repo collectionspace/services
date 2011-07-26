@@ -227,9 +227,10 @@ public abstract class ResourceBase
     public AbstractCommonList getList(@Context UriInfo ui) {
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+        String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
         AbstractCommonList list;
-        if (keywords != null) {
-            list = search(queryParams, keywords);
+        if (keywords != null || advancedSearch != null) {
+            list = search(queryParams, keywords, advancedSearch);
         } else {
             list = getList(queryParams);
         }
@@ -257,13 +258,23 @@ public abstract class ResourceBase
         }
     }
 
-    protected AbstractCommonList search(MultivaluedMap<String, String> queryParams, String keywords) {
+    protected AbstractCommonList search(MultivaluedMap<String, String> queryParams,
+    		String keywords,
+    		String advancedSearch) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             // perform a keyword search
             if (keywords != null && !keywords.isEmpty()) {
                 String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+                DocumentFilter documentFilter = handler.getDocumentFilter();
+                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+                }
+            }
+            if (advancedSearch != null && !advancedSearch.isEmpty()) {
+                String whereClause = QueryManager.createWhereClauseFromAdvancedSearch(advancedSearch);
                 DocumentFilter documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
                 if (logger.isDebugEnabled()) {

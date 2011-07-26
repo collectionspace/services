@@ -45,4 +45,10 @@ public abstract class AbstractPoxServiceClientImpl<LT extends AbstractCommonList
         return proxy.keywordSearchIncludeDeleted(keywords, includeDeleted.toString());
     }
 
+    @Override
+    public ClientResponse<LT> advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted) {
+        CollectionSpacePoxProxy<LT> proxy = getProxy();
+        return proxy.advancedSearchIncludeDeleted(whereClause, includeDeleted.toString());
+    }
+
 }
