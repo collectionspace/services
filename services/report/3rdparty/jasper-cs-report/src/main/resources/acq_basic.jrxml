@@ -17,7 +17,10 @@
 		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
 	</parameter>
 	<parameter name="where_clause" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA[(($P{csid}==null||($P{csid}.length()==0))?"":" WHERE hierarchy.name = '"+$P{csid}+"'")]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA[(($P{csid}==null||($P{csid}.length()==0))?"":" AND hierarchy.name = '"+$P{csid}+"'")]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tenantid" class="java.lang.String">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT
@@ -31,6 +34,8 @@
      acquisitions_common."acquisitionreason" AS acquisitions_common_acquisitionreason
 FROM
      "public"."acquisitions_common" acquisitions_common INNER JOIN "public"."hierarchy" hierarchy ON acquisitions_common."id" = hierarchy."id"
+INNER JOIN "public"."collectionspace_core" core ON acquisitions_common."id" = core."id"
+WHERE core.tenantid = $P{tenantid}
 $P!{where_clause}]]>
 	</queryString>
 	<field name="acquisitions_common_originalobjectpurchasepricevalue" class="java.lang.String"/>
