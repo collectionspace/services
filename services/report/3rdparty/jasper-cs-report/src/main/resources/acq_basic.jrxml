@@ -35,7 +35,8 @@
 FROM
      "public"."acquisitions_common" acquisitions_common INNER JOIN "public"."hierarchy" hierarchy ON acquisitions_common."id" = hierarchy."id"
 INNER JOIN "public"."collectionspace_core" core ON acquisitions_common."id" = core."id"
-WHERE core.tenantid = $P{tenantid}
+INNER JOIN "public"."misc" misc ON misc."id" = hierarchy."id"
+WHERE core.tenantid = $P{tenantid} AND misc.lifecyclestate != 'deleted'
 $P!{where_clause}]]>
 	</queryString>
 	<field name="acquisitions_common_originalobjectpurchasepricevalue" class="java.lang.String"/>
