@@ -33,8 +33,7 @@ import javax.ws.rs.Path;
 
 @Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT)
 public class VocabularyResource extends 
-	AuthorityResource<VocabulariesCommon, VocabulariesCommonList, VocabularyitemsCommonList,
-						VocabularyItemDocumentModelHandler> {
+	AuthorityResource<VocabulariesCommon, VocabularyItemDocumentModelHandler> {
 
     private final static String vocabularyServiceName = VocabularyClient.SERVICE_PATH_COMPONENT;
 

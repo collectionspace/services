@@ -89,43 +89,5 @@
         </xs:sequence>
     </xs:complexType>
     
-    <!-- This is the base class for paginated lists -->
-    <xs:complexType name="abstractCommonListItem">
-        <xs:annotation>
-            <xs:appinfo>
-                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
-            </xs:appinfo>
-        </xs:annotation>
-    </xs:complexType>
-    
-    <!-- Person instances, as in nuxeo repository -->
-    <xs:element name="persons-common-list">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonListItem">                    
-                    <xs:sequence>
-                        <xs:element name="person_list_item" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="displayName" type="xs:string"
-                                        minOccurs="1" />
-									<xs:element name="shortIdentifier" type="xs:string"
-                                        minOccurs="1" />
-                                    <!-- uri to retrieve person details -->
-                                    <xs:element name="uri" type="xs:anyURI"
-                                        minOccurs="1" />
-                                    <xs:element name="refName" type="xs:string"
-                                        minOccurs="1" />
-                                    <xs:element name="csid" type="xs:string"
-                                        minOccurs="1" />
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    
 </xs:schema>
 

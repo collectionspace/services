@@ -35,14 +35,13 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClientUtils;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.taxonomy.TaxonAuthorGroup;
 import org.collectionspace.services.taxonomy.TaxonAuthorGroupList;
 import org.collectionspace.services.taxonomy.TaxonCitationList;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
-import org.collectionspace.services.taxonomy.TaxonomyauthorityCommonList;
 import org.collectionspace.services.taxonomy.TaxonCommon;
-import org.collectionspace.services.taxonomy.TaxonCommonList;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -67,6 +66,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     /** The logger. */
     private final String CLASS_NAME = TaxonomyAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(TaxonomyAuthorityServiceTest.class);
+    private final String REFNAME = "refName";
+    private final String DISPLAYNAME = "displayName";
 
     @Override
     public String getServicePathComponent() {
@@ -129,15 +130,6 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     @Override
     protected CollectionSpaceClient getClientInstance() {
         return new TaxonomyAuthorityClient();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-    protected AbstractCommonList getAbstractCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(TaxonCommonList.class);
     }
 
     @Override
@@ -775,9 +767,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 
         // Submit the request to the service and store the response.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-        ClientResponse<TaxonomyauthorityCommonList> res = client.readList();
+        ClientResponse<AbstractCommonList> res = client.readList();
         try {
-            TaxonomyauthorityCommonList list = res.getEntity();
+        	AbstractCommonList list = res.getEntity();
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -790,22 +782,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
             // Optionally output additional data about list members for debugging.
-            boolean iterateThroughList = false;
-            if (iterateThroughList && logger.isDebugEnabled()) {
-                List<TaxonomyauthorityCommonList.TaxonomyauthorityListItem> items =
-                        list.getTaxonomyauthorityListItem();
-                int i = 0;
-                for (TaxonomyauthorityCommonList.TaxonomyauthorityListItem item : items) {
-                    String csid = item.getCsid();
-                    logger.debug(testName + ": list-item[" + i + "] csid="
-                            + csid);
-                    logger.debug(testName + ": list-item[" + i + "] displayName="
-                            + item.getDisplayName());
-                    logger.debug(testName + ": list-item[" + i + "] URI="
-                            + item.getUri());
-                    readItemList(csid, null);
-                    i++;
-                }
+            if(logger.isTraceEnabled()){
+            	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
             }
         } finally {
             res.releaseConnection();
@@ -851,7 +829,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 
         // Submit the request to the service and store the response.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-        ClientResponse<TaxonCommonList> res = null;
+        ClientResponse<AbstractCommonList> res = null;
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
         } else if (shortId != null) {
@@ -860,7 +838,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
             Assert.fail("readItemList passed null csid and name!");
         }
         try {
-            TaxonCommonList list = res.getEntity();
+        	AbstractCommonList list = res.getEntity();
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -872,8 +850,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
                     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-            List<TaxonCommonList.TaxonListItem> items =
-                    list.getTaxonListItem();
+            List<AbstractCommonList.ListItem> items =
+                    list.getListItem();
             int nItemsReturned = items.size();
             // There will be one item created, associated with a
             // known parent resource, by the createItem test.
@@ -888,23 +866,16 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
             }
             Assert.assertEquals(nItemsReturned, nExpectedItems);
 
-            int i = 0;
-            for (TaxonCommonList.TaxonListItem item : items) {
-                Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
-                Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
-                // Optionally output additional data about list members for debugging.
-                boolean showDetails = true;
-                if (showDetails && logger.isDebugEnabled()) {
-                    logger.debug("  " + testName + ": list-item[" + i + "] csid="
-                            + item.getCsid());
-                    logger.debug("  " + testName + ": list-item[" + i + "] refName="
-                            + item.getRefName());
-                    logger.debug("  " + testName + ": list-item[" + i + "] displayName="
-                            + item.getDisplayName());
-                    logger.debug("  " + testName + ": list-item[" + i + "] URI="
-                            + item.getUri());
-                }
-                i++;
+            for (AbstractCommonList.ListItem item : items) {
+            	String value = 
+            		AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
+                Assert.assertTrue((null != value), "Item refName is null!");
+            	value = 
+            		AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
+                Assert.assertTrue((null != value), "Item displayName is null!");
+            }
+            if(logger.isTraceEnabled()){
+            	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
             }
         } finally {
             res.releaseConnection();

@@ -37,8 +37,7 @@ import javax.ws.rs.Produces;
 @Consumes("application/xml")
 @Produces("application/xml")
 public class OrgAuthorityResource extends
-	AuthorityResourceWithContacts<OrgauthoritiesCommon, OrgauthoritiesCommonList, OrganizationsCommon,
-	OrganizationDocumentModelHandler> {
+	AuthorityResourceWithContacts<OrgauthoritiesCommon, OrganizationDocumentModelHandler> {
 
     private final static String orgAuthorityServiceName = OrgAuthorityClient.SERVICE_NAME;
 	private final static String ORGAUTHORITIES_COMMON = "orgauthorities_common";

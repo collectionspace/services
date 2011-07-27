@@ -23,22 +23,8 @@
  */
 package org.collectionspace.services.person.nuxeo;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
-import org.collectionspace.services.person.PersonauthoritiesCommonList;
-import org.collectionspace.services.person.PersonauthoritiesCommonList.PersonauthorityListItem;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
-
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * PersonAuthorityDocumentModelHandler
@@ -47,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class PersonAuthorityDocumentModelHandler
-		extends AuthorityDocumentModelHandler<PersonauthoritiesCommon, PersonauthoritiesCommonList> {
+		extends AuthorityDocumentModelHandler<PersonauthoritiesCommon> {
 
     /**
      * Common part schema label
@@ -58,38 +44,6 @@ public class PersonAuthorityDocumentModelHandler
     	super(COMMON_PART_LABEL);
     }
 	
-    @Override
-    public PersonauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        PersonauthoritiesCommonList coList = extractPagingInfo(new PersonauthoritiesCommonList(),
-        		wrapDoc);
-        AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("displayName|refName|shortIdentifier|vocabType|uri|csid");
-
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        List<PersonauthoritiesCommonList.PersonauthorityListItem> list = coList.getPersonauthorityListItem();
-        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-        String label = getServiceContext().getCommonPartLabel();
-        while(iter.hasNext()){
-            DocumentModel docModel = iter.next();
-            PersonauthorityListItem ilistItem = new PersonauthorityListItem();
-            ilistItem.setDisplayName((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.DISPLAY_NAME));
-            ilistItem.setRefName((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.REF_NAME));
-            ilistItem.setShortIdentifier((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.SHORT_IDENTIFIER));
-            ilistItem.setVocabType((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.VOCAB_TYPE));
-            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
-            ilistItem.setUri(getServiceContextPath() + id);
-            ilistItem.setCsid(id);
-            list.add(ilistItem);
-        }
-
-        return coList;
-    }
-
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop

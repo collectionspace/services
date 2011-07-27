@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -39,9 +40,7 @@ import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.VocabularyClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
-import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
-import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
@@ -89,15 +88,6 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     @Override
     protected CollectionSpaceClient getClientInstance() {
         return new VocabularyClient();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-    protected AbstractCommonList getAbstractCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(VocabulariesCommonList.class);
     }
 
     @Override
@@ -663,8 +653,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
-        ClientResponse<VocabulariesCommonList> res = client.readList();
-        VocabulariesCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -677,22 +667,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            List<VocabulariesCommonList.VocabularyListItem> items =
-                    list.getVocabularyListItem();
-            int i = 0;
-            for (VocabulariesCommonList.VocabularyListItem item : items) {
-                String csid = item.getCsid();
-                logger.debug(testName + ": list-item[" + i + "] csid="
-                        + csid);
-                logger.debug(testName + ": list-item[" + i + "] displayName="
-                        + item.getDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] URI="
-                        + item.getUri());
-                readItemListInt(csid, null, "readList");
-                i++;
-            }
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
 
@@ -715,7 +691,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
-        ClientResponse<VocabularyitemsCommonList> res = null;
+        ClientResponse<AbstractCommonList> res = null;
         if (vcsid != null) {
             res = client.readItemList(vcsid, null, null);
         } else if (shortId != null) {
@@ -723,7 +699,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         } else {
             Assert.fail("Internal Error: readItemList both vcsid and shortId are null!");
         }
-        VocabularyitemsCommonList list = res.getEntity();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -735,8 +711,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        List<VocabularyitemsCommonList.VocabularyitemListItem> items =
-                list.getVocabularyitemListItem();
+        List<AbstractCommonList.ListItem> items = list.getListItem();
         int nItemsReturned = items.size();
         long nItemsTotal = list.getTotalItems();
         if (logger.isDebugEnabled()) {
@@ -745,20 +720,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertEquals(nItemsTotal, nItemsToCreateInList);
 
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            logger.debug("  " + testName + ": checking items");
-            int i = 0;
-            for (VocabularyitemsCommonList.VocabularyitemListItem item : items) {
-                logger.debug("  " + testName + ": list-item[" + i + "] csid="
-                        + item.getCsid());
-                logger.debug("  " + testName + ": list-item[" + i + "] displayName="
-                        + item.getDisplayName());
-                logger.debug("  " + testName + ": list-item[" + i + "] URI="
-                        + item.getUri());
-                i++;
-            }
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
 

@@ -35,15 +35,14 @@ import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
-import org.collectionspace.services.location.LocationauthoritiesCommonList;
 import org.collectionspace.services.location.LocationsCommon;
-import org.collectionspace.services.location.LocationsCommonList;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -68,6 +67,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     /** The logger. */
     private final String CLASS_NAME = LocationAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(LocationAuthorityServiceTest.class);
+    private final String REFNAME = "refName";
+    private final String DISPLAYNAME = "displayName";
 
 	@Override
 	public String getServicePathComponent() {
@@ -145,15 +146,6 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     	return new LocationAuthorityClient();
     }
     
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(LocationsCommonList.class);
-    }
-
     @Override
     protected PoxPayloadOut createInstance(String identifier) {
     	LocationAuthorityClient client = new LocationAuthorityClient();
@@ -769,9 +761,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<LocationauthoritiesCommonList> res = client.readList();
+        ClientResponse<AbstractCommonList> res = client.readList();
         try {
-	        LocationauthoritiesCommonList list = res.getEntity();
+        	AbstractCommonList list = res.getEntity();
 	        int statusCode = res.getStatus();
 	
 	        // Check the status code of the response: does it match
@@ -784,22 +776,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Optionally output additional data about list members for debugging.
-	        boolean iterateThroughList = false;
-	        if (iterateThroughList && logger.isDebugEnabled()) {
-	            List<LocationauthoritiesCommonList.LocationauthorityListItem> items =
-	                    list.getLocationauthorityListItem();
-	            int i = 0;
-	            for (LocationauthoritiesCommonList.LocationauthorityListItem item : items) {
-	                String csid = item.getCsid();
-	                logger.debug(testName + ": list-item[" + i + "] csid=" +
-	                        csid);
-	                logger.debug(testName + ": list-item[" + i + "] displayName=" +
-	                        item.getDisplayName());
-	                logger.debug(testName + ": list-item[" + i + "] URI=" +
-	                        item.getUri());
-	                readItemList(csid, null);
-	                i++;
-	            }
+	        if(logger.isTraceEnabled()){
+	        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
 	        }
 	    } finally {
 	    	res.releaseConnection();
@@ -845,7 +823,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<LocationsCommonList> res = null;
+        ClientResponse<AbstractCommonList> res = null;
         if(vcsid!= null) {
 	        res = client.readItemList(vcsid, null, null);
         } else if(shortId!= null) {
@@ -854,7 +832,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         	Assert.fail("readItemList passed null csid and name!");
         }
         try {
-	        LocationsCommonList list = res.getEntity();
+        	AbstractCommonList list = res.getEntity();
 	        int statusCode = res.getStatus();
 	
 	        // Check the status code of the response: does it match
@@ -866,8 +844,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
-	        List<LocationsCommonList.LocationListItem> items =
-	            list.getLocationListItem();
+	        List<AbstractCommonList.ListItem> items =
+	            list.getListItem();
 	        int nItemsReturned = items.size();
 	        // There will be one item created, associated with a
 	        // known parent resource, by the createItem test.
@@ -882,24 +860,17 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        }
 	        Assert.assertEquals(nItemsReturned, nExpectedItems);
 	
-	        int i = 0;
-	        for (LocationsCommonList.LocationListItem item : items) {
-	        	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
-	        	Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
-	        	// Optionally output additional data about list members for debugging.
-		        boolean showDetails = true;
-		        if (showDetails && logger.isDebugEnabled()) {
-	                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
-	                        item.getCsid());
-	                logger.debug("  " + testName + ": list-item[" + i + "] refName=" +
-	                        item.getRefName());
-	                logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
-	                        item.getDisplayName());
-	                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
-	                        item.getUri());
-	            }
-	            i++;
-	        }
+            for (AbstractCommonList.ListItem item : items) {
+            	String value = 
+            		AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
+                Assert.assertTrue((null != value), "Item refName is null!");
+            	value = 
+            		AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
+                Assert.assertTrue((null != value), "Item displayName is null!");
+            }
+            if(logger.isTraceEnabled()){
+            	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
+            }
 	    } finally {
 	    	res.releaseConnection();
 	    }

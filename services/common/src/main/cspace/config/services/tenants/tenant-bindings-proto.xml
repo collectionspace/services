@@ -988,6 +988,10 @@
               <service:xpath>shortIdentifier</service:xpath>
             </service:ListResultField>
             <service:ListResultField>
+              <service:element>refName</service:element>
+              <service:xpath>refName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
               <service:element>order</service:element>
               <service:xpath>order</service:xpath>
             </service:ListResultField>
@@ -1120,6 +1124,10 @@
             <service:ListResultField>
               <service:element>shortIdentifier</service:element>
               <service:xpath>shortIdentifier</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>refName</service:element>
+              <service:xpath>refName</service:xpath>
             </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
@@ -1261,6 +1269,10 @@
               <service:element>shortIdentifier</service:element>
               <service:xpath>shortIdentifier</service:xpath>
             </service:ListResultField>
+            <service:ListResultField>
+              <service:element>refName</service:element>
+              <service:xpath>refName</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -1394,6 +1406,10 @@
               <service:element>shortIdentifier</service:element>
               <service:xpath>shortIdentifier</service:xpath>
             </service:ListResultField>
+            <service:ListResultField>
+              <service:element>refName</service:element>
+              <service:xpath>refName</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -1445,12 +1461,12 @@
     </tenant:serviceBindings>
     <!-- end location service meta-data -->
     <!-- begin taxonomyauthority service meta-data -->
-    <tenant:serviceBindings id="Taxonomyauthorities" name="Taxonomyauthorities" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/taxonomyauthorities/*/workflow/</service:uriPath>
-      <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/taxonomyauthorities/*/items/*/workflow/</service:uriPath>
+    <tenant:serviceBindings id="Taxonomyauthority" name="Taxonomyauthority" version="0.1">
+      <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/taxonomyauthority/*/workflow/</service:uriPath>
+      <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/taxonomyauthority/*/items/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /taxonomyauthorities/*/items/
+                /taxonomyauthority/*/items/
             </service:uriPath>-->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityDocumentModelHandler</service:documentHandler>
@@ -1525,6 +1541,10 @@
             <service:ListResultField>
               <service:element>shortIdentifier</service:element>
               <service:xpath>shortIdentifier</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>refName</service:element>
+              <service:xpath>refName</service:xpath>
             </service:ListResultField>
           </service:ListResultsFields>
         </service:params>

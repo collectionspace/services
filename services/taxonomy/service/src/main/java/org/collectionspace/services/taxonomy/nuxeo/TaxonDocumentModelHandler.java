@@ -23,29 +23,11 @@
  */
 package org.collectionspace.services.taxonomy.nuxeo;
 
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import org.collectionspace.services.TaxonJAXBSchema;
-import org.collectionspace.services.client.TaxonomyAuthorityClient;
-import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.service.ObjectPartType;
-import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.taxonomy.TaxonCommon;
-import org.collectionspace.services.taxonomy.TaxonCommonList;
-import org.collectionspace.services.taxonomy.TaxonCommonList.TaxonListItem;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * TaxonomyDocumentModelHandler
@@ -58,10 +40,8 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class TaxonDocumentModelHandler
-        extends AuthorityItemDocumentModelHandler<TaxonCommon, TaxonCommonList> {
+        extends AuthorityItemDocumentModelHandler<TaxonCommon> {
 
-    /** The logger. */
-    private final Logger logger = LoggerFactory.getLogger(TaxonDocumentModelHandler.class);
     /**
      * Common part schema label
      */
@@ -136,37 +116,6 @@ public class TaxonDocumentModelHandler
         StringBuilder newStr = new StringBuilder();
         newStr.append(name);
         return newStr.toString();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public TaxonCommonList extractCommonPartList(
-            DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        TaxonCommonList coList = extractPagingInfo(new TaxonCommonList(), wrapDoc);
-        AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("displayName|refName|shortIdentifier|uri|csid");
-        List<TaxonCommonList.TaxonListItem> list = coList.getTaxonListItem();
-        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-        String commonPartLabel = getServiceContext().getCommonPartLabel("taxon");
-        while (iter.hasNext()) {
-            DocumentModel docModel = iter.next();
-            TaxonListItem ilistItem = new TaxonListItem();
-            ilistItem.setDisplayName((String) docModel.getProperty(
-                    commonPartLabel, AuthorityItemJAXBSchema.DISPLAY_NAME));
-            ilistItem.setShortIdentifier((String) docModel.getProperty(commonPartLabel,
-                    AuthorityItemJAXBSchema.SHORT_IDENTIFIER));
-            ilistItem.setRefName((String) docModel.getProperty(commonPartLabel,
-                    AuthorityItemJAXBSchema.REF_NAME));
-            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
-            ilistItem.setUri("/taxonomyauthorities/" + inAuthority + "/items/"
-                    + id);
-            ilistItem.setCsid(id);
-            list.add(ilistItem);
-        }
-
-        return coList;
     }
 
     /**

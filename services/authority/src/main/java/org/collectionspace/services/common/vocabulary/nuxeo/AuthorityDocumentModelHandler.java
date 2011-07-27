@@ -25,21 +25,13 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
-
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
@@ -49,80 +41,18 @@ import org.nuxeo.ecm.core.api.DocumentModel;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public abstract class AuthorityDocumentModelHandler<AuthCommon, AuthCommonList>
-        extends RemoteDocumentModelHandlerImpl<AuthCommon, AuthCommonList> {
+public abstract class AuthorityDocumentModelHandler<AuthCommon>
+        extends DocHandlerBase<AuthCommon> {
 
 	private String authorityCommonSchemaName;
 	
-    /**
-     * authority is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
-    private AuthCommon authority;
-    /**
-     * authorityList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
-    private AuthCommonList authorityList;
-
-
     public AuthorityDocumentModelHandler(String authorityCommonSchemaName) {
     	this.authorityCommonSchemaName = authorityCommonSchemaName;
     }
 
-    /**
-     * getCommonPart get associated authority
-     * @return
-     */
-    @Override
-    public AuthCommon getCommonPart() {
-        return authority;
-    }
-
-    /**
-     * setCommonPart set associated authority
-     * @param authority
-     */
-    @Override
-    public void setCommonPart(AuthCommon authority) {
-        this.authority = authority;
-    }
-
-    /**
-     * getCommonPartList get associated authority (for index/GET_ALL)
-     * @return
-     */
-    @Override
-    public AuthCommonList getCommonPartList() {
-        return authorityList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
-     */
-    @Override
-    public void setCommonPartList(AuthCommonList authorityList) {
-        this.authorityList = authorityList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public AuthCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void fillCommonPart(AuthCommon vocabularyObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    /* (non-Javadoc)
+    /*
+     * Non standard injection of CSID into common part, since caller may access through
+     * shortId, and not know the CSID.
      * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
      */
     @Override

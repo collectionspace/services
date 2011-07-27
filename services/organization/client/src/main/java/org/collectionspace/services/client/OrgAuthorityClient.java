@@ -25,15 +25,11 @@
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
 package org.collectionspace.services.client;
-import org.jboss.resteasy.client.ClientResponse;
-
-import org.collectionspace.services.organization.OrgauthoritiesCommonList;
-import org.collectionspace.services.organization.OrganizationsCommonList;
 
 /**
  * The Class OrgAuthorityClient.
  */
-public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrgauthoritiesCommonList, OrganizationsCommonList, OrgAuthorityProxy> {
+public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrgAuthorityProxy> {
 	public static final String SERVICE_NAME = "orgauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -69,18 +65,5 @@ public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<Orgautho
 	@Override
     public String getItemCommonPartName() {
         return getCommonPartName(SERVICE_ITEM_NAME);
-    }
-
-    /*
-     * Proxied service call methods
-     */
-    
-    /**
-     * Read list.
-     *
-     * @return the client response
-     */
-    public ClientResponse<OrgauthoritiesCommonList> readList() {
-        return getProxy().readList();
     }
 }

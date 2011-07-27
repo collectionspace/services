@@ -21,7 +21,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * ILT = Item list type
  * LT = List type
  */
-public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends AbstractCommonList> extends CollectionSpacePoxProxy<LT> {
+public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
 	
 	/*
 	 * Basic CRUD operations
@@ -117,7 +117,7 @@ public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends Abstr
     @GET
     @Produces({"application/xml"})
     @Path("/{csid}/items/")
-    ClientResponse<ILT> readItemList(
+    ClientResponse<AbstractCommonList> readItemList(
     		@PathParam("csid") String vcsid,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
@@ -127,7 +127,7 @@ public interface AuthorityProxy<LT extends AbstractCommonList, ILT extends Abstr
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
-    ClientResponse<ILT> readItemListForNamedAuthority(
+    ClientResponse<AbstractCommonList> readItemListForNamedAuthority(
     		@PathParam("specifier") String specifier,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,

@@ -23,25 +23,8 @@
  */
 package org.collectionspace.services.location.nuxeo;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.collectionspace.services.common.document.DocumentHandler.Action;
-import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
-import org.collectionspace.services.location.LocationauthoritiesCommonList;
-import org.collectionspace.services.location.LocationauthoritiesCommonList.LocationauthorityListItem;
-
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * LocationAuthorityDocumentModelHandler
@@ -50,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class LocationAuthorityDocumentModelHandler
-        extends AuthorityDocumentModelHandler<LocationauthoritiesCommon, LocationauthoritiesCommonList> {
+        extends AuthorityDocumentModelHandler<LocationauthoritiesCommon> {
 
     /**
      * Common part schema label
@@ -61,38 +44,6 @@ public class LocationAuthorityDocumentModelHandler
     	super(COMMON_PART_LABEL);
     }
 	
-    @Override
-    public LocationauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        LocationauthoritiesCommonList coList = extractPagingInfo(new LocationauthoritiesCommonList(),
-        		wrapDoc);
-        AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("displayName|refName|shortIdentifier|vocabType|uri|csid");
-
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        List<LocationauthoritiesCommonList.LocationauthorityListItem> list = coList.getLocationauthorityListItem();
-        String label = getServiceContext().getCommonPartLabel();
-        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-        while(iter.hasNext()){
-            DocumentModel docModel = iter.next();
-            LocationauthorityListItem ilistItem = new LocationauthorityListItem();
-            ilistItem.setDisplayName((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.DISPLAY_NAME));
-            ilistItem.setRefName((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.REF_NAME));
-            ilistItem.setShortIdentifier((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.SHORT_IDENTIFIER));
-            ilistItem.setVocabType((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.VOCAB_TYPE));
-            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
-            ilistItem.setUri(getServiceContextPath() + id);
-            ilistItem.setCsid(id);
-            list.add(ilistItem);
-        }
-
-        return coList;
-    }
-
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop

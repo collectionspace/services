@@ -23,22 +23,8 @@
  */
 package org.collectionspace.services.vocabulary.nuxeo;
 
-import java.util.Iterator;
-import java.util.List;
-
-import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
-import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
-import org.collectionspace.services.vocabulary.VocabulariesCommonList;
-import org.collectionspace.services.vocabulary.VocabulariesCommonList.VocabularyListItem;
-
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * VocabularyDocumentModelHandler
@@ -47,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class VocabularyDocumentModelHandler
-		extends AuthorityDocumentModelHandler<VocabulariesCommon, VocabulariesCommonList> {
+		extends AuthorityDocumentModelHandler<VocabulariesCommon> {
 
     /**
      * Common part schema label
@@ -56,38 +42,6 @@ public class VocabularyDocumentModelHandler
     
     public VocabularyDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
-    }
-	
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public VocabulariesCommonList extractCommonPartList(
-    		DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-		String label = getServiceContext().getCommonPartLabel();
-        VocabulariesCommonList coList = extractPagingInfo(new VocabulariesCommonList(), wrapDoc);
-        AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("displayName|refName|shortIdentifier|vocabType|uri|csid");
-        List<VocabulariesCommonList.VocabularyListItem> list = coList.getVocabularyListItem();
-        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-        while(iter.hasNext()){
-            DocumentModel docModel = iter.next();
-            VocabularyListItem ilistItem = new VocabularyListItem();
-            ilistItem.setDisplayName((String) docModel.getProperty(label,
-                    AuthorityJAXBSchema.DISPLAY_NAME));
-            ilistItem.setRefName((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.REF_NAME));
-            ilistItem.setShortIdentifier((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.SHORT_IDENTIFIER));
-            ilistItem.setVocabType((String) docModel.getProperty(label,
-            		AuthorityJAXBSchema.VOCAB_TYPE));
-            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
-            ilistItem.setUri(getServiceContextPath() + id);
-            ilistItem.setCsid(id);
-            list.add(ilistItem);
-        }
-
-        return coList;
     }
 
     /**

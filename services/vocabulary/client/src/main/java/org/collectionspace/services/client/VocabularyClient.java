@@ -26,16 +26,10 @@
  */
 package org.collectionspace.services.client;
 
-import org.jboss.resteasy.client.ClientResponse;
-
-import org.collectionspace.services.vocabulary.VocabulariesCommonList;
-import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
-import org.collectionspace.services.client.VocabularyProxy;
-
 /**
  * The Class VocabularyClient.
  */
-public class VocabularyClient extends AuthorityClientImpl<VocabulariesCommonList, VocabularyitemsCommonList, VocabularyProxy> {
+public class VocabularyClient extends AuthorityClientImpl<VocabularyProxy> {
 	public static final String SERVICE_NAME = "vocabularies";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -78,18 +72,5 @@ public class VocabularyClient extends AuthorityClientImpl<VocabulariesCommonList
 	@Deprecated // Use getItemCommonPartName() instead
     public String getCommonPartItemName() {
         return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
-    }
-
-    /*
-     * Service calls
-     */
-    
-    /**
-     * Read list.
-     *
-     * @return the client response
-     */
-    public ClientResponse<VocabulariesCommonList> readList() {
-        return getProxy().readList();
     }
 }

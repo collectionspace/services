@@ -186,7 +186,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
             DocumentModel docModel = iter.next();
             String id = NuxeoUtils.getCsid(docModel);
             item.put(fields[0], id);
-            String uri = getServiceContextPath() + id;
+            String uri = getUri(docModel);
             item.put(fields[1], uri);
             GregorianCalendar cal = (GregorianCalendar)
             					docModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,

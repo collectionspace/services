@@ -41,6 +41,7 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationResource;
@@ -68,25 +69,13 @@ import java.util.regex.Pattern;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
-        extends RemoteDocumentModelHandlerImpl<AICommon, AICommonList> {
+public abstract class AuthorityItemDocumentModelHandler<AICommon>
+        extends DocHandlerBase<AICommon> {
 
     private final Logger logger = LoggerFactory.getLogger(AuthorityItemDocumentModelHandler.class);
 
 	private String authorityItemCommonSchemaName;
 	
-    //private final Logger logger = LoggerFactory.getLogger(AuthorityItemDocumentModelHandler.class);
-    /**
-     * item is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
-    protected AICommon item;
-    /**
-     * itemList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
-    protected AICommonList itemList;
-    
     /**
      * inVocabulary is the parent Authority for this context
      */
@@ -175,45 +164,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
     }
 
 
-    /**
-     * getCommonPart get associated item
-     * @return
-     */
-    @Override
-    public AICommon getCommonPart() {
-        return item;
-    }
-
-    @Override
-    public void setCommonPart(AICommon item) {
-        this.item = item;
-    }
-
-    /**
-     * getCommonPartList get associated item (for index/GET_ALL)
-     * @return
-     */
-    @Override
-    public AICommonList getCommonPartList() {
-        return itemList;
-    }
-
-    @Override
-    public void setCommonPartList(AICommonList itemList) {
-        this.itemList = itemList;
-    }
-
-    @Override
-    public AICommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void fillCommonPart(AICommon itemObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
-    
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
      */

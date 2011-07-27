@@ -37,8 +37,8 @@ import javax.ws.rs.Produces;
 @Consumes("application/xml")
 @Produces("application/xml")
 public class LocationAuthorityResource 
-	extends AuthorityResource<LocationauthoritiesCommon, LocationauthoritiesCommonList, 
-							LocationsCommon, LocationDocumentModelHandler> {
+	extends AuthorityResource<LocationauthoritiesCommon, 
+								LocationDocumentModelHandler> {
 
     private final static String locationAuthorityServiceName = "locationauthorities";
 	private final static String LOCATIONAUTHORITIES_COMMON = "locationauthorities_common";

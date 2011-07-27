@@ -45,46 +45,5 @@
         </xs:complexType>
     </xs:element>
     
-    <!-- This is the base class for paginated lists -->
-    <xs:complexType name="abstractCommonList">
-        <xs:annotation>
-            <xs:appinfo>
-                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
-            </xs:appinfo>
-        </xs:annotation>
-    </xs:complexType>
-    
-    
-    <!-- TaxonomyAuthority instances, as in nuxeo repository -->
-    <xs:element name="taxonomyauthority-common-list">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-                    <xs:sequence>
-                        <xs:element name="taxonomyauthority-list-item" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="displayName" type="xs:string"
-                                        minOccurs="1" />
-                                    <xs:element name="refName" type="xs:string"
-                                        minOccurs="1" />
-                                    <xs:element name="shortIdentifier" type="xs:string"
-                                        minOccurs="1" />
-                                    <xs:element name="vocabType" type="xs:string"
-                                        minOccurs="1" />
-                                    <!-- uri to retrieve taxonomyauthority details -->
-                                    <xs:element name="uri" type="xs:anyURI"
-                                        minOccurs="1" />
-                                    <xs:element name="csid" type="xs:string"
-                                        minOccurs="1" />
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:extension>
-            </xs:complexContent>                    
-        </xs:complexType>
-    </xs:element>
-    
 </xs:schema>
 

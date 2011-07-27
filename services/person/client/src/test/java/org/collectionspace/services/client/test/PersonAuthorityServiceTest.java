@@ -38,7 +38,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
-import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 
@@ -46,9 +46,7 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
-import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
-import org.collectionspace.services.person.PersonsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 //import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
@@ -70,6 +68,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
     /** The logger. */
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    private final String REFNAME = "refName";
+    private final String DISPLAYNAME = "displayName";
     
 	@Override
 	public String getServicePathComponent() {
@@ -145,15 +145,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
     	return new PersonAuthorityClient();
     }
     
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(PersonsCommonList.class);
-    }
- 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -1316,8 +1307,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        PersonauthoritiesCommonList list = null;
-        ClientResponse<PersonauthoritiesCommonList> res = client.readList();
+        AbstractCommonList list = null;
+        ClientResponse<AbstractCommonList> res = client.readList();
         try {
 	        int statusCode = res.getStatus();
 	
@@ -1336,22 +1327,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         }
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            List<PersonauthoritiesCommonList.PersonauthorityListItem> items =
-                    list.getPersonauthorityListItem();
-            int i = 0;
-            for (PersonauthoritiesCommonList.PersonauthorityListItem item : items) {
-                String csid = item.getCsid();
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        csid);
-                logger.debug(testName + ": list-item[" + i + "] displayName=" +
-                        item.getDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
-                readItemList(csid, null, testName);
-                i++;
-            }
+        // Optionally output additional data about list members for debugging.
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
 
@@ -1386,7 +1364,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         
 	// Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<PersonsCommonList> res = null;
+        ClientResponse<AbstractCommonList> res = null;
         if (vcsid!= null) {
 	        res = client.readItemList(vcsid, null, null);
         } else if (name!= null) {
@@ -1394,7 +1372,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         } else {
         	Assert.fail("readItemList passed null csid and name!");
         }
-        PersonsCommonList list = null;
+        AbstractCommonList list = null;
         try {
 	        int statusCode = res.getStatus();
 	
@@ -1412,8 +1390,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         	res.releaseConnection();
         }
 
-        List<PersonsCommonList.PersonListItem> items =
-            list.getPersonListItem();
+        List<AbstractCommonList.ListItem> items =
+            list.getListItem();
         int nItemsReturned = items.size();
         // There will be one item created, associated with a
         // known parent resource, by the createItem test.
@@ -1428,23 +1406,16 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         }
         Assert.assertEquals(nItemsReturned, nExpectedItems);
 
-        int i = 0;
-        for (PersonsCommonList.PersonListItem item : items) {
-        	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
-        	Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
-        	// Optionally output additional data about list members for debugging.
-	        boolean showDetails = true;
-	        if (showDetails && logger.isDebugEnabled()) {
-                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug("  " + testName + ": list-item[" + i + "] refName=" +
-                        item.getRefName());
-                logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
-                        item.getDisplayName());
-                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
-            }
-            i++;
+        for (AbstractCommonList.ListItem item : items) {
+        	String value = 
+        		AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
+            Assert.assertTrue((null != value), "Item refName is null!");
+        	value = 
+        		AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
+            Assert.assertTrue((null != value), "Item displayName is null!");
+        }
+        if(logger.isTraceEnabled()){
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
 

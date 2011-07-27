@@ -26,30 +26,15 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-
-//import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.taxonomy.TaxonomyauthorityCommonList;
-import org.collectionspace.services.taxonomy.TaxonCommonList;
-import org.collectionspace.services.client.TaxonomyAuthorityProxy;
-
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-
 /**
  * The Class TaxonomyAuthorityClient.
  */
-public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyauthorityCommonList, TaxonCommonList, TaxonomyAuthorityProxy> {
+public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyAuthorityProxy> {
 
-    public static final String SERVICE_NAME = "taxonomyauthorities";
+    public static final String SERVICE_NAME = "taxonomyauthority";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
-    public static final String SERVICE_PAYLOAD_NAME = "taxonomyauthority";
+    public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
     //
     // Subitem constants
     //
@@ -74,11 +59,6 @@ public class TaxonomyAuthorityClient extends AuthorityClientImpl<Taxonomyauthori
     }
 
     @Override
-    public String getCommonPartName() {
-        return getCommonPartName(SERVICE_PAYLOAD_NAME);
-    }
-
-    @Override
     public String getItemCommonPartName() {
         return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
     }
@@ -86,16 +66,5 @@ public class TaxonomyAuthorityClient extends AuthorityClientImpl<Taxonomyauthori
     @Override
     public Class<TaxonomyAuthorityProxy> getProxyClass() {
         return TaxonomyAuthorityProxy.class;
-    }
-
-    /*
-     * Proxied service calls.
-     */
-    /**
-     * @return list
-     * @see org.collectionspace.services.client.TaxonomyAuthorityProxy#readList()
-     */
-    public ClientResponse<TaxonomyauthorityCommonList> readList() {
-        return getProxy().readList();
     }
 }

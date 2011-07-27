@@ -37,9 +37,9 @@ import javax.ws.rs.Produces;
 @Consumes("application/xml")
 @Produces("application/xml")
 public class TaxonomyAuthorityResource
-        extends AuthorityResource<TaxonomyauthorityCommon, TaxonomyauthorityCommonList, TaxonCommon, TaxonDocumentModelHandler> {
+        extends AuthorityResource<TaxonomyauthorityCommon, TaxonDocumentModelHandler> {
 
-    private final static String taxonomyAuthorityServiceName = "taxonomyauthorities";
+    private final static String taxonomyAuthorityServiceName = "taxonomyauthority";
     private final static String TAXONOMYAUTHORITY_COMMON = "taxonomyauthority_common";
     private final static String taxonomyItemServiceName = "taxon";
     private final static String TAXONOMYITEM_COMMON = "taxon_common";

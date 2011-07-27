@@ -26,17 +26,10 @@
  */
 package org.collectionspace.services.client;
 
-//import javax.ws.rs.PathParam;
-import org.jboss.resteasy.client.ClientResponse;
-
-import org.collectionspace.services.person.PersonauthoritiesCommonList;
-import org.collectionspace.services.person.PersonsCommonList;
-import org.collectionspace.services.client.PersonAuthorityProxy;
-
 /**
  * The Class PersonAuthorityClient.
  */
-public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonauthoritiesCommonList, PersonsCommonList, PersonAuthorityProxy> {
+public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonAuthorityProxy> {
 	public static final String SERVICE_NAME = "personauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -78,12 +71,4 @@ public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<Perso
 	public Class<PersonAuthorityProxy> getProxyClass() {
 		return PersonAuthorityProxy.class;
 	}
-    
-    /*
-     * Proxied service call methods
-     */
-	
-    public ClientResponse<PersonauthoritiesCommonList> readList() {
-        return getProxy().readList();
-    }
 }

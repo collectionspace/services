@@ -37,8 +37,7 @@ import javax.ws.rs.Produces;
 @Consumes("application/xml")
 @Produces("application/xml")
 public class PersonAuthorityResource extends
-	AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonList, PersonsCommon,
-		PersonDocumentModelHandler> {
+	AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonDocumentModelHandler> {
 
     final Logger logger = LoggerFactory.getLogger(PersonAuthorityResource.class);
 

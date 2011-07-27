@@ -12,8 +12,8 @@ import org.jboss.resteasy.client.ClientResponse;
  * ILT - Authority item list type
  * P - Proxy type
  */
-public interface AuthorityClient<LT extends AbstractCommonList, ILT extends AbstractCommonList, P extends AuthorityProxy<LT, ILT>> 
-	extends CollectionSpacePoxClient<LT, P> {
+public interface AuthorityClient<P extends AuthorityProxy> 
+	extends CollectionSpacePoxClient<AbstractCommonList, P> {
 
     /** The uri path element for items in an authority */
     public static String ITEMS = "items";    //used to construct uri's in service paths for authorities.
@@ -111,9 +111,9 @@ public interface AuthorityClient<LT extends AbstractCommonList, ILT extends Abst
      *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<ILT> readItemList(String inAuthority, String partialTerm, String keywords);
+    public ClientResponse<AbstractCommonList> readItemList(String inAuthority, String partialTerm, String keywords);
     
-    public ClientResponse<ILT> readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted);
+    public ClientResponse<AbstractCommonList> readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted);
     
     /**
      * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
@@ -127,10 +127,10 @@ public interface AuthorityClient<LT extends AbstractCommonList, ILT extends Abst
      *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<ILT> readItemListForNamedAuthority(String specifier, 
+    public ClientResponse<AbstractCommonList> readItemListForNamedAuthority(String specifier, 
     		String partialTerm, String keywords);
     
-    public ClientResponse<ILT> readItemListForNamedAuthority(String specifier, 
+    public ClientResponse<AbstractCommonList> readItemListForNamedAuthority(String specifier, 
     		String partialTerm, 
     		String keywords,
     		Boolean includeDeleted);

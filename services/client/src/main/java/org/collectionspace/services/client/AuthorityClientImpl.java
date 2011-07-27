@@ -8,13 +8,11 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
- * LT - List type
- * ILT - Authority item list type
  * P - Proxy type
  */
-public abstract class AuthorityClientImpl<LT extends AbstractCommonList, ILT extends AbstractCommonList, P extends AuthorityProxy<LT, ILT>>
-	extends AbstractPoxServiceClientImpl<LT, P>
-	implements AuthorityClient<LT, ILT, P> {
+public abstract class AuthorityClientImpl<P extends AuthorityProxy>
+	extends AbstractCommonListPoxServiceClientImpl<P>
+	implements AuthorityClient<P> {
 
 	private static final String INCLUDE_DELETE_TRUE = Boolean.TRUE.toString();
 	/*
@@ -151,13 +149,13 @@ public abstract class AuthorityClientImpl<LT extends AbstractCommonList, ILT ext
      * @return the client response
      */
     @Override
-    public ClientResponse<ILT> 
+    public ClientResponse<AbstractCommonList> 
     		readItemList(String inAuthority, String partialTerm, String keywords) {
         return getProxy().readItemList(inAuthority, partialTerm, keywords, INCLUDE_DELETE_TRUE);
     }
 
     @Override
-    public ClientResponse<ILT> 
+    public ClientResponse<AbstractCommonList> 
     		readItemList(String inAuthority, String partialTerm, String keywords, Boolean includeDeleted) {
         return getProxy().readItemList(inAuthority, partialTerm, keywords, includeDeleted.toString());
     }
@@ -176,13 +174,13 @@ public abstract class AuthorityClientImpl<LT extends AbstractCommonList, ILT ext
      */
 
 	@Override
-	public ClientResponse<ILT> readItemListForNamedAuthority(
+	public ClientResponse<AbstractCommonList> readItemListForNamedAuthority(
 			String specifier, String partialTerm, String keywords) {
         return getProxy().readItemListForNamedAuthority(specifier, partialTerm, keywords, INCLUDE_DELETE_TRUE);
 	}
 
 	@Override
-	public ClientResponse<ILT> readItemListForNamedAuthority(
+	public ClientResponse<AbstractCommonList> readItemListForNamedAuthority(
 			String specifier, 
 			String partialTerm, 
 			String keywords,

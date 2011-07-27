@@ -34,7 +34,6 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.person.PersonsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
@@ -117,7 +116,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     @Override
 	protected AbstractCommonList getAbstractCommonList(
 			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(PersonsCommonList.class);
+        return response.getEntity(AbstractCommonList.class);
     }
  
     @BeforeClass
@@ -308,13 +307,13 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<PersonsCommonList> res = null;
+        ClientResponse<AbstractCommonList> res = null;
         if (authorityCsid != null) {
         	res = client.readItemList(authorityCsid, partialTerm, keywords);
         } else {
             Assert.fail(testName+" passed null csid!");
         }
-        PersonsCommonList list = null;
+        AbstractCommonList list = null;
         try {
             int statusCode = res.getStatus();
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -326,7 +325,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
             res.releaseConnection();
         }
 
-        List<PersonsCommonList.PersonListItem> items = list.getPersonListItem();
+        List<AbstractCommonList.ListItem> items = list.getListItem();
         return (int)list.getTotalItems();
     }
     // ---------------------------------------------------------------

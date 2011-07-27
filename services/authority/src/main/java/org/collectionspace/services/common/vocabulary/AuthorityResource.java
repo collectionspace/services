@@ -27,7 +27,6 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMain;
@@ -49,12 +48,11 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
@@ -87,9 +85,8 @@ import java.util.List;
  */
 @Consumes("application/xml")
 @Produces("application/xml")
-public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemCommonList, AuthItemHandler>
+public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         extends ResourceBase {
-        //extends AbstractMultiPartCollectionSpaceResourceImpl {
 
 	protected Class<AuthCommon> authCommonClass;
 	protected Class<?> resourceClass;
@@ -188,7 +185,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			String inAuthority, String parentShortIdentifier)
 	throws Exception {
 		String authorityRefNameBase;
-		AuthorityItemDocumentModelHandler<?,?> docHandler;
+		AuthorityItemDocumentModelHandler<?> docHandler;
 		
 		if(parentShortIdentifier==null) {
 			authorityRefNameBase = null;
@@ -202,7 +199,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			authorityRefNameBase = buildAuthorityRefNameBase(parentCtx, parentShortIdentifier);
 		}
 
-		docHandler = (AuthorityItemDocumentModelHandler<?,?>)createDocumentHandler(ctx,
+		docHandler = (AuthorityItemDocumentModelHandler<?>)createDocumentHandler(ctx,
 				ctx.getCommonPartLabel(getItemServiceName()),
 				authCommonClass);  	
 		docHandler.setInAuthority(inAuthority);
@@ -217,8 +214,8 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
         String shortIdentifier = null;
         try {
             DocumentWrapper<DocumentModel> wrapDoc = getRepositoryClient(ctx).getDocFromCsid(ctx, authCSID);
-            AuthorityDocumentModelHandler<?,?> handler = 
-            	(AuthorityDocumentModelHandler<?,?>)createDocumentHandler(ctx);
+            AuthorityDocumentModelHandler<?> handler = 
+            	(AuthorityDocumentModelHandler<?>)createDocumentHandler(ctx);
             shortIdentifier = handler.getShortIdentifier(wrapDoc, authorityCommonSchemaName);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -370,7 +367,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
     @GET
     @Produces("application/xml")
-    public AuthCommonList getAuthorityList(@Context UriInfo ui) {
+    public AbstractCommonList getAuthorityList(@Context UriInfo ui) {
 		try {
 			MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
@@ -381,7 +378,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				myFilter.setWhereClause(authorityCommonSchemaName+":refName='" + nameQ + "'");
 			}
 			getRepositoryClient(ctx).getFiltered(ctx, handler);
-			return (AuthCommonList) handler.getCommonPartList();
+			return (AbstractCommonList) handler.getCommonPartList();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
 		}
@@ -583,7 +580,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	@GET
 	@Path("{csid}/items")
 	@Produces("application/xml")
-	public AuthItemCommonList getAuthorityItemList(
+	public AbstractCommonList getAuthorityItemList(
 			@PathParam("csid") String specifier,
 			@QueryParam(IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
 			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
@@ -620,7 +617,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 						+ myFilter.getWhereClause());
 			}
 			getRepositoryClient(ctx).getFiltered(ctx, handler);
-			return (AuthItemCommonList) handler.getCommonPartList();
+			return (AbstractCommonList) handler.getCommonPartList();
 		} catch (Exception e) {
 			throw bigReThrow(e, ServiceMessages.LIST_FAILED);
 		}
