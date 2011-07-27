@@ -88,6 +88,11 @@ public class ReportResource extends ResourceBase {
     private static String REPORTS_FOLDER = "reports";
     private static String CSID_LIST_SEPARATOR = ",";
     final Logger logger = LoggerFactory.getLogger(ReportResource.class);
+    
+    private static String REPORTS_STD_CSID_PARAM = "csid";
+    private static String REPORTS_STD_GROUPCSID_PARAM = "groupcsid";
+    private static String REPORTS_STD_CSIDLIST_PARAM = "csidlist";
+    private static String REPORTS_STD_TENANTID_PARAM = "tenantid";
 
     @Override
     protected String getVersionString() {
@@ -189,10 +194,11 @@ public class ReportResource extends ResourceBase {
     		String invocationMode = invContext.getMode();
     		String modeProperty = null;
     		HashMap params = new HashMap();
+    		params.put(REPORTS_STD_TENANTID_PARAM, ctx.getTenantId());
     		boolean checkDocType = true;
     		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
     			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
-        		params.put("csid", invContext.getSingleCSID());
+        		params.put(REPORTS_STD_CSID_PARAM, invContext.getSingleCSID());
     		} else if(Invocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
     			modeProperty = InvocableJAXBSchema.SUPPORTS_DOC_LIST;
     			List<String> csids = null;
@@ -213,10 +219,10 @@ public class ReportResource extends ResourceBase {
    						sb.append(CSID_LIST_SEPARATOR);
    	   				sb.append(csidItem);
    				}
-        		params.put("csidlist", sb.toString());
+        		params.put(REPORTS_STD_CSIDLIST_PARAM, sb.toString());
     		} else if(Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
     			modeProperty = InvocableJAXBSchema.SUPPORTS_GROUP;
-        		params.put("groupcsid", invContext.getGroupCSID());
+        		params.put(REPORTS_STD_GROUPCSID_PARAM, invContext.getGroupCSID());
     		} else if(Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode)) {
     			modeProperty = InvocableJAXBSchema.SUPPORTS_NO_CONTEXT;
     			checkDocType = false;
