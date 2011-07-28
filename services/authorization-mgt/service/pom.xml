@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.authorization-mgt</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.9-SNAPSHOT</version>
+        <version>1.11-SNAPSHOT</version>
     </parent>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authorization-mgt.service</artifactId>
