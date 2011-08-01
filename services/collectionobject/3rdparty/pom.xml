@@ -17,6 +17,13 @@
         3rd party build for collectionobject service
     </description>
 
+	<properties>
+		<ServiceName>collectionobject</ServiceName>
+		<NuxeoDocTypeName>CollectionObject</NuxeoDocTypeName>	
+		<CommonSchemaName>collectionobjects_common</CommonSchemaName>
+		<TenantPrefix>Tenant</TenantPrefix>
+	</properties>
+	
     <modules>
     	<module>nuxeo-platform-collectionobject</module>
         <module>nuxeo-platform-collectionobject-lifesci</module>

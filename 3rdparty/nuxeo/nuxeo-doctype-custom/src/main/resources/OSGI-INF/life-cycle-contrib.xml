@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.${ServiceName}.${TenantLabel}.ecm.platform.LifeCycleManagerExtensions">
+
+  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService" point="types">
+    <types>
+      <type name="${NuxeoDocTypeName}${TenantPrefix}${TenantId}">default</type>
+    </types>
+  </extension>
+
+</component>

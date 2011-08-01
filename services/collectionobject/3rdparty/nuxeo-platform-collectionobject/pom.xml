@@ -14,12 +14,6 @@
     <description>
         CollectionObject Common Nuxeo document type
     </description>
-
-	<properties>
-		<ServiceName>collectionobject</ServiceName>
-		<NuxeoDocTypeName>CollectionObject</NuxeoDocTypeName>
-		<CommonSchemaName>collectionobjects_common</CommonSchemaName>
-	</properties>
     
     <build>
 		<resources>

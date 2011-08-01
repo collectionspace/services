@@ -15,14 +15,34 @@
         CollectionObject Nuxeo document type for Tenant ID = "2"
     </description>
 
+	<properties>
+		<CustomSchemaName>collectionobjects_naturalhistory</CustomSchemaName>
+		<TenantId>2</TenantId>
+		<TenantLabel>lifesci</TenantLabel>
+	</properties>
+	
     <build>
+		<resources>
+		  <resource>
+			<directory>../../../../3rdparty/nuxeo/nuxeo-doctype/src/main/resources</directory>
+			<filtering>true</filtering>
+		  </resource>
+		  <resource>
+			<directory>../../../../3rdparty/nuxeo/nuxeo-doctype-custom/src/main/resources</directory>
+			<filtering>true</filtering>
+		  </resource>
+		  <resource>
+			<directory>src/main/resources</directory>
+			<filtering>true</filtering>
+		  </resource>
+		</resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <manifestFile> src/main/resources/META-INF/MANIFEST.MF </manifestFile>
+                        <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
                         <manifestEntries>
                             <Bundle-Version>${eclipseVersion}</Bundle-Version>
                             <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
