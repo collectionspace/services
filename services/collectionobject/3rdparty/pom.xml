@@ -25,7 +25,7 @@
 	</properties>
 	
     <modules>
-    	<module>nuxeo-platform-collectionobject</module>
+    	<module>nuxeo-platform-cs-collectionobject</module>
         <module>nuxeo-platform-collectionobject-lifesci</module>
     </modules>
 
