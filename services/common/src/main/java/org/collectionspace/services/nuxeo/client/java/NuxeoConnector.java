@@ -46,6 +46,8 @@ public class NuxeoConnector {
     public final static String NUXEO_CLIENT_DIR = "nuxeo-client";
     private Logger logger = LoggerFactory.getLogger(NuxeoConnector.class);
     private static final NuxeoConnector self = new NuxeoConnector();
+	private static final String NUXEO_CLIENT_USERNAME = "NUXEO_CLIENT_USERNAME";
+	private static final String NUXEO_CLIENT_PASSWORD = "NUXEO_CLIENT_PASSWORD";
     private NuxeoApp app;
     private NuxeoClient client;
     private volatile boolean initialized = false; //use volatile for lazy initialization in singleton
@@ -58,6 +60,22 @@ public class NuxeoConnector {
         return self;
     }
 
+    private String getClientUserName(RepositoryClientConfigType repositoryClientConfig) {
+    	String username = System.getenv(NUXEO_CLIENT_USERNAME);
+    	if (username == null) {
+    		username = repositoryClientConfig.getUser();
+    	}
+    	return username;
+    }
+    
+    private String getClientPassword(RepositoryClientConfigType repositoryClientConfig) {
+    	String password = System.getenv(NUXEO_CLIENT_PASSWORD);
+    	if (password == null) {
+    		password = repositoryClientConfig.getPassword();
+    	}
+    	return password;
+    }
+    
     /**
      * initialize initialize the Nuxeo connector. It makes sure that the connector
      * is initialized in a thread-safe manner and not initialized more than once.
@@ -81,8 +99,11 @@ public class NuxeoConnector {
                         }
                         loadBundles();
                         client = NuxeoClient.getInstance();
-                        DefaultLoginHandler loginHandler = new DefaultLoginHandler(
-                                repositoryClientConfig.getUser(), repositoryClientConfig.getPassword());
+                        String username = getClientUserName(repositoryClientConfig);
+                        String password = getClientPassword(repositoryClientConfig);
+//                        DefaultLoginHandler loginHandler = new DefaultLoginHandler(
+//                                repositoryClientConfig.getUser(), repositoryClientConfig.getPassword());
+                        DefaultLoginHandler loginHandler = new DefaultLoginHandler(username, password);
                         client.setLoginHandler(loginHandler);
                         client.connect(repositoryClientConfig.getHost(),
                                 repositoryClientConfig.getPort());
