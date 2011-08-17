@@ -191,8 +191,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public void filterReadOnlyPropertiesForPart(
     		Map<String, Object> objectProps, ObjectPartType partMeta) {
     	super.filterReadOnlyPropertiesForPart(objectProps, partMeta);
-    	objectProps.remove(AuthorityItemJAXBSchema.IN_AUTHORITY);
-    	objectProps.remove(AuthorityItemJAXBSchema.CSID);
+    	String commonPartLabel = getServiceContext().getCommonPartLabel();
+    	if(partMeta.getLabel().equalsIgnoreCase(commonPartLabel)) {
+        	objectProps.remove(AuthorityItemJAXBSchema.IN_AUTHORITY);
+        	objectProps.remove(AuthorityItemJAXBSchema.CSID);
+    	}
     }
 
     @Override
