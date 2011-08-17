@@ -7,6 +7,7 @@ xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
   <email>bigbird@cspace.org</email>
   <phone>1234567890</phone>
   <userId>bigbird2010</userId>
+	<!-- Password is bigbird2010 base 64 encoded -->
   <password>YmlnYmlyZDIwMTA=</password>
   <tenants>
     <tenant_id>1</tenant_id>

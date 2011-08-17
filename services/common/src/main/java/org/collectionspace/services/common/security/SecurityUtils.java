@@ -43,6 +43,8 @@ public class SecurityUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
     public static final String URI_PATH_SEPARATOR = "/";
+    public static final int MIN_PASSWORD_LENGTH = 8;
+    public static final int MAX_PASSWORD_LENGTH = 24;
 
     /**
      * createPasswordHash creates password has using configured digest algorithm
@@ -65,14 +67,15 @@ public class SecurityUtils {
      * @param password
      */
     public static void validatePassword(String password) {
-        //TODO: externalize password length
         if (password == null) {
             String msg = "Password missing ";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
-        if (password.length() < 8 || password.length() > 24) {
-            String msg = "Password length should be >8 and <24";
+        if (password.length() < MIN_PASSWORD_LENGTH 
+        		|| password.length() > MAX_PASSWORD_LENGTH) {
+            String msg = "Bad password: '"+password+"': length should be >= "
+            		+ MIN_PASSWORD_LENGTH + " and <= " + MAX_PASSWORD_LENGTH;
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }

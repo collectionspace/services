@@ -7,6 +7,7 @@ xmlns:ns3="http://collectionspace.org/services/hyperjaxb">
   <email>elmo@cspace.org</email>
   <phone>1234567890</phone>
   <userId>elmo2010</userId>
+	<!-- Pass word is elmo2010, base64 encoded -->
   <password>ZWxtbzIwMTA=</password>
   <tenants>
     <tenant_id>1</tenant_id>
