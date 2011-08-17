@@ -26,6 +26,8 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.dom4j.Element;
+
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.PayloadInputPart;
@@ -33,6 +35,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCommonListUtils;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.EntryMethodList;
 import org.collectionspace.services.intake.FieldCollectionEventNameList;
 import org.collectionspace.services.intake.CurrentLocationGroup;
@@ -481,11 +484,12 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         currentLocationGroups.get(0).setCurrentLocationNote(updatedCurrentLocationNote);
         intakeCommons.setCurrentLocationGroupList(currentLocationGroupList);
 
-        // Submit the request to the service and store the response.
+        // Create an output payload to send to the service, and add teh common part
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart = output.addPart(intakeCommons, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
-
+        
+        // Submit the request to the service and store the response.
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
@@ -527,6 +531,113 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(updatedIntake.getEntryNote(),
                 intakeCommons.getEntryNote(),
                 "Data in updated object did not match submitted data.");
+
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"update"})
+    public void verifyReadOnlyCoreFields(String testName) throws Exception {
+        // TODO These should be in some core client utils
+        final String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
+        final String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
+        final String COLLECTIONSPACE_CORE_URI = "uri";
+        final String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
+        final String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
+        final String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
+        final String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdate();
+
+        // Retrieve the contents of a resource to update.
+        IntakeClient client = new IntakeClient();
+        ClientResponse<String> res = client.read(knownResourceId);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("got object to update with ID: " + knownResourceId);
+        }
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
+        Element coreAsElement = null;
+        if (payloadInputPart != null) {
+        	coreAsElement = payloadInputPart.getElementBody();
+        }
+        Assert.assertNotNull(coreAsElement);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Core part before update:");
+            logger.debug(coreAsElement.asXML());
+        }
+
+        // Update the read-only elements
+        Element tenantId = coreAsElement.element(COLLECTIONSPACE_CORE_TENANTID);
+        String originalTenantId = tenantId.getText();
+        tenantId.setText("foo");
+        Element uri = coreAsElement.element(COLLECTIONSPACE_CORE_URI);
+        String originalUri = uri.getText();
+        uri.setText("foo");
+        Element createdAt = coreAsElement.element(COLLECTIONSPACE_CORE_CREATED_AT);
+        String originalCreatedAt = createdAt.getText();
+        String now = GregorianCalendarDateTimeUtils.timestampUTC();
+        if(originalCreatedAt.equalsIgnoreCase(now) && logger.isWarnEnabled()) {
+        		logger.warn("Cannot check createdAt read-only; too fast!");
+        }
+        createdAt.setText(now);
+        Element createdBy = coreAsElement.element(COLLECTIONSPACE_CORE_CREATED_BY);
+        String originalCreatedBy = createdBy.getText();
+        createdBy.setText("foo");
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug("Core part to be updated:");
+            logger.debug(coreAsElement.asXML());
+        }
+
+        // Create an output payload to send to the service, and add the common part
+        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart corePart = output.addPart(
+        					COLLECTIONSPACE_CORE_SCHEMA, coreAsElement);
+        
+        // Submit the request to the service and store the response.
+        res = client.update(knownResourceId, output);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart updatedCorePart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
+        Element updatedCoreAsElement = null;
+        if (updatedCorePart != null) {
+        	updatedCoreAsElement = updatedCorePart.getElementBody();
+        }
+        Assert.assertNotNull(updatedCoreAsElement);
+        
+        tenantId = updatedCoreAsElement.element(COLLECTIONSPACE_CORE_TENANTID);
+        String updatedTenantId = tenantId.getText();
+        Assert.assertEquals(updatedTenantId, originalTenantId,
+        			"CORE part TenantID was able to update!");
+        uri = updatedCoreAsElement.element(COLLECTIONSPACE_CORE_URI);
+        String updatedUri = uri.getText();
+        Assert.assertEquals(updatedUri, originalUri,
+        			"CORE part URI was able to update!");
+        createdAt = updatedCoreAsElement.element(COLLECTIONSPACE_CORE_CREATED_AT);
+        String updatedCreatedAt = createdAt.getText();
+        Assert.assertEquals(updatedCreatedAt, originalCreatedAt,
+        			"CORE part CreatedAt was able to update!");
+        createdBy = updatedCoreAsElement.element(COLLECTIONSPACE_CORE_CREATED_BY);
+        String updatedCreatedBy = createdBy.getText();
+        Assert.assertEquals(updatedCreatedBy, originalCreatedBy,
+        			"CORE part CreatedBy was able to update!");
 
     }
 
@@ -691,7 +802,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "verifyReadOnlyCoreFields"})
     public void delete(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

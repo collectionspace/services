@@ -284,7 +284,15 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      */
     public void filterReadOnlyPropertiesForPart(
             Map<String, Object> objectProps, ObjectPartType partMeta) {
-        // Currently a no-op, but can be overridden in Doc handlers.
+    	// Should add in logic to filter most of the core items on update
+    	if(partMeta.getLabel().equalsIgnoreCase(COLLECTIONSPACE_CORE_SCHEMA)) {
+        	objectProps.remove(COLLECTIONSPACE_CORE_CREATED_AT);
+        	objectProps.remove(COLLECTIONSPACE_CORE_CREATED_BY);
+        	objectProps.remove(COLLECTIONSPACE_CORE_URI);
+        	objectProps.remove(COLLECTIONSPACE_CORE_TENANTID);
+        	// Note that the updatedAt/updatedBy fields are set internally
+        	// in DocumentModelHandler.handleCoreValues().
+    	}
     }
 
     /**
