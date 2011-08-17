@@ -65,6 +65,8 @@ public abstract class DocumentModelHandler<T, TL>
     public final static String COLLECTIONSPACE_CORE_URI = "uri";
     public final static String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
     public final static String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
+    public final static String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
+    public final static String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
 
     /*
      * We're using the "name" field of Nuxeo's DocumentModel to store
@@ -181,14 +183,15 @@ public abstract class DocumentModelHandler<T, TL>
     		Action action)  throws ClientException {
     	DocumentModel documentModel = docWrapper.getWrappedObject();
         String now = GregorianCalendarDateTimeUtils.timestampUTC();
+    	ServiceContext ctx = getServiceContext();
+    	String userId = ctx.getUserId();
     	if(action==Action.CREATE) {
-        	String tenantId = getServiceContext().getTenantId();
             //
             // Add the tenant ID value to the new entity
             //
+        	String tenantId = ctx.getTenantId();
             documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
-                    COLLECTIONSPACE_CORE_TENANTID,
-                    getServiceContext().getTenantId());
+                    COLLECTIONSPACE_CORE_TENANTID, tenantId);
             //
             // Add the uri value to the new entity
             //
@@ -209,10 +212,14 @@ public abstract class DocumentModelHandler<T, TL>
         	}
             documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
                     COLLECTIONSPACE_CORE_CREATED_AT, now);
+            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
+                    COLLECTIONSPACE_CORE_CREATED_BY, userId);
     	}
     	if(action==Action.CREATE || action==Action.UPDATE) {
             documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
                     COLLECTIONSPACE_CORE_UPDATED_AT, now);
+            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
+                    COLLECTIONSPACE_CORE_UPDATED_BY, userId);
     	}
     }
 

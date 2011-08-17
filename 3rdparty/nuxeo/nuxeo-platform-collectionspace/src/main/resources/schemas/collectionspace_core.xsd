@@ -20,4 +20,6 @@
     <!--<xs:element name="createdAt" type="xs:string"/>-->
     <xs:element name="createdAt" type="xs:dateTime"/>
     <xs:element name="updatedAt" type="xs:dateTime"/>
+    <xs:element name="createdBy" type="xs:string"/>
+    <xs:element name="updatedBy" type="xs:string"/>
 </xs:schema>
