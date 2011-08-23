@@ -265,8 +265,8 @@ public class ServiceMain {
         	// then the accounts were as well
             String insertAccountSQL = 
             	"INSERT INTO accounts_common "
-            	+ "(csid, email, userid, status, screen_name, created_at) "
-            	+ "VALUES (?,?,?,'ACTIVE',?, now())";
+            	+ "(csid, email, userid, status, screen_name, metadata_protection, roles_protection, created_at) "
+            	+ "VALUES (?,?,?,'ACTIVE',?, 'immutable', 'immutable', now())";
             Hashtable<String, String> tenantAdminAcctCSIDs = new Hashtable<String, String>();
             Hashtable<String, String> tenantReaderAcctCSIDs = new Hashtable<String, String>();
         	pstmt = conn.prepareStatement(insertAccountSQL); // create a statement

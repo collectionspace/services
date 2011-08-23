@@ -610,6 +610,92 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
                 roleToUpdate.getDescription(),
                 "Data in updated object did not match submitted data.");
     }
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"read", "readList", "readNonExistent"})
+	public void verifyProtectionReadOnly(String testName) throws Exception {
+
+    	if (logger.isDebugEnabled()) {
+    		logger.debug(testBanner(testName, CLASS_NAME));
+    	}
+    	
+        setupCreate();
+
+        // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
+        Role role = createRoleInstance(knownRoleName+"_PT", "Just a temp", true);
+        role.setMetadataProtection(RoleClient.IMMUTABLE);
+        role.setPermsProtection(RoleClient.IMMUTABLE);
+        ClientResponse<Response> res = client.create(role);
+        int statusCode = res.getStatus();
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Store the ID returned from this create operation
+        // for additional tests below.
+        String testResourceId = extractId(res);
+        allResourceIdsCreated.add(testResourceId);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": testResourceId=" + testResourceId);
+        }
+        setupRead();
+
+        // Submit the request to the service and store the response.
+        ClientResponse<Role> roleRes = client.read(testResourceId);
+        statusCode = roleRes.getStatus();
+
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        Role roleRead = (Role) roleRes.getEntity();
+        Assert.assertNotNull(roleRead);
+        String mdProtection = roleRead.getMetadataProtection();
+        String permsProtection = roleRead.getPermsProtection();
+        if (logger.isTraceEnabled()) {
+            logger.trace(testName + ": metadataProtection=" + mdProtection);
+            logger.trace(testName + ": permsProtection=" + permsProtection);
+        }
+    	Assert.assertFalse(role.getMetadataProtection().equals(mdProtection),
+    			"Role allowed create to set the metadata protection flag.");
+    	Assert.assertFalse(role.getPermsProtection().equals(permsProtection),
+    			"Role allowed create to set the perms protection flag.");
+        
+    	setupUpdate();
+
+    	Role roleToUpdate = createRoleInstance(knownRoleName+"_PT", "Just a temp", true);
+    	roleToUpdate.setMetadataProtection(RoleClient.IMMUTABLE);
+    	roleToUpdate.setPermsProtection(RoleClient.IMMUTABLE);
+
+    	// Submit the request to the service and store the response.
+    	roleRes = client.update(testResourceId, roleToUpdate);
+    	statusCode = roleRes.getStatus();
+    	// Check the status code of the response: does it match the expected response(s)?
+    	if (logger.isDebugEnabled()) {
+    		logger.debug(testName + ": status = " + statusCode);
+    	}
+    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+
+    	Role roleUpdated = (Role) roleRes.getEntity();
+    	Assert.assertNotNull(roleUpdated);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + "Updated role: ");
+            logger.debug(objectAsXmlString(roleUpdated,Role.class));
+        }
+
+    	Assert.assertFalse(
+    			RoleClient.IMMUTABLE.equalsIgnoreCase(roleUpdated.getMetadataProtection()),
+    			"Role allowed update of the metadata protection flag.");
+    	Assert.assertFalse(
+    			RoleClient.IMMUTABLE.equalsIgnoreCase(roleUpdated.getPermsProtection()),
+    			"Role allowed update of the perms protection flag.");
+    }
+
+
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read", "readList", "readNonExistent"})
@@ -714,7 +800,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"updateNotAllowed", "testSubmitRequest"})
+    dependsOnMethods = {"updateNotAllowed", "testSubmitRequest", "verifyProtectionReadOnly"})
     public void delete(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

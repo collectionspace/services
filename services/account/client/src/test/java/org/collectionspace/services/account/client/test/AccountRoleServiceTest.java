@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 
 //import org.collectionspace.services.authorization.AccountRolesList;
 import org.collectionspace.services.account.AccountsCommon;
+import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.Role;
@@ -70,6 +71,8 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
+    private String prebuiltAdminCSID = null;
+    private String prebuiltAdminUserId = "admin@core.collectionspace.org";
     /** The all resource ids created. */
     private List<String> allResourceIdsCreated = new ArrayList<String>();
     /** The acc values. */
@@ -486,6 +489,33 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         
     }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    	    dependsOnMethods = {"read"})
+	public void deleteLockedAccount(String testName) throws Exception {
+
+    	if (logger.isDebugEnabled()) {
+    		testBanner(testName, CLASS_NAME);
+    	}
+    	
+    	findPrebuiltAdminAccount();
+
+    	// Perform setup.
+        EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
+        REQUEST_TYPE = ServiceRequestType.DELETE;
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE);
+
+    	AccountRoleClient client = new AccountRoleClient();
+    	ClientResponse<Response> res = client.delete(prebuiltAdminCSID);
+    	try {
+    		int statusCode = res.getStatus();
+    		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    	} finally {
+    		res.releaseConnection();
+    	}
+    }
+
     // Failure outcomes
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
@@ -625,6 +655,27 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         return extractId(res);
     }
 
+    private void findPrebuiltAdminAccount() {
+    	// Search for the prebuilt admin user and then hold its CSID
+    	if(prebuiltAdminCSID == null) {
+            setupReadList();
+            AccountClient client = new AccountClient();
+            ClientResponse<AccountsCommonList> res =
+                    client.readSearchList(null, this.prebuiltAdminUserId, null);
+            AccountsCommonList list = res.getEntity();
+            int statusCode = res.getStatus();
+
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            List<AccountsCommonList.AccountListItem> items = list.getAccountListItem();
+            Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
+            AccountsCommonList.AccountListItem item = items.get(0);
+            prebuiltAdminCSID = item.getCsid();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found Admin Account with ID: " + prebuiltAdminCSID);
+            }
+    	}
+    }
+    
     /**
      * Delete account.
      *

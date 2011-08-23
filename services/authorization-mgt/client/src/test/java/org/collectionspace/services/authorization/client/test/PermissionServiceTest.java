@@ -421,10 +421,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         }
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
+        if ((iterateThroughList || (EXPECTED_ITEMS != list.getPermissions().size()))
+        		&& logger.isDebugEnabled()) {
             printList(testName, list);
         }
-        Assert.assertEquals(EXPECTED_ITEMS, list.getPermissions().size());
+        Assert.assertEquals(list.getPermissions().size(), EXPECTED_ITEMS);
 
     }
 

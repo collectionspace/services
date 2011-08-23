@@ -34,6 +34,7 @@ import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountsCommonList.AccountListItem;
 import org.collectionspace.services.account.Status;
 
+import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -62,13 +63,19 @@ public class AccountDocumentHandler
         account.setCsid(id);
         setTenant(account);
         account.setStatus(Status.ACTIVE);
+        // We do not allow creation of locked accounts through the services.
+        account.setMetadataProtection(null);
+        account.setRolesProtection(null);
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         AccountsCommon accountFound = wrapDoc.getWrappedObject();
         AccountsCommon accountReceived = getCommonPart();
-        merge(accountReceived, accountFound);
+        // If marked as metadata immutable, do not do update
+        if(!AccountClient.IMMUTABLE.equals(accountFound.getMetadataProtection())) {
+        	merge(accountReceived, accountFound);
+        }
     }
 
     /**
@@ -99,6 +106,7 @@ public class AccountDocumentHandler
         if (from.getPersonRefName() != null) {
             to.setPersonRefName(from.getPersonRefName());
         }
+        // Note that we do not allow update of locks
         //fixme update for tenant association
 
         if (logger.isDebugEnabled()) {
@@ -111,7 +119,7 @@ public class AccountDocumentHandler
     @Override
     public void completeUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         AccountsCommon upAcc = wrapDoc.getWrappedObject();
-        getServiceContext().setOutput(account);
+        getServiceContext().setOutput(upAcc);
         sanitize(upAcc);
     }
 

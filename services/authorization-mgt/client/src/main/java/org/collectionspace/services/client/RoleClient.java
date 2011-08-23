@@ -43,6 +43,7 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, RoleProxy> 
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
+	public final static String IMMUTABLE = "immutable";
 
     @Override
     public String getServiceName() { 

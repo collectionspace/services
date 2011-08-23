@@ -30,6 +30,7 @@ import java.util.UUID;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
 
+import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -69,15 +70,21 @@ public class RoleDocumentHandler
         role.setRoleName(fixRoleName(role.getRoleName(),
         		role.getTenantId()));
         role.setCsid(id);
+        // We do not allow creation of locked roles through the services.
+        role.setMetadataProtection(null);
+        role.setPermsProtection(null);
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
         Role roleFound = wrapDoc.getWrappedObject();
         Role roleReceived = getCommonPart();
-        roleReceived.setRoleName(fixRoleName(roleReceived.getRoleName(),
-        		roleFound.getTenantId()));
-        merge(roleReceived, roleFound);
+        // If marked as metadata immutable, do not do update
+        if(!RoleClient.IMMUTABLE.equals(roleFound.getMetadataProtection())) {
+	        roleReceived.setRoleName(fixRoleName(roleReceived.getRoleName(),
+	        		roleFound.getTenantId()));
+	        merge(roleReceived, roleFound);
+        }
     }
 
     /**
@@ -103,6 +110,7 @@ public class RoleDocumentHandler
         if (from.getDescription() != null) {
             to.setDescription(from.getDescription());
         }
+        // Note that we do not allow update of locks
         if (logger.isDebugEnabled()) {
             logger.debug("merged role=" + JaxbUtils.toString(to, Role.class));
         }
@@ -112,7 +120,7 @@ public class RoleDocumentHandler
     @Override
     public void completeUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
         Role upAcc = wrapDoc.getWrappedObject();
-        getServiceContext().setOutput(role);
+        getServiceContext().setOutput(upAcc);
         sanitize(upAcc);
     }
 

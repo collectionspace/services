@@ -49,6 +49,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -120,7 +121,14 @@ public class AccountResource extends SecurityResourceBase {
         logger.debug("deleteAccount with csid=" + csid);
         ensureCSID(csid, ServiceMessages.DELETE_FAILED);
         try {
-            //FIXME ideally the following two ops shoudl be in the same tx CSPACE-658
+        	AccountsCommon account = (AccountsCommon)get(csid, AccountsCommon.class);
+            // If marked as metadata immutable, do not delete
+            if(AccountClient.IMMUTABLE.equals(account.getMetadataProtection())) {
+                Response response = 
+                	Response.status(Response.Status.FORBIDDEN).entity("Account: "+csid+" is immutable.").type("text/plain").build();
+                return response;
+            }
+            //FIXME ideally the following two ops should be in the same tx CSPACE-658
             //delete all relationships
             AccountRoleSubResource subResource = new AccountRoleSubResource("accounts/accountroles");
             subResource.deleteAccountRole(csid, SubjectType.ROLE);
@@ -147,6 +155,13 @@ public class AccountResource extends SecurityResourceBase {
         logger.debug("createAccountRole with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.POST_FAILED+ "accountroles account ");
         try {
+        	AccountsCommon account = (AccountsCommon)get(accCsid, AccountsCommon.class);
+            // If marked as roles immutable, do not create
+            if(AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
+                Response response = 
+                	Response.status(Response.Status.FORBIDDEN).entity("Roles for Account: "+accCsid+" are immutable.").type("text/plain").build();
+                return response;
+            }
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             String accrolecsid = subResource.createAccountRole(input, SubjectType.ROLE);
@@ -218,6 +233,13 @@ public class AccountResource extends SecurityResourceBase {
         logger.debug("deleteAccountRole with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.DELETE_FAILED+ "accountroles account ");
         try {
+        	AccountsCommon account = (AccountsCommon)get(accCsid, AccountsCommon.class);
+            // If marked as roles immutable, do not delete
+            if(AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
+                Response response = 
+                	Response.status(Response.Status.FORBIDDEN).entity("Roles for Account: "+accCsid+" are immutable.").type("text/plain").build();
+                return response;
+            }
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //delete all relationships for an account
@@ -234,6 +256,13 @@ public class AccountResource extends SecurityResourceBase {
         logger.debug("deleteAccountRole: All roles related to account with accCsid=" + accCsid);
         ensureCSID(accCsid, ServiceMessages.DELETE_FAILED+ "accountroles account ");
         try {
+            // If marked as roles immutable, do not delete
+        	AccountsCommon account = (AccountsCommon)get(accCsid, AccountsCommon.class);
+            if(AccountClient.IMMUTABLE.equals(account.getRolesProtection())) {
+                Response response = 
+                	Response.status(Response.Status.FORBIDDEN).entity("Roles for Account: "+accCsid+" are immutable.").type("text/plain").build();
+                return response;
+            }
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //delete all relationships for an account

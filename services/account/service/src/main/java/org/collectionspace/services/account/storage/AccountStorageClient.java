@@ -205,6 +205,8 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             AccountsCommon accountFound = getAccount(em, id);
             checkAllowedUpdates(accountReceived, accountFound);
             //if userid and password are given, add to default id provider
+            // Note that this ignores the immutable flag, as we allow
+            // password changes.
             if (accountReceived.getUserId() != null
                     && isForCSIdP(accountReceived.getPassword())) {
                 userStorageClient.update(em,

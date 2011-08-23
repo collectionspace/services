@@ -40,6 +40,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
     public static final String SERVICE_NAME = "accounts";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+    public final static String IMMUTABLE = "immutable";
 
 	@Override
 	public String getServiceName() {

@@ -164,7 +164,7 @@ public class PermissionDocumentHandler
     @Override
     public void completeUpdate(DocumentWrapper<Permission> wrapDoc) throws Exception {
         Permission upAcc = wrapDoc.getWrappedObject();
-        getServiceContext().setOutput(permission);
+        getServiceContext().setOutput(upAcc);
         sanitize(upAcc);
         //FIXME update lower-layer authorization (acls)
         //will require deleting old permissions for this resource and adding

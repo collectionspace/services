@@ -57,6 +57,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
+    private String prebuiltAdminCSID = null;
+    private String prebuiltAdminUserId = "admin@core.collectionspace.org";
     private String knownUserId = "barney";
     private String knownUserPassword = "hithere08";
     /** The add tenant. */
@@ -931,6 +933,173 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
 
     }
+    
+    private void findPrebuiltAdminAccount() {
+    	// Search for the prebuilt admin user and then hold its CSID
+    	if(prebuiltAdminCSID == null) {
+            setupReadList();
+            AccountClient client = new AccountClient();
+            ClientResponse<AccountsCommonList> res =
+                    client.readSearchList(null, this.prebuiltAdminUserId, null);
+            AccountsCommonList list = res.getEntity();
+            int statusCode = res.getStatus();
+
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            List<AccountsCommonList.AccountListItem> items = list.getAccountListItem();
+            Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
+            AccountsCommonList.AccountListItem item = items.get(0);
+            prebuiltAdminCSID = item.getCsid();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Found Admin Account with ID: " + prebuiltAdminCSID);
+            }
+    	}
+    }
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"read", "readList", "readNonExistent"})
+	public void verifyMetadataProtection(String testName) throws Exception {
+    	findPrebuiltAdminAccount();
+    	// Try to update the metadata - it should just get ignored
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdate();
+
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommon> res = client.read(prebuiltAdminCSID);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Did get on Admin Account to update with ID: " + prebuiltAdminCSID);
+        }
+        AccountsCommon accountFound = (AccountsCommon) res.getEntity();
+        Assert.assertNotNull(accountFound);
+
+        //create a new account object to test partial updates
+        AccountsCommon accountToUpdate = new AccountsCommon();
+        accountToUpdate.setCsid(prebuiltAdminCSID);
+        accountToUpdate.setUserId(accountFound.getUserId());
+        // Update the content of this resource.
+        accountToUpdate.setEmail("updated-" + accountFound.getEmail());
+        if (logger.isDebugEnabled()) {
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(accountFound,
+                    AccountsCommon.class));
+        }
+
+        // Submit the request to the service and store the response.
+        res = client.update(prebuiltAdminCSID, accountToUpdate);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        // Note that the error is not returned, it is just ignored
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        AccountsCommon accountUpdated = (AccountsCommon) res.getEntity();
+        Assert.assertNotNull(accountUpdated);
+
+    	Assert.assertFalse(accountUpdated.getEmail().equals(accountToUpdate.getEmail()),
+    		"Admin Account (with metadata lock) allowed update to change the email!");
+    }
+    
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"read", "readList", "readNonExistent"})
+	public void verifyProtectionReadOnly(String testName) throws Exception {
+
+    	if (logger.isDebugEnabled()) {
+    		logger.debug(testBanner(testName, CLASS_NAME));
+    	}
+    	
+        setupCreate();
+
+        // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
+        AccountsCommon account = 
+        	createAccountInstance("mdTest", "mdTest", "mdTestPW", "md@test.com", 
+        			client.getTenantId(), true, false, true, true);
+        account.setMetadataProtection(AccountClient.IMMUTABLE);
+        account.setRolesProtection(AccountClient.IMMUTABLE);
+        ClientResponse<Response> res = client.create(account);
+        int statusCode = res.getStatus();
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Store the ID returned from this create operation
+        // for additional tests below.
+        String testResourceId = extractId(res);
+        allResourceIdsCreated.add(testResourceId);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": testResourceId=" + testResourceId);
+        }
+        setupRead();
+
+        // Submit the request to the service and store the response.
+        ClientResponse<AccountsCommon> accountRes = client.read(testResourceId);
+        statusCode = accountRes.getStatus();
+
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        AccountsCommon accountRead = (AccountsCommon) accountRes.getEntity();
+        Assert.assertNotNull(accountRead);
+        String mdProtection = accountRead.getMetadataProtection();
+        String rolesProtection = accountRead.getRolesProtection();
+        if (logger.isTraceEnabled()) {
+            logger.trace(testName + ": metadataProtection=" + mdProtection);
+            logger.trace(testName + ": rolesProtection=" + rolesProtection);
+        }
+    	Assert.assertFalse(account.getMetadataProtection().equals(mdProtection),
+    			"Account allowed create to set the metadata protection flag.");
+    	Assert.assertFalse(account.getRolesProtection().equals(rolesProtection),
+    			"Account allowed create to set the perms protection flag.");
+        
+    	setupUpdate();
+
+    	AccountsCommon accountToUpdate = 
+		    	createAccountInstance("mdTest", "mdTest", "mdTestPW", "md@test.com", 
+		    			client.getTenantId(), true, false, true, true);
+    	accountToUpdate.setMetadataProtection(AccountClient.IMMUTABLE);
+    	accountToUpdate.setRolesProtection(AccountClient.IMMUTABLE);
+
+    	// Submit the request to the service and store the response.
+    	accountRes = client.update(testResourceId, accountToUpdate);
+    	statusCode = accountRes.getStatus();
+    	// Check the status code of the response: does it match the expected response(s)?
+    	if (logger.isDebugEnabled()) {
+    		logger.debug(testName + ": status = " + statusCode);
+    	}
+    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+
+    	AccountsCommon accountUpdated = (AccountsCommon) accountRes.getEntity();
+    	Assert.assertNotNull(accountUpdated);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + "Updated account: ");
+            logger.debug(objectAsXmlString(accountUpdated,AccountsCommon.class));
+        }
+
+    	Assert.assertFalse(
+    			AccountClient.IMMUTABLE.equalsIgnoreCase(accountUpdated.getMetadataProtection()),
+    			"Account allowed update of the metadata protection flag.");
+    	Assert.assertFalse(
+    			AccountClient.IMMUTABLE.equalsIgnoreCase(accountUpdated.getRolesProtection()),
+    			"Account allowed update of the roles protection flag.");
+    }
+
+
 
     /**
      * Deactivate.

@@ -42,6 +42,7 @@ import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
+import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.RolesList;
@@ -266,31 +267,26 @@ public class AuthorizationGen {
     }
 
     private Role buildTenantAdminRole(String tenantId) {
-        Role role = new Role();
-        role.setCreatedAtItem(new Date());
-        role.setDisplayName(ROLE_TENANT_ADMINISTRATOR);
-        role.setRoleName(ROLE_PREFIX +
-        		tenantId + "_" +
-        		role.getDisplayName());
-
-        String id = UUID.randomUUID().toString();
-        role.setCsid(id);
-        role.setDescription("generated tenant admin role");
-        role.setTenantId(tenantId);
-        return role;
+        return buildTenantRole(tenantId, ROLE_TENANT_ADMINISTRATOR, "admin");
     }
 
     private Role buildTenantReaderRole(String tenantId) {
+        return buildTenantRole(tenantId, ROLE_TENANT_READER, "read only");
+    }
+
+    private Role buildTenantRole(String tenantId, String name, String type) {
         Role role = new Role();
         role.setCreatedAtItem(new Date());
-        role.setDisplayName(ROLE_TENANT_READER);
+        role.setDisplayName(name);
         role.setRoleName(ROLE_PREFIX +
         		tenantId + "_" +
         		role.getDisplayName());
         String id = UUID.randomUUID().toString();
         role.setCsid(id);
-        role.setDescription("generated tenant read only role");
+        role.setDescription("generated tenant "+type+" role");
         role.setTenantId(tenantId);
+        role.setMetadataProtection(RoleClient.IMMUTABLE);
+        role.setPermsProtection(RoleClient.IMMUTABLE);
         return role;
     }
 

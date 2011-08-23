@@ -139,7 +139,25 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="createdAt" type="xs:dateTime">
+                <xs:element name="metadataProtection" type="xs:string" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="metadata_protection"  nullable="true"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="rolesProtection" type="xs:string" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="roles_protection"  nullable="true"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+								</xs:element>
+								<xs:element name="createdAt" type="xs:dateTime">
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>

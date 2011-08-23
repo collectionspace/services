@@ -45,6 +45,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -104,7 +105,18 @@ public class RoleResource extends SecurityResourceBase {
     @PUT
     @Path("{csid}")
     public Role updateRole(@PathParam("csid") String csid, Role theUpdate) {
-        return (Role)update(csid, theUpdate, Role.class);
+        try {
+	    	Role role = (Role)get(csid, Role.class);
+	        // If marked as metadata immutable, do not update
+	        if(RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
+	            Response response = 
+	            	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build();
+                throw new WebApplicationException(response);
+	        }
+	        return (Role)update(csid, theUpdate, Role.class);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
+        }
     }
 
     @DELETE
@@ -114,6 +126,13 @@ public class RoleResource extends SecurityResourceBase {
         ensureCSID(csid, ServiceMessages.DELETE_FAILED + "deleteRole ");
 
         try {
+        	Role role = (Role)get(csid, Role.class);
+            // If marked as metadata immutable, do not delete
+            if(RoleClient.IMMUTABLE.equals(role.getMetadataProtection())) {
+                Response response = 
+                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+csid+" is immutable.").type("text/plain").build();
+                return response;
+            }
             //FIXME ideally the following three operations should be in the same tx CSPACE-658
             //delete all relationships for this permission
             PermissionRoleSubResource permRoleResource =
@@ -144,6 +163,13 @@ public class RoleResource extends SecurityResourceBase {
         logger.debug("createRolePermission with roleCsid=" + roleCsid);
         ensureCSID(roleCsid, ServiceMessages.PUT_FAILED + "permroles role ");
         try {
+        	Role role = (Role)get(roleCsid, Role.class);
+            // If marked as metadata immutable, do not delete
+            if(RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
+                Response response = 
+                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+roleCsid+" is immutable.").type("text/plain").build();
+                return response;
+            }
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             String permrolecsid = subResource.createPermissionRole(input, SubjectType.PERMISSION);
@@ -199,6 +225,13 @@ public class RoleResource extends SecurityResourceBase {
         logger.debug("deleteRolePermission with roleCsid=" + roleCsid);
         ensureCSID(roleCsid, ServiceMessages.DELETE_FAILED + "permroles role ");
         try {
+        	Role role = (Role)get(roleCsid, Role.class);
+            // If marked as metadata immutable, do not delete
+            if(RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
+                Response response = 
+                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+roleCsid+" is immutable.").type("text/plain").build();
+                return response;
+            }
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //delete all relationships for a permission
@@ -216,6 +249,13 @@ public class RoleResource extends SecurityResourceBase {
         logger.debug("deleteRolePermission with roleCsid=" + roleCsid);
         ensureCSID(roleCsid, ServiceMessages.DELETE_FAILED + "permroles role ");
         try {
+        	Role role = (Role)get(roleCsid, Role.class);
+            // If marked as metadata immutable, do not delete
+            if(RoleClient.IMMUTABLE.equals(role.getPermsProtection())) {
+                Response response = 
+                	Response.status(Response.Status.FORBIDDEN).entity("Role: "+roleCsid+" is immutable.").type("text/plain").build();
+                return response;
+            }
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //delete all relationships for a permission
