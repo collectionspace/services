@@ -580,13 +580,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 	@GET
 	@Path("{csid}/items")
 	@Produces("application/xml")
-	public AbstractCommonList getAuthorityItemList(
-			@PathParam("csid") String specifier,
-			@QueryParam(IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
-			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+	public AbstractCommonList getAuthorityItemList(@PathParam("csid") String specifier,
 			@Context UriInfo ui) {
 		try {
 			MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+	        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+	        String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+	        String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
+			
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 
@@ -603,14 +604,17 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 					IQueryManager.SEARCH_QUALIFIER_AND);
 
 			// AND vocabularyitems_common:displayName LIKE '%partialTerm%'
+			// NOTE: Partial terms searches are mutually exclusive to keyword and advanced-search, but
+			// the PT query param trumps the KW and AS query params.
 			if (partialTerm != null && !partialTerm.isEmpty()) {
 				String ptClause = QueryManager.createWhereClauseForPartialMatch(
 				authorityItemCommonSchemaName + ":"
 				+ AuthorityItemJAXBSchema.DISPLAY_NAME, partialTerm );
 				myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
-			} else if (keywords != null) {
-				String kwdClause = QueryManager.createWhereClauseFromKeywords(keywords);
-				myFilter.appendWhereClause(kwdClause, IQueryManager.SEARCH_QUALIFIER_AND);
+			} else if (keywords != null || advancedSearch != null) {
+//				String kwdClause = QueryManager.createWhereClauseFromKeywords(keywords);
+//				myFilter.appendWhereClause(kwdClause, IQueryManager.SEARCH_QUALIFIER_AND);
+				return search(ctx, handler, queryParams, keywords, advancedSearch);
 			}
 			if (logger.isDebugEnabled()) {
 				logger.debug("getAuthorityItemList filtered WHERE clause: "
