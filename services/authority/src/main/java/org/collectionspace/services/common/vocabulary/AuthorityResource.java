@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common.vocabulary;
 
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -78,6 +79,8 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -587,7 +590,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 	        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
 	        String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
 	        String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
-			
+	        
+	        String qualifiedDisplayNameField = authorityItemCommonSchemaName + ":"
+											+ AuthorityItemJAXBSchema.DISPLAY_NAME;
+	        
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 
@@ -598,6 +604,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 			DocumentHandler handler = createItemDocumentHandler(ctx, 
 										parentcsid, null);
 			DocumentFilter myFilter = handler.getDocumentFilter();
+	        // Need to make the default sort order for authority items
+			// be on the displayName field
+	        String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
+	        if(sortBy==null || sortBy.isEmpty()) {
+	        	myFilter.setOrderByClause(qualifiedDisplayNameField);
+	        }
+			
 			myFilter.appendWhereClause(authorityItemCommonSchemaName + ":" +
 					AuthorityItemJAXBSchema.IN_AUTHORITY + "=" + 
 					"'" + parentcsid + "'",
@@ -608,8 +621,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 			// the PT query param trumps the KW and AS query params.
 			if (partialTerm != null && !partialTerm.isEmpty()) {
 				String ptClause = QueryManager.createWhereClauseForPartialMatch(
-				authorityItemCommonSchemaName + ":"
-				+ AuthorityItemJAXBSchema.DISPLAY_NAME, partialTerm );
+						qualifiedDisplayNameField, partialTerm );
 				myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
 			} else if (keywords != null || advancedSearch != null) {
 //				String kwdClause = QueryManager.createWhereClauseFromKeywords(keywords);
