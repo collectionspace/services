@@ -3,7 +3,7 @@
 <xmlReplay>
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
-        <auth ID="admin@lifesci.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+        <auth ID="admin@lifesci.collectionspace.org">YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
     
     <testGroup ID="advSearchCommonSchema" autoDeletePOSTS="true">
@@ -28,7 +28,7 @@
    
     <testGroup ID="advSearchExtensionSchema" autoDeletePOSTS="true">
         <!-- Create a new CollectionObject record with an extension schema part -->
-       <test ID="co2"  auth="admin@lifesci.collectionspace.org">
+       <test ID="co2" auth="admin@lifesci.collectionspace.org">
              <method>POST</method>
              <uri>/cspace-services/collectionobjects/</uri>
              <filename>collectionobject/co2.xml</filename>
@@ -46,7 +46,6 @@
         </test>
         <!-- Advanced search for CollectionObject records matching the -->
         <!-- expected text within a single field in the extension schema part. -->
-        <!--
         <test ID="co2advsearch">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects?as=collectionobjects_naturalhistory%3AfieldLocVerbatim%3D'jlmbsoqjlmbsoq'</uri>
@@ -56,7 +55,6 @@
                 <filename>collectionobject/res/co2-adv-search-lifesci.res.xml</filename>
              </response>
          </test>
-         -->
     </testGroup>
 
 </xmlReplay>

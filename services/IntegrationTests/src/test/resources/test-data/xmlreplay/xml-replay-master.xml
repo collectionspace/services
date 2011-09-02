@@ -38,6 +38,7 @@
     <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
     <run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
     <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchCommonSchema" />
+    <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchExtensionSchema" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
     <run controlFile="relation/relation.xml" testGroup="makeRelations" />
