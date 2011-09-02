@@ -59,7 +59,8 @@
     <xs:element name="objectPurchaseOfferPriceCurrency" type="xs:string"/>
     <xs:element name="objectPurchaseOfferPriceValue" type="xs:string"/>
     <xs:element name="objectPurchasePriceCurrency" type="xs:string"/>
-    <xs:element name="objectPurchasePriceValue" type="xs:string"/>
+    <!-- CSPACE-4330: We may also wish to experiment with xs:decimal or other datatypes -->
+    <xs:element name="objectPurchasePriceValue" type="xs:float"/>
     <xs:element name="originalObjectPurchasePriceCurrency" type="xs:string"/>
     <xs:element name="originalObjectPurchasePriceValue" type="xs:string"/>
     <xs:element name="transferOfTitleNumber" type="xs:string"/>

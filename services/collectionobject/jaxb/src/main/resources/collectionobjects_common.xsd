@@ -47,7 +47,7 @@
                 <xs:element name="briefDescriptions" type="briefDescriptionList"/>
                 <xs:element name="comments" type="commentList"/>
                 <xs:element name="distinguishingFeatures" type="xs:string"/>
-                <xs:element name="numberOfObjects" type="xs:string"/>
+                <xs:element name="numberOfObjects" type="xs:integer"/>
                 <xs:element name="objectNameList" type="ns:objectNameList"/>
                 <xs:element name="responsibleDepartments" type="responsibleDepartmentList"/>
                 <xs:element name="collection" type="xs:string"/>

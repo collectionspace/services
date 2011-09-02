@@ -3,7 +3,7 @@
 <objectNumber>objectNumber</objectNumber>
 <briefDescriptions> <briefDescription> briefDescription</briefDescription></briefDescriptions>
 <distinguishingFeatures>distFeatures</distinguishingFeatures>
-<numberOfObjects>numberOfObjects</numberOfObjects>
+<numberOfObjects>1</numberOfObjects>
 <!-- test whitespace as first child node -->
 <responsibleDepartments> <responsibleDepartment> responsibleDept1</responsibleDepartment><responsibleDepartment>responsibleDept2</responsibleDepartment></responsibleDepartments>
 <titleGroupList><titleGroup><title>title</title></titleGroup></titleGroupList>

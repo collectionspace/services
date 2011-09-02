@@ -9,7 +9,7 @@
     <briefDescription>briefDescription2</briefDescription>
 </briefDescriptions>
 <distinguishingFeatures>distFeatures</distinguishingFeatures>
-<numberOfObjects>numberOfObjects</numberOfObjects>
+<numberOfObjects>1</numberOfObjects>
 <!-- test newline and tab whitespace -->
 <responsibleDepartments>
     <responsibleDepartment>responsibleDept1</responsibleDepartment>
