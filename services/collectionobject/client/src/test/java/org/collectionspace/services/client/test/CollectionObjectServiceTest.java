@@ -22,6 +22,8 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -74,6 +76,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private String knownResourceId = null;
 
     private final String OBJECT_NAME_VALUE = "an object name";
+    private final BigInteger AGE_VALUE = new BigInteger("55");
+    private final BigDecimal DIMENSION_VALUE_LENGTH = new BigDecimal("0.009");
+    private final BigDecimal DIMENSION_VALUE_WIDTH = new BigDecimal("3087.56");
     private final String UPDATED_MEASURED_PART_VALUE = "updated measured part value";
     private final String UTF8_DATA_SAMPLE = "Audiorecording album cover signed by Lech "
             + "Wa" + '\u0142' + '\u0119' + "sa";
@@ -1222,7 +1227,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         
         // Scalar fields
         collectionObject.setObjectNumber(objectNumber);
-        collectionObject.setAge(""); //test for null string
+        collectionObject.setAge(AGE_VALUE); //test for null string
         
         // FIXME this can be removed when the repeatable other number list
         // is supported by the application layers
@@ -1249,12 +1254,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         DimensionGroup dimensionGroup1 = new DimensionGroup();
         dimensionGroup1.setMeasuredPart("head");
         dimensionGroup1.setDimension("length");
-        dimensionGroup1.setValue("30");
+        dimensionGroup1.setValue(DIMENSION_VALUE_LENGTH);
         dimensionGroup1.setMeasurementUnit("cm");
         DimensionGroup dimensionGroup2 = new DimensionGroup();
         dimensionGroup2.setMeasuredPart("leg");
         dimensionGroup2.setDimension("width");
-        dimensionGroup2.setValue("2.57");
+        dimensionGroup2.setValue(DIMENSION_VALUE_WIDTH);
         dimensionGroup2.setMeasurementUnit("m");
         dimensionGroup2.setValueQualifier("");  // test null string
         dimensionGroups.add(dimensionGroup1);
