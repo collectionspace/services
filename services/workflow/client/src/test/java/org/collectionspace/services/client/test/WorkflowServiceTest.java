@@ -22,9 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.List;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -37,7 +35,6 @@ import org.collectionspace.services.workflow.WorkflowCommon;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.dimension.DimensionsCommon;
-import org.collectionspace.services.dimension.DimensionsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -237,11 +234,11 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     }    
     
     private PoxPayloadOut createDimensionInstance(String dimensionValue) {
-        String value = "dimensionValue-" + dimensionValue;
+        String measurementUnit = "measurementUnit-" + dimensionValue;
         String dimensionsCommonPartName = new DimensionClient().getCommonPartName();
         DimensionsCommon dimensionsCommon = new DimensionsCommon();
         
-        dimensionsCommon.setValue(value);
+        dimensionsCommon.setMeasurementUnit(measurementUnit);
         PoxPayloadOut multipart = new PoxPayloadOut(DimensionClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(dimensionsCommonPartName, dimensionsCommon);
 
