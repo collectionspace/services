@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.main</artifactId>
-        <version>1.11-SNAPSHOT</version>
+        <version>1.12-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -28,15 +28,14 @@
         <module>client</module>
     </modules>
     
-	<profiles>
-		<profile>
-			<id>samples</id>
+    <profiles>
+        <profile>
+            <id>samples</id>
 	    <modules>
-        <module>import</module>
-        <module>sample</module>
+                <module>sample</module>
 	    </modules>
-		</profile>
-	</profiles>
+        </profile>
+    </profiles>
     
 </project>
 

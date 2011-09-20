@@ -53,15 +53,15 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="groupPurchasePriceCurrency" type="xs:string"/>
-    <xs:element name="groupPurchasePriceValue" type="xs:string"/>
+    <xs:element name="groupPurchasePriceValue" type="xs:decimal"/>
     <xs:element name="objectOfferPriceCurrency" type="xs:string"/>
-    <xs:element name="objectOfferPriceValue" type="xs:string"/>
+    <xs:element name="objectOfferPriceValue" type="xs:decimal"/>
     <xs:element name="objectPurchaseOfferPriceCurrency" type="xs:string"/>
-    <xs:element name="objectPurchaseOfferPriceValue" type="xs:string"/>
+    <xs:element name="objectPurchaseOfferPriceValue" type="xs:decimal"/>
     <xs:element name="objectPurchasePriceCurrency" type="xs:string"/>
-    <xs:element name="objectPurchasePriceValue" type="xs:string"/>
+    <xs:element name="objectPurchasePriceValue" type="xs:decimal"/>
     <xs:element name="originalObjectPurchasePriceCurrency" type="xs:string"/>
-    <xs:element name="originalObjectPurchasePriceValue" type="xs:string"/>
+    <xs:element name="originalObjectPurchasePriceValue" type="xs:decimal"/>
     <xs:element name="transferOfTitleNumber" type="xs:string"/>
     <xs:element name="creditLine" type="xs:string"/>
 
@@ -86,7 +86,7 @@
     <xs:complexType name="acquisitionFunding">
         <xs:sequence>
                 <xs:element name="acquisitionFundingCurrency" type="xs:string"/>
-                <xs:element name="acquisitionFundingValue" type="xs:string"/>
+                <xs:element name="acquisitionFundingValue" type="xs:decimal"/>
                 <xs:element name="acquisitionFundingSource" type="xs:string"/>
                 <xs:element name="acquisitionFundingSourceProvisos" type="xs:string"/>
         </xs:sequence>

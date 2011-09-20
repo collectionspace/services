@@ -258,36 +258,49 @@ public abstract class ResourceBase
         }
     }
 
+    protected AbstractCommonList search(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		DocumentHandler handler, 
+    		MultivaluedMap<String, String> queryParams,
+    		String keywords,
+    		String advancedSearch) throws Exception {
+        
+        // perform a keyword search
+        if (keywords != null && !keywords.isEmpty()) {
+            String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+            DocumentFilter documentFilter = handler.getDocumentFilter();
+            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            if (logger.isDebugEnabled()) {
+                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+            }
+        }
+        if (advancedSearch != null && !advancedSearch.isEmpty()) {
+            String whereClause = QueryManager.createWhereClauseFromAdvancedSearch(advancedSearch);
+            DocumentFilter documentFilter = handler.getDocumentFilter();
+            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            if (logger.isDebugEnabled()) {
+                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+            }
+        }
+        getRepositoryClient(ctx).getFiltered(ctx, handler);
+        
+        return (AbstractCommonList) handler.getCommonPartList();
+    }
+
     protected AbstractCommonList search(MultivaluedMap<String, String> queryParams,
     		String keywords,
     		String advancedSearch) {
-        try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
-            DocumentHandler handler = createDocumentHandler(ctx);
-            // perform a keyword search
-            if (keywords != null && !keywords.isEmpty()) {
-                String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-                DocumentFilter documentFilter = handler.getDocumentFilter();
-                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
-                }
-            }
-            if (advancedSearch != null && !advancedSearch.isEmpty()) {
-                String whereClause = QueryManager.createWhereClauseFromAdvancedSearch(advancedSearch);
-                DocumentFilter documentFilter = handler.getDocumentFilter();
-                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
-                }
-            }
-            getRepositoryClient(ctx).getFiltered(ctx, handler);
-            return (AbstractCommonList) handler.getCommonPartList();
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
-        }
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
+            AbstractCommonList result = null;
+			try {
+				ctx = createServiceContext(queryParams);
+		        DocumentHandler handler = createDocumentHandler(ctx);
+				result = search(ctx, handler, queryParams, keywords, advancedSearch);
+			} catch (Exception e) {
+	            throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
+			}
+            return result;
     }
-
+    
     //FIXME: REM - This should not be @Deprecated since we may want to implement this -it has been on the wish list.
     @Deprecated
     public AbstractCommonList getList(List<String> csidList) {

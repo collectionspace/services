@@ -11,7 +11,7 @@
 </briefDescriptions>
 
 <distinguishingFeatures>distFeatures</distinguishingFeatures>
-<numberOfObjects>numberOfObjects</numberOfObjects>
+<numberOfObjects>1</numberOfObjects>
 <!-- test newline whitespace -->
 <responsibleDepartments>
 <!-- test childnode as whitespace -->

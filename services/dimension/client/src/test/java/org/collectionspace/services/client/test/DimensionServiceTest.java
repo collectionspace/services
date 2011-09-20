@@ -23,6 +23,7 @@
 package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -66,6 +67,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     /** The SERVIC e_ pat h_ component. */
     /** The known resource id. */
     private String knownResourceId = null;
+    private final String DIMENSION_VALUE = "78.306";
 
 	@Override
 	protected String getServiceName() {
@@ -435,7 +437,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(dimensionsCommon);
 
         // Update the content of this resource.
-        dimensionsCommon.setValue("updated-" + dimensionsCommon.getValue());
+        dimensionsCommon.setValue(dimensionsCommon.getValue().multiply(new BigDecimal("2.0")));
         dimensionsCommon.setValueDate("updated-" + dimensionsCommon.getValueDate());
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
@@ -745,7 +747,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     private PoxPayloadOut createDimensionInstance(String commonPartName, String identifier) {
         return createDimensionInstance(commonPartName, 
                 "dimensionType-" + identifier,
-                "entryNumber-" + identifier,
+                DIMENSION_VALUE,
                 "entryDate-" + identifier);
     }
 
@@ -757,10 +759,10 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @param entryDate the entry date
      * @return the multipart output
      */
-    private PoxPayloadOut createDimensionInstance(String commonPartName, String dimensionType, String entryNumber, String entryDate) {
+    private PoxPayloadOut createDimensionInstance(String commonPartName, String dimensionType, String dimensionValue, String entryDate) {
         DimensionsCommon dimensionsCommon = new DimensionsCommon();
         dimensionsCommon.setDimension(dimensionType);
-        dimensionsCommon.setValue(entryNumber);
+        dimensionsCommon.setValue(new BigDecimal(dimensionValue));
         dimensionsCommon.setValueDate(entryDate);
         PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(
                 commonPartName, dimensionsCommon);

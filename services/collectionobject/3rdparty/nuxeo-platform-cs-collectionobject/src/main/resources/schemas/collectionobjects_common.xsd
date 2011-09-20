@@ -44,7 +44,7 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="distinguishingFeatures" type="xs:string"/>
-    <xs:element name="numberOfObjects" type="xs:string"/>
+    <xs:element name="numberOfObjects" type="xs:integer"/>
     <xs:element name="objectNameList" type="ns:objectNameList"/>
     <xs:element name="responsibleDepartments">
         <xs:complexType>
@@ -60,7 +60,7 @@
 
     <!-- Object Description Information -->
 
-    <xs:element name="age" type="xs:string"/>
+    <xs:element name="age" type="xs:integer"/>
     <xs:element name="ageQualifier" type="xs:string"/>
     <xs:element name="ageUnit" type="xs:string"/>
     <xs:element name="colors">
@@ -304,7 +304,7 @@
     <xs:element name="ownershipExchangeMethod" type="xs:string"/>
     <xs:element name="ownershipExchangeNote" type="xs:string"/>
     <xs:element name="ownershipExchangePriceCurrency" type="xs:string"/>
-    <xs:element name="ownershipExchangePriceValue" type="xs:string"/>
+    <xs:element name="ownershipExchangePriceValue" type="xs:decimal"/>
     <xs:element name="ownershipPlace" type="xs:string"/>
     <!-- FIXME End of owner repeatable group -->
     <xs:element name="usageGroupList" type="usageGroupList"/>
@@ -472,7 +472,7 @@
             <xs:element name="dimension" type="xs:string"/>
             <xs:element name="measuredPart" type="xs:string"/>
             <xs:element name="measurementUnit" type="xs:string"/>
-            <xs:element name="value" type="xs:string"/>
+            <xs:element name="value" type="xs:decimal"/>
             <xs:element name="valueDate" type="xs:string"/>
             <xs:element name="valueQualifier" type="xs:string"/>
         </xs:sequence>
@@ -531,21 +531,21 @@
         <xs:sequence>
             <xs:element name="dateDisplayDate" type="xs:string"/>
             <xs:element name="dateAssociation" type="xs:string"/>
-            <xs:element name="dateEarliestSingleYear" type="xs:string"/>
-            <xs:element name="dateEarliestSingleMonth" type="xs:string"/>
-            <xs:element name="dateEarliestSingleDay" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
             <xs:element name="dateEarliestSingleEra" type="xs:string"/>
             <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
             <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
-            <xs:element name="dateEarliestSingleQualifierValue" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
             <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
-            <xs:element name="dateLatestYear" type="xs:string"/>
-            <xs:element name="dateLatestMonth" type="xs:string"/>
-            <xs:element name="dateLatestDay" type="xs:string"/>
+            <xs:element name="dateLatestYear" type="xs:integer"/>
+            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="dateLatestDay" type="xs:integer"/>
             <xs:element name="dateLatestEra" type="xs:string"/>
             <xs:element name="dateLatestCertainty" type="xs:string"/>
             <xs:element name="dateLatestQualifier" type="xs:string"/>
-            <xs:element name="dateLatestQualifierValue" type="xs:string"/>
+            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
             <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
             <xs:element name="datePeriod" type="xs:string"/>
             <xs:element name="dateNote" type="xs:string"/>

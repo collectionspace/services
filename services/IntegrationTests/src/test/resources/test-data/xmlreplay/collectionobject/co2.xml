@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">
+
+  <ns2:collectionobjects_common
+    xmlns:ns2="http://collectionspace.org/services/collectionobject">
+    <objectNumber>6.0221415</objectNumber>
+  </ns2:collectionobjects_common>
+
+  <ns3:collectionobjects_naturalhistory
+    xmlns:ns3="http://collectionspace.org/services/collectionobject/domain/naturalhistory">
+    <fieldLocVerbatim>jlmbsoqjlmbsoq</fieldLocVerbatim>
+  </ns3:collectionobjects_naturalhistory>
+
+</document>

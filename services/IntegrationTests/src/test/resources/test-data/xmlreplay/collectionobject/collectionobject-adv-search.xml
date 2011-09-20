@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XMLReplay tests of advanced search in CollectionObject records -->
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@lifesci.collectionspace.org">YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+    </auths>
+    
+    <testGroup ID="advSearchCommonSchema" autoDeletePOSTS="true">
+        <!-- Create a new CollectionObject record with a common part. -->
+       <test ID="co1"  auth="admin@lifesci.collectionspace.org">
+             <method>POST</method>
+             <uri>/cspace-services/collectionobjects/</uri>
+             <filename>collectionobject/co1.xml</filename>
+         </test>
+        <!-- Advanced search for CollectionObject records matching the -->
+        <!-- expected text within a single field in the common part. -->
+        <test ID="co1advsearch">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects?as=collectionobjects_common%3AobjectNumber%3D'6.0221415'</uri>
+            <response>
+                <expected level="TEXT" />
+                <label>abstract-common-list</label>
+                <filename>collectionobject/res/co1-adv-search-lifesci.res.xml</filename>
+             </response>
+         </test>
+    </testGroup>
+   
+    <testGroup ID="advSearchExtensionSchema" autoDeletePOSTS="true">
+        <!-- Create a new CollectionObject record with an extension schema part -->
+       <test ID="co2" auth="admin@lifesci.collectionspace.org">
+             <method>POST</method>
+             <uri>/cspace-services/collectionobjects/</uri>
+             <filename>collectionobject/co2.xml</filename>
+        </test>
+        <!-- Verify that the record contains an expected field value -->
+        <!-- in the extension schema part -->
+        <test ID="co2get">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${co2.CSID}</uri>
+            <response>
+                <expected level="TEXT" />
+                <label>collectionobjects_naturalhistory</label>
+				<filename>collectionobject/res/co2.res.xml</filename>
+             </response>
+        </test>
+        <!-- Advanced search for CollectionObject records matching the -->
+        <!-- expected text within a single field in the extension schema part. -->
+        <test ID="co2advsearch">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects?as=collectionobjects_naturalhistory%3AfieldLocVerbatim%3D'jlmbsoqjlmbsoq'</uri>
+            <response>
+                <expected level="TEXT" />
+                <label>abstract-common-list</label>
+                <filename>collectionobject/res/co2-adv-search-lifesci.res.xml</filename>
+             </response>
+         </test>
+    </testGroup>
+
+</xmlReplay>
+        
+        

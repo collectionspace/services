@@ -276,7 +276,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         String identifier = createIdentifier();
         DimensionsCommon dimension = new DimensionsCommon();
         dimension.setDimension("dimensionType");
-        dimension.setValue("value-" + identifier);
+        dimension.setMeasurementUnit("measurementUnit-" + identifier);
         dimension.setValueDate(new Date().toString());
         PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
                 dimension);
@@ -375,7 +375,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         String identifier = createIdentifier();
         DimensionsCommon dimension = new DimensionsCommon();
         dimension.setDimension("dimensionType");
-        dimension.setValue("value-" + identifier);
+        dimension.setMeasurementUnit("measurementUnit-" + identifier);
         dimension.setValueDate(new Date().toString());
         PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
                 dimension);
@@ -545,7 +545,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         DimensionsCommon dimension = new DimensionsCommon();
         dimension.setDimension("dimensionType");
         // Update the content of this resource.
-        dimension.setValue("updated-" + dimension.getValue());
+        dimension.setMeasurementUnit("updated-" + dimension.getMeasurementUnit());
         dimension.setValueDate("updated-" + dimension.getValueDate());
         // Submit the request to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(DimensionClient.SERVICE_PAYLOAD_NAME);
