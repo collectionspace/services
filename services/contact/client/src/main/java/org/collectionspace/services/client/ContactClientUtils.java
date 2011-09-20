@@ -1,10 +1,14 @@
 package org.collectionspace.services.client;
 
+import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.collectionspace.services.client.ContactClient;
+import org.collectionspace.services.contact.AddressGroup;
+import org.collectionspace.services.contact.AddressGroupList;
 import org.collectionspace.services.contact.ContactsCommon;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+import org.collectionspace.services.contact.EmailGroup;
+import org.collectionspace.services.contact.EmailGroupList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +24,9 @@ public class ContactClientUtils {
         return createContactInstance(
             inAuthority,
             inItem,
+            "email-" + identifier,
             "addressType-" + identifier,
             "addressPlace-" + identifier,
-            "emakl-" + identifier,
             headerLabel);
     }
 
@@ -31,21 +35,35 @@ public class ContactClientUtils {
         return createContactInstance(
             inAuthority,
             inItem,
+            "email-" + identifier,
             "addressType-" + identifier,
             "addressPlace-" + identifier,
-            "emakl-" + identifier,
             headerLabel);
     }
 
     public static PoxPayloadOut createContactInstance(
-        String inAuthority, String inItem, String addressType,
-        String addressPlace, String email, String headerLabel) {
+        String inAuthority, String inItem, String email,
+        String addressType, String addressPlace, String headerLabel) {
         ContactsCommon contact = new ContactsCommon();
+        
         contact.setInAuthority(inAuthority);
         contact.setInItem(inItem);
-        contact.setAddressType(addressType);
-        contact.setAddressPlace(addressPlace);
-        contact.setEmail(email);
+        
+        EmailGroupList emailGroupList = new EmailGroupList();
+        List<EmailGroup> emailGroups = emailGroupList.getEmailGroup();
+        EmailGroup emailGroup = new EmailGroup();
+        emailGroup.setEmail(email);
+        emailGroups.add(emailGroup);
+        contact.setEmailGroupList(emailGroupList);
+        
+        AddressGroupList addressGroupList = new AddressGroupList();
+        List<AddressGroup> addressGroups = addressGroupList.getAddressGroup();
+        AddressGroup addressGroup = new AddressGroup();
+        addressGroup.setAddressType(addressType);
+        addressGroup.setAddressPlace1(addressPlace);
+        addressGroups.add(addressGroup);
+        contact.setAddressGroupList(addressGroupList);
+        
         PoxPayloadOut multipart = new PoxPayloadOut(ContactClient.SERVICE_PAYLOAD_NAME);
         @SuppressWarnings("deprecation")
 		PayloadOutputPart commonPart =
@@ -53,13 +71,7 @@ public class ContactClientUtils {
 //        ContactClient client = new ContactClient();
         commonPart.setLabel(headerLabel);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("to be created, contact common");
-            // logger.debug(objectAsXmlString(contact, ContactsCommon.class));
-        }
-
         return multipart;
     }
-
 
 }

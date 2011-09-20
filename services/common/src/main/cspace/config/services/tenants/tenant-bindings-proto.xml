@@ -1831,6 +1831,16 @@
             </service:uriPath>-->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>displayName</service:element>
+              <service:xpath>displayName</service:xpath>
+            </service:ListResultField>
+           </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Contact" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="contacts-system" updated="" order="0">
           <service:content contentType="application/xml">
