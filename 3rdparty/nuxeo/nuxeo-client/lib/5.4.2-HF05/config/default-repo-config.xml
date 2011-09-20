@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<component name="config:default-repository">
+  <extension target="org.nuxeo.ecm.core.repository.RepositoryService"
+    point="repository">
+    <repository name="default"
+      factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
+      <repository name="default">
+        <xa-datasource>org.apache.derby.jdbc.EmbeddedXADataSource</xa-datasource>
+        <property name="createDatabase">create</property>
+        <property name="databaseName">nuxeo</property>
+        <property name="user">nuxeo</property>
+        <property name="password">nuxeo</property>
+      </repository>
+    </repository>
+  </extension>
+  
+   <extension target="org.nuxeo.ecm.core.api.repository.RepositoryManager"
+    point="repositories">
+    <documentation>The default repository</documentation>
+
+    <repository name="default" label="Default Repository" />
+
+  </extension>
+</component>
