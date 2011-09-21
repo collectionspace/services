@@ -90,7 +90,7 @@ public class ContactDocumentModelHandler
         // first fill all the parts of the document
         super.handleCreate(wrapDoc);
         handleInAuthority(wrapDoc.getWrappedObject());
-        // handleDisplayNames(wrapDoc.getWrappedObject());
+        handleDisplayNames(wrapDoc.getWrappedObject());
     }
 
     /**
@@ -144,31 +144,37 @@ public class ContactDocumentModelHandler
         final String sep = " ";
         boolean firstAdded = false;
         
-        if (! email.isEmpty()) {
+        if (! (email == null || email.isEmpty()) ) {
             newStr.append(email);
             firstAdded = true;
         }
         
-        if (! telephoneNumber.isEmpty() && newStr.length() <= MAX_DISPLAY_NAME_LENGTH) {
-            if (firstAdded) {
-                newStr.append(sep);
-            } else {
-                firstAdded = true;
+        if (! (telephoneNumber == null || telephoneNumber.isEmpty()) ) {
+            if (newStr.length() <= MAX_DISPLAY_NAME_LENGTH) {
+                if (firstAdded) {
+                    newStr.append(sep);
+                } else {
+                    firstAdded = true;
+                }
+                newStr.append(telephoneNumber);
             }
-            newStr.append(telephoneNumber);
         }
         
-        if (! addressPlace1.isEmpty() && newStr.length() <= MAX_DISPLAY_NAME_LENGTH) {
-            if (firstAdded) {
-                newStr.append(sep);
+        if (! (addressPlace1 == null || addressPlace1.isEmpty()) ) {
+            if (newStr.length() <= MAX_DISPLAY_NAME_LENGTH) {
+                if (firstAdded) {
+                    newStr.append(sep);
+                }
+                newStr.append(addressPlace1);
             }
-            newStr.append(addressPlace1);
         }
-                
-        if (newStr.length() > MAX_DISPLAY_NAME_LENGTH) {
-           return newStr.toString().substring(0, MAX_DISPLAY_NAME_LENGTH) + "...";
+        
+        String displayName = newStr.toString();
+             
+        if (displayName.length() > MAX_DISPLAY_NAME_LENGTH) {
+           return displayName.substring(0, MAX_DISPLAY_NAME_LENGTH) + "...";
         } else {
-           return newStr.toString();
+           return displayName;
         }
     }
 
