@@ -92,6 +92,15 @@ public class ContactDocumentModelHandler
         handleInAuthority(wrapDoc.getWrappedObject());
         handleDisplayNames(wrapDoc.getWrappedObject());
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	super.handleUpdate(wrapDoc);
+    	handleDisplayNames(wrapDoc.getWrappedObject());
+    }
 
     /**
      * Check the logic around the parent pointer. Note that we only need do this on
