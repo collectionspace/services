@@ -50,6 +50,7 @@
         <module>batch</module>
         <module>imports</module>
         <module>location</module>
+        <module>place</module>
         <module>taxonomy</module>
         <module>movement</module>
         <module>report</module>

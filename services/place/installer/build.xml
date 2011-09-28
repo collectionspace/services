@@ -1,0 +1,61 @@
+
+<project name="place" default="package" basedir=".">
+    <description>
+        place service
+    </description>
+  <!-- set global properties for this build -->
+    <property name="services.trunk" value="../.."/>
+    <property file="${services.trunk}/build.properties" />
+    <property name="mvn.opts" value="" />
+    <property name="src" location="src"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+    
+    <target name="install" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing place Service's &apos;install&apos; target." />
+				</exec>
+				<!-- Copy the Nuxeo DocType jar files to the Nuxeo app server domain -->
+        <copy todir="${jboss.deploy.nuxeo.plugins}">
+            <fileset file="nuxeo/*.jar"/>
+        </copy>				
+    </target>    
+
+    <target name="config" description="" depends="install">
+        <exec executable="echo">
+        		<arg value="Installer: Executing Place Service's &apos;config&apos; target." />
+				</exec>
+    </target>
+    
+    <target name="predeploy" description="" depends="config">
+        <exec executable="echo">
+        		<arg value="Installer: Executing Place Service's &apos;predeploy&apos; target." />
+				</exec>
+    </target>    
+    
+    <target name="deploy" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing Place Service's &apos;deploy&apos; target." />
+				</exec>
+    </target>
+    
+    <target name="postdeploy">
+        <exec executable="echo">
+        		<arg value="Installer: Executing installer's &apos;postdeploy&apos; target for the Place Service." />
+				</exec>		
+        <exec executable="echo">
+        		<arg value="Importing necessary placeauthorities." />
+				</exec>				
+        <java jar="./postdeploy/collectionspace-services-place-importer-jar-with-dependencies.jar"
+        	fork="true"
+        	failonerror="true">
+				</java>	
+    </target>
+    
+
+</project>

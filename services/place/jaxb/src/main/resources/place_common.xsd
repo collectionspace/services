@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
+    xmlns:ns="http://collectionspace.org/services/place"
+    xmlns="http://collectionspace.org/services/place"
+    targetNamespace="http://collectionspace.org/services/place"
+    version="0.1"
+    >
+    
+    
+    <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Place+Service+Home -->    
+    
+    <!-- Place -->
+    <xs:element name="places_common">
+        <xs:complexType>
+            <xs:sequence>
+              <!--  Common identifier -->
+              <xs:element name="csid" type="xs:string" />
+                
+							<!--  Place Information Group -->
+							<!--  inAuthority is the csid of the owning PlaceAuthority -->
+							<xs:element name="inAuthority" type="xs:string" />
+							<xs:element name="shortIdentifier" type="xs:string"/>
+							<xs:element name="refName" type="xs:string"/>
+							<xs:element name="termStatus" type="xs:string"/>
+							<xs:element name="displayName" type="xs:string"/>
+							<xs:element name="displayNameComputed" type="xs:boolean"/>
+							<xs:element name="shortDisplayName" type="xs:string"/>
+							<xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
+							<xs:element name="fullDisplayName" type="xs:string"/>
+							<xs:element name="fullDisplayNameComputed" type="xs:boolean"/>
+							<xs:element name="placeType" type="xs:string" />
+							<xs:element name="placeRecordAdminStatus" type="xs:string" />
+							<xs:element name="placeNameGroupList" type="placeNameGroupList"/>
+							<xs:element name="placeOwnerGroupList" type="placeOwnerGroupList"/>
+							<xs:element name="note" type="xs:string"/>
+							<xs:element name="source" type="xs:string"/>
+							<xs:element name="sourcePage" type="xs:string"/>
+
+							<!-- Locality Information  -->
+							<xs:element name="vCoordinates" type="xs:string"/>
+							<xs:element name="vLatitude" type="xs:string"/>
+							<xs:element name="vLongitude" type="xs:string"/>
+							<xs:element name="vCoordSys" type="xs:string"/>
+							<xs:element name="vSpatialReferenceSystem" type="xs:string"/>
+							<xs:element name="vCoordSource" type="xs:string"/>
+							<xs:element name="vCoordSourceRefId" type="xs:string"/>
+							<xs:element name="vUnitofMeasure" type="xs:string"/>
+							<xs:element name="vElevation" type="xs:string"/>
+							<xs:element name="minElevationInMeters" type="xs:decimal"/>
+							<xs:element name="maxElevationInMeters" type="xs:decimal"/>
+							<xs:element name="vDepth" type="xs:string"/>
+							<xs:element name="minDepthInMeters" type="xs:decimal"/>
+							<xs:element name="maxDepthInMeters" type="xs:decimal"/>
+							<xs:element name="vDistanceAboveSurface" type="xs:string"/>
+							<xs:element name="minDistanceAboveSurfaceInMeters" type="xs:decimal"/>
+							<xs:element name="maxDistanceAboveSurfaceInMeters" type="xs:decimal"/>
+
+							<xs:element name="placeGeoRefGroupList" type="placeGeoRefGroupList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:complexType name="placeNameGroupList">
+        <xs:sequence>
+            <xs:element name="placeNameGroup" type="placeNameGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="placeNameGroup">
+        <xs:sequence>
+					<xs:element name="name" type="xs:string"/>
+					<xs:element name="displayName" type="xs:string"/>
+					<xs:element name="displayNameComputed" type="xs:boolean"/>
+					<xs:element name="nameLang" type="xs:string"/>
+					<xs:element name="nameAbbrev" type="xs:string"/>
+					<xs:element name="nameStatus" type="xs:string"/>
+					<xs:element name="nameSource" type="xs:string"/>
+					<xs:element name="nameSourceDetail" type="xs:string"/>
+					<xs:element name="nameSourceRefId" type="xs:string"/>
+					<xs:element name="nameNotes" type="xs:string"/>
+					<xs:element name="nameDates" type="xs:string"/>
+					<xs:element name="nameAdminStatus" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="placeOwnerGroupList">
+        <xs:sequence>
+            <xs:element name="placeOwnerGroup" type="placeOwnerGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="placeOwnerGroup">
+        <xs:sequence>
+					<xs:element name="owner" type="xs:string"/>
+					<xs:element name="ownerDate" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="placeGeoRefGroupList">
+        <xs:sequence>
+            <xs:element name="placeGeoRefGroup" type="placeGeoRefGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="placeGeoRefGroup">
+        <xs:sequence>
+					<xs:element name="decimalLatitude" type="xs:decimal"/>
+					<xs:element name="decimalLongitude" type="xs:decimal"/>
+					<xs:element name="geodeticDatum" type="xs:string"/>
+					<xs:element name="coordUncertaintyInMeters" type="xs:integer"/>
+					<xs:element name="coordPrecision" type="xs:string"/>
+					<xs:element name="pointRadiusSpatialFit" type="xs:string"/>
+					<xs:element name="footprintWKT" type="xs:string"/>
+					<xs:element name="footprintSRS" type="xs:string"/>
+					<xs:element name="footprintSpatialFit" type="xs:string"/>
+					<xs:element name="geoReferencedBy" type="xs:string"/>
+					<xs:element name="geoRefDate" type="xs:string"/>
+					<xs:element name="geoRefProtocol" type="xs:string"/>
+					<xs:element name="geoRefSource" type="xs:string"/>
+					<xs:element name="geoRefVerificationStatus" type="xs:string"/>
+					<xs:element name="geoRefRemarks" type="xs:string"/>
+					<xs:element name="geoRefPlaceName" type="xs:string"/>
+       </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
+
