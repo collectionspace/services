@@ -80,9 +80,6 @@ public class RefName {
                 }
                 info.tenantName = m.group(1);
                 info.resource = m.group(2);
-                if (Tools.notEmpty(info.resource)) {
-                    info.resource.toLowerCase();
-                }
                 info.shortIdentifier = m.group(3);
                 info.displayName = m.group(4);
                 return info;
@@ -173,6 +170,9 @@ public class RefName {
         Authority authority = new Authority();
         authority.tenantName = tenantName;
         authority.resource = serviceName;
+        if (Tools.notEmpty(authority.resource)) {
+            authority.resource = authority.resource.toLowerCase();
+        }
         authority.shortIdentifier = authorityShortIdentifier;
         authority.displayName = authorityDisplayName;
         return authority;
