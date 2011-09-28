@@ -44,10 +44,10 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 public abstract class AuthorityDocumentModelHandler<AuthCommon>
         extends DocHandlerBase<AuthCommon> {
 
-	private String authorityCommonSchemaName;
-	
+    private String authorityCommonSchemaName;
+
     public AuthorityDocumentModelHandler(String authorityCommonSchemaName) {
-    	this.authorityCommonSchemaName = authorityCommonSchemaName;
+        this.authorityCommonSchemaName = authorityCommonSchemaName;
     }
 
     /*
@@ -58,48 +58,71 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     @Override
     protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
             throws Exception {
-    	Map<String, Object> unQObjectProperties = super.extractPart(docModel, schema, partMeta);
-    	
-    	// Add the CSID to the common part
-    	if (partMeta.getLabel().equalsIgnoreCase(authorityCommonSchemaName)) {
-	    	String csid = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
-	    	unQObjectProperties.put("csid", csid);
-    	}
-    	
-    	return unQObjectProperties;
+        Map<String, Object> unQObjectProperties = super.extractPart(docModel, schema, partMeta);
+
+        // Add the CSID to the common part
+        if (partMeta.getLabel().equalsIgnoreCase(authorityCommonSchemaName)) {
+            String csid = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+            unQObjectProperties.put("csid", csid);
+        }
+
+        return unQObjectProperties;
     }
-    
+
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	super.handleCreate(wrapDoc);
+        super.handleCreate(wrapDoc);
+        // CSPACE-3178:
         // Uncomment once debugged and App layer is read to integrate
-    	//updateRefnameForAuthority(wrapDoc, authorityCommonSchemaName);//CSPACE-3178
+        // Experimenting with this uncommented now ...
+        updateRefnameForAuthority(wrapDoc, authorityCommonSchemaName);//CSPACE-3178
     }
 
     protected void updateRefnameForAuthority(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        String shortIdentifier = (String)docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
-        String displayName =     (String)docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
-        MultipartServiceContext ctx = (MultipartServiceContext)getServiceContext();
-        RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
-                                                             ctx.getServiceName(),
-                                                             shortIdentifier,
-                                                             displayName);
-        String refName = authority.toString();
-        docModel.setProperty(schemaName , AuthorityJAXBSchema.REF_NAME, refName);
+        String suppliedRefName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.REF_NAME);
+        // CSPACE-3178:
+        // Temporarily accept client-supplied refName values, rather than always generating such values,
+        // Remove the surrounding 'if' statement when clients should no longer supply refName values.
+        if (suppliedRefName == null || suppliedRefName.isEmpty()) {
+            String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+            String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
+            MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
+            RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
+                    ctx.getServiceName(),
+                    shortIdentifier,
+                    displayName);
+            String refName = authority.toString();
+            docModel.setProperty(schemaName, AuthorityJAXBSchema.REF_NAME, refName);
+        }
     }
-    
 
     public String getShortIdentifier(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) {
         DocumentModel docModel = wrapDoc.getWrappedObject();
         String shortIdentifier = null;
         try {
-        	shortIdentifier = (String)docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+            shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         } catch (ClientException ce) {
-        	throw new RuntimeException("AuthorityDocHandler Internal Error: cannot get shortId!", ce);
+            throw new RuntimeException("AuthorityDocHandler Internal Error: cannot get shortId!", ce);
         }
         return shortIdentifier;
     }
 
-}
+    /**
+     * Filters out values supplied in the request
+     * @param objectProps the properties parsed from the update payload
+     * @param partMeta metadata for the object to fill
+     */
+    @Override
+    public void filterReadOnlyPropertiesForPart(
+            Map<String, Object> objectProps, ObjectPartType partMeta) {
+        super.filterReadOnlyPropertiesForPart(objectProps, partMeta);
+        String commonPartLabel = getServiceContext().getCommonPartLabel();
+        if (partMeta.getLabel().equalsIgnoreCase(commonPartLabel)) {
+            objectProps.remove(AuthorityJAXBSchema.CSID);
+            // Enable when clients should no longer supply refName values
+            // objectProps.remove(AuthorityItemJAXBSchema.REF_NAME); // CSPACE-3178
 
+        }
+    }
+}

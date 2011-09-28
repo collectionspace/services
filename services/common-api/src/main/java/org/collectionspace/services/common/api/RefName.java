@@ -49,13 +49,13 @@ public class RefName {
 
     public static final String REFNAME = "refName";
 
-    public static final String AUTHORITY_REGEX      = "urn:cspace:(.*):(.*)\\((.*)\\)\\'?([^\\']*)\\'?";
-    public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*)\\((.*)\\):items\\((.*)\\)\\'?([^\\']*)\\'?";
+    public static final String AUTHORITY_REGEX      = "urn:cspace:(.*):(.*):name\\((.*)\\)\\'?([^\\']*)\\'?";
+    public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\):item:name\\((.*)\\)\\'?([^\\']*)\\'?";
 
-    public static final String AUTHORITY_EXAMPLE  = "urn:cspace:collectionspace.org:Loansin(shortID)'displayName'";
-    public static final String AUTHORITY_EXAMPLE2 = "urn:cspace:collectionspace.org:Loansin(shortID)";
+    public static final String AUTHORITY_EXAMPLE  = "urn:cspace:collectionspace.org:Loansin:name(shortID)'displayName'";
+    public static final String AUTHORITY_EXAMPLE2 = "urn:cspace:collectionspace.org:Loansin:name(shortID)";
 
-    public static final String AUTHORITY_ITEM_EXAMPLE ="urn:cspace:collectionspace.org:Loansin(shortID):items(itemShortID)'itemDisplayName'";
+    public static final String AUTHORITY_ITEM_EXAMPLE ="urn:cspace:collectionspace.org:Loansin:name(shortID):item:name(itemShortID)'itemDisplayName'";
 
     public static final String EX_tenantName = "collectionspace.org";
     public static final String EX_resource = "Loansin";
@@ -80,6 +80,9 @@ public class RefName {
                 }
                 info.tenantName = m.group(1);
                 info.resource = m.group(2);
+                if (Tools.notEmpty(info.resource)) {
+                    info.resource.toLowerCase();
+                }
                 info.shortIdentifier = m.group(3);
                 info.displayName = m.group(4);
                 return info;
@@ -105,7 +108,7 @@ public class RefName {
         }
         public String toString() {
             String displaySuffix = (displayName != null && (!displayName.isEmpty())) ? '\'' + displayName + '\'' : "";
-            return URN_PREFIX + tenantName + ':' + resource + "(" + shortIdentifier + ")" + displaySuffix;
+            return URN_PREFIX + tenantName + ':' + resource + ":" + "name" + "(" + shortIdentifier + ")" + displaySuffix;
         }
 
     }
@@ -158,8 +161,8 @@ public class RefName {
             if (ai==null){
                return URN_PREFIX+"ERROR:inAuthorityNotSet: (" + shortIdentifier + ")" + displaySuffix;
             } else {
-               String base = URN_PREFIX + ai.tenantName + ':' + ai.resource + "(" + ai.shortIdentifier + ")" ;
-               String refname = base+":items("+shortIdentifier+")"+displaySuffix;
+               String base = URN_PREFIX + ai.tenantName + ':' + ai.resource + ":" + "name" + "(" + ai.shortIdentifier + ")" ;
+               String refname = base+":item:name("+shortIdentifier+")"+displaySuffix;
                return refname;
             }
         }
