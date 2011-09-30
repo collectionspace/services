@@ -94,7 +94,7 @@ public class ImportsResource extends ResourceBase {
     	
     	return result;
     }
-    
+
     @Override
     public String getServiceName(){
         return SERVICE_NAME;
@@ -217,6 +217,7 @@ public class ImportsResource extends ResourceBase {
      *      trunk/services/imports/service/src/test/resources/requests/authority-request.xml
      */
     public static InputSource payloadToInputSource(String xmlPayload) throws Exception {
+        xmlPayload = encodeAmpersands(xmlPayload);
         String requestDir = FileTools.createTmpDir("imports-request-").getCanonicalPath();
         File requestFile = FileTools.saveFile(requestDir, "request.xml", xmlPayload, true);
         if (requestFile == null){
@@ -229,6 +230,7 @@ public class ImportsResource extends ResourceBase {
     }
 
     public static String payloadToFilename(String xmlPayload) throws Exception {
+        xmlPayload = encodeAmpersands(xmlPayload);
         String requestDir = FileTools.createTmpDir("imports-request-").getCanonicalPath();
         File requestFile = FileTools.saveFile(requestDir, "request.xml", xmlPayload, true);
         if (requestFile == null){
@@ -238,7 +240,30 @@ public class ImportsResource extends ResourceBase {
         System.out.println("############## REQUEST_FILENAME: "+requestFilename);
         return requestFilename;
     }
-
+    
+    /**
+     * Encodes each ampersand ('&') in the incoming XML payload by replacing
+     * it with the predefined XML entity for an ampersand ('&amp;').
+     *
+     * This is a workaround for the issue described in CSPACE-3911.  Its
+     * intended effect is to have these added ampersand XML entities being
+     * resolved to 'bare' ampersands during the initial parse, thus preserving
+     * any XML entities in the payload, which will then be resolved correctly
+     * during the second parse.
+     * 
+     * (This is not designed to compensate for instances where the incoming
+     * XML payload contains 'bare' ampersands - that is, used in any other
+     * context than as the initial characters in XML entities.  In those cases,
+     * the payload may not be a legal XML document.)
+     * 
+     * @param xmlPayload
+     * @return The original XML payload, with each ampersand replaced by
+     *   the predefined XML entity for an ampersand.
+     */
+    private static String encodeAmpersands(String xmlPayload) {
+        return xmlPayload.replace("&", "&amp;");
+    }
+    
     public static void expandXmlPayloadToDir(String tenantId, String inputFilename, String templateDir, String outputDir) throws Exception {
      System.out.println("############## TEMPLATE_DIR: "+templateDir);
         System.out.println("############## OUTPUT_DIR:"+outputDir);
