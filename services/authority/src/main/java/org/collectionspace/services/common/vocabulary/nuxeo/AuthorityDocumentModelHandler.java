@@ -109,8 +109,9 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
     }
 
     /**
-     * Filters out values supplied in the request
-     * @param objectProps the properties parsed from the update payload
+     * Filters out selected values supplied in an update request.
+     * 
+     * @param objectProps the properties filtered out from the update payload
      * @param partMeta metadata for the object to fill
      */
     @Override
@@ -120,6 +121,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         String commonPartLabel = getServiceContext().getCommonPartLabel();
         if (partMeta.getLabel().equalsIgnoreCase(commonPartLabel)) {
             objectProps.remove(AuthorityJAXBSchema.CSID);
+            objectProps.remove(AuthorityJAXBSchema.SHORT_IDENTIFIER);
             // Enable when clients should no longer supply refName values
             // objectProps.remove(AuthorityItemJAXBSchema.REF_NAME); // CSPACE-3178
 

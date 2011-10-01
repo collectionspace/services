@@ -219,10 +219,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
 
     /**
-     * Filters out values supplied in the request; e.g.:
-     * AuthorityItemJAXBSchema.IN_AUTHORITY, to ensure that
-     * the parent link remains untouched.
-     * @param objectProps the properties parsed from the update payload
+     * Filters out selected values supplied in an update request.
+     * 
+     * For example, filters out AuthorityItemJAXBSchema.IN_AUTHORITY, to ensure
+     * that the link to the item's parent remains untouched.
+     * 
+     * @param objectProps the properties filtered out from the update payload
      * @param partMeta metadata for the object to fill
      */
     @Override
@@ -233,6 +235,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         if (partMeta.getLabel().equalsIgnoreCase(commonPartLabel)) {
             objectProps.remove(AuthorityItemJAXBSchema.IN_AUTHORITY);
             objectProps.remove(AuthorityItemJAXBSchema.CSID);
+            objectProps.remove(AuthorityJAXBSchema.SHORT_IDENTIFIER);
             // Enable when clients should no longer supply refName values
             // objectProps.remove(AuthorityItemJAXBSchema.REF_NAME); // CSPACE-3178
 
