@@ -42,7 +42,6 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
-import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationResource;
@@ -138,33 +137,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             // Do nothing on exception. Some vocabulary schemas may not include a short display name.
         }
         if (Tools.isEmpty(shortIdentifier)) {
-            String generatedShortIdentifier = generateShortIdentifierFromDisplayName(displayName, shortDisplayName);
+            String generatedShortIdentifier = AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(displayName, shortDisplayName);
             docModel.setProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER, generatedShortIdentifier);
         }
-    }
-
-    // CSPACE-2215
-    // FIXME: Consider replacing this with a different algorithm, perhaps one
-    // that combines stems of each word token in the displayname.
-    // FIXME: Verify uniqueness before returning the generated short identifier.
-    // FIXME: Consider using a hash of the display name, rather than a timestamp,
-    // when it is necessary to add a suffix for uniqueness.
-    private String generateShortIdentifierFromDisplayName(String displayName, String shortDisplayName) {
-        String generatedShortIdentifier = "";
-        if (Tools.notEmpty(displayName)) {
-            generatedShortIdentifier = displayName + '-' + Tools.now().toString();
-        } else if (Tools.notEmpty(shortDisplayName)) {
-            generatedShortIdentifier = shortDisplayName + '-' + Tools.now().toString();
-        }
-        // Ensure that the short identifier consists only of word chars.
-        if (Tools.notEmpty(generatedShortIdentifier)) {
-            generatedShortIdentifier = generatedShortIdentifier.replaceAll("[^\\w]", "");
-        }
-        // Fallback if we can't generate a short identifier from the displayname(s).
-        if (generatedShortIdentifier.isEmpty()) {
-            generatedShortIdentifier = java.util.UUID.randomUUID().toString();
-        }
-        return generatedShortIdentifier;
     }
 
     protected void updateRefnameForAuthorityItem(DocumentWrapper<DocumentModel> wrapDoc,

@@ -26,6 +26,7 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 import java.util.Map;
 
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
@@ -75,9 +76,20 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         // CSPACE-3178:
         // Uncomment once debugged and App layer is read to integrate
         // Experimenting with this uncommented now ...
+        handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityCommonSchemaName);
         updateRefnameForAuthority(wrapDoc, authorityCommonSchemaName);//CSPACE-3178
     }
 
+    private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
+        String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+        String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
+        String shortDisplayName = "";
+        if (Tools.isEmpty(shortIdentifier)) {
+            String generatedShortIdentifier = AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(displayName, shortDisplayName);
+            docModel.setProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER, generatedShortIdentifier);
+        }
+    }
+    
     protected void updateRefnameForAuthority(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
         String suppliedRefName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.REF_NAME);

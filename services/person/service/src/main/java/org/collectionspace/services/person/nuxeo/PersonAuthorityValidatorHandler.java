@@ -64,13 +64,11 @@ public class PersonAuthorityValidatorHandler implements ValidatorHandler {
             // Validation specific to creates or updates
             if (action.equals(Action.CREATE)) {
                 String shortId = personAuth.getShortIdentifier();
-                if (shortId == null) {
-                    invalid = true;
-                    msg += "shortIdentifier must be non-null";
-                } else if (shortId.trim().isEmpty()) {
-                    invalid = true;
-                    msg += "shortIdentifier must have a non-empty value";
-                } else if (shortIdBadPattern.matcher(shortId).find()) {
+                // Per CSPACE-2215, shortIdentifier values that are null (missing)
+                // oe the empty string are now legally accepted in create payloads.
+                // In either of those cases, a short identifier will be synthesized from
+                // a display name or supplied in another manner.
+                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
                     invalid = true;
                     msg += "shortIdentifier must only contain standard word characters";
                 }
