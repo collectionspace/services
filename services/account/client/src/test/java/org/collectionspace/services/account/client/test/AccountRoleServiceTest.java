@@ -348,6 +348,72 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             res.releaseConnection();
         }
     }
+    
+    /*
+     * In this test, for setup, we associate both test roles ("ROLE_CO1", "ROLE_CO2") with the test account "acc-role-user2".
+     * After we've performed this setup, our call to "/role/{csid}/accountroles" should contain an AccountRole that has
+     * a list of 1 account -the test user account we associated during setup.
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    	    dependsOnMethods = {"delete"})
+    public void readRoleAccounts(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            testBanner(testName, CLASS_NAME);
+        }
+
+		/*
+		 * Setup a temp local scope for local variables that we need to create the AccountRole for
+		 * the setup of the read tests.
+		 */
+        {
+	        setupCreate();
+
+	        // Associate "acc-role-user2" with all the roles.
+	        AccountValue av = accValues.get("acc-role-user2");
+	        AccountRole accRole = createAccountRoleInstance(av,
+	                roleValues.values(), true, true);
+	        AccountRoleClient client = new AccountRoleClient();
+	        ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
+	        int statusCode = res.getStatus();
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        }
+
+        //
+        // Now read the list of accounts associated with the role "ROLE_CO1".
+        // There should be just the "acc-role-user2" account.
+        //
+        setupRead();        
+        RoleClient roleClient = new RoleClient();
+        
+        // Submit the request to the service and store the response.
+        ClientResponse<AccountRole> res = roleClient.readRoleAccounts(
+        		roleValues.get("ROLE_CO1").getRoleId());
+        int statusCode = res.getStatus();
+        try {
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            AccountRole output = res.getEntity();
+            
+            // Now verify that the role has 2 accounts associate to it.
+            Assert.assertEquals(output.getAccounts().size(), 1);
+
+            String sOutput = objectAsXmlString(output, AccountRole.class);
+            if(logger.isDebugEnabled()) {
+                logger.debug(testName + " received " + sOutput);
+            }
+        } finally {
+            res.releaseConnection();
+        }
+    }    
 
     // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
