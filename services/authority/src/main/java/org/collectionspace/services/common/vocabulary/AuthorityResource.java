@@ -379,6 +379,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = handler.getDocumentFilter();
+            // Need to make the default sort order for authority items
+            // be on the displayName field
+            String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
+            if (sortBy == null || sortBy.isEmpty()) {
+                String qualifiedDisplayNameField = authorityCommonSchemaName + ":"
+                        + AuthorityItemJAXBSchema.DISPLAY_NAME;
+                myFilter.setOrderByClause(qualifiedDisplayNameField);
+            }
             String nameQ = queryParams.getFirst("refName");
             if (nameQ != null) {
                 myFilter.setWhereClause(authorityCommonSchemaName + ":refName='" + nameQ + "'");
