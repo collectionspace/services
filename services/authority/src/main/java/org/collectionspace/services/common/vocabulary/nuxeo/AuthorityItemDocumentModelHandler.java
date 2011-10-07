@@ -120,11 +120,31 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // first fill all the parts of the document
         super.handleCreate(wrapDoc);
         handleInAuthority(wrapDoc.getWrappedObject());
+    	handleComputedDisplayNames(wrapDoc.getWrappedObject());
         // CSPACE-3178:
         // Uncomment once debugged and App layer is read to integrate
         // Experimenting with these uncommented now ...
         handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
         updateRefnameForAuthorityItem(wrapDoc, authorityItemCommonSchemaName, getAuthorityRefNameBase());
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	super.handleUpdate(wrapDoc);
+    	handleComputedDisplayNames(wrapDoc.getWrappedObject());
+    }
+
+    /**
+     * Handle display name.
+     *
+     * @param docModel the doc model
+     * @throws Exception the exception
+     */
+    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
+    	// Do nothing by default.
     }
 
     private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {

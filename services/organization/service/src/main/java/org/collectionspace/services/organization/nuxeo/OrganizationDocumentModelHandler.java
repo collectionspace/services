@@ -57,25 +57,6 @@ public class OrganizationDocumentModelHandler
         return OrgAuthorityClient.SERVICE_PATH_COMPONENT;    //  CSPACE-3932
     }
 	
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	// first fill all the parts of the document
-    	super.handleCreate(wrapDoc);    	
-    	handleDisplayNames(wrapDoc.getWrappedObject());
-    }
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	super.handleUpdate(wrapDoc);
-    	handleDisplayNames(wrapDoc.getWrappedObject());
-    }
-
     /**
      * Check the logic around the computed displayName
      * 
@@ -83,7 +64,8 @@ public class OrganizationDocumentModelHandler
      * 
      * @throws Exception the exception
      */
-    private void handleDisplayNames(DocumentModel docModel) throws Exception {
+    @Override
+    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
     	String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");
     	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
     			OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
