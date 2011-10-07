@@ -25,6 +25,8 @@ package org.collectionspace.services.contact.nuxeo;
 
 import java.util.Map;
 
+import javax.ws.rs.core.UriInfo;
+import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
@@ -45,8 +47,8 @@ public class ContactDocumentModelHandler
     private static final String COMMON_PART_LABEL = "contacts_common";
     private String inAuthority;
     private String inItem;
-    
-     /**
+
+    /**
      * Gets the in authority.
      *
      * @return the in authority
@@ -92,14 +94,14 @@ public class ContactDocumentModelHandler
         handleInAuthority(wrapDoc.getWrappedObject());
         handleDisplayNames(wrapDoc.getWrappedObject());
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	super.handleUpdate(wrapDoc);
-    	handleDisplayNames(wrapDoc.getWrappedObject());
+        super.handleUpdate(wrapDoc);
+        handleDisplayNames(wrapDoc.getWrappedObject());
     }
 
     /**
@@ -131,7 +133,7 @@ public class ContactDocumentModelHandler
                 ContactJAXBSchema.ADDRESS_PLACE_1);
         String displayName = prepareDefaultDisplayName(email, telephoneNumber, addressPlace1);
         docModel.setProperty(commonPartLabel, ContactJAXBSchema.DISPLAY_NAME,
-                    displayName);
+                displayName);
     }
 
     /**
@@ -146,19 +148,19 @@ public class ContactDocumentModelHandler
      */
     private static String prepareDefaultDisplayName(String email,
             String telephoneNumber, String addressPlace1) throws Exception {
-        
+
         final int MAX_DISPLAY_NAME_LENGTH = 30;
-        
+
         StringBuilder newStr = new StringBuilder("");
         final String sep = " ";
         boolean firstAdded = false;
-        
-        if (! (email == null || email.isEmpty()) ) {
+
+        if (!(email == null || email.isEmpty())) {
             newStr.append(email);
             firstAdded = true;
         }
-        
-        if (! (telephoneNumber == null || telephoneNumber.isEmpty()) ) {
+
+        if (!(telephoneNumber == null || telephoneNumber.isEmpty())) {
             if (newStr.length() <= MAX_DISPLAY_NAME_LENGTH) {
                 if (firstAdded) {
                     newStr.append(sep);
@@ -168,8 +170,8 @@ public class ContactDocumentModelHandler
                 newStr.append(telephoneNumber);
             }
         }
-        
-        if (! (addressPlace1 == null || addressPlace1.isEmpty()) ) {
+
+        if (!(addressPlace1 == null || addressPlace1.isEmpty())) {
             if (newStr.length() <= MAX_DISPLAY_NAME_LENGTH) {
                 if (firstAdded) {
                     newStr.append(sep);
@@ -177,14 +179,35 @@ public class ContactDocumentModelHandler
                 newStr.append(addressPlace1);
             }
         }
-        
+
         String displayName = newStr.toString();
-             
+
         if (displayName.length() > MAX_DISPLAY_NAME_LENGTH) {
-           return displayName.substring(0, MAX_DISPLAY_NAME_LENGTH) + "...";
+            return displayName.substring(0, MAX_DISPLAY_NAME_LENGTH) + "...";
         } else {
-           return displayName;
+            return displayName;
         }
+    }
+
+    @Override
+    public String getUri(DocumentModel docModel) {
+        String uri = "";
+        UriInfo ui = getServiceContext().getUriInfo();
+        if (ui != null) {
+            uri = '/' + getAuthorityPathComponent(ui) + '/' + inAuthority
+                    + '/' + AuthorityClient.ITEMS + '/' + inItem
+                    + getServiceContextPath() + getCsid(docModel);
+            // uri = "/" + ui.getPath() + "/" + getCsid(docModel);
+        } else {
+            uri = super.getUri(docModel);
+        }
+        return uri;
+    }
+
+    // Assumes the initial path component in the URI, following the base URI,
+    // identifies the relevant authority resource
+    private String getAuthorityPathComponent(UriInfo ui) {
+        return ui.getPathSegments().get(0).toString();
     }
 
     /**
