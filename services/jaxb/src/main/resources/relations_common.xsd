@@ -34,6 +34,10 @@
                 <!--- New Names -->
                 <xs:element name="subjectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentId1 -->
                 <xs:element name="objectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentId2 -->
+                <xs:element name="subjectDocumentType" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentType1 -->
+                <xs:element name="objectDocumentType" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentType2 -->
+                <xs:element name="subjectRefName" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+                <xs:element name="objectRefName" type="xs:string"  minOccurs="1" maxOccurs="1"/>
                 <xs:element name="predicate" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>   <!-- new name for relationshipType -->
                 <xs:element name="subjectUri" type="xs:string" minOccurs="1"/>
                 <xs:element name="objectUri" type="xs:string" minOccurs="1"/>
