@@ -3,6 +3,9 @@ package org.collectionspace.services.common.api;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Usage for this class, if you have a URN and would like to get at its fields, is to call one of these methods:
  *
@@ -37,6 +40,9 @@ import java.util.regex.Pattern;
  * User: laramie
  */
 public class RefName {
+	
+    /** The logger. */
+    private static final Logger logger = LoggerFactory.getLogger(RefName.class);
 
     public static final String HACK_VOCABULARIES = "Vocabularies"; //TODO: get rid of these.
     public static final String HACK_ORGANIZATIONS = "Organizations"; //TODO: get rid of these.
@@ -124,6 +130,9 @@ public class RefName {
             Matcher m = p.matcher(urn);
             if (m.find()) {
                 if (m.groupCount() < 5) {
+                	if (m.groupCount() == 4 && logger.isDebugEnabled()) {
+                		logger.debug("AuthorityItem.parse only found 4 items; Missing displayName? Urn:"+urn);
+                	}
                     return null;
                 }
                 termInfo.inAuthority.tenantName = m.group(1);

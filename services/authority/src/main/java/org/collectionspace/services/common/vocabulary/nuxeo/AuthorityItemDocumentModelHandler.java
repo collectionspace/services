@@ -42,6 +42,7 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationResource;
@@ -79,6 +80,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      */
     protected String inAuthority;
     protected String authorityRefNameBase;
+    
+    // Used to determine when the displayName changes as part of the update.
+    protected String oldDisplayNameOnUpdate = null;
+    protected String oldRefNameOnUpdate = null;
+    protected String newRefNameOnUpdate = null;
 
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
@@ -121,6 +127,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         super.handleCreate(wrapDoc);
         handleInAuthority(wrapDoc.getWrappedObject());
     	handleComputedDisplayNames(wrapDoc.getWrappedObject());
+    	String displayName = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName, 
+				AuthorityItemJAXBSchema.DISPLAY_NAME);
+    	if(Tools.isEmpty(displayName)) {
+    		logger.warn("Creating Authority Item with no displayName!");
+    	}
         // CSPACE-3178:
         // Uncomment once debugged and App layer is read to integrate
         // Experimenting with these uncommented now ...
@@ -133,8 +144,23 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      */
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// First, get a copy of the old displayName
+    	oldDisplayNameOnUpdate = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName, 
+    																AuthorityItemJAXBSchema.DISPLAY_NAME);
+    	oldRefNameOnUpdate = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName, 
+																	AuthorityItemJAXBSchema.REF_NAME);
     	super.handleUpdate(wrapDoc);
     	handleComputedDisplayNames(wrapDoc.getWrappedObject());
+    	String newDisplayName = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName, 
+																	AuthorityItemJAXBSchema.DISPLAY_NAME);
+    	if(newDisplayName != null && !newDisplayName.equals(oldDisplayNameOnUpdate)) {
+    		// Need to update the refName, and then fix all references.
+    		newRefNameOnUpdate = handleItemRefNameUpdateForDisplayName(wrapDoc.getWrappedObject(), newDisplayName);
+    	} else {
+    		// Mark as not needing attention in completeUpdate phase.
+    		newRefNameOnUpdate = null;
+    		oldRefNameOnUpdate = null;
+    	}
     }
 
     /**
@@ -146,6 +172,44 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
     	// Do nothing by default.
     }
+
+    /**
+     * Handle refName updates for changes to display name.
+     * Assumes refName is already correct. Just ensures it is right.
+     *
+     * @param docModel the doc model
+     * @throws Exception the exception
+     */
+    protected String handleItemRefNameUpdateForDisplayName(DocumentModel docModel,
+            String newDisplayName) throws Exception {
+        //String suppliedRefName = (String) docModel.getProperty(authorityItemCommonSchemaName, 
+        //														AuthorityItemJAXBSchema.REF_NAME);
+        RefName.AuthorityItem authItem = RefName.AuthorityItem.parse(oldRefNameOnUpdate);
+        if(authItem == null) {
+        	String err = "Authority Item has illegal refName: "+oldRefNameOnUpdate;
+        	logger.debug(err);
+        	throw new IllegalArgumentException(err);
+        }
+        authItem.displayName = newDisplayName;
+        String updatedRefName = authItem.toString();
+        docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, updatedRefName);
+        return updatedRefName;
+    }
+
+    
+    /**
+     * Checks to see if the refName has changed, and if so, 
+     * uses utilities to find all references and update them.
+     */
+    protected void handleItemRefNameReferenceUpdate() {
+    	if(newRefNameOnUpdate != null && oldRefNameOnUpdate!= null) {
+    		// We have work to do.
+    		logger.debug("Need to find and update references to Item.");
+    		logger.debug("Old refName" + oldRefNameOnUpdate);
+    		logger.debug("New refName" + newRefNameOnUpdate);
+    	}
+    }
+
 
     private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
@@ -169,8 +233,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         String suppliedRefName = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.REF_NAME);
         // CSPACE-3178:
         // Temporarily accept client-supplied refName values, rather than always generating such values.
-        // Remove the surrounding 'if' statement when clients should no longer supply refName values.
-        if (suppliedRefName == null || suppliedRefName.isEmpty()) {
+        // Remove first block and the surrounding 'if' statement when clients should no longer supply refName values.
+        if(!Tools.isEmpty(suppliedRefName) ) {
+        	// Supplied refName must at least be legal
+        	RefName.AuthorityItem item = RefName.AuthorityItem.parse(suppliedRefName);
+        	if(item==null) {
+                logger.error("Passed refName for authority item not legal: "+suppliedRefName);
+                suppliedRefName = null; // Clear this and compute a new one below.
+        	}
+        } 
+        // Recheck, in case we cleared it for being illegal
+        if(Tools.isEmpty(suppliedRefName) ) {
             String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
             String displayName = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.DISPLAY_NAME);
             if (Tools.isEmpty(authorityRefBaseName)) {
@@ -386,6 +459,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         ServiceContext ctx = getServiceContext();
         PayloadOutputPart foo = (PayloadOutputPart) ctx.getProperty(RelationClient.SERVICE_COMMON_LIST_NAME);
         ((PoxPayloadOut) ctx.getOutput()).addPart(foo);
+        handleItemRefNameReferenceUpdate();
     }
 
     /**  updateRelations strategy:

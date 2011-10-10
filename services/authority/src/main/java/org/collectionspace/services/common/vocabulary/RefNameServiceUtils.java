@@ -59,7 +59,7 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
  */
 public class RefNameServiceUtils {
 
-    private final Logger logger = LoggerFactory.getLogger(RefNameServiceUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(RefNameServiceUtils.class);
 
     public static AuthorityRefDocList getAuthorityRefDocs(ServiceContext ctx,
             RepositoryClient repoClient,
@@ -70,24 +70,52 @@ public class RefNameServiceUtils {
         AbstractCommonList commonList = (AbstractCommonList) wrapperList;
         commonList.setPageNum(pageNum);
         commonList.setPageSize(pageSize);
-
-        
         List<AuthorityRefDocList.AuthorityRefDocItem> list =
                 wrapperList.getAuthorityRefDocItem();
+
+        // Get the service bindings for this tenant
         TenantBindingConfigReaderImpl tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
         List<ServiceBindingType> servicebindings = tReader.getServiceBindingsByType(ctx.getTenantId(), serviceType);
         if (servicebindings == null || servicebindings.isEmpty()) {
+        	logger.error("RefNameServiceUtils.getAuthorityRefDocs: No services bindings found, cannot proceed!");
             return null;
         }
+        
         // Need to escape the quotes in the refName
         // TODO What if they are already escaped?
         String escapedRefName = refName.replaceAll("'", "\\\\'");
-//    	String domain = 
-//    		tReader.getTenantBinding(ctx.getTenantId()).getRepositoryDomain();
         ArrayList<String> docTypes = new ArrayList<String>();
         Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
         Map<String, Map<String, String>> authRefFieldsByService = new HashMap<String, Map<String, String>>();
+        
+        String query = computeWhereClauseForAuthorityRefDocs(escapedRefName, docTypes, servicebindings, 
+        											queriedServiceBindings, authRefFieldsByService );
+        if (query == null) { // found no authRef fields - nothing to query
+            return wrapperList;
+        }
+        // Now we have to issue the search
+        DocumentWrapper<DocumentModelList> docListWrapper = repoClient.findDocs(ctx,
+                docTypes, query, pageSize, pageNum, computeTotal);
+        // Now we gather the info for each document into the list and return
+        DocumentModelList docList = docListWrapper.getWrappedObject();
+        // Set num of items in list. this is useful to our testing framework.
+        commonList.setItemsInPage(docList.size());
+        // set the total result size
+        commonList.setTotalItems(docList.totalSize());
+        
+        processRefObjsDocList(docList, refName, servicebindings,
+				        		queriedServiceBindings, authRefFieldsByService,
+				       			list, null);
+        return wrapperList;
+    }
+    
+    private static String computeWhereClauseForAuthorityRefDocs(
+    		String escapedRefName,
+    		ArrayList<String> docTypes,
+    		List<ServiceBindingType> servicebindings,
+    		Map<String, ServiceBindingType> queriedServiceBindings,
+    		Map<String, Map<String, String>> authRefFieldsByService ) {
         StringBuilder whereClause = new StringBuilder();
         boolean fFirst = true;
         List<String> authRefFieldPaths = new ArrayList<String>();
@@ -133,25 +161,30 @@ public class RefNameServiceUtils {
             }
         }
         String whereClauseStr = whereClause.toString(); // for debugging
-        if (fFirst) // found no authRef fields - nothing to query
-        {
-            return wrapperList;
+        if (fFirst) { // found no authRef fields - nothing to query
+            return null;
+        } else {
+        	return whereClause.toString(); 
         }
-        String fullQuery = whereClause.toString(); // for debug
-        // Now we have to issue the search
-        DocumentWrapper<DocumentModelList> docListWrapper = repoClient.findDocs(ctx,
-                docTypes, whereClause.toString(), pageSize, pageNum, computeTotal);
-        // Now we gather the info for each document into the list and return
-        DocumentModelList docList = docListWrapper.getWrappedObject();
-        // Set num of items in list. this is useful to our testing framework.
-        commonList.setItemsInPage(docList.size());
-        // set the total result size
-        commonList.setTotalItems(docList.totalSize());
+    }
+    
+    /*
+     * Runs through the list of found docs, processing them. 
+     * If list is non-null, then processing means gather the info for items.
+     * If list is null, and newRefName is non-null, then processing means replacing and updating.
+     */
+    private static void processRefObjsDocList(DocumentModelList docList,
+    		String refName,
+    		List<ServiceBindingType> servicebindings,
+    		Map<String, ServiceBindingType> queriedServiceBindings,
+    		Map<String, Map<String, String>> authRefFieldsByService,
+   			List<AuthorityRefDocList.AuthorityRefDocItem> list, 
+   			String newAuthorityRefName) {
         Iterator<DocumentModel> iter = docList.iterator();
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
-            AuthorityRefDocList.AuthorityRefDocItem ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
-            String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+            AuthorityRefDocList.AuthorityRefDocItem ilistItem;
+
             String docType = docModel.getDocumentType().getName();
             ServiceBindingType sb = queriedServiceBindings.get(docType);
             if (sb == null) {
@@ -159,14 +192,21 @@ public class RefNameServiceUtils {
                         "getAuthorityRefDocs: No Service Binding for docType: " + docType);
             }
             String serviceContextPath = "/" + sb.getName().toLowerCase() + "/";
-            // The id and URI are the same on all doctypes
-            ilistItem.setDocId(csid);
-            ilistItem.setUri(serviceContextPath + csid);
-            ilistItem.setDocType(docType);
-            ilistItem.setDocNumber(
-                    ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NUMBER_PROP, docModel));
-            ilistItem.setDocName(
-                    ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NAME_PROP, docModel));
+            
+            if(list == null) {
+            	ilistItem = null;
+            } else {
+            	ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
+                String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+                ilistItem.setDocId(csid);
+                ilistItem.setUri(serviceContextPath + csid);
+                // The id and URI are the same on all doctypes
+                ilistItem.setDocType(docType);
+                ilistItem.setDocNumber(
+                        ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NUMBER_PROP, docModel));
+                ilistItem.setDocName(
+                        ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NAME_PROP, docModel));
+            }
             // Now, we have to loop over the authRefFieldsByService to figure
             // out which field matched this. Ignore multiple matches.
             Map<String,String> matchingAuthRefFields = authRefFieldsByService.get(docType);
@@ -209,12 +249,18 @@ public class RefNameServiceUtils {
                         // Handle multiple fields matching in one Doc. See CSPACE-2863.
                     	if(fRefFound) {
                     		// We already added ilistItem, so we need to clone that and add again
-                            ilistItem = cloneAuthRefDocItem(ilistItem, sourceField);
+                    		if(ilistItem != null) {
+                    			ilistItem = cloneAuthRefDocItem(ilistItem, sourceField);
+                    		}
                     	} else {
-                    		ilistItem.setSourceField(sourceField);
+                    		if(ilistItem != null) {
+                    			ilistItem.setSourceField(sourceField);
+                    		}
                             fRefFound = true;
                     	}
-                        list.add(ilistItem);
+                		if(ilistItem != null) {
+                			list.add(ilistItem);
+                		}
                     }
 
                 } catch (ClientException ce) {
@@ -225,10 +271,10 @@ public class RefNameServiceUtils {
             if (!fRefFound) {
                 throw new RuntimeException(
                         "getAuthorityRefDocs: Could not find refname in object:"
-                        + docType + ":" + csid);
+                        + docType + ":" + NuxeoUtils.getCsid(docModel));
             }
         }
-        return wrapperList;
+
     }
     
     private static AuthorityRefDocList.AuthorityRefDocItem cloneAuthRefDocItem(
