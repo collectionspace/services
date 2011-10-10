@@ -72,6 +72,16 @@ public class RelationDocumentModelHandler
      * for ACTION.GET_ALL
      */
     private RelationsCommonList relationList;
+    
+    @Override
+    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        super.handleCreate(wrapDoc);
+    }
+    
+    @Override
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	super.handleUpdate(wrapDoc);
+    }
 
     @Override
     public RelationsCommon getCommonPart() {
