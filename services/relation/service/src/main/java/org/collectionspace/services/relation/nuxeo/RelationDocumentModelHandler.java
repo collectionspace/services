@@ -174,7 +174,7 @@ public class RelationDocumentModelHandler
         //Object o1 =  docModel.getProperty(ctx.getCommonPartLabel(), "subject");
         //Object o2 =  docModel.getProperty(ctx.getCommonPartLabel(), "object");
 
-        String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.subjectUri);
+        String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.SUBJECT_URI);
         subject.setUri(subjectUri);
         relationListItem.setSubject(subject);
 
@@ -182,7 +182,7 @@ public class RelationDocumentModelHandler
         String documentType2 = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_2);
         RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, documentType2);
 
-        String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.objectUri);
+        String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.OBJECT_URI);
         object.setUri(objectUri);
         relationListItem.setObject(object);
 
