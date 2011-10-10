@@ -132,7 +132,7 @@ public class CollectionSpaceJaxRsApplication extends Application
     
     private void addResourceToMapAndSingletons(ResourceBase resource) {
         singletons.add(resource);
-        resourceMap.put(resource.getClass().getName(), resource);
+        resourceMap.put(resource.getServiceName(), resource);
     }
 
     @Override
