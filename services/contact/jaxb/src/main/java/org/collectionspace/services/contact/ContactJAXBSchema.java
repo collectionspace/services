@@ -12,6 +12,7 @@ public interface ContactJAXBSchema {
     final static String CSID = "csid";
     final static String IN_AUTHORITY = "inAuthority";
     final static String IN_ITEM = "inItem";
+    final static String URI = "uri";
     final static String DISPLAY_NAME = "displayName";
     
     final static String EMAIL_GROUP_LIST = "emailGroupList";

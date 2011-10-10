@@ -223,6 +223,7 @@ public class ContactDocumentModelHandler
         super.filterReadOnlyPropertiesForPart(objectProps, partMeta);
         objectProps.remove(ContactJAXBSchema.IN_AUTHORITY);
         objectProps.remove(ContactJAXBSchema.IN_ITEM);
+        objectProps.remove(ContactJAXBSchema.URI);
         objectProps.remove(ContactJAXBSchema.DISPLAY_NAME);
     }
 }
