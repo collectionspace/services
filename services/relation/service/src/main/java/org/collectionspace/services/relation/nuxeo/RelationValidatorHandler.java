@@ -98,7 +98,7 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
 
     private boolean hasCsid(String csid) {
         boolean hasCsid = false;
-        if (csid != null && Tools.notBlank(csid)) {
+        if (Tools.notBlank(csid)) {
             hasCsid = true;
         }
         return hasCsid;
@@ -116,7 +116,7 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
 
     private boolean hasRefName(String refName) {
         boolean hasRefname = false;
-        if (refName == null || Tools.isBlank(refName)) {
+        if (Tools.isBlank(refName)) {
             return hasRefname;
         } else {
             Authority authority = Authority.parse(refName);
