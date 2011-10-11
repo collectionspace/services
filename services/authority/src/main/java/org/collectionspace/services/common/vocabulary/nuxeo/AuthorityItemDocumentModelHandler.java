@@ -659,23 +659,28 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             RelationsDocListItem itemObject = item.getObject();
 
             String subjectCsid = itemSubject.getCsid();
-            rc.setDocumentId1(subjectCsid);
             rc.setSubjectCsid(subjectCsid);
+            rc.setDocumentId1(subjectCsid); // populate legacy field for backward compatibility
 
-            String objCsid = item.getObject().getCsid();
-            rc.setDocumentId2(objCsid);
+            String objCsid = itemObject.getCsid();
             rc.setObjectCsid(objCsid);
+            rc.setDocumentId2(objCsid); // populate legacy field for backward compatibility
+            
+            rc.setSubjectRefName(itemSubject.getRefName());
+            rc.setObjectRefName(itemObject.getRefName());
 
             rc.setRelationshipType(item.getPredicate());
             //RelationshipType  foo = (RelationshipType.valueOf(item.getPredicate())) ;
             //rc.setPredicate(foo);     //this must be one of the type found in the enum in  services/jaxb/src/main/resources/relations_common.xsd
 
+            rc.setSubjectDocumentType(itemSubject.getDocumentType());
+            rc.setObjectDocumentType(itemObject.getDocumentType());
+            // populate legacy fields for backward compatibility
             rc.setDocumentType1(itemSubject.getDocumentType());
             rc.setDocumentType2(itemObject.getDocumentType());
 
             rc.setSubjectUri(itemSubject.getUri());
             rc.setObjectUri(itemObject.getUri());
-
 
             PoxPayloadOut payloadOut = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
             PayloadOutputPart outputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMONPART_NAME, rc);

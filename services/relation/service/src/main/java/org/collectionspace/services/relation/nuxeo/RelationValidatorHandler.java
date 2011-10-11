@@ -41,17 +41,18 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
                 logger.trace(relationsCommon.toString());
             }
 
+            String subjectCsid = getSubjectCsid(relationsCommon);
+            String objectCsid = getObjectCsid(relationsCommon);
+
             // If no CSID for a subject or object is included in the create payload,
             // a refName must be provided for that subject or object as an alternate identifier.
-            assert (hasObjectCsid(relationsCommon) || hasObjectRefname(relationsCommon));
-            assert (hasSubjectCsid(relationsCommon) || hasSubjectRefname(relationsCommon));
+            assert (hasCsid(subjectCsid) || hasSubjectRefname(relationsCommon));
+            assert (hasCsid(objectCsid) || hasObjectRefname(relationsCommon));
 
             // The Subject identifier and Object ID must not be identical:
             // that is, a resource cannot be related to itself.
-            // FIXME: Can store values of calls above if desired to save additional checks here.
-            if (hasObjectCsid(relationsCommon) && hasSubjectCsid(relationsCommon)) {
-                assert (relationsCommon.getObjectCsid().trim().equalsIgnoreCase(
-                        relationsCommon.getSubjectCsid().trim()) == false) :
+            if (hasCsid(subjectCsid) && hasCsid(objectCsid)) {
+                assert (subjectCsid.trim().equalsIgnoreCase(objectCsid.trim()) == false) :
                         SUBJECT_EQUALS_OBJECT_ERROR;
             }
 
@@ -86,14 +87,22 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
         // TODO Auto-generated method stub
     }
 
-    private boolean hasObjectCsid(RelationsCommon relationsCommon) {
-        String objectCsid = relationsCommon.getObjectCsid();
-        return hasCsid(objectCsid);
+    private String getSubjectCsid(RelationsCommon relationsCommon) {
+        String subjectCsid = relationsCommon.getSubjectCsid();
+        // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
+        if (Tools.isBlank(subjectCsid)) {
+            subjectCsid = relationsCommon.getDocumentId1();
+        }
+        return subjectCsid;
     }
 
-    private boolean hasSubjectCsid(RelationsCommon relationsCommon) {
-        String subjectCsid = relationsCommon.getSubjectCsid();
-        return hasCsid(subjectCsid);
+    private String getObjectCsid(RelationsCommon relationsCommon) {
+        String objectCsid = relationsCommon.getObjectCsid();
+        // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
+        if (Tools.isBlank(objectCsid)) {
+            objectCsid = relationsCommon.getDocumentId2();
+        }
+        return objectCsid;
     }
 
     private boolean hasCsid(String csid) {
@@ -104,14 +113,14 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
         return hasCsid;
     }
 
-    private boolean hasObjectRefname(RelationsCommon relationsCommon) {
-        String objectRefName = relationsCommon.getObjectRefName();
-        return hasRefName(objectRefName);
-    }
-
     private boolean hasSubjectRefname(RelationsCommon relationsCommon) {
         String subjectRefName = relationsCommon.getSubjectRefName();
         return hasRefName(subjectRefName);
+    }
+
+    private boolean hasObjectRefname(RelationsCommon relationsCommon) {
+        String objectRefName = relationsCommon.getObjectRefName();
+        return hasRefName(objectRefName);
     }
 
     private boolean hasRefName(String refName) {
