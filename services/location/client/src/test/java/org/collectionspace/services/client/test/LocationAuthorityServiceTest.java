@@ -207,9 +207,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         }
         // Store the ID returned from the first resource created
         // for additional tests below.
-        final String NULL_REFNAME = null;
+        final String EMPTY_REFNAME = "";
         if (knownResourceId == null){
-        	setKnownResource( newID, shortId, NULL_REFNAME );
+        	setKnownResource( newID, shortId, EMPTY_REFNAME );
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -1119,9 +1119,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     	// LocationAuthorityClientUtils.createLocationInstance(
     	//		LocationAuthorityClientUtils.createLocationRefName(knownResourceRefName, "nonEx", "Non Existent"), 
     	//		nonexMap, client.getItemCommonPartName() );
-        final String NULL_REFNAME = null;
+        final String EMPTY_REFNAME = "";
         PoxPayloadOut multipart = 
-                LocationAuthorityClientUtils.createLocationInstance(NULL_REFNAME, 
+                LocationAuthorityClientUtils.createLocationInstance(EMPTY_REFNAME, 
     			nonexMap, client.getItemCommonPartName() );
         ClientResponse<String> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
