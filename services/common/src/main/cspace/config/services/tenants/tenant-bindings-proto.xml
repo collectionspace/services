@@ -366,6 +366,7 @@
         </service:params>
       </service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.loanin.nuxeo.LoaninValidatorHandler</service:validatorHandler>
+      <!-- This block is likely cruft; see CSPACE-4475 -->
       <s:initHandler xmlns:s="http://collectionspace.org/services/common/service">
         <s:classname>org.collectionspace.services.common.init.InitHandler</s:classname>
         <s:params>
@@ -391,6 +392,7 @@
           </s:property>
         </s:params>
       </s:initHandler>
+      <!-- This tenant:properties block is likely cruft; see CSPACE-4475 -->
       <tenant:properties>
         <types:item xmlns:types="http://collectionspace.org/services/common/types">
           <types:key>datePattern</types:key>
@@ -423,10 +425,6 @@
         </service:part>
         <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="loansin_common" updated="" order="1">
           <service:properties>
-            <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
-            <!-- types:item><types:key>authRef</types:key><types:value>lender</types:value></types:item -->
-            <!-- types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item -->
-            <!-- types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>loanInContact</types:value>
@@ -435,6 +433,36 @@
               <types:key>authRef</types:key>
               <types:value>borrowersAuthorizer</types:value>
             </types:item>
+            <!-- To be added to Loan In records per CSPACE-3269 -->
+            <!--
+            <types:item>
+               <types:key>authRef</types:key>
+               <types:value>borrowersContact</types:value>
+            </types:item>
+            -->
+            <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
+            <!--
+            <types:item>
+              <types:key>authRef</types:key>
+              <types:value>LenderGroupList|lender</types:value>
+            </types:item>
+            <types:item>
+              <types:key>authRef</types:key>
+              <types:value>LenderGroupList|lendersAuthorizer</types:value>
+            </types:item>
+            <types:item>
+               <types:key>authRef</types:key>
+               <types:value>LenderGroupList|lendersContact</types:value>
+               </types:item>
+            </types:item>
+            -->
+            <!-- To be added to Loan In records per CSPACE-3269 -->
+            <!--
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>loanStatusGroupList|loanStatus</types:value>
+            </types:item>
+            -->
           </service:properties>
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/loanin" schemaLocation="http://collectionspace.org/services/loanin http://services.collectionspace.org/loanin/loansin_common.xsd" />
