@@ -39,8 +39,8 @@ public class LocationAuthorityClientUtils {
         LocationauthoritiesCommon locationAuthority = new LocationauthoritiesCommon();
         locationAuthority.setDisplayName(displayName);
         locationAuthority.setShortIdentifier(shortIdentifier);
-        String refName = createLocationAuthRefName(shortIdentifier, displayName);
-        locationAuthority.setRefName(refName);
+        // String refName = createLocationAuthRefName(shortIdentifier, displayName);
+        // locationAuthority.setRefName(refName);
         locationAuthority.setVocabType("LocationAuthority"); //FIXME: REM - Should this really be hard-coded?
         PoxPayloadOut multipart = new PoxPayloadOut(LocationAuthorityClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(locationAuthority, MediaType.APPLICATION_XML_TYPE);
@@ -68,8 +68,8 @@ public class LocationAuthorityClientUtils {
     	String shortId = locationInfo.get(LocationJAXBSchema.SHORT_IDENTIFIER);
     	String displayName = locationInfo.get(LocationJAXBSchema.DISPLAY_NAME);
     	location.setShortIdentifier(shortId);
-    	String locationRefName = createLocationRefName(locationAuthRefName, shortId, displayName);
-       	location.setRefName(locationRefName);
+    	// String locationRefName = createLocationRefName(locationAuthRefName, shortId, displayName);
+       	// location.setRefName(locationRefName);
        	String value = null;
     	value = locationInfo.get(LocationJAXBSchema.DISPLAY_NAME_COMPUTED);
     	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 

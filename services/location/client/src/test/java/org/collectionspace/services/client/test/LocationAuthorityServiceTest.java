@@ -147,8 +147,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     	LocationAuthorityClient client = new LocationAuthorityClient();
         String shortId = identifier;
     	String displayName = "displayName-" + shortId;
-    	String baseRefName = 
-    		LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
+    	// String baseRefName = LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
     	PoxPayloadOut multipart = 
             LocationAuthorityClientUtils.createLocationAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
@@ -179,8 +178,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         LocationAuthorityClient client = new LocationAuthorityClient();
         String shortId = createIdentifier();
     	String displayName = "displayName-" + shortId;
-    	String baseRefName = 
-    		LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
+    	// String baseRefName = LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
     	
     	PoxPayloadOut multipart = 
             LocationAuthorityClientUtils.createLocationAuthorityInstance(
@@ -209,8 +207,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         }
         // Store the ID returned from the first resource created
         // for additional tests below.
+        final String NULL_REFNAME = null;
         if (knownResourceId == null){
-        	setKnownResource( newID, shortId, baseRefName );
+        	setKnownResource( newID, shortId, NULL_REFNAME );
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -1116,9 +1115,13 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         nonexMap.put(LocationJAXBSchema.SHORT_IDENTIFIER, "nonEx");
         nonexMap.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
         nonexMap.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
+        // PoxPayloadOut multipart = 
+    	// LocationAuthorityClientUtils.createLocationInstance(
+    	//		LocationAuthorityClientUtils.createLocationRefName(knownResourceRefName, "nonEx", "Non Existent"), 
+    	//		nonexMap, client.getItemCommonPartName() );
+        final String NULL_REFNAME = null;
         PoxPayloadOut multipart = 
-    	LocationAuthorityClientUtils.createLocationInstance(
-    			LocationAuthorityClientUtils.createLocationRefName(knownResourceRefName, "nonEx", "Non Existent"), 
+                LocationAuthorityClientUtils.createLocationInstance(NULL_REFNAME, 
     			nonexMap, client.getItemCommonPartName() );
         ClientResponse<String> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
