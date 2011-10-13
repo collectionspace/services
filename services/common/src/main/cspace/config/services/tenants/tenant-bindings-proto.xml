@@ -218,6 +218,8 @@
         <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="blobs_common" updated="" order="1">
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/blob" schemaLocation="http://collectionspace.org/services/blob http://services.collectionspace.org/blob/blobs_common.xsd" />
+            <!-- The Blob service has at least one authRef field and two or more termRef fields in its multivalued dimensionGroup. -->
+            <!-- If these require enumeration here, please see authRef and termRef declarations in  Media for relevant entries. -->
           </service:content>
         </service:part>
         <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
@@ -899,15 +901,15 @@
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
-              <types:value>dimentionGroupList|dimension</types:value>
+              <types:value>dimensionGroupList|dimension</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
-              <types:value>dimentionGroupList|measurementUnit</types:value>
+              <types:value>dimensionGroupList|measurementUnit</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
-              <types:value>dimentionGroupList|measurementMethod</types:value>
+              <types:value>dimensionGroupList|measurementMethod</types:value>
             </types:item>
             -->
           </service:properties>
