@@ -1813,11 +1813,50 @@
               <types:key>authRef</types:key>
               <types:value>acquisitionSources|acquisitionSource</types:value>
             </types:item>
+            <!-- Collecting Event Authority field -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
+            </types:item>
             <!-- Commented out for now, as searching within a field in a complexType breaks searches for referenced objects -->
             <!--
             <types:item>
               <types:key>authRef</types:key>
               <types:value>acquisitionFundingList|acquisitionFundingSource</types:value>
+            </types:item>
+            -->
+            <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
+            <!--
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>acquisitionMethod</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>groupPurchasePriceCurrency</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>objectOfferPriceCurrency</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>objectPurchaseOfferPriceCurrency</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>objectPurchasePriceCurrency</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>groupPurchasePriceCurrency</types:value>
+            </types:item>
+            -->
+            <!-- The following term references all fall within a nested complexType / multivalued group of fields -->
+            <!--
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>AcquisitionFundingList|acquisitionFundingCurrency</types:value>
             </types:item>
             -->
           </service:properties>
