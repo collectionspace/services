@@ -92,6 +92,20 @@ public class RelationDocumentModelHandler
     	// Merge in the data from the payload
         super.handleCreate(wrapDoc);
 
+        // And take care of ensuring all the values for the relation info are correct 
+        populateSubjectAndObjectValues(wrapDoc);
+    }
+
+    @Override
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// Merge in the data from the payload
+        super.handleUpdate(wrapDoc);
+        
+        // And take care of ensuring all the values for the relation info are correct 
+        populateSubjectAndObjectValues(wrapDoc);
+    }
+    
+    private void populateSubjectAndObjectValues(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         // Obtain document models for the subject and object of the relation, so that
         // we ensure we have value docType, URI info. If the docModels support refNames, 
         // we will also set those.
@@ -109,11 +123,6 @@ public class RelationDocumentModelHandler
         if (objectDocModel != null) {
             populateSubjectOrObjectValues(relationDocModel, objectDocModel, ctx, OBJ_DOC_MODEL);
         }
-    }
-
-    @Override
-    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        super.handleUpdate(wrapDoc);
     }
 
     @Override

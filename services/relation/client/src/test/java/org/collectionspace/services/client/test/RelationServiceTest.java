@@ -554,22 +554,16 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
+    	logger.debug(testBanner(testName, CLASS_NAME));
         // Perform setup.
         setupUpdate();
 
         // Retrieve an existing resource that we can update.
         RelationClient client = new RelationClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
+        logger.debug(testName + ": read status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-        if(logger.isDebugEnabled()){
-            logger.debug("Got object to update with ID: " + knownResourceId);
-        }
+        logger.debug("Got object to update with ID: " + knownResourceId);
         
         // Extract the common part and verify that it is not null.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -579,17 +573,21 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         	relationCommon = (RelationsCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(relationCommon);
+        logger.trace("object before update");
+        logger.trace(objectAsXmlString(relationCommon, RelationsCommon.class));
 
-        // Update the content of this resource.
-        relationCommon.setDocumentId1("updated-" + relationCommon.getDocumentId1());
-        relationCommon.setDocumentType1("updated-" + relationCommon.getDocumentType1());
-        relationCommon.setDocumentId2("updated-" + relationCommon.getDocumentId2());
-        relationCommon.setDocumentType2("updated-" + relationCommon.getDocumentType2());
+        String newSubjectDocType = relationCommon.getObjectDocumentType();
+        String newObjectDocType = relationCommon.getSubjectDocumentType();
+        String newSubjectId = relationCommon.getObjectCsid();
+        String newObjectId = relationCommon.getSubjectCsid();
+        // Update the content of this resource, inverting subject and object
+        relationCommon.setSubjectCsid(newSubjectId);
+        relationCommon.setSubjectDocumentType("Hooey");
+        relationCommon.setObjectCsid(newObjectId);
+        relationCommon.setObjectDocumentType("Fooey");
         relationCommon.setPredicateDisplayName("updated-" + relationCommon.getPredicateDisplayName());
-        if(logger.isDebugEnabled()){
-            logger.debug("updated object");
-            logger.debug(objectAsXmlString(relationCommon, RelationsCommon.class));
-        }
+        logger.trace("updated object to send");
+        logger.trace(objectAsXmlString(relationCommon, RelationsCommon.class));
 
         // Submit the request containing the updated resource to the service
         // and store the response.
@@ -600,9 +598,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
-        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -614,16 +610,21 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
                         client.getCommonPartName(), RelationsCommon.class);
         Assert.assertNotNull(updatedRelationCommon);
 
+        logger.trace("updated object as received");
+        logger.trace(objectAsXmlString(updatedRelationCommon, RelationsCommon.class));
+
         final String msg =
                 "Data in updated object did not match submitted data.";
+        final String msg2 =
+                "Data in updated object was not correctly computed.";
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentId1(), relationCommon.getDocumentId1(), msg);
+                updatedRelationCommon.getDocumentId1(), newSubjectId, msg);
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentType1(), relationCommon.getDocumentType1(), msg);
+                updatedRelationCommon.getDocumentType1(), newSubjectDocType, msg2);
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentId2(), relationCommon.getDocumentId2(), msg);
+                updatedRelationCommon.getDocumentId2(), newObjectId, msg);
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentType2(), relationCommon.getDocumentType2(), msg);
+                updatedRelationCommon.getDocumentType2(), newObjectDocType, msg2);
         Assert.assertEquals(
                 updatedRelationCommon.getPredicateDisplayName(), relationCommon.getPredicateDisplayName(), msg);
 
