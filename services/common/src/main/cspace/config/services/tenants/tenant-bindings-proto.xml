@@ -1852,7 +1852,7 @@
               <types:value>groupPurchasePriceCurrency</types:value>
             </types:item>
             -->
-            <!-- The following term references all fall within a nested complexType / multivalued group of fields -->
+            <!-- The following term reference falls within a nested complexType / multivalued group of fields -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
@@ -2071,6 +2071,52 @@
           </service:content>
         </service:part>
         <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="contacts_common" updated="" order="1">
+          <!--
+          <service:properties>
+          -->
+            <!-- The following authority references are commented out for now, as searching within -->
+            <!-- a field in a complexType breaks searches for referenced objects -->
+            <!--
+            <types:item>
+              <types:key>authRef</types:key>
+              <types:value>addressGroupList|addressMunicipality</types:value>
+            </types:item>
+            <types:item>
+              <types:key>authRef</types:key>
+              <types:value>addressGroupList|addressStateOrProvince</types:value>
+            </types:item>
+            <types:item>
+              <types:key>authRef</types:key>
+              <types:value>addressGroupList|addressCountry</types:value>
+            </types:item>
+            -->
+            <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
+            <!-- The following term references all fall within a nested complexType / multivalued group of fields -->
+            <!--
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>emailGroupList|emailType</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>webAddressGroupList|webAddressType</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>telephoneNumberGroupList|telephoneNumberType</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>faxNumberGroupList|faxNumberType</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>addressGroupList|addressType</types:value>
+            </types:item>
+            -->
+          <!--
+          </service:properties>
+          -->
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/contact" schemaLocation="http://collectionspace.org/services/contact http://services.collectionspace.org/contact/contacts_common.xsd" />
           </service:content>
