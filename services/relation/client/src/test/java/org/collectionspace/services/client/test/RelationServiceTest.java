@@ -22,13 +22,20 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
@@ -56,7 +63,16 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
 
    /** The logger. */
     private final String CLASS_NAME = RelationServiceTest.class.getName();
+    private final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    private List<String> personIdsCreated = new ArrayList<String>();
+    private String samSubjectPersonCSID = null;
+    private String oliveObjectPersonCSID = null;
+    private String samSubjectRefName = null;
+    private String oliveObjectRefName = null;
+    private String personAuthCSID = null;
+    private String personShortId = PERSON_AUTHORITY_NAME;
+    
 
     /** The SERVICE path component. */
     final String SERVICE_PATH_COMPONENT = "relations";
@@ -99,6 +115,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
         setupCreate();
+        createPersonRefs();
 
         // Submit the request to the service and store the response.
         RelationClient client = new RelationClient();
@@ -132,6 +149,58 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         // so they can be deleted after tests have been run.
         allResourceIdsCreated.add(extractId(res));
     }
+    
+    /**
+     * Creates the person refs.
+     */
+    protected void createPersonRefs() {
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+                PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+        ClientResponse<Response> res = personAuthClient.create(multipart);
+        int statusCode = res.getStatus();
+
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, STATUS_CREATED);
+        personAuthCSID = extractId(res);
+
+        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+
+        String csid = createPerson("Sam", "Subject", "samSubject", authRefName);
+        Assert.assertNotNull(csid);
+        samSubjectPersonCSID = csid;
+        samSubjectRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        Assert.assertNotNull(samSubjectRefName);
+        personIdsCreated.add(csid);
+
+        csid = createPerson("Olive", "Object", "oliveObject", authRefName);
+        Assert.assertNotNull(csid);
+        oliveObjectRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        oliveObjectPersonCSID = csid;
+        Assert.assertNotNull(oliveObjectRefName);
+        personIdsCreated.add(csid);
+    }
+
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName) {
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        Map<String, String> personInfo = new HashMap<String, String>();
+        personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
+        personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        PoxPayloadOut multipart =
+                PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
+                authRefName, personInfo, personAuthClient.getItemCommonPartName());
+        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
+        int statusCode = res.getStatus();
+
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, STATUS_CREATED);
+        return extractId(res);
+    }
+
+    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
@@ -857,10 +926,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      */
     private void fillRelation(RelationsCommon relationCommon, String identifier) {
-        fillRelation(relationCommon, "Subject-" + identifier,
-                "SubjectType-" + identifier + "-type",
-                "Object-" + identifier,
-                "ObjectType-" + identifier + "-type",
+        fillRelation(relationCommon, samSubjectPersonCSID, null, oliveObjectPersonCSID, null,
                 RelationshipType.COLLECTIONOBJECT_INTAKE.toString(),
                 RelationshipType.COLLECTIONOBJECT_INTAKE + ".displayName");
     }

@@ -30,6 +30,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.XmlTools;
@@ -287,6 +288,31 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return itemcsid;
     }
 
+    /*
+     * Generally, callers will first call RefName.AuthorityItem.parse with a refName, and then 
+     * use the returned item.inAuthority.resource and a resourceMap to get a service-specific
+     * Resource. They then call this method on that resource.
+     */
+    @Override
+   	public DocumentModel getDocModelForAuthorityItem(RefName.AuthorityItem item) 
+   			throws Exception, DocumentNotFoundException {
+    	if(item == null) {
+    		return null;
+    	}
+        String whereClause = buildWhereForAuthByName(item.getParentShortIdentifier());
+        // Ensure we have the right context.
+        ServiceContext ctx = createServiceContext(item.inAuthority.resource);
+        
+        String parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
+
+        String itemWhereClause = buildWhereForAuthItemByName(item.getShortIdentifier(), parentcsid);
+        ctx = createServiceContext(getItemServiceName());
+        DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).findDoc(ctx, itemWhereClause);
+        DocumentModel docModel = docWrapper.getWrappedObject();
+        return docModel;
+    }
+
+
     @POST
     public Response createAuthority(String xmlPayload) {
         try {
@@ -461,10 +487,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      *************************************************************************/
     @POST
     @Path("{csid}/items")
-    public Response createAuthorityItem(@Context UriInfo ui, @PathParam("csid") String specifier, String xmlPayload) {
+    public Response createAuthorityItem(@Context ResourceMap resourceMap, @Context UriInfo ui, 
+    		@PathParam("csid") String specifier, String xmlPayload) {
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext ctx = createServiceContext(getItemServiceName(), input);
+            ctx.setResourceMap(resourceMap);
             ctx.setUriInfo(ui);    //Laramie
 
             // Note: must have the parentShortId, to do the create.
@@ -761,6 +789,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @PUT
     @Path("{csid}/items/{itemcsid}")
     public byte[] updateAuthorityItem(
+    		@Context ResourceMap resourceMap, 
             @Context UriInfo ui,
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
@@ -773,6 +802,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String parentcsid = lookupParentCSID(parentspecifier, "updateAuthorityItem(parent)", "UPDATE_ITEM", null);
 
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), theUpdate);
+            ctx.setResourceMap(resourceMap);
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM", ctx);
 
             // We omit the parentShortId, only needed when doing a create...

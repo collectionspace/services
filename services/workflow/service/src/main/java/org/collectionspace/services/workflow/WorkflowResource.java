@@ -25,6 +25,7 @@ package org.collectionspace.services.workflow;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
@@ -72,7 +73,7 @@ public class WorkflowResource extends ResourceBase {
     
 	@Override
 	@POST
-	public Response create(@Context UriInfo ui, String xmlPayload) {
+	public Response create(@Context ResourceMap resourceMap, @Context UriInfo ui, String xmlPayload) {
 		Response response = Response.status(Response.Status.BAD_REQUEST)
 				.entity(ServiceMessages.POST_UNSUPPORTED).type("text/plain").build();
 		return response;

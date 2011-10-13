@@ -146,7 +146,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         OrgAuthorityClient client = new OrgAuthorityClient();
         String shortId = createIdentifier();
         String displayName = "displayName-" + shortId;
-        String baseRefName = OrgAuthorityClientUtils.createOrgAuthRefName(shortId, null);
+        //String baseRefName = OrgAuthorityClientUtils.createOrgAuthRefName(shortId, null);
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
                 displayName, shortId, client.getCommonPartName());
 
@@ -176,7 +176,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null) {
-            setKnownResource(newID, shortId, baseRefName);
+            setKnownResource(newID, shortId, null ); //baseRefName);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }

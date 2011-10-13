@@ -23,14 +23,19 @@
  */
 package org.collectionspace.services.relation.nuxeo;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
@@ -43,10 +48,17 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 
+// HACK HACK HACK
+import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.LocationAuthorityClient;
+import org.collectionspace.services.client.TaxonomyAuthorityClient;
+
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.relation.RelationsDocListItem;
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -77,28 +89,26 @@ public class RelationDocumentModelHandler
 
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// Merge in the data from the payload
+        super.handleCreate(wrapDoc);
 
-        // Obtain document models for the subject and object of the relation.
+        // Obtain document models for the subject and object of the relation, so that
+        // we ensure we have value docType, URI info. If the docModels support refNames, 
+        // we will also set those.
+        // Note that this introduces another caching problem... 
         DocumentModel relationDocModel = wrapDoc.getWrappedObject();
         ServiceContext ctx = getServiceContext();
-        DocumentModel subjectDocModel = getSubjectDocModel(relationDocModel, ctx);
-        DocumentModel objectDocModel = getObjectDocModel(relationDocModel, ctx);
+        DocumentModel subjectDocModel = getSubjectOrObjectDocModel(relationDocModel, ctx, SUBJ_DOC_MODEL);
+        DocumentModel objectDocModel = getSubjectOrObjectDocModel(relationDocModel, ctx, OBJ_DOC_MODEL);
 
         // Use values from the subject and object document models to populate the
         // relevant fields of the relation's own document model.
         if (subjectDocModel != null) {
-            relationDocModel = populateSubjectValues(relationDocModel, subjectDocModel);
+            populateSubjectOrObjectValues(relationDocModel, subjectDocModel, ctx, SUBJ_DOC_MODEL);
         }
         if (objectDocModel != null) {
-            relationDocModel = populateObjectValues(relationDocModel, objectDocModel);
+            populateSubjectOrObjectValues(relationDocModel, objectDocModel, ctx, OBJ_DOC_MODEL);
         }
-
-        // FIXME: Verify the following:
-        // Do we call this method here, only after we've updated the relationDocModel?
-        // Has the wrapDoc instance itself been updated, in the process of updating the relationDocModel,
-        // or do we need to pass the updated relationDocModel back into that instance?
-        super.handleCreate(wrapDoc);
-
     }
 
     @Override
@@ -199,6 +209,8 @@ public class RelationDocumentModelHandler
 
         String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.SUBJECT_URI);
         subject.setUri(subjectUri);
+        String subjectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.SUBJECT_REFNAME);
+        subject.setRefName(subjectRefName);
         relationListItem.setSubject(subject);
 
         String objectCsid = relationListItem.getObjectCsid();
@@ -207,6 +219,8 @@ public class RelationDocumentModelHandler
 
         String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.OBJECT_URI);
         object.setUri(objectUri);
+        String objectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.OBJECT_REFNAME);
+        object.setRefName(objectRefName);
         relationListItem.setObject(object);
 
         return relationListItem;
@@ -293,62 +307,25 @@ public class RelationDocumentModelHandler
         return "/" + RelationConstants.NUXEO_SCHEMA_ROOT_ELEMENT + "/" + prop;
     }
 
-    /**
-     * Obtains the subject resource and uses its values to populate
-     * subject-related fields in the relation resource.
-     */
-    private DocumentModel getSubjectDocModel(DocumentModel relationDocModel, ServiceContext ctx) throws Exception {
-        // Get the document model for the subject of the relation.
-        DocumentModel subjectDocModel = null;
-        String subjectCsid = "";
-        String subjectRefName = "";
-        // FIXME: Currently assumes that the object CSID is valid if present
-        // in the incoming payload.
-        try {
-            subjectCsid = (String) relationDocModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.SUBJECT_CSID);
-            // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
-            if (Tools.isBlank(subjectCsid)) {
-                subjectCsid = (String) relationDocModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_ID_1);
-            }
-        } catch (PropertyException pe) {
-            // Per CSPACE-4468, ignore any property exception here.
-            // (See parallel comment below in getObjectDocModel.)
-        }
-        if (Tools.notBlank(subjectCsid)) {
-            // FIXME: Call a utility routine here that uses the CSID to retrieve the subject record's docModel.
-            // The following is a placeholder:
-            subjectDocModel = getDocModelFromCsid(subjectCsid);
-        }
-        if (Tools.isBlank(subjectCsid)) {
-            try {
-                subjectRefName = (String) relationDocModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.SUBJECT_REFNAME);
-                // FIXME: Call a utility routine here - for which the method below is currently a
-                // placeholder - that uses the refName to retrieve the subject record's docModel.
-                subjectDocModel = getDocModelFromRefname(subjectRefName);
-            } catch (Exception e) {
-                throw new InvalidDocumentException(
-                        "Relation record must contain a CSID or refName to identify the subject of the relation.", e);
-            }
-        }
-        return subjectDocModel;
-    }
-
-    /**
-     * Obtains the object resource and uses its values to populate
-     * object-related fields in the relation resource.
-     */
-    private DocumentModel getObjectDocModel(DocumentModel relationDocModel, ServiceContext ctx) throws Exception {
+    private final boolean SUBJ_DOC_MODEL = true;
+    private final boolean OBJ_DOC_MODEL = false;
+    
+    private DocumentModel getSubjectOrObjectDocModel(
+    		DocumentModel relationDocModel, ServiceContext ctx, boolean fSubject) throws Exception {
         // Get the document model for the object of the relation.
-        String objectCsid = "";
-        String objectRefName = "";
-        DocumentModel objectDocModel = null;
+    	String commonPartLabel = ctx.getCommonPartLabel();
+        String csid = "";
+        String refName = "";
+        DocumentModel docModel = null;
         // FIXME: Currently assumes that the object CSID is valid if present
         // in the incoming payload.
         try {
-            objectCsid = (String) relationDocModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.OBJECT_CSID);
+            csid = (String) relationDocModel.getProperty(commonPartLabel, 
+            		(fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID));
             // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
-            if (Tools.isBlank(objectCsid)) {
-                objectCsid = (String) relationDocModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_ID_2);
+            if (Tools.isBlank(csid)) {
+                csid = (String) relationDocModel.getProperty(commonPartLabel, 
+					(fSubject?RelationJAXBSchema.DOCUMENT_ID_1:RelationJAXBSchema.DOCUMENT_ID_2));
             }
         } catch (PropertyException pe) {
             // Per CSPACE-4468, ignore any property exception here.
@@ -356,40 +333,88 @@ public class RelationDocumentModelHandler
             // can now be null (missing), because a refName value can be
             // provided as an alternate identifier.
         }
-        if (Tools.isBlank(objectCsid)) {
+        if (Tools.notBlank(csid)) {
+            DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDocFromCsid(ctx, csid);
+            docModel = docWrapper.getWrappedObject();
+        } else { //  if (Tools.isBlank(objectCsid)) {
             try {
-                objectRefName = (String) relationDocModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.OBJECT_REFNAME);
-                // FIXME: Call a utility routine here - for which the method below is currently a
-                // placeholder - that uses the refName to retrieve the object record's docModel.
-                objectDocModel = getDocModelFromRefname(objectRefName);
+            	refName = (String) relationDocModel.getProperty(commonPartLabel, 
+            			(fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
+            	docModel = ResourceBase.getDocModelForRefName(refName, ctx.getResourceMap());
             } catch (Exception e) {
                 throw new InvalidDocumentException(
                         "Relation record must have a CSID or refName to identify the object of the relation.", e);
             }
         }
-        return objectDocModel;
+        if(docModel==null) {
+           	throw new DocumentNotFoundException("Relation.getSubjectOrObjectDocModel could not find doc with CSID: "
+           				+csid+" and/or refName: "+refName );
+        }
+        return docModel;
     }
-
-    // CSPACE-4468 placeholder methods:
     
-    // FIXME: Placeholder method.
-    private DocumentModel getDocModelFromCsid(String csid) {
-        return null;
+    private void populateSubjectOrObjectValues(
+    		DocumentModel relationDocModel, 
+    		DocumentModel subjectOrObjectDocModel,
+    		ServiceContext ctx,
+    		boolean fSubject ) {
+        HashMap<String,Object> properties = new HashMap<String,Object>();
+
+        try {
+	        String doctype = (String) subjectOrObjectDocModel.getType();
+	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_DOCTYPE:RelationJAXBSchema.OBJECT_DOCTYPE),
+	        					doctype);
+	        // FIXME: Remove the line below when legacy fields are removed from the Relation record:
+	        properties.put((fSubject?RelationJAXBSchema.DOCUMENT_TYPE_1:RelationJAXBSchema.DOCUMENT_TYPE_2), 
+	        					doctype);
+	
+	        String csid = (String) subjectOrObjectDocModel.getName();
+	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID),
+	        					csid);
+	        // FIXME: Remove the two lines immediately below when legacy fields are removed from the Relation record:
+	        properties.put((fSubject?RelationJAXBSchema.DOCUMENT_ID_1:RelationJAXBSchema.DOCUMENT_ID_2),
+	        					csid);
+	
+	        String uri = (String) subjectOrObjectDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,
+	        															COLLECTIONSPACE_CORE_URI);
+	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_URI:RelationJAXBSchema.OBJECT_URI),
+	        					uri);
+	        
+	    	String common_schema = getCommonSchemaNameForDocType(doctype);
+	    	
+	    	if(common_schema!=null) {
+	    		String refname = (String)subjectOrObjectDocModel.getProperty(common_schema, 
+	    														RefName.REFNAME );
+	            properties.put((fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME),
+	            		refname);
+	    	}
+        } catch (ClientException ce) {
+            throw new RuntimeException(
+                    "populateSubjectOrObjectValues: Problem fetching field " + ce.getLocalizedMessage());
+        }
+
+        // FIXME: Call below is based solely on Nuxeo API docs; have not yet verified that it correctly updates existing
+        // property values in the target document model.
+        try {
+        	relationDocModel.setProperties(ctx.getCommonPartLabel(), properties);
+        } catch (ClientException ce) {
+            throw new RuntimeException(
+                    "populateSubjectValues: Problem setting fields " + ce.getLocalizedMessage());
+        }
+    }
+    
+    private String getCommonSchemaNameForDocType(String docType) {
+    	String common_schema = null;
+    	if("Person".equals(docType))
+    		common_schema = PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    	else if("Organization".equals(docType))
+    		common_schema = OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    	else if("Locationitem".equals(docType))
+    		common_schema = LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    	else if("Taxon".equals(docType))
+    		common_schema = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    	//else leave it null.
+    	return common_schema;
     }
 
-    // FIXME: Placeholder method.
-    // Patrick is providing a working replacement for this method, in a framework class.
-    private DocumentModel getDocModelFromRefname(String csid) {
-        return null;
-    }
-
-    // FIXME: Placeholder method.
-    private DocumentModel populateSubjectValues(DocumentModel relationDocModel, DocumentModel objectDocModel) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    // FIXME: Placeholder method.
-    private DocumentModel populateObjectValues(DocumentModel relationDocModel, DocumentModel objectDocModel) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 }

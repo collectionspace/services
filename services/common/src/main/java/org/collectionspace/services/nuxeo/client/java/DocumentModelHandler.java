@@ -37,6 +37,8 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.client.*;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
+import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.repository.RepositoryClientFactory;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -81,6 +83,11 @@ public abstract class DocumentModelHandler<T, TL>
     }
     
     
+    public RepositoryClient getRepositoryClient(ServiceContext ctx) {
+        RepositoryClient repositoryClient = RepositoryClientFactory.getInstance().getClient(ctx.getRepositoryClientName());
+        return repositoryClient;
+    }
+
     /**
      * getRepositorySession returns Nuxeo Repository Session
      * @return

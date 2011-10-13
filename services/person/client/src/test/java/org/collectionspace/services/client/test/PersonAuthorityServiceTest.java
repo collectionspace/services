@@ -98,7 +98,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
     // Hold some values for a recently created item to verify upon read.
     private String knownResourceId = null;
     private String knownResourceShortIdentifer = null;
-    private String knownResourceRefName = null;
+    //private String knownResourceRefName = null;
     private String knownItemResourceId = null;
     private String knownItemResourceShortIdentifer = null;
     // The resource ID of an item resource used for partial term matching tests.
@@ -118,7 +118,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
             String refName) {
         knownResourceId = id;
         knownResourceShortIdentifer = shortIdentifer;
-        knownResourceRefName = refName;
+        //knownResourceRefName = refName;
     }
 
     protected void setKnownItemResource(String id, String shortIdentifer) {
@@ -158,7 +158,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         PersonAuthorityClient client = new PersonAuthorityClient();
         String shortId = createIdentifier();
         String displayName = "displayName-" + shortId;
-        String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
+        //String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 displayName, shortId, client.getCommonPartName());
@@ -187,7 +187,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         }
         // Save values for additional tests
         if (knownResourceId == null) {
-            setKnownResource(newID, shortId, baseRefName);
+            setKnownResource(newID, shortId, null ); //baseRefName);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -232,7 +232,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
             logger.debug(testBanner(testName, CLASS_NAME));
         }
         setupCreate();
-        String newID = createItemInAuthority(knownResourceId, knownResourceRefName);
+        String newID = createItemInAuthority(knownResourceId, null ); //knownResourceRefName);
     }
 
     /**
@@ -307,7 +307,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         johnWayneGroups.add("Scottish");
         johnWayneRepeatablesMap.put(PersonJAXBSchema.GROUPS, johnWayneGroups);
 
-        return createItemInAuthority(vcsid, authRefName, shortId, johnWayneMap, johnWayneRepeatablesMap);
+        return createItemInAuthority(vcsid, null /*authRefName*/, shortId, johnWayneMap, johnWayneRepeatablesMap);
 
     }
 
@@ -332,7 +332,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         PersonAuthorityClient client = new PersonAuthorityClient();
 
         PoxPayloadOut multipart =
-                PersonAuthorityClientUtils.createPersonInstance(vcsid, authRefName, itemFieldProperties,
+                PersonAuthorityClientUtils.createPersonInstance(vcsid, null /*authRefName*/, itemFieldProperties,
                 itemRepeatableFieldProperties, client.getItemCommonPartName());
 
         String newID = null;
@@ -633,7 +633,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(knownResourceId,
-                knownResourceRefName, fieldProperties,
+                null /*knownResourceRefName*/, fieldProperties,
                 NULL_REPEATABLE_FIELD_PROPERTIES, client.getItemCommonPartName());
 
         // Send the request and receive a response
@@ -1921,7 +1921,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         Map<String, List<String>> nonexRepeatablesMap = new HashMap<String, List<String>>();
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID,
-                PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
+                null, //PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
                 nonexMap, nonexRepeatablesMap, client.getItemCommonPartName());
         ClientResponse<String> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);

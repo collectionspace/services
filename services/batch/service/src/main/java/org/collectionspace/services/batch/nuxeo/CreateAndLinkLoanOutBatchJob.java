@@ -135,7 +135,7 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 		// First, create the Loanout
 		// We fetch the resource class by service name
 		ResourceBase resource = resourceMap.get( LoanoutClient.SERVICE_NAME); 
-		Response response = resource.create(null, loanoutPayload);
+		Response response = resource.create(resourceMap, null, loanoutPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;
 			errorInfo = new InvocationError(INT_ERROR_STATUS,
@@ -161,7 +161,7 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 			+   "<predicateDisplayName>"+RELATION_PREDICATE_DISP+"</predicateDisplayName>"
 			+ "</ns2:relations_common></document>";
 		ResourceBase resource = resourceMap.get(RelationClient.SERVICE_NAME);
-		Response response = resource.create(null, relationPayload);
+		Response response = resource.create(resourceMap, null, relationPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;
 			errorInfo = new InvocationError(INT_ERROR_STATUS,
