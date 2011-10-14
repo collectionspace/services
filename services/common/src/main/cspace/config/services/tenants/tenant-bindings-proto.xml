@@ -1333,10 +1333,51 @@
               <types:key>authRef</types:key>
               <types:value>contactNames|contactName</types:value>
             </types:item>
+            <!-- Organization's subBody field was removed here from authRef list per anticipated work on CSPACE-3939 -->
+            <!-- Place Authority -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-              <types:value>subBodies|subBody</types:value>
+              <types:value>foundingPlace</types:value>
             </types:item>
+            <!-- Concept Authority -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>groups|group</types:value>
+            </types:item>
+            <!-- Concept Authority -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>functions|function</types:value>
+            </types:item>
+            <!-- To be added per CSPACE-3939. Name is preliminary; please check organizations_common schema before enabling -->
+            <!-- Commented out for now, as searching within a field in a complexType breaks searches for referenced objects -->
+            <!--
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>affiliatedPersonGroupList|affiliatedPerson</types:value>
+            </types:item>
+            -->
+            <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
+            <!--
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>termStatus</types:value>
+            </types:item>
+            -->
+            <!-- To be added per CSPACE-3939. -->
+            <!--
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>nameType</types:value>
+            </types:item>
+            -->
+            <!-- The following term reference falls within a nested complexType / multivalued group of fields -->
+            <!--
+              <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>affiliatedPersonGroupList|affiliatedPersonType</types:value>
+            </types:item>
+            -->
           </service:properties>
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/organization" schemaLocation="http://collectionspace.org/services/organization http://services.collectionspace.org/organization/organizations_common.xsd" />
