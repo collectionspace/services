@@ -809,8 +809,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 	            DocumentModel domain = repoSession.getDocument(docRef);
 	            domainId = domain.getId();
 	        } catch (Exception e) {
-	            if (logger.isDebugEnabled()) {
-	                logger.debug("Caught exception ", e);
+	            if (logger.isTraceEnabled()) {
+	                logger.trace("Caught exception ", e);
 	            }
 	            //there is no way to identify if document does not exist due to
 	            //lack of typed exception for getDocument method
