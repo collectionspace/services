@@ -990,7 +990,7 @@
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
-              <types:value>types|type</types:value>
+              <types:value>typeList|type</types:value>
             </types:item>
             -->
             <!-- The following term references all fall within a nested complexType / multivalued group of fields -->
