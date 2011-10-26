@@ -205,7 +205,6 @@
               <types:value>fieldCollectors|fieldCollector</types:value>
             </types:item>
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>responsibleDepartment|responsibleDepartments</types:value>
@@ -218,7 +217,6 @@
               <types:key>termRef</types:key>
               <types:value>recordStatus</types:value>
             </types:item>
-            -->
             <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -431,7 +429,6 @@
             </types:item>
             -->
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>entryMethods|entryMethod</types:value>
@@ -452,7 +449,6 @@
               <types:key>termRef</types:key>
               <types:value>conditionCheckReasons|conditionCheckReason</types:value>
             </types:item>
-            -->
             <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -673,12 +669,10 @@
               <types:value>lendersContact</types:value>
             </types:item>
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>loanPurpose</types:value>
             </types:item>
-            -->
             <!-- The following term reference is within a nested complexType / multivalued group of fields -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -749,7 +743,6 @@
               <types:value>depositor</types:value>
             </types:item>
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>exitMethods|exitMethod</types:value>
@@ -758,7 +751,6 @@
               <types:key>termRef</types:key>
               <types:value>exitReason</types:value>
             </types:item>
-            -->
           </service:properties>
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/objectexit" schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd" />
@@ -843,12 +835,10 @@
               <types:value>owner</types:value>
             </types:item>
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>responsibleDepartment</types:value>
             </types:item>
-            -->
           </service:properties>
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/group" schemaLocation="http://collectionspace.org/services/group http://services.collectionspace.org/group/groups_common.xsd" />
@@ -983,16 +973,14 @@
             </types:item>
             -->
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
-              <types:value>languages|language</types:value>
+              <types:value>languageList|language</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>typeList|type</types:value>
             </types:item>
-            -->
             <!-- The following term references all fall within a nested complexType / multivalued group of fields -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -1070,7 +1058,6 @@
               <types:value>movementContact</types:value>
             </types:item>
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>currentLocationFitness</types:value>
@@ -1083,7 +1070,6 @@
               <types:key>termRef</types:key>
               <types:value>movementMethods|movementMethod</types:value>
             </types:item>
-            -->
           </service:properties>
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/movement" schemaLocation="http://collectionspace.org/services/movement http://services.collectionspace.org/movement/movements_common.xsd" />
@@ -1454,12 +1440,10 @@
             </types:item>
             -->
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>termStatus</types:value>
             </types:item>
-            -->
             <!-- To be added per CSPACE-3939. -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -1834,7 +1818,6 @@
           <service:properties xmlns:service="http://collectionspace.org/services/common/service">
           -->
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>termStatus</types:value>
@@ -1843,7 +1826,6 @@
               <types:key>termRef</types:key>
               <types:value>locationType</types:value>
             </types:item>
-          -->
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/location" schemaLocation="http://collectionspace.org/services/location http://services.collectionspace.org/location/locations_common.xsd" />
           </service:content>
@@ -1980,7 +1962,6 @@
             </types:item>
             -->
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>termStatus</types:value>
@@ -2001,7 +1982,6 @@
               <types:key>termRef</types:key>
               <types:value>taxonNameSource</types:value>
             </types:item>
-            -->
             <!-- The following term reference falls within a nested complexType / multivalued group of fields -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -2091,7 +2071,6 @@
             </types:item>
             -->
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>acquisitionMethod</types:value>
@@ -2116,7 +2095,6 @@
               <types:key>termRef</types:key>
               <types:value>groupPurchasePriceCurrency</types:value>
             </types:item>
-            -->
             <!-- The following term reference falls within a nested complexType / multivalued group of fields -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">

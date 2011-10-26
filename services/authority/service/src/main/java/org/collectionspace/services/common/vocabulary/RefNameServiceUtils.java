@@ -65,6 +65,7 @@ public class RefNameServiceUtils {
             RepositoryClient repoClient,
             String serviceType,
             String refName,
+            String refPropName,
             int pageSize, int pageNum, boolean computeTotal) throws DocumentException, DocumentNotFoundException {
         AuthorityRefDocList wrapperList = new AuthorityRefDocList();
         AbstractCommonList commonList = (AbstractCommonList) wrapperList;
@@ -89,7 +90,7 @@ public class RefNameServiceUtils {
         Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
         Map<String, Map<String, String>> authRefFieldsByService = new HashMap<String, Map<String, String>>();
         
-        String query = computeWhereClauseForAuthorityRefDocs(escapedRefName, docTypes, servicebindings, 
+        String query = computeWhereClauseForAuthorityRefDocs(escapedRefName, refPropName, docTypes, servicebindings, 
         											queriedServiceBindings, authRefFieldsByService );
         if (query == null) { // found no authRef fields - nothing to query
             return wrapperList;
@@ -112,6 +113,7 @@ public class RefNameServiceUtils {
     
     private static String computeWhereClauseForAuthorityRefDocs(
     		String escapedRefName,
+    		String refPropName,
     		ArrayList<String> docTypes,
     		List<ServiceBindingType> servicebindings,
     		Map<String, ServiceBindingType> queriedServiceBindings,
@@ -124,7 +126,7 @@ public class RefNameServiceUtils {
         	// is also the table name, the way that the repository works).
             authRefFieldPaths =
                     ServiceBindingUtils.getAllPartsPropertyValues(sb,
-                    ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
+                    		refPropName, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
             if (authRefFieldPaths.isEmpty()) {
                 continue;
             }

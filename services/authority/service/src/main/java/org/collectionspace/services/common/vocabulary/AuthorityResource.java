@@ -87,6 +87,18 @@ import java.util.List;
 /**
  * The Class AuthorityResource.
  */
+/**
+ * @author pschmitz
+ *
+ * @param <AuthCommon>
+ * @param <AuthItemHandler>
+ */
+/**
+ * @author pschmitz
+ *
+ * @param <AuthCommon>
+ * @param <AuthItemHandler>
+ */
 @Consumes("application/xml")
 @Produces("application/xml")
 public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
@@ -678,6 +690,15 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     /**
+     * @return the name of the property used to specify references for items in this type of
+     * authority. For most authorities, it is ServiceBindingUtils.AUTH_REF_PROP ("authRef").
+     * Some types (like Vocabulary) use a separate property.
+     */
+    protected String getRefPropName() {
+    	return ServiceBindingUtils.AUTH_REF_PROP;
+    }
+    
+    /**
      * Gets the entities referencing this Authority item instance. The service type
      * can be passed as a query param "type", and must match a configured type
      * for the service bindings. If not set, the type defaults to
@@ -723,6 +744,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                     repoClient,
                     serviceType,
                     refName,
+                    getRefPropName(),
                     myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
