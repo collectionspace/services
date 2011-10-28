@@ -11,7 +11,6 @@
     $LastChangedDate: 2011-05-12 17:36:23 -0700 (Thu, 12 May 2011) $
 -->
 
-
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ns="http://collectionspace.org/collectionobject/"
     xmlns="http://collectionspace.org/collectionobject/"
@@ -469,9 +468,11 @@
     </xs:complexType>
     <xs:complexType name="dimensionGroup">
         <xs:sequence>
-            <xs:element name="dimension" type="xs:string"/>
             <xs:element name="measuredPart" type="xs:string"/>
+            <xs:element name="dimension" type="xs:string"/>
+            <xs:element name="measuredBy" type="xs:string"/>
             <xs:element name="measurementUnit" type="xs:string"/>
+            <xs:element name="measurementMethod" type="xs:string"/>
             <xs:element name="value" type="xs:decimal"/>
             <xs:element name="valueDate" type="xs:string"/>
             <xs:element name="valueQualifier" type="xs:string"/>
