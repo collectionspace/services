@@ -184,72 +184,110 @@
             <!-- Commented out for now, as searching within a field in a complexType breaks searches. -->
             <!-- The following fields were placed into complexTypes in group repeatability work in CSPACE-2927: -->
             <!--
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>contentEventNameGroupList|contentEventName</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>contentEventNameGroupList|contentEventNameType</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>contentObjectGroupList|contentObjectType</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>contentOtherGroupList|contentOtherType</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>materialGroupList|material</types:value>
             </types:item>
-             <types:item>
+             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>materialGroupList|materialComponent</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>materialGroupList|materialSource</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>objectComponentGroupList|objectComponentName</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-              <types:value>objectProductionPerson</types:value>
+              <types:value>assocActivityGroupList|assocActivity</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-              <types:value>objectProductionOrganization</types:value>
+              <types:value>assocConceptGroupList|assocConcept</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-              <types:value>assocOrganizations|assocOrganization</types:value>
+              <types:value>assocCulturalContextGroupList|assocCulturalContext</types:value>
             </types:item>
-            <types:item>
+            
+
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-              <types:value>assocPersons|assocPerson</types:value>
+              <types:value>objectProductionOrganizationGroupList|objectProductionOrganization</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>objectProductionPeopleGroupList|objectProductionPeople</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>objectProductionPersonGroupList|objectProductionPerson</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>techniqueGroupList|technique</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>techniqueGroupList|techniqueType</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>objectProductionPlaceGroupList|objectProductionPlace</types:value>
+            </types:item> 
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocOrganizationGroupList|assocOrganization</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocPeopleGroupList|assocPeople</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocPersonGroupList|assocPerson</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocPlaceGroupList|assocPlace</types:value>
             </types:item>
             -->
             <!-- The following fields will become part of a repeatable group, per CSPACE-4486. -->
             <!-- As a result, they will fall into complexType structures. -->
             <!-- The names of ancestor elements below are anticipated, arbitrary and subject to change. -->
             <!--
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>inscriptionContentGroupList|inscriptionContentInscriber</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>inscriptionContentGroupList|inscriptionContentMethod</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>inscriptionDescriptionGroupList|inscriptionDescriptionInscriber</types:value>
             </types:item>
-            <types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>inscriptionDescriptionGroupList|inscriptionDescriptionMethod</types:value>
             </types:item>
@@ -260,6 +298,36 @@
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>dimensionList|measuredBy</types:value>
+            </types:item>
+            -->
+            <!-- The following fields may become part of a repeatable sub-group, per JIRA(s) -->
+            <!-- spawned from CSPACE-4490. -->
+            <!-- As a result, they will fall into complexType structures. -->
+            <!-- The names of ancestor elements below are anticipated, arbitrary and subject to change. -->
+            <!--
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocEventGroupList|assocEventOrganization</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocEventGroupList|assocEventPeople</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocEventGroupList|assocEventPerson</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocEventGroupList|assocEventPlace</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>ownerGroupList|owner</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>ownerGroupList|ownershipPlace</types:value>
             </types:item>
             -->
             <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
@@ -361,6 +429,14 @@
               <types:key>termRef</types:key>
               <types:value>technicalAttributeGroupList|technicalAttributeMeasurementUnit</types:value>
             </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>assocObjectGroupList|assocObject</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>assocObjectGroupList|assocObjectType</types:value>
+            </types:item>
             -->
             <!-- The following field will become part of a repeatable sub-group, per CSPACE-3627. -->
             <!-- As a result, its parent field/hiearchical path will change from that below. -->
@@ -417,6 +493,36 @@
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>inscriptionDescriptionGroupList|inscriptionDescriptionType</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>usageGroupList|usage</types:value>
+            </types:item>
+            -->
+            <!-- The following fields may become part of a repeatable sub-group, per JIRA(s) -->
+            <!-- spawned from CSPACE-4490. -->
+            <!-- As a result, they will fall into complexType structures. -->
+            <!-- The names of ancestor elements below are anticipated, arbitrary and subject to change. -->
+            <!--
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>assocEventGroupList|assocEventName</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>assocEventGroupList|assocEventNameType</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>ownerGroupList|ownershipAccess</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>ownerGroupList|ownershipCategory</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>ownerGroupList|ownershipExchangeMethod</types:value>
             </types:item>
             -->
           </service:properties>
