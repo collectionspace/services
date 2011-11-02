@@ -173,6 +173,11 @@
               <types:key>authRef</types:key>
               <types:value>owners|owner</types:value>
             </types:item>
+            <!-- Place authority -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>fieldCollectionPlace</types:value>
+            </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>fieldCollectionSources|fieldCollectionSource</types:value>
@@ -180,6 +185,11 @@
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>fieldCollectors|fieldCollector</types:value>
+            </types:item>
+            <!-- Field collection event authority -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>fieldColEventNames|fieldColEventName</types:value>
             </types:item>
             <!-- Commented out for now, as searching within a field in a complexType breaks searches. -->
             <!-- The following fields were placed into complexTypes in group repeatability work in CSPACE-2927: -->
@@ -218,20 +228,6 @@
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-              <types:value>assocActivityGroupList|assocActivity</types:value>
-            </types:item>
-            <types:item xmlns:types="http://collectionspace.org/services/common/types">
-              <types:key>authRef</types:key>
-              <types:value>assocConceptGroupList|assocConcept</types:value>
-            </types:item>
-            <types:item xmlns:types="http://collectionspace.org/services/common/types">
-              <types:key>authRef</types:key>
-              <types:value>assocCulturalContextGroupList|assocCulturalContext</types:value>
-            </types:item>
-            
-
-            <types:item xmlns:types="http://collectionspace.org/services/common/types">
-              <types:key>authRef</types:key>
               <types:value>objectProductionOrganizationGroupList|objectProductionOrganization</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -253,7 +249,19 @@
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>objectProductionPlaceGroupList|objectProductionPlace</types:value>
-            </types:item> 
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocActivityGroupList|assocActivity</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocConceptGroupList|assocConcept</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>assocCulturalContextGroupList|assocCulturalContext</types:value>
+            </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>assocOrganizationGroupList|assocOrganization</types:value>
@@ -269,6 +277,10 @@
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>assocPlaceGroupList|assocPlace</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>referenceGroupList|reference</types:value>
             </types:item>
             -->
             <!-- The following fields will become part of a repeatable group, per CSPACE-4486. -->
@@ -374,6 +386,10 @@
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>sex</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>fieldCollectionMethods|fieldCollectionMethod</types:value>
             </types:item>
             <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
             <!--
