@@ -860,7 +860,7 @@ public class DocumentUtils {
                 return false;
             }
         }
-
+        
 	/**
 	 * Insert multi values.
 	 *
@@ -1189,7 +1189,12 @@ public class DocumentUtils {
                                 }
                             }
                         } else {
-			    result = type.decode(element.getText());
+                            String textValue = element.getText();
+                            if (textValue != null && textValue.trim().isEmpty()) {
+                                result = null;
+                            } else {
+			        result = type.decode(textValue);
+                            }
                         }
 		} else if (type.isListType()) {
 			ListType ltype = (ListType) type;
