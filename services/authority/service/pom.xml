@@ -4,14 +4,14 @@
 			xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.main</artifactId>
+        <artifactId>org.collectionspace.services.authority</artifactId>
         <version>1.12-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authority.service</artifactId>
-    <name>services.authority</name>
+    <name>services.authority.service</name>
     <packaging>jar</packaging>
 
     <dependencies>
