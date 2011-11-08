@@ -40,8 +40,8 @@ public class TaxonomyAuthorityClientUtils {
         TaxonomyauthorityCommon Taxonomyauthority = new TaxonomyauthorityCommon();
         Taxonomyauthority.setDisplayName(displayName);
         Taxonomyauthority.setShortIdentifier(shortIdentifier);
-        String refName = createTaxonomyAuthRefName(shortIdentifier, displayName);
-        Taxonomyauthority.setRefName(refName);
+        // String refName = createTaxonomyAuthRefName(shortIdentifier, displayName);
+        // Taxonomyauthority.setRefName(refName);
         Taxonomyauthority.setVocabType("Taxonomyauthority"); //FIXME: REM - Should this really be hard-coded?
         PoxPayloadOut multipart = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(Taxonomyauthority, MediaType.APPLICATION_XML_TYPE);
@@ -71,8 +71,8 @@ public class TaxonomyAuthorityClientUtils {
         String shortId = taxonInfo.get(TaxonJAXBSchema.SHORT_IDENTIFIER);
         String displayName = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME);
         taxon.setShortIdentifier(shortId);
-        String taxonomyRefName = createTaxonomyRefName(taxonomyAuthRefName, shortId, displayName);
-        taxon.setRefName(taxonomyRefName);
+        // String taxonomyRefName = createTaxonomyRefName(taxonomyAuthRefName, shortId, displayName);
+        // taxon.setRefName(taxonomyRefName);
         String value = null;
         value = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME_COMPUTED);
         boolean displayNameComputed = (value == null) || value.equalsIgnoreCase("true");

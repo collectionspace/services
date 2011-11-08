@@ -20,10 +20,11 @@
     
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Dimension+Schema -->
 
-<!--  Object Entry Information Group -->
-    <xs:element name="dimension" type="xs:string"/>
     <xs:element name="measuredPart" type="xs:string"/>
+    <xs:element name="dimension" type="xs:string"/>
+    <xs:element name="measuredBy" type="xs:string"/>
     <xs:element name="measurementUnit" type="xs:string"/>
+    <xs:element name="measurementMethod" type="xs:string"/>
     <xs:element name="value" type="xs:decimal"/>
     <xs:element name="valueDate" type="xs:string"/>
     <xs:element name="valueQualifier" type="xs:string"/>

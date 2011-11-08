@@ -123,7 +123,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     private String knownResourceId = null;
     
     /** The known resource ref name. */
-    private String knownResourceRefName = null;
+    //private String knownResourceRefName = null;
     
     /** The known item resource id. */
     private String knownItemResourceId = null;
@@ -210,7 +210,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
             Assert.fail("Could not create new Authority for search tests.", e);
         }
         try {
-            createItemsInAuthorityForPartialTermMatch(knownResourceId, knownResourceRefName);
+            createItemsInAuthorityForPartialTermMatch(knownResourceId, null ); //knownResourceRefName);
         } catch (Exception e) {
             Assert.fail("Could not create new item in Authority for search tests.", e);
         }
@@ -594,7 +594,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         PersonAuthorityClient client = new PersonAuthorityClient();
         String shortId = createIdentifier();
     	String displayName = "displayName-" + shortId;
-    	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
+    	//String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
     	PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
@@ -617,12 +617,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     	}
         // Store the refname from the first resource created
         // for additional tests below.
-        knownResourceRefName = baseRefName;
+        //knownResourceRefName = baseRefName;
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
             knownResourceId = newID;
-            knownResourceRefName = baseRefName;
+            //knownResourceRefName = baseRefName;
         }
 
         // Store the IDs from every resource created by tests,
@@ -666,7 +666,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         styles.add(TEST_KWD_UTF8_STYLE);
         partialTermRepeatablesMap.put(PersonJAXBSchema.SCHOOLS_OR_STYLES, styles);
 
-        createItem(testName, authorityCsid, authRefName, client, 
+        createItem(testName, authorityCsid, null /*authRefName*/, client, 
                 partialTermPersonMap, partialTermRepeatablesMap);
         //
         // Adjust the property map for the QUOTE item
@@ -676,7 +676,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         partialTermPersonMap.put(PersonJAXBSchema.SUR_NAME, TEST_PARTIAL_TERM_SUR_NAME_QUOTE);
         partialTermPersonMap.put(PersonJAXBSchema.BIO_NOTE, TEST_KWD_BIO_NOTE_DBL_QUOTES);
 
-        createItem(testName, authorityCsid, authRefName, client, 
+        createItem(testName, authorityCsid, null /*authRefName*/, client, 
                 partialTermPersonMap, partialTermRepeatablesMap);
     }
     
@@ -688,7 +688,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     		Map<String, String> partialTermPersonMap,
     		Map<String, List<String>> partialTermRepeatablesMap) throws Exception {
         PoxPayloadOut multipart =
-            PersonAuthorityClientUtils.createPersonInstance(authorityCsid, authRefName, 
+            PersonAuthorityClientUtils.createPersonInstance(authorityCsid, null, //authRefName, 
                 partialTermPersonMap, partialTermRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;

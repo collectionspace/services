@@ -30,6 +30,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.ClientType;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.query.QueryContext;
@@ -43,6 +44,12 @@ import org.collectionspace.services.common.service.ServiceBindingType;
  * ServiceContext is used to pass along metadata and runtime context
  * between various components of the service framework while processing
  * a service request.
+ */
+/**
+ * @author pschmitz
+ *
+ * @param <IT>
+ * @param <OT>
  */
 public interface ServiceContext<IT, OT> {
 
@@ -169,7 +176,7 @@ public interface ServiceContext<IT, OT> {
      * @return the input
      */
     public IT getInput();
-
+    
     /**
      * setInput is used to set request input before starting to
      * process input data
@@ -188,6 +195,16 @@ public interface ServiceContext<IT, OT> {
      * @param output
      */
     public void setOutput(OT output);
+
+    /**
+     * @return the map of service names to resource classes.
+     */
+    public ResourceMap getResourceMap();
+
+    /**
+     * @param map the map of service names to resource instances.
+     */
+    public void setResourceMap(ResourceMap map);
 
     /**
      * getPartsMetadata returns metadata for object parts used by the service

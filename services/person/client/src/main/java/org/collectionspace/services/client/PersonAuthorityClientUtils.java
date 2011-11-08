@@ -140,8 +140,8 @@ public class PersonAuthorityClientUtils {
         PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
         personAuthority.setDisplayName(displayName);
         personAuthority.setShortIdentifier(shortIdentifier);
-        String refName = createPersonAuthRefName(shortIdentifier, displayName);
-        personAuthority.setRefName(refName);
+        //String refName = createPersonAuthRefName(shortIdentifier, displayName);
+        //personAuthority.setRefName(refName);
         personAuthority.setVocabType("PersonAuthority");
         PoxPayloadOut multipart = new PoxPayloadOut(PersonAuthorityClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
@@ -170,7 +170,7 @@ public class PersonAuthorityClientUtils {
     		String headerLabel){
         final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO =
                 new HashMap<String, List<String>>();
-        return createPersonInstance(inAuthority, personAuthRefName, personInfo,
+        return createPersonInstance(inAuthority, null /*personAuthRefName*/, personInfo,
                 EMPTY_PERSON_REPEATABLES_INFO, headerLabel);
     }
 
@@ -226,8 +226,8 @@ public class PersonAuthorityClientUtils {
     		throw new IllegalArgumentException("shortDisplayName cannot be null when shortDisplayComputed is 'false'");
     	}      	
 
-    	String refName = createPersonRefName(personAuthRefName, shortId, displayName);
-       	person.setRefName(refName);
+    	//String refName = createPersonRefName(personAuthRefName, shortId, displayName);
+       	//person.setRefName(refName);
     	
     	String value;
         List<String> values = null;
@@ -352,10 +352,10 @@ public class PersonAuthorityClientUtils {
     	
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \"" + displayName
-    				+"\" in personAuthorityulary: \"" + personAuthorityRefName +"\"");
+    				+"\" in personAuthorityulary: \"" + vcsid +"\"");
     	}
     	PoxPayloadOut multipart = 
-    		createPersonInstance(vcsid, personAuthorityRefName,
+    		createPersonInstance(vcsid, null /*personAuthorityRefName*/,
     			personMap, personRepeatablesMap, client.getItemCommonPartName());
     	
     	String result = null;
@@ -365,12 +365,12 @@ public class PersonAuthorityClientUtils {
 	
 	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
 	    		throw new RuntimeException("Could not create Item: \""+personMap.get(PersonJAXBSchema.SHORT_IDENTIFIER)
-	    				+"\" in personAuthority: \"" + personAuthorityRefName
+	    				+"\" in personAuthority: \"" + vcsid //personAuthorityRefName
 	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	    	}
 	    	if(statusCode != EXPECTED_STATUS_CODE) {
 	    		throw new RuntimeException("Unexpected Status when creating Item: \""+personMap.get(PersonJAXBSchema.SHORT_IDENTIFIER)
-	    				+"\" in personAuthority: \"" + personAuthorityRefName +"\", Status:"+ statusCode);
+	    				+"\" in personAuthority: \"" + vcsid /*personAuthorityRefName*/ +"\", Status:"+ statusCode);
 	    	}
 	
 	    	result = extractId(res);
@@ -388,6 +388,7 @@ public class PersonAuthorityClientUtils {
      * @param displaySuffix displayName to be appended, if non-null
      * @return the string
      */
+    /*
     public static String createPersonAuthRefName(String shortId, String displaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:personauthority:name("
     			+shortId+")";
@@ -395,6 +396,7 @@ public class PersonAuthorityClientUtils {
     		refName += "'"+displaySuffix+"'";
     	return refName;
     }
+    */
 
     /**
      * Creates the person ref name.
@@ -404,6 +406,7 @@ public class PersonAuthorityClientUtils {
      * @param displaySuffix displayName to be appended, if non-null
      * @return the string
      */
+    /*
     public static String createPersonRefName(
     						String personAuthRefName, String shortId, String displaySuffix) {
     	String refName = personAuthRefName+":person:name("+shortId+")";
@@ -411,6 +414,7 @@ public class PersonAuthorityClientUtils {
     		refName += "'"+displaySuffix+"'";
     	return refName;
     }
+    */
 
     /**
      * Extract id.

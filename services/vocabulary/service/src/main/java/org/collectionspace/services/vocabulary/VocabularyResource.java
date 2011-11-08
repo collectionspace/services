@@ -24,6 +24,7 @@
 package org.collectionspace.services.vocabulary;
 
 import org.collectionspace.services.client.VocabularyClient;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
 import org.slf4j.Logger;
@@ -64,4 +65,14 @@ public class VocabularyResource extends
 		return VocabulariesCommon.class;
 	}
 
+    /**
+     * @return the name of the property used to specify references for items in this type of
+     * authority. For most authorities, it is ServiceBindingUtils.AUTH_REF_PROP ("authRef").
+     * Some types (like Vocabulary) use a separate property.
+     */
+	@Override
+    protected String getRefPropName() {
+    	return ServiceBindingUtils.TERM_REF_PROP;
+    }
+    
 }

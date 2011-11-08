@@ -29,6 +29,7 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 
 
+import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
 import org.jboss.resteasy.client.ClientResponse;
@@ -70,6 +71,10 @@ public class RoleClient extends AbstractServiceClientImpl<RolesList, RoleProxy> 
 
     public ClientResponse<Role> read(String csid) {
         return getProxy().read(csid);
+    }
+    
+    public ClientResponse<AccountRole> readRoleAccounts(String csid) {
+    	return getProxy().readRoleAccounts(csid);
     }
 
     /**

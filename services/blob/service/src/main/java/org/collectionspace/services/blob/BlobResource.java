@@ -28,6 +28,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
@@ -207,7 +208,9 @@ public class BlobResource extends ResourceBase {
     
     @POST
     @Override
-    public Response create(@Context UriInfo ui,
+    public Response create(
+    		@Context ResourceMap resourceMap, 
+    		@Context UriInfo ui,
     		String xmlPayload) {
     	Response response = null;
     	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
@@ -220,7 +223,7 @@ public class BlobResource extends ResourceBase {
 		    	blobInput.createBlobFile(blobUri);
 		    	response = this.create(null, ctx);
     		} else {
-    			response = super.create(ui, xmlPayload);
+    			response = super.create(resourceMap, ui, xmlPayload);
     		}
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
