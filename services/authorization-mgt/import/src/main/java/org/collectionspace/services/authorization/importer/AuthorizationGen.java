@@ -33,14 +33,14 @@ import java.util.List;
 import java.util.UUID;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import org.collectionspace.services.authorization.ActionType;
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.EffectType;
-import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.perms.ActionType;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.EffectType;
+import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionActionUtil;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
-import org.collectionspace.services.authorization.PermissionsList;
+import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.authorization.Role;
@@ -160,7 +160,7 @@ public class AuthorizationGen {
         
         perm.setActionGroup(ACTIONGROUP_CRUDL);
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
-        perm.setActions(pas);
+        perm.setAction(pas);
 
         PermissionAction permAction = PermissionActionUtil.create(perm, ActionType.CREATE);
         pas.add(permAction);
@@ -225,7 +225,7 @@ public class AuthorizationGen {
         
         perm.setActionGroup(ACTIONGROUP_RL);
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
-        perm.setActions(pas);
+        perm.setAction(pas);
 
         PermissionAction permAction = PermissionActionUtil.create(perm, ActionType.READ);
         pas.add(permAction);
@@ -342,7 +342,7 @@ public class AuthorizationGen {
         PermissionRole pr = new PermissionRole();
         pr.setSubject(SubjectType.ROLE);
         List<PermissionValue> permValues = new ArrayList<PermissionValue>();
-        pr.setPermissions(permValues);
+        pr.setPermission(permValues);
         PermissionValue permValue = new PermissionValue();
         permValue.setPermissionId(perm.getCsid());
         permValue.setResourceName(perm.getResourceName().toLowerCase());
@@ -372,7 +372,7 @@ public class AuthorizationGen {
         // otherwise, return null;
         //
         if (roleValues.isEmpty() == false) {
-        	pr.setRoles(roleValues);
+        	pr.setRole(roleValues);
         	result = pr;
         }
 
@@ -408,8 +408,13 @@ public class AuthorizationGen {
         List<Role> allRoleList = new ArrayList<Role>();
         allRoleList.addAll(adminRoles);
         allRoleList.addAll(readerRoles);
-        rList.setRoles(allRoleList);
-        toFile(rList, RolesList.class,
+        rList.setRole(allRoleList);
+        //
+        // Since it is missing the @XMLRootElement annotation, create a JAXBElement wrapper for the RoleList instance
+        // so we can have it marshalled it correctly.
+        //
+        org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();
+        toFile(objectFactory.createRolesList(rList), RolesList.class,
                 fileName);
         if (logger.isDebugEnabled()) {
             logger.debug("exported roles to " + fileName);
@@ -421,8 +426,11 @@ public class AuthorizationGen {
         List<Permission> allPermList = new ArrayList<Permission>();
         allPermList.addAll(adminPermList);
         allPermList.addAll(readerPermList);
-        pcList.setPermissions(allPermList);
+        pcList.setPermission(allPermList);
+        org.collectionspace.services.authorization.ObjectFactory objectFactory =
+        	new org.collectionspace.services.authorization.ObjectFactory();
         toFile(pcList, PermissionsList.class,
+//        toFile(objectFactory.createPermissionsList(pcList), PermissionsList.class,
                 fileName);
         if (logger.isDebugEnabled()) {
             logger.debug("exported permissions to " + fileName);
@@ -434,7 +442,7 @@ public class AuthorizationGen {
         List<PermissionRole> allPermRoleList = new ArrayList<PermissionRole>();
         allPermRoleList.addAll(adminPermRoleList);
         allPermRoleList.addAll(readerPermRoleList);
-        psrsl.setPermissionRoles(allPermRoleList);
+        psrsl.setPermissionRole(allPermRoleList);
         toFile(psrsl, PermissionsRolesList.class,
                 fileName);
         if (logger.isDebugEnabled()) {

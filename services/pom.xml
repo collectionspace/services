@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.14-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -11,6 +11,13 @@
     <artifactId>org.collectionspace.services.main</artifactId>
     <name>services.main</name>
     <packaging>pom</packaging>
+
+	<properties>
+		<annox.version>0.5.0</annox.version>
+		<jaxb2-basics.version>0.6.2</jaxb2-basics.version>
+		<maven-jaxb2-plugin.version>0.8.0</maven-jaxb2-plugin.version>
+		<jaxb.version>2.2.4-1</jaxb.version>
+	</properties>
 
     <!--
     !!!!!PLEASE READ!!!!!
@@ -102,7 +109,6 @@
           <artifactId>properties-maven-plugin</artifactId>
           <version>1.0-alpha-2</version>
         </plugin>
-								
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
@@ -119,7 +125,7 @@
                 <plugin>
                     <groupId>org.jvnet.hyperjaxb3</groupId>
                     <artifactId>maven-hyperjaxb3-plugin</artifactId>
-                    <version>0.5.4</version>
+                    <version>0.5.6</version>
                     <executions>
                         <execution>
                             <goals>
@@ -128,53 +134,58 @@
                         </execution>
                     </executions>
                     <configuration>
+                    	<bindingIncludes>
+                			<include>bindings.xjb</include>
+              			</bindingIncludes>
                         <extension>true</extension>
                         <jdk5>true</jdk5>
                         <ejb3>false</ejb3>
                         <persistenceUnitName>garbage</persistenceUnitName>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.jvnet.jaxb2.maven2</groupId>
-                    <artifactId>maven-jaxb2-plugin</artifactId>
-					<version>0.7.3</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>generate</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <dependencies>
-                        <!-- javax.activation.DataSource provider is required by spec -->
-                        <dependency>
-                            <groupId>javax.activation</groupId>
-                            <artifactId>activation</artifactId>
-                            <version>1.1</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <args>
-                            <arg>-XtoString</arg>
-                            <arg>-Xinject-listener-code</arg>
-
-                            <!-- <arg>-Xcollection-setter-injector</arg>
-                                <arg>-Xfluent-api</arg> -->
-                        </args>
-                        <plugins>
-                            <plugin>
-                                <groupId>org.jvnet.jaxb2_commons</groupId>
-                                <artifactId>basic</artifactId>
-                                <version>0.4.1</version>
-                            </plugin>
-                            <plugin>
-                                <groupId>org.jvnet.jaxb2-commons</groupId>
-                                <artifactId>property-listener-injector</artifactId>
-                                <version>1.0</version>
-                            </plugin>
-                        </plugins>
-                    </configuration>
-                </plugin>
+				<plugin>
+					<groupId>org.jvnet.jaxb2.maven2</groupId>
+					<artifactId>maven-jaxb2-plugin</artifactId>
+					<version>${maven-jaxb2-plugin.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>generate</goal>
+							</goals>
+							<configuration>
+								<extension>true</extension>
+								<bindingIncludes>
+                					<include>xbindings.xjb</include>
+              					</bindingIncludes>
+								<args>
+								 	<arg>-Xannotate</arg> 
+								 	<arg>-verbose</arg> 
+									<arg>-XtoString</arg>
+									<arg>-Xequals</arg>
+									<arg>-XhashCode</arg>
+									<arg>-Xcopyable</arg>
+								</args>
+								<plugins>
+									<plugin> 
+									  <groupId>javax.xml.bind</groupId>
+									  <artifactId>jaxb-api</artifactId>
+									  <version>2.1</version>
+                                    </plugin> 
+									<plugin> 
+	                                    <groupId>org.jvnet.jaxb2_commons</groupId> 
+	                                    <artifactId>jaxb2-basics-annotate</artifactId> 
+										<version>${jaxb2-basics.version}</version>
+                                    </plugin> 
+									<plugin>
+										<groupId>org.jvnet.jaxb2_commons</groupId>
+										<artifactId>jaxb2-basics</artifactId>
+										<version>${jaxb2-basics.version}</version>
+									</plugin>
+								</plugins>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
@@ -267,40 +278,40 @@
                 <scope>test</scope>
                 <classifier>jdk15</classifier>
             </dependency>
-            <dependency>
-                <groupId>org.jvnet.jaxb2_commons</groupId>
-                <artifactId>basic</artifactId>
-                <version>0.4.1</version>
-            </dependency>
+			<dependency>
+				<groupId>org.jvnet.jaxb2_commons</groupId>
+				<artifactId>jaxb2-basics</artifactId>
+				<version>${jaxb2-basics.version}</version>
+			</dependency>
             <dependency>
                 <groupId>org.jvnet.jaxb2-commons</groupId>
                 <artifactId>property-listener-injector</artifactId>
                 <version>1.0</version>
             </dependency>
-            <dependency>
-                <groupId>org.jvnet.jaxb2_commons</groupId>
-                <artifactId>runtime</artifactId>
-                <version>0.4.1.4</version>
-            </dependency>
+			<dependency>
+				<groupId>org.jvnet.jaxb2_commons</groupId>
+				<artifactId>jaxb2-basics-runtime</artifactId>
+				<version>${jaxb2-basics.version}</version>
+			</dependency>
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>jaxrs-api</artifactId>
-                <version>1.2.1.GA</version>
+                <version>2.2.2.GA</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-jaxrs</artifactId>
-                <version>1.2.1.GA</version>
+                <version>2.2.2.GA</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-jaxb-provider</artifactId>
-                <version>1.2.1.GA</version>
+                <version>2.2.2.GA</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-multipart-provider</artifactId>
-                <version>1.2.1.GA</version>
+                <version>2.2.2.GA</version>
             </dependency>
             <dependency>
                 <groupId>commons-httpclient</groupId>
@@ -317,11 +328,11 @@
                 <artifactId>commons-cli</artifactId>
                 <version>1.2</version>
             </dependency>
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>2.1.9</version>
-            </dependency>
+			<dependency>
+				<groupId>com.sun.xml.bind</groupId>
+				<artifactId>jaxb-impl</artifactId>
+				<version>${jaxb.version}</version>
+			</dependency>
             <dependency>
                 <groupId>javax.persistence</groupId>
                 <artifactId>persistence-api</artifactId>
@@ -341,7 +352,7 @@
                 <groupId>org.jvnet.hyperjaxb3</groupId>
                 <!-- for time type adapters -->
                 <artifactId>hyperjaxb3-ejb-runtime</artifactId>
-                <version>0.5.4</version>
+                <version>0.5.6</version>
             </dependency>
             <dependency>
                 <groupId>mysql</groupId>

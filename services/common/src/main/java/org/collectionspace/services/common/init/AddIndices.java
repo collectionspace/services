@@ -23,6 +23,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.InitHandler.Params.Field;
@@ -84,7 +86,10 @@ public class AddIndices extends InitHandler implements IInitHandler {
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */
     @Override
-    public void onRepositoryInitialized(ServiceBindingType sbt, List<Field> fields, List<Property> properties) throws Exception {
+    public void onRepositoryInitialized(DataSource dataSource,
+    		ServiceBindingType sbt, 
+    		List<Field> fields, 
+    		List<Property> properties) throws Exception {
         //todo: all post-init tasks for services, or delegate to services that override.
         int rows = 0;
         String sql = "";
@@ -98,21 +103,21 @@ public class AddIndices extends InitHandler implements IInitHandler {
             if(Tools.notEmpty(param) && (param.indexOf(',')>-1)){
                 String[] fieldNames = param.split(",");
                 for (String fn: fieldNames){
-                    rows = addOneIndex(tableName, fn);
+                    rows = addOneIndex(dataSource, tableName, fn);
                 }
             } else {
-                rows = addOneIndex(tableName, fieldName);
+                rows = addOneIndex(dataSource, tableName, fieldName);
             }
         }
     }
 
-    private int addOneIndex(String tableName, String columnName){
+    private int addOneIndex(DataSource dataSource, String tableName, String columnName){
         int rows = 0;
         String sql = "";
         String indexName = tableName + INDEX_SEP + columnName + INDEX_SUFFIX;
         try {
             DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType();
-            if (indexExists(databaseProductType, tableName, columnName, indexName)) {
+            if (indexExists(dataSource, databaseProductType, tableName, columnName, indexName)) {
                 logger.trace("Index already exists for column " + columnName
                         + " in table " + tableName);
                 // FIXME: Can add the option to drop and re-create an index here.
@@ -140,7 +145,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
                 //
                 // If this assumption is no longer valid, we might instead
                 // identify the relevant repository from the table name here.
-                rows = JDBCTools.executeUpdate(JDBCTools.NUXEO_REPOSITORY_NAME, sql);
+                rows = JDBCTools.executeUpdate(dataSource, sql);
                 logger.trace("Index added to column ("+columnName+") on table ("+tableName+")");
             }
             return rows;
@@ -150,8 +155,11 @@ public class AddIndices extends InitHandler implements IInitHandler {
         }
     }
 
-    private boolean indexExists(DatabaseProductType databaseProductType,
-            String tableName, String colName, String indexName) {
+    private boolean indexExists(DataSource dataSource,
+    		DatabaseProductType databaseProductType,
+            String tableName, 
+            String colName, 
+            String indexName) {
         
         // FIXME: May need to qualify table name by database/catalog,
         // as table names likely will not be globally unique across same
@@ -193,7 +201,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
             //
             // If this assumption is no longer valid, we might instead
             // identify the relevant repository from the table name here.
-            conn = JDBCTools.getConnection(JDBCTools.NUXEO_REPOSITORY_NAME);
+            conn = JDBCTools.getConnection(dataSource);
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if (rs.next()) {

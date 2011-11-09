@@ -26,19 +26,14 @@ package org.collectionspace.services.authorization.storage;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.collectionspace.services.authorization.AccountRole;
-import org.collectionspace.services.authorization.AccountRoleRel;
-import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
-import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
-import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
@@ -160,13 +155,13 @@ public class PermissionRoleDocumentHandler
         if (SubjectType.ROLE.equals(subject)) {
 
             List<PermissionValue> pvs = new ArrayList<PermissionValue>();
-            pr.setPermissions(pvs);
+            pr.setPermission(pvs);
             PermissionValue pv = AuthorizationRoleRel.buildPermissionValue(prr0);
             pvs.add(pv);
 
             //add roles
             List<RoleValue> rvs = new ArrayList<RoleValue>();
-            pr.setRoles(rvs);
+            pr.setRole(rvs);
             for (PermissionRoleRel prr : prrl) {
                 RoleValue rv = AuthorizationRoleRel.buildRoleValue(prr);
                 rvs.add(rv);
@@ -174,13 +169,13 @@ public class PermissionRoleDocumentHandler
         } else if (SubjectType.PERMISSION.equals(subject)) {
 
             List<RoleValue> rvs = new ArrayList<RoleValue>();
-            pr.setRoles(rvs);
+            pr.setRole(rvs);
             RoleValue rv = AuthorizationRoleRel.buildRoleValue(prr0);
             rvs.add(rv);
 
             //add permssions
             List<PermissionValue> pvs = new ArrayList<PermissionValue>();
-            pr.setPermissions(pvs);
+            pr.setPermission(pvs);
             for (PermissionRoleRel prr : prrl) {
                 PermissionValue pv = AuthorizationRoleRel.buildPermissionValue(prr);
                 pvs.add(pv);

@@ -25,7 +25,7 @@
 package org.collectionspace.services.authorization.storage;
 
 import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
@@ -60,12 +60,12 @@ public class PermissionRoleValidatorHandler implements ValidatorHandler {
 
             if (action.equals(Action.CREATE)) {
 
-                for (PermissionValue pv : permRole.getPermissions()) {
+                for (PermissionValue pv : permRole.getPermission()) {
                     if (isPermissionInvalid(pv.getPermissionId(), msgBldr)) {
                         invalid = true;
                     }
                 }
-                for (RoleValue rv : permRole.getRoles()) {
+                for (RoleValue rv : permRole.getRole()) {
                     if (isRoleInvalid(rv.getRoleId(), msgBldr)) {
                         invalid = true;
                     }

@@ -29,9 +29,9 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.authorization.EffectType;
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.perms.EffectType;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
@@ -477,7 +477,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         }        
 
         ClientResponse<Response> res = client.delete(
-        		toDelete.getPermissions().get(0).getPermissionId(), toDelete);
+        		toDelete.getPermission().get(0).getPermissionId(), toDelete);
         try {
             int statusCode = res.getStatus();
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -507,7 +507,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         	readResponse.releaseConnection();
         }
 
-        res = client.delete(toDelete.getPermissions().get(0).getPermissionId());
+        res = client.delete(toDelete.getPermission().get(0).getPermissionId());
         try {
             int statusCode = res.getStatus();
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),

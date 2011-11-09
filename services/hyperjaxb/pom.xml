@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.main</artifactId>
-    <version>1.12-SNAPSHOT</version>
+    <version>1.14-SNAPSHOT</version>
   </parent>
   
   <modelVersion>4.0.0</modelVersion>
@@ -34,7 +34,8 @@
   <artifactId>org.collectionspace.services.hyperjaxb</artifactId>
   <name>services.hyperjaxb</name>
   
-  <dependencies>  
+  <dependencies>
+  <!-- 
 		<dependency>
 		  <groupId>com.sun.xml.bind</groupId>
 		  <artifactId>jaxb-impl</artifactId>
@@ -42,11 +43,12 @@
 		<dependency>
 		  <groupId>org.jvnet.jaxb2-commons</groupId>
 		  <artifactId>property-listener-injector</artifactId>
-		</dependency>    
+		</dependency>   
 		<dependency>
-		  <groupId>org.jvnet.jaxb2_commons</groupId>
-		  <artifactId>runtime</artifactId>
+			<groupId>org.jvnet.jaxb2_commons</groupId>
+			<artifactId>jaxb2-basics-runtime</artifactId>
 		</dependency>
+		 -->
     <!-- Dependencies for HyperJaxB -->
 		<dependency>
 		    <groupId>javax.persistence</groupId>

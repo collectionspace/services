@@ -173,8 +173,8 @@ public class TenantBindingConfigReaderImpl
             tenantBindings.put(tenantBinding.getId(), tenantBinding);
             readDomains(tenantBinding);
             readServiceBindings(tenantBinding);
-            if (logger.isDebugEnabled()) {
-                logger.debug("read() added tenant id=" + tenantBinding.getId()
+            if (logger.isInfoEnabled()) {
+                logger.info("Finished reading tenant bindings for tenant id=" + tenantBinding.getId()
                         + " name=" + tenantBinding.getName());
             }
         }

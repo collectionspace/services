@@ -18,14 +18,12 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
     @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
-            ServletContext sc = event.getServletContext();
-
             //create repository select to stop jboss from jamming
             //our log on top of theirs
 //            LogManager.setRepositorySelector(new CollectionSpaceLog4jRepositorySelector(),
 //                    null);
 
-            ServiceMain svcMain = ServiceMain.getInstance(); //first access initializes as well
+            ServiceMain svcMain = ServiceMain.getInstance();
             svcMain.retrieveAllWorkspaceIds();
 
         } catch (Exception e) {

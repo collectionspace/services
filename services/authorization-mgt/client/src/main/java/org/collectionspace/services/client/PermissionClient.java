@@ -29,8 +29,8 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.PermissionsList;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionsList;
 
 /**
  * A PermissionClient.

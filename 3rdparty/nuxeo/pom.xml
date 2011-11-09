@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.3rdparty</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.14-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -27,10 +27,9 @@
         </dependency>
         <!-- jboss -->
         <dependency>
-            <groupId>jboss</groupId>
-            <artifactId>jboss-remoting</artifactId>
-            <version>2.2.2.SP8</version>
-            <scope>provided</scope>
+		<groupId>org.jboss.remoting</groupId>
+		<artifactId>jboss-remoting</artifactId>
+        <scope>provided</scope>
         </dependency>
     </dependencies>
 

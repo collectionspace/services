@@ -27,20 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.collectionspace.services.authorization.AccountRole;
-import org.collectionspace.services.authorization.AccountRoleRel;
-import org.collectionspace.services.authorization.ActionType;
-import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.CSpaceAction;
-import org.collectionspace.services.authorization.EffectType;
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.PermissionAction;
-import org.collectionspace.services.authorization.PermissionActionUtil;
-import org.collectionspace.services.authorization.PermissionsList;
-import org.collectionspace.services.authorization.PermissionsRolesList;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
+import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.URIResourceImpl;
 
-import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -92,7 +85,7 @@ public class PermissionDocumentHandler
     private void handlePermissionActions(Permission perm) {
     	//FIXME: REM - Having Java class loader issues with ActionType class.  Not sure of the cause.
     	try {
-	        List<PermissionAction> permActions = perm.getActions();
+	        List<PermissionAction> permActions = perm.getAction();
 	        for (PermissionAction permAction : permActions) {
 	            CSpaceAction action = getAction(permAction.getName());
 	            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
@@ -147,10 +140,10 @@ public class PermissionDocumentHandler
         if (from.getEffect() != null) {
             to.setEffect(from.getEffect());
         }
-        List<PermissionAction> fromActions = from.getActions();
+        List<PermissionAction> fromActions = from.getAction();
         if (!fromActions.isEmpty()) {
             //override the whole list, no reconcilliation by design
-            to.setActions(fromActions);
+            to.setAction(fromActions);
         }
 
         if (logger.isDebugEnabled()) {
@@ -209,7 +202,7 @@ public class PermissionDocumentHandler
 
         PermissionsList permissionsList = new PermissionsList();
         List<Permission> list = new ArrayList<Permission>();
-        permissionsList.setPermissions(list);
+        permissionsList.setPermission(list);
         for (Object obj : wrapDoc.getWrappedObject()) {
             Permission permission = (Permission) obj;
             sanitize(permission);

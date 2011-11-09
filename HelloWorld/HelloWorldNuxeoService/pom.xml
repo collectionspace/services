@@ -36,12 +36,6 @@
         </repository>
 
         <repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>http://maven.restlet.org</url>
-        </repository>
-        
-        <repository>
             <id>cspace.local.nuxeo</id>
             <url>${nuxeo.local.repo.dir}</url>
         </repository>
@@ -180,22 +174,6 @@
             <version>${nuxeo.version.1.5}</version>
         </dependency>
 -->
-
-        <dependency>
-            <groupId>org.restlet</groupId>
-            <artifactId>org.restlet</artifactId>
-            <version>1.0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.noelios.restlet</groupId>
-            <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
-            <version>1.0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.noelios.restlet</groupId>
-            <artifactId>com.noelios.restlet</artifactId>
-            <version>1.0.7</version>
-        </dependency>
 
         <dependency>
             <groupId>jaxen</groupId>

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jboss-web>
-  <!-- All secure web resources will use this security domain -->
+   <class-loading java2ClassLoadingCompliance="true"> 
+   </class-loading>
+   <!-- All secure web resources will use this security domain -->
     <security-domain>java:/jaas/cspace</security-domain>
     <context-root>/cspace-services</context-root>
     <!--resource-ref>

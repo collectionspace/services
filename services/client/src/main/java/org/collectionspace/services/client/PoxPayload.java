@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
@@ -270,6 +271,10 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     	try {
     		String thePackage = jaxbObject.getClass().getPackage().getName();
+    		if (thePackage.equals(JAXBElement.class.getPackage().getName())) {
+    			JAXBElement jaxbElement = (JAXBElement)jaxbObject;
+    			thePackage = jaxbElement.getValue().getClass().getPackage().getName();
+    		}
 	    	JAXBContext jc = JAXBContext.newInstance(thePackage);
 	    	//Create marshaller
 	    	Marshaller m = jc.createMarshaller();

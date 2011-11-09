@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.person</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.14-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -18,18 +18,6 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.jaxb2-commons</groupId>
-            <artifactId>property-listener-injector</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.jaxb2_commons</groupId>
-            <artifactId>runtime</artifactId>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>

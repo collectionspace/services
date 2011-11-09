@@ -31,6 +31,8 @@ import javax.ws.rs.core.Response;
 //import org.collectionspace.services.authorization.AccountRolesList;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
+import org.collectionspace.services.account.AccountListItem;
+
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.Role;
@@ -340,8 +342,9 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
             AccountRole output = res.getEntity();
 
-            String sOutput = objectAsXmlString(output, AccountRole.class);
             if(logger.isDebugEnabled()) {
+            	org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();
+            	String sOutput = objectAsXmlString(objectFactory.createAccountRole(output), AccountRole.class);
                 logger.debug(testName + " received " + sOutput);
             }
         } finally {
@@ -404,7 +407,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             AccountRole output = res.getEntity();
             
             // Now verify that the role has 2 accounts associate to it.
-            Assert.assertEquals(output.getAccounts().size(), 1);
+            Assert.assertEquals(output.getAccount().size(), 1);
 
             String sOutput = objectAsXmlString(output, AccountRole.class);
             if(logger.isDebugEnabled()) {
@@ -515,7 +518,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         }
 
         ClientResponse<Response> res = client.delete(
-                toDelete.getAccounts().get(0).getAccountId(), toDelete);
+                toDelete.getAccount().get(0).getAccountId(), toDelete);
         try {
             int statusCode = res.getStatus();
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -543,7 +546,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         	readResponse.releaseConnection();
         }
 
-        res = client.delete(toDelete.getAccounts().get(0).getAccountId());
+        res = client.delete(toDelete.getAccount().get(0).getAccountId());
         try {
             int statusCode = res.getStatus();
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -654,7 +657,8 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, accRole common");
-            logger.debug(objectAsXmlString(accRole, AccountRole.class));
+            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();
+            logger.debug(objectAsXmlString(objectFactory.createAccountRole(accRole), AccountRole.class));
         }
         return accRole;
     }
@@ -732,9 +736,9 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             int statusCode = res.getStatus();
 
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-            List<AccountsCommonList.AccountListItem> items = list.getAccountListItem();
+            List<AccountListItem> items = list.getAccountListItem();
             Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
-            AccountsCommonList.AccountListItem item = items.get(0);
+            AccountListItem item = items.get(0);
             prebuiltAdminCSID = item.getCsid();
             if (logger.isDebugEnabled()) {
                 logger.debug("Found Admin Account with ID: " + prebuiltAdminCSID);

@@ -23,6 +23,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.init.IInitHandler;
@@ -54,8 +56,10 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */
     @Override
-    public void onRepositoryInitialized(ServiceBindingType sbt, List<Field> fields, 
-    			List<Property> properties) throws Exception {
+    public void onRepositoryInitialized(DataSource dataSource,
+    		ServiceBindingType sbt, 
+    		List<Field> fields, 
+    		List<Property> properties) throws Exception {
         //Check for existing privileges, and if not there, grant them
     	for(Property prop:properties) {
     		if(READ_ROLE_NAME_KEY.equals(prop.getKey())) {
@@ -81,7 +85,7 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
             	// Check for rights on report_common, and infer rights from that
             	sql = "SELECT has_table_privilege('"+readerRoleName
             		+"', '"+ReportConstants.DB_COMMON_PART_TABLE_NAME+"', 'SELECT')";
-                conn = JDBCTools.getConnection(JDBCTools.NUXEO_REPOSITORY_NAME);
+                conn = JDBCTools.getConnection(dataSource);
                 stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);
                 if(rs.next()) {

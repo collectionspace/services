@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.authorization;
 
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;

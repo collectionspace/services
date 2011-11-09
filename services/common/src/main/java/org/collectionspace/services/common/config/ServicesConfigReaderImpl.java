@@ -65,7 +65,7 @@ public class ServicesConfigReaderImpl
         }
         File configFile = new File(configFileName);
         if (!configFile.exists()) {
-            String msg = "Could not find configuration file " + configFileName;
+            String msg = "Could not find configuration file " + configFile.getAbsolutePath(); //configFileName;
             logger.error(msg);
             throw new RuntimeException(msg);
         }

@@ -32,7 +32,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jvnet.jaxb2_commons.lang.ToString;
-import org.jvnet.jaxb2_commons.lang.builder.JAXBToStringBuilder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;

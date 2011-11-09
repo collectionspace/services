@@ -132,9 +132,15 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         setupCreate();
         MediaClient client = new MediaClient();
         PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-        ClientResponse<Response> mediaRes = client.create(multipart);
-        assertStatusCode(mediaRes, testName);
-        String mediaCsid = extractId(mediaRes);
+        ClientResponse<Response> mediaRes = null;
+        String mediaCsid = null;
+        try {
+	        mediaRes = client.create(multipart);
+	        assertStatusCode(mediaRes, testName);
+	        mediaCsid = extractId(mediaRes);
+        } finally {
+        	mediaRes.releaseConnection();
+        }
         
         String currentDir = this.getResourceDir();
         String blobsDirPath = currentDir + File.separator + BLOBS_DIR;
@@ -157,17 +163,22 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
 	        	// If we found a good blob candidate file, then try to create the blob record
 	        	//
 	        	if (blobFile != null) {
+	        		client = new MediaClient();
 	        		ClientResponse<Response> res = null;
 	        		String mimeType = this.getMimeType(blobFile);
 	        		logger.debug("Processing file URI: " + blobFile.getAbsolutePath());
 	        		logger.debug("MIME type is: " + mimeType);
-	        		if (fromUri == true) {
-	        			URL childUrl = blobFile.toURI().toURL();
-	        			res = client.createBlobFromUri(mediaCsid, childUrl.toString());
-	        		} else {
-			            MultipartFormDataOutput formData = new MultipartFormDataOutput();
-			            OutputPart outputPart = formData.addFormData("file", blobFile, MediaType.valueOf(mimeType));
-			            res = client.createBlobFromFormData(mediaCsid, formData);
+	        		try {
+		        		if (fromUri == true) {
+		        			URL childUrl = blobFile.toURI().toURL();
+		        			res = client.createBlobFromUri(mediaCsid, childUrl.toString());
+		        		} else {
+				            MultipartFormDataOutput formData = new MultipartFormDataOutput();
+				            OutputPart outputPart = formData.addFormData("file", blobFile, MediaType.valueOf(mimeType));
+				            res = client.createBlobFromFormData(mediaCsid, formData);
+		        		}
+	        		} finally {
+	        			res.releaseConnection();
 	        		}
 		            assertStatusCode(res, testName);
 		            if (isMediaCleanup() == true) {

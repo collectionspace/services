@@ -112,7 +112,9 @@ public class RoleDocumentHandler
         }
         // Note that we do not allow update of locks
         if (logger.isDebugEnabled()) {
-            logger.debug("merged role=" + JaxbUtils.toString(to, Role.class));
+        	org.collectionspace.services.authorization.ObjectFactory objectFactory =
+        		new org.collectionspace.services.authorization.ObjectFactory();
+            logger.debug("merged role=" + JaxbUtils.toString(objectFactory.createRole(to) ,Role.class));
         }
         return to;
     }
@@ -158,7 +160,7 @@ public class RoleDocumentHandler
 
         RolesList rolesList = new RolesList();
         List<Role> list = new ArrayList<Role>();
-        rolesList.setRoles(list);
+        rolesList.setRole(list);
         for (Object obj : wrapDoc.getWrappedObject()) {
             Role role = (Role) obj;
             sanitize(role);

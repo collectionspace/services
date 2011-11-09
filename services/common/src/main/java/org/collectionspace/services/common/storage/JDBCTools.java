@@ -22,6 +22,7 @@ import org.collectionspace.services.common.api.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
@@ -46,36 +47,73 @@ public class JDBCTools {
 
     //todo: make sure this will get instantiated in the right order
     final static Logger logger = LoggerFactory.getLogger(JDBCTools.class);
+    
+    public static DataSource getDataSource(String repositoryName) throws NamingException {
+    	DataSource result = null;
+    	InitialContext ctx = new InitialContext();
+    	Context envCtx = null;
+    	
+        if (logger.isDebugEnabled() == true) {
+        	logger.debug("Looking up datasource in JNDI with name: " + repositoryName);
+        }
+            	
+    	try {
+	        envCtx = (Context) ctx.lookup("java:comp/env");
+	        DataSource ds = (DataSource) envCtx.lookup("jdbc/" + repositoryName);
+	        if (ds == null) {
+	            throw new IllegalArgumentException("datasource not found: " + repositoryName);
+	        } else {
+	        	result = ds;
+	        }
+    	} finally {
+            if (ctx != null) {
+                try {
+                    ctx.close();
+                } catch (Exception e) {
+                	logger.error("Error getting DataSource for: " + repositoryName, e);
+                }
+            }
+            if (envCtx != null) {
+                try {
+                	envCtx.close();
+                } catch (Exception e) {
+                	logger.error("Error getting DataSource for: " + repositoryName, e);
+                }
+            }
+    	}
+    	return result;
+    }
+    
+    /*
+     * This is a wrapper around DataSource's getConnectionMethod -mainly exists modularize all connection related code to JDBCTool class.
+     */
+    public static Connection getConnection(DataSource dataSource) throws SQLException {
+    	Connection result = null;
+    	result = dataSource.getConnection();
+    	return result;
+    }
 
     public static Connection getConnection(String repositoryName) throws LoginException, SQLException {
-        if (Tools.isEmpty(repositoryName)) {
+    	Connection result = null;
+    	
+    	if (Tools.isEmpty(repositoryName)) {
             repositoryName = getDefaultRepositoryName();
         }
-        InitialContext ctx = null;
+        
         Connection conn = null;
         try {
-            ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(repositoryName);
-            if (ds == null) {
-                throw new IllegalArgumentException("datasource not found: " + repositoryName);
-            }
+            DataSource ds = getDataSource(repositoryName);
             conn = ds.getConnection();
-            return conn;
+            result = conn;
         } catch (NamingException ex) {
             LoginException le = new LoginException("Error looking up DataSource from: " + repositoryName);
             le.initCause(ex);
             throw le;
         } catch (SQLException e) {
             throw e;
-        } finally {
-            if (ctx != null) {
-                try {
-                    ctx.close();
-                } catch (Exception e) {
-                    // Do nothing with exception in 'finally' clause.
-                }
-            }
         }
+        
+        return result;
     }
 
 
@@ -111,11 +149,11 @@ public class JDBCTools {
         }
     } */
 
-    public static int executeUpdate(String repoName, String sql) throws Exception {
+    public static int executeUpdate(DataSource dataSource, String sql) throws Exception {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = getConnection(repoName);	// If null, uses default
+            conn = getConnection(dataSource);
             stmt = conn.createStatement();
             int rows = stmt.executeUpdate(sql);
             stmt.close();
@@ -165,7 +203,7 @@ public class JDBCTools {
     	if(DBProductName==null) {
 	        Connection conn = null;
 	        try {
-	            conn = getConnection(getDefaultRepositoryName());
+	            conn = getConnection(getDefaultRepositoryName()); //FIXME: REM - getDefaultRepositoryName returns the Nuxeo repo name -we should be using the "cspace" repo name
 	            DBProductName = conn.getMetaData().getDatabaseProductName();
 	        } catch (Exception e) {
 	        } finally {

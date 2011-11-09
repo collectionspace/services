@@ -115,17 +115,14 @@
 
     <target name="deploy" depends="package"
     	description="deploy nuxeo client libs to ${jboss.server.cspace}">
-        <copy todir="${jboss.server.cspace}/nuxeo-client/lib">
-            <fileset dir="${basedir}/nuxeo-client/lib">
-                <include name="*.jar"/>
-            </fileset>
-            <fileset dir="${basedir}/nuxeo-client/lib/${nuxeo.release}">
-                <include name="*.jar"/>
-            </fileset>
+        <copy todir="${jboss.server.cspace}/nuxeo-client">
+            <fileset dir="${basedir}/nuxeo-client/lib/${nuxeo.release}"/>
         </copy>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
+    	<!--
 		<ant antfile="nuxeo-platform-quote/build.xml" target="deploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote-api/build.xml" target="deploy" inheritall="false"/>
+		-->
         <ant antfile="nuxeo-database-templates/build.xml" target="deploy" inheritall="false"/>
     </target>
 

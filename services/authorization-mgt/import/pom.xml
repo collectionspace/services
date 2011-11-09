@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.authorization-mgt</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.14-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -22,10 +22,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>

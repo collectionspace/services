@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.collectionspace.services</groupId>
 		<artifactId>org.collectionspace.services.3rdparty.nuxeo</artifactId>
-		<version>1.12-SNAPSHOT</version>
+		<version>1.14-SNAPSHOT</version>
 	</parent>
 
   <groupId>org.collectionspace.services</groupId>
@@ -75,8 +75,8 @@
       <artifactId>jms</artifactId>
     </dependency>
     <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss-j2ee</artifactId>
+	  <groupId>org.jboss.javaee</groupId>
+	  <artifactId>jboss-javaee</artifactId>	  
     </dependency>
     
     <dependency>
@@ -101,13 +101,13 @@
     <dependency>
       <groupId>org.nuxeo.ecm.core</groupId>
       <artifactId>nuxeo-core-jcr-connector</artifactId>
-      <version>${nuxeo.core.version}</version>
+      <version>1.6.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.core</groupId>
       <artifactId>nuxeo-core-jcr-connector-test</artifactId>
-      <version>${nuxeo.core.version}</version>
+      <version>1.6.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>

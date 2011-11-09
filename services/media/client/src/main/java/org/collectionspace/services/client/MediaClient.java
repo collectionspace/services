@@ -68,7 +68,7 @@ public class MediaClient extends AbstractCommonListPoxServiceClientImpl<MediaPro
      *
      */
     public ClientResponse<Response> createBlobFromUri(String csid, String blobUri) {
-        return getProxy().createBlobFromUri(csid, blobUri);
+        return getProxy().createBlobFromUri(csid, blobUri, blobUri); //send the URI as both a query param and as content
     }    
         
     /**

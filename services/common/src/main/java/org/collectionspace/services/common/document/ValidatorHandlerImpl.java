@@ -1,17 +1,9 @@
 package org.collectionspace.services.common.document;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
 
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
-import org.collectionspace.services.relation.RelationsCommon;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,17 +22,54 @@ public abstract class ValidatorHandlerImpl<IT, OT> implements ValidatorHandler<I
     	return ctx;
     }
     
-    protected void setServiceContext(ServiceContext<IT, OT> ctx) {
+    // gets reset by calls to setServiceContext() method
+    protected boolean enforceAsserts = true;
+    
+    public boolean getEnforceAsserts() {
+		return enforceAsserts;
+	}
+
+	public void setEnforceAsserts(ServiceContext<IT, OT> ctx) {
+		Boolean disableAssertsAttr = ctx.getServiceBinding().isDisableAsserts();
+		if (disableAssertsAttr == null) {
+			enforceAsserts = true;
+		} else {
+			enforceAsserts = !disableAssertsAttr.booleanValue();
+		}
+	}
+
+	protected void setServiceContext(ServiceContext<IT, OT> ctx) {
     	this.ctx = ctx;
+    	
+    }
+    
+    protected void CS_ASSERT(boolean expression, String errorMsg) throws AssertionError {
+    	if (expression != true) {
+    		if (errorMsg == null) {
+    			errorMsg = "Validation exception occurred in: " +
+					this.getClass().getName();
+    		}
+    		throw new AssertionError(errorMsg);
+    	}
+    }
+    
+    protected void CS_ASSERT(boolean expression) throws AssertionError {
+    	CS_ASSERT(expression, null);
     }
 	
+    private void init(ServiceContext<IT, OT> ctx) {
+    	setEnforceAsserts(ctx);
+		setServiceContext(ctx);
+    }
+    
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.common.document.ValidatorHandler#validate(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.context.ServiceContext)
 	 */
 	@Override
     public void validate(Action action, ServiceContext<IT, OT> ctx)
     		throws InvalidDocumentException {
-		setServiceContext(ctx);
+		init(ctx);
+		
 		switch (action) {
 			case CREATE:
 				handleCreate();
@@ -62,6 +91,10 @@ public abstract class ValidatorHandlerImpl<IT, OT> implements ValidatorHandler<I
 						action);
 		}    	
     }
+	
+	protected boolean enforceAsserts() {
+		return !ctx.getServiceBinding().isDisableAsserts();
+	}
 	
     protected Object getCommonPart() {
     	Object result = null;    	

@@ -25,13 +25,13 @@ package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.collectionspace.services.authorization.ActionType;
+import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.CSpaceResource;
-import org.collectionspace.services.authorization.EffectType;
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.perms.EffectType;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
@@ -66,7 +66,7 @@ public class AuthorizationDelegate {
         SubjectType subject = PermissionRoleUtil.getRelationSubject(ctx, pr);
         AuthZ authz = AuthZ.get();
         if (subject.equals(SubjectType.ROLE)) {
-            PermissionValue pv = pr.getPermissions().get(0);
+            PermissionValue pv = pr.getPermission().get(0);
             Permission p = getPermission(pv.getPermissionId());
             if (p == null) {
                 String msg = "addPermissions: No permission found for id=" + pv.getPermissionId();
@@ -74,13 +74,13 @@ public class AuthorizationDelegate {
                 throw new DocumentNotFoundException(msg);
             }
             CSpaceResource[] resources = getResources(p);
-            String[] roles = getRoles(pr.getRoles());
+            String[] roles = getRoles(pr.getRole());
             for (CSpaceResource res : resources) {
                 boolean grant = p.getEffect().equals(EffectType.PERMIT) ? true : false;
                 authz.addPermissions(res, roles, grant);
             }
         } else if (SubjectType.PERMISSION.equals(subject)) {
-            RoleValue rv = pr.getRoles().get(0);
+            RoleValue rv = pr.getRole().get(0);
             Role r = getRole(rv.getRoleId());
             if (r == null) {
                 String msg = "addPermissions: No role found for id=" + rv.getRoleId();
@@ -90,7 +90,7 @@ public class AuthorizationDelegate {
             //using r not rv ensures we're getting the "ROLE" prefix/qualified name
             // This needs to use the qualified name, not the display name
             String[] roles = {r.getRoleName()};
-            for (PermissionValue pv : pr.getPermissions()) {
+            for (PermissionValue pv : pr.getPermission()) {
                 Permission p = getPermission(pv.getPermissionId());
                 if (p == null) {
                     String msg = "addPermissions: No permission found for id=" + pv.getPermissionId();
@@ -118,7 +118,7 @@ public class AuthorizationDelegate {
         SubjectType subject = PermissionRoleUtil.getRelationSubject(ctx, pr);
         AuthZ authz = AuthZ.get();
         if (subject.equals(SubjectType.ROLE)) {
-        	List<PermissionValue> permissionValues = pr.getPermissions();
+        	List<PermissionValue> permissionValues = pr.getPermission();
         	if (permissionValues != null & permissionValues.size() > 0) {
 	            PermissionValue pv = permissionValues.get(0);
 	            Permission p = getPermission(pv.getPermissionId());
@@ -128,13 +128,13 @@ public class AuthorizationDelegate {
 	                throw new DocumentNotFoundException(msg);
 	            }
 	            CSpaceResource[] resources = getResources(p);
-	            String[] roles = getRoles(pr.getRoles());
+	            String[] roles = getRoles(pr.getRole());
 	            for (CSpaceResource res : resources) {
 	                authz.deletePermissions(res, roles);
 	            }
         	}
         } else if (SubjectType.PERMISSION.equals(subject)) {
-        	List<RoleValue> roleValues = pr.getRoles();
+        	List<RoleValue> roleValues = pr.getRole();
         	if (roleValues != null && roleValues.size() > 0) {
 	            RoleValue rv = roleValues.get(0);
 	            Role r = getRole(rv.getRoleId());
@@ -146,7 +146,7 @@ public class AuthorizationDelegate {
 	            //using r not rv ensures we're getting the "ROLE" prefix/qualified name
 	            // This needs to use the qualified name, not the display name
 	            String[] roles = {r.getRoleName()}; 
-	            for (PermissionValue pv : pr.getPermissions()) {
+	            for (PermissionValue pv : pr.getPermission()) {
 	                Permission p = getPermission(pv.getPermissionId());
 	                if (p == null) {
 	                    String msg = "deletePermissions: No permission found for id=" + pv.getPermissionId();
@@ -225,7 +225,7 @@ public class AuthorizationDelegate {
     private static CSpaceResource[] getResources(Permission p) {
         List<CSpaceResource> rl = new ArrayList<CSpaceResource>();
 
-        for (PermissionAction pa : p.getActions()) {
+        for (PermissionAction pa : p.getAction()) {
             CSpaceResource res = null;
             if (p.getTenantId() == null) {
                 res = new URIResourceImpl(p.getResourceName(),

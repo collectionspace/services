@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import org.collectionspace.services.authorization.AuthZ;
-import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.Role;

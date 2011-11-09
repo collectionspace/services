@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.authentication</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.14-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -61,10 +61,15 @@
             <version>2.1.0.GA</version>
         </dependency>
         <dependency>
+        <!--
             <groupId>jboss</groupId>
             <artifactId>jbosssx</artifactId>
             <version>4.2.3.GA</version>
+            -->
+		  <groupId>org.jboss.security</groupId>
+		  <artifactId>jbosssx</artifactId>
             <scope>provided</scope>
+			<version>2.0.3.SP1</version>            
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>

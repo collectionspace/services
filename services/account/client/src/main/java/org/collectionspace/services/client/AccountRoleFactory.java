@@ -61,7 +61,7 @@ public class AccountRoleFactory {
         if (usePermId) {
             ArrayList<AccountValue> pvs = new ArrayList<AccountValue>();
             pvs.add(pv);
-            accRole.setAccounts(pvs);
+            accRole.setAccount(pvs);
         }
         if (useRoleId) {
             //FIXME is there a better way?
@@ -69,7 +69,7 @@ public class AccountRoleFactory {
             for (RoleValue rv : rvs) {
                 rvas.add(rv);
             }
-            accRole.setRoles(rvas);
+            accRole.setRole(rvas);
         }
 
         return accRole;

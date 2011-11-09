@@ -24,10 +24,6 @@
     jaxb:extensionBindingPrefixes="hj orm xjc"
     >
 
-    <!--
-    Avoid XmlRootElement nightmare:
-    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
--->
 <!--
     Notes for MySQL
     MySQL puts key length limit of 1000 bytes
@@ -35,16 +31,6 @@
     hbm2ddl makes column length >= 256 as long text, such as column cannot be used
     in defining a key (pk, fk or constraint)
     -->
-    <!--xs:annotation>
-    Note that roles.xsd already defines global bindings for the authorization namespace
-    so, it is not necessary to give the bindingings here because all the xsds are compiled
-    at once for this namespace
-        <xs:appinfo>
-            <jaxb:globalBindings>
-                <xjc:simple />
-            </jaxb:globalBindings>
-        </xs:appinfo>
-    </xs:annotation-->
 
     <xs:include schemaLocation="authorization_common.xsd"/>
 
