@@ -143,8 +143,8 @@ public class OrgAuthorityClientUtils {
         OrgauthoritiesCommon orgAuthority = new OrgauthoritiesCommon();
         orgAuthority.setDisplayName(displayName);
         orgAuthority.setShortIdentifier(shortIdentifier);
-        //String refName = createOrgAuthRefName(shortIdentifier, displayName);
-        //orgAuthority.setRefName(refName);
+        String refName = createOrgAuthRefName(shortIdentifier, displayName);
+        orgAuthority.setRefName(refName);
         orgAuthority.setVocabType("OrgAuthority");
         PoxPayloadOut multipart = new PoxPayloadOut(OrgAuthorityClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
@@ -258,8 +258,8 @@ public class OrgAuthorityClientUtils {
        	if((value = (String)orgInfo.get(OrganizationJAXBSchema.SHORT_DISPLAY_NAME))!=null)
         	organization.setShortDisplayName(value);
    		
-    	//String refName = createOrganizationRefName(orgAuthRefName, shortId, value);
-    	//organization.setRefName(refName);
+    	String refName = createOrganizationRefName(orgAuthRefName, shortId, value);
+    	organization.setRefName(refName);
 
         if (mainBodyList != null) {
             organization.setMainBodyGroupList(mainBodyList);
@@ -359,7 +359,6 @@ public class OrgAuthorityClientUtils {
      * @param displaySuffix displayName to be appended, if non-null
      * @return the string
      */
-    /*
     public static String createOrgAuthRefName(String shortId, String displaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:orgauthority:name("
 			+shortId+")";
@@ -367,7 +366,6 @@ public class OrgAuthorityClientUtils {
     		refName += "'"+displaySuffix+"'";
     	return refName;
     }
-    */
 
     /**
      * Creates the organization ref name.
@@ -377,7 +375,6 @@ public class OrgAuthorityClientUtils {
      * @param displaySuffix displayName to be appended, if non-null
      * @return the string
      */
-    /*
     public static String createOrganizationRefName(
 			String orgAuthRefName, String shortId, String displaySuffix) {
     	String refName = orgAuthRefName+":organization:name("+shortId+")";
@@ -385,7 +382,6 @@ public class OrgAuthorityClientUtils {
     		refName += "'"+displaySuffix+"'";
     	return refName;
     }
-    */
 
     /**
      * Produces a default displayName from the basic name and foundingPlace fields.

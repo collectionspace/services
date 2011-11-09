@@ -52,7 +52,7 @@
         <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.authority.service</artifactId>
+            <artifactId>org.collectionspace.services.authority</artifactId>
             <version>${project.version}</version>
         </dependency>        
         <dependency>

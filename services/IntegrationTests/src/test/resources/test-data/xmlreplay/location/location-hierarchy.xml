@@ -61,30 +61,24 @@
             	<var ID="name">Aisle 3</var>
             </vars>
         </test>
-
-				<test ID="Location1_old">
-            <method>POST</method>
-            <uri>/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
-            <filename>location/hierarchy/3-locations_w_relations_CSID.xml</filename>
-            <vars>
-							<var ID="name">Cabinet 1</var>
-            	<var ID="parentCSID">${LocationParent.CSID}</var>
-            	<var ID="childCSID">${LocationChild1.CSID}</var>
-            	<var ID="child2CSID">${LocationChild2.CSID}</var>
-            	<var ID="child3CSID">${LocationChild3.CSID}</var>
-            </vars>
-        </test>
         
         <test ID="Location1">
             <method>POST</method>
             <uri>/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
-            <filename>location/hierarchy/5-locations_w_relations_RefNames.xml</filename>
+            <filename>location/hierarchy/3-locations_w_relations.xml</filename>
             <vars>
-            	<var ID="shortIdentifier">Cabinet1a</var>
-							<var ID="name">Cabinet 1a</var>
+            	<var ID="inAuthority">${LocationAuth1.CSID}</var>
+            	<var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
+            	<var ID="shortIdentifier">Cabinet1</var>
+            	<var ID="name">Cabinet 1</var>
+            	<var ID="parentCSID">${LocationParent.CSID}</var>
+            	<var ID="parentUri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority-setting-error-parent)/items/${LocationParent.CSID}</var>
             	<var ID="childCSID">${LocationChild1.CSID}</var>
+            	<var ID="childUri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/${LocationChild1.CSID}</var>
             	<var ID="child2CSID">${LocationChild2.CSID}</var>
+            	<var ID="child2Uri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/${LocationChild2.CSID}</var>
             	<var ID="child3CSID">${LocationChild3.CSID}</var>
+            	<var ID="child3Uri">/cspace-services/locationauthorities/urn:cspace:name(CSPACE3739LocationAuthority)/items/${LocationChild3.CSID}</var>
             </vars>
         </test>
         

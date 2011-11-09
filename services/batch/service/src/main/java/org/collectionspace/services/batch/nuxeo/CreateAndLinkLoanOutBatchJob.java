@@ -13,8 +13,6 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
-import org.collectionspace.services.client.LoanoutClient;
-import org.collectionspace.services.client.RelationClient;
 
 public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 
@@ -133,9 +131,9 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 		  +"</ns2:loansout_common></document>";
 
 		// First, create the Loanout
-		// We fetch the resource class by service name
-		ResourceBase resource = resourceMap.get( LoanoutClient.SERVICE_NAME); 
-		Response response = resource.create(resourceMap, null, loanoutPayload);
+		ResourceBase resource = 
+			resourceMap.get("org.collectionspace.services.loanout.LoanoutResource");
+		Response response = resource.create(null, loanoutPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;
 			errorInfo = new InvocationError(INT_ERROR_STATUS,
@@ -160,8 +158,9 @@ public class CreateAndLinkLoanOutBatchJob implements BatchInvocable {
 			+   "<relationshipType>"+RELATION_TYPE+"</relationshipType>"
 			+   "<predicateDisplayName>"+RELATION_PREDICATE_DISP+"</predicateDisplayName>"
 			+ "</ns2:relations_common></document>";
-		ResourceBase resource = resourceMap.get(RelationClient.SERVICE_NAME);
-		Response response = resource.create(resourceMap, null, relationPayload);
+		ResourceBase resource = 
+			resourceMap.get("org.collectionspace.services.relation.RelationResource");
+		Response response = resource.create(null, relationPayload);
 		if(response.getStatus() != CREATED_STATUS) {
 			completionStatus = STATUS_ERROR;
 			errorInfo = new InvocationError(INT_ERROR_STATUS,

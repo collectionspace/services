@@ -169,9 +169,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         String shortId = createIdentifier();
         String displayName = "displayName-" + shortId;
-        // String baseRefName =
-        //        TaxonomyAuthorityClientUtils.createTaxonomyAuthRefName(shortId, null);
-        final String EMPTY_REFNAME = "";
+        String baseRefName =
+                TaxonomyAuthorityClientUtils.createTaxonomyAuthRefName(shortId, null);
+
         PoxPayloadOut multipart =
                 TaxonomyAuthorityClientUtils.createTaxonomyAuthorityInstance(
                 displayName, shortId, client.getCommonPartName());
@@ -200,7 +200,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null) {
-            setKnownResource(newID, shortId, EMPTY_REFNAME);
+            setKnownResource(newID, shortId, baseRefName);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -1123,14 +1123,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         nonexMap.put(TaxonJAXBSchema.NAME, TEST_TAXON_FULL_NAME);
         nonexMap.put(TaxonJAXBSchema.SHORT_IDENTIFIER, "nonEx");
         nonexMap.put(TaxonJAXBSchema.TERM_STATUS, TEST_TERM_STATUS);
-        // PoxPayloadOut multipart =
-        //        TaxonomyAuthorityClientUtils.createTaxonInstance(
-        //        TaxonomyAuthorityClientUtils.createTaxonomyRefName(knownResourceRefName, "nonEx", "Non Existent"),
-        //        nonexMap, NULL_TAXON_AUTHOR_GROUP_LIST, NULL_TAXON_CITATION_LIST,
-        //        client.getItemCommonPartName());
-        final String EMPTY_REFNAME = "";
         PoxPayloadOut multipart =
-                TaxonomyAuthorityClientUtils.createTaxonInstance(EMPTY_REFNAME,
+                TaxonomyAuthorityClientUtils.createTaxonInstance(
+                TaxonomyAuthorityClientUtils.createTaxonomyRefName(knownResourceRefName, "nonEx", "Non Existent"),
                 nonexMap, NULL_TAXON_AUTHOR_GROUP_LIST, NULL_TAXON_CITATION_LIST,
                 client.getItemCommonPartName());
         ClientResponse<String> res =

@@ -31,11 +31,6 @@
         </dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
-            <version>${project.version}</version>
-        </dependency>        
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
             <optional>true</optional>
             <version>${project.version}</version>

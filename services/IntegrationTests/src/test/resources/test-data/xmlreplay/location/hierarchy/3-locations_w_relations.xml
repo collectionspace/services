@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="locations">
+  <ns2:locations_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <inAuthority>${inAuthority}</inAuthority>
+    <shortIdentifier>${shortIdentifier}</shortIdentifier>
+    <refName>urn:cspace:org.collectionspace.demo:locationauthority:name(${authShortIdentifier}):location:name(${shortIdentifier})'${name}'</refName>
+    <displayName>${name}</displayName>
+    <displayNameComputed>false</displayNameComputed>
+    <shortDisplayNameComputed>true</shortDisplayNameComputed>
+  </ns2:locations_common>
+  <!-- 
+       WARNING: ${itemCSID} does NOT get expanded by XmlReplay. 
+	   It passes through and then the service deals with it.
+  -->
+  <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <relation-list-item>
+		<predicate>hasBroader</predicate>
+		<subject>
+		  <csid>${itemCSID}</csid>
+		  <documentType>Locationitem</documentType>
+		</subject>
+		<object>
+		  <csid>${parentCSID}</csid>
+		  <uri>${parentUri}</uri>
+		  <documentType>Locationitem</documentType>
+		</object>
+	</relation-list-item>
+	<relation-list-item>
+		<predicate>hasBroader</predicate>
+		<subject>
+		  <csid>${childCSID}</csid>
+		  <uri>${childUri}</uri>
+		  <documentType>Locationitem</documentType>
+		  <name>Child1</name>
+		  <number>2200</number>
+		</subject>
+		<object>
+		  <csid>${itemCSID}</csid>
+		  <documentType>Locationitem</documentType>
+		  <name>Item</name>
+		  <number>1111</number>
+		</object>
+	</relation-list-item>
+	<relation-list-item>
+		<predicate>hasBroader</predicate>
+		<subject>
+		  <uri>${child2Uri}</uri>
+		  <csid>${child2CSID}</csid>
+		  <documentType>Locationitem</documentType>
+		  <name>Child2</name>
+		  <number>2222</number>
+		</subject>
+		<object>
+		  <csid>${itemCSID}</csid>
+		  <documentType>Locationitem</documentType>
+		  <name>Item</name>
+		  <number>1111</number>
+		</object>
+	</relation-list-item>
+	<relation-list-item>
+		<predicate>hasBroader</predicate>
+		<subject>
+		  <uri>${child3Uri}</uri>
+		  <csid>${child3CSID}</csid>
+		  <documentType>Locationitem</documentType>
+		  <name>Child3</name>
+		  <number>3333</number>
+		</subject>
+		<object>
+		  <csid>${itemCSID}</csid>
+		  <documentType>Locationitem</documentType>
+		  <name>Item</name>
+		  <number>1111</number>
+		</object>
+	</relation-list-item>
+  </ns3:relations-common-list>
+</document>
+
+

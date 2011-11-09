@@ -95,28 +95,6 @@ public class RoleResource extends SecurityResourceBase {
     public Role getRole(@PathParam("csid") String csid) {
         return (Role)get(csid, Role.class);
     }
-    
-    /*
-     * Get a list of accounts associated with this role.
-     */
-    @GET
-    @Path("{csid}/accountroles")
-    public AccountRole getRoleAccounts(
-            @PathParam("csid") String accCsid) {
-        logger.debug("getAccountRole with accCsid=" + accCsid);
-        ensureCSID(accCsid, ServiceMessages.GET_FAILED+ "accountroles role ");
-        AccountRole result = null;
-        try {
-            AccountRoleSubResource subResource =
-                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
-            //get relationships for a role
-            result = subResource.getAccountRole(accCsid, SubjectType.ACCOUNT);
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.GET_FAILED, accCsid);
-        }
-        checkResult(result, accCsid, ServiceMessages.GET_FAILED);
-        return result;
-    }
 
     @GET
     @Produces("application/xml")

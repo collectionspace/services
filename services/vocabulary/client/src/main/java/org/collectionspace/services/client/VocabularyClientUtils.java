@@ -26,8 +26,8 @@ public class VocabularyClientUtils {
         VocabulariesCommon vocabulary = new VocabulariesCommon();
         vocabulary.setDisplayName(displayName);
         vocabulary.setShortIdentifier(shortIdentifier);
-        //String refName = createVocabularyRefName(shortIdentifier, displayName);
-        //vocabulary.setRefName(refName);
+        String refName = createVocabularyRefName(shortIdentifier, displayName);
+        vocabulary.setRefName(refName);
         vocabulary.setVocabType("enum");
         PoxPayloadOut multipart = new PoxPayloadOut(VocabularyClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
@@ -50,8 +50,8 @@ public class VocabularyClientUtils {
     	String displayName = vocabItemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME);
        	vocabularyItem.setShortIdentifier(shortId);
        	vocabularyItem.setDisplayName(displayName);
-    	//String refName = createVocabularyItemRefName(vocabularyRefName, shortId, displayName);
-       	//vocabularyItem.setRefName(refName);
+    	String refName = createVocabularyItemRefName(vocabularyRefName, shortId, displayName);
+       	vocabularyItem.setRefName(refName);
        	PoxPayloadOut multipart = new PoxPayloadOut(VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(vocabularyItem,
             MediaType.APPLICATION_XML_TYPE);
@@ -76,7 +76,7 @@ public class VocabularyClientUtils {
     		logger.debug("Import: Create Item: \""+itemMap.get(AuthorityItemJAXBSchema.SHORT_IDENTIFIER)
     				+"\" in personAuthority: \"" + vcsid +"\"");
     	}
-    	PoxPayloadOut multipart = createVocabularyItemInstance(null, //vocabularyRefName,
+    	PoxPayloadOut multipart = createVocabularyItemInstance(vocabularyRefName,
     				itemMap, client.getCommonPartItemName());
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
@@ -84,12 +84,12 @@ public class VocabularyClientUtils {
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not create Item: \"" + itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-    				+ "\" in personAuthority: \"" + vcsid //vocabularyRefName
+    				+ "\" in personAuthority: \"" + vocabularyRefName
     				+ "\" " + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating Item: \""+itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-    				+ "\" in personAuthority: \"" + vcsid /*vocabularyRefName*/ + "\", Status:" + statusCode);
+    				+ "\" in personAuthority: \"" + vocabularyRefName + "\", Status:" + statusCode);
     	}
 
     	return extractId(res);
@@ -126,7 +126,6 @@ public class VocabularyClientUtils {
         return id;
     }
     
-    /*
     public static String createVocabularyRefName(String shortIdentifier, String displaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:vocabulary:name("
     			+ shortIdentifier + ")";
@@ -142,6 +141,5 @@ public class VocabularyClientUtils {
     		refName += "'" + displaySuffix + "'";
     	return refName;
     }
-    */
 
 }

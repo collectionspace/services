@@ -37,7 +37,7 @@
         </dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
+            <artifactId>org.collectionspace.services.authority</artifactId>
             <optional>true</optional>
             <version>${project.version}</version>
         </dependency>        

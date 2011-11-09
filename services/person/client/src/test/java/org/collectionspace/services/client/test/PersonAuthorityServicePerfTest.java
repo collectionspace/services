@@ -59,7 +59,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
 //    final String SERVICE_PATH_COMPONENT = "personauthorities";
 //    final String ITEM_SERVICE_PATH_COMPONENT = "items";
     private String authId = null;
-    //private String authRefName = null;
+    private String authRefName = null;
     private List<String> allItemIdsCreated = new ArrayList<String>();
     private String[] firstNames = { 
     		"Ann","Anne","Anno",
@@ -155,7 +155,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
         PersonAuthorityClient client = new PersonAuthorityClient();
         String shortId = "perfTestPersons";
     	String displayName = "Perf Test Person Auth";
-    	//String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
+    	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
     	PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
@@ -176,7 +176,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     	}
         // Store the refname from the first resource created
         // for additional tests below.
-    	//authRefName = baseRefName;
+    	authRefName = baseRefName;
         // Store the ID returned from the first resource created
         // for additional tests below.
     	authId = newID;
@@ -211,7 +211,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
         personMap.put(PersonJAXBSchema.SUR_NAME, lastName);
         Map<String, List<String>> personRepeatablesMap = new HashMap<String, List<String>>();
         PoxPayloadOut multipart =
-            PersonAuthorityClientUtils.createPersonInstance(authId, null, //authRefName, 
+            PersonAuthorityClientUtils.createPersonInstance(authId, authRefName, 
             		personMap, personRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;

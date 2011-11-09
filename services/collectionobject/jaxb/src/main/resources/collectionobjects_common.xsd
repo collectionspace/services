@@ -248,29 +248,15 @@
                 maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-
     <xs:complexType name="titleGroup">
         <xs:sequence>
             <xs:element name="title" type="xs:string"/>
             <xs:element name="titleLanguage" type="xs:string"/>
-            <xs:element name="titleTranslationSubGroupList" type="titleTranslationSubGroupList"/>
+            <xs:element name="titleTranslation" type="xs:string"/>
+            <xs:element name="titleTranslationLanguage" type="xs:string"/>
             <xs:element name="titleType" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
-    <xs:complexType name="titleTranslationSubGroupList">
-        <xs:sequence>
-            <xs:element name="titleTranslationSubGroup" type="titleTranslationSubGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="titleTranslationSubGroup">
-        <xs:sequence>
-            <xs:element name="titleTranslation" type="xs:string"/>
-            <xs:element name="titleTranslationLanguage" type="xs:string"/>
-        </xs:sequence>
-     </xs:complexType>
 
         <xs:complexType name="contentEventNameGroupList">
         <xs:sequence>
@@ -397,11 +383,9 @@
     </xs:complexType>
     <xs:complexType name="dimensionGroup">
         <xs:sequence>
-            <xs:element name="measuredPart" type="xs:string"/>
             <xs:element name="dimension" type="xs:string"/>
-            <xs:element name="measuredBy" type="xs:string"/>
+            <xs:element name="measuredPart" type="xs:string"/>
             <xs:element name="measurementUnit" type="xs:string"/>
-            <xs:element name="measurementMethod" type="xs:string"/>
             <xs:element name="value" type="xs:decimal"/>
             <xs:element name="valueDate" type="xs:string"/>
             <xs:element name="valueQualifier" type="xs:string"/>

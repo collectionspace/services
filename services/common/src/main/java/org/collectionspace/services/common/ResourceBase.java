@@ -26,7 +26,6 @@ package org.collectionspace.services.common;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -79,15 +78,13 @@ public abstract class ResourceBase
 
 
     //======================= CREATE ====================================================
-    
     @POST
-    public Response create(@Context ResourceMap resourceMap, @Context UriInfo ui,
+    public Response create(@Context UriInfo ui,
             String xmlPayload) {
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             //System.out.println("\r\n\r\n==============================\r\nxmlPayload:\r\n"+xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
-            ctx.setResourceMap(resourceMap);
             return create(input, ctx);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
@@ -119,13 +116,12 @@ public abstract class ResourceBase
     //======================= UPDATE ====================================================
     @PUT
     @Path("{csid}")
-    public byte[] update(@Context ResourceMap resourceMap, @PathParam("csid") String csid, String xmlPayload) {
+    public byte[] update(@PathParam("csid") String csid, String xmlPayload) {
         PoxPayloadOut result = null;
         ensureCSID(csid, UPDATE);
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
-            ctx.setResourceMap(resourceMap);
             result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
@@ -340,35 +336,4 @@ public abstract class ResourceBase
         }
         return authRefList;
     }
-    
-    //======================== UTILITY : getDocModelForRefName ========================================
-    /*
-     * ResourceBase create and update calls will set the resourceMap into the service context
-     * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
-     * the map, and pass it in.
-     */
-    public static DocumentModel getDocModelForRefName(String refName, ResourceMap resourceMap) 
-   			throws Exception, DocumentNotFoundException {
-    	// TODO - we need to generalize the idea of a refName to more than Authorities and Items. 
-    	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
-    	if(item == null) {
-    		return null;
-    	}
-    	ResourceBase resource = resourceMap.get(item.inAuthority.resource);
-    	return resource.getDocModelForAuthorityItem(item);
-    }
-
-    // THis is ugly, but prevents us parsing the refName twice. Once we make refName a little more
-    // general, and less Authority(Item) specific, this will look better.
-   	public DocumentModel getDocModelForAuthorityItem(RefName.AuthorityItem item) 
-   			throws Exception, DocumentNotFoundException {
-   		logger.warn("Default (ResourceBase) getDocModelForAuthorityItem called - should not happen!");
-   		return null;
-   	}
-
-    public DocumentModel getDocModelForRefName(String refName) 
-   			throws Exception, DocumentNotFoundException {
-    	return getDocModelForAuthorityItem(RefName.AuthorityItem.parse(refName));
-    }
-
 }

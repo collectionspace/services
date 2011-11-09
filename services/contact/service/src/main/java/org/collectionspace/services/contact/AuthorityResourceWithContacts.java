@@ -78,24 +78,16 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     public String getContactServiceName() {
         return contactResource.getServiceName();
     }
-    
-    private DocumentHandler createContactDocumentHandler(
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String inAuthority,
-            String inItem) throws Exception {
-        UriInfo ui = null;
-        return createContactDocumentHandler(ctx, inAuthority, inItem, ui);
-    }
 
     private DocumentHandler createContactDocumentHandler(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String inAuthority,
-            String inItem, UriInfo ui) throws Exception {
+            String inItem) throws Exception {
     	ContactDocumentModelHandler docHandler = (ContactDocumentModelHandler)createDocumentHandler(
     			ctx,
     			ctx.getCommonPartLabel(getContactServiceName()),
     			ContactsCommon.class);        	
         docHandler.setInAuthority(inAuthority);
         docHandler.setInItem(inItem);
-        docHandler.getServiceContext().setUriInfo(ui);
         return docHandler;
     }
 
@@ -160,7 +152,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
 
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         	ServiceContext ctx = createServiceContext(getContactServiceName(), queryParams);
-            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, ui);
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             DocumentFilter myFilter = handler.getDocumentFilter(); //new DocumentFilter();
             myFilter.appendWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_AUTHORITY +

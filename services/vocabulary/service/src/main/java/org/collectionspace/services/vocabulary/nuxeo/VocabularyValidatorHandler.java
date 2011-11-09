@@ -20,6 +20,32 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
+ *//**
+ *  This document is a part of the source code and related artifacts
+ *  for CollectionSpace, an open source collections management system
+ *  for museums and related institutions:
+
+ *  http://www.collectionspace.org
+ *  http://wiki.collectionspace.org
+
+ *  Copyright 2009 University of California at Berkeley
+
+ *  Licensed under the Educational Community License (ECL), Version 2.0.
+ *  You may not use this file except in compliance with this License.
+
+ *  You may obtain a copy of the ECL 2.0 License at
+
+ *  https://source.collectionspace.org/collection-space/LICENSE.txt
+
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 package org.collectionspace.services.vocabulary.nuxeo;
 
@@ -35,12 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * VocabularyValidatorHandler
- * 
- * Validates data supplied when attempting to create and/or update Vocabulary records.
- * 
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ *
+ * @author 
  */
 public class VocabularyValidatorHandler implements ValidatorHandler {
 
@@ -50,7 +72,7 @@ public class VocabularyValidatorHandler implements ValidatorHandler {
     @Override
     public void validate(Action action, ServiceContext ctx)
             throws InvalidDocumentException {
-        if (logger.isDebugEnabled()) {
+        if(logger.isDebugEnabled()) {
             logger.debug("validate() action=" + action.name());
         }
         try {
@@ -59,27 +81,26 @@ public class VocabularyValidatorHandler implements ValidatorHandler {
                     VocabulariesCommon.class);
             String msg = "";
             boolean invalid = false;
-
-            // Validation occurring on both creates and updates
-            String displayName = vocab.getDisplayName();
-            if ((displayName == null) || (displayName.trim().length() < 2)) {
+			String displayName = vocab.getDisplayName();
+            if((displayName==null)||(displayName.length()<2)) {
                 invalid = true;
-                msg += "displayName must be non-null and contain at least 2 non-whitespace characters";
+                msg += "displayName must be non-null, and at least 2 chars long!";
             }
-
-            // Validation specific to creates or updates
-            if (action.equals(Action.CREATE)) {
-                String shortId = vocab.getShortIdentifier();
-                // Per CSPACE-2215, shortIdentifier values that are null (missing)
-                // or the empty string are now legally accepted in create payloads.
-                // In either of those cases, a short identifier will be synthesized from
-                // a display name or supplied in another manner.
-                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
-                    invalid = true;
-                    msg += "shortIdentifier must only contain standard word characters";
-                }
-            } else if (action.equals(Action.UPDATE)) {
+			String shortId = vocab.getShortIdentifier();
+            if(shortId==null){
+                invalid = true;
+                msg += "shortIdentifier must be non-null";
+            } else if(shortIdBadPattern.matcher(shortId).find()) {
+                invalid = true;
+                msg += "shortIdentifier must only contain standard word characters";
             }
+            /*
+            if(action.equals(Action.CREATE)) {
+                //create specific validation here
+            } else if(action.equals(Action.UPDATE)) {
+                //update specific validation here
+            }
+            */
 
             if (invalid) {
                 logger.error(msg);

@@ -476,10 +476,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         }
 
         // Check selected fields in the updated common part.
-        
-        // By submitting an empty string in the update payload, the value of this field
-        // in the object created from the response payload will be null.
-        Assert.assertNull(updatedMovementCommon.getNormalLocation(), "Data in updated object did not match submitted data.");
+        Assert.assertEquals(updatedMovementCommon.getNormalLocation(),
+            movementCommon.getNormalLocation(), "Data in updated object did not match submitted data.");
         if(logger.isDebugEnabled()){
             logger.debug("Normal location after update=|" + updatedMovementCommon.getNormalLocation() + "|");
         }

@@ -85,31 +85,5 @@ import org.testng.annotations.Test;
         check(item.toString(), item3.toString(), "buildAuthorityItem(Authority,str,str) from AUTHORITY_EXAMPLE2 vs. AUTHORITY_ITEM_EXAMPLE");
         Assert.assertEquals(item, item3);
     }
-    
-    /**
-     * Test convenience getters that return short identifiers for authorities and authority items.
-     */
-    @Test
-    public void testShortIDGetters(){
-        testBanner("testShortIDGetters");
-        RefName.Authority authority = RefName.Authority.parse(RefName.AUTHORITY_EXAMPLE);
-        Assert.assertEquals(authority.getShortIdentifier(), RefName.EX_shortIdentifier,
-                "Short identifier from parsing parent authority refName does not match value of Authority.getShortIdentifier().");
-        
-        RefName.AuthorityItem item = RefName.buildAuthorityItem(RefName.AUTHORITY_EXAMPLE,
-                                                                RefName.EX_itemShortIdentifier,
-                                                                RefName.EX_itemDisplayName);
-        Assert.assertEquals(item.getParentShortIdentifier(), RefName.EX_shortIdentifier,
-              "Parent short identifier from parsing authority refName does not match value of AuthorityItem.getParentShortIdentifier().");
-        Assert.assertEquals(item.getShortIdentifier(), RefName.EX_itemShortIdentifier,
-              "Short identifier from item does not match value of AuthorityItem.getShortIdentifier().");
-        
-        RefName.AuthorityItem parsedItem = RefName.AuthorityItem.parse(RefName.AUTHORITY_ITEM_EXAMPLE);
-        Assert.assertEquals(parsedItem.getParentShortIdentifier(), RefName.EX_shortIdentifier,
-              "Parent short identifier from parsing item refName does not match value of AuthorityItem.getParentShortIdentifier().");
-        Assert.assertEquals(parsedItem.getShortIdentifier(), RefName.EX_itemShortIdentifier,
-              "Short identifier from parsing item refName does not match value of AuthorityItem.getShortIdentifier().");
-
-    }
 
 }

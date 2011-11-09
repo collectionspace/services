@@ -66,8 +66,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     final String SERVICE_ITEM_PAYLOAD_NAME = VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME;
     private String knownResourceId = null;
     private String knownResourceShortIdentifer = null;
-    //private String knownResourceRefName = null;
-    //private String knownResourceFullRefName = null;
+    private String knownResourceRefName = null;
+    private String knownResourceFullRefName = null;
     private String knownItemResourceId = null;
     private int nItemsToCreateInList = 5;
 //    private List<String> allResourceIdsCreated = new ArrayList<String>();
@@ -78,8 +78,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
             String refName, String fullRefName) {
         knownResourceId = id;
         knownResourceShortIdentifer = shortIdentifer;
-        //knownResourceRefName = refName;
-        //knownResourceFullRefName = fullRefName;
+        knownResourceRefName = refName;
+        knownResourceFullRefName = fullRefName;
     }
 
     /* (non-Javadoc)
@@ -140,9 +140,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null) {
-            setKnownResource(extractId(res), identifier, null, null );
-                    //VocabularyClientUtils.createVocabularyRefName(identifier, null),
-                    //VocabularyClientUtils.createVocabularyRefName(identifier, displayName));
+            setKnownResource(extractId(res), identifier,
+                    VocabularyClientUtils.createVocabularyRefName(identifier, null),
+                    VocabularyClientUtils.createVocabularyRefName(identifier, displayName));
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -180,7 +180,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-" + shortId);
         String newID = VocabularyClientUtils.createItemInVocabulary(knownResourceId,
-                null /*knownResourceRefName*/, itemInfo, client);
+                knownResourceRefName, itemInfo, client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -272,7 +272,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, "Bad Item Short Id!");
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "Bad Item!");
         PoxPayloadOut multipart =
-                VocabularyClientUtils.createVocabularyItemInstance(null, //knownResourceRefName,
+                VocabularyClientUtils.createVocabularyItemInstance(knownResourceRefName,
                 itemInfo, client.getCommonPartItemName());
         ClientResponse<Response> res = client.createItem(knownResourceId, multipart);
 
@@ -280,12 +280,12 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         if (!REQUEST_TYPE.isValidStatusCode(statusCode)) {
             throw new RuntimeException("Could not create Item: \"" + itemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-                    + "\" in personAuthority: \"" + knownResourceId //knownResourceRefName
+                    + "\" in personAuthority: \"" + knownResourceRefName
                     + "\" " + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         }
         if (statusCode != EXPECTED_STATUS_CODE) {
             throw new RuntimeException("Unexpected Status when creating Item: \"" + itemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-                    + "\" in personAuthority: \"" + knownResourceId /*knownResourceRefName*/ + "\", Status:" + statusCode);
+                    + "\" in personAuthority: \"" + knownResourceRefName + "\", Status:" + statusCode);
         }
     }
 
@@ -410,7 +410,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
                 client.getCommonPartName(), VocabulariesCommon.class);
 
         Assert.assertNotNull(vocabulary);
-        //Assert.assertEquals(vocabulary.getRefName(), knownResourceFullRefName);
+        Assert.assertEquals(vocabulary.getRefName(), knownResourceFullRefName);
     }
 
     /**
@@ -1079,7 +1079,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-nonex");
         PoxPayloadOut multipart =
                 VocabularyClientUtils.createVocabularyItemInstance(
-                null, //VocabularyClientUtils.createVocabularyRefName(NON_EXISTENT_ID, null),
+                VocabularyClientUtils.createVocabularyRefName(NON_EXISTENT_ID, null),
                 itemInfo, client.getCommonPartItemName());
         ClientResponse<String> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);

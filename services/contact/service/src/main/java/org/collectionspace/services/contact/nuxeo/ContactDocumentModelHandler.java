@@ -23,17 +23,24 @@
  */
 package org.collectionspace.services.contact.nuxeo;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.UriInfo;
-import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.contact.ContactJAXBSchema;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.common.service.ObjectPartType;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.contact.ContactsCommon;
+import org.collectionspace.services.contact.ContactsCommonList;
+import org.collectionspace.services.contact.ContactsCommonList.ContactListItem;
 
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,12 +48,19 @@ import org.slf4j.LoggerFactory;
  * The Class ContactDocumentModelHandler.
  */
 public class ContactDocumentModelHandler
-        extends DocHandlerBase<ContactsCommon> {
+        extends RemoteDocumentModelHandlerImpl<ContactsCommon, ContactsCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(ContactDocumentModelHandler.class);
-    private static final String COMMON_PART_LABEL = "contacts_common";
+    
+    /** The contact. */
+    private ContactsCommon contact;
+    
+    /** The contact list. */
+    private ContactsCommonList contactList;
+
+    /** The in authority. */
     private String inAuthority;
-    private String inItem;
 
     /**
      * Gets the in authority.
@@ -60,11 +74,14 @@ public class ContactDocumentModelHandler
     /**
      * Sets the in authority.
      *
-     * @param inAuthority the new in item
+     * @param inAuthority the new in authority
      */
     public void setInAuthority(String inAuthority) {
         this.inAuthority = inAuthority;
     }
+
+    /** The in item. */
+    private String inItem;
 
     /**
      * Gets the in item.
@@ -89,21 +106,11 @@ public class ContactDocumentModelHandler
      */
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        // first fill all the parts of the document
-        super.handleCreate(wrapDoc);
-        handleInAuthority(wrapDoc.getWrappedObject());
-        handleDisplayNames(wrapDoc.getWrappedObject());
+    	// first fill all the parts of the document
+    	super.handleCreate(wrapDoc);    	
+    	handleInAuthority(wrapDoc.getWrappedObject());
     }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        super.handleUpdate(wrapDoc);
-        handleDisplayNames(wrapDoc.getWrappedObject());
-    }
-
+    
     /**
      * Check the logic around the parent pointer. Note that we only need do this on
      * create, since we have logic to make this read-only on update. 
@@ -113,117 +120,110 @@ public class ContactDocumentModelHandler
      * @throws Exception the exception
      */
     private void handleInAuthority(DocumentModel docModel) throws Exception {
-        String commonPartLabel = getServiceContext().getCommonPartLabel("contacts");
-        docModel.setProperty(commonPartLabel,
-                ContactJAXBSchema.IN_AUTHORITY, inAuthority);
-        docModel.setProperty(commonPartLabel,
-                ContactJAXBSchema.IN_ITEM, inItem);
+    	String commonPartLabel = getServiceContext().getCommonPartLabel("contacts");
+    	docModel.setProperty(commonPartLabel, 
+    			ContactJAXBSchema.IN_AUTHORITY, inAuthority);
+    	docModel.setProperty(commonPartLabel, 
+    			ContactJAXBSchema.IN_ITEM, inItem);
     }
 
-    private void handleDisplayNames(DocumentModel docModel) throws Exception {
-        String commonPartLabel = getServiceContext().getCommonPartLabel("contacts");
-        String email = getStringValueInPrimaryRepeatingComplexProperty(
-                docModel, commonPartLabel, ContactJAXBSchema.EMAIL_GROUP_LIST,
-                ContactJAXBSchema.EMAIL);
-        String telephoneNumber = getStringValueInPrimaryRepeatingComplexProperty(
-                docModel, commonPartLabel, ContactJAXBSchema.TELEPHONE_NUMBER_GROUP_LIST,
-                ContactJAXBSchema.TELEPHONE_NUMBER);
-        String addressPlace1 = getStringValueInPrimaryRepeatingComplexProperty(
-                docModel, commonPartLabel, ContactJAXBSchema.ADDRESS_GROUP_LIST,
-                ContactJAXBSchema.ADDRESS_PLACE_1);
-        String displayName = prepareDefaultDisplayName(email, telephoneNumber, addressPlace1);
-        docModel.setProperty(commonPartLabel, ContactJAXBSchema.DISPLAY_NAME,
-                displayName);
-    }
-
-    /**
-     * Produces a default displayName from the basic name and foundingPlace fields.
-     * @see OrgAuthorityClientUtils.prepareDefaultDisplayName() which
-     * duplicates this logic, until we define a service-general utils package
-     * that is neither client nor service specific.
-     * @param shortName
-     * @param foundingPlace
-     * @return
-     * @throws Exception
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getCommonPart()
      */
-    private static String prepareDefaultDisplayName(String email,
-            String telephoneNumber, String addressPlace1) throws Exception {
-
-        final int MAX_DISPLAY_NAME_LENGTH = 30;
-
-        StringBuilder newStr = new StringBuilder("");
-        final String sep = " ";
-        boolean firstAdded = false;
-
-        if (!(email == null || email.isEmpty())) {
-            newStr.append(email);
-            firstAdded = true;
-        }
-
-        if (!(telephoneNumber == null || telephoneNumber.isEmpty())) {
-            if (newStr.length() <= MAX_DISPLAY_NAME_LENGTH) {
-                if (firstAdded) {
-                    newStr.append(sep);
-                } else {
-                    firstAdded = true;
-                }
-                newStr.append(telephoneNumber);
-            }
-        }
-
-        if (!(addressPlace1 == null || addressPlace1.isEmpty())) {
-            if (newStr.length() <= MAX_DISPLAY_NAME_LENGTH) {
-                if (firstAdded) {
-                    newStr.append(sep);
-                }
-                newStr.append(addressPlace1);
-            }
-        }
-
-        String displayName = newStr.toString();
-
-        if (displayName.length() > MAX_DISPLAY_NAME_LENGTH) {
-            return displayName.substring(0, MAX_DISPLAY_NAME_LENGTH) + "...";
-        } else {
-            return displayName;
-        }
-    }
-
     @Override
-    public String getUri(DocumentModel docModel) {
-        String uri = "";
-        UriInfo ui = getServiceContext().getUriInfo();
-        if (ui != null) {
-            uri = '/' + getAuthorityPathComponent(ui) + '/' + inAuthority
-                    + '/' + AuthorityClient.ITEMS + '/' + inItem
-                    + getServiceContextPath() + getCsid(docModel);
-            // uri = "/" + ui.getPath() + "/" + getCsid(docModel);
-        } else {
-            uri = super.getUri(docModel);
+    public ContactsCommon getCommonPart() {
+        return contact;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPart(java.lang.Object)
+     */
+    @Override
+    public void setCommonPart(ContactsCommon contact) {
+        this.contact = contact;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getCommonPartList()
+     */
+    @Override
+    public ContactsCommonList getCommonPartList() {
+        return contactList;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
+     */
+    @Override
+    public void setCommonPartList(ContactsCommonList contactList) {
+        this.contactList = contactList;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public ContactsCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
+            throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void fillCommonPart(ContactsCommon contactObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public ContactsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        ContactsCommonList coList = extractPagingInfo(new ContactsCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("addressPlace|uri|csid");
+        List<ContactsCommonList.ContactListItem> list = coList.getContactListItem();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        while(iter.hasNext()){
+            DocumentModel docModel = iter.next();
+            ContactListItem clistItem = new ContactListItem();
+            // TODO Revisit which information unit(s) should be returned
+            // in each entry, in a list of contact information.
+            // See CSPACE-1018
+            clistItem.setAddressPlace((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                    ContactJAXBSchema.ADDRESS_PLACE));
+            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+            clistItem.setUri(getServiceContextPath() + id);
+            clistItem.setCsid(id);
+            list.add(clistItem);
         }
-        return uri;
+
+        return coList;
     }
 
-    // Assumes the initial path component in the URI, following the base URI,
-    // identifies the relevant authority resource
-    private String getAuthorityPathComponent(UriInfo ui) {
-        return ui.getPathSegments().get(0).toString();
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl#getQProperty(java.lang.String)
+     */
+    @Override
+    public String getQProperty(String prop) {
+        return ContactConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
-
+    
     /**
      * Filters out ContactJAXBSchema.IN_AUTHORITY, and IN_ITEM, to ensure that
      * the parent links remains untouched.
-     * Also remove the display name, as this is always computed.
      * @param objectProps the properties parsed from the update payload
      * @param partMeta metadata for the object to fill
      */
     @Override
     public void filterReadOnlyPropertiesForPart(
-            Map<String, Object> objectProps, ObjectPartType partMeta) {
-        super.filterReadOnlyPropertiesForPart(objectProps, partMeta);
-        objectProps.remove(ContactJAXBSchema.IN_AUTHORITY);
-        objectProps.remove(ContactJAXBSchema.IN_ITEM);
-        objectProps.remove(ContactJAXBSchema.URI);
-        objectProps.remove(ContactJAXBSchema.DISPLAY_NAME);
+    		Map<String, Object> objectProps, ObjectPartType partMeta) {
+    	super.filterReadOnlyPropertiesForPart(objectProps, partMeta);
+    	objectProps.remove(ContactJAXBSchema.IN_AUTHORITY);
+    	objectProps.remove(ContactJAXBSchema.IN_ITEM);
     }
+
 }
+

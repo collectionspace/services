@@ -27,7 +27,6 @@ import java.lang.reflect.Constructor;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +50,6 @@ public class RemoteServiceContextImpl<IT, OT>
     private OT output;
     /** The target of the HTTP request **/
     JaxRsContext jaxRsContext;
-    
-    ResourceMap resourceMap = null;
     
     @Override
     public void setJaxRsContext(JaxRsContext theJaxRsContext) {
@@ -141,22 +138,6 @@ public class RemoteServiceContextImpl<IT, OT>
         this.output = output;
     }
 
-    /**
-     * @return the map of service names to resource classes.
-     */
-    public ResourceMap getResourceMap() {
-    	return resourceMap;
-    }
-
-    /**
-     * @param map the map of service names to resource instances.
-     */
-    public void setResourceMap(ResourceMap map) {
-    	this.resourceMap = map;
-    }
-
- 
-    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.RemoteServiceContext#getLocalContext(java.lang.String)
      */

@@ -20,7 +20,6 @@
             <vars>
             	<var ID="inAuthority">${PersonAuth1.CSID}</var>
             	<var ID="authShortIdentifier">CSPACE3739PersonAuthority</var>
-            	<var ID="shortIdentifier">johnWayneActor1</var>
             </vars>
         </test>
         <test ID="Person2">

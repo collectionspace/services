@@ -37,7 +37,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 
-import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
 import org.jboss.resteasy.client.ClientResponse;
@@ -65,11 +64,6 @@ public interface RoleProxy extends CollectionSpaceProxy<RolesList> {
     @GET
     @Path("/{csid}")
     ClientResponse<Role> read(@PathParam("csid") String csid);
-    
-    //(R)ead accounts associate with this role
-    @GET
-    @Path("{csid}/accountroles")
-    ClientResponse<AccountRole> readRoleAccounts(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT

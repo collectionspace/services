@@ -18,7 +18,6 @@ public class ServiceBindingUtils {
 	public static final boolean QUALIFIED_PROP_NAMES = true;
 	public static final boolean UNQUALIFIED_PROP_NAMES = false;
 	public static final String AUTH_REF_PROP = "authRef";
-	public static final String TERM_REF_PROP = "termRef";
 	public static final String OBJ_NUMBER_PROP = "objectNumberProperty";
 	public static final String OBJ_NAME_PROP = "objectNameProperty";
 	public static final String SERVICE_TYPE_PROP = "type";

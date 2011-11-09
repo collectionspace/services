@@ -23,7 +23,6 @@
  */
 package org.collectionspace.services.taxonomy.nuxeo;
 
-import java.util.regex.Pattern;
 import org.collectionspace.services.taxonomy.TaxonCommon;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -34,51 +33,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TaxonValidatorHandler
- * 
- * Validates data supplied when attempting to create and/or update Taxon records.
- * 
- * $LastChangedRevision$
- * $LastChangedDate$
+ *
+ * @author 
  */
 public class TaxonValidatorHandler implements ValidatorHandler {
 
     final Logger logger = LoggerFactory.getLogger(TaxonValidatorHandler.class);
-    private static final Pattern shortIdBadPattern = Pattern.compile("[\\W]"); //.matcher(input).matches()
 
     @Override
     public void validate(Action action, ServiceContext ctx)
             throws InvalidDocumentException {
-        if (logger.isDebugEnabled()) {
+        if(logger.isDebugEnabled()) {
             logger.debug("validate() action=" + action.name());
         }
         try {
             MultipartServiceContext mctx = (MultipartServiceContext) ctx;
-            TaxonCommon taxon = (TaxonCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
+            TaxonCommon taxonomy = (TaxonCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
                     TaxonCommon.class);
             String msg = "";
             boolean invalid = false;
-
-            // Validation occurring on both creates and updates
-            String displayName = taxon.getDisplayName();
-            if (!taxon.isDisplayNameComputed() && ((displayName == null) || displayName.trim().isEmpty())) {
+            if(!taxonomy.isDisplayNameComputed() && (taxonomy.getDisplayName()==null)) {
                 invalid = true;
-                msg += "displayName must be non-null and non-blank if displayNameComputed is false";
+                msg += "displayName must be non-null if displayNameComputed is false!";
             }
-
-            // Validation specific to creates or updates
-            if (action.equals(Action.CREATE)) {
-                String shortId = taxon.getShortIdentifier();
-                // Per CSPACE-2215, shortIdentifier values that are null (missing)
-                // oe the empty string are now legally accepted in create payloads.
-                // In either of those cases, a short identifier will be synthesized from
-                // a display name or supplied in another manner.
-                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
-                    invalid = true;
-                    msg += "shortIdentifier must only contain standard word characters";
-                }
-            } else if (action.equals(Action.UPDATE)) {
+            /*
+            if(action.equals(Action.CREATE)) {
+                //create specific validation here
+            } else if(action.equals(Action.UPDATE)) {
+                //update specific validation here
             }
+            */
 
             if (invalid) {
                 logger.error(msg);

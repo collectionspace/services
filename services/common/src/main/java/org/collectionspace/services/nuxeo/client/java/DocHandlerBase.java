@@ -32,13 +32,10 @@ import java.util.List;
 
 import org.collectionspace.services.common.ReflectionMapper;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.common.service.DocHandlerParams;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -91,7 +88,6 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 	public void setCommonPart(T commonPart) {
         this.commonPart = commonPart;
     }
-
 
     /** Subclass DocHandlers may override this method to control exact creation of the common list.
      *  This class instantiates an AbstractCommonList from the classname returned by getDocHandlerParams().AbstractCommonListClassname.
