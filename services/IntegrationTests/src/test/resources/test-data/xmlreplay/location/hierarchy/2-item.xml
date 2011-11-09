@@ -2,7 +2,7 @@
 <document name="locations">
   <ns2:locations_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
-    <refName>urn:cspace:org.collectionspace.demo:locationauthority:name(${authShortIdentifier}):location:name(${shortIdentifier})</refName>
+		<!-- <refName>urn:cspace:org.collectionspace.demo:locationauthority:name(${authShortIdentifier}):location:name(${shortIdentifier})</refName> -->
     <termStatus>Approved</termStatus>
     <displayNameComputed>true</displayNameComputed>
     <shortDisplayNameComputed>false</shortDisplayNameComputed>

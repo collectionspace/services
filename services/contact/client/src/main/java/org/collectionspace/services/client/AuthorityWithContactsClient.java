@@ -2,7 +2,6 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -121,7 +120,7 @@ public interface AuthorityWithContactsClient<P extends AuthorityProxy>
      * @param itemcsid the itemcsid
      * @return the client response
      */
-    public ClientResponse<ContactsCommonList> readContactList(String parentcsid,
+    public ClientResponse<AbstractCommonList> readContactList(String parentcsid,
             String itemcsid);
     
     /**
@@ -131,7 +130,7 @@ public interface AuthorityWithContactsClient<P extends AuthorityProxy>
      * @param itemspecifier (shortIdentifier)
      * @return the client response
      */
-    public ClientResponse<ContactsCommonList> readContactListForNamedItem(
+    public ClientResponse<AbstractCommonList> readContactListForNamedItem(
     		String parentcsid,
     		String itemspecifier);
 
@@ -142,7 +141,7 @@ public interface AuthorityWithContactsClient<P extends AuthorityProxy>
      * @param itemcsid
      * @return the client response
      */
-    public ClientResponse<ContactsCommonList> readContactListForItemInNamedAuthority(
+    public ClientResponse<AbstractCommonList> readContactListForItemInNamedAuthority(
     		String parentspecifier,
     		String itemcsid);
 
@@ -153,7 +152,7 @@ public interface AuthorityWithContactsClient<P extends AuthorityProxy>
      * @param itemspecifier (shortIdentifier)
      * @return the client response
      */
-    public ClientResponse<ContactsCommonList> readContactListForNamedItemInNamedAuthority(
+    public ClientResponse<AbstractCommonList> readContactListForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier);
 

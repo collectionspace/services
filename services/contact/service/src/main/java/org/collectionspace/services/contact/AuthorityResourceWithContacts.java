@@ -47,9 +47,9 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
-import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,41 +60,48 @@ import org.slf4j.LoggerFactory;
 @Consumes("application/xml")
 @Produces("application/xml")
 public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler> extends //FIXME: REM - Why is this resource in this package instead of somewhere in 'common'?
-     AuthorityResource<AuthCommon, AuthItemHandler> {
+        AuthorityResource<AuthCommon, AuthItemHandler> {
 
     private ContactResource contactResource = new ContactResource(); // Warning: ContactResource is a singleton.
-
     final Logger logger = LoggerFactory.getLogger(AuthorityResourceWithContacts.class);
 
-	public AuthorityResourceWithContacts(
-			Class<AuthCommon> authCommonClass, Class<?> resourceClass,
-			String authorityCommonSchemaName, String authorityItemCommonSchemaName) {
-		super(authCommonClass, resourceClass,
-			authorityCommonSchemaName, authorityItemCommonSchemaName);
-	}
+    public AuthorityResourceWithContacts(
+            Class<AuthCommon> authCommonClass, Class<?> resourceClass,
+            String authorityCommonSchemaName, String authorityItemCommonSchemaName) {
+        super(authCommonClass, resourceClass,
+                authorityCommonSchemaName, authorityItemCommonSchemaName);
+    }
 
-	public abstract String getItemServiceName();
+    public abstract String getItemServiceName();
 
     public String getContactServiceName() {
         return contactResource.getServiceName();
     }
+    
+    private DocumentHandler createContactDocumentHandler(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String inAuthority,
+            String inItem) throws Exception {
+        UriInfo ui = null;
+        return createContactDocumentHandler(ctx, inAuthority, inItem, ui);
+    }
 
     private DocumentHandler createContactDocumentHandler(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String inAuthority,
-            String inItem) throws Exception {
-    	ContactDocumentModelHandler docHandler = (ContactDocumentModelHandler)createDocumentHandler(
-    			ctx,
-    			ctx.getCommonPartLabel(getContactServiceName()),
-    			ContactsCommon.class);        	
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String inAuthority,
+            String inItem, UriInfo ui) throws Exception {
+        ContactDocumentModelHandler docHandler = (ContactDocumentModelHandler) createDocumentHandler(
+                ctx,
+                ctx.getCommonPartLabel(getContactServiceName()),
+                ContactsCommon.class);
         docHandler.setInAuthority(inAuthority);
         docHandler.setInItem(inItem);
+        docHandler.getServiceContext().setUriInfo(ui);
         return docHandler;
     }
 
     /*************************************************************************
      * Contact parts - this is a sub-resource of the AuthorityItem
-	 * @param parentspecifier either a CSID or one of the urn forms
-	 * @param itemspecifier either a CSID or one of the urn forms
+     * @param parentspecifier either a CSID or one of the urn forms
+     * @param itemspecifier either a CSID or one of the urn forms
      * @return contact
      *************************************************************************/
     @POST
@@ -104,7 +111,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             @PathParam("itemcsid") String itemspecifier,
             String xmlPayload) {
         try {
-        	PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+            PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             String parentcsid = lookupParentCSID(parentspecifier, "createContact(authority)", "CREATE_ITEM_CONTACT", null);
 
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
@@ -112,7 +119,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
 
             // Note that we have to create the service context and document
             // handler for the Contact service, not the main service.
-        	ServiceContext ctx = createServiceContext(getContactServiceName(), input);
+            ServiceContext ctx = createServiceContext(getContactServiceName(), input);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(resourceClass);
@@ -121,17 +128,17 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             return response;
         } catch (Exception e) {
             throw bigReThrow(e,
-                                        "Create Contact failed; one of the requested specifiers for authority:"
-                		                       +parentspecifier+": and item:"+itemspecifier+": was not found.",
-                                        itemspecifier);
+                    "Create Contact failed; one of the requested specifiers for authority:"
+                    + parentspecifier + ": and item:" + itemspecifier + ": was not found.",
+                    itemspecifier);
         }
     }
 
     /**
      * Gets the contact list.
      * 
-	 * @param parentspecifier either a CSID or one of the urn forms
-	 * @param itemspecifier either a CSID or one of the urn forms
+     * @param parentspecifier either a CSID or one of the urn forms
+     * @param itemspecifier either a CSID or one of the urn forms
      * @param ui the ui
      * 
      * @return the contact list
@@ -139,11 +146,11 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     @GET
     @Produces({"application/xml"})
     @Path("{parentcsid}/items/{itemcsid}/contacts/")
-    public ContactsCommonList getContactList(
+    public AbstractCommonList getContactList(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
             @Context UriInfo ui) {
-        ContactsCommonList contactObjectList = new ContactsCommonList();
+        AbstractCommonList contactObjectList = new AbstractCommonList();
         try {
             String parentcsid = lookupParentCSID(parentspecifier, "getContactList(parent)", "GET_CONTACT_LIST", null);
 
@@ -151,24 +158,24 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getContactList(item)", "GET_CONTACT_LIST", itemCtx);
 
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        	ServiceContext ctx = createServiceContext(getContactServiceName(), queryParams);
-            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
+            ServiceContext ctx = createServiceContext(getContactServiceName(), queryParams);
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, ui);
             DocumentFilter myFilter = handler.getDocumentFilter(); //new DocumentFilter();
-            myFilter.appendWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
-                ContactJAXBSchema.IN_AUTHORITY +
-                "='" + parentcsid + "'" +
-                IQueryManager.SEARCH_QUALIFIER_AND +
-                ContactJAXBSchema.CONTACTS_COMMON + ":" +
-                ContactJAXBSchema.IN_ITEM +
-                "='" + itemcsid + "'",
-                IQueryManager.SEARCH_QUALIFIER_AND);  // "AND" this clause to any existing
+            myFilter.appendWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":"
+                    + ContactJAXBSchema.IN_AUTHORITY
+                    + "='" + parentcsid + "'"
+                    + IQueryManager.SEARCH_QUALIFIER_AND
+                    + ContactJAXBSchema.CONTACTS_COMMON + ":"
+                    + ContactJAXBSchema.IN_ITEM
+                    + "='" + itemcsid + "'",
+                    IQueryManager.SEARCH_QUALIFIER_AND);  // "AND" this clause to any existing
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            contactObjectList = (ContactsCommonList) handler.getCommonPartList();
+            contactObjectList = (AbstractCommonList) handler.getCommonPartList();
         } catch (Exception e) {
             throw bigReThrow(e,
-                                        "Get ContactList failed; one of the requested specifiers for authority:"
-                		                    +parentspecifier+": and item:"+itemspecifier+": was not found.",
-                                        itemspecifier);
+                    "Get ContactList failed; one of the requested specifiers for authority:"
+                    + parentspecifier + ": and item:" + itemspecifier + ": was not found.",
+                    itemspecifier);
         }
         return contactObjectList;
     }
@@ -176,8 +183,8 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     /**
      * Gets the contact.
      * 
-	 * @param parentspecifier either a CSID or one of the urn forms
-	 * @param itemspecifier either a CSID or one of the urn forms
+     * @param parentspecifier either a CSID or one of the urn forms
+     * @param itemspecifier either a CSID or one of the urn forms
      * @param csid the csid
      * 
      * @return the contact
@@ -188,7 +195,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
             @PathParam("csid") String csid) {
-    	PoxPayloadOut result = null;
+        PoxPayloadOut result = null;
         try {
             String parentcsid = lookupParentCSID(parentspecifier, "getContact(parent)", "GET_ITEM_CONTACT", null);
 
@@ -196,20 +203,18 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getContact(item)", "GET_ITEM_CONTACT", itemCtx);
 
             // Note that we have to create the service context and document handler for the Contact service, not the main service.
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getContactServiceName());
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getContactServiceName());
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();
         } catch (Exception e) {
-            throw bigReThrow(e, "Get failed, the requested Contact CSID:" + csid +
-                                            ": or one of the specifiers for authority:"+parentspecifier+
-                                            ": and item:"+itemspecifier+": was not found.",
-                                        csid);
+            throw bigReThrow(e, "Get failed, the requested Contact CSID:" + csid
+                    + ": or one of the specifiers for authority:" + parentspecifier
+                    + ": and item:" + itemspecifier + ": was not found.",
+                    csid);
         }
         if (result == null) {
-            Response response = Response.status(Response.Status.NOT_FOUND)
-                .entity("Get failed, the requested Contact CSID:" + csid + ": was not found.")
-                .type("text/plain").build();
+            Response response = Response.status(Response.Status.NOT_FOUND).entity("Get failed, the requested Contact CSID:" + csid + ": was not found.").type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result.toXML();
@@ -218,8 +223,8 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     /**
      * Update contact.
      * 
-	 * @param parentspecifier either a CSID or one of the urn forms
-	 * @param itemspecifier either a CSID or one of the urn forms
+     * @param parentspecifier either a CSID or one of the urn forms
+     * @param itemspecifier either a CSID or one of the urn forms
      * @param csid the csid
      *
      * @return the multipart output
@@ -231,25 +236,25 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             @PathParam("itemcsid") String itemspecifier,
             @PathParam("csid") String csid,
             String xmlPayload) {
-    	PoxPayloadOut result = null;
+        PoxPayloadOut result = null;
         try {
-        	PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
-   			String parentcsid = lookupParentCSID(parentspecifier, "updateContact(authority)", "UPDATE_CONTACT", null);
+            PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
+            String parentcsid = lookupParentCSID(parentspecifier, "updateContact(authority)", "UPDATE_CONTACT", null);
 
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "updateContact(item)", "UPDATE_CONTACT", itemCtx);
 
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
             // Note that we have to create the service context and document handler for the Contact service, not the main service.
-        	ctx = createServiceContext(getContactServiceName(), theUpdate);
+            ctx = createServiceContext(getContactServiceName(), theUpdate);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
         } catch (Exception e) {
-           throw bigReThrow(e, "Update failed, the requested Contact CSID:" + csid +
-                    		": or one of the specifiers for authority:"+parentspecifier+
-                    		": and item:"+itemspecifier+": was not found.",
-                            csid);
+            throw bigReThrow(e, "Update failed, the requested Contact CSID:" + csid
+                    + ": or one of the specifiers for authority:" + parentspecifier
+                    + ": and item:" + itemspecifier + ": was not found.",
+                    csid);
         }
         return result.toXML();
     }
@@ -257,8 +262,8 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     /**
      * Delete contact.
      * 
-	 * @param parentspecifier either a CSID or one of the urn forms
-	 * @param itemspecifier either a CSID or one of the urn forms
+     * @param parentspecifier either a CSID or one of the urn forms
+     * @param itemspecifier either a CSID or one of the urn forms
      * @param csid the csid
      * 
      * @return the response
@@ -270,7 +275,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             @PathParam("itemcsid") String itemspecifier,
             @PathParam("csid") String csid) {
         try {
-   			String parentcsid = lookupParentCSID(parentspecifier, "deleteContact(authority)", "DELETE_CONTACT", null);
+            String parentcsid = lookupParentCSID(parentspecifier, "deleteContact(authority)", "DELETE_CONTACT", null);
 
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "deleteContact(item)", "DELETE_CONTACT", itemCtx);
@@ -278,14 +283,13 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
 
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
             // Note that we have to create the service context for the Contact service, not the main service.
-        	ctx = createServiceContext(getContactServiceName());
+            ctx = createServiceContext(getContactServiceName());
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
-         } catch (Exception e) {
-            throw bigReThrow(e, "DELETE failed, the requested Contact CSID:" + csid +
-                    		": or one of the specifiers for authority:"+parentspecifier+
-                    		": and item:"+itemspecifier+": was not found.", csid);
+        } catch (Exception e) {
+            throw bigReThrow(e, "DELETE failed, the requested Contact CSID:" + csid
+                    + ": or one of the specifiers for authority:" + parentspecifier
+                    + ": and item:" + itemspecifier + ": was not found.", csid);
         }
     }
-    
 }

@@ -74,7 +74,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     private List<String> intakeIdsCreated = new ArrayList<String>();
     private List<String> orgIdsCreated = new ArrayList<String>();
     private String orgAuthCSID = null; 
-    private String orgAuthRefName = null; 
+    //private String orgAuthRefName = null; 
     private String currentOwnerOrgCSID = null; 
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
@@ -173,8 +173,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
      */
     protected void createOrgRefs(){
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-        orgAuthRefName = 
-    		OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
+        //orgAuthRefName = 
+    	//	OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			ORGANIZATION_AUTHORITY_NAME, ORGANIZATION_AUTHORITY_NAME, orgAuthClient.getCommonPartName());
         ClientResponse<Response> res = orgAuthClient.create(multipart);
@@ -218,7 +218,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         orgInfo.put(OrganizationJAXBSchema.SHORT_NAME, shortName);
         orgInfo.put(OrganizationJAXBSchema.LONG_NAME, longName);
         PoxPayloadOut multipart = 
-    		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthRefName,
+    		OrgAuthorityClientUtils.createOrganizationInstance(null, //orgAuthRefName,
     				orgInfo, orgAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
         int statusCode = res.getStatus();

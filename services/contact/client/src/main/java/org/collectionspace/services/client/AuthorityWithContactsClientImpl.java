@@ -3,7 +3,6 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /*
@@ -140,7 +139,7 @@ public abstract class AuthorityWithContactsClientImpl<P extends AuthorityWithCon
      * @return the client response
      */
     @Override
-	public ClientResponse<ContactsCommonList> readContactList(String parentcsid,
+	public ClientResponse<AbstractCommonList> readContactList(String parentcsid,
             String itemcsid) {
         return getProxy().readContactList(parentcsid, itemcsid);
     }
@@ -153,7 +152,7 @@ public abstract class AuthorityWithContactsClientImpl<P extends AuthorityWithCon
      * @return the client response
      */
     @Override
-	public ClientResponse<ContactsCommonList> readContactListForNamedItem(
+	public ClientResponse<AbstractCommonList> readContactListForNamedItem(
     		String parentcsid,
     		String itemspecifier){
     	return getProxy().readContactList(parentcsid, itemspecifier);
@@ -167,7 +166,7 @@ public abstract class AuthorityWithContactsClientImpl<P extends AuthorityWithCon
      * @return the client response
      */
     @Override
-	public ClientResponse<ContactsCommonList> readContactListForItemInNamedAuthority(
+	public ClientResponse<AbstractCommonList> readContactListForItemInNamedAuthority(
     		String parentspecifier,
     		String itemcsid){
     	return getProxy().readContactList(parentspecifier, itemcsid);
@@ -181,7 +180,7 @@ public abstract class AuthorityWithContactsClientImpl<P extends AuthorityWithCon
      * @return the client response
      */
     @Override
-	public ClientResponse<ContactsCommonList> readContactListForNamedItemInNamedAuthority(
+	public ClientResponse<AbstractCommonList> readContactListForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier){
     	return getProxy().readContactList(parentspecifier, itemspecifier);

@@ -97,15 +97,13 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
 
-        singletons.add(new VocabularyResource());
-        singletons.add(new PersonAuthorityResource());
-        singletons.add(new OrgAuthorityResource());
-        singletons.add(new LocationAuthorityResource());
-        singletons.add(new PlaceAuthorityResource());
-        singletons.add(new TaxonomyAuthorityResource());
-
-        singletons.add(new AcquisitionResource());
-        
+        addResourceToMapAndSingletons(new VocabularyResource());
+        addResourceToMapAndSingletons(new PersonAuthorityResource());
+        addResourceToMapAndSingletons(new OrgAuthorityResource());
+        addResourceToMapAndSingletons(new LocationAuthorityResource());
+        addResourceToMapAndSingletons(new TaxonomyAuthorityResource());
+        addResourceToMapAndSingletons(new PlaceAuthorityResource());
+        addResourceToMapAndSingletons(new AcquisitionResource());
         addResourceToMapAndSingletons(new ContactResource());
         addResourceToMapAndSingletons(new CollectionObjectResource());
         addResourceToMapAndSingletons(new GroupResource());
@@ -134,7 +132,7 @@ public class CollectionSpaceJaxRsApplication extends Application
     
     private void addResourceToMapAndSingletons(ResourceBase resource) {
         singletons.add(resource);
-        resourceMap.put(resource.getClass().getName(), resource);
+        resourceMap.put(resource.getServiceName(), resource);
     }
 
     @Override

@@ -9,7 +9,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.contact.ContactsCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 /*
@@ -20,27 +20,27 @@ public interface AuthorityWithContactsProxy extends AuthorityProxy {
     @GET
     @Produces({"application/xml"})
     @Path("/{parentcsid}/items/{itemcsid}/contacts/")
-    public ClientResponse<ContactsCommonList> readContactList(
+    public ClientResponse<AbstractCommonList> readContactList(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid);
 
     @GET
     @Produces({"application/xml"})
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/")
-    ClientResponse<ContactsCommonList> readContactListForNamedItem(
+    ClientResponse<AbstractCommonList> readContactListForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier);
     
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/")
-    ClientResponse<ContactsCommonList> readContactListForItemInNamedAuthority(
+    ClientResponse<AbstractCommonList> readContactListForItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid);
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/")
-    ClientResponse<ContactsCommonList> readContactListForNamedItemInNamedAuthority(
+    ClientResponse<AbstractCommonList> readContactListForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier);
 

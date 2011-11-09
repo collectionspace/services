@@ -3,6 +3,9 @@ package org.collectionspace.services.common.api;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Usage for this class, if you have a URN and would like to get at its fields, is to call one of these methods:
  *
@@ -36,27 +39,24 @@ import java.util.regex.Pattern;
  *
  * User: laramie
  */
- 
 public class RefName {
+	
+    /** The logger. */
+    private static final Logger logger = LoggerFactory.getLogger(RefName.class);
+
     public static final String HACK_VOCABULARIES = "Vocabularies"; //TODO: get rid of these.
     public static final String HACK_ORGANIZATIONS = "Organizations"; //TODO: get rid of these.
     public static final String HACK_ORGAUTHORITIES = "Orgauthorities";  //TODO: get rid of these.
     public static final String HACK_PERSONAUTHORITIES = "Personauthorities";  //TODO: get rid of these.
     public static final String HACK_LOCATIONAUTHORITIES = "Locationauthorities";  //TODO: get rid of these.
-
-    public static final String URN_PREFIX      = "urn:cspace:";
+    public static final String URN_PREFIX = "urn:cspace:";
     public static final String URN_NAME_PREFIX = "urn:cspace:name";
-
     public static final String REFNAME = "refName";
-
-    public static final String AUTHORITY_REGEX      = "urn:cspace:(.*):(.*)\\((.*)\\)\\'?([^\\']*)\\'?";
-    public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*)\\((.*)\\):items\\((.*)\\)\\'?([^\\']*)\\'?";
-
-    public static final String AUTHORITY_EXAMPLE  = "urn:cspace:collectionspace.org:Loansin(shortID)'displayName'";
-    public static final String AUTHORITY_EXAMPLE2 = "urn:cspace:collectionspace.org:Loansin(shortID)";
-
-    public static final String AUTHORITY_ITEM_EXAMPLE ="urn:cspace:collectionspace.org:Loansin(shortID):items(itemShortID)'itemDisplayName'";
-
+    public static final String AUTHORITY_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\)\\'?([^\\']*)\\'?";
+    public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\):item:name\\((.*)\\)\\'?([^\\']*)\\'?";
+    public static final String AUTHORITY_EXAMPLE = "urn:cspace:collectionspace.org:Loansin:name(shortID)'displayName'";
+    public static final String AUTHORITY_EXAMPLE2 = "urn:cspace:collectionspace.org:Loansin:name(shortID)";
+    public static final String AUTHORITY_ITEM_EXAMPLE = "urn:cspace:collectionspace.org:Loansin:name(shortID):item:name(itemShortID)'itemDisplayName'";
     public static final String EX_tenantName = "collectionspace.org";
     public static final String EX_resource = "Loansin";
     public static final String EX_shortIdentifier = "shortID";
@@ -64,18 +64,19 @@ public class RefName {
     public static final String EX_itemShortIdentifier = "itemShortID";
     public static final String EX_itemDisplayName = "itemDisplayName";
 
-
     public static class Authority {
+
         public String tenantName = "";
         public String resource = "";
         public String shortIdentifier = "";
         public String displayName = "";
+
         public static Authority parse(String urn) {
             Authority info = new Authority();
             Pattern p = Pattern.compile(AUTHORITY_REGEX);
             Matcher m = p.matcher(urn);
-            if (m.find()){
-                if (m.groupCount()<4){
+            if (m.find()) {
+                if (m.groupCount() < 4) {
                     return null;
                 }
                 info.tenantName = m.group(1);
@@ -86,43 +87,53 @@ public class RefName {
             }
             return null;
         }
-        public boolean equals(Object other){
-            if (other == null){
+        
+        public String getShortIdentifier() {
+            return this.shortIdentifier;
+        }
+
+        public boolean equals(Object other) {
+            if (other == null) {
                 return false;
             }
-            if (other instanceof Authority){
-                Authority ao = (Authority)other;
-                return (   this.tenantName.equals(ao.tenantName)
+            if (other instanceof Authority) {
+                Authority ao = (Authority) other;
+                return (this.tenantName.equals(ao.tenantName)
                         && this.resource.equals(ao.resource)
-                        && this.shortIdentifier.equals(ao.shortIdentifier)
-                       );
+                        && this.shortIdentifier.equals(ao.shortIdentifier));
             } else {
                 return false;
             }
         }
+
         public String getRelativeUri() {
-        	return "/"+resource+"/"+URN_NAME_PREFIX+"("+shortIdentifier+")";
-        }
-        public String toString() {
-            String displaySuffix = (displayName != null && (!displayName.isEmpty())) ? '\'' + displayName + '\'' : "";
-            return URN_PREFIX + tenantName + ':' + resource + "(" + shortIdentifier + ")" + displaySuffix;
+            return "/" + resource + "/" + URN_NAME_PREFIX + "(" + shortIdentifier + ")";
         }
 
+        public String toString() {
+            String displaySuffix = (displayName != null && (!displayName.isEmpty())) ? '\'' + displayName + '\'' : "";
+            return URN_PREFIX + tenantName + ':' + resource + ":" + "name" + "(" + shortIdentifier + ")" + displaySuffix;
+        }
     }
 
     public static class AuthorityItem {
+
         public Authority inAuthority;
         public String shortIdentifier = "";
         public String displayName = "";
+
         public static AuthorityItem parse(String urn) {
             Authority info = new Authority();
             AuthorityItem termInfo = new AuthorityItem();
             termInfo.inAuthority = info;
             Pattern p = Pattern.compile(AUTHORITY_ITEM_REGEX);
             Matcher m = p.matcher(urn);
-            if (m.find()){
-                if (m.groupCount()<5){
-                    return  null;
+            if (m.find()) {
+                if (m.groupCount() < 5) {
+                	if (m.groupCount() == 4 && logger.isDebugEnabled()) {
+                		logger.debug("AuthorityItem.parse only found 4 items; Missing displayName? Urn:"+urn);
+                	}
+                    return null;
                 }
                 termInfo.inAuthority.tenantName = m.group(1);
                 termInfo.inAuthority.resource = m.group(2);
@@ -133,12 +144,21 @@ public class RefName {
             }
             return null;
         }
-        public boolean equals(Object other){
-            if (other == null){
+        
+        public String getParentShortIdentifier() {
+            return this.inAuthority.shortIdentifier;
+        }
+        
+        public String getShortIdentifier() {
+            return this.shortIdentifier;
+        }
+    
+        public boolean equals(Object other) {
+            if (other == null) {
                 return false;
             }
-            if (other instanceof AuthorityItem){
-                AuthorityItem aio = (AuthorityItem)other;
+            if (other instanceof AuthorityItem) {
+                AuthorityItem aio = (AuthorityItem) other;
                 boolean ok = true;
                 ok = ok && aio.inAuthority != null;
                 ok = ok && aio.inAuthority.equals(this.inAuthority);
@@ -149,34 +169,38 @@ public class RefName {
                 return false;
             }
         }
+
         public String getRelativeUri() {
-        	return inAuthority.getRelativeUri()+"/items/"+URN_NAME_PREFIX+"("+shortIdentifier+")";
+            return inAuthority.getRelativeUri() + "/items/" + URN_NAME_PREFIX + "(" + shortIdentifier + ")";
         }
+
         public String toString() {
             String displaySuffix = (displayName != null && (!displayName.isEmpty())) ? '\'' + displayName + '\'' : "";
             Authority ai = inAuthority;
-            if (ai==null){
-               return URN_PREFIX+"ERROR:inAuthorityNotSet: (" + shortIdentifier + ")" + displaySuffix;
+            if (ai == null) {
+                return URN_PREFIX + "ERROR:inAuthorityNotSet: (" + shortIdentifier + ")" + displaySuffix;
             } else {
-               String base = URN_PREFIX + ai.tenantName + ':' + ai.resource + "(" + ai.shortIdentifier + ")" ;
-               String refname = base+":items("+shortIdentifier+")"+displaySuffix;
-               return refname;
+                String base = URN_PREFIX + ai.tenantName + ':' + ai.resource + ":" + "name" + "(" + ai.shortIdentifier + ")";
+                String refname = base + ":item:name(" + shortIdentifier + ")" + displaySuffix;
+                return refname;
             }
         }
-
     }
 
     public static Authority buildAuthority(String tenantName, String serviceName, String authorityShortIdentifier, String authorityDisplayName) {
         Authority authority = new Authority();
         authority.tenantName = tenantName;
         authority.resource = serviceName;
+        if (Tools.notEmpty(authority.resource)) {
+            authority.resource = authority.resource.toLowerCase();
+        }
         authority.shortIdentifier = authorityShortIdentifier;
         authority.displayName = authorityDisplayName;
         return authority;
     }
 
     public static AuthorityItem buildAuthorityItem(String tenantName, String serviceName, String authorityShortIdentifier,
-                                                   String itemShortIdentifier, String itemDisplayName) {
+            String itemShortIdentifier, String itemDisplayName) {
         Authority authority = buildAuthority(tenantName, serviceName, authorityShortIdentifier, "");
         return buildAuthorityItem(authority, itemShortIdentifier, itemDisplayName);
     }
@@ -201,7 +225,7 @@ public class RefName {
      * so that calling shortIdToPath("TestAuthority") returns "urn:cspace:name(TestAuthority)", and
      * then this value may be put into a path, such as "/personauthorities/urn:cspace:name(TestAuthority)/items".
      */
-    public static String shortIdToPath(String shortId){
-        return URN_NAME_PREFIX+'('+shortId+')';
+    public static String shortIdToPath(String shortId) {
+        return URN_NAME_PREFIX + '(' + shortId + ')';
     }
 }

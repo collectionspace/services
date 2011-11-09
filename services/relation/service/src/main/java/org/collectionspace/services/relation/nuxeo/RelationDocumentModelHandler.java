@@ -23,14 +23,20 @@
  */
 package org.collectionspace.services.relation.nuxeo;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -42,12 +48,20 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 
+// HACK HACK HACK
+import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.LocationAuthorityClient;
+import org.collectionspace.services.client.TaxonomyAuthorityClient;
+
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.relation.RelationsDocListItem;
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +86,44 @@ public class RelationDocumentModelHandler
      * for ACTION.GET_ALL
      */
     private RelationsCommonList relationList;
+
+    @Override
+    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// Merge in the data from the payload
+        super.handleCreate(wrapDoc);
+
+        // And take care of ensuring all the values for the relation info are correct 
+        populateSubjectAndObjectValues(wrapDoc);
+    }
+
+    @Override
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// Merge in the data from the payload
+        super.handleUpdate(wrapDoc);
+        
+        // And take care of ensuring all the values for the relation info are correct 
+        populateSubjectAndObjectValues(wrapDoc);
+    }
+    
+    private void populateSubjectAndObjectValues(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        // Obtain document models for the subject and object of the relation, so that
+        // we ensure we have value docType, URI info. If the docModels support refNames, 
+        // we will also set those.
+        // Note that this introduces another caching problem... 
+        DocumentModel relationDocModel = wrapDoc.getWrappedObject();
+        ServiceContext ctx = getServiceContext();
+        DocumentModel subjectDocModel = getSubjectOrObjectDocModel(relationDocModel, ctx, SUBJ_DOC_MODEL);
+        DocumentModel objectDocModel = getSubjectOrObjectDocModel(relationDocModel, ctx, OBJ_DOC_MODEL);
+
+        // Use values from the subject and object document models to populate the
+        // relevant fields of the relation's own document model.
+        if (subjectDocModel != null) {
+            populateSubjectOrObjectValues(relationDocModel, subjectDocModel, ctx, SUBJ_DOC_MODEL);
+        }
+        if (objectDocModel != null) {
+            populateSubjectOrObjectValues(relationDocModel, objectDocModel, ctx, OBJ_DOC_MODEL);
+        }
+    }
 
     @Override
     public RelationsCommon getCommonPart() {
@@ -108,7 +160,7 @@ public class RelationDocumentModelHandler
 
     @Override
     public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc) ;
+        RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc);
         relList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object");
         ServiceContext ctx = getServiceContext();
         String serviceContextPath = getServiceContextPath();
@@ -118,7 +170,7 @@ public class RelationDocumentModelHandler
         ServiceBindingType sbt = tReader.getServiceBinding(ctx.getTenantId(), serviceName);
 
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-        while(iter.hasNext()){
+        while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             RelationListItem relListItem = getRelationListItem(ctx, sbt, tReader, docModel, serviceContextPath);
             relList.getRelationListItem().add(relListItem);
@@ -137,10 +189,10 @@ public class RelationDocumentModelHandler
      * @throws Exception the exception
      */
     private RelationListItem getRelationListItem(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-                                                                        ServiceBindingType sbt,
-                                                                        TenantBindingConfigReaderImpl tReader,
-                                                                        DocumentModel docModel,
-                                                                        String serviceContextPath) throws Exception {
+            ServiceBindingType sbt,
+            TenantBindingConfigReaderImpl tReader,
+            DocumentModel docModel,
+            String serviceContextPath) throws Exception {
         RelationListItem relationListItem = new RelationListItem();
         String id = getCsid(docModel);
         relationListItem.setCsid(id);
@@ -153,7 +205,7 @@ public class RelationDocumentModelHandler
         relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
 
         relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_ID_2));
-        
+
         relationListItem.setUri(serviceContextPath + id);
 
         //Now fill in summary info for the related docs: subject and object.
@@ -164,54 +216,57 @@ public class RelationDocumentModelHandler
         //Object o1 =  docModel.getProperty(ctx.getCommonPartLabel(), "subject");
         //Object o2 =  docModel.getProperty(ctx.getCommonPartLabel(), "object");
 
-        String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.subjectUri);
+        String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.SUBJECT_URI);
         subject.setUri(subjectUri);
+        String subjectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.SUBJECT_REFNAME);
+        subject.setRefName(subjectRefName);
         relationListItem.setSubject(subject);
 
         String objectCsid = relationListItem.getObjectCsid();
         String documentType2 = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_2);
         RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, documentType2);
 
-        String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.objectUri);
+        String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.OBJECT_URI);
         object.setUri(objectUri);
+        String objectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.OBJECT_REFNAME);
+        object.setRefName(objectRefName);
         relationListItem.setObject(object);
 
         return relationListItem;
     }
 
-     // DocumentModel itemDocModel = docModelFromCSID(ctx, itemCsid);
-
-    protected RelationsDocListItem createRelationsDocListItem(ServiceContext  ctx, 
-                                                                                                 ServiceBindingType sbt,
-                                                                                                 String itemCsid,
-                                                                                                 TenantBindingConfigReaderImpl tReader,
-                                                                                                 String documentType) throws Exception {
+    // DocumentModel itemDocModel = docModelFromCSID(ctx, itemCsid);
+    protected RelationsDocListItem createRelationsDocListItem(ServiceContext ctx,
+            ServiceBindingType sbt,
+            String itemCsid,
+            TenantBindingConfigReaderImpl tReader,
+            String documentType) throws Exception {
         RelationsDocListItem item = new RelationsDocListItem();
         item.setDocumentType(documentType);//this one comes from the record, as documentType1, documentType2.
         // CSPACE-4037 REMOVING: item.setService(documentType);//this one comes from the record, as documentType1, documentType2.   Current app seems to use servicename for this.
         item.setCsid(itemCsid);
 
-        DocumentModel itemDocModel =  NuxeoUtils.getDocFromCsid(getRepositorySession(), ctx, itemCsid);    //null if not found.
-        if (itemDocModel!=null){
+        DocumentModel itemDocModel = NuxeoUtils.getDocFromCsid(getRepositorySession(), ctx, itemCsid);    //null if not found.
+        if (itemDocModel != null) {
             String itemDocType = itemDocModel.getDocumentType().getName();
             // CSPACE-4037 REMOVING: item.setDocumentTypeFromModel(itemDocType);           //this one comes from the nuxeo documentType
 
             //DEBUG: System.out.println("\r\n******** AuthorityItemDocumentModelHandlder documentType **************\r\n\tdocModel: "+itemDocType+"\r\n\tpayload: "+documentType);
             //boolean usedDocumentTypeFromPayload = true;
             /*if ( ! Tools.isBlank(documentType)){
-                if (documentType.equals(itemDocType)){
-                    //usedDocumentTypeFromPayload = true;
-                }  else {
-                    // Laramie20110510 CSPACE-3739  throw the exception for 3739, otherwise, don't throw it.
-                    //throw new Exception("documentType supplied was wrong.  supplied: "+documentType+" required: "+itemDocType+ " itemCsid: "+itemCsid );
-                }
+            if (documentType.equals(itemDocType)){
+            //usedDocumentTypeFromPayload = true;
+            }  else {
+            // Laramie20110510 CSPACE-3739  throw the exception for 3739, otherwise, don't throw it.
+            //throw new Exception("documentType supplied was wrong.  supplied: "+documentType+" required: "+itemDocType+ " itemCsid: "+itemCsid );
+            }
             } else {
-                //usedDocumentTypeFromPayload = false;
-                item.setDocumentType(itemDocType);
+            //usedDocumentTypeFromPayload = false;
+            item.setDocumentType(itemDocType);
             }   */
-             if (Tools.isBlank(documentType)){
-               item.setDocumentType(itemDocType);
-             }
+            if (Tools.isBlank(documentType)) {
+                item.setDocumentType(itemDocType);
+            }
 
             // TODO: clean all the output statements out of here when CSPACE-4037 is done.
             //TODO: ensure that itemDocType is really the entry point, i.e. servicename==doctype
@@ -221,32 +276,32 @@ public class RelationDocumentModelHandler
             try {
                 propName = ServiceBindingUtils.getPropertyValue(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP);
                 String itemDocname = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP, itemDocModel);
-                if (propName==null || itemDocname==null){
+                if (propName == null || itemDocname == null) {
                     //System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
-                }  else{
+                } else {
                     item.setName(itemDocname);
                     //System.out.println("=== found prop : "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
                 }
-            } catch (Throwable t){
-                 System.out.println("====Error finding objectNameProperty: "+itemDocModel+" field "+ServiceBindingUtils.OBJ_NAME_PROP+"="+propName
-                                            +" not found in itemDocType: "+itemDocType+" inner: "+t.getMessage());
+            } catch (Throwable t) {
+                System.out.println("====Error finding objectNameProperty: " + itemDocModel + " field " + ServiceBindingUtils.OBJ_NAME_PROP + "=" + propName
+                        + " not found in itemDocType: " + itemDocType + " inner: " + t.getMessage());
             }
             propName = "ERROR-FINDING-PROP-VALUE";
             try {
                 propName = ServiceBindingUtils.getPropertyValue(itemSbt, ServiceBindingUtils.OBJ_NUMBER_PROP);
                 String itemDocnumber = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NUMBER_PROP, itemDocModel);
 
-                 if (propName==null || itemDocnumber==null){
-                     //System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
-                      //                          +" documentType: "+documentType);
-                 } else {
-                     item.setNumber(itemDocnumber);
-                     //System.out.println("============ found prop : "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
-                      //                          +" documentType: "+documentType);
-                 }
-            } catch (Throwable t){
-                logger.error("====Error finding objectNumberProperty: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"="+propName
-                                           +" not found in itemDocType: "+itemDocType+" inner: "+t.getMessage());
+                if (propName == null || itemDocnumber == null) {
+                    //System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
+                    //                          +" documentType: "+documentType);
+                } else {
+                    item.setNumber(itemDocnumber);
+                    //System.out.println("============ found prop : "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
+                    //                          +" documentType: "+documentType);
+                }
+            } catch (Throwable t) {
+                logger.error("====Error finding objectNumberProperty: " + ServiceBindingUtils.OBJ_NUMBER_PROP + "=" + propName
+                        + " not found in itemDocType: " + itemDocType + " inner: " + t.getMessage());
             }
         } else {
             item.setError("INVALID: related object is absent");
@@ -260,5 +315,115 @@ public class RelationDocumentModelHandler
     public String getQProperty(String prop) {
         return "/" + RelationConstants.NUXEO_SCHEMA_ROOT_ELEMENT + "/" + prop;
     }
-}
 
+    private final boolean SUBJ_DOC_MODEL = true;
+    private final boolean OBJ_DOC_MODEL = false;
+    
+    private DocumentModel getSubjectOrObjectDocModel(
+    		DocumentModel relationDocModel, ServiceContext ctx, boolean fSubject) throws Exception {
+        // Get the document model for the object of the relation.
+    	String commonPartLabel = ctx.getCommonPartLabel();
+        String csid = "";
+        String refName = "";
+        DocumentModel docModel = null;
+        // FIXME: Currently assumes that the object CSID is valid if present
+        // in the incoming payload.
+        try {
+            csid = (String) relationDocModel.getProperty(commonPartLabel, 
+            		(fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID));
+            // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
+            if (Tools.isBlank(csid)) {
+                csid = (String) relationDocModel.getProperty(commonPartLabel, 
+					(fSubject?RelationJAXBSchema.DOCUMENT_ID_1:RelationJAXBSchema.DOCUMENT_ID_2));
+            }
+        } catch (PropertyException pe) {
+            // Per CSPACE-4468, ignore any property exception here.
+            // The objectCsid and/or subjectCsid field in a relation record
+            // can now be null (missing), because a refName value can be
+            // provided as an alternate identifier.
+        }
+        if (Tools.notBlank(csid)) {
+            DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDocFromCsid(ctx, csid);
+            docModel = docWrapper.getWrappedObject();
+        } else { //  if (Tools.isBlank(objectCsid)) {
+            try {
+            	refName = (String) relationDocModel.getProperty(commonPartLabel, 
+            			(fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
+            	docModel = ResourceBase.getDocModelForRefName(refName, ctx.getResourceMap());
+            } catch (Exception e) {
+                throw new InvalidDocumentException(
+                        "Relation record must have a CSID or refName to identify the object of the relation.", e);
+            }
+        }
+        if(docModel==null) {
+           	throw new DocumentNotFoundException("Relation.getSubjectOrObjectDocModel could not find doc with CSID: "
+           				+csid+" and/or refName: "+refName );
+        }
+        return docModel;
+    }
+    
+    private void populateSubjectOrObjectValues(
+    		DocumentModel relationDocModel, 
+    		DocumentModel subjectOrObjectDocModel,
+    		ServiceContext ctx,
+    		boolean fSubject ) {
+        HashMap<String,Object> properties = new HashMap<String,Object>();
+
+        try {
+	        String doctype = (String) subjectOrObjectDocModel.getType();
+	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_DOCTYPE:RelationJAXBSchema.OBJECT_DOCTYPE),
+	        					doctype);
+	        // FIXME: Remove the line below when legacy fields are removed from the Relation record:
+	        properties.put((fSubject?RelationJAXBSchema.DOCUMENT_TYPE_1:RelationJAXBSchema.DOCUMENT_TYPE_2), 
+	        					doctype);
+	
+	        String csid = (String) subjectOrObjectDocModel.getName();
+	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID),
+	        					csid);
+	        // FIXME: Remove the two lines immediately below when legacy fields are removed from the Relation record:
+	        properties.put((fSubject?RelationJAXBSchema.DOCUMENT_ID_1:RelationJAXBSchema.DOCUMENT_ID_2),
+	        					csid);
+	
+	        String uri = (String) subjectOrObjectDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,
+	        															COLLECTIONSPACE_CORE_URI);
+	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_URI:RelationJAXBSchema.OBJECT_URI),
+	        					uri);
+	        
+	    	String common_schema = getCommonSchemaNameForDocType(doctype);
+	    	
+	    	if(common_schema!=null) {
+	    		String refname = (String)subjectOrObjectDocModel.getProperty(common_schema, 
+	    														RefName.REFNAME );
+	            properties.put((fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME),
+	            		refname);
+	    	}
+        } catch (ClientException ce) {
+            throw new RuntimeException(
+                    "populateSubjectOrObjectValues: Problem fetching field " + ce.getLocalizedMessage());
+        }
+
+        // FIXME: Call below is based solely on Nuxeo API docs; have not yet verified that it correctly updates existing
+        // property values in the target document model.
+        try {
+        	relationDocModel.setProperties(ctx.getCommonPartLabel(), properties);
+        } catch (ClientException ce) {
+            throw new RuntimeException(
+                    "populateSubjectValues: Problem setting fields " + ce.getLocalizedMessage());
+        }
+    }
+    
+    private String getCommonSchemaNameForDocType(String docType) {
+    	String common_schema = null;
+    	if("Person".equals(docType))
+    		common_schema = PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    	else if("Organization".equals(docType))
+    		common_schema = OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    	else if("Locationitem".equals(docType))
+    		common_schema = LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    	else if("Taxon".equals(docType))
+    		common_schema = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    	//else leave it null.
+    	return common_schema;
+    }
+
+}

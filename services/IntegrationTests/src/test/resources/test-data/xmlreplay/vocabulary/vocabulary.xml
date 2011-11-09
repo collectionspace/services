@@ -6,7 +6,7 @@
 		<auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
 	</auths>
 	<testGroup ID="TestOrder" autoDeletePOSTS="true">
-        <!-- The purpose of this testGroup is to test the new "order" field
+		<!-- The purpose of this testGroup is to test the new "order" field
 	      that was added in http://issues.collectionspace.org/browse/CSPACE-573
 	      and to ensure that this order field is returned in list results, 
 	      and that duplicate values for the order field is accepted.
@@ -46,25 +46,34 @@
 				<var ID="displayName">TestOrder item ${itemID} order ${order}</var>
 			</vars>
 		</test>
-		
+
 		<test ID="GetVocabularies" auth="admin@core.collectionspace.org">
-            <method>GET</method>
-            <uri>/cspace-services/vocabularies/</uri>
-        </test>
-        
-        <test ID="GetVocabularyItems" auth="admin@core.collectionspace.org">
-            <method>GET</method>
-            <uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
-            <response>
-                <expected level="ADDOK" />
-                <filename>vocabulary/res/GetVocabularyItems.res.xml</filename>
-                <vars>
+			<method>GET</method>
+			<uri>/cspace-services/vocabularies/</uri>
+		</test>
+
+		<test ID="GetVocabularyItems" auth="admin@core.collectionspace.org">
+			<method>GET</method>
+			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/</uri>
+			<response>
+				<expected level="ADDOK"/>
+				<filename>vocabulary/res/GetVocabularyItems.res.xml</filename>
+				<vars>
 					<var ID="I3displayName">${Item3DupeOrder.displayName}</var>
 				</vars>
-                <!--<startElement>//vocabulary-list-item[./exitNumber='checkList-1234']</startElement>-->
-             </response>
-        </test>
-		
+				<!--<startElement>//vocabulary-list-item[./exitNumber='checkList-1234']</startElement>-->
+			</response>
+		</test>
+
+		<test ID="GetVocabularyItem" auth="admin@core.collectionspace.org">
+			<method>GET</method>
+			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/${Item1.CSID}</uri>
+		</test>
+
+		<test ID="GetVocabularyItemRefObjs" auth="admin@core.collectionspace.org">
+			<method>GET</method>
+			<uri>/cspace-services/vocabularies/${Vocabulary1.CSID}/items/${Item1.CSID}/refObjs</uri>
+		</test>
+
 	</testGroup>
 </xmlReplay>
-

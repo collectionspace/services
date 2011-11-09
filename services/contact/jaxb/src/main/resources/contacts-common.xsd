@@ -33,49 +33,86 @@
                 <xs:element name="csid" type="xs:string" />
                 <xs:element name="inAuthority" type="xs:string" />
                 <xs:element name="inItem" type="xs:string" />
-                <xs:element name="addressType" type="xs:string"/>
-                <xs:element name="addressPlace" type="xs:string"/>
-                <xs:element name="web" type="xs:string"/>
-                <xs:element name="email" type="xs:string"/>
-                <xs:element name="telephoneNumber" type="xs:string"/>
-                <xs:element name="faxNumber" type="xs:string"/>
+                <xs:element name="displayName" type="xs:string"/>
+                <xs:element name="emailGroupList" type="emailGroupList"/>
+                <xs:element name="telephoneNumberGroupList" type="telephoneNumberGroupList"/>
+                <xs:element name="faxNumberGroupList" type="faxNumberGroupList"/>
+                <xs:element name="webAddressGroupList" type="webAddressGroupList"/>
+                <xs:element name="addressGroupList" type="addressGroupList"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     
-    <!-- This is the base class for paginated lists -->
-    <xs:complexType name="abstractCommonList">
-        <xs:annotation>
-            <xs:appinfo>
-                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
-            </xs:appinfo>
-        </xs:annotation>
+    
+    <xs:complexType name="emailGroupList">
+        <xs:sequence>
+            <xs:element name="emailGroup" type="emailGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="emailGroup">
+        <xs:sequence>
+            <xs:element name="email" type="xs:string"/>
+            <xs:element name="emailType" type="xs:string"/>
+        </xs:sequence>
     </xs:complexType>
     
-    <!-- contact records, as in Nuxeo repository -->
-    <xs:element name="contacts-common-list">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-                    <xs:sequence>
-                        <xs:element name="contact-list-item" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="addressPlace" type="xs:string"
-                                        minOccurs="1" />
-                                    <!-- uri to retrive contact details -->
-                                    <xs:element name="uri" type="xs:anyURI"
-                                        minOccurs="1" />
-                                    <xs:element name="csid" type="xs:string"
-                                        minOccurs="1" />
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:extension>
-            </xs:complexContent>                    
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="telephoneNumberGroupList">
+        <xs:sequence>
+            <xs:element name="telephoneNumberGroup" type="telephoneNumberGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="telephoneNumberGroup">
+        <xs:sequence>
+            <xs:element name="telephoneNumber" type="xs:string"/>
+            <xs:element name="telephoneNumberType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="faxNumberGroupList">
+        <xs:sequence>
+            <xs:element name="faxNumberGroup" type="faxNumberGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="faxNumberGroup">
+        <xs:sequence>
+            <xs:element name="faxNumber" type="xs:string"/>
+            <xs:element name="faxNumberType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="webAddressGroupList">
+        <xs:sequence>
+            <xs:element name="webAddressGroup" type="webAddressGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="webAddressGroup">
+        <xs:sequence>
+            <xs:element name="webAddress" type="xs:string"/>
+            <xs:element name="webAddressType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="addressGroupList">
+        <xs:sequence>
+            <xs:element name="addressGroup" type="addressGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="addressGroup">
+        <xs:sequence>
+            <xs:element name="addressPlace1" type="xs:string"/>
+            <xs:element name="addressPlace2" type="xs:string"/>
+            <xs:element name="addressMunicipality" type="xs:string"/>
+            <xs:element name="addressStateOrProvince" type="xs:string"/>
+            <xs:element name="addressPostCode" type="xs:string"/>
+            <xs:element name="addressCountry" type="xs:string"/>
+            <xs:element name="addressType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
     
 </xs:schema>
 

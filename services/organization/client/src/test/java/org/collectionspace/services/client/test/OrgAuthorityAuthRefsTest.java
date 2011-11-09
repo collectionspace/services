@@ -155,7 +155,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         String shortId = createIdentifier();
         String displayName = "TestOrgAuth-" + shortId;
-    	String baseRefName = OrgAuthorityClientUtils.createOrgAuthRefName(shortId, null);
+    	//String baseRefName = OrgAuthorityClientUtils.createOrgAuthRefName(shortId, null);
         PoxPayloadOut multipart =
             OrgAuthorityClientUtils.createOrgAuthorityInstance(
             			displayName, shortId, orgAuthClient.getCommonPartName());
@@ -181,7 +181,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 	        // so they can be deleted after tests have been run.
 	        String newId = extractId(res);
 	        if (knownResourceId == null){
-	        	setKnownResource( newId, baseRefName );
+	        	setKnownResource( newId, null ); //baseRefName );
 	        }
 	        allResourceIdsCreated.add(newId);
         } finally {
@@ -252,17 +252,17 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
             res.releaseConnection();
         }
 
-        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+        //String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
         
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-       	String csid = createPerson("Charlie", "Orgcontact", "charlieOrgcontact", authRefName);
+       	String csid = createPerson("Charlie", "Orgcontact", "charlieOrgcontact", null ); // authRefName);
         personIdsCreated.add(csid);
         organizationContactPersonRefName1 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-       	csid = createPerson("Chelsie", "Contact", "chelsieContact", authRefName);
+       	csid = createPerson("Chelsie", "Contact", "chelsieContact", null ); // authRefName);
         personIdsCreated.add(csid);
         organizationContactPersonRefName2 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
