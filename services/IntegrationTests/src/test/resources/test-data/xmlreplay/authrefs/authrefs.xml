@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <!-- 
+         testGroup ID="person" is not live.  It works, but may not clean up correctly. 
+         For now, use ID="updatePerson"
+    -->
+    <testGroup ID="AuthRefs" autoDeletePOSTS="true">
+        <test ID="PersonAuth1" auth="admin@core.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <filename>authrefs/newPersonAuthority.xml</filename>
+        </test>
+        <test ID="Person1">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+            <filename>authrefs/newPerson1.xml</filename>
+        </test>
+        <test ID="Person2">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+            <filename>authrefs/newPerson2.xml</filename>
+        </test>
+
+        <test ID="loanout1" auth="test">
+            <method>POST</method>
+            <uri>/cspace-services/loansout/</uri>
+            <filename>authrefs/loanout.xml</filename>
+            <vars>
+                <var ID="loannum">42</var>
+                <var ID="person">${Person1.CSID}</var>
+            </vars>
+        </test>
+
+        <test ID="loanout2" auth="test">
+            <method>POST</method>
+            <uri>/cspace-services/loansout/</uri>
+            <filename>authrefs/loanout.xml</filename>
+            <vars>
+                <var ID="loannum">69</var>
+                <var ID="person">${Person2.CSID}</var>
+            </vars>
+        </test>
+
+        <test ID="UpdatePerson1">
+            <method>PUT</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
+            <filename>authrefs/updatePerson1.xml</filename>
+        </test>
+
+        <test ID="UpdatePerson2">
+            <method>PUT</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}</uri>
+            <filename>authrefs/updatePerson2.xml</filename>
+        </test>
+    </testGroup>
+
+</xmlReplay>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="persons">
+	<ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
+		<shortIdentifier>debbieDoNothingPerson</shortIdentifier>
+		<displayNameComputed>true</displayNameComputed>
+		<foreName>Debbie</foreName>
+		<surName>DoNothingPerson</surName>
+	</ns2:persons_common>
+</document>
