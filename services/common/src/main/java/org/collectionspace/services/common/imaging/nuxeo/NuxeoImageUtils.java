@@ -32,8 +32,9 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
-
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,12 +112,15 @@ import org.slf4j.LoggerFactory;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.blob.DimensionGroup;
-import org.collectionspace.services.blob.DimensionGroupList;
+import org.collectionspace.services.blob.DimensionSubGroup;
+import org.collectionspace.services.blob.DimensionSubGroupList;
+import org.collectionspace.services.blob.MeasuredPartGroup;
+import org.collectionspace.services.blob.MeasuredPartGroupList;
 //import org.collectionspace.services.blob.BlobsCommonList;
 //import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -289,47 +293,57 @@ public class NuxeoImageUtils {
 	    return metadataMap;
 	}
 		
-	static private DimensionGroupList getDimensions(DocumentModel documentModel, Blob nuxeoBlob) {
-		DimensionGroupList result = null;
+	static private MeasuredPartGroupList getDimensions(DocumentModel documentModel, Blob nuxeoBlob) {
+		MeasuredPartGroupList result = null;
 		try {
 		    ImagingService service = Framework.getService(ImagingService.class);			
 		    ImageInfo imageInfo = service.getImageInfo(nuxeoBlob);
 		    Map<String, Object> metadataMap = getMetadata(nuxeoBlob);
 		    
 		    if (imageInfo != null) {
-		    	DimensionGroupList dimensionGroupList = new DimensionGroupList();
-		    	List<DimensionGroup> dgList = dimensionGroupList.getDimensionGroup();
+                        MeasuredPartGroupList measuredPartGroupList = new MeasuredPartGroupList();
+                        List<MeasuredPartGroup> measuredPartList = measuredPartGroupList.getMeasuredPartGroup();
+                        
+                        MeasuredPartGroup mpGroup = new MeasuredPartGroup();
+                        mpGroup.setMeasuredPart(PART_IMAGE);
+                        
+		    	DimensionSubGroupList dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
+		    	List<DimensionSubGroup> dgList = dimensionSubGroupList.getDimensionSubGroup();
+                        
+                        String valueDate = GregorianCalendarDateTimeUtils.timestampUTC(); 
+
 		    	//
 		    	// Set the width
 		    	//
-		    	DimensionGroup widthDimension = new DimensionGroup();
-		    	widthDimension.setMeasuredPart(PART_IMAGE);
+		    	DimensionSubGroup widthDimension = new DimensionSubGroup();
 		    	widthDimension.setDimension(WIDTH);
 		    	widthDimension.setMeasurementUnit(UNIT_PIXELS);
-		    	widthDimension.setValue(Integer.toString(imageInfo.getWidth()));
+		    	widthDimension.setValue(intToBigDecimal(imageInfo.getWidth()));
+                        widthDimension.setValueDate(valueDate);
 		    	dgList.add(widthDimension);
 		    	//
 		    	// Set the height
 		    	//
-		    	DimensionGroup heightDimension = new DimensionGroup();
-		    	heightDimension.setMeasuredPart(PART_IMAGE);
+		    	DimensionSubGroup heightDimension = new DimensionSubGroup();
 		    	heightDimension.setDimension(HEIGHT);
 		    	heightDimension.setMeasurementUnit(UNIT_PIXELS);
-		    	heightDimension.setValue(Integer.toString(imageInfo.getHeight()));
+		    	heightDimension.setValue(intToBigDecimal(imageInfo.getHeight()));
+                        heightDimension.setValueDate(valueDate);
 		    	dgList.add(heightDimension);
 		    	//
 		    	// Set the depth
 		    	//
-		    	DimensionGroup depthDimension = new DimensionGroup();
-		    	depthDimension.setMeasuredPart(PART_IMAGE);
+		    	DimensionSubGroup depthDimension = new DimensionSubGroup();
 		    	depthDimension.setDimension(DEPTH);
 		    	depthDimension.setMeasurementUnit(UNIT_BITS);
-		    	depthDimension.setValue(Integer.toString(imageInfo.getDepth()));
+		    	depthDimension.setValue(intToBigDecimal(imageInfo.getDepth()));
+                        depthDimension.setValueDate(valueDate);
 		    	dgList.add(depthDimension);
 		    	//
 		    	// Now set out result
 		    	//
-		    	result = dimensionGroupList;
+                        measuredPartList.add(mpGroup);
+		    	result = measuredPartGroupList;
 		    } else {
 		    	if (logger.isWarnEnabled() == true) {
 		    		logger.warn("Could not synthesize a dimension list of the blob: " + documentModel.getName());
@@ -341,6 +355,13 @@ public class NuxeoImageUtils {
 		
 		return result;
 	}
+        
+        // FIXME: Add error checking here, as none of these calls return an Exception
+        static private BigDecimal intToBigDecimal(int i) {
+            BigInteger bigint = BigInteger.valueOf(i);
+            BigDecimal bigdec = new BigDecimal(bigint);
+            return bigdec;
+        }
 
 	static private BlobsCommon createBlobsCommon(DocumentModel documentModel, Blob nuxeoBlob) {
 		BlobsCommon result = new BlobsCommon();
@@ -350,9 +371,9 @@ public class NuxeoImageUtils {
 			result.setName(nuxeoBlob.getFilename());
 			result.setLength(Long.toString(nuxeoBlob.getLength()));
 			result.setRepositoryId(documentModel.getId());
-			DimensionGroupList dimensionGroupList = getDimensions(documentModel, nuxeoBlob);
-			if (dimensionGroupList != null) {
-				result.setDimensionGroupList(dimensionGroupList);
+			MeasuredPartGroupList measuredPartGroupList = getDimensions(documentModel, nuxeoBlob);
+			if (measuredPartGroupList != null) {
+				result.setMeasuredPartGroupList(measuredPartGroupList);
 			}
 		}
 				
