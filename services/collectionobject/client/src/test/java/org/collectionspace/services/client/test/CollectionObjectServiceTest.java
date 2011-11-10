@@ -650,7 +650,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(dimensionSubGroups.size() > 0, "No dimension subgroups were returned");
         DimensionSubGroup lengthDimension = dimensionSubGroups.get(0);
         Assert.assertNotNull(lengthDimension, "Length dimension was null");
-        Assert.assertEquals(lengthDimension.getValue().setScale(5), DIMENSION_VALUE_LENGTH.setScale(5),
+        Assert.assertTrue(lengthDimension.getValue().compareTo(DIMENSION_VALUE_LENGTH) == 0,
                 "Dimension length value returned didn't match expected value");
         
         /* No longer part of the "default" domain service tests for the CollectionObject record.
