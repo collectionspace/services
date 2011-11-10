@@ -26,6 +26,7 @@
         <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>runtime</artifactId>
+			<version>${jaxb2-basics.version}</version>
         </dependency>
 		-->
         <dependency>

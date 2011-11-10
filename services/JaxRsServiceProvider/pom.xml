@@ -53,6 +53,16 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authority.service</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>nuxeo-core-facade</artifactId>
+            		<groupId>org.nuxeo.ecm.core</groupId>
+            	</exclusion>
+            	<exclusion>
+            		<artifactId>servlet-api-2.5</artifactId>
+            		<groupId>org.mortbay.jetty</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -502,20 +512,6 @@
 			<artifactId>nuxeo-platform-audit-api</artifactId>
 			<version>${nuxeo.core.version}</version>
         </dependency>
-        <!-- 
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-facade</artifactId>
-			<version>${nuxeo.core.version}</version>
-			<scope>provided</scope>
-			<exclusions>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions> 
-        </dependency>
-         -->
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime-osgi</artifactId>

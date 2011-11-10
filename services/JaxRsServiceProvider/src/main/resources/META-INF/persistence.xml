@@ -3,7 +3,9 @@
              http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <persistence-unit name="org.collectionspace.services">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <non-jta-data-source>CspaceDS</non-jta-data-source>
+		<!-- Until our JNDI issue with Nuxeo is resolved, we can't use this datasource element
+        <non-jta-data-source>CspaceDS</non-jta-data-source> -->
+
         <class>org.collectionspace.services.account.AccountsCommon</class>
         <class>org.collectionspace.services.account.Tenant</class>
         <class>org.collectionspace.services.account.AccountTenant</class>
@@ -15,8 +17,14 @@
         <class>org.collectionspace.services.authorization.Role</class>
         <class>org.collectionspace.services.authorization.AccountRoleRel</class>
         <properties>
-					<property name="hibernate.dialect" value="${db.dialect}"/>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
             <property name="hibernate.max_fetch_depth" value="3"/>
+			<!-- Until our JNDI issue with Nuxeo is resolved, we have to use these JDBC properties rather than a datasource -->
+			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
+			<property name="hibernate.connection.username" value="root"/>
+			<property name="hibernate.connection.password" value="admin"/>
+			<property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/cspace"/>
+			
             <!--property name="hibernate.hbm2ddl.auto" value="create-drop"/-->
         </properties>
 
