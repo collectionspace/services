@@ -56,34 +56,16 @@ public class PlaceDocumentModelHandler
     public String getAuthorityServicePath(){
         return PlaceAuthorityClient.SERVICE_PATH_COMPONENT;    //  CSPACE-3932
     }
-	
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	// first fill all the parts of the document
-    	super.handleCreate(wrapDoc);    	
-    	handleDisplayNames(wrapDoc.getWrappedObject());
-    }
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	super.handleUpdate(wrapDoc);
-    	handleDisplayNames(wrapDoc.getWrappedObject());
-    }
 
-    /**
+        /**
      * Handle display name.
      *
      * @param docModel the doc model
      * @throws Exception the exception
      */
-    private void handleDisplayNames(DocumentModel docModel) throws Exception {
-    	String commonPartLabel = getServiceContext().getCommonPartLabel("places");
+    @Override
+    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
+        String commonPartLabel = getServiceContext().getCommonPartLabel("places");
     	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
     			PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
     	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
@@ -93,7 +75,9 @@ public class PlaceDocumentModelHandler
     	if(shortDisplayNameComputed==null)
     		shortDisplayNameComputed = true;
     	if (displayNameComputed || shortDisplayNameComputed) {
-    		String xpathToName = "placeNameGroupList/[0]/name";
+                // Obtain the primary place name from the list of place names, for computing the display name.
+    		String xpathToName = PlaceJAXBSchema.PLACE_NAME_GROUP_LIST 
+                        + "/[0]/" + PlaceJAXBSchema.NAME;
     		String name = getXPathStringValue(docModel, COMMON_PART_LABEL, xpathToName);
     		String displayName = prepareDefaultDisplayName(name);
     		if (displayNameComputed) {
@@ -108,16 +92,12 @@ public class PlaceDocumentModelHandler
     }
 	
     /**
-     * Produces a default displayName from the basic name and dates fields.
+     * Produces a default displayName from one or more supplied fields.
      * @see PlaceAuthorityClientUtils.prepareDefaultDisplayName() which
      * duplicates this logic, until we define a service-general utils package
      * that is neither client nor service specific.
-     * @param foreName	
-     * @param middleName
-     * @param surName
-     * @param birthDate
-     * @param deathDate
-     * @return
+     * @param name
+     * @return the default display name
      * @throws Exception
      */
     private static String prepareDefaultDisplayName(

@@ -299,12 +299,12 @@ public class PlaceAuthorityClientUtils {
 
     
     /**
-     * Produces a default displayName from the basic name and dates fields.
-     * @see PlaceDocumentModelHandler.prepareDefaultDisplayName() which
+     * Produces a default displayName from one or more supplied field(s).
+     * @see PlaceAuthorityDocumentModelHandler.prepareDefaultDisplayName() which
      * duplicates this logic, until we define a service-general utils package
      * that is neither client nor service specific.
      * @param name	
-     * @return
+     * @return a display name
      */
     public static String prepareDefaultDisplayName(
     		String name ) {
