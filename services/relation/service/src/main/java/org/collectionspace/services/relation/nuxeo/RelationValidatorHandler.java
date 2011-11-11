@@ -10,14 +10,11 @@ import org.collectionspace.services.common.api.RefName.AuthorityItem;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.relation.RelationsCommon;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.testng.Assert;
 
-public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
+public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut>	 {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RelationValidatorHandler.class);
@@ -25,74 +22,74 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
      */
     private static final String VALIDATION_ERROR = "The relation record payload was invalid. See log file for more details.";
     private static final String SUBJECT_EQUALS_OBJECT_ERROR = "The subject ID and object ID cannot be the same.";
-
+    
     @Override
     protected Class<?> getCommonPartClass() {
-        return RelationsCommon.class;
+    	return RelationsCommon.class;
     }
-
+    
     @Override
     protected void handleCreate()
-            throws InvalidDocumentException {
-        try {
-            RelationsCommon relationsCommon = (RelationsCommon) getCommonPart();
-            assert (relationsCommon != null);
-            if (logger.isTraceEnabled() == true) {
-                logger.trace(relationsCommon.toString());
-            }
-
+    		throws InvalidDocumentException{
+    	try {
+	    	RelationsCommon relationsCommon = (RelationsCommon)getCommonPart();
+	    	CS_ASSERT(relationsCommon != null);
+    		if (logger.isTraceEnabled() == true) {
+    			logger.trace(relationsCommon.toString());
+    		}
+	    	
             String subjectCsid = getSubjectCsid(relationsCommon);
             String objectCsid = getObjectCsid(relationsCommon);
-
+	    	
             // If no CSID for a subject or object is included in the create payload,
             // a refName must be provided for that subject or object as an alternate identifier.
-            assert (hasCsid(subjectCsid) || hasSubjectRefname(relationsCommon));
-            assert (hasCsid(objectCsid) || hasObjectRefname(relationsCommon));
-
+            CS_ASSERT(hasCsid(subjectCsid) || hasSubjectRefname(relationsCommon));
+            CS_ASSERT(hasCsid(objectCsid) || hasObjectRefname(relationsCommon));
+	    	
             // The Subject identifier and Object ID must not be identical:
             // that is, a resource cannot be related to itself.
             if (hasCsid(subjectCsid) && hasCsid(objectCsid)) {
-                assert (subjectCsid.trim().equalsIgnoreCase(objectCsid.trim()) == false) :
-                        SUBJECT_EQUALS_OBJECT_ERROR;
+            	CS_ASSERT (subjectCsid.trim().equalsIgnoreCase(objectCsid.trim()) == false,
+                        SUBJECT_EQUALS_OBJECT_ERROR);
             }
 
             // A relationship type must be provided.
-            assert (relationsCommon.getRelationshipType() != null);
+            CS_ASSERT(relationsCommon.getRelationshipType() != null);
 
-        } catch (AssertionError e) {
-            if (logger.isErrorEnabled() == true) {
-                logger.error(e.getMessage(), e);
-            }
-            throw new InvalidDocumentException(VALIDATION_ERROR, e);
-        }
+    	} catch (AssertionError e) {
+    		if (logger.isErrorEnabled() == true) {
+    			logger.error(e.getMessage(), e);
+    		}
+    		throw new InvalidDocumentException(VALIDATION_ERROR, e);
+    	}
     }
 
-    @Override
-    protected void handleGet() {
-        // TODO Auto-generated method stub
-    }
+	@Override
+	protected void handleGet() {
+		// TODO Auto-generated method stub
+	}
 
-    @Override
-    protected void handleGetAll() {
-        // TODO Auto-generated method stub
-    }
+	@Override
+	protected void handleGetAll() {
+		// TODO Auto-generated method stub
+	}
 
-    @Override
-    protected void handleUpdate() {
-        // TODO Auto-generated method stub
-    }
+	@Override
+	protected void handleUpdate() {
+		// TODO Auto-generated method stub
+	}
 
-    @Override
-    protected void handleDelete() {
-        // TODO Auto-generated method stub
+	@Override
+	protected void handleDelete() {
+		// TODO Auto-generated method stub
     }
-
+		
     private String getSubjectCsid(RelationsCommon relationsCommon) {
         String subjectCsid = relationsCommon.getSubjectCsid();
         // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
         if (Tools.isBlank(subjectCsid)) {
             subjectCsid = relationsCommon.getDocumentId1();
-        }
+	}
         return subjectCsid;
     }
 
@@ -101,7 +98,7 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
         // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
         if (Tools.isBlank(objectCsid)) {
             objectCsid = relationsCommon.getDocumentId2();
-        }
+}
         return objectCsid;
     }
 

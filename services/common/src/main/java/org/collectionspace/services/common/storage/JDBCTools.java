@@ -32,6 +32,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 
 /**
  * User: laramie
@@ -39,48 +40,62 @@ import java.sql.Statement;
  * $LastChangedDate:  $
  */
 public class JDBCTools {
+	public static HashMap<String, DataSource> cachedDataSources = new HashMap<String, DataSource>();
     public static String CSPACE_REPOSITORY_NAME = "CspaceDS";
     public static String NUXEO_REPOSITORY_NAME = "NuxeoDS";
-    public static String DEFAULT_REPOSITORY_NAME = NUXEO_REPOSITORY_NAME;
+    //
+    // Private constants
+    //
+    private static String DEFAULT_REPOSITORY_NAME = NUXEO_REPOSITORY_NAME;
     private static String DBProductName = null;
     private static DatabaseProductType DBProductType = DatabaseProductType.UNRECOGNIZED;
 
     //todo: make sure this will get instantiated in the right order
     final static Logger logger = LoggerFactory.getLogger(JDBCTools.class);
-    
+        
     public static DataSource getDataSource(String repositoryName) throws NamingException {
     	DataSource result = null;
-    	InitialContext ctx = new InitialContext();
-    	Context envCtx = null;
     	
-        if (logger.isDebugEnabled() == true) {
-        	logger.debug("Looking up datasource in JNDI with name: " + repositoryName);
-        }
-            	
-    	try {
-	        envCtx = (Context) ctx.lookup("java:comp/env");
-	        DataSource ds = (DataSource) envCtx.lookup("jdbc/" + repositoryName);
-	        if (ds == null) {
-	            throw new IllegalArgumentException("datasource not found: " + repositoryName);
-	        } else {
-	        	result = ds;
+    	//
+    	// First, see if we already have this DataSource instance cached
+    	//
+    	result = cachedDataSources.get(repositoryName);
+    	if (result == null) {    	
+        	InitialContext ctx = new InitialContext();
+        	Context envCtx = null;
+
+        	if (logger.isDebugEnabled() == true) {
+	        	logger.debug("Looking up DataSource instance in JNDI with name: " + repositoryName);
 	        }
-    	} finally {
-            if (ctx != null) {
-                try {
-                    ctx.close();
-                } catch (Exception e) {
-                	logger.error("Error getting DataSource for: " + repositoryName, e);
-                }
-            }
-            if (envCtx != null) {
-                try {
-                	envCtx.close();
-                } catch (Exception e) {
-                	logger.error("Error getting DataSource for: " + repositoryName, e);
-                }
-            }
+	            	
+	    	try {
+		        envCtx = (Context) ctx.lookup("java:comp/env");
+		        DataSource ds = (DataSource) envCtx.lookup("jdbc/" + repositoryName);
+		        if (ds == null) {
+		            throw new IllegalArgumentException("DataSource instance not found: " + repositoryName);
+		        } else {
+		        	result = ds;
+		        	// now cache this DataSource instance for future references
+		        	cachedDataSources.put(repositoryName, result);
+		        }
+	    	} finally {
+	            if (ctx != null) {
+	                try {
+	                    ctx.close();
+	                } catch (Exception e) {
+	                	logger.error("Error getting DataSource for: " + repositoryName, e);
+	                }
+	            }
+	            if (envCtx != null) {
+	                try {
+	                	envCtx.close();
+	                } catch (Exception e) {
+	                	logger.error("Error getting DataSource for: " + repositoryName, e);
+	                }
+	            }
+	    	}
     	}
+    	
     	return result;
     }
     
@@ -93,29 +108,22 @@ public class JDBCTools {
     	return result;
     }
 
-    public static Connection getConnection(String repositoryName) throws LoginException, SQLException {
+    public static Connection getConnection(String repositoryName) throws NamingException, SQLException {
     	Connection result = null;
     	
     	if (Tools.isEmpty(repositoryName)) {
             repositoryName = getDefaultRepositoryName();
+            if (logger.isWarnEnabled() == true) {
+            	logger.warn("getConnection() method was called with an empty or null repository name.  Using " + repositoryName + " instead.");
+            }
         }
         
-        Connection conn = null;
-        try {
-            DataSource ds = getDataSource(repositoryName);
-            conn = ds.getConnection();
-            result = conn;
-        } catch (NamingException ex) {
-            LoginException le = new LoginException("Error looking up DataSource from: " + repositoryName);
-            le.initCause(ex);
-            throw le;
-        } catch (SQLException e) {
-            throw e;
-        }
+        DataSource ds = getDataSource(repositoryName);
+        Connection conn = getConnection(ds);
+        result = conn;
         
         return result;
     }
-
 
     /* THIS IS BROKEN - If you close the statement, it closes the ResultSet!!!
     public static ResultSet executeQuery(String repoName, String sql) throws Exception {
@@ -242,7 +250,7 @@ public class JDBCTools {
         return DBProductType;
     }
 
-    public static String getDefaultRepositoryName() {
+    private static String getDefaultRepositoryName() {
         return DEFAULT_REPOSITORY_NAME;
     }
 

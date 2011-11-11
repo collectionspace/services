@@ -609,7 +609,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         DocumentFilter filter = handler.getDocumentFilter();
         String oldOrderBy = filter.getOrderByClause();
         if (isClauseEmpty(oldOrderBy) == true){
-            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);  //per http://issues.collectionspace.org/browse/CSPACE-705
+            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);  //per http://issues.collectionspace.org/browse/CSPACE-705 (Doesn't this conflict with what happens with the QueryContext instance that we create below?)
         }
         QueryContext queryContext = new QueryContext(ctx, handler);
         RepositoryInstance repoSession = null;

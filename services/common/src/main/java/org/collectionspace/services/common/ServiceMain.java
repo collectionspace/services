@@ -66,9 +66,6 @@ public class ServiceMain {
     private static final String DEFAULT_READER_PASSWORD = "reader";
     private static final String SERVER_HOME_PROPERTY = "catalina.home";
     
-    private static DataSource cspaceDataSource = null;
-    private static DataSource nuxeoDataSource = null;
-    
     private ServiceMain() {
     	//empty
     }
@@ -159,7 +156,7 @@ public class ServiceMain {
         	// Invoke all post-initialization handlers, passing in a DataSource instance of the Nuxeo db.
         	// Typically, these handlers modify column types and add indexes to the Nuxeo db schema.
         	//
-            firePostInitHandlers(ServiceMain.nuxeoDataSource);
+            firePostInitHandlers(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME));
         } catch(Exception e) {
             logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: " + e.getLocalizedMessage());
         }
@@ -638,7 +635,7 @@ public class ServiceMain {
         return null;
     }
 
-    private Connection getConnection() throws LoginException, SQLException {
+    private Connection getConnection() throws NamingException, SQLException {
         return JDBCTools.getConnection(JDBCTools.CSPACE_REPOSITORY_NAME);
     }
 
@@ -679,8 +676,16 @@ public class ServiceMain {
      * static members.
      */
     private void setDataSources() throws NamingException {
-    	ServiceMain.cspaceDataSource = JDBCTools.getDataSource(JDBCTools.CSPACE_REPOSITORY_NAME);
-    	ServiceMain.nuxeoDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
+    	//
+    	// As a side-effect of calling JDBCTools.getDataSource(...), the DataSource instance will be
+    	// cached in a static hash map of the JDBCTools class.  This will speed up lookups as well as protect our
+    	// code from JNDI lookup problems -for example, if the JNDI context gets stepped on or corrupted.
+    	//
+    	DataSource cspaceDataSource = JDBCTools.getDataSource(JDBCTools.CSPACE_REPOSITORY_NAME);
+    	DataSource nuxeoDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
+    	//
+    	// Set our AuthN's datasource to be the cspaceDataSource
+    	//
     	AuthN.setDataSource(cspaceDataSource);
     }
     
