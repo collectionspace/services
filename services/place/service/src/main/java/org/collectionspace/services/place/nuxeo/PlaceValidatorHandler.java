@@ -49,6 +49,8 @@
  */
 package org.collectionspace.services.place.nuxeo;
 
+import java.util.regex.Pattern;
+
 import org.collectionspace.services.place.PlacesCommon;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -65,6 +67,7 @@ import org.slf4j.LoggerFactory;
 public class PlaceValidatorHandler implements ValidatorHandler {
 
     final Logger logger = LoggerFactory.getLogger(PlaceValidatorHandler.class);
+    private static final Pattern shortIdBadPattern = Pattern.compile("[\\W]"); //.matcher(input).matches()
 
     @Override
     public void validate(Action action, ServiceContext ctx)
@@ -78,17 +81,27 @@ public class PlaceValidatorHandler implements ValidatorHandler {
                     PlacesCommon.class);
             String msg = "";
             boolean invalid = false;
-            if(!place.isDisplayNameComputed() && (place.getDisplayName()==null)) {
+
+            // Validation occurring on both creates and updates
+            String displayName = place.getDisplayName();
+            if (!place.isDisplayNameComputed() && ((displayName == null) || displayName.trim().isEmpty())) {
                 invalid = true;
-                msg += "displayName must be non-null if displayNameComputed is false!";
+                msg += "displayName must be non-null and non-blank if displayNameComputed is false";
             }
-            /*
-            if(action.equals(Action.CREATE)) {
-                //create specific validation here
-            } else if(action.equals(Action.UPDATE)) {
-                //update specific validation here
+
+            // Validation specific to creates or updates
+            if (action.equals(Action.CREATE)) {
+                String shortId = place.getShortIdentifier();
+                // Per CSPACE-2215, shortIdentifier values that are null (missing)
+                // oe the empty string are now legally accepted in create payloads.
+                // In either of those cases, a short identifier will be synthesized from
+                // a display name or supplied in another manner.
+                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
+                    invalid = true;
+                    msg += "shortIdentifier must only contain standard word characters";
+                }
+            } else if (action.equals(Action.UPDATE)) {
             }
-            */
 
             if (invalid) {
                 logger.error(msg);
