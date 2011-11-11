@@ -66,6 +66,7 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
     private final String CLASS_NAME = PlaceAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(PlaceAuthorityServiceTest.class);
     private final String REFNAME = "refName";
+    private final static String EMPTY_REFNAME = "";
     private final String DISPLAYNAME = "displayName";
 
 	@Override
@@ -143,8 +144,6 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
     	PlaceAuthorityClient client = new PlaceAuthorityClient();
         String shortId = identifier;
     	String displayName = "displayName-" + shortId;
-    	String baseRefName = 
-    		PlaceAuthorityClientUtils.createPlaceAuthRefName(shortId, null);
     	PoxPayloadOut multipart = 
             PlaceAuthorityClientUtils.createPlaceAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
@@ -175,8 +174,6 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         String shortId = createIdentifier();
     	String displayName = "displayName-" + shortId;
-    	String baseRefName = 
-    		PlaceAuthorityClientUtils.createPlaceAuthRefName(shortId, null);
     	
     	PoxPayloadOut multipart = 
             PlaceAuthorityClientUtils.createPlaceAuthorityInstance(
@@ -206,7 +203,7 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-        	setKnownResource( newID, shortId, baseRefName );
+        	setKnownResource( newID, shortId, EMPTY_REFNAME);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -228,7 +225,7 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
             logger.debug(testBanner(testName, CLASS_NAME));
         }
         setupCreate();
-        createItemInAuthority(knownResourceId, knownResourceRefName);
+        createItemInAuthority(knownResourceId, EMPTY_REFNAME);
     }
 
     /**
@@ -244,17 +241,12 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         if(logger.isDebugEnabled()){
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        
-        String refName = 
-        	PlaceAuthorityClientUtils.createPlaceRefName(authRefName, 
-        			TEST_SHORTID, TEST_DNAME);
 
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         String commonPartXML = 
         	"<ns2:places_common xmlns:ns2=\"http://collectionspace.org/services/place\" >"
         		+ "<shortIdentifier>"+TEST_SHORTID+"</shortIdentifier>"
-        		+ "<refName>"+refName+"</refName>"
         		+ "<displayName>"+TEST_DNAME+"</displayName>"
         		+ "<displayNameComputed>false</displayNameComputed>"
         		+ "<placeNameGroupList>"
@@ -1158,8 +1150,7 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         nonexMap.put(PlaceJAXBSchema.TERM_STATUS, TEST_STATUS);
         PoxPayloadOut multipart = 
     	PlaceAuthorityClientUtils.createPlaceInstance(
-    			PlaceAuthorityClientUtils.createPlaceRefName(knownResourceRefName, "nonEx", "Non Existent"), 
-    			nonexMap, client.getItemCommonPartName() );
+    			EMPTY_REFNAME, nonexMap, client.getItemCommonPartName() );
         ClientResponse<String> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         try {
