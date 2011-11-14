@@ -852,13 +852,10 @@
               <types:key>authRef</types:key>
               <types:value>borrowersAuthorizer</types:value>
             </types:item>
-            <!-- To be added to Loan In records per CSPACE-3269 -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
                <types:key>authRef</types:key>
                <types:value>borrowersContact</types:value>
             </types:item>
-            -->
             <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">

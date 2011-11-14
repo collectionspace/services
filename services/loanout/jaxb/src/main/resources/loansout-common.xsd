@@ -34,6 +34,8 @@
                 <!--  Loan Out Information Group -->
                 <xs:element name="loanOutNumber" type="xs:string"/>
                 <xs:element name="borrower" type="xs:string"/>
+                <xs:element name="borrowersAuthorizer" type="xs:string"/>
+                <xs:element name="borrowersAuthorizationDate" type="xs:string"/>
                 <xs:element name="borrowersContact" type="xs:string"/>
                 <xs:element name="lendersAuthorizer" type="xs:string"/>
                 <xs:element name="lendersAuthorizationDate" type="xs:string"/>

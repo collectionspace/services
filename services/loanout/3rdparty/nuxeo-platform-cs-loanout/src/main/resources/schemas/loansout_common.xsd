@@ -23,16 +23,18 @@
     <!--  Loan Out Information Group -->
     <xs:element name="loanOutNumber" type="xs:string"/>
     <xs:element name="borrower" type="xs:string"/>
+    <xs:element name="borrowersAuthorizer" type="xs:string"/>
+    <xs:element name="borrowersAuthorizationDate" type="xs:date"/>
     <xs:element name="borrowersContact" type="xs:string"/>
     <xs:element name="lendersAuthorizer" type="xs:string"/>
-    <xs:element name="lendersAuthorizationDate" type="xs:string"/>
+    <xs:element name="lendersAuthorizationDate" type="xs:date"/>
     <xs:element name="lendersContact" type="xs:string"/>
 
     <xs:element name="loanedObjectStatusGroupList" type="loanedObjectStatusGroupList"/>
     
-    <xs:element name="loanOutDate" type="xs:string"/>
-    <xs:element name="loanReturnDate" type="xs:string"/>
-    <xs:element name="loanRenewalApplicationDate" type="xs:string"/>
+    <xs:element name="loanOutDate" type="xs:date"/>
+    <xs:element name="loanReturnDate" type="xs:date"/>
+    <xs:element name="loanRenewalApplicationDate" type="xs:date"/>
     <xs:element name="specialConditionsOfLoan" type="xs:string"/>
     <xs:element name="loanOutNote" type="xs:string"/>
     <xs:element name="loanPurpose" type="xs:string"/>
@@ -43,11 +45,11 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="loanedObjectStatusGroup">
+    <xs:complexType name="loanStatusGroup">
         <xs:sequence>
-            <xs:element name="loanedObjectStatus" type="xs:string"/>
-            <xs:element name="loanedObjectStatusDate" type="xs:string"/>
-            <xs:element name="loanedObjectStatusNote" type="xs:string"/>
+            <xs:element name="loanStatus" type="xs:string"/>
+            <xs:element name="loanStatusDate" type="xs:date"/>
+            <xs:element name="loanStatusNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
     

@@ -33,6 +33,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCommonListUtils;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoanedObjectStatusGroup;
 import org.collectionspace.services.loanout.LoanedObjectStatusGroupList;
@@ -60,6 +61,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     /** The known resource id. */
     private String knownResourceId = null;
+    private final static String CURRENT_DATE_UTC =
+        GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -436,7 +439,6 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Update the content of this resource.
         loanoutCommon.setLoanOutNumber("updated-" + loanoutCommon.getLoanOutNumber());
-        loanoutCommon.setLoanReturnDate("updated-" + loanoutCommon.getLoanReturnDate());
         LoanedObjectStatusGroupList statusGroupList = loanoutCommon.getLoanedObjectStatusGroupList();
         Assert.assertNotNull(statusGroupList);
         List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
@@ -480,8 +482,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(updatedLoanoutCommon);
 
         // Check selected fields in the updated resource.
-        Assert.assertEquals(updatedLoanoutCommon.getLoanReturnDate(),
-                loanoutCommon.getLoanReturnDate(),
+        Assert.assertEquals(updatedLoanoutCommon.getLoanOutNumber(),
+                loanoutCommon.getLoanOutNumber(),
                 "Data in updated object did not match submitted data.");
 
         LoanedObjectStatusGroupList updatedStatusGroupList =
@@ -773,7 +775,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
     private PoxPayloadOut createLoanoutInstance(String identifier) {
         return createLoanoutInstance(
                 "loanoutNumber-" + identifier,
-                "returnDate-" + identifier);
+                CURRENT_DATE_UTC);
     }
 
     /**
@@ -789,9 +791,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         loanoutCommon.setLoanOutNumber(loanOutNumber);
         loanoutCommon.setLoanReturnDate(returnDate);
         loanoutCommon.setBorrower(
-                "urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'");
+                "urn:cspace:org.collectionspace.demo:orgauthorities:name(TestOrgAuth):item:name(NorthernClimesMuseum)'Northern Climes Museum'");
         loanoutCommon.setBorrowersContact(
-                "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Chris Contact)'Chris Contact'");
+                "urn:cspace:org.collectionspace.demo:personauthorities:name(TestPersonAuth):item:name(ChrisContact)'Chris Contact'");
         loanoutCommon.setLoanPurpose("Allow people in cold climes to share the magic of Surfboards of the 1960s.");
         LoanedObjectStatusGroupList statusGroupList = new LoanedObjectStatusGroupList();
         List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();

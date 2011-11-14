@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    Loan Out schema (XSD)
+    Object Exit schema (XSD)
     
     Entity  : ObjectExit
     Part    : Common
@@ -23,7 +23,7 @@
     <!--  ObjectExit Information Group -->
     <xs:element name="currentOwner" type="xs:string"/>
     <xs:element name="depositor" type="xs:string"/>
-    <xs:element name="exitDate" type="xs:string"/>
+    <xs:element name="exitDate" type="xs:date"/>
     <xs:element name="exitMethods">
         <xs:complexType>
             <xs:sequence>

@@ -49,7 +49,7 @@
     <xs:complexType name="conditionGroup">
         <xs:sequence>
 					<xs:element name="conditionNote" type="xs:string"/>
-					<xs:element name="conditionNoteDate" type="xs:string"/>
+					<xs:element name="conditionNoteDate" type="xs:date"/>
         </xs:sequence>
     </xs:complexType>
     

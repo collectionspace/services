@@ -65,6 +65,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
     private final Logger logger = LoggerFactory.getLogger(IntakeServiceTest.class);
     /** The known resource id. */
     private String knownResourceId = null;
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     @Override
     protected CollectionSpaceClient getClientInstance() {
@@ -465,7 +467,6 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         // Update the content of this resource.
         intakeCommons.setEntryNumber("updated-" + intakeCommons.getEntryNumber());
-        intakeCommons.setEntryDate("updated-" + intakeCommons.getEntryDate());
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(intakeCommons, IntakesCommon.class));
@@ -507,8 +508,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         Assert.assertNotNull(updatedIntake);
 
-        Assert.assertEquals(updatedIntake.getEntryDate(),
-                intakeCommons.getEntryDate(),
+        Assert.assertEquals(updatedIntake.getEntryNumber(),
+                intakeCommons.getEntryNumber(),
                 "Data in updated object did not match submitted data.");
 
         currentLocationGroupList = updatedIntake.getCurrentLocationGroupList();
@@ -908,7 +909,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
     protected PoxPayloadOut createInstance(String identifier) {
         return createIntakeInstance(
                 "entryNumber-" + identifier,
-                "entryDate-" + identifier,
+                CURRENT_DATE_UTC,
                 "depositor-" + identifier);
     }
 
