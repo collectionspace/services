@@ -1144,8 +1144,8 @@ public class DocumentUtils {
 				data.put(name, value);
 			} else	{
 				if (logger.isDebugEnabled() == true) {
-					logger.debug("Invalid input document. No such property was found " +
-							name + " in schema " + schemaName);
+					logger.debug("Invalid input document. No such property was found [" +
+							name + "] in schema " + schemaName);
 				}
 			}
 		}
