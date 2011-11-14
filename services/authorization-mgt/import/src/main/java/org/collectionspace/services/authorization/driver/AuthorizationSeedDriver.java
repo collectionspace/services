@@ -111,12 +111,10 @@ public class AuthorizationSeedDriver {
             authzGen.exportDefaultPermissions(exportDir + File.separator + PERMISSION_FILE);
             authzGen.exportDefaultPermissionRoles(exportDir + File.separator + PERMISSION_ROLE_FILE);
             if (logger.isDebugEnabled()) {
-                logger.debug("authorization generation completed ");
+                logger.debug("Authorization generation completed but not yet persisted.");
             }
         } catch (Exception ex) {
-            if (logger.isDebugEnabled()) {
-                ex.printStackTrace();
-            }
+            logger.error("AuthorizationSeedDriver caught an exception: ", ex);
             throw new RuntimeException(ex);
         }
     }
@@ -157,10 +155,11 @@ public class AuthorizationSeedDriver {
                 new String[]{SPRING_SECURITY_METADATA});
         login();
         System.setProperty("spring-beans-config", SPRING_SECURITY_METADATA);
+        // authZ local not used but call to AuthZ.get() has side-effect of initializing our Spring Security context
         AuthZ authZ = AuthZ.get();
         txManager = (org.springframework.jdbc.datasource.DataSourceTransactionManager) appContext.getBean("transactionManager");
         if (logger.isDebugEnabled()) {
-            logger.debug("spring setup complete");
+            logger.debug("Spring Security setup complete.");
         }
     }
 
@@ -173,14 +172,14 @@ public class AuthorizationSeedDriver {
         Authentication authRequest = new UsernamePasswordAuthenticationToken(user, password, gauths);
         SecurityContextHolder.getContext().setAuthentication(authRequest);
         if (logger.isDebugEnabled()) {
-            logger.debug("login successful for user=" + user);
+            logger.debug("Spring Security login successful for user=" + user);
         }
     }
 
     private void logout() {
         SecurityContextHolder.getContext().setAuthentication(null);
         if (logger.isDebugEnabled()) {
-            logger.debug("logged out user=" + user);
+            logger.debug("Spring Security logged out user=" + user);
         }
     }
 
@@ -202,10 +201,9 @@ public class AuthorizationSeedDriver {
             authzStore.store(permRoleRel);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("authroization storage completed ");
+        if (logger.isInfoEnabled()) {
+            logger.info("Authroization metata persisted.");
         }
-
     }
 
     private TransactionStatus beginTransaction(String name) {

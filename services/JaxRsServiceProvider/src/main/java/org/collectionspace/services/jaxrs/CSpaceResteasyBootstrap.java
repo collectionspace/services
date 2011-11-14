@@ -13,10 +13,10 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 //	private static final String 
 	public void  contextInitialized(ServletContextEvent event) {
     	if (true) {
-    		System.out.print("Pausing 10 seconds in RESTEasy bootstrap for you to attached the debugger");
+    		System.out.print("Pausing 1 seconds in RESTEasy bootstrap for you to attached the debugger");
     		long startTime, currentTime;
     		currentTime = startTime = System.currentTimeMillis();
-    		long stopTime = startTime + 10 * 1000; //5 seconds
+    		long stopTime = startTime + 1 * 1000; //5 seconds
     		do {
     			if (currentTime % 1000 == 0) {
     				System.out.print(".");
