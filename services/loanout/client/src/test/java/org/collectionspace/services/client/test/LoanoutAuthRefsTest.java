@@ -40,6 +40,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.authorityref.AuthorityRefList.AuthorityRefItem;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoansoutCommon;
 //import org.collectionspace.services.loanout.LoansoutCommonList;
@@ -82,6 +83,9 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     // authority - as an authRef to tests below, and increase the
     // number of expected authRefs to 4.
     private final int NUM_AUTH_REFS_EXPECTED = 4;
+    
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -125,7 +129,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         LoanoutClient loanoutClient = new LoanoutClient();
         PoxPayloadOut multipart = createLoanoutInstance(
                 "loanOutNumber-" + identifier,
-                "returnDate-" + identifier,
+                CURRENT_DATE_UTC,
                 borrowerRefName,
                 borrowersContactRefName,
                 lendersAuthorizerRefName,

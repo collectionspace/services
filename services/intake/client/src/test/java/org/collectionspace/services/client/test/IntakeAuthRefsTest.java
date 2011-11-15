@@ -39,6 +39,7 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
@@ -81,6 +82,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     private String insurerRefName = null;
     private String valuerRefName = null;
     private final int NUM_AUTH_REFS_EXPECTED = 5;
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
 	@Override
 	protected String getServiceName() {
@@ -126,7 +129,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         IntakeClient intakeClient = new IntakeClient();
         PoxPayloadOut multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
-                "entryDate-" + identifier,
+                CURRENT_DATE_UTC,
                 currentOwnerRefName,
                 depositorRefName,
                 conditionCheckerOrAssessorRefName,
