@@ -33,6 +33,7 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
         } catch (Exception e) {
             e.printStackTrace();
             //fail here
+            System.err.println("[ERROR] The CollectionSpace Services could not initialize.  Please see the log files for details.");
             throw new RuntimeException(e);
         }
     }

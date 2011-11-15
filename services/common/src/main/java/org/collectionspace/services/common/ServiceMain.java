@@ -152,17 +152,22 @@ public class ServiceMain {
     	setServerRootDir();
         readConfig();
         propagateConfiguredProperties();
+        //
+        // Create all the default user accounts
+        //
         try {
         	createDefaultAccounts();
         } catch(Exception e) {
-        	logger.error("Default Account setup failed on exception: " + e.getLocalizedMessage());
+        	logger.error("Default accounts setup failed with exception(s): " + e.getLocalizedMessage());
         }
         //
         // Start up and initialize our embedded Nuxeo server instance
         //
         if (getClientType().equals(ClientType.JAVA)) {
             nuxeoConnector = NuxeoConnectorEmbedded.getInstance();
-            nuxeoConnector.initialize(getServicesConfigReader().getConfiguration().getRepositoryClient(),
+            nuxeoConnector.initialize(
+            		getServerRootDir(),
+            		getServicesConfigReader().getConfiguration().getRepositoryClient(),
             		ServiceMain.servletContext);
         } else {
         	//
