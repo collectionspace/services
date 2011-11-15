@@ -30,7 +30,7 @@
     <xs:element name="lendersAuthorizationDate" type="xs:date"/>
     <xs:element name="lendersContact" type="xs:string"/>
 
-    <xs:element name="loanedObjectStatusGroupList" type="loanedObjectStatusGroupList"/>
+    <xs:element name="loanStatusGroupList" type="loanStatusGroupList"/>
     
     <xs:element name="loanOutDate" type="xs:date"/>
     <xs:element name="loanReturnDate" type="xs:date"/>
@@ -39,9 +39,9 @@
     <xs:element name="loanOutNote" type="xs:string"/>
     <xs:element name="loanPurpose" type="xs:string"/>
 
-    <xs:complexType name="loanedObjectStatusGroupList">
+    <xs:complexType name="loanStatusGroupList">
         <xs:sequence>
-            <xs:element name="loanedObjectStatusGroup" type="loanedObjectStatusGroup" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="loanStatusGroup" type="loanStatusGroup" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
