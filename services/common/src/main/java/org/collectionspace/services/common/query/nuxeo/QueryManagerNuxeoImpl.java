@@ -296,4 +296,36 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 
 		return fFilteredChars;
 	}
+	
+	/**
+	 * Creates a query to filter a qualified (string) field according to a list of string values. 
+	 * @param qualifiedField The schema-qualified field to filter on
+	 * @param filterTerms the list of one or more strings to filter on
+	 * @param fExclude If true, will require qualifiedField NOT match the filters strings.
+	 * 					If false, will require qualifiedField does match one of the filters strings.
+	 * @return queryString
+	 */
+	@Override
+	public String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude) {
+    	// Start with the qualified termStatus field
+    	StringBuilder filterClause = new StringBuilder(qualifiedField);
+    	if(filterTerms.length == 1) {
+    		filterClause.append(fExclude?" <> '":" = '");
+    		filterClause.append(filterTerms[0]);
+    		filterClause.append('\'');  
+    	} else {
+    		filterClause.append(fExclude?" NOT IN (":" IN (");
+    		for(int i=0; i<filterTerms.length; i++) {
+    			if(i>0) {
+    				filterClause.append(',');
+    			}
+    			filterClause.append('\'');  
+    			filterClause.append(filterTerms[i]);
+    			filterClause.append('\'');  
+    		}
+    		filterClause.append(')');  
+    	}
+    	return filterClause.toString();
+	}
+
 }

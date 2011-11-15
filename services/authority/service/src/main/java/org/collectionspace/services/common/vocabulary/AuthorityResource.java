@@ -103,6 +103,8 @@ import java.util.List;
 @Produces("application/xml")
 public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         extends ResourceBase {
+	
+	final static String SEARCH_TYPE_TERMSTATUS = "ts";
 
     protected Class<AuthCommon> authCommonClass;
     protected Class<?> resourceClass;
@@ -638,6 +640,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+            String termStatus = queryParams.getFirst(SEARCH_TYPE_TERMSTATUS);
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
 
@@ -660,12 +663,21 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             if (sortBy == null || sortBy.isEmpty()) {
                 myFilter.setOrderByClause(qualifiedDisplayNameField);
             }
-
+            
             myFilter.appendWhereClause(authorityItemCommonSchemaName + ":"
                     + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
                     + "'" + parentcsid + "'",
                     IQueryManager.SEARCH_QUALIFIER_AND);
 
+            if (Tools.notBlank(termStatus)) {
+            	// Start with the qualified termStatus field
+            	String qualifiedTermStatusField = authorityItemCommonSchemaName + ":"
+                        + AuthorityItemJAXBSchema.TERM_STATUS;
+            	String[] filterTerms = termStatus.trim().split("\\|");
+            	String tsClause = QueryManager.createWhereClauseToFilterFromStringList(qualifiedTermStatusField, filterTerms, IQueryManager.FILTER_EXCLUDE);
+                myFilter.appendWhereClause(tsClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            }
+                
             // AND vocabularyitems_common:displayName LIKE '%partialTerm%'
             // NOTE: Partial terms searches are mutually exclusive to keyword and advanced-search, but
             // the PT query param trumps the KW and AS query params.
