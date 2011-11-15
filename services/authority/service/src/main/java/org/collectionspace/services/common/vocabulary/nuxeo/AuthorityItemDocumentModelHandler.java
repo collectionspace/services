@@ -233,12 +233,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * Assumes refName is already correct. Just ensures it is right.
      *
      * @param docModel the doc model
+     * @param newDisplayName the new display name
      * @throws Exception the exception
      */
     protected String handleItemRefNameUpdateForDisplayName(DocumentModel docModel,
             String newDisplayName) throws Exception {
-        //String suppliedRefName = (String) docModel.getProperty(authorityItemCommonSchemaName, 
-        //														AuthorityItemJAXBSchema.REF_NAME);
         RefName.AuthorityItem authItem = RefName.AuthorityItem.parse(oldRefNameOnUpdate);
         if (authItem == null) {
             String err = "Authority Item has illegal refName: " + oldRefNameOnUpdate;
@@ -266,7 +265,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             }
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
             RepositoryClient repoClient = getRepositoryClient(ctx);
-            // HACK - this should be defined for each handler, as with 
+            // FIXME HACK - this should be defined for each handler, as with 
             // AuthorityResource.getRefPropName()
             String refNameProp = ServiceBindingUtils.AUTH_REF_PROP;
 
@@ -278,6 +277,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
     }
 
+    /**
+     * If no short identifier was provided in the input payload,
+     * generate a short identifier from the display name.
+     */
     private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         String displayName = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.DISPLAY_NAME);
@@ -288,38 +291,35 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             // Do nothing on exception. Some vocabulary schemas may not include a short display name.
         }
         if (Tools.isEmpty(shortIdentifier)) {
-            String generatedShortIdentifier = AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(displayName, shortDisplayName);
+            String generatedShortIdentifier =
+                    AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(displayName, shortDisplayName);
             docModel.setProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER, generatedShortIdentifier);
         }
     }
 
+    /**
+     * Generate a refName for the authority item from the short identifier
+     * and display name.
+     * 
+     * All refNames for authority items are generated.  If a client supplies
+     * a refName, it will be overwritten during create (per this method) 
+     * or discarded during update (per filterReadOnlyPropertiesForPart).
+     * 
+     * @see #filterReadOnlyPropertiesForPart(Map<String, Object>, org.collectionspace.services.common.service.ObjectPartType)
+     * 
+     */
     protected void updateRefnameForAuthorityItem(DocumentWrapper<DocumentModel> wrapDoc,
             String schemaName,
             String authorityRefBaseName) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        String suppliedRefName = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.REF_NAME);
-        // CSPACE-3178:
-        // Temporarily accept client-supplied refName values, rather than always generating such values.
-        // Remove first block and the surrounding 'if' statement when clients should no longer supply refName values.
-        if (!Tools.isEmpty(suppliedRefName)) {
-            // Supplied refName must at least be legal
-            RefName.AuthorityItem item = RefName.AuthorityItem.parse(suppliedRefName);
-            if (item == null) {
-                logger.error("Passed refName for authority item not legal: " + suppliedRefName);
-                suppliedRefName = null; // Clear this and compute a new one below.
-            }
+        String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+        String displayName = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.DISPLAY_NAME);
+        if (Tools.isEmpty(authorityRefBaseName)) {
+            throw new Exception("Could not create the refName for this authority term, because the refName for its authority parent was empty.");
         }
-        // Recheck, in case we cleared it for being illegal
-        if (Tools.isEmpty(suppliedRefName)) {
-            String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-            String displayName = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.DISPLAY_NAME);
-            if (Tools.isEmpty(authorityRefBaseName)) {
-                throw new Exception("Could not create the refName for this authority term, because the refName for its authority parent was empty.");
-            }
-            RefName.Authority authority = RefName.Authority.parse(authorityRefBaseName);
-            String refName = RefName.buildAuthorityItem(authority, shortIdentifier, displayName).toString();
-            docModel.setProperty(schemaName, AuthorityItemJAXBSchema.REF_NAME, refName);
-        }
+        RefName.Authority authority = RefName.Authority.parse(authorityRefBaseName);
+        String refName = RefName.buildAuthorityItem(authority, shortIdentifier, displayName).toString();
+        docModel.setProperty(schemaName, AuthorityItemJAXBSchema.REF_NAME, refName);
     }
 
     /**
@@ -371,9 +371,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             objectProps.remove(AuthorityItemJAXBSchema.IN_AUTHORITY);
             objectProps.remove(AuthorityItemJAXBSchema.CSID);
             objectProps.remove(AuthorityJAXBSchema.SHORT_IDENTIFIER);
-            // Enable when clients should no longer supply refName values
-            // objectProps.remove(AuthorityItemJAXBSchema.REF_NAME); // CSPACE-3178
-
+            objectProps.remove(AuthorityItemJAXBSchema.REF_NAME);
         }
     }
 
