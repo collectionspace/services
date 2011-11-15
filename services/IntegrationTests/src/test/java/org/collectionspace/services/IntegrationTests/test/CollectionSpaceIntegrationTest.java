@@ -39,6 +39,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationshipType;
@@ -91,8 +92,8 @@ public abstract class CollectionSpaceIntegrationTest {
 	 * @param identifier the identifier
 	 */
 	void fillIntake(IntakesCommon theIntake, String identifier) {
-		fillIntake(theIntake, "entryNumber-" + identifier, "entryDate-"
-				+ identifier);
+		String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
+		fillIntake(theIntake, "entryNumber-" + identifier, CURRENT_DATE_UTC);
 	}
 
 	/**

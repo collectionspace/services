@@ -35,6 +35,7 @@ import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.relation.IRelationsManager;
@@ -45,6 +46,7 @@ import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommon;
@@ -118,6 +120,57 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public void setAuthorityRefNameBase(String value) {
         this.authorityRefNameBase = value;
     }
+
+    @Override
+    public List<ListResultField> getListItemsArray() throws DocumentException {
+    	List<ListResultField> list = super.getListItemsArray();
+    	int nFields = list.size();
+    	// Ensure some common fields so do not depend upon config for general logic
+    	boolean hasDisplayName = false;
+    	boolean hasShortId = false;
+    	boolean hasRefName = false;
+    	boolean hasTermStatus = false;
+        for(int i=0;i<nFields;i++) {
+        	ListResultField field = list.get(i); 
+        	String elName = field.getElement();
+        	if(AuthorityItemJAXBSchema.DISPLAY_NAME.equals(elName))
+        		hasDisplayName = true;
+        	else if(AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName))
+        		hasShortId = true;
+        	else if(AuthorityItemJAXBSchema.REF_NAME.equals(elName))
+        		hasRefName = true;
+        	else if(AuthorityItemJAXBSchema.TERM_STATUS.equals(elName))
+        		hasTermStatus = true;
+        }
+        ListResultField field;
+        if(!hasDisplayName) {
+        	field = new ListResultField();
+        	field.setElement(AuthorityItemJAXBSchema.DISPLAY_NAME);
+        	field.setXpath(AuthorityItemJAXBSchema.DISPLAY_NAME);
+        	list.add(field);
+        }
+        if(!hasShortId) {
+        	field = new ListResultField();
+        	field.setElement(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+        	field.setXpath(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+        	list.add(field);
+        }
+        if(!hasRefName) {
+        	field = new ListResultField();
+        	field.setElement(AuthorityItemJAXBSchema.REF_NAME);
+        	field.setXpath(AuthorityItemJAXBSchema.REF_NAME);
+        	list.add(field);
+        }
+        if(!hasTermStatus) {
+        	field = new ListResultField();
+        	field.setElement(AuthorityItemJAXBSchema.TERM_STATUS);
+        	field.setXpath(AuthorityItemJAXBSchema.TERM_STATUS);
+        	list.add(field);
+        }
+        return list;
+
+    }
+
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)

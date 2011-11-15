@@ -1512,18 +1512,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+						<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
             <service:ListResultField>
               <service:element>order</service:element>
               <service:xpath>order</service:xpath>
@@ -1650,18 +1639,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -1833,18 +1811,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2044,18 +2011,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2192,18 +2148,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
