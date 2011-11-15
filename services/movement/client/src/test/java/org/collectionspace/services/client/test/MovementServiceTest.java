@@ -69,8 +69,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
 
     // Instance variables specific to this test.
     private String knownResourceId = null;
-    private final static String CURRENT_DATE_UTC =
-            GregorianCalendarDateTimeUtils.currentDateUTC();
+    private final static String TIMESTAMP_UTC =
+            GregorianCalendarDateTimeUtils.timestampUTC();
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -308,10 +308,10 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         // Check the values of one or more date/time fields.
         if (logger.isDebugEnabled()) {
             logger.debug("locationDate=" + movementCommon.getLocationDate());
-            logger.debug("TIMESTAMP_UTC=" + CURRENT_DATE_UTC);
+            logger.debug("TIMESTAMP_UTC=" + TIMESTAMP_UTC);
         }
-        Assert.assertTrue(movementCommon.getLocationDate().equals(CURRENT_DATE_UTC));
-        Assert.assertTrue(movementCommon.getPlannedRemovalDate().equals(CURRENT_DATE_UTC));
+        Assert.assertTrue(movementCommon.getLocationDate().equals(TIMESTAMP_UTC));
+        Assert.assertTrue(movementCommon.getPlannedRemovalDate().equals(TIMESTAMP_UTC));
         Assert.assertNull(movementCommon.getRemovalDate());
         
         // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
@@ -795,7 +795,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         movementCommon.setCurrentLocation("currentLocation value");
         movementCommon.setCurrentLocationFitness("currentLocationFitness value");
         movementCommon.setCurrentLocationNote("currentLocationNote value");
-        movementCommon.setLocationDate(CURRENT_DATE_UTC);
+        movementCommon.setLocationDate(TIMESTAMP_UTC);
         movementCommon.setNormalLocation("normalLocation value");
         movementCommon.setMovementContact("movementContact value");
         MovementMethodsList movementMethodsList = new MovementMethodsList();
@@ -808,7 +808,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         movementCommon.setMovementMethods(movementMethodsList);
         movementCommon.setMovementNote(getUTF8DataFragment());
         movementCommon.setMovementReferenceNumber(movementReferenceNumber);
-        movementCommon.setPlannedRemovalDate(CURRENT_DATE_UTC);
+        movementCommon.setPlannedRemovalDate(TIMESTAMP_UTC);
         movementCommon.setRemovalDate(""); // Test empty date value
         movementCommon.setReasonForMove("reasonForMove value");
 
