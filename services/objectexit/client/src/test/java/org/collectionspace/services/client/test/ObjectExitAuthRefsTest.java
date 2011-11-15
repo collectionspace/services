@@ -40,6 +40,7 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 
@@ -70,6 +71,8 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
     private String depositorRefName = null;
     private String exitDate = null;
     private String exitNumber = null;
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     @Override
 	public String getServicePathComponent() {
@@ -116,7 +119,8 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
         // Create a new Loans In resource. One or more fields in this resource will be PersonAuthority
         //    references, and will refer to Person resources by their refNames.
         ObjectExitClient objectexitClient = new ObjectExitClient();
-        PoxPayloadOut multipart = createObjectExitInstance(depositorRefName, "exitNumber-" + identifier, "exitDate-" + identifier);
+        PoxPayloadOut multipart = createObjectExitInstance(depositorRefName,
+                "exitNumber-" + identifier, CURRENT_DATE_UTC);
         ClientResponse<Response> res = objectexitClient.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -171,7 +175,6 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
 
         // Check a couple of fields
         Assert.assertEquals(objectexit.getDepositor(), depositorRefName);
-        Assert.assertEquals(objectexit.getExitDate(), exitDate);
         Assert.assertEquals(objectexit.getExitNumber(), exitNumber);
 
         // Get the auth refs and check them
