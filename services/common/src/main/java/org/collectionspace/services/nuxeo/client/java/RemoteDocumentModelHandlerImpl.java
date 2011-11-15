@@ -111,12 +111,16 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	            String partLabel = part.getLabel();
                 try{
                     ObjectPartType partMeta = partsMetaMap.get(partLabel);
-        //            extractPart(docModel, partLabel, partMeta);
-                    Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
-                    addOutputPart(unQObjectProperties, partLabel, partMeta);
+                    // CSPACE-4030 - generates NPE if the part is missing.
+                    if(partMeta!=null) {
+	                    Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
+	                    if(unQObjectProperties!=null) {
+	                    	addOutputPart(unQObjectProperties, partLabel, partMeta);
+	                    }
+                    }
                 } catch (Throwable t){
 
-                    System.out.println("===============================\r\nUnable to addOutputPart: "+partLabel
+                    logger.error("Unable to addOutputPart: "+partLabel
                                                +" in serviceContextPath: "+this.getServiceContextPath()
                                                +" with URI: "+this.getServiceContext().getUriInfo().getPath()
                                                +" error: "+t);
