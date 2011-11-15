@@ -45,13 +45,15 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceMain {
 
+    final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
     /**
      * volatile is used here to assume about ordering (post JDK 1.5)
      */
     private static volatile ServiceMain instance = null;
-    final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
+    private static volatile boolean initFailed = false;
+    
     private NuxeoConnectorEmbedded nuxeoConnector;
-    private static ServletContext servletContext;
+    private static ServletContext servletContext = null;
     private String serverRootDir = null;
     private ServicesConfigReaderImpl servicesConfigReader;
     private TenantBindingConfigReaderImpl tenantBindingConfigReader;
@@ -84,6 +86,10 @@ public class ServiceMain {
 		}
     }
     
+    public boolean inServletContext() {
+    	return ServiceMain.servletContext != null;
+    }
+    
     public static ServiceMain getInstance(ServletContext servletContext) {
     	ServiceMain.servletContext = servletContext;
     	return ServiceMain.getInstance();
@@ -95,12 +101,16 @@ public class ServiceMain {
      * @return
      */
     public static ServiceMain getInstance() {
-        if (instance == null) {
+        if (instance == null && initFailed == false) {
             synchronized (ServiceMain.class) {
-                if (instance == null) {
+                if (instance == null && initFailed == false) {
                     ServiceMain temp = new ServiceMain();
                     try {
+                    	//assume the worse
+                    	initFailed = true;
                         temp.initialize();
+                    	//celebrate success
+                        initFailed = false;
                     } catch (Exception e) {
                         instance = null;
                         if (e instanceof RuntimeException) {
@@ -113,15 +123,20 @@ public class ServiceMain {
                 }
             }
         }
+        
+        if (instance == null) {
+        	throw new RuntimeException("Could not initialize the CollectionSpace services.  Please see the CollectionSpace services log file(s) for details.");
+        }
+        
         return instance;
     }
 
     private void initialize() throws Exception {
     	if (logger.isDebugEnabled() == true) {
-    		System.out.print("Pausing 1 seconds for you to attached the debugger");
+    		System.out.print("Pausing 5 seconds for you to attached the debugger");
     		long startTime, currentTime;
     		currentTime = startTime = System.currentTimeMillis();
-    		long stopTime = startTime + 1 * 1000; //5 seconds
+    		long stopTime = startTime + 5 * 1000; //5 seconds
     		do {
     			if (currentTime % 1000 == 0) {
     				System.out.print(".");
@@ -149,6 +164,11 @@ public class ServiceMain {
             nuxeoConnector = NuxeoConnectorEmbedded.getInstance();
             nuxeoConnector.initialize(getServicesConfigReader().getConfiguration().getRepositoryClient(),
             		ServiceMain.servletContext);
+        } else {
+        	//
+        	// Exit if we don't have the correct/known client type
+        	//
+        	throw new RuntimeException("Unknown CollectionSpace services client type: " + getClientType());
         }
 
         try {

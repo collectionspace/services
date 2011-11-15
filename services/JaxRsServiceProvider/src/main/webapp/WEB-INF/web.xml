@@ -10,21 +10,6 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">    
     <display-name>CollectionSpace Services</display-name>
     	
-	<!--	
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>CollectionSpace Services</web-resource-name>
-            <url-pattern>/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>*</role-name>
-        </auth-constraint>
-        <user-data-constraint>
-            <transport-guarantee>NONE</transport-guarantee>
-        </user-data-constraint>
-    </security-constraint>
-	-->
-
     <login-config>
         <auth-method>BASIC</auth-method>
         <realm-name>CollectionSpace realm</realm-name>
@@ -78,7 +63,11 @@
 	</filter-mapping>
     
 
-    <!-- Listeners -->
+    <!--
+    	***
+    	*** Servlet Context Listeners
+    	***
+    -->
 
     <!--
       - Loads the root application context of this web app at startup.
@@ -101,15 +90,17 @@
         <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
     </listener-->
 
-    <listener>
-        <listener-class>
-            org.collectionspace.services.jaxrs.CSpaceResteasyBootstrap
-        </listener-class>
-    </listener>
-
+	<!-- A general listener for the CollectionSpace services.  In particular, this listener starts the embedded Nuxeo EP server instance. -->
     <listener>
         <listener-class>
             org.collectionspace.services.common.CollectionSpaceServiceContextListener
+        </listener-class>
+    </listener>
+    
+	<!-- The CollectionSpace listener that starts up the RESTEasy/JAX-RS service framework. -->
+    <listener>
+        <listener-class>
+            org.collectionspace.services.jaxrs.CSpaceResteasyBootstrap
         </listener-class>
     </listener>
 

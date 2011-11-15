@@ -28,11 +28,20 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
     		System.out.println("Resuming RESTEasy bootstrap initialization.");
     	}
 		
-    	// Save a copy of the ServletContext inside our ServiceMain singleton
-		ServletContext servletContext = event.getServletContext();
-		ServiceMain.getInstance(servletContext); //First access causes initialization of the Services' main class
+//    	// Save a copy of the ServletContext inside our ServiceMain singleton
+//		ServletContext servletContext = event.getServletContext();
+//		try {
+//			ServiceMain.getInstance(servletContext); //First access causes initialization of the Services' main class
+//		} catch (RuntimeException e) {
+//			e.printStackTrace();
+//			//rethrow the exception
+//			throw e;
+//		}
 		
-		// This call to super instantiates and initializes our JAX-RS application class (org.collectionspace.services.jaxrs.CollectionSpaceJaxRsApplication)
+		//
+    	// This call to super instantiates and initializes our JAX-RS application class.
+    	// The application class is org.collectionspace.services.jaxrs.CollectionSpaceJaxRsApplication.
+    	//
 		super.contextInitialized(event);
 		CollectionSpaceJaxRsApplication app = 
 			(CollectionSpaceJaxRsApplication)deployment.getApplication();
