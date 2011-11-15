@@ -740,9 +740,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             DocumentModel docModel = docWrapper.getWrappedObject();
             String refName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
 
+            // Could be smarter about using the list from above, and/or allowing multiple
+            ArrayList<String> serviceTypes = new ArrayList<String>(1);
+            serviceTypes.add(serviceType);
+            
             authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(ctx,
                     repoClient,
-                    serviceType,
+                    serviceTypes,
                     refName,
                     getRefPropName(),
                     myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/);

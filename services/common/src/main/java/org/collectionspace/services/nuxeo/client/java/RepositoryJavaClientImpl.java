@@ -708,6 +708,80 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
         }
     }
+    
+    /**
+     * Save a documentModel to the Nuxeo repository, using the current session,
+     * bypassing the normal document handler processing (validation, etc.)
+     * NOTE: This should be called only in specific circumstances, e.g., to
+     * update known cached values like refNames. DO NOT USE this for any normal
+     * document processing.
+     * NOTE: Does not release session, as it should be called in a wider session context.
+     *  Caller is responsible for releasing the session.
+     * 
+     * @param ctx service context under which this method is invoked
+     * @param docModel the document to save
+     * @param fSaveSession if TRUE, will call CoreSession.save() to save accumulated changes.
+     * @throws DocumentException
+     */
+    public void saveDocWithoutHandlerProcessing(
+            ServiceContext ctx, DocumentModel docModel, boolean fSaveSession)
+            throws ClientException, DocumentException {
+        RepositoryInstance repoSession = null;
+        DocumentWrapper<DocumentModel> wrapDoc = null;
+
+        try {
+            repoSession = getRepositorySession();
+            repoSession.saveDocument(docModel);
+            if(fSaveSession)
+            	repoSession.save();
+        } catch (ClientException ce) {
+            throw ce;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        }
+    }
+
+
+    /**
+     * Save a list of documentModels to the Nuxeo repository, using the current session,
+     * bypassing the normal document handler processing (validation, etc.)
+     * NOTE: This should be called only in specific circumstances, e.g., to
+     * update known cached values like refNames. DO NOT USE this for any normal
+     * document processing.
+     * NOTE: Does not release session, as it should be called in a wider session context.
+     *  Caller is responsible for releasing the session.
+     * 
+     * @param ctx service context under which this method is invoked
+     * @param docModel the document to save
+     * @param fSaveSession if TRUE, will call CoreSession.save() to save accumulated changes.
+     * @throws DocumentException
+     */
+    public void saveDocListWithoutHandlerProcessing(
+            ServiceContext ctx, DocumentModelList docList, boolean fSaveSession)
+            throws ClientException, DocumentException {
+        RepositoryInstance repoSession = null;
+        DocumentWrapper<DocumentModel> wrapDoc = null;
+
+        try {
+            repoSession = getRepositorySession();
+            DocumentModel[] docModelArray = new DocumentModel[docList.size()];
+            repoSession.saveDocuments(docList.toArray(docModelArray));
+            if(fSaveSession)
+            	repoSession.save();
+        } catch (ClientException ce) {
+            throw ce;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        }
+    }
+
+
 
     /**
      * delete a document from the Nuxeo repository

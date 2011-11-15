@@ -33,6 +33,7 @@ import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
@@ -205,9 +206,23 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected void handleItemRefNameReferenceUpdate() {
     	if(newRefNameOnUpdate != null && oldRefNameOnUpdate!= null) {
     		// We have work to do.
-    		logger.debug("Need to find and update references to Item.");
-    		logger.debug("Old refName" + oldRefNameOnUpdate);
-    		logger.debug("New refName" + newRefNameOnUpdate);
+    		if(logger.isDebugEnabled()) {
+    			String eol = System.getProperty("line.separator");
+    			logger.debug("Need to find and update references to Item."+eol
+    							+"   Old refName" + oldRefNameOnUpdate + eol
+    							+"   New refName" + newRefNameOnUpdate);
+    		}
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
+    		RepositoryClient repoClient = getRepositoryClient(ctx);
+    		// HACK - this should be defined for each handler, as with 
+    		// AuthorityResource.getRefPropName()
+    		String refNameProp = ServiceBindingUtils.AUTH_REF_PROP;
+
+    		int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient,
+    							oldRefNameOnUpdate, newRefNameOnUpdate, refNameProp );
+    		if(logger.isDebugEnabled()) {
+    			logger.debug("Updated "+nUpdated+" instances of oldRefName to newRefName");
+    		}
     	}
     }
 
@@ -278,7 +293,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             throws Exception {
         Map<String, Object> unQObjectProperties = super.extractPart(docModel, schema, partMeta);
 
-        // Add the CSID to the common part
+        // Add the CSID to the common part, since they may have fetched via the shortId.
         if (partMeta.getLabel().equalsIgnoreCase(authorityItemCommonSchemaName)) {
             String csid = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             unQObjectProperties.put("csid", csid);

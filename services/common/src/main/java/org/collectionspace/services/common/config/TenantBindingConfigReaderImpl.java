@@ -386,12 +386,12 @@ public class TenantBindingConfigReaderImpl
      * @return
      */
     public List<ServiceBindingType> getServiceBindingsByType(
-            String tenantId, String serviceType) {
+            String tenantId, List<String> serviceTypes) {
         ArrayList<ServiceBindingType> list = null;
         TenantBindingType tenant = tenantBindings.get(tenantId);
         if (tenant != null) {
             for (ServiceBindingType sb : tenant.getServiceBindings()) {
-                if (serviceType.equals(sb.getType())) {
+                if (serviceTypes.contains(sb.getType())) {
                     if (list == null) {
                         list = new ArrayList<ServiceBindingType>();
                     }
