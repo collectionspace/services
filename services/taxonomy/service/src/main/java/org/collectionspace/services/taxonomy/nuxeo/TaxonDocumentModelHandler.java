@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.taxonomy.nuxeo;
 
+import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.TaxonJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
@@ -49,6 +50,10 @@ public class TaxonDocumentModelHandler
 
     public TaxonDocumentModelHandler() {
         super(COMMON_PART_LABEL);
+    }
+    
+    public String getAuthorityServicePath(){
+        return TaxonomyAuthorityClient.SERVICE_PATH_COMPONENT;
     }
 
     /**
