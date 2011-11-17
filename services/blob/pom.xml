@@ -16,9 +16,8 @@
     <modules>
         <module>service</module>
         <module>3rdparty</module>
-        <!-- Not working with embedded Nuxeo EP instance on Tomcat
+        <!-- Not working with embedded Nuxeo EP instance on Tomcat -->
         <module>client</module>
-         -->
     </modules>
 
 </project>

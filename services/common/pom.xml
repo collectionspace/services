@@ -207,6 +207,21 @@
 	    </dependency>        
 	    <dependency>
 	      <groupId>org.nuxeo.ecm.platform</groupId>
+	      <artifactId>nuxeo-platform-mimetype-core</artifactId>
+	      <version>${nuxeo.platform.version}</version>
+	    </dependency>        
+	    <dependency>
+	      <groupId>org.nuxeo.ecm.platform</groupId>
+	      <artifactId>nuxeo-platform-types-api</artifactId>
+	      <version>${nuxeo.platform.version}</version>
+	    </dependency>        
+	    <dependency>
+	      <groupId>org.nuxeo.ecm.platform</groupId>
+	      <artifactId>nuxeo-platform-types-core</artifactId>
+	      <version>${nuxeo.platform.version}</version>
+	    </dependency>        
+	    <dependency>
+	      <groupId>org.nuxeo.ecm.platform</groupId>
 	      <artifactId>nuxeo-platform-imaging-core</artifactId>
 	      <version>${nuxeo.platform.version}</version>
 	    </dependency>        
