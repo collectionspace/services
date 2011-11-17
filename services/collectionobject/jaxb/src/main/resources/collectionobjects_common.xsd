@@ -501,6 +501,9 @@
             <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
             <xs:element name="datePeriod" type="xs:string"/>
             <xs:element name="dateNote" type="xs:string"/>
+            <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+            <xs:element name="dateLatestScalarValue" type="xs:date"/>
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 
