@@ -98,7 +98,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 			RepositoryInstance repoSession = client.openRepository();
 
 			DocumentModelList docModelList = repoSession
-					.query("SELECT * FROM Relation WHERE relation:relationtype.documentId1='updated-Subject-1'");
+					.query("SELECT * FROM Relation WHERE relations_common:subjectCsid='updated-Subject-1'");
 			// DocumentModelList docModelList =
 			// repoSession.query("SELECT * FROM Relation");
 			// DocumentModelList docModelList =
@@ -109,9 +109,9 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 				System.out.println(docModel.getPathAsString());
 				System.out.println(docModel.getName());
 				System.out.println(docModel.getPropertyValue("dc:title"));
-				// System.out.println("documentId1=" +
-				// docModel.getProperty("relation",
-				// "relationtype/documentId1").toString());
+				// System.out.println("subjectCsid=" +
+				// docModel.getProperty("relations_common",
+				// "subjectCsid").toString());
 			}
 
 		} catch (Exception e) {

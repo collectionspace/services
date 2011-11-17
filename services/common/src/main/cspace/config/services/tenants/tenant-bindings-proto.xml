@@ -2398,7 +2398,7 @@
       <service:properties xmlns:service="http://collectionspace.org/services/common/service">
         <types:item xmlns:types="http://collectionspace.org/services/common/types">
           <types:key>objectNameProperty</types:key>
-          <types:value>documentId1</types:value>
+          <types:value>subjectCsid</types:value>
         </types:item>
         <types:item xmlns:types="http://collectionspace.org/services/common/types">
           <types:key>objectNumberProperty</types:key>
@@ -2417,7 +2417,7 @@
           </service:field>
           <service:field>
             <service:table>relations_common</service:table>
-            <service:param>documentid1,documentid2</service:param>
+            <service:param>subjectcsid,objectcsid</service:param>
           </service:field>
         </service:params>
       </service:initHandler>

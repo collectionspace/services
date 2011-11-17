@@ -229,7 +229,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         String identifier = createIdentifier();
         RelationsCommon relationsCommon = createRelationsCommon(identifier);
         // Make the subject ID equal to the object ID
-        relationsCommon.setDocumentId1(relationsCommon.getDocumentId2());
+        relationsCommon.setSubjectCsid(relationsCommon.getObjectCsid());
         PoxPayloadOut multipart = createRelationInstance(relationsCommon);
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
@@ -618,13 +618,13 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         final String msg2 =
                 "Data in updated object was not correctly computed.";
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentId1(), newSubjectId, msg);
+                updatedRelationCommon.getSubjectCsid(), newSubjectId, msg);
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentType1(), newSubjectDocType, msg2);
+                updatedRelationCommon.getSubjectDocumentType(), newSubjectDocType, msg2);
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentId2(), newObjectId, msg);
+                updatedRelationCommon.getObjectCsid(), newObjectId, msg);
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentType2(), newObjectDocType, msg2);
+                updatedRelationCommon.getObjectDocumentType(), newObjectDocType, msg2);
         Assert.assertEquals(
                 updatedRelationCommon.getPredicateDisplayName(), relationCommon.getPredicateDisplayName(), msg);
 
@@ -936,21 +936,21 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
      * Fills the relation.
      *
      * @param relationCommon the relation
-     * @param documentId1 the document id1
-     * @param documentType1 the document type1
-     * @param documentId2 the document id2
-     * @param documentType2 the document type2
+     * @param subjectCsid the subject document id
+     * @param subjectDocumentType the subject document type
+     * @param objectCsid the object document id
+     * @param objectDocumentType the object document type
      * @param rt the rt
      */
     private void fillRelation(RelationsCommon relationCommon,
-            String documentId1, String documentType1,
-            String documentId2, String documentType2,
+            String subjectCsid, String subjectDocumentType,
+            String objectCsid, String objectDocumentType,
             String rt,
             String rtDisplayName) {
-        relationCommon.setDocumentId1(documentId1);
-        relationCommon.setDocumentType1(documentType1);
-        relationCommon.setDocumentId2(documentId2);
-        relationCommon.setDocumentType2(documentType2);
+        relationCommon.setSubjectCsid(subjectCsid);
+        relationCommon.setSubjectDocumentType(subjectDocumentType);
+        relationCommon.setObjectCsid(objectCsid);
+        relationCommon.setObjectDocumentType(objectDocumentType);
 
         relationCommon.setRelationshipType(rt);
         relationCommon.setPredicateDisplayName(rtDisplayName);

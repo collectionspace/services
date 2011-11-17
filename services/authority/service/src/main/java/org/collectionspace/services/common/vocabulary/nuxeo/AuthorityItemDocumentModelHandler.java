@@ -787,11 +787,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             // Either value might be null for for each of Subject and Object 
             String subjectCsid = itemSubject.getCsid();
             rc.setSubjectCsid(subjectCsid);
-            rc.setDocumentId1(subjectCsid); // populate legacy field for backward compatibility
 
             String objCsid = itemObject.getCsid();
             rc.setObjectCsid(objCsid);
-            rc.setDocumentId2(objCsid); // populate legacy field for backward compatibility
 
             rc.setSubjectRefName(itemSubject.getRefName());
             rc.setObjectRefName(itemObject.getRefName());
@@ -803,9 +801,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             // This is superfluous, since it will be fetched by the Relations Create logic.
             rc.setSubjectDocumentType(itemSubject.getDocumentType());
             rc.setObjectDocumentType(itemObject.getDocumentType());
-            // populate legacy fields for backward compatibility
-            rc.setDocumentType1(itemSubject.getDocumentType());
-            rc.setDocumentType2(itemObject.getDocumentType());
 
             // This is superfluous, since it will be fetched by the Relations Create logic.
             rc.setSubjectUri(itemSubject.getUri());
@@ -817,7 +812,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             PoxPayloadOut payloadOut = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
             PayloadOutputPart outputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMONPART_NAME, rc);
             payloadOut.addPart(outputPart);
-            //System.out.println("\r\n==== TO CREATE: "+rc.getDocumentId1()+"==>"+rc.getPredicate()+"==>"+rc.getDocumentId2());
             RelationResource relationResource = new RelationResource();
             Object res = relationResource.create(ctx.getResourceMap(),
                     ctx.getUriInfo(), payloadOut.toXML());    //NOTE ui recycled from above to pass in unknown query params.

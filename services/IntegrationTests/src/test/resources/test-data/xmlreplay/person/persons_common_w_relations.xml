@@ -30,8 +30,8 @@
     <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
     <relation-list-item>
 		<subjectCsid>${myCSID}</subjectCsid>
-		<documentType1>Person</documentType1>
-		<documentType2>Person</documentType2>
+		<subjectDocumentType>Person</subjectDocumentType>
+		<objectDocumentType>Person</objectDocumentType>
 		<relationshipType>hasBroader</relationshipType>
 		<predicate>hasBroader</predicate>
 		<predicateDisplayName>hasBroader</predicateDisplayName>
@@ -49,8 +49,8 @@
 	</relation-list-item>
 	<relation-list-item>
 		<subjectCsid>${childCSID}</subjectCsid>
-		<documentType1>Person</documentType1>
-		<documentType2>Person</documentType2>
+		<subjectDocumentType>Person</subjectDocumentType>
+		<objectDocumentType>Person</objectDocumentType>
 		<relationshipType>hasBroader</relationshipType>
 		<predicate>hasBroader</predicate>
 		<predicateDisplayName>hasBroader</predicateDisplayName>

@@ -112,19 +112,21 @@ public abstract class CollectionSpaceIntegrationTest {
      * Fill relation.
      * 
      * @param relation the relation
-     * @param documentId1 the document id1
-     * @param documentType1 the document type1
-     * @param documentId2 the document id2
-     * @param documentType2 the document type2
+     * @param subjectCsid the document id1
+     * @param subjectDocumentType the document type1
+     * @param objectCsid the document id2
+     * @param objectDocumentType the document type2
      * @param rt the rt
      */
-    void fillRelation(RelationsCommon relation, String documentId1, String documentType1,
-    		String documentId2, String documentType2, String rt)
+    void fillRelation(RelationsCommon relation, 
+            String subjectCsid, String subjectDocumentType,
+            String objectCsid, String objectDocumentType,
+            String rt)
     {
-        relation.setDocumentId1(documentId1);
-        relation.setDocumentType1(documentType1);
-        relation.setDocumentId2(documentId2);
-        relation.setDocumentType2(documentType2);
+    	relation.setSubjectCsid(subjectCsid);
+    	relation.setSubjectDocumentType(subjectDocumentType);
+    	relation.setObjectCsid(objectCsid);
+    	relation.setObjectDocumentType(objectDocumentType);
         
         relation.setRelationshipType(rt);
     }

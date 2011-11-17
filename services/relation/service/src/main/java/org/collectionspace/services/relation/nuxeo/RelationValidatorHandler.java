@@ -41,8 +41,8 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
                 logger.trace(relationsCommon.toString());
             }
 
-            String subjectCsid = getSubjectCsid(relationsCommon);
-            String objectCsid = getObjectCsid(relationsCommon);
+            String subjectCsid = relationsCommon.getSubjectCsid();
+            String objectCsid = relationsCommon.getObjectCsid();
 
             // If no CSID for a subject or object is included in the create payload,
             // a refName must be provided for that subject or object as an alternate identifier.
@@ -85,24 +85,6 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn,
     @Override
     protected void handleDelete() {
         // TODO Auto-generated method stub
-    }
-
-    private String getSubjectCsid(RelationsCommon relationsCommon) {
-        String subjectCsid = relationsCommon.getSubjectCsid();
-        // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
-        if (Tools.isBlank(subjectCsid)) {
-            subjectCsid = relationsCommon.getDocumentId1();
-        }
-        return subjectCsid;
-    }
-
-    private String getObjectCsid(RelationsCommon relationsCommon) {
-        String objectCsid = relationsCommon.getObjectCsid();
-        // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
-        if (Tools.isBlank(objectCsid)) {
-            objectCsid = relationsCommon.getDocumentId2();
-        }
-        return objectCsid;
     }
 
     private boolean hasCsid(String csid) {

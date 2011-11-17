@@ -179,9 +179,9 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         		multiPartResponse.releaseConnection();
         	}
         	
-        	Assert.assertEquals(resultRelation.getDocumentId1(), collectionObjectCsid);
+        	Assert.assertEquals(resultRelation.getSubjectCsid(), collectionObjectCsid);
         	Assert.assertEquals(resultRelation.getRelationshipType(), RelationshipType.COLLECTIONOBJECT_INTAKE.toString());
-        	Assert.assertEquals(resultRelation.getDocumentId2(), intakeCsid);
+        	Assert.assertEquals(resultRelation.getObjectCsid(), intakeCsid);
             System.out.println();
         	i++;            
         }
@@ -308,9 +308,9 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	        		multiPartResponse.releaseConnection();
 	        	}
 	
-	        	Assert.assertEquals(resultRelation.getDocumentId1(), intakeCsid);
+	        	Assert.assertEquals(resultRelation.getSubjectCsid(), intakeCsid);
 	        	Assert.assertEquals(resultRelation.getRelationshipType(), RelationshipType.COLLECTIONOBJECT_INTAKE.toString());
-	        	Assert.assertEquals(resultRelation.getDocumentId2(), collectionObjectCsid);
+	        	Assert.assertEquals(resultRelation.getObjectCsid(), collectionObjectCsid);
 	        	System.out.println();
 	        	i++;            
 	        }
