@@ -32,7 +32,7 @@
         <module>common-api</module>
         <module>authentication</module>
         <module>authorization</module>
-        <module>blob</module>
+<!--        <module>blob</module> -->
         <module>client</module>
         <module>jaxb</module>
         <module>hyperjaxb</module>
@@ -64,7 +64,7 @@
         <module>dimension</module>
         <module>contact</module>
         <module>workflow</module>
-		<module>media</module>
+<!--		<module>media</module> -->
         <module>JaxRsServiceProvider</module>
         <!--module>sdk</module-->
         <module>IntegrationTests</module>
