@@ -144,7 +144,7 @@
         <filter token="DB_URL" value="${db.jdbc.cspace.url}" />
         <filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
         <filter token="DB_USER" value="${db.cspace.user}" /> <!-- double-sub from ${db.user} fails -->
-        <filter token="DB_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" /> <!-- double-sub from ${db.jboss.user.password} fails -->
+        <filter token="DB_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" /> <!-- double-sub from ${db.j2ee.user.password} fails -->
         <filter token="DB_DIALECT" value="${db.dialect}" />
         <filter token="CLASS_ID_QUERY" value="${db.spring.acl.classIdentityQuery}" />
         <filter token="SID_ID_QUERY" value="${db.spring.acl.sidIdentityQuery}" />
@@ -154,11 +154,11 @@
 
     
     <target name="deploy" depends="install"
-            description="deploy authorization-mgt import in ${jboss.server.cspace}">
+            description="deploy authorization-mgt import in ${jee.server.cspace}">
     </target>
 
     <target name="undeploy"
-            description="undeploy authorization-mgt import from ${jboss.server.cspace}">
+            description="undeploy authorization-mgt import from ${jee.server.cspace}">
     </target>
 
     <target name="dist"

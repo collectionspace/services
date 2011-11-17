@@ -113,19 +113,19 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy movement doctype in ${jboss.server.nuxeo}">
+        description="deploy movement doctype in ${jee.server.nuxeo}">
         <copy file="${basedir}/target/${nuxeo.movement.jar}"
-        todir="${jboss.deploy.nuxeo.plugins}"/>
+        todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy movement doctype from ${jboss.server.nuxeo}">
+        description="undeploy movement doctype from ${jee.server.nuxeo}">
         <delete>
-            <fileset dir="${jboss.deploy.nuxeo.plugins}">
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
                 <include name="${nuxeo.movement.jars.all}"/>
             </fileset>
             <!-- Legacy deployment location through release 0.6 -->
-            <fileset dir="${jboss.deploy.nuxeo.system}">
+            <fileset dir="${jee.deploy.nuxeo.system}">
                 <include name="${nuxeo.movement.jars.all}"/>
             </fileset>
         </delete>

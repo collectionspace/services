@@ -113,12 +113,16 @@
     </target>
 
     <target name="deploy" depends="package"
-    	description="deploy 3rdparty in ${jboss.server.cspace}">
+    	description="deploy 3rdparty in ${jee.server.cspace}">
+        <copy todir="${db.base.dir}/jdbc_drivers">
+            <fileset dir="${basedir}/jdbc_drivers"/>
+        </copy>
+
         <ant antfile="nuxeo/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    	description="undeploy 3rdparty from ${jboss.server.cspace}">
+    	description="undeploy 3rdparty from ${jee.server.cspace}">
         <ant antfile="nuxeo/build.xml" target="undeploy" inheritall="false"/>
     </target>
 

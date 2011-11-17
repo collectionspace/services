@@ -114,9 +114,9 @@
     </target>
 
     <target name="deploy" depends="package"
-    	description="deploy nuxeo client libs to ${jboss.server.cspace}">
-        <copy todir="${jboss.server.cspace}/nuxeo-client">
-            <fileset dir="${basedir}/nuxeo-client/lib/${nuxeo.release}"/>
+    	description="deploy nuxeo client libs to ${jee.server.cspace}">
+        <copy todir="${jee.server.cspace}/nuxeo-server">
+            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}"/>
         </copy>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
     	<!--
@@ -127,8 +127,8 @@
     </target>
 
     <target name="undeploy"
-    description="undeploy nuxeo client libs from ${jboss.server.cspace}">
-        <delete dir="${jboss.server.cspace}/nuxeo-client"/>
+    description="undeploy nuxeo client libs from ${jee.server.cspace}">
+        <delete dir="${jee.server.cspace}/nuxeo-client"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>

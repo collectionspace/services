@@ -21,7 +21,7 @@
         		<arg value="Installer: Executing person Service's &apos;install&apos; target." />
 				</exec>
 				<!-- Copy the Nuxeo DocType jar files to the Nuxeo app server domain -->
-        <copy todir="${jboss.deploy.nuxeo.plugins}">
+        <copy todir="${jee.deploy.nuxeo.plugins}">
             <fileset file="nuxeo/*.jar"/>
         </copy>				
     </target>    

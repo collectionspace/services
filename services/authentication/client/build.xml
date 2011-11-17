@@ -126,11 +126,11 @@
     </target>
     
     <target name="deploy" depends="install"
-    description="deploy authentication service in ${jboss.server.cspace}">
+    description="deploy authentication service in ${jee.server.cspace}">
     </target>
 
     <target name="undeploy"
-    description="undeploy authentication service from ${jboss.server.cspace}">
+    description="undeploy authentication service from ${jee.server.cspace}">
     </target>
 
     <target name="dist"

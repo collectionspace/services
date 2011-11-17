@@ -140,13 +140,15 @@
     </target>
 
     <target name="deploy" depends="package"
-    description="deploy cspace services in ${jboss.server.cspace}">
-        <copy file="${basedir}/target/${cspace-services.war}" todir="${jboss.server.cspace}/deploy"/>
+    description="deploy cspace services in ${jee.server.cspace}">
+		<delete dir="${jee.deploy.cspace}/${cspace.services.context}"/>
+        <copy file="${basedir}/target/${cspace-services.war}" todir="${jee.deploy.cspace}"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy cspace services from ${jboss.server.cspace}">
-        <delete file="${jboss.server.cspace}/deploy/${cspace-services.war}"/>
+    description="undeploy cspace services from ${jee.server.cspace}">
+        <delete file="${jee.deploy.cspace}/${cspace-services.war}"/>
+		<delete dir="${jee.deploy.cspace}/${cspace.services.context}"/>
     </target>
 
     <target name="dist"

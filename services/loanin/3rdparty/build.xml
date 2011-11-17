@@ -109,12 +109,12 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy loanin in ${jboss.server.nuxeo}">
+    description="deploy loanin in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-loanin/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy loanin from ${jboss.server.nuxeo}">
+    description="undeploy loanin from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-loanin/build.xml" target="undeploy" inheritall="false"/>
     </target>
 

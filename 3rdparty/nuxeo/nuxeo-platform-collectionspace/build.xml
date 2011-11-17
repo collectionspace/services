@@ -81,19 +81,19 @@
   </target>
   
   <target name="deploy" depends="install"
-    description="deploy collectionspace core doctype in ${jboss.server.nuxeo}">
+    description="deploy collectionspace core doctype in ${jee.server.nuxeo}">
     <copy file="${basedir}/target/${nuxeo.collectionspace_core.jar}"
-      todir="${jboss.deploy.nuxeo.plugins}"/>
+      todir="${jee.deploy.nuxeo.plugins}"/>
   </target>
   
   <target name="undeploy"
-    description="undeploy collectionspace core doctype from ${jboss.server.nuxeo}">
+    description="undeploy collectionspace core doctype from ${jee.server.nuxeo}">
     <delete>
-      <fileset dir="${jboss.deploy.nuxeo.plugins}">
-        <include name="${nuxeo.collectionspace_core.jars.all}"/>
-      </fileset>
+      <fileset dir="${jee.deploy.nuxeo.plugins}">
+        <include name="${nuxeo.collectionspace_core.jars.all}"/>		
+      </fileset>	  
       <!-- Legacy deployment location through release 0.6 -->
-      <fileset dir="${jboss.deploy.nuxeo.system}">
+      <fileset dir="${jee.deploy.nuxeo.system}">
         <include name="${nuxeo.collectionspace_core.jars.all}"/>
       </fileset>
     </delete>

@@ -1,6 +1,6 @@
 <project name="common" default="package" basedir=".">
     <description>
-        collectionspace services common
+        Collectionspace Services common module
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
@@ -117,101 +117,88 @@
         </exec>
     </target>
 
-    <target name="deploy_jpa" description="deploy jpa binaries in ${jboss.server.cspace}">
-        <move todir="${jboss.server.cspace}/jpa-upgrade/lib" overwrite="false">
-
-            <fileset dir="${jboss.server.cspace}/lib">
-              <include name="hibernate-annotations*.jar"/>
-              <include name="hibernate-entitymanager*.jar"/>
-              <include name="ejb3-persistence*.jar"/>
-            </fileset>
-        </move>
-        <copy todir="${jboss.server.cspace}/lib">
-            <fileset dir="${basedir}/lib/jpa-upgrade"/>
-        </copy>
-
-    </target>
-
     <target name="deploy_spring"
-            description="deploy spring binaries in ${jboss.server.cspace}">
-        <copy todir="${jboss.server.cspace}/lib">
+            description="deploy spring binaries in ${jee.server.cspace}">
+        <copy todir="${jee.server.cspace}/lib">
             <fileset dir="${basedir}/lib/spring"/>
         </copy>
     </target>
 
     <target name="deploy_slf4j"
-            description="deploy spring binaries in ${jboss.server.cspace}">
-        <copy todir="${jboss.server.cspace}/lib">
+            description="deploy spring binaries in ${jee.server.cspace}">
+        <copy todir="${jee.server.cspace}/lib">
             <fileset dir="${basedir}/lib/slf4j"/>
         </copy>
     </target>
 	
     <target name="deploy_xmlmerge"
-            description="deploy XMLMerge binaries in ${jboss.server.cspace}">
-        <copy todir="${jboss.server.cspace}/lib">
+            description="deploy XMLMerge binaries in ${jee.server.cspace}">
+        <copy todir="${jee.server.cspace}/lib">
             <fileset dir="${basedir}/lib/xmlmerge"/>
         </copy>
     </target>
 	
 
     <target name="deploy" depends="install"
-            description="deploy common elements in ${jboss.server.cspace}">
-        <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml.org"
-              file="${jboss.server.cspace}/conf/jboss-log4j.xml"
+            description="deploy common elements in ${jee.server.cspace}">
+		<!--
+        <copy tofile="${jee.server.cspace}/conf/jboss-log4j.xml.org"
+              file="${jee.server.cspace}/conf/jboss-log4j.xml"
               overwrite="false"/>
-
-        <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml"
+        <copy tofile="${jee.server.cspace}/conf/jboss-log4j.xml"
               file="${src}/main/cspace/config/log/jboss-log4j.xml"
               overwrite="true"/>
-        <copy todir="${jboss.server.cspace}/conf"
-              file="${src}/main/cspace/config/log/jboss-log4j-release.xml"
-              />
-        <antcall target="deploy_jpa" />
+        <copy todir="${jee.server.cspace}/conf"
+              file="${src}/main/cspace/config/log/jboss-log4j-release.xml"/>
+		-->
         <antcall target="deploy_spring" />
         <antcall target="deploy_slf4j" />
         <antcall target="deploy_xmlmerge" />
     	
-        <copy todir="${jboss.server.cspace}/cspace/config/services">
+        <copy todir="${jee.server.cspace}/cspace/config/services">
             <fileset dir="${basedir}/src/main/cspace/config/services"/>
         </copy>
     	
     </target>
 
     <target name="undeploy"
-            description="undeploy common elements from ${jboss.server.cspace}">
+            description="undeploy common elements from ${jee.server.cspace}">
         <antcall target="undeploy_spring" />
 		<antcall target="undeploy_slf4j" />
-        <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml"
-              file="${jboss.server.cspace}/conf/jboss-log4j.xml.org"
+		<antcall target="undeploy_xmlmerge" />
+		<!--
+        <copy tofile="${jee.server.cspace}/conf/jboss-log4j.xml"
+              file="${jee.server.cspace}/conf/jboss-log4j.xml.org"
               overwrite="true" failonerror="false" />
-        <delete failonerror="false" file="${jboss.server.cspace}/conf/jboss-log4j-release.xml"/>
-        <delete failonerror="false" dir="${jboss.server.cspace}/cspace/config/services"/>
+		-->
+		<!--
+        <delete failonerror="false" file="${jee.server.cspace}/conf/jboss-log4j-release.xml"/>
+		-->
+        <delete failonerror="false" dir="${jee.server.cspace}/cspace/config/services"/>
     </target>
 
     <target name="undeploy_spring"
-            description="undeploy spring binaries from ${jboss.server.cspace}">
+            description="undeploy spring binaries from ${jee.server.cspace}">
         <delete>
-            <fileset dir="${jboss.server.cspace}/lib" includes="org.springframework.*.jar"/>
-            <fileset dir="${jboss.server.cspace}/lib" includes="spring-security*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="org.springframework.*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="spring-security*.jar"/>
         </delete>
     </target>
 	
     <target name="undeploy_slf4j"
-            description="undeploy spring binaries from ${jboss.server.cspace}">
+            description="undeploy SLF4J binaries from ${jee.server.cspace}">
         <delete>
-            <fileset dir="${jboss.server.cspace}/lib" includes="slf4j*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="slf4j*.jar"/>
         </delete>
     </target>
 	
-
-    <target name="dist_jpa"
-            description="dist jpa binaries in ${dist.server.cspace}">
-        <copy todir="${services.trunk}/${dist.server.cspace}/lib">
-            <fileset dir="${basedir}/lib/jpa-upgrade"/>
-        </copy>
-
+    <target name="undeploy_xmlmerge"
+            description="undeploy XMLMerge binaries from ${jee.server.cspace}">
+        <delete>
+            <fileset dir="${jee.server.cspace}/lib" includes="module-xml_merge*.jar"/>
+        </delete>
     </target>
-
+	
     <target name="dist_spring"
             description="dist spring binaries in ${dist.server.cspace}">
         <copy todir="${services.trunk}/${dist.server.cspace}/lib">
@@ -221,8 +208,6 @@
 
     <target name="dist"
             description="generate distribution for common elements" depends="package">
-        <antcall target="dist_jpa" />
-
         <antcall target="dist_spring" />
         <copy todir="${services.trunk}/${dist.server.cspace}/cspace/config/services">
             <fileset dir="${basedir}/src/main/cspace/config/services"/>

@@ -132,7 +132,7 @@ public class ServiceMain {
     }
 
     private void initialize() throws Exception {
-    	if (logger.isDebugEnabled() == true) {
+    	if (logger.isTraceEnabled() == true) {
     		System.out.print("Pausing 5 seconds for you to attached the debugger");
     		long startTime, currentTime;
     		currentTime = startTime = System.currentTimeMillis();
