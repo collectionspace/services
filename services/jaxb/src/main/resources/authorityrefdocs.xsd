@@ -47,6 +47,7 @@
 									<xs:element name="docName"         type="xs:string" minOccurs="0" />
 									<xs:element name="sourceField"     type="xs:string" minOccurs="1" />
 									<xs:element name="uri"             type="xs:anyURI" minOccurs="1" />
+									<xs:element name="updatedAt"       type="xs:string" minOccurs="1" />
 								</xs:sequence>
 							</xs:complexType>
 						</xs:element>

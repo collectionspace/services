@@ -51,6 +51,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -296,6 +297,11 @@ public class RefNameServiceUtils {
                 String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
                 ilistItem.setDocId(csid);
                 ilistItem.setUri(serviceContextPath + csid);
+                try {
+                	ilistItem.setUpdatedAt(DocHandlerBase.getUpdatedAtAsString(docModel));
+                } catch(Exception e) {
+                	logger.error("Error getting udpatedAt value for doc ["+csid+"]: "+e.getLocalizedMessage());
+                }
                 // The id and URI are the same on all doctypes
                 ilistItem.setDocType(docType);
                 ilistItem.setDocNumber(
