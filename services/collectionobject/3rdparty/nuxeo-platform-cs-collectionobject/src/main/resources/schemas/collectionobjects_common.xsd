@@ -83,12 +83,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <!-- Note: Penelope's repeatability spreadsheet identifies a Content Date -->
-    <!-- repeatable group, containing contentDate and dateAssociation fields. -->
-    <!-- Did not find the dateAssociation field in the wiki schemas, however.  -->
-    <!-- contentDate is itself a structured date field, containing a dateAssociation -->
-    <!-- field, so perhaps this may merely be a product of some confusion. -->
-    <xs:element name="contentDate" type="xs:string"/>
+    <xs:element name="contentDateGroup" type="structuredDateGroup"/>
     <xs:element name="contentDescription" type="xs:string"/>
     <xs:element name="contentEventNameGroupList" type="contentEventNameGroupList"/>
     <xs:element name="contentNote" type="xs:string"/>
@@ -204,9 +199,7 @@
     <xs:element name="objectComponentGroupList" type="objectComponentGroupList"/>
 
     <!-- Object Production Information -->
-
-    <xs:element name="objectProductionDateGroup" type="objectProductionDateGroup"/>
-
+    <xs:element name="objectProductionDateGroupList" type="objectProductionDateGroupList"/>
     <xs:element name="objectProductionNote" type="xs:string"/>
     <xs:element name="objectProductionOrganizationGroupList" type="objectProductionOrganizationGroupList"/>
     <xs:element name="objectProductionPeopleGroupList" type="objectProductionPeopleGroupList"/>
@@ -317,7 +310,7 @@
     <xs:element name="viewersPersonalExperience" type="xs:string"/>
     <xs:element name="viewersPersonalResponse" type="xs:string"/>
     <xs:element name="viewersReferences">
-            <xs:complexType>
+        <xs:complexType>
             <xs:sequence>
                 <xs:element name="viewersReference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
@@ -385,13 +378,13 @@
     </xs:complexType>
     <xs:complexType name="objectNameGroup">
         <xs:sequence>
-                <xs:element name="objectName" type="xs:string"/>
-                <xs:element name="objectNameCurrency" type="xs:string"/>
-                <xs:element name="objectNameLevel" type="xs:string"/>
-                <xs:element name="objectNameNote" type="xs:string"/>
-                <xs:element name="objectNameSystem" type="xs:string"/>
-                <xs:element name="objectNameType" type="xs:string"/>
-                <xs:element name="objectNameLanguage" type="xs:string"/>
+            <xs:element name="objectName" type="xs:string"/>
+            <xs:element name="objectNameCurrency" type="xs:string"/>
+            <xs:element name="objectNameLevel" type="xs:string"/>
+            <xs:element name="objectNameNote" type="xs:string"/>
+            <xs:element name="objectNameSystem" type="xs:string"/>
+            <xs:element name="objectNameType" type="xs:string"/>
+            <xs:element name="objectNameLanguage" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -423,7 +416,7 @@
             <xs:element name="titleTranslation" type="xs:string"/>
             <xs:element name="titleTranslationLanguage" type="xs:string"/>
         </xs:sequence>
-     </xs:complexType>
+    </xs:complexType>
 
     <xs:complexType name="contentEventNameGroupList">
         <xs:sequence>
@@ -448,7 +441,7 @@
         <xs:sequence>
             <xs:element name="contentObject" type="xs:string"/>
             <xs:element name="contentObjectType" type="xs:string"/>
-         </xs:sequence>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="contentOtherGroupList">
@@ -513,11 +506,11 @@
         </xs:sequence>
     </xs:complexType>
     
-	<xs:complexType name="objectStatusList">
-		<xs:sequence>
-			<xs:element name="objectStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
-		</xs:sequence>
-	</xs:complexType>
+    <xs:complexType name="objectStatusList">
+        <xs:sequence>
+            <xs:element name="objectStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="technicalAttributeGroupList">
         <xs:sequence>
@@ -546,31 +539,10 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="objectProductionDateGroup">
+    <xs:complexType name="objectProductionDateGroupList">
         <xs:sequence>
-            <xs:element name="dateDisplayDate" type="xs:string"/>
-            <xs:element name="dateAssociation" type="xs:string"/>
-            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
-            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
-            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
-            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
-            <xs:element name="dateLatestYear" type="xs:integer"/>
-            <xs:element name="dateLatestMonth" type="xs:integer"/>
-            <xs:element name="dateLatestDay" type="xs:integer"/>
-            <xs:element name="dateLatestEra" type="xs:string"/>
-            <xs:element name="dateLatestCertainty" type="xs:string"/>
-            <xs:element name="dateLatestQualifier" type="xs:string"/>
-            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
-            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
-            <xs:element name="datePeriod" type="xs:string"/>
-            <xs:element name="dateNote" type="xs:string"/>
-            <xs:element name="dateEarliestScalarValue" type="xs:date"/>
-            <xs:element name="dateLatestScalarValue" type="xs:date"/>
-            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+            <xs:element name="objectProductionDateGroup" type="structuredDateGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -710,7 +682,7 @@
             <xs:element name="assocObject" type="xs:string"/>
             <xs:element name="assocObjectType" type="xs:string"/>
             <xs:element name="assocObjectNote" type="xs:string"/>
-         </xs:sequence>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="assocOrganizationGroupList">
@@ -782,29 +754,48 @@
         </xs:sequence>
     </xs:complexType>
     
-	<xs:complexType name="referenceGroupList">
-		<xs:sequence>
-			<xs:element name="referenceGroup" type="referenceGroup" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
+    <xs:complexType name="referenceGroupList">
+        <xs:sequence>
+            <xs:element name="referenceGroup" type="referenceGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 	 
-	<xs:complexType name="referenceGroup">
-		<xs:sequence>
-			<xs:element name="reference" type="xs:string"/>
-			<xs:element name="referenceNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-    
-    <!-- Object Description Date Information -->
-    <!-- This appears to be a placeholder structured date -->
-    <xs:element name="dateAssociation" type="xs:string"/>
-    <xs:element name="dateEarliestSingle" type="xs:string"/>
-    <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
-    <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
-    <xs:element name="dateLatest" type="xs:string"/>
-    <xs:element name="dateLatestCertainty" type="xs:string"/>
-    <xs:element name="dateLatestQualifier" type="xs:string"/>
-    <xs:element name="datePeriod" type="xs:string"/>
-    <xs:element name="dateText" type="xs:string"/>
+    <xs:complexType name="referenceGroup">
+        <xs:sequence>
+            <xs:element name="reference" type="xs:string"/>
+            <xs:element name="referenceNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Before (re)using this generic complex type in any record type -->
+    <!-- other than CollectionObject, be sure to verify that Nuxeo handles -->
+    <!-- that correctly in its table creation/row linking. -->
+    <xs:complexType name="structuredDateGroup">
+        <xs:sequence>
+            <xs:element name="dateDisplayDate" type="xs:string"/>
+            <xs:element name="dateAssociation" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+            <xs:element name="dateLatestYear" type="xs:integer"/>
+            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="dateLatestDay" type="xs:integer"/>
+            <xs:element name="dateLatestEra" type="xs:string"/>
+            <xs:element name="dateLatestCertainty" type="xs:string"/>
+            <xs:element name="dateLatestQualifier" type="xs:string"/>
+            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+            <xs:element name="datePeriod" type="xs:string"/>
+            <xs:element name="dateNote" type="xs:string"/>
+            <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+            <xs:element name="dateLatestScalarValue" type="xs:date"/>
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>
