@@ -42,10 +42,10 @@
      -->
     
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost:3306/cspace"/>
-        <property name="username" value="root"/>
-        <property name="password" value="admin"/>
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/cspace"/>
+        <property name="username" value="postgres"/>
+        <property name="password" value="pgSEE^quell"/>
     </bean>    
 
     <bean id="lookupStrategy" class="org.springframework.security.acls.jdbc.BasicLookupStrategy">
