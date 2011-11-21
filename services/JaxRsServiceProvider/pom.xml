@@ -107,12 +107,11 @@
                 </exclusion>
             </exclusions> 
         </dependency>
-		<!--
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.blob.service</artifactId>
             <version>${project.version}</version>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.service</artifactId>
@@ -163,12 +162,11 @@
             <artifactId>org.collectionspace.services.imports.service</artifactId>
              <version>${project.version}</version>
         </dependency>
-		<!--
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.media.service</artifactId>
             <version>${project.version}</version>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.location.service</artifactId>
