@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <!-- 
+         testGroup ID="person" is not live.  It works, but may not clean up correctly. 
+         For now, use ID="updatePerson"
+    -->
+    <testGroup ID="personTermStatus" autoDeletePOSTS="true">
+        <test ID="PersonAuth1" auth="admin@core.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <filename>person/personauthorities_common.xml</filename>
+            <vars>
+                <var ID="authShortIdentifier">TermStatusTestAuth</var>
+            </vars>
+        </test>
+        <test ID="Patrick">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+            <filename>person/person_pschmitz.xml</filename>
+            <vars>
+                <var ID="termStatus">Approved</var>
+            </vars>
+        </test>
+        <test ID="Penelope">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+            <filename>person/person_pmadry.xml</filename>
+            <vars>
+                <var ID="termStatus">Inactive</var>
+            </vars>
+        </test>
+
+        <test ID="GetAll">
+            <method>GET</method>
+						<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items</uri>
+						<response>
+							<expected level="ADDOK"/>
+							<filename>person/res/personlistAll.res.xml</filename>
+						</response>
+        </test>
+        <test ID="GetActive">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items?ts=Inactive</uri>
+						<response>
+							<expected level="ADDOK"/>
+							<filename>person/res/personlistActive.res.xml</filename>
+						</response>
+        </test>
+        <test ID="GetBogus">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items?ts=Garbage</uri>
+						<response>
+							<expected level="ADDOK"/>
+							<filename>person/res/personlistAll.res.xml</filename>
+						</response>
+        </test>
+        <test ID="GetNone">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items?ts=Inactive%7CApproved</uri>
+						<response>
+							<expected level="ADDOK"/>
+							<filename>person/res/personlistNone.res.xml</filename>
+						</response>
+        </test>
+				<test ID="GetPartial">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items?pt=Patrick</uri>
+						<response>
+							<expected level="ADDOK"/>
+							<filename>person/res/personlistActive.res.xml</filename>
+						</response>
+        </test>
+				<test ID="GetPartialNone">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items?pt=Patrick&amp;ts=Approved</uri>
+						<response>
+							<expected level="ADDOK"/>
+							<filename>person/res/personlistNone.res.xml</filename>
+						</response>
+        </test>
+   </testGroup>
+
+</xmlReplay>

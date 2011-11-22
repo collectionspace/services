@@ -138,6 +138,13 @@
         </copy>
     </target>
 	
+    <target name="deploy_tenantconfig"
+            description="deploy tenant configuration">
+        <copy todir="${jee.server.cspace}/cspace/config/services">
+            <fileset dir="${basedir}/src/main/cspace/config/services"/>
+        </copy>
+    </target>
+	
 
     <target name="deploy" depends="install"
             description="deploy common elements in ${jee.server.cspace}">
@@ -154,11 +161,7 @@
         <antcall target="deploy_spring" />
         <antcall target="deploy_slf4j" />
         <antcall target="deploy_xmlmerge" />
-    	
-        <copy todir="${jee.server.cspace}/cspace/config/services">
-            <fileset dir="${basedir}/src/main/cspace/config/services"/>
-        </copy>
-    	
+    	<antcall target="deploy_tenantconfig" />
     </target>
 
     <target name="undeploy"

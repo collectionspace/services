@@ -25,10 +25,10 @@
             </templates>            
             <rows>
                 <row><widget>relationshipType</widget></row>
-                <row><widget>documentId1</widget></row>
-                <row><widget>documentType1</widget></row>
-                <row><widget>documentId2</widget></row>
-                <row><widget>documentType2</widget></row>
+                <row><widget>subjectCsid</widget></row>
+                <row><widget>subjectDocumentType</widget></row>
+                <row><widget>objectCsid</widget></row>
+                <row><widget>objectDocumentType</widget></row>
             </rows>
             
             <widget name="relationshipType" type="text">
@@ -44,52 +44,52 @@
                 </properties>
             </widget>
             
-            <widget name="documentId1" type="text">
+            <widget name="subjectCsid" type="text">
                 <labels>
-                    <label mode="any">Document ID 1</label>
+                    <label mode="any">Subject CSID</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="relations_common">documentId1</field>
+                    <field schema="relations_common">subjectCsid</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
                 </properties>
             </widget>
             
-            <widget name="documentType1" type="text">
+            <widget name="subjectDocumentType" type="text">
                 <labels>
-                    <label mode="any">Document Type 1</label>
+                    <label mode="any">Subject Document Type</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="relations_common">documentType1</field>
+                    <field schema="relations_common">subjectDocumentType</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
                 </properties>
             </widget>
             
-            <widget name="documentId2" type="text">
+            <widget name="objectCsid" type="text">
                 <labels>
-                    <label mode="any">Document ID 2</label>
+                    <label mode="any">Object CSID</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="relations_common">documentId2</field>
+                    <field schema="relations_common">objectCsid</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
                 </properties>
             </widget>
             
-            <widget name="documentType2" type="text">
+            <widget name="objectDocumentType" type="text">
                 <labels>
-                    <label mode="any">Document Type 2</label>
+                    <label mode="any">Object Document Type</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="relations_common">documentType2</field>
+                    <field schema="relations_common">objectDocumentType</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>

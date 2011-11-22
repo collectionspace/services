@@ -80,6 +80,10 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         updateRefnameForAuthority(wrapDoc, authorityCommonSchemaName);//CSPACE-3178
     }
 
+    /**
+     * If no short identifier was provided in the input payload,
+     * generate a short identifier from the display name.
+     */
     private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
@@ -89,24 +93,29 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
             docModel.setProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER, generatedShortIdentifier);
         }
     }
-    
+ 
+    /**
+     * Generate a refName for the authority from the short identifier
+     * and display name.
+     * 
+     * All refNames for authorities are generated.  If a client supplies
+     * a refName, it will be overwritten during create (per this method) 
+     * or discarded during update (per filterReadOnlyPropertiesForPart).
+     * 
+     * @see #filterReadOnlyPropertiesForPart(Map<String, Object>, org.collectionspace.services.common.service.ObjectPartType)
+     * 
+     */
     protected void updateRefnameForAuthority(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        String suppliedRefName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.REF_NAME);
-        // CSPACE-3178:
-        // Temporarily accept client-supplied refName values, rather than always generating such values,
-        // Remove the surrounding 'if' statement when clients should no longer supply refName values.
-        if (suppliedRefName == null || suppliedRefName.isEmpty()) {
-            String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
-            String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
-            MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-            RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
-                    ctx.getServiceName(),
-                    shortIdentifier,
-                    displayName);
-            String refName = authority.toString();
-            docModel.setProperty(schemaName, AuthorityJAXBSchema.REF_NAME, refName);
-        }
+        String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+        String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
+        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
+        RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
+                ctx.getServiceName(),
+                shortIdentifier,
+                displayName);
+        String refName = authority.toString();
+        docModel.setProperty(schemaName, AuthorityJAXBSchema.REF_NAME, refName);
     }
 
     public String getShortIdentifier(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) {
@@ -134,9 +143,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         if (partMeta.getLabel().equalsIgnoreCase(commonPartLabel)) {
             objectProps.remove(AuthorityJAXBSchema.CSID);
             objectProps.remove(AuthorityJAXBSchema.SHORT_IDENTIFIER);
-            // Enable when clients should no longer supply refName values
-            // objectProps.remove(AuthorityItemJAXBSchema.REF_NAME); // CSPACE-3178
-
+            objectProps.remove(AuthorityJAXBSchema.REF_NAME);
         }
     }
 }

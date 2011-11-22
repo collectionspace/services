@@ -40,8 +40,8 @@
                 <xs:element name="dateCreated" type="xs:string"/>
                 <xs:element name="dateModified" type="xs:string"/>
                 <xs:element name="description" type="xs:string"/>
-                <xs:element name="dimensionSummary" type="xs:string"/>
-                <xs:element name="dimensionGroupList" type="dimensionGroupList"/>
+                 <!-- Changed name of next field from dimensionGroupList (type="dimensionGroupList") in v1.13 when adding repeatable sub group -->
+                <xs:element name="measuredPartGroupList" type="measuredPartGroupList"/>
                 <xs:element name="filename" type="xs:string"/>
                 <xs:element name="format" type="xs:string"/>
                 <xs:element name="identificationNumber" type="xs:string"/>
@@ -50,8 +50,8 @@
                 <xs:element name="publisher" type="xs:string"/>
                 <xs:element name="relationList" type="relationList"/>
                 <xs:element name="rightsHolder" type="xs:string"/>
-			    <xs:element name="source" type="xs:string"/>
-			    <xs:element name="sourceUrl" type="xs:string"/>
+                <xs:element name="source" type="xs:string"/>
+                <xs:element name="sourceUrl" type="xs:string"/>
                 <xs:element name="subjectList" type="subjectList"/>
                 <xs:element name="title" type="xs:string"/>
                 <xs:element name="typeList" type="typeList"/>
@@ -67,15 +67,29 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="dimensionGroupList">
+    <!-- Changed names, as of v1.13: dimensionGroupList became measuredPartGroupList, dimensionGroup became measuredPartGroup. -->
+    <xs:complexType name="measuredPartGroupList">
         <xs:sequence>
-            <xs:element name="dimensionGroup" type="dimensionGroup" minOccurs="0"
+            <xs:element name="measuredPartGroup" type="measuredPartGroup" minOccurs="0"
                 maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="dimensionGroup">
+    <xs:complexType name="measuredPartGroup">
         <xs:sequence>
             <xs:element name="measuredPart" type="xs:string"/>
+            <xs:element name="dimensionSummary" type="xs:string"/>
+            <xs:element name="dimensionSubGroupList" type="dimensionSubGroupList"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dimensionSubGroupList">
+        <xs:sequence>
+            <xs:element name="dimensionSubGroup" type="dimensionSubGroup" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dimensionSubGroup">
+        <xs:sequence>
             <xs:element name="dimension" type="xs:string"/>
             <xs:element name="measuredBy" type="xs:string"/>
             <xs:element name="measurementUnit" type="xs:string"/>

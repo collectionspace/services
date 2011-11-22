@@ -39,33 +39,21 @@ public interface RelationJAXBSchema {
 	/** The Constant CSID. */
 	final static String CSID = "csid";
 	
-	/** The Constant DOCUMENT_ID_1. */
-	final static String DOCUMENT_ID_1 = "documentId1";
-	
-	/** The Constant DOCUMENT_TYPE_1. */
-	final static String DOCUMENT_TYPE_1 = "documentType1";
-	
-	/** The Constant DOCUMENT_ID_2. */
-	final static String DOCUMENT_ID_2 = "documentId2";
-	
-	/** The Constant DOCUMENT_TYPE_2. */
-	final static String DOCUMENT_TYPE_2 = "documentType2";
-	
 	/** The Constant RELATIONSHIP_TYPE. */
 	final static String RELATIONSHIP_TYPE = "relationshipType";
 	
 	/** The Constant RELATIONSHIP_TYPE_DISPLAYNAME. */
 	final static String RELATIONSHIP_TYPE_DISPLAYNAME = "predicateDisplayName";
 
-    final static String SUBJECT_URI = "subjectUri";
-    final static String SUBJECT_CSID = "subjectCsid";
-    final static String SUBJECT_REFNAME = "subjectRefName";
-    final static String SUBJECT_DOCTYPE = "subjectDocumentType";
+    final static String SUBJECT_URI =		"subjectUri";
+    final static String SUBJECT_CSID =		"subjectCsid";
+    final static String SUBJECT_REFNAME =	"subjectRefName";
+    final static String SUBJECT_DOCTYPE =	"subjectDocumentType";
 
-    final static String OBJECT_URI = "objectUri";
-    final static String OBJECT_CSID = "objectCsid";
-    final static String OBJECT_REFNAME = "objectRefName";
-    final static String OBJECT_DOCTYPE = "objectDocumentType";
+    final static String OBJECT_URI =		"objectUri";
+    final static String OBJECT_CSID =		"objectCsid";
+    final static String OBJECT_REFNAME =	"objectRefName";
+    final static String OBJECT_DOCTYPE =	"objectDocumentType";
 
 }
 

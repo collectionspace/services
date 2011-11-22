@@ -163,6 +163,14 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         return commonList;
     }
 
+	public static String getUpdatedAtAsString(DocumentModel docModel) throws Exception {
+			GregorianCalendar cal = (GregorianCalendar)
+								docModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,
+											COLLECTIONSPACE_CORE_UPDATED_AT);
+			String updatedAt = DateTimeFormatUtils.formatAsISO8601Timestamp(cal);
+			return updatedAt;
+	}
+
     @Override
     public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         String classname = getDocHandlerParams().getAbstractCommonListClassname();
@@ -192,11 +200,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
             item.put(fields[0], id);
             String uri = getUri(docModel);
             item.put(fields[1], uri);
-            GregorianCalendar cal = (GregorianCalendar)
-            					docModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,
-            								COLLECTIONSPACE_CORE_UPDATED_AT);
-            String updatedAt = DateTimeFormatUtils.formatAsISO8601Timestamp(cal);
-            item.put(fields[2], updatedAt);
+            item.put(fields[2], getUpdatedAtAsString(docModel));
 
             for (ListResultField field : resultsFields ){
             	String schema = field.getSchema();

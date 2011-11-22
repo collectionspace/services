@@ -58,15 +58,16 @@ public class RelationsUtils {
     	StringBuilder stringBuilder = new StringBuilder();
     	if (subject != null) {
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
-    				RelationJAXBSchema.DOCUMENT_ID_1 + " = " + "'" + subject + "'");
+    				RelationJAXBSchema.SUBJECT_CSID + " = " + "'" + subject + "'");
     	}
     	
     	if (subjectType != null) {
     		if (stringBuilder.length() > 0) {
     			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
     		}
+    		// BUG - this should use the new field RelationJAXBSchema.SUBJECT_DOCTYPE
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
-    				RelationJAXBSchema.DOCUMENT_TYPE_1 + " = " + "'" + subjectType + "'");
+    				RelationJAXBSchema.SUBJECT_DOCTYPE + " = " + "'" + subjectType + "'");
     	}
     	
     	if (predicate != null) {
@@ -82,15 +83,16 @@ public class RelationsUtils {
     			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
     		}
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
-    				RelationJAXBSchema.DOCUMENT_ID_2 + " = " + "'" + object + "'");
+    				RelationJAXBSchema.OBJECT_CSID + " = " + "'" + object + "'");
     	}
     	
     	if (objectType != null) {
     		if (stringBuilder.length() > 0) {
     			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
     		}
+    		// BUG - this should use the new field RelationJAXBSchema.OBJECT_DOCTYPE
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
-    				RelationJAXBSchema.DOCUMENT_TYPE_2 + " = " + "'" + objectType + "'");
+    				RelationJAXBSchema.OBJECT_DOCTYPE + " = " + "'" + objectType + "'");
     	}
     	
     	if (stringBuilder.length() > 0) {

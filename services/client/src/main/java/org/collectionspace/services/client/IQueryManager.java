@@ -56,6 +56,19 @@ public interface IQueryManager {
 	
 	public String createWhereClauseFromAdvancedSearch(String advancedSearch);
 
+	final static boolean FILTER_EXCLUDE = true;
+	final static boolean FILTER_INCLUDE = false;
+	
+	/**
+	 * Creates a query to filter a qualified (string) field according to a list of string values. 
+	 * @param qualifiedField The schema-qualified field to filter on
+	 * @param filterTerms the list of one or more strings to filter on
+	 * @param fExclude If true, will require qualifiedField NOT match the filters strings.
+	 * 					If false, will require qualifiedField does match one of the filters strings.
+	 * @return queryString
+	 */
+	public String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude);
+	
 	/**
 	 * Creates the where clause for partial term match.
 	 * 

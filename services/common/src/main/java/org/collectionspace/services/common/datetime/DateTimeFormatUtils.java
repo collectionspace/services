@@ -54,7 +54,7 @@ public class DateTimeFormatUtils {
     final static String LOCALE_LANGUAGE_CODE_PROPERTY_NAME = "localeLanguage";
     final static Locale NULL_LOCALE = null;
     final static List<String> isoLanguageCodes = new ArrayList(Arrays.asList(Locale.getISOLanguages()));
-    final static String ISO_8601_FLOATING_DATE_PATTERN = "yyyy-MM-dd";
+    final static String ISO_8601_DATE_PATTERN = "yyyy-MM-dd";
     final static String ISO_8601_UTC_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     static Map<String,List<DateFormat>> dateFormatters = new HashMap<String,List<DateFormat>>();
     static Map<String,List<String>> datePatterns = new HashMap<String,List<String>>();
@@ -345,6 +345,20 @@ public class DateTimeFormatUtils {
     public static String formatAsISO8601Timestamp(GregorianCalendar cal) {
         return formatGregorianCalendarDate(cal, GregorianCalendarDateTimeUtils.UTCTimeZone(),
                 getDateFormatter(ISO_8601_UTC_TIMESTAMP_PATTERN));
+    }
+    
+    /**
+     * Returns a representation of a calendar date and time instance,
+     * as an ISO 8601-formatted date.
+     *
+     * @param cal a calendar date and time instance.
+     *
+     * @return    a representation of that calendar date and time instance,
+     *            as an ISO 8601-formatted date.
+     */
+    public static String formatAsISO8601Date(GregorianCalendar cal) {
+        return formatGregorianCalendarDate(cal, GregorianCalendarDateTimeUtils.UTCTimeZone(),
+                getDateFormatter(ISO_8601_DATE_PATTERN));
     }
 
     /**

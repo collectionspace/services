@@ -34,6 +34,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCommonListUtils;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -65,6 +66,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     private final Logger logger = LoggerFactory.getLogger(LocationAuthorityServiceTest.class);
     private final String REFNAME = "refName";
     private final String DISPLAYNAME = "displayName";
+    private final static String CURRENT_DATE_UTC =
+        GregorianCalendarDateTimeUtils.currentDateUTC();
 
 	@Override
 	public String getServicePathComponent() {
@@ -94,7 +97,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
     final String TEST_NAME = "Shelf 1";
     final String TEST_SHORTID = "shelf1";
     final String TEST_CONDITION_NOTE = "Basically clean";
-    final String TEST_CONDITION_NOTE_DATE = "June 11, 1979";
+    final String TEST_CONDITION_NOTE_DATE = CURRENT_DATE_UTC;
     final String TEST_SECURITY_NOTE = "Kind of safe";
     final String TEST_ACCESS_NOTE = "Only right-thinkers may see";
     final String TEST_ADDRESS = "123 Main Street, Anytown USA";

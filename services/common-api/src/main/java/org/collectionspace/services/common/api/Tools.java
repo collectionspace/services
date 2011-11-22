@@ -171,6 +171,7 @@ public class Tools {
         }
         StringBuffer sb = new StringBuffer();
         int i = 0;
+        // BUG - \n is not the separator on all systems. Have to use the system line separator.
         String[] foo = result.split("\n");
         for (String line: foo){
             i++;

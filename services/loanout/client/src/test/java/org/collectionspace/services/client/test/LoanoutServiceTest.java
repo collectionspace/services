@@ -33,9 +33,10 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCommonListUtils;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.loanout.LoanedObjectStatusGroup;
-import org.collectionspace.services.loanout.LoanedObjectStatusGroupList;
+import org.collectionspace.services.loanout.LoanStatusGroup;
+import org.collectionspace.services.loanout.LoanStatusGroupList;
 import org.collectionspace.services.loanout.LoansoutCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -60,6 +61,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     /** The known resource id. */
     private String knownResourceId = null;
+    private final static String CURRENT_DATE_UTC =
+        GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -303,14 +306,14 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         // Check selected fields in the common part.
         Assert.assertNotNull(loanoutCommon.getLoanOutNumber());
 
-        LoanedObjectStatusGroupList statusGroupList = loanoutCommon.getLoanedObjectStatusGroupList();
+        LoanStatusGroupList statusGroupList = loanoutCommon.getLoanStatusGroupList();
         Assert.assertNotNull(statusGroupList);
-        List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
+        List<LoanStatusGroup> statusGroups = statusGroupList.getLoanStatusGroup();
         Assert.assertNotNull(statusGroups);
         Assert.assertTrue(statusGroups.size() > 0);
-        LoanedObjectStatusGroup statusGroup = statusGroups.get(0);
+        LoanStatusGroup statusGroup = statusGroups.get(0);
         Assert.assertNotNull(statusGroup);
-        Assert.assertNotNull(statusGroup.getLoanedObjectStatus());
+        Assert.assertNotNull(statusGroup.getLoanStatus());
 
         // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
         if (logger.isDebugEnabled()) {
@@ -436,19 +439,18 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Update the content of this resource.
         loanoutCommon.setLoanOutNumber("updated-" + loanoutCommon.getLoanOutNumber());
-        loanoutCommon.setLoanReturnDate("updated-" + loanoutCommon.getLoanReturnDate());
-        LoanedObjectStatusGroupList statusGroupList = loanoutCommon.getLoanedObjectStatusGroupList();
+        LoanStatusGroupList statusGroupList = loanoutCommon.getLoanStatusGroupList();
         Assert.assertNotNull(statusGroupList);
-        List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
+        List<LoanStatusGroup> statusGroups = statusGroupList.getLoanStatusGroup();
         Assert.assertNotNull(statusGroups);
         Assert.assertTrue(statusGroups.size() > 0);
-        LoanedObjectStatusGroup statusGroup = statusGroups.get(0);
+        LoanStatusGroup statusGroup = statusGroups.get(0);
         Assert.assertNotNull(statusGroup);
-        String loanedObjectStatus = statusGroup.getLoanedObjectStatus();
-        Assert.assertNotNull(loanedObjectStatus);
-        String updatedLoanedObjectStatus = "updated-" + loanedObjectStatus;
-        statusGroups.get(0).setLoanedObjectStatus(updatedLoanedObjectStatus);
-        loanoutCommon.setLoanedObjectStatusGroupList(statusGroupList);
+        String loanStatus = statusGroup.getLoanStatus();
+        Assert.assertNotNull(loanStatus);
+        String updatedLoanStatus = "updated-" + loanStatus;
+        statusGroups.get(0).setLoanStatus(updatedLoanStatus);
+        loanoutCommon.setLoanStatusGroupList(statusGroupList);
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
@@ -480,20 +482,20 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(updatedLoanoutCommon);
 
         // Check selected fields in the updated resource.
-        Assert.assertEquals(updatedLoanoutCommon.getLoanReturnDate(),
-                loanoutCommon.getLoanReturnDate(),
+        Assert.assertEquals(updatedLoanoutCommon.getLoanOutNumber(),
+                loanoutCommon.getLoanOutNumber(),
                 "Data in updated object did not match submitted data.");
 
-        LoanedObjectStatusGroupList updatedStatusGroupList =
-                updatedLoanoutCommon.getLoanedObjectStatusGroupList();
+        LoanStatusGroupList updatedStatusGroupList =
+                updatedLoanoutCommon.getLoanStatusGroupList();
         Assert.assertNotNull(updatedStatusGroupList);
-        List<LoanedObjectStatusGroup> updatedStatusGroups =
-                updatedStatusGroupList.getLoanedObjectStatusGroup();
+        List<LoanStatusGroup> updatedStatusGroups =
+                updatedStatusGroupList.getLoanStatusGroup();
         Assert.assertNotNull(updatedStatusGroups);
         Assert.assertTrue(updatedStatusGroups.size() > 0);
         Assert.assertNotNull(updatedStatusGroups.get(0));
-        Assert.assertEquals(updatedLoanedObjectStatus,
-                updatedStatusGroups.get(0).getLoanedObjectStatus(),
+        Assert.assertEquals(updatedLoanStatus,
+                updatedStatusGroups.get(0).getLoanStatus(),
                 "Data in updated object did not match submitted data.");
 
         // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
@@ -773,7 +775,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
     private PoxPayloadOut createLoanoutInstance(String identifier) {
         return createLoanoutInstance(
                 "loanoutNumber-" + identifier,
-                "returnDate-" + identifier);
+                CURRENT_DATE_UTC);
     }
 
     /**
@@ -789,17 +791,17 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         loanoutCommon.setLoanOutNumber(loanOutNumber);
         loanoutCommon.setLoanReturnDate(returnDate);
         loanoutCommon.setBorrower(
-                "urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'");
+                "urn:cspace:org.collectionspace.demo:orgauthorities:name(TestOrgAuth):item:name(NorthernClimesMuseum)'Northern Climes Museum'");
         loanoutCommon.setBorrowersContact(
-                "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Chris Contact)'Chris Contact'");
+                "urn:cspace:org.collectionspace.demo:personauthorities:name(TestPersonAuth):item:name(ChrisContact)'Chris Contact'");
         loanoutCommon.setLoanPurpose("Allow people in cold climes to share the magic of Surfboards of the 1960s.");
-        LoanedObjectStatusGroupList statusGroupList = new LoanedObjectStatusGroupList();
-        List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
-        LoanedObjectStatusGroup statusGroup = new LoanedObjectStatusGroup();
-        statusGroup.setLoanedObjectStatus("returned");
-        statusGroup.setLoanedObjectStatusNote("Left under the front mat.");
+        LoanStatusGroupList statusGroupList = new LoanStatusGroupList();
+        List<LoanStatusGroup> statusGroups = statusGroupList.getLoanStatusGroup();
+        LoanStatusGroup statusGroup = new LoanStatusGroup();
+        statusGroup.setLoanStatus("returned");
+        statusGroup.setLoanStatusNote("Left under the front mat.");
         statusGroups.add(statusGroup);
-        loanoutCommon.setLoanedObjectStatusGroupList(statusGroupList);
+        loanoutCommon.setLoanStatusGroupList(statusGroupList);
         loanoutCommon.setLoanOutNote(getUTF8DataFragment());  // For UTF-8 tests
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());

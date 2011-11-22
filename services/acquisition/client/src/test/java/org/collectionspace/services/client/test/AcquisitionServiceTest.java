@@ -32,6 +32,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCommonListUtils;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
@@ -62,17 +63,20 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
-
-	@Override
-	public String getServicePathComponent() {
-		return AcquisitionClient.SERVICE_PATH_COMPONENT;
-	}
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.timestampUTC();
 
 
-	@Override
-	protected String getServiceName() {
-		return AcquisitionClient.SERVICE_NAME;
-	}
+    @Override
+    public String getServicePathComponent() {
+        return AcquisitionClient.SERVICE_PATH_COMPONENT;
+    }
+
+
+    @Override
+    protected String getServiceName() {
+        return AcquisitionClient.SERVICE_NAME;
+    }
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -797,10 +801,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         AcquisitionDateList acqDatesList = new AcquisitionDateList();
         List<String> acqDates = acqDatesList.getAcquisitionDate();
-        // FIXME Use properly timestamps for representative acquisition
-        // dates in this example test record. The following are mere placeholders.
-        acqDates.add("First Acquisition Date -" + identifier);
-        acqDates.add("Second Acquisition Date-" + identifier);
+        acqDates.add(CURRENT_DATE_UTC);
+        acqDates.add(CURRENT_DATE_UTC);
         acquisition.setAcquisitionDates(acqDatesList);
 
         OwnerList ownersList = new OwnerList();

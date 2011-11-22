@@ -24,10 +24,6 @@
         <xs:complexType>
             <xs:sequence>
             	<xs:element name="csid" type="xs:string" />            
-                <xs:element name="documentId1" type="xs:string" minOccurs="1"/>
-                <xs:element name="documentType1" type="xs:string" minOccurs="1"/>
-                <xs:element name="documentId2" type="xs:string" minOccurs="1"/>
-                <xs:element name="documentType2" type="xs:string" minOccurs="1"/>
                 <!-- type of relationship between two entities -->
                 <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
                 <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>

@@ -39,15 +39,19 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.BriefDescriptionList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
-import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
-import org.collectionspace.services.collectionobject.DimensionGroup;
-import org.collectionspace.services.collectionobject.DimensionList;
+import org.collectionspace.services.collectionobject.DimensionSubGroup;
+import org.collectionspace.services.collectionobject.DimensionSubGroupList;
+import org.collectionspace.services.collectionobject.MeasuredPartGroup;
+import org.collectionspace.services.collectionobject.MeasuredPartGroupList;
 import org.collectionspace.services.collectionobject.ObjectNameGroup;
 import org.collectionspace.services.collectionobject.ObjectNameList;
 import org.collectionspace.services.collectionobject.OtherNumber;
 import org.collectionspace.services.collectionobject.OtherNumberList;
+import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
+import org.collectionspace.services.collectionobject.TitleTranslationSubGroup;
+import org.collectionspace.services.collectionobject.TitleTranslationSubGroupList;
 import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
@@ -77,9 +81,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
     private final String OBJECT_NAME_VALUE = "an object name";
     private final BigInteger AGE_VALUE = new BigInteger("55");
+    private final String MEASURED_PART = "light box frame";
     private final BigDecimal DIMENSION_VALUE_LENGTH = new BigDecimal("0.009");
     private final BigDecimal DIMENSION_VALUE_WIDTH = new BigDecimal("3087.56");
-    private final String UPDATED_MEASURED_PART_VALUE = "updated measured part value";
+    private final String UPDATED_MEASUREMENT_UNIT = "Angstroms";
     private final String UTF8_DATA_SAMPLE = "Audiorecording album cover signed by Lech "
             + "Wa" + '\u0142' + '\u0119' + "sa";
 
@@ -628,14 +633,26 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         // Verify the number and contents of values in repeatable fields,
         // as created in the instance record used for testing.
-        DimensionList dimensionList = collectionobjectCommon.getDimensions();
-        Assert.assertNotNull(dimensionList);
-        List<DimensionGroup> dimensionsGroups = dimensionList.getDimensionGroup();
-        Assert.assertNotNull(dimensionsGroups);
-        Assert.assertTrue(dimensionsGroups.size() > 0);
-        Assert.assertNotNull(dimensionsGroups.get(0));
-        Assert.assertNotNull(dimensionsGroups.get(0).getMeasuredPart());
-
+        MeasuredPartGroupList measuredPartGroupList = collectionobjectCommon.getMeasuredPartGroupList();
+        Assert.assertNotNull(measuredPartGroupList, "Measured part group list was null");
+        List<MeasuredPartGroup> measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
+        Assert.assertNotNull(measuredPartGroups, "Measured part groups were null");
+        Assert.assertTrue(measuredPartGroups.size() > 0, "No measured part groups were returned");
+        MeasuredPartGroup mpGroup = measuredPartGroups.get(0);
+        Assert.assertNotNull(mpGroup.getMeasuredPart(), "Measured part was null");
+        Assert.assertEquals(mpGroup.getMeasuredPart(), MEASURED_PART,
+                "Measured part value returned didn't match expected value");
+        
+        DimensionSubGroupList dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
+        Assert.assertNotNull(dimensionSubGroupList, "Dimension subgroup list was null");
+        List<DimensionSubGroup> dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
+        Assert.assertNotNull(dimensionSubGroups, "Dimension subgroups were null");
+        Assert.assertTrue(dimensionSubGroups.size() > 0, "No dimension subgroups were returned");
+        DimensionSubGroup lengthDimension = dimensionSubGroups.get(0);
+        Assert.assertNotNull(lengthDimension, "Length dimension was null");
+        Assert.assertTrue(lengthDimension.getValue().compareTo(DIMENSION_VALUE_LENGTH) == 0,
+                "Dimension length value returned didn't match expected value");
+        
         /* No longer part of the "default" domain service tests for the CollectionObject record.
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Reading Natural History part ...");
@@ -762,21 +779,32 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         // Replace the existing value instances in the dimensions repeatable group
         // with entirely new value instances, also changing the number of such instances.
-        DimensionList dimensionList = collectionObjectCommon.getDimensions();
-        Assert.assertNotNull(dimensionList);
-        List<DimensionGroup> dimensionGroups = dimensionList.getDimensionGroup();
-        Assert.assertNotNull(dimensionGroups);
-        int originalDimensionGroupSize = dimensionGroups.size();
-        Assert.assertTrue(originalDimensionGroupSize >= 1);
-
-        DimensionGroup updatedDimensionGroup = new DimensionGroup();
-        updatedDimensionGroup.setMeasuredPart(UPDATED_MEASURED_PART_VALUE);
-        dimensionGroups.clear();
-        dimensionGroups.add(updatedDimensionGroup);
-        int updatedDimensionGroupSize = dimensionGroups.size();
-        Assert.assertTrue(updatedDimensionGroupSize >= 1);
-        Assert.assertTrue(updatedDimensionGroupSize != originalDimensionGroupSize);
-        collectionObjectCommon.setDimensions(dimensionList);
+        MeasuredPartGroupList measuredPartGroupList = collectionObjectCommon.getMeasuredPartGroupList();
+        Assert.assertNotNull(measuredPartGroupList);
+        List<MeasuredPartGroup> measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
+        Assert.assertNotNull(measuredPartGroups);
+        Assert.assertTrue(measuredPartGroups.size() > 0);
+        MeasuredPartGroup mpGroup = measuredPartGroups.get(0);
+        Assert.assertNotNull(mpGroup.getMeasuredPart());
+        
+        DimensionSubGroupList dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
+        Assert.assertNotNull(dimensionSubGroupList);
+        List<DimensionSubGroup> dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
+        Assert.assertNotNull(dimensionSubGroups);
+        int originalDimensionSubGroupSize = dimensionSubGroups.size();
+        Assert.assertTrue(dimensionSubGroups.size() > 0);
+        dimensionSubGroups.clear();
+        
+        DimensionSubGroup heightDimension = new DimensionSubGroup();
+        heightDimension.setDimension("height");
+        heightDimension.setMeasurementUnit(UPDATED_MEASUREMENT_UNIT);
+        dimensionSubGroups.add(heightDimension);
+        
+        int updatedDimensionGroupSize = dimensionSubGroups.size();
+        Assert.assertTrue(updatedDimensionGroupSize > 0);
+        Assert.assertTrue(updatedDimensionGroupSize != originalDimensionSubGroupSize);
+        
+        collectionObjectCommon.setMeasuredPartGroupList(measuredPartGroupList);
 
         if (logger.isDebugEnabled()) {
             logger.debug("sparse update that will be sent in update request:");
@@ -801,13 +829,22 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                 objNameGroups.get(0).getObjectName(),
                 "Data in updated object did not match submitted data.");
         
-        dimensionList = updatedCollectionobjectCommon.getDimensions();
-        Assert.assertNotNull(dimensionList);
-        dimensionGroups = dimensionList.getDimensionGroup();
-        Assert.assertNotNull(dimensionGroups);
-        Assert.assertTrue(dimensionGroups.size() == updatedDimensionGroupSize);
-        Assert.assertEquals(UPDATED_MEASURED_PART_VALUE,
-                dimensionGroups.get(0).getMeasuredPart(),
+        measuredPartGroupList = collectionObjectCommon.getMeasuredPartGroupList();
+        Assert.assertNotNull(measuredPartGroupList);
+        measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
+        Assert.assertNotNull(measuredPartGroups);
+        Assert.assertTrue(measuredPartGroups.size() > 0);
+        mpGroup = measuredPartGroups.get(0);
+        Assert.assertNotNull(mpGroup.getMeasuredPart());
+        
+        dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
+        Assert.assertNotNull(dimensionSubGroupList);
+        dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
+        Assert.assertNotNull(dimensionSubGroups);
+        Assert.assertTrue(dimensionSubGroups.size() > 0);
+        Assert.assertTrue(dimensionSubGroups.size() == updatedDimensionGroupSize);
+        Assert.assertEquals(UPDATED_MEASUREMENT_UNIT,
+                dimensionSubGroups.get(0).getMeasurementUnit(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -1237,6 +1274,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         TitleGroupList titleGroupList = new TitleGroupList();
         List<TitleGroup> titleGroups = titleGroupList.getTitleGroup();
+        Assert.assertNotNull(titleGroups);
         TitleGroup titleGroup = new TitleGroup();
         titleGroup.setTitle("a title");
         titleGroups.add(titleGroup);
@@ -1249,22 +1287,32 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         objNameGroups.add(objectNameGroup);
         collectionObject.setObjectNameList(objNameList);
 
-        DimensionList dimensionList = new DimensionList();
-        List<DimensionGroup> dimensionGroups = dimensionList.getDimensionGroup();
-        DimensionGroup dimensionGroup1 = new DimensionGroup();
-        dimensionGroup1.setMeasuredPart("head");
-        dimensionGroup1.setDimension("length");
-        dimensionGroup1.setValue(DIMENSION_VALUE_LENGTH);
-        dimensionGroup1.setMeasurementUnit("cm");
-        DimensionGroup dimensionGroup2 = new DimensionGroup();
-        dimensionGroup2.setMeasuredPart("leg");
-        dimensionGroup2.setDimension("width");
-        dimensionGroup2.setValue(DIMENSION_VALUE_WIDTH);
-        dimensionGroup2.setMeasurementUnit("m");
-        dimensionGroup2.setValueQualifier("");  // test null string
-        dimensionGroups.add(dimensionGroup1);
-        dimensionGroups.add(dimensionGroup2);
-        collectionObject.setDimensions(dimensionList);
+        MeasuredPartGroupList measuredPartGroupList = new MeasuredPartGroupList();
+        List<MeasuredPartGroup> measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
+        Assert.assertNotNull(measuredPartGroups, "Measured part groups are null");
+        MeasuredPartGroup measuredPartGroup = new MeasuredPartGroup();
+        measuredPartGroup.setMeasuredPart(MEASURED_PART);
+
+        DimensionSubGroupList dimensionSubGroupList = new DimensionSubGroupList();
+        List<DimensionSubGroup> dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
+        Assert.assertNotNull(dimensionSubGroups, "Dimension subgroups are null");
+
+        DimensionSubGroup lengthDimension = new DimensionSubGroup();
+        lengthDimension.setDimension("length");
+        lengthDimension.setValue(DIMENSION_VALUE_LENGTH);
+        lengthDimension.setMeasurementUnit("cm");
+        dimensionSubGroups.add(lengthDimension);
+        
+        DimensionSubGroup widthDimension = new DimensionSubGroup();
+        widthDimension.setDimension("width");
+        widthDimension.setValue(DIMENSION_VALUE_WIDTH);
+        widthDimension.setMeasurementUnit("m");
+        widthDimension.setValueQualifier(""); // test empty string
+        dimensionSubGroups.add(widthDimension);
+        
+        measuredPartGroup.setDimensionSubGroupList(dimensionSubGroupList);
+        measuredPartGroups.add(measuredPartGroup);
+        collectionObject.setMeasuredPartGroupList(measuredPartGroupList);
 
         // Repeatable scalar fields
         

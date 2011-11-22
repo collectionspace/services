@@ -34,6 +34,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCommonListUtils;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
@@ -65,7 +66,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
     private String LENDER_REF_NAME =
-            "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Harry Lender)'Harry Lender'";
+            "urn:cspace:org.collectionspace.demo:personauthorities:name(TestPersonAuth):item:name(HarryLender)'Harry Lender'";
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -477,7 +480,6 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 
         // Update the content of this resource.
         loaninCommon.setLoanInNumber("updated-" + loaninCommon.getLoanInNumber());
-        loaninCommon.setLoanReturnDate("updated-" + loaninCommon.getLoanReturnDate());
         loaninCommon.setLoanInNote("updated-" + loaninCommon.getLoanInNote());
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
@@ -513,8 +515,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(updatedLoaninCommon);
 
         // Check selected fields in the updated common part.
-        Assert.assertEquals(updatedLoaninCommon.getLoanReturnDate(),
-                loaninCommon.getLoanReturnDate(),
+        Assert.assertEquals(updatedLoaninCommon.getLoanInNumber(),
+                loaninCommon.getLoanInNumber(),
                 "Data in updated object did not match submitted data.");
 
         if (logger.isDebugEnabled()) {
@@ -831,7 +833,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 
         LoansinCommon loaninCommon = new LoansinCommon();
         loaninCommon.setLoanInNumber(loaninNumber);
-        loaninCommon.setLoanReturnDate(returnDate);
+        loaninCommon.setLoanReturnDate(CURRENT_DATE_UTC);
         LenderGroupList lenderGroupList = new LenderGroupList();
         LenderGroup lenderGroup = new LenderGroup();
         lenderGroup.setLender(LENDER_REF_NAME);

@@ -30,12 +30,12 @@
       <!-- <types:item><types:key>localeLanguage</types:key><types:value>da</types:value></types:item> -->
     </tenant:properties>		
     <!-- begin idgenerators service meta-data -->
-    <tenant:serviceBindings id="idgenerators" name="idgenerators" version="0.1">
+    <tenant:serviceBindings id="idgenerators" name="idgenerators" type="utility" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
     </tenant:serviceBindings>
     <!-- end idgenerator service meta-data -->
     <!-- begin id service meta-data -->
-    <tenant:serviceBindings id="id" name="id" version="0.1">
+    <tenant:serviceBindings id="id" name="id" type="utility" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /idgenerators/*/ids
@@ -555,6 +555,7 @@
     </tenant:serviceBindings>
     <!--end collectionobject service meta-data -->
     <!-- begin blob service meta-data -->
+		<!-- This should likely be type="object" -->
     <tenant:serviceBindings id="Blobs" name="Blobs" type="procedure" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/blobs/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
@@ -852,13 +853,10 @@
               <types:key>authRef</types:key>
               <types:value>borrowersAuthorizer</types:value>
             </types:item>
-            <!-- To be added to Loan In records per CSPACE-3269 -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
                <types:key>authRef</types:key>
                <types:value>borrowersContact</types:value>
             </types:item>
-            -->
             <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -1174,7 +1172,8 @@
     </tenant:serviceBindings>
     <!-- end imports service meta-data -->
     <!-- begin media service meta-data -->
-    <tenant:serviceBindings id="Media" name="Media" type="procedure" version="0.1">
+		<!-- This should likely be type="object" -->
+     <tenant:serviceBindings id="Media" name="Media" type="procedure" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/media/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler</service:documentHandler>
@@ -1432,7 +1431,7 @@
     </tenant:serviceBindings>
     <!-- end report service meta-data -->
     <!-- begin vocabulary service meta-data -->
-    <tenant:serviceBindings id="Vocabularies" name="Vocabularies" version="0.1">
+    <tenant:serviceBindings id="Vocabularies" name="Vocabularies" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/vocabularies/*/workflow/</service:uriPath>
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/vocabularies/*/items/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
@@ -1497,7 +1496,7 @@
             Note there is no Vocabularyitem service, but there is a
             Repository workspace so we have to configure that.
         -->
-    <tenant:serviceBindings id="Vocabularyitems" name="Vocabularyitems" version="0.1">
+    <tenant:serviceBindings id="Vocabularyitems" name="Vocabularyitems" type="authority" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/vocabularyitems/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
       <!--
@@ -1513,18 +1512,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+						<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
             <service:ListResultField>
               <service:element>order</service:element>
               <service:xpath>order</service:xpath>
@@ -1570,7 +1558,7 @@
     </tenant:serviceBindings>
     <!-- end vocabulary service meta-data -->
     <!-- begin orgauthority service meta-data -->
-    <tenant:serviceBindings id="Orgauthorities" name="Orgauthorities" version="0.1">
+    <tenant:serviceBindings id="Orgauthorities" name="Orgauthorities" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/orgauthorities/*/workflow/</service:uriPath>
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/orgauthorities/*/items/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
@@ -1638,7 +1626,7 @@
              Note there is no Organization service, but there is a
              Repository workspace so we have to configure that.
         -->
-    <tenant:serviceBindings id="Organizations" name="Organizations" version="0.1">
+    <tenant:serviceBindings id="Organizations" name="Organizations" type="authority" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/items/
@@ -1651,18 +1639,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -1753,7 +1730,7 @@
     </tenant:serviceBindings>
     <!-- end organization service meta-data -->
     <!-- begin personauthority service meta-data -->
-    <tenant:serviceBindings id="Personauthorities" name="Personauthorities" version="0.1">
+    <tenant:serviceBindings id="Personauthorities" name="Personauthorities" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/personauthorities/*/workflow/</service:uriPath>
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/personauthorities/*/items/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
@@ -1824,7 +1801,7 @@
              Note there is no Person service, but there is a
              Repository workspace so we have to configure that.
         -->
-    <tenant:serviceBindings id="Persons" name="Persons" version="0.1">
+    <tenant:serviceBindings id="Persons" name="Persons" type="authority" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/
@@ -1834,18 +1811,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -1880,6 +1846,14 @@
       </service:properties>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" id="1" name="Person" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="persons-system" updated="" order="0">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/services/common/system" schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd" />
+          </service:content>
+        </service:part>
+        <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="persons_common" updated="" order="1">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/services/person" schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/persons_common.xsd" />
+          </service:content>
           <service:properties>
             <!-- Place Authority reference -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -1954,14 +1928,6 @@
             </types:item>
             -->
           </service:properties>
-          <service:content contentType="application/xml">
-            <service:xmlContent namespaceURI="http://collectionspace.org/services/common/system" schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd" />
-          </service:content>
-        </service:part>
-        <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="persons_common" updated="" order="1">
-          <service:content contentType="application/xml">
-            <service:xmlContent namespaceURI="http://collectionspace.org/services/person" schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/persons_common.xsd" />
-          </service:content>
         </service:part>
         <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
           <service:content contentType="application/xml">
@@ -1972,7 +1938,7 @@
     </tenant:serviceBindings>
     <!-- end person service meta-data -->
     <!-- begin locationauthority service meta-data -->
-    <tenant:serviceBindings id="Locationauthorities" name="Locationauthorities" version="0.1">
+    <tenant:serviceBindings id="Locationauthorities" name="Locationauthorities" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/locationauthorities/*/workflow/</service:uriPath>
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/locationauthorities/*/items/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
@@ -2039,24 +2005,13 @@
              Note there is no Location service, but there is a
              Repository workspace so we have to configure that.
         -->
-    <tenant:serviceBindings id="Locations" name="Locations" version="0.1">
+    <tenant:serviceBindings id="Locations" name="Locations" type="authority" version="0.1">
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.location.nuxeo.LocationDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2120,7 +2075,7 @@
     </tenant:serviceBindings>
     <!-- end location service meta-data -->
     <!-- begin taxonomyauthority service meta-data -->
-    <tenant:serviceBindings id="Taxonomyauthority" name="Taxonomyauthority" version="0.1">
+    <tenant:serviceBindings id="Taxonomyauthority" name="Taxonomyauthority" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/taxonomyauthority/*/workflow/</service:uriPath>
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/taxonomyauthority/*/items/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
@@ -2187,24 +2142,13 @@
              Note there is no Taxon service, but there is a
              Repository workspace so we have to configure that.
         -->
-    <tenant:serviceBindings id="Taxon" name="Taxon" version="0.1">
+    <tenant:serviceBindings id="Taxon" name="Taxon" type="authority" version="0.1">
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.taxonomy.nuxeo.TaxonDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-            <service:ListResultField>
-              <service:element>displayName</service:element>
-              <service:xpath>displayName</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>shortIdentifier</service:element>
-              <service:xpath>shortIdentifier</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>refName</service:element>
-              <service:xpath>refName</service:xpath>
-            </service:ListResultField>
+					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2397,7 +2341,7 @@
     </tenant:serviceBindings>
     <!-- end acquisition service meta-data -->
     <!-- begin relation service meta-data -->
-    <tenant:serviceBindings id="Relations" name="Relations" version="0.1">
+    <tenant:serviceBindings id="Relations" name="Relations" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/relations/*/workflow/</service:uriPath>
       <!-- other URI paths using which this service could be accessed -->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
@@ -2454,7 +2398,7 @@
       <service:properties xmlns:service="http://collectionspace.org/services/common/service">
         <types:item xmlns:types="http://collectionspace.org/services/common/types">
           <types:key>objectNameProperty</types:key>
-          <types:value>documentId1</types:value>
+          <types:value>subjectCsid</types:value>
         </types:item>
         <types:item xmlns:types="http://collectionspace.org/services/common/types">
           <types:key>objectNumberProperty</types:key>
@@ -2473,7 +2417,7 @@
           </service:field>
           <service:field>
             <service:table>relations_common</service:table>
-            <service:param>documentid1,documentid2</service:param>
+            <service:param>subjectcsid,objectcsid</service:param>
           </service:field>
         </service:params>
       </service:initHandler>
@@ -2497,7 +2441,7 @@
     </tenant:serviceBindings>
     <!-- end relation service meta-data -->
     <!-- begin account service meta-data -->
-    <tenant:serviceBindings id="Accounts" name="Accounts" version="0.1">
+    <tenant:serviceBindings id="Accounts" name="Accounts" type="security" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.account.storage.AccountDocumentHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
@@ -2543,7 +2487,7 @@
     </tenant:serviceBindings>
     <!-- end account service meta-data -->
     <!-- begin dimension service meta-data -->
-    <tenant:serviceBindings id="Dimensions" name="Dimensions" version="0.1">
+    <tenant:serviceBindings id="Dimensions" name="Dimensions" type="utility" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/dimensions/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
@@ -2568,7 +2512,7 @@
     </tenant:serviceBindings>
     <!-- end dimension service meta-data -->
     <!-- begin contact service meta-data -->
-    <tenant:serviceBindings id="Contacts" name="Contacts" version="0.1">
+    <tenant:serviceBindings id="Contacts" name="Contacts" type="utility" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/*/contacts
@@ -2654,7 +2598,7 @@
     </tenant:serviceBindings>
     <!-- end contact service meta-data -->
     <!-- begin note service meta-data -->
-    <tenant:serviceBindings id="Notes" name="Notes" version="0.1">
+    <tenant:serviceBindings id="Notes" name="Notes" type="utility" version="0.1">
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.note.nuxeo.NoteDocumentModelHandler</service:documentHandler>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="CSNote" version="0.1">
@@ -2677,7 +2621,7 @@
     </tenant:serviceBindings>
     <!-- end note service meta-data -->
     <!-- begin role service meta-data -->
-    <tenant:serviceBindings id="authorization/roles" name="authorization/roles" version="0.1">
+    <tenant:serviceBindings id="authorization/roles" name="authorization/roles" type="security" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.authorization.storage.RoleDocumentHandler</service:documentHandler>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.authorization.storage.RoleValidatorHandler</service:validatorHandler>
@@ -2696,7 +2640,7 @@
     </tenant:serviceBindings>
     <!-- end role service meta-data -->
     <!-- begin permission service meta-data -->
-    <tenant:serviceBindings id="authorization/permissions" name="authorization/permissions" version="0.1">
+    <tenant:serviceBindings id="authorization/permissions" name="authorization/permissions" type="security" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.authorization.storage.PermissionDocumentHandler</service:documentHandler>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.authorization.storage.PermissionValidatorHandler</service:validatorHandler>
@@ -2717,7 +2661,7 @@
     <!-- begin permission-role service meta-data -->
     <!-- the following service is same as authorization/roles/permroles service -->
     <!-- except that it is available as a sub resource of the permission service -->
-    <tenant:serviceBindings id="authorization/permissions/permroles" name="authorization/permissions/permroles" version="0.1">
+    <tenant:serviceBindings id="authorization/permissions/permroles" name="authorization/permissions/permroles" type="security" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /authorization/permissions/*/permroles/
@@ -2741,7 +2685,7 @@
     </tenant:serviceBindings>
     <!-- end permission-role service meta-data -->
     <!-- begin account-role service meta-data -->
-    <tenant:serviceBindings id="accounts/accountroles" name="accounts/accountroles" version="0.1">
+    <tenant:serviceBindings id="accounts/accountroles" name="accounts/accountroles" type="security" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /accounts/*/accountroles/
@@ -2767,7 +2711,7 @@
     <!-- begin role-permission service meta-data -->
     <!-- the following service is same as authorization/permissions/permroles service -->
     <!-- except that it is available as a sub resource of the role service -->
-    <tenant:serviceBindings id="authorization/roles/permroles" name="authorization/roles/permroles" version="0.1">
+    <tenant:serviceBindings id="authorization/roles/permroles" name="authorization/roles/permroles" type="security" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /authorization/roles/*/permroles/
@@ -2793,7 +2737,7 @@
     <!-- begin role-account service meta-data -->
     <!-- the following service is same as account/accountroles service -->
     <!-- except that it is available as a sub resource of the role service -->
-    <tenant:serviceBindings id="authorization/roles/accountroles" name="authorization/roles/accountroles" version="0.1">
+    <tenant:serviceBindings id="authorization/roles/accountroles" name="authorization/roles/accountroles" type="security" version="0.1">
       <!-- other URI paths using which this service could be accessed -->
       <!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /authorization/roles/*/accountroles/

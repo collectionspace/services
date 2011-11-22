@@ -41,6 +41,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
@@ -83,6 +84,8 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     // FIXME: Value changed from 5 to 2 when repeatable / multivalue 'lenders'
     // group was added to tenant-bindings.xml
     private final int NUM_AUTH_REFS_EXPECTED = 2;
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -126,7 +129,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         LoaninClient loaninClient = new LoaninClient();
         PoxPayloadOut multipart = createLoaninInstance(
                 "loanInNumber-" + identifier,
-                "returnDate-" + identifier,
+                CURRENT_DATE_UTC,
 		lenderRefName,
                 lendersAuthorizerRefName,
                 lendersContactRefName,

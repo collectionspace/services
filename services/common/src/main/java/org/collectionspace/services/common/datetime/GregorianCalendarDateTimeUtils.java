@@ -86,5 +86,15 @@ public class GregorianCalendarDateTimeUtils {
     public static String timestampUTC() {
         return DateTimeFormatUtils.formatAsISO8601Timestamp(currentDateAndTime(UTCTimeZone()));
     }
+    
+   /**
+    * Returns a String representing the current date and time instance.
+    * in the UTC time zone, formatted as an ISO 8601 date.
+    *
+    * @return A String representing the current date and time instance.
+    */
+    public static String currentDateUTC() {
+        return DateTimeFormatUtils.formatAsISO8601Date(currentDateAndTime(UTCTimeZone()));
+    }
 
 }

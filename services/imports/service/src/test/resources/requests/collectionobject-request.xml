@@ -54,7 +54,7 @@
               <contentPlace></contentPlace>
             </collectionobjects_common:contentPlaces>
             <collectionobjects_common:dateEarliestSingleCertainty/>
-            <collectionobjects_common:objectProductionDates/>
+            <collectionobjects_common:objectProductionDateGroupList/>
             <collectionobjects_common:contentConcepts>
               <contentConcept></contentConcept>
             </collectionobjects_common:contentConcepts>
@@ -98,7 +98,7 @@
                 <objectProductionPlaceRole></objectProductionPlaceRole>
               </objectProductionPlaceGroup>
             </collectionobjects_common:objectProductionPlaceGroupList>
-            <collectionobjects_common:contentDate></collectionobjects_common:contentDate>
+            <collectionobjects_common:contentDateGroup/>
             <collectionobjects_common:assocPlaceGroupList/>
             <collectionobjects_common:physicalDescription>It's pretty big - the size of an ogre.. Three arms and a hump-back</collectionobjects_common:physicalDescription>
             <collectionobjects_common:dimensionValue/>

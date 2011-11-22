@@ -133,9 +133,9 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
      * @param ctx 
      * @param docTypes a list of DocType names to match
      * @param where the clause to qualify on
-     * @param pageSize 
-     * @param pageNum 
-     * @param computeTotal 
+     * @param pageSize (0 for all of them)
+     * @param pageNum  (0 for the first one)
+     * @param computeTotal
      * @param domain the domain for the associated services
      * @return document wrapper
      * @throws DocumentNotFoundException 

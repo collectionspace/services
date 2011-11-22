@@ -69,7 +69,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
 
     // Instance variables specific to this test.
     private String knownResourceId = null;
-    private final static String TIMESTAMP_UTC = GregorianCalendarDateTimeUtils.timestampUTC();
+    private final static String TIMESTAMP_UTC =
+            GregorianCalendarDateTimeUtils.timestampUTC();
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -822,72 +823,6 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         }
 
         return multipart;
-    }
-
-    // FIXME Should be moved to a common class, as these are general utilities.
-    // FIXME Should be refactored to become a convenience variant of a
-    // general method to return a current datestamp or timestamp in any
-    // provided time zone.
-
-   /**
-    * Returns an ISO 8601 formatted timestamp of the
-    * current time instance in the UTC time zone.
-    */
-    public String datestampUTC() {
-        final String ISO_8601_DATE_FORMAT_PATTERN = "yyyy-MM-dd";
-        final DateFormat ISO_8601_DATE_FORMAT =
-            new SimpleDateFormat(ISO_8601_DATE_FORMAT_PATTERN);
-
-        final String UTC_TIMEZONE_IDENTIFIER = "UTC";
-        final TimeZone UTC_TIMEZONE = TimeZone.getTimeZone(UTC_TIMEZONE_IDENTIFIER);
-
-        Date timestamp = new Date();
-        return formatDate(timestamp, UTC_TIMEZONE, ISO_8601_DATE_FORMAT);
-    }
-
-   /**
-    * Returns an ISO 8601 formatted timestamp of the
-    * current time instance in the UTC time zone.
-    */
-    public String timestampUTC() {
-        final String ISO_8601_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-        final DateFormat ISO_8601_FORMAT =
-            new SimpleDateFormat(ISO_8601_FORMAT_PATTERN);
-
-        final String UTC_TIMEZONE_IDENTIFIER = "UTC";
-        final TimeZone UTC_TIMEZONE = TimeZone.getTimeZone(UTC_TIMEZONE_IDENTIFIER);
-
-        Date timestamp = new Date();
-        return formatDate(timestamp, UTC_TIMEZONE, ISO_8601_FORMAT);
-    }
-
-   /**
-    * Formats a provided date using a provided date formatter,
-    * in the default system time zone.
-    *
-    * @param date  A date to format.
-    * @param df    A date formatter to apply.
-    * @return      A formatted date string.
-    */
-    public String formatDate(Date date, DateFormat df) {
-        return formatDate(date, TimeZone.getDefault(), df);
-    }
-
-    // FIXME Add error handling.
-
-   /**
-    * Formats a provided date using a provided date formatter,
-    * in a provided time zone.
-    *
-    * @param date  A date to format.
-    * @param tz    The time zone qualifier for the date to format.
-    * @param df    A date formatter to apply.
-    *
-    * @return      A formatted date string.
-    */
-    public String formatDate(Date date, TimeZone tz, DateFormat df) {
-        df.setTimeZone(tz);
-        return df.format(date);
     }
 
 }

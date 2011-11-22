@@ -109,7 +109,8 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     public Response createContact(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
-            String xmlPayload) {
+            String xmlPayload,
+            @Context UriInfo ui) {
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             String parentcsid = lookupParentCSID(parentspecifier, "createContact(authority)", "CREATE_ITEM_CONTACT", null);
@@ -120,7 +121,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             // Note that we have to create the service context and document
             // handler for the Contact service, not the main service.
             ServiceContext ctx = createServiceContext(getContactServiceName(), input);
-            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, ui);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(resourceClass);
             path.path("" + parentcsid + "/items/" + itemcsid + "/contacts/" + csid);
