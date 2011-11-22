@@ -32,12 +32,12 @@
         <module>common-api</module>
         <module>authentication</module>
         <module>authorization</module>
-<!--        <module>blob</module> -->
+        <module>blob</module>
         <module>client</module>
         <module>jaxb</module>
         <module>hyperjaxb</module>
         <module>common</module>
-		<module>authority</module>
+        <module>authority</module>
         <module>authorization-mgt</module> <!-- relies on authorization -->
         <module>common-test</module>
         <module>account</module> <!-- relies on authorization-mgt.import -->
@@ -64,7 +64,7 @@
         <module>dimension</module>
         <module>contact</module>
         <module>workflow</module>
-<!--		<module>media</module> -->
+        <module>media</module>
         <module>JaxRsServiceProvider</module>
         <!--module>sdk</module-->
         <module>IntegrationTests</module>
