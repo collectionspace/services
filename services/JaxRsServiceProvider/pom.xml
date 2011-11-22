@@ -595,15 +595,19 @@
     <build>
         <finalName>cspace-services</finalName>
         <defaultGoal>package</defaultGoal>
-					<filters>
-						<filter>../../build.properties</filter>
-					</filters>
-					<resources>
-						<resource>
-							<directory>src/main/resources</directory>
-							<filtering>true</filtering>
-						</resource>
-					</resources>
+        <filters>
+            <filter>../../build.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/webapp/META-INF</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -623,20 +627,20 @@
                     </files>
                 </configuration>
             </plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-resources-plugin</artifactId>
-							<version>2.5</version>
-							<executions>
-								<execution>
-									<phase>process-resources</phase>
-									<goals>
-										<goal>resources</goal>
-									</goals>
-								</execution>
-							</executions>
-						</plugin>
-             <plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
                 <version>0.3</version>
@@ -672,7 +676,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
                 <configuration>
+                    <webResources>
+                        <resource>
+                          <directory>src/main/webapp</directory>
+                          <filtering>true</filtering>
+                        </resource>
+                    </webResources>
                     <archive>
                         <manifest>
                             <packageName>${pom.groupid}</packageName>

@@ -92,6 +92,7 @@
     mail.smtp.user="anonymous" password="password"
     mail.from="noreply@nuxeo.com" mail.debug="false" />
 	
+    <!--
 	<Resource name="jdbc/CspaceDS"
             auth="Container"
             type="javax.sql.DataSource"
@@ -109,6 +110,27 @@
             password="admin"
             driverClassName="com.mysql.jdbc.Driver"
             url="jdbc:mysql://localhost:3306/nuxeo"
+            maxActive="8"
+            maxIdle="4"/>
+            -->
+            
+     <Resource name="jdbc/CspaceDS"
+            auth="Container"
+            type="javax.sql.DataSource"
+            username="${db.user}"
+            password="${db.user.password}"
+            driverClassName="${db.jdbc.driver.class}"
+            url="jdbc:${db}://localhost:${db.port}/cspace"
+            maxActive="8"
+            maxIdle="4"/>
+			
+	<Resource name="jdbc/NuxeoDS"
+            auth="Container"
+            type="javax.sql.DataSource"
+            username="${db.user}"
+            password="${db.user.password}"
+            driverClassName="${db.jdbc.driver.class}"
+            url="jdbc:${db}://localhost:${db.port}/nuxeo"
             maxActive="8"
             maxIdle="4"/>	
 

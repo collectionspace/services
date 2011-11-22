@@ -9,8 +9,9 @@
         <xa-datasource>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource>
         <property name="URL">jdbc:mysql://localhost:3306/nuxeo?relaxAutoCommit=true</property>
 		-->
-        <xa-datasource>org.postgres.jdbc.jdbc2.optional.PostgreSQLXADataSource</xa-datasource>
+        <xa-datasource>org.postgresql.xa.PGXADataSource</xa-datasource>
         <property name="URL">jdbc:postgresql://localhost:5432/nuxeo</property>
+        <property name="DatabaseName">nuxeo</property>
         <property name="User">nuxeo</property>
         <property name="Password">nuxpw</property>
 		<schema>
