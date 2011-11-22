@@ -34,5 +34,3 @@ nuxeo-runtime-management-${version}.jar
 nuxeo-runtime-osgi-${version}.jar
 nuxeo-runtime-remoting-${version}.jar
 nuxeo-runtime-scripting-${version}.jar
-nuxeo-shell-ejb-core-${version}.jar
-nuxeo-shell-ejb-servlet-handlers-${version}.jar

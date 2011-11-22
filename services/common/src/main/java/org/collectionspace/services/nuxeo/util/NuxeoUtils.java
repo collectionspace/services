@@ -415,6 +415,7 @@ public class NuxeoUtils {
         return result;
     }    
 
+    /*
     public static void printDocumentModel(DocumentModel docModel) throws Exception {
         String[] schemas = docModel.getDeclaredSchemas();
         for (int i = 0; schemas != null && i < schemas.length; i++) {
@@ -429,8 +430,8 @@ public class NuxeoUtils {
             logger.debug("Part-" + i + " schema =" + parts[i].getSchema().getName());
             propertyValues = parts[i].exportValues();
         }
-
     }
+    */
 
     /**
      * createPathRef creates a PathRef for given service context using given id

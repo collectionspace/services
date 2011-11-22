@@ -92,10 +92,6 @@
       <fileset dir="${jee.deploy.nuxeo.plugins}">
         <include name="${nuxeo.collectionspace_core.jars.all}"/>		
       </fileset>	  
-      <!-- Legacy deployment location through release 0.6 -->
-      <fileset dir="${jee.deploy.nuxeo.system}">
-        <include name="${nuxeo.collectionspace_core.jars.all}"/>
-      </fileset>
     </delete>
   </target>
   

@@ -265,11 +265,13 @@
             <artifactId>nuxeo-core-io</artifactId>
             <version>${nuxeo.core.version}</version>
         </dependency>
+		<!--
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-facade</artifactId>
             <version>${nuxeo.core.version}</version>
         </dependency>
+		-->
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-io</artifactId>

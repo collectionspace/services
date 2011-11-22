@@ -114,31 +114,33 @@
     </target>
 
     <target name="deploy" depends="package"
-    	description="deploy nuxeo client libs to ${jee.server.cspace}">
+    	description="deploy nuxeo server libs to ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/nuxeo-server">
             <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}"/>
         </copy>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
-    	<!--
-		<ant antfile="nuxeo-platform-quote/build.xml" target="deploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-quote-api/build.xml" target="deploy" inheritall="false"/>
-		-->
+    		<!--
+				<ant antfile="nuxeo-platform-quote/build.xml" target="deploy" inheritall="false"/>
+				<ant antfile="nuxeo-platform-quote-api/build.xml" target="deploy" inheritall="false"/>
+				-->
         <ant antfile="nuxeo-database-templates/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy nuxeo client libs from ${jee.server.cspace}">
-        <delete dir="${jee.server.cspace}/nuxeo-client"/>
+    	description="undeploy nuxeo server libs from ${jee.server.cspace}">
+        <delete dir="${jee.server.cspace}/nuxeo-server/bundles"/>
+        <delete dir="${jee.server.cspace}/nuxeo-server/config"/>
+        <delete dir="${jee.server.cspace}/nuxeo-server/lib"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
+				<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
+				<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-database-templates/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
-    	description="generate distribution for nuxeo client libs" depends="package">
-        <copy todir="${services.trunk}/${dist.server.cspace}/nuxeo-client">
-            <fileset dir="${basedir}/nuxeo-client"/>
+    	description="generate distribution for nuxeo server libs" depends="package">
+        <copy todir="${services.trunk}/${dist.server.cspace}/nuxeo-server">
+            <fileset dir="${basedir}/nuxeo-server"/>
         </copy>
     </target>
 

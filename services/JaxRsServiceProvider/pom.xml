@@ -346,22 +346,6 @@
             <scope>provided</scope>
         </dependency>
         <!-- nuxeo -->
-		<dependency>
-			<groupId>org.nuxeo.shell</groupId>
-			<artifactId>nuxeo-shell-ejb-core</artifactId>
-            <version>${nuxeo.shell.version}</version>
-            <exclusions>
-            	<exclusion>
-            		<artifactId>jruby</artifactId>
-            		<groupId>org.jruby</groupId>
-            	</exclusion>
-            </exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.shell</groupId>
-			<artifactId>nuxeo-shell-ejb-servlet-handlers</artifactId>
-            <version>${nuxeo.shell.version}</version>
-		</dependency>
         <dependency>
             <groupId>org.nuxeo.common</groupId>
             <artifactId>nuxeo-common</artifactId>
