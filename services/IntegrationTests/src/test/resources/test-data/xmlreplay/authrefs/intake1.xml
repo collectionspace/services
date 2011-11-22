@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="intakes">
+    <ns2:intakes_common xmlns:ns2="http://collectionspace.org/services/intake"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <entryNumber>CompleteIntake001</entryNumber>
+        <normalLocation>urn:cspace:core.collectionspace.org:locationauthorities:name(location):item:name(MOMA1321979112557)'MOMA'</normalLocation>
+        <insurancePolicyNumber>BH-90210</insurancePolicyNumber>
+        <depositorsRequirements>Must wear suit and tie</depositorsRequirements>
+        <entryReason>commission</entryReason>
+        <insuranceReferenceNumber>1234-5678-90</insuranceReferenceNumber>
+        <returnDate>2010-07-14T04:00:00Z</returnDate>
+        <valuer>urn:cspace:org.collectionspace.demo:orgauthority:name(organization):organization:name(twentiethcentury-foxfilmcorporation)'Twentieth+Century-Fox+Film+Corporation'</valuer>
+        <conditionCheckNote>We got the governator himself to travel back in time, and bring some
+            robot spiders, so the condition can be proper checked</conditionCheckNote>
+        <conditionCheckReferenceNumber>TERM-II</conditionCheckReferenceNumber>
+        <entryMethods>
+            <entryMethod>found-on-doorstep</entryMethod>
+        </entryMethods>
+        <insuranceNote>Dont break it - we cannot afford it</insuranceNote>
+        <valuationReferenceNumber>911-101-404-411</valuationReferenceNumber>
+        <fieldCollectionSources>
+            <fieldCollectionSource/>
+        </fieldCollectionSources>
+        <currentLocationGroupList>
+            <currentLocationGroup>
+                <currentLocationFitness>urn:cspace:core.collectionspace.org:vocabularies:name(conditionfitness):item:name(suitable)'Suitable'</currentLocationFitness>
+                <currentLocationNote>Where is this?</currentLocationNote>
+                <currentLocation>urn:cspace:core.collectionspace.org:locationauthorities:name(location):item:name(TheVault1321979077879)'The Vault'</currentLocation>
+            </currentLocationGroup>
+            <currentLocationGroup>
+                <currentLocationFitness>urn:cspace:core.collectionspace.org:vocabularies:name(conditionfitness):item:name(reasonable)'Reasonable'</currentLocationFitness>
+                <currentLocationNote>Not in plain sight</currentLocationNote>
+                <currentLocation>urn:cspace:core.collectionspace.org:locationauthorities:name(location):item:name(PatricksCube1321979033052)'Patricks Cube'</currentLocation>
+            </currentLocationGroup>
+        </currentLocationGroupList>
+        <fieldCollectors>
+            <fieldCollector/>
+        </fieldCollectors>
+        <insurers>
+            <insurer>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(arnoldschwarzenegger)'Arnold Schwarzenegger'</insurer>
+        </insurers>
+        <packingNote>Packed with bubble-wrap and duct-tape - no one will ever be able to open
+            it</packingNote>
+        <conditionCheckersOrAssessors>
+            <conditionCheckerOrAssessor>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(tommyjones)'Tommy+Jones'</conditionCheckerOrAssessor>
+        </conditionCheckersOrAssessors>
+        <entryDate>2010-07-16T04:00:00Z</entryDate>
+        <insuranceRenewalDate>2010-07-05T04:00:00Z</insuranceRenewalDate>
+        <currentOwner>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(seanbean)'Sean+Bean'</currentOwner>
+        <locationDate>2009-07-15T04:00:00Z</locationDate>
+        <depositor>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(tommyjones)'Tommy+Jones'</depositor>
+    </ns2:intakes_common>
+</document>

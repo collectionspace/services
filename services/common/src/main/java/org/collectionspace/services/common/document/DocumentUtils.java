@@ -817,6 +817,7 @@ public class DocumentUtils {
 	 * @return true, if is list type
 	 */
 	public static boolean isListType(Property prop) {
+		// TODO simplify this to return (prop!=null && prop.getType().isListType());
 		boolean isList = false;
 		if (prop == null) {
 			return isList;
@@ -834,6 +835,7 @@ public class DocumentUtils {
 	 * @return true, if is complex type
 	 */
 	public static boolean isComplexType(Property prop) {
+		// TODO simplify this to return (prop!=null && prop.getType().isComplexType());
 		boolean isComplex = false;
 		if (prop == null) {
 			return isComplex;
@@ -853,6 +855,7 @@ public class DocumentUtils {
          *               false, if it is not a date type.
          */
         private static boolean isDateType(Type type) {
+    		// TODO simplify this to return ((SimpleType)type).getPrimitiveType() instanceof DateType;
             SimpleType st = (SimpleType) type;
             if (st.getPrimitiveType() instanceof DateType) {
                 return true;

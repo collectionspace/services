@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="organizations">
+	<ns2:organizations_common xmlns:ns2="http://collectionspace.org/services/organization"
+		xmlns:ns3="http://collectionspace.org/services/jaxb">
+		<shortIdentifier>1288047801161</shortIdentifier>
+		<displayNameComputed>true</displayNameComputed>
+		<shortDisplayNameComputed>true</shortDisplayNameComputed>
+		<shortName>Test Organization-1288047801161</shortName>
+		<longName>Test Organization Name</longName>
+		<contactNames>
+			<contactName>${person1}</contactName>
+			<contactName>${person2}</contactName>
+		</contactNames>
+		<foundingPlace>Anytown, USA</foundingPlace>
+		<subBodies>
+			<subBody>urn:cspace:org.collectionspace.demo:orgauthority:name(1288047801161):organization:name(1288047803708)</subBody>
+		</subBodies>
+		<functions>
+			<function>My new function</function>
+			<function>My second function</function>
+		</functions>
+		<groups>
+			<group>My new group</group>
+			<group>My second group</group>
+			<group>My third group</group>
+		</groups>
+		<description>This is a test Authority item</description>
+		<source>Some mythical book</source>
+		<sourcePage>Let's say page 39</sourcePage>
+
+	</ns2:organizations_common>
+</document>
