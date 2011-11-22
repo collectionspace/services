@@ -232,7 +232,7 @@
         <ant antfile="services/build.xml" target="import" inheritAll="false"/>
     </target>
 
-    <target name="deploy" depends="checkvars,install,setup_nuxeo.conf,setup_cspaceds.cfg,setup_initdb.sql"
+    <target name="deploy" depends="checkvars,install,setup_cspaceds.cfg,setup_initdb.sql"
             description="deploy services in ${jee.server.cspace}">
         <!-- copy db scripts, etc. -->
 		<copy todir="${jee.server.cspace}/cspace/services/scripts">
@@ -261,19 +261,6 @@
 							message="Required environment variable DB_PASSWORD has not been set."/>
 		</target>
 
-
-		<target name="setup_nuxeo.conf"
-					 description="copy nuxeo.conf, replacing keyword to set DB dialect">
-			<property name="src.nuxeo.conf" value="${src}/main/resources/config/nuxeo.conf"/>
-			<delete file="${jee.bin}/nuxeo.conf" failonerror="false" />
-			<copy file="${src.nuxeo.conf}" todir="${jee.bin}">
-				<filterset>
-					<filter token="DB" value="${db}" />
-					<filter token="NUXEO_USER" value="${db.nuxeo.user}" />
-					<filter token="NUXEO_PW" value="${env.DB_PASSWORD_NUXEO}" />
-				</filterset>
-			</copy>
-    </target>
 
 		<target name="setup_cspaceds.cfg"
 					 description="copy cspace-ds.xml, replacing keywords">

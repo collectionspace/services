@@ -4,8 +4,8 @@
     <datasource name="jdbc/nxaudit" xaDataSource="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource"
       maxActive="20" maxIdle="5">
         <property name="databaseName">nuxeo</property>
-        <property name="user">nuxeo</property>
-        <property name="password">nuxpw</property>
+        <property name="user">@NUXEO_USER@</property>
+        <property name="password">@NUXEO_PW@</property>
     </datasource>
   </extension>
 </component>
