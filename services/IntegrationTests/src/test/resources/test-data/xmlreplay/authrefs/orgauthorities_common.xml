@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="orgauthorities">
+	<ns2:orgauthorities_common xmlns:ns2="http://collectionspace.org/services/organization"
+		xmlns:ns3="http://collectionspace.org/services/jaxb">
+		<shortIdentifier>1288047801161</shortIdentifier>
+		<displayName>TestOrgAuth-1288047801161</displayName>
+		<vocabType>OrgAuthority</vocabType>
+		<description>This is a test authority</description>
+		<source>Some mythical book</source>
+	</ns2:orgauthorities_common>
+</document>

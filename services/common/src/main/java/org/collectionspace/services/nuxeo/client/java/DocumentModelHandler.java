@@ -24,6 +24,7 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.List;
+import java.util.Map;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -39,6 +40,7 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -184,7 +186,7 @@ public abstract class DocumentModelHandler<T, TL>
      */
     abstract public AuthorityRefList getAuthorityRefs(
             DocumentWrapper<DocumentModel> docWrapper,
-		List<String> authRefFields) throws PropertyException;    
+            List<AuthRefConfigInfo> authRefsInfo) throws PropertyException;    
 
     private void handleCoreValues(DocumentWrapper<DocumentModel> docWrapper, 
     		Action action)  throws ClientException {

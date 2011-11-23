@@ -37,6 +37,8 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -48,6 +50,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * $LastChangedRevision:  $
@@ -334,10 +337,8 @@ public abstract class ResourceBase
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDoc(ctx, csid);
             DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> handler = (DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>) createDocumentHandler(ctx);
-            List<String> authRefFields =
-                    ((MultipartServiceContextImpl) ctx).getCommonPartPropertyValues(
-                    ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
-            authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
+            List<AuthRefConfigInfo> authRefsInfo = RefNameServiceUtils.getConfiguredAuthorityRefs(ctx);
+            authRefList = handler.getAuthorityRefs(docWrapper, authRefsInfo);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.AUTH_REFS_FAILED, csid);
         }

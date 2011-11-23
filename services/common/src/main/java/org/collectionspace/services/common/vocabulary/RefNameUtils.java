@@ -113,7 +113,14 @@ public class RefNameUtils {
         	} else if(resource.equals("orgauthority")) {
         		uri.append("/orgauthorities/");
         	} else {
-        		throw new RuntimeException("Illegal Authority Type: " + resource);
+        		if(!(resource.equals("orgauthorities")
+        			|| resource.equals("personauthorities")
+        			|| resource.equals("locationauthorities")
+        			|| resource.equals("placeauthorities")
+        			|| resource.equals("vocabularies"))) {	
+        			logger.error("Unrecognized Authority Type: " + resource);
+        		}
+        		uri.append("/"+resource+"/");
         	}
         	if(csid!=null) {
         		uri.append(csid);

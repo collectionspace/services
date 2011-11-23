@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -57,6 +59,8 @@ import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.dom4j.Element;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -385,7 +389,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     @Override
     public AuthorityRefList getAuthorityRefs(
             DocumentWrapper<DocumentModel> docWrapper,
-            List<String> authRefFieldNames) throws PropertyException {
+            List<AuthRefConfigInfo> authRefsInfo) throws PropertyException {
 
         AuthorityRefList authRefList = new AuthorityRefList();
         AbstractCommonList commonList = (AbstractCommonList) authRefList;
@@ -404,101 +408,22 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	int iFirstToUse = (int)(pageSize*pageNum);
         	int nFoundInPage = 0;
         	int nFoundTotal = 0;
-            for (String authRefFieldName : authRefFieldNames) {
-
-                // FIXME: Can use the schema to validate field existence,
-                // to help avoid encountering PropertyExceptions.
-                String schemaName = DocumentUtils.getSchemaNamePart(authRefFieldName);
-                Schema schema = DocumentUtils.getSchemaFromName(schemaName);
-
-                String descendantAuthRefFieldName = DocumentUtils.getDescendantAuthRefFieldName(authRefFieldName);
-                if (descendantAuthRefFieldName != null && !descendantAuthRefFieldName.trim().isEmpty()) {
-                    authRefFieldName = DocumentUtils.getAncestorAuthRefFieldName(authRefFieldName);
-                }
-
-                String xpath = "//" + authRefFieldName;
-                Property prop = docModel.getProperty(xpath);
-                if (prop == null) {
-                    continue;
-                }
-
-                // If this is a single scalar field, with no children,
-                // add an item with its values to the authRefs list.
-                if (DocumentUtils.isSimpleType(prop)) {
-                	String refName = prop.getValue(String.class);
-                    if (refName == null) {
-                        continue;
-                    }
-                    refName = refName.trim();
-                    if (refName.isEmpty()) {
-                        continue;
-                    }
-                	if((nFoundTotal < iFirstToUse)
-                		|| (nFoundInPage >= pageSize)) {
-                		nFoundTotal++;
-                		continue;
-                	}
-            		nFoundTotal++;
-            		nFoundInPage++;
-            		appendToAuthRefsList(refName, schemaName, authRefFieldName, list);
-
-                    // Otherwise, if this field has children, cycle through each child.
-                    //
-                    // Whenever we find instances of the descendant field among
-                    // these children, add an item with its values to the authRefs list.
-                    //
-                    // FIXME: When we increase maximum repeatability depth, that is, the depth
-                    // between ancestor and descendant, we'll need to use recursion here,
-                    // rather than making fixed assumptions about hierarchical depth.
-                } else if ((DocumentUtils.isListType(prop) || DocumentUtils.isComplexType(prop))
-                        && prop.size() > 0) {
-                    
-                    Collection<Property> childProp = prop.getChildren();
-                    for (Property cProp : childProp) {
-                        if (DocumentUtils.isSimpleType(cProp) && cProp.getName().equals(descendantAuthRefFieldName)) {
-                        	String refName = cProp.getValue(String.class);
-                            if (refName == null) {
-                                continue;
-                            }
-                            refName = refName.trim();
-                            if (refName.isEmpty()) {
-                                continue;
-                            }
-                        	if((nFoundTotal < iFirstToUse)
-                            		|| (nFoundInPage >= pageSize)) {
-                        		nFoundTotal++;
-                        		continue;
-                        	}
-                    		nFoundTotal++;
-                    		nFoundInPage++;
-                            appendToAuthRefsList(refName, schemaName, descendantAuthRefFieldName, list);
-                        } else if ((DocumentUtils.isListType(cProp) || DocumentUtils.isComplexType(cProp))
-                            && prop.size() > 0) {
-                            Collection<Property> grandChildProp = cProp.getChildren();
-                            for (Property gProp : grandChildProp) {
-                                if (DocumentUtils.isSimpleType(gProp) && gProp.getName().equals(descendantAuthRefFieldName)) {
-                                	String refName = gProp.getValue(String.class);
-                                    if (refName == null) {
-                                        continue;
-                                    }
-                                    refName = refName.trim();
-                                    if (refName.isEmpty()) {
-                                        continue;
-                                    }
-                                	if((nFoundTotal < iFirstToUse)
-                                    		|| (nFoundInPage >= pageSize)) {
-                                		nFoundTotal++;
-                                		continue;
-                                	}
-                            		nFoundTotal++;
-                            		nFoundInPage++;
-                                    appendToAuthRefsList(refName, schemaName, descendantAuthRefFieldName, list);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        	
+        	ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps 
+        		= new ArrayList<RefNameServiceUtils.AuthRefInfo>();
+           	RefNameServiceUtils.findAuthRefPropertiesInDoc(docModel, authRefsInfo, null, foundProps);
+           	// Slightly goofy pagination support - how many refs do we expect from one object?
+           	for(RefNameServiceUtils.AuthRefInfo ari:foundProps) {
+       			if((nFoundTotal >= iFirstToUse) && (nFoundInPage < pageSize)) {
+       				if(appendToAuthRefsList(ari, list)) {
+           				nFoundInPage++;
+               			nFoundTotal++;
+       				}
+       			} else {
+       				nFoundTotal++;
+       			}
+           	}
+        	
             // Set num of items in list. this is useful to our testing framework.
             commonList.setItemsInPage(nFoundInPage);
             // set the total result size
@@ -523,13 +448,21 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         return authRefList;
     }
 
-    private void appendToAuthRefsList(String refName, String schemaName,
-            String fieldName, List<AuthorityRefList.AuthorityRefItem> list)
+    private boolean appendToAuthRefsList(RefNameServiceUtils.AuthRefInfo ari, 
+    						List<AuthorityRefList.AuthorityRefItem> list)
             throws Exception {
-        if (DocumentUtils.getSchemaNamePart(fieldName).isEmpty()) {
-            fieldName = DocumentUtils.appendSchemaName(schemaName, fieldName);
-        }
-        list.add(authorityRefListItem(fieldName, refName));
+    	String fieldName = ari.getQualifiedDisplayName();
+    	try {
+	   		String refNameValue = (String)ari.getProperty().getValue();
+	   		AuthorityRefList.AuthorityRefItem item = authorityRefListItem(fieldName, refNameValue);
+	   		if(item!=null) {	// ignore garbage values.
+	   			list.add(item);
+	   			return true;
+	   		}
+    	} catch(PropertyException pe) {
+			logger.debug("PropertyException on: "+ari.getProperty().getPath()+pe.getLocalizedMessage());
+    	}
+    	return false;
     }
 
     private AuthorityRefList.AuthorityRefItem authorityRefListItem(String authRefFieldName, String refName) {
@@ -543,7 +476,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             ilistItem.setSourceField(authRefFieldName);
             ilistItem.setUri(termInfo.getRelativeUri());
         } catch (Exception e) {
-            // Do nothing upon encountering an Exception here.
+        	logger.error("Trouble parsing refName from value: "+refName+" in field: "+authRefFieldName+e.getLocalizedMessage());
+        	ilistItem = null;
         }
         return ilistItem;
     }

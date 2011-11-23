@@ -35,12 +35,14 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.context.AbstractServiceContextImpl;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -57,6 +59,8 @@ import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
+import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 /**
  * RefNameServiceUtils is a collection of services utilities related to refName usage.
  *
@@ -65,9 +69,137 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
  */
 public class RefNameServiceUtils {
 
+	public static class AuthRefConfigInfo {
+		public String getQualifiedDisplayName() {
+	        return(Tools.isBlank(schema))?
+	        		displayName:DocumentUtils.appendSchemaName(schema, displayName);
+		}
+		public String getDisplayName() {
+			return displayName;
+		}
+		public void setDisplayName(String displayName) {
+			this.displayName = displayName;
+		}
+		String displayName;
+		String schema;
+		public String getSchema() {
+			return schema;
+		}
+		public void setSchema(String schema) {
+			this.schema = schema;
+		}
+		public String getFullPath() {
+			return fullPath;
+		}
+		public void setFullPath(String fullPath) {
+			this.fullPath = fullPath;
+		}
+		String fullPath;
+		protected String[] pathEls;
+		public AuthRefConfigInfo(AuthRefConfigInfo arci) {
+			this.displayName = arci.displayName;
+			this.schema = arci.schema;
+			this.fullPath = arci.fullPath;
+			this.pathEls = arci.pathEls;
+			// Skip the pathElse check, since we are creatign from another (presumably valid) arci.
+		}
+		
+		public AuthRefConfigInfo(String displayName, String schema, String fullPath, String[] pathEls) {
+			this.displayName = displayName;
+			this.schema = schema;
+			this.fullPath = fullPath;
+			this.pathEls = pathEls;
+			checkPathEls();
+		}
+
+		// Split a config value string like "intakes_common:collector", or
+		// "collectionobjects_common:contentPeoples|contentPeople"
+		// "collectionobjects_common:assocEventGroupList/*/assocEventPlace"
+		// If has a pipe ('|') second part is a displayLabel, and first is path
+		// Otherwise, entry is a path, and can use the last pathElement as displayName
+		// Should be schema qualified.
+		public AuthRefConfigInfo(String configString) {
+        	String[] pair = configString.split("\\|", 2);
+        	String[] pathEls;
+        	String displayName, fullPath;
+        	if(pair.length == 1) {
+        		// no label specifier, so we'll defer getting label
+        		fullPath = pair[0];
+        		pathEls = pair[0].split("/");
+        		displayName = pathEls[pathEls.length-1];
+        	} else {
+        		fullPath = pair[0];
+        		pathEls = pair[0].split("/");
+        		displayName = pair[1];
+        	}
+        	String[] schemaSplit = pathEls[0].split(":",2);
+        	String schema; 
+        	if(schemaSplit.length==1) {	// schema not specified
+        		schema = null;
+        	} else {
+        		schema = schemaSplit[0];
+        		if(pair.length == 1 && pathEls.length == 1) {	// simplest case of field in top level schema, no labelll
+        			displayName = schemaSplit[1];	// Have to fix up displayName to have no schema
+        		}
+        	}
+			this.displayName = displayName;
+			this.schema = schema;
+			this.fullPath = fullPath;
+			this.pathEls = pathEls;
+			checkPathEls();
+		}
+		
+		protected void checkPathEls() {
+        	int len = pathEls.length;
+        	if(len<1)
+        		throw new InternalError("Bad values in authRef info - caller screwed up:"+fullPath);
+        	// Handle case of them putting a leading slash on the path
+        	if(len>1 && pathEls[0].endsWith(":")) {
+        		len--;
+        		String[] newArray = new String[len];
+        		newArray[0] = pathEls[0]+pathEls[1];
+        		if(len>=2) {
+        			System.arraycopy(pathEls, 2, newArray, 1, len-1);
+        		}
+        		pathEls = newArray;
+        	}
+		}
+	}
+
+	public static class AuthRefInfo extends AuthRefConfigInfo {
+		public Property getProperty() {
+			return property;
+		}
+		public void setProperty(Property property) {
+			this.property = property;
+		}
+		Property property;
+		public AuthRefInfo(String displayName, String schema, String fullPath, String[] pathEls, Property prop) {
+			super(displayName, schema, fullPath, pathEls);
+			this.property = prop;
+		}
+		public AuthRefInfo(AuthRefConfigInfo arci, Property prop) {
+			super(arci);
+			this.property = prop;
+		}
+	}
+
     private static final Logger logger = LoggerFactory.getLogger(RefNameServiceUtils.class);
     
     private static ArrayList<String> refNameServiceTypes = null;
+    
+    public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext ctx) {
+    	List<String> authRefFields =
+                ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
+                ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
+    	ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<AuthRefConfigInfo>(authRefFields.size()); 
+    	for(String spec:authRefFields) {
+    		AuthRefConfigInfo arci = new AuthRefConfigInfo(spec);
+    		authRefsInfo.add(arci);
+    	}
+    	return authRefsInfo;
+    }
+
 
     public static AuthorityRefDocList getAuthorityRefDocs(ServiceContext ctx,
             RepositoryClient repoClient,
@@ -83,7 +215,7 @@ public class RefNameServiceUtils {
                 wrapperList.getAuthorityRefDocItem();
         
         Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
-        Map<String, Map<String, String>> authRefFieldsByService = new HashMap<String, Map<String, String>>();
+        Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<String, List<AuthRefConfigInfo>>();
 
         DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, serviceTypes, refName, refPropName,
         		queriedServiceBindings, authRefFieldsByService, pageSize, pageNum, computeTotal);
@@ -114,24 +246,28 @@ public class RefNameServiceUtils {
     	return refNameServiceTypes;
     }
     
+    // Seems like a good value - no real data to set this well.
+    private static final int N_OBJS_TO_UPDATE_PER_LOOP = 100;
+    
     public static int updateAuthorityRefDocs(ServiceContext ctx,
             RepositoryClient repoClient,
             String oldRefName,
             String newRefName,
             String refPropName ) {
         Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
-        Map<String, Map<String, String>> authRefFieldsByService = new HashMap<String, Map<String, String>>();
+        Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<String, List<AuthRefConfigInfo>>();
         int nRefsFound = 0;
         if(!(repoClient instanceof RepositoryJavaClientImpl)) {
     		throw new InternalError("updateAuthorityRefDocs() called with unknown repoClient type!");
         }
         try {
-        	final int pageSize = 100;	// Seems like a good value - no real data to set this well.
+        	final int pageSize = N_OBJS_TO_UPDATE_PER_LOOP;	
         	int pageNumProcessed = 1;
         	while(true) {	// Keep looping until we find all the refs.
         		logger.debug("updateAuthorityRefDocs working on page: "+pageNumProcessed);
         		// Note that we always ask the Repo for the first page, since each page we process
-        		// should not be found in successive searches.
+        		// should not be found in successive searches. Slightly inefficient, but more
+        		// reliable (stateless).
 		        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, getRefNameServiceTypes(), oldRefName, refPropName,
 		        		queriedServiceBindings, authRefFieldsByService, pageSize, 0, false);
 		
@@ -163,7 +299,7 @@ public class RefNameServiceUtils {
             String refName,
             String refPropName,
             Map<String, ServiceBindingType> queriedServiceBindings,
-            Map<String, Map<String, String>> authRefFieldsByService,
+            Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
             int pageSize, int pageNum, boolean computeTotal) throws DocumentException, DocumentNotFoundException {
 
         // Get the service bindings for this tenant
@@ -194,16 +330,18 @@ public class RefNameServiceUtils {
         return docList;
     }
     
+    private static final boolean READY_FOR_COMPLEX_QUERY = false;
+    
     private static String computeWhereClauseForAuthorityRefDocs(
     		String escapedRefName,
     		String refPropName,
     		ArrayList<String> docTypes,
     		List<ServiceBindingType> servicebindings,
     		Map<String, ServiceBindingType> queriedServiceBindings,
-    		Map<String, Map<String, String>> authRefFieldsByService ) {
+    		Map<String, List<AuthRefConfigInfo>> authRefFieldsByService ) {
         StringBuilder whereClause = new StringBuilder();
         boolean fFirst = true;
-        List<String> authRefFieldPaths = new ArrayList<String>();
+        List<String> authRefFieldPaths;
         for (ServiceBindingType sb : servicebindings) {
         	// Gets the property names for each part, qualified with the part label (which
         	// is also the table name, the way that the repository works).
@@ -213,33 +351,29 @@ public class RefNameServiceUtils {
             if (authRefFieldPaths.isEmpty()) {
                 continue;
             }
-            String authRefPath = "";
-            String ancestorAuthRefFieldName = "";
-            Map<String, String> authRefFields = new HashMap<String, String>();
-            for (int i = 0; i < authRefFieldPaths.size(); i++) {
-                // fieldName = DocumentUtils.getDescendantOrAncestor(authRefFields.get(i));
-            	// For simple field values, we just search on the item.
-            	// For simple repeating scalars, we just search the group field 
-            	// For repeating complex types, we will need to do more.
-                authRefPath = authRefFieldPaths.get(i);
-                ancestorAuthRefFieldName = DocumentUtils.getAncestorAuthRefFieldName(authRefFieldPaths.get(i));
-                authRefFields.put(authRefPath, ancestorAuthRefFieldName);
-            }
+            ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<AuthRefConfigInfo>();
+        	for(String spec:authRefFieldPaths) {
+        		AuthRefConfigInfo arci = new AuthRefConfigInfo(spec);
+        		authRefsInfo.add(arci);
+        	}
 
             String docType = sb.getObject().getName();
             queriedServiceBindings.put(docType, sb);
-            authRefFieldsByService.put(docType, authRefFields);
+            authRefFieldsByService.put(docType, authRefsInfo);
             docTypes.add(docType);
-            Collection<String> fields = authRefFields.values();
-            for (String field : fields) {
+            for (AuthRefConfigInfo arci : authRefsInfo) {
                 // Build up the where clause for each authRef field
+            	if(!READY_FOR_COMPLEX_QUERY) {	// filter complex field references
+            		if(arci.pathEls.length>1)
+            			continue;				// skip this one
+            	}
                 if (fFirst) {
                     fFirst = false;
                 } else {
                     whereClause.append(" OR ");
                 }
                 //whereClause.append(prefix);
-                whereClause.append(field);
+                whereClause.append(arci.getFullPath());
                 whereClause.append("='");
                 whereClause.append(escapedRefName);
                 whereClause.append("'");
@@ -265,17 +399,9 @@ public class RefNameServiceUtils {
     		DocumentModelList docList,
     		String refName,
     		Map<String, ServiceBindingType> queriedServiceBindings,
-    		Map<String, Map<String, String>> authRefFieldsByService,
+    		Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
    			List<AuthorityRefDocList.AuthorityRefDocItem> list, 
    			String newAuthorityRefName) {
-    	if(newAuthorityRefName==null) {
-    		if(list==null) {
-        		throw new InternalError("processRefObjsDocList() called with neither an itemList nor a new RefName!");
-    		}
-    	} else if(list!=null) {
-    		throw new InternalError("processRefObjsDocList() called with both an itemList and a new RefName!");
-    	}
-
         Iterator<DocumentModel> iter = docList.iterator();
         int nRefsFoundTotal = 0;
         while (iter.hasNext()) {
@@ -290,9 +416,15 @@ public class RefNameServiceUtils {
             }
             String serviceContextPath = "/" + sb.getName().toLowerCase() + "/";
             
-            if(list == null) {
+            if(list == null) { // no list - should be update refName case.
+            	if(newAuthorityRefName==null) {
+            		throw new InternalError("processRefObjsDocList() called with neither an itemList nor a new RefName!");
+        		}
             	ilistItem = null;
-            } else {
+            } else {	// Have a list - refObjs case
+            	if(newAuthorityRefName!=null) {
+            		throw new InternalError("processRefObjsDocList() called with both an itemList and a new RefName!");
+            	}
             	ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
                 String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
                 ilistItem.setDocId(csid);
@@ -311,71 +443,37 @@ public class RefNameServiceUtils {
             }
             // Now, we have to loop over the authRefFieldsByService to figure
             // out which field(s) matched this.
-            Map<String,String> matchingAuthRefFields = authRefFieldsByService.get(docType);
+            List<AuthRefConfigInfo> matchingAuthRefFields = authRefFieldsByService.get(docType);
             if (matchingAuthRefFields == null || matchingAuthRefFields.isEmpty()) {
                 throw new RuntimeException(
                         "getAuthorityRefDocs: internal logic error: can't fetch authRefFields for DocType.");
             }
-            String authRefAncestorField = "";
-            String authRefDescendantField = "";
-            String sourceField = "";
+            //String authRefAncestorField = "";
+            //String authRefDescendantField = "";
+            //String sourceField = "";
             int nRefsFoundInDoc = 0;
-            // Use this if we go to qualified field names
-            for (String path : matchingAuthRefFields.keySet()) {
-                try {
-                	// This is the field name we show in the return info
-                	// Returned as a schema-qualified property path
-                    authRefAncestorField = (String) matchingAuthRefFields.get(path);
-                    // This is the qualified field we have to get from the doc model
-                    authRefDescendantField = DocumentUtils.getDescendantOrAncestor(path);
-                    // The ancestor field is part-schema (tablename) qualified
-                    //String[] strings = authRefAncestorField.split(":");
-                    //if (strings.length != 2) {
-                    //   throw new RuntimeException(
-                    //            "getAuthorityRefDocs: Bad configuration of path to authority reference field.");
-                    //}
-                    // strings[0] holds a schema name, such as "intakes_common"
-                    //
-                    // strings[1] holds:
-                    // * The name of an authority reference field, such as "depositor";
-                    //   or
-                    // * The name of an ancestor (e.g. parent, grandparent ...) field,
-                    //   such as "fieldCollectors", of a repeatable authority reference
-                    //   field, such as "fieldCollector".
-                    // TODO - if the value is not simple, or repeating scalar, need a more
-                    // sophisticated fetch. 
-                    // Change this to an XPath model
-                    //Object fieldValue = docModel.getProperty(strings[0], strings[1]);
-                    // This will have to handle repeating complex fields by iterating over the possibilities
-                    // and finding the one that matches.
-                    Property fieldValue = docModel.getProperty(authRefAncestorField);
-                    // We know this doc should have a match somewhere, but it may not be in this field
-                    // If we are just building up the refItems, then it is enough to know we found a match.
-                    // If we are patching refName values, then we have to replace each match.
-                    int nRefsMatchedInField = refNameFoundInField(refName, fieldValue, newAuthorityRefName);
-                    if (nRefsMatchedInField > 0) {
-                        sourceField = authRefDescendantField;
-                        // Handle multiple fields matching in one Doc. See CSPACE-2863.
-                    	if(nRefsFoundInDoc > 0) {
-                    		// We already added ilistItem, so we need to clone that and add again
-                    		if(ilistItem != null) {
-                    			ilistItem = cloneAuthRefDocItem(ilistItem, sourceField);
-                    		}
-                    	} else {
-                    		if(ilistItem != null) {
-                    			ilistItem.setSourceField(sourceField);
-                    		}
-                    	}
-                		if(ilistItem != null) {
-                			list.add(ilistItem);
-                		}
-                		nRefsFoundInDoc += nRefsMatchedInField;
-                    }
-
-                } catch (ClientException ce) {
-                    throw new RuntimeException(
-                            "getAuthorityRefDocs: Problem fetching: " + sourceField, ce);
-                }
+            
+            ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps 
+            					= new ArrayList<RefNameServiceUtils.AuthRefInfo>();
+            try {
+	            findAuthRefPropertiesInDoc(docModel, matchingAuthRefFields, refName, foundProps);
+	            for(RefNameServiceUtils.AuthRefInfo ari:foundProps) {
+	        		if(ilistItem != null) {
+	                	if(nRefsFoundInDoc == 0) {	// First one?
+	            			ilistItem.setSourceField(ari.getQualifiedDisplayName());
+	                	} else {	// duplicates from one object
+	            			ilistItem = cloneAuthRefDocItem(ilistItem, ari.getQualifiedDisplayName());
+	            		}
+	        			list.add(ilistItem);
+	        		} else {	// update refName case
+	        			Property propToUpdate = ari.getProperty();
+	        			propToUpdate.setValue(newAuthorityRefName);
+	        		}
+	        		nRefsFoundInDoc++;
+	            }
+            } catch (ClientException ce) {
+                throw new RuntimeException(
+                        "getAuthorityRefDocs: Problem fetching values from repo: " + ce.getLocalizedMessage());
             }
             if (nRefsFoundInDoc == 0) {
                 throw new RuntimeException(
@@ -398,6 +496,119 @@ public class RefNameServiceUtils {
     	newlistItem.setSourceField(sourceField);
     	return newlistItem;
     }
+    
+    public static List<AuthRefInfo> findAuthRefPropertiesInDoc( 
+    		DocumentModel docModel, 
+    		List<AuthRefConfigInfo> authRefFieldInfo,
+    		String refNameToMatch,
+    		List<AuthRefInfo> foundProps
+    		) {
+    	// Assume that authRefFieldInfo is keyed by the field name (possibly mapped for UI)
+    	// and the values are elPaths to the field, where intervening group structures in
+    	// lists of complex structures are replaced with "*". Thus, valid paths include
+    	// the following (note that the ServiceBindingUtils prepend schema names to configured values):
+    	// "schemaname:fieldname"
+    	// "schemaname:scalarlistname"
+    	// "schemaname:complexfieldname/fieldname"
+    	// "schemaname:complexlistname/*/fieldname"
+    	// "schemaname:complexlistname/*/scalarlistname"
+    	// "schemaname:complexlistname/*/complexfieldname/fieldname"
+    	// "schemaname:complexlistname/*/complexlistname/*/fieldname"
+    	// etc.
+        for (AuthRefConfigInfo arci : authRefFieldInfo) {
+            try {
+            	// Get first property and work down as needed.
+           		Property prop = docModel.getProperty(arci.pathEls[0]);
+           		findAuthRefPropertiesInProperty(foundProps, prop, arci, 0, refNameToMatch);
+            } catch(Exception e) {
+            	logger.error("Problem fetching property: "+arci.pathEls[0]);
+            }
+        }
+        return foundProps;
+    }
+
+    public static List<AuthRefInfo> findAuthRefPropertiesInProperty(
+    		List<AuthRefInfo> foundProps,
+    		Property prop, 
+    		AuthRefConfigInfo arci,
+    		int pathStartIndex,		// Supports recursion and we work down the path
+    		String refNameToMatch
+    		) {
+    	if(pathStartIndex >= arci.pathEls.length) {
+    		throw new ArrayIndexOutOfBoundsException("Index = "+pathStartIndex+" for path: "
+    												+arci.pathEls.toString());
+    	}
+		AuthRefInfo ari = null;
+   		if(prop == null)
+   			return foundProps;
+   		if(prop instanceof StringProperty) {	// scalar string
+			addARIifMatches(refNameToMatch, arci, prop, foundProps);
+   		} else if(prop instanceof List) {
+   			List<Property> propList = (List)prop;
+   			// run through list. Must either be list of Strings, or Complex
+   			for (Property listItemProp : propList) {
+   				if(listItemProp instanceof StringProperty) {
+   					if(arci.pathEls.length-pathStartIndex != 1) {
+   						logger.error("Configuration for authRefs does not match schema structure: "
+   								+arci.pathEls.toString());
+   						break;
+   					} else {
+   						addARIifMatches(refNameToMatch, arci, listItemProp, foundProps);
+   					}
+   				} else if(listItemProp.isComplex()) {	
+   					// Just recurse to handle this. Note that since this is a list of complex, 
+   					// which should look like listName/*/... we add 2 to the path start index 
+   					findAuthRefPropertiesInProperty(foundProps, listItemProp, arci,
+   							pathStartIndex+2, refNameToMatch);
+   				} else {
+   					logger.error("Configuration for authRefs does not match schema structure: "
+   							+arci.pathEls.toString());
+   					break;
+   				}
+   			}
+   		} else if(prop.isComplex()) {
+   			String localPropName = arci.pathEls[pathStartIndex];
+   			try {
+	   			Property localProp = prop.get(localPropName);
+	   			// Now just recurse, pushing down the path 1 step
+				findAuthRefPropertiesInProperty(foundProps, localProp, arci, 
+												pathStartIndex, refNameToMatch);
+   			} catch(PropertyNotFoundException pnfe) {
+   				logger.error("Could not find property: ["+localPropName+"] in path: "+
+   								arci.getFullPath());
+   				// Fall through - ari will be null and we will continue...
+   			}
+		} else {
+				logger.error("Configuration for authRefs does not match schema structure: "
+						+arci.pathEls.toString());
+		}
+
+    	if(ari != null) {
+    		foundProps.add(ari);
+    	}
+    	return foundProps;
+    }
+    
+    private static void addARIifMatches(
+    		String refNameToMatch, 
+    		AuthRefConfigInfo arci, 
+    		Property prop, 
+    		List<AuthRefInfo> foundProps) {
+		// Need to either match a passed refName 
+		// OR have no refName to match but be non-empty
+    	try {
+	    	String value = (String)prop.getValue();
+			if(((refNameToMatch!=null) && refNameToMatch.equals(value))
+	   				|| ((refNameToMatch==null) && Tools.notBlank(value))) {
+				// Found a match
+				logger.debug("Found a match on property: "+prop.getPath()+" with value: ["+value+"]");
+				AuthRefInfo ari = new AuthRefInfo(arci, prop);
+				foundProps.add(ari);
+	   		}
+    	} catch(PropertyException pe) {
+			logger.debug("PropertyException on: "+prop.getPath()+pe.getLocalizedMessage());
+    	}
+    }
 
     /*
      * Identifies whether the refName was found in the supplied field.
@@ -410,7 +621,6 @@ public class RefNameServiceUtils {
      * Does not work for:
      * * Structured fields (complexTypes)
      * * Repeatable structured fields (repeatable complexTypes)
-     */
     private static int refNameFoundInField(String oldRefName, Property fieldValue, String newRefName) {
     	int nFound = 0;
     	if (fieldValue instanceof List) {
@@ -443,5 +653,6 @@ public class RefNameServiceUtils {
     	}
     	return nFound;
     }
+     */
 }
 

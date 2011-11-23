@@ -51,6 +51,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
@@ -806,10 +807,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getAuthorityItemAuthRefs(item)", "GET_ITEM_AUTH_REFS", ctx);
 
             DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDoc(ctx, itemcsid);
-            List<String> authRefFields =
-                    ((MultipartServiceContextImpl) ctx).getCommonPartPropertyValues(
-                    ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
-            authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
+            List<RefNameServiceUtils.AuthRefConfigInfo> authRefsInfo = RefNameServiceUtils.getConfiguredAuthorityRefs(ctx);
+            authRefList = handler.getAuthorityRefs(docWrapper, authRefsInfo);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED + " parentspecifier: " + parentspecifier + " itemspecifier:" + itemspecifier);
         }

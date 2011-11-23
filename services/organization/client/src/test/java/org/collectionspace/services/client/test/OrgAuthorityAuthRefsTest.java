@@ -109,7 +109,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     private String subBodyRefName = null;
     
     /** The number of authorityreferences expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 3;
+    private final int NUM_AUTH_REFS_EXPECTED = 2;	// Place authRef not legal, should not be returned.
 
     protected void setKnownResource( String id, String refName ) {
     	knownResourceId = id;
