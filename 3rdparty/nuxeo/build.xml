@@ -116,7 +116,10 @@
     <target name="deploy" depends="package"
     	description="deploy nuxeo server libs to ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/nuxeo-server">
-            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}"/>
+           <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}"/>
+        </copy>
+        <copy todir="${jee.server.cspace}/nuxeo-server/config" overwrite="true">
+            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}/config"/>
             <filterset>
                 <filter token="DB" value="${db}" />
                 <filter token="NUXEO_USER" value="${db.nuxeo.user}" />
