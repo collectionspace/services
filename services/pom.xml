@@ -263,7 +263,12 @@
     </reporting>
     <dependencyManagement>
         <dependencies>
-	        	<dependency>
+			 <dependency>
+				<artifactId>servlet-api</artifactId>
+				<groupId>javax.servlet</groupId>
+				<version>2.5</version>
+			</dependency>
+	        <dependency>
 	            <groupId>org.nuxeo.ecm.core</groupId>
 	            <artifactId>nuxeo-core-api</artifactId>
 	            <version>${nuxeo.core.version}</version>        	

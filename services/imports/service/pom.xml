@@ -50,13 +50,17 @@
         
       <!-- javax -->
 
+	  	<dependency>
+			<artifactId>servlet-api</artifactId>
+			<groupId>javax.servlet</groupId>
+			<scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>javax.security</groupId>
             <artifactId>jaas</artifactId>
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
