@@ -117,19 +117,15 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="Deploy CollectionObjectsCommon doctype in ${jboss.server.nuxeo}">
+        description="Deploy CollectionObjectsCommon doctype in ${jee.server.nuxeo}">
         <copy file="${basedir}/target/${nuxeo.collectionobject.jar}"
-        todir="${jboss.deploy.nuxeo.plugins}"/>
+        todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="Undeploy CollectionObjectsCommon doctype from ${jboss.server.nuxeo}">
+        description="Undeploy CollectionObjectsCommon doctype from ${jee.server.nuxeo}">
         <delete>
-            <fileset dir="${jboss.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.collectionobject.jars.all}"/>
-            </fileset>
-            <!-- Legacy deployment location through release 0.6 -->
-            <fileset dir="${jboss.deploy.nuxeo.system}">
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
                 <include name="${nuxeo.collectionobject.jars.all}"/>
             </fileset>
         </delete>

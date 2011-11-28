@@ -23,7 +23,11 @@
  */
 package org.collectionspace.services.authorization;
 
+import org.collectionspace.services.authorization.perms.FooPermissionsList;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.storage.AuthorizationDelegate;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.common.SecurityResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
@@ -98,7 +102,19 @@ public class PermissionResource extends SecurityResourceBase {
     @GET
     @Produces("application/xml")
     public PermissionsList getPermissionList(@Context UriInfo ui) {
-        return (PermissionsList)getList(ui, Permission.class);
+    	PermissionsList result = (PermissionsList)getList(ui, Permission.class);
+    	PayloadOutputPart ppo = new PayloadOutputPart(PermissionsList.class.getName(), result);
+    	System.out.println(ppo.asXML());
+    	
+    	return result;
+    }
+
+    @GET
+    @Path("{csid}/foo")
+    @Produces("application/xml")
+    public FooPermissionsList getPermissionFooList(@Context UriInfo ui) {
+    	FooPermissionsList result = new FooPermissionsList();    	
+    	return result;
     }
 
     @PUT

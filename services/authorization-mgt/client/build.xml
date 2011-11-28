@@ -112,11 +112,11 @@
 
 
     <target name="deploy" depends="install"
-            description="deploy authorization-mgt service in ${jboss.server.cspace}">
+            description="deploy authorization-mgt service in ${jee.server.cspace}">
     </target>
 
     <target name="undeploy"
-            description="undeploy authorization-mgt service from ${jboss.server.cspace}">
+            description="undeploy authorization-mgt service from ${jee.server.cspace}">
     </target>
 
     <target name="dist"

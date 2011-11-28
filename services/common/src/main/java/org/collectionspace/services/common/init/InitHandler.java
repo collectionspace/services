@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 /** Concrete class which does nothing, but subclasses may override to do
  *  some action on the event onRepositoryInitialized(), such as sending JDBC
  *  calls to the repository to add indices, etc.
@@ -51,7 +53,10 @@ public class InitHandler implements IInitHandler {
      * @throws Exception
      */
     @Override
-    public void onRepositoryInitialized(ServiceBindingType sbt, List<Field> fields, List<Property> properties) throws Exception {
+    public void onRepositoryInitialized(DataSource dataSource,
+    		ServiceBindingType sbt, 
+    		List<Field> fields, 
+    		List<Property> properties) throws Exception {
 
         // For debugging.
         /*

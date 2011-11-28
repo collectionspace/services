@@ -13,17 +13,39 @@
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
     xmlns:ns="http://collectionspace.org/services/authorization"
     xmlns="http://collectionspace.org/services/authorization"
     targetNamespace="http://collectionspace.org/services/authorization"
-    version="0.1"
-    jaxb:version="1.0"
-    jaxb:extensionBindingPrefixes="hj orm xjc"
+		version="0.1"
+		jaxb:extensionBindingPrefixes="hj orm xjc"
     >
 
+    <!--
+    see http://weblogs.java.net/blog/2006/03/03/why-does-jaxb-put-xmlrootelement-sometimes-not-always
+    for more details behind xjc:simple
+    -->
+    <!-- 
+    <xs:annotation>
+        <xs:appinfo>
+            <jaxb:globalBindings>
+                <xjc:simple />
+            </jaxb:globalBindings>
+        </xs:appinfo>
+    </xs:annotation>
+    -->
+    
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:globalBindings generateIsSetMethod="true" localScoping="toplevel">
+				<jaxb:serializable/>
+			</jaxb:globalBindings>
+		</xs:appinfo>
+	</xs:annotation>
+    
     <!--
     Notes for MySQL
     MySQL puts key length limit of 1000 bytes
@@ -32,17 +54,6 @@
     in defining a key (pk, fk or constraint)
     -->
 
-    <!--
-    see http://weblogs.java.net/blog/2006/03/03/why-does-jaxb-put-xmlrootelement-sometimes-not-always
-    for more details behind xjc:simple
-    -->
-    <xs:annotation>
-        <xs:appinfo>
-            <jaxb:globalBindings>
-                <xjc:simple />
-            </jaxb:globalBindings>
-        </xs:appinfo>
-    </xs:annotation>
     <xs:element name="role" type="role"/>
     <!-- role type has a name so that it could be referred from roles_list -->
     <xs:complexType name="role">

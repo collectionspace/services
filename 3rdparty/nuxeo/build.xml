@@ -114,34 +114,43 @@
     </target>
 
     <target name="deploy" depends="package"
-    	description="deploy nuxeo client libs to ${jboss.server.cspace}">
-        <copy todir="${jboss.server.cspace}/nuxeo-client/lib">
-            <fileset dir="${basedir}/nuxeo-client/lib">
-                <include name="*.jar"/>
-            </fileset>
-            <fileset dir="${basedir}/nuxeo-client/lib/${nuxeo.release}">
-                <include name="*.jar"/>
-            </fileset>
+    	description="deploy nuxeo server libs to ${jee.server.cspace}">
+        <copy todir="${jee.server.cspace}/nuxeo-server">
+           <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}"/>
+        </copy>
+        <copy todir="${jee.server.cspace}/nuxeo-server/config" overwrite="true">
+            <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}/config"/>
+            <filterset>
+                <filter token="DB" value="${db}" />
+				<filter token="DB_URL" value="jdbc:${db}://localhost:${db.port}/nuxeo" />
+				<filter token="XA_DATASOURCE" value="${db.xaDataSource}" />
+                <filter token="NUXEO_USER" value="${db.nuxeo.user}" />
+                <filter token="NUXEO_PW" value="${db.nuxeo.user.password}" />
+            </filterset>
         </copy>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-quote/build.xml" target="deploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-quote-api/build.xml" target="deploy" inheritall="false"/>
+    		<!--
+				<ant antfile="nuxeo-platform-quote/build.xml" target="deploy" inheritall="false"/>
+				<ant antfile="nuxeo-platform-quote-api/build.xml" target="deploy" inheritall="false"/>
+				-->
         <ant antfile="nuxeo-database-templates/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy nuxeo client libs from ${jboss.server.cspace}">
-        <delete dir="${jboss.server.cspace}/nuxeo-client"/>
+    	description="undeploy nuxeo server libs from ${jee.server.cspace}">
+        <delete dir="${jee.server.cspace}/nuxeo-server/bundles"/>
+        <delete dir="${jee.server.cspace}/nuxeo-server/config"/>
+        <delete dir="${jee.server.cspace}/nuxeo-server/lib"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
+				<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
+				<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-database-templates/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
-    	description="generate distribution for nuxeo client libs" depends="package">
-        <copy todir="${services.trunk}/${dist.server.cspace}/nuxeo-client">
-            <fileset dir="${basedir}/nuxeo-client"/>
+    	description="generate distribution for nuxeo server libs" depends="package">
+        <copy todir="${services.trunk}/${dist.server.cspace}/nuxeo-server">
+            <fileset dir="${basedir}/nuxeo-server"/>
         </copy>
     </target>
 

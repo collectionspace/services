@@ -34,10 +34,14 @@ import java.util.regex.Pattern;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.client.NuxeoClient;
+//import org.nuxeo.ecm.core.client.NuxeoClient;
 
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
-import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
+//import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
+//import org.collectionspace.services.nuxeo.client.java.NxConnect;
+import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
+import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
+
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocableUtils;
@@ -92,9 +96,9 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	@Override
 	@Deprecated
 	public void execQuery(String queryString) {
-		NuxeoClient client = null;
+		NuxeoClientEmbedded client = null;
 		try {
-			client = NuxeoConnector.getInstance().getClient();
+			client = NuxeoConnectorEmbedded.getInstance().getClient();
 			RepositoryInstance repoSession = client.openRepository();
 
 			DocumentModelList docModelList = repoSession

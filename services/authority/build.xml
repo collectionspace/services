@@ -118,11 +118,11 @@
     </target>
 
     <target name="deploy" depends="install"
-            description="deploy common elements in ${jboss.server.cspace}">    	
+            description="deploy common elements in ${jee.server.cspace}">    	
     </target>
 
     <target name="undeploy"
-            description="undeploy common elements from ${jboss.server.cspace}">
+            description="undeploy common elements from ${jee.server.cspace}">
     </target>
 
     <target name="dist"

@@ -5,7 +5,7 @@
 
 
   <target name="deploy" description="Deploy">
-    <copy todir="${jboss.dir}/server/default/deploy">
+    <copy todir="${jee.dir}/server/default/deploy">
       <fileset file="${basedir}/target/helloworld.war" />
     </copy>
   </target>

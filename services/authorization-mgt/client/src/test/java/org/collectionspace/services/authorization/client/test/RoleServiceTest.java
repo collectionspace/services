@@ -58,10 +58,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
-    private String knownRoleName = "ROLE_USERS_TEST";
-    private String knownRoleDisplayName = "ROLE_DISPLAYNAME_USERS_TEST";
+    private String knownRoleName = "ROLE_USERS_MOCK";
+    private String knownRoleDisplayName = "ROLE_DISPLAYNAME_USERS_MOCK";
     private String verifyResourceId = null;
-    private String verifyRoleName = "collections_manager_test";
+    private String verifyRoleName = "collections_manager_mock";
 //    private List<String> allResourceIdsCreated = new ArrayList<String>();
 
     @Override
@@ -547,10 +547,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         int EXPECTED_ITEMS = 1;
         if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": received = " + list.getRoles().size()
+            logger.debug(testName + ": received = " + list.getRole().size()
                     + " expected=" + EXPECTED_ITEMS);
         }
-        Assert.assertEquals(EXPECTED_ITEMS, list.getRoles().size());
+        Assert.assertEquals(EXPECTED_ITEMS, list.getRole().size());
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         if (iterateThroughList && logger.isDebugEnabled()) {
@@ -587,7 +587,8 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         roleToUpdate.setDescription("updated role description");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
-            logger.debug(objectAsXmlString(roleToUpdate,
+            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
+            logger.debug(objectAsXmlString(objectFactory.createRole(roleToUpdate),
                     Role.class));
         }
         RoleClient client = new RoleClient();
@@ -684,7 +685,9 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     	Assert.assertNotNull(roleUpdated);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + "Updated role: ");
-            logger.debug(objectAsXmlString(roleUpdated,Role.class));
+            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
+            logger.debug(objectAsXmlString(objectFactory.createRole(roleUpdated),
+                    Role.class));            
         }
 
     	Assert.assertFalse(
@@ -711,7 +714,8 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         roleToUpdate.setDisplayName("UPDATED-ROLE_USERS_TEST");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
-            logger.debug(objectAsXmlString(roleToUpdate,
+            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
+            logger.debug(objectAsXmlString(objectFactory.createRole(roleToUpdate),
                     Role.class));
         }
         RoleClient client = new RoleClient();
@@ -914,7 +918,9 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
                 useRoleName);
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, role");
-            logger.debug(objectAsXmlString(role, Role.class));
+            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
+            logger.debug(objectAsXmlString(objectFactory.createRole(role),
+                    Role.class));
         }
         return role;
 
@@ -931,7 +937,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
 
         int i = 0;
 
-        for (Role role : list.getRoles()) {
+        for (Role role : list.getRole()) {
             logger.debug(testName + " role csid=" + role.getCsid()
                     + " name=" + role.getRoleName()
                     + " desc=" + role.getDescription());

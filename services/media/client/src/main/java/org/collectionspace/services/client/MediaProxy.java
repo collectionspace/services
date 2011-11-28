@@ -22,16 +22,16 @@ import org.collectionspace.services.client.BlobClient;
 public interface MediaProxy extends CollectionSpaceCommonListPoxProxy {
 
     @POST
-    @Path("/{csid}")
+    @Path("{csid}")
     @Consumes("multipart/form-data")
     ClientResponse<Response> createBlobFromFormData(@PathParam("csid") String csid,
     		MultipartFormDataOutput formDataOutput);
             
     @POST
-    @Path("/{csid}")
+    @Path("{csid}")
 	@Produces("application/xml")
 	@Consumes("application/xml")
     ClientResponse<Response>createBlobFromUri(@PathParam("csid") String csid,
-    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri);
-    
+    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,
+    		String emptyXML); //this "emptyXML" param is needed to force RESTEasy to produce a Content-Type header for this POST    
 }

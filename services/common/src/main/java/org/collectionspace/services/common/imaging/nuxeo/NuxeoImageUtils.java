@@ -128,7 +128,7 @@ import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.common.blob.BlobOutput;
 
-import org.collectionspace.ecm.platform.quote.api.QuoteManager;
+//import org.collectionspace.ecm.platform.quote.api.QuoteManager;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -264,13 +264,14 @@ public class NuxeoImageUtils {
 		DocumentBlobHolder docBlobHolder = (DocumentBlobHolder)documentModel.getAdapter(BlobHolder.class);
 		//
 		// FIXME: REM this looks like cruft
-		try {
+/*		try {
 			QuoteManager quoteManager = (QuoteManager)Framework.getService(QuoteManager.class);
 			quoteManager.createQuote(documentModel, "Quoted - Comment" + System.currentTimeMillis(),
 					"Administrator");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		*/
 		//
 		//
 		List<Blob> docBlobs = docBlobHolder.getBlobs();		
@@ -584,14 +585,14 @@ public class NuxeoImageUtils {
 	 * verified by the mimetype service.
 	 * @return the blob
 	 */
-	private static Blob createStreamingBlob(InputStream file,
+	private static Blob createStreamingBlob(File file,
 			String filename, String mimeType) {
 		Blob blob = null;
 		try {
 			// persisting the blob makes it possible to read the binary content
 			// of the request stream several times (mimetype sniffing, digest
 			// computation, core binary storage)
-			blob = StreamingBlob.createFromStream(file, mimeType).persist();
+			blob = StreamingBlob.createFromFile(file, mimeType).persist();
 			// filename
 			if (filename != null) {
 				filename = getCleanFileName(filename);
@@ -683,7 +684,7 @@ public class NuxeoImageUtils {
 			FileInputStream inputStream = new FileInputStream(blobFile);            
 			if (inputStream != null) {
 				result = createImage(repoSession, wspaceDoc,
-						inputStream, blobFile.getName(), null);
+						inputStream, blobFile, null);
 			}            
 		} catch (Exception e) {
 			logger.error("Could not create image blob", e);
@@ -705,15 +706,15 @@ public class NuxeoImageUtils {
 	static public BlobsCommon createImage(RepositoryInstance nuxeoSession,
 			DocumentModel blobLocation,
 			InputStream file,
-			String fileName, 
+			File blobFile, 
 			String mimeType) {
 		BlobsCommon result = null;
 
 		try {
-			Blob fileBlob = createStreamingBlob(file, fileName, mimeType);
+			Blob fileBlob = createStreamingBlob(blobFile, blobFile.getName(), mimeType);
 			String digestAlgorithm = getFileManagerService().getDigestAlgorithm(); //Need some way on initializing the FileManager with a call.
 			DocumentModel documentModel = getFileManagerService().createDocumentFromBlob(nuxeoSession,
-					fileBlob, blobLocation.getPathAsString(), true, fileName);
+					fileBlob, blobLocation.getPathAsString(), true, blobFile.getName());
 			result = createBlobsCommon(documentModel, fileBlob);
 		} catch (Exception e) {
 			result = null;

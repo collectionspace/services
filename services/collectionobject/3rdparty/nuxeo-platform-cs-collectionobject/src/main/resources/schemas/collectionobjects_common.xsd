@@ -27,11 +27,10 @@
     <xs:element name="otherNumber" type="xs:string"/>
     <xs:element name="otherNumberType" type="xs:string"/>
     <!-- end of two elements to be removed -->
-    <xs:element name="briefDescriptions" type="xs:string">
+    <xs:element name="briefDescriptions">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="briefDescription" type="xs:string"
-                    minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="briefDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

@@ -68,6 +68,10 @@ public abstract class ResourceBase
     //FIXME retrieve client type from configuration
     static ClientType CLIENT_TYPE;
 
+    /*
+     * REM - 11/14/2011 - I discovered this static block of code and don't understand why it exists.  However, a side-effect of this static block is that ServiceMain is trying
+     * to create a valid instance of entire CSpace services include an embedded Nuxeo instance.  This block of code seems goofy and unnecessary and probably should be removed?
+     */
     static {
         try {
             // I put this in a try-catch static block instead of file-level static var initializer so that static methods of
@@ -79,8 +83,7 @@ public abstract class ResourceBase
             System.out.println("Static initializer failed in ResourceBase because not running from deployment.  OK to use Resource classes statically for tests.");
         }
     }
-
-
+    
     //======================= CREATE ====================================================
     
     @POST

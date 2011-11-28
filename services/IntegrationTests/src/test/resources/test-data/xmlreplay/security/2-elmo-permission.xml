@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:permission   xmlns:ns2="http://collectionspace.org/services/authorization">
+<ns3:permission xmlns:ns3="http://collectionspace.org/services/authorization/perms">
   <resourceName>dimensions</resourceName>
   <action>
     <name>READ</name>
   </action>
   <effect>PERMIT</effect>
-</ns2:permission>
-
+</ns3:permission>

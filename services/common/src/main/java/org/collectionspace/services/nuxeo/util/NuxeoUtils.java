@@ -86,7 +86,8 @@ public class NuxeoUtils {
     // Base document type in Nuxeo is "Document"
     //
     public static final String BASE_DOCUMENT_TYPE = "Document";
-    public static final String WORKSPACES = "workspaces";
+//    public static final String WORKSPACES = "workspaces";
+    public static final String Workspaces = "Workspaces";
     
     // Regular expressions pattern for identifying valid ORDER BY clauses.
     // FIXME: Currently supports only USASCII word characters in field names.
@@ -414,6 +415,7 @@ public class NuxeoUtils {
         return result;
     }    
 
+    /*
     public static void printDocumentModel(DocumentModel docModel) throws Exception {
         String[] schemas = docModel.getDeclaredSchemas();
         for (int i = 0; schemas != null && i < schemas.length; i++) {
@@ -428,8 +430,8 @@ public class NuxeoUtils {
             logger.debug("Part-" + i + " schema =" + parts[i].getSchema().getName());
             propertyValues = parts[i].exportValues();
         }
-
     }
+    */
 
     /**
      * createPathRef creates a PathRef for given service context using given id
@@ -439,7 +441,7 @@ public class NuxeoUtils {
      */
     public static DocumentRef createPathRef(ServiceContext ctx, String id) {
         return new PathRef("/" + ctx.getRepositoryDomainStorageName() +
-                "/" + WORKSPACES +
+                "/" + Workspaces +
                 "/" + ctx.getRepositoryWorkspaceName() +
                 "/" + id);
     }

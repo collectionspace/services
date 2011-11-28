@@ -32,12 +32,11 @@ import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
-import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
-import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 
@@ -101,19 +100,19 @@ public class PermissionRoleUtil {
     		boolean handleDelete)
     			throws DocumentNotFoundException {
         if (subject.equals(SubjectType.ROLE)) {
-        	List<PermissionValue> permissionValues = pr.getPermissions();
+        	List<PermissionValue> permissionValues = pr.getPermission();
         	if (permissionValues != null && permissionValues.size() > 0) {
 	            PermissionValue pv = permissionValues.get(0);
-	            for (RoleValue rv : pr.getRoles()) {
+	            for (RoleValue rv : pr.getRole()) {
 	                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
 	                prrl.add(prr);
 	            }
         	}
         } else if (subject.equals(SubjectType.PERMISSION)) {
-        	List<RoleValue> roleValues = pr.getRoles();
+        	List<RoleValue> roleValues = pr.getRole();
         	if (roleValues != null && roleValues.size() > 0) {
 	            RoleValue rv = roleValues.get(0);
-	            for (PermissionValue pv : pr.getPermissions()) {
+	            for (PermissionValue pv : pr.getPermission()) {
 	                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
 	                prrl.add(prr);
 	            }

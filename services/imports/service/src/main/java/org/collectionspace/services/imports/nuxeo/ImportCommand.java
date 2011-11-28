@@ -3,9 +3,11 @@ package org.collectionspace.services.imports.nuxeo;
 import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
+import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.client.NuxeoClient;
+//import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
@@ -20,7 +22,7 @@ public class ImportCommand {
     public String run(String src, String dest) throws Exception {
         File file = new File(src);
         ///cspace way of configuring client and auth:
-        NuxeoClient client = NuxeoConnector.getInstance().getClient();
+        NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
         RepositoryInstance  repository = client.openRepository();
         try {
             return importTree(repository, file, dest);

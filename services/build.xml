@@ -146,7 +146,7 @@
 
     <!-- this target is called in order based on the dependencies between the services -->
     <target name="deploy" depends="install"
-            description="deploy services in ${jboss.server.cspace}">
+            description="deploy services in ${jee.server.cspace}">
         <ant antfile="authentication/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="authorization/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="authority/build.xml" target="deploy" inheritAll="false"/>
@@ -181,7 +181,7 @@
 
     <!-- this target is called in reverse order of deploy targets -->
     <target name="undeploy"
-            description="undeploy services from ${jboss.server.cspace}">
+            description="undeploy services from ${jee.server.cspace}">
         <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="undeploy" inheritAll="false"/>
@@ -199,6 +199,7 @@
         <ant antfile="loanin/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="media/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="imports/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="group/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="note/build.xml" target="undeploy" inheritAll="false"/>
@@ -215,7 +216,7 @@
     </target>
 
     <target name="hotdeploy" depends="install"
-            description="deploy services in running ${jboss.server.cspace}">
+            description="deploy services in running ${jee.server.cspace}">
         <ant antfile="JaxRsServiceProvider/build.xml" target="hotdeploy" inheritAll="false"/>
     </target>
 

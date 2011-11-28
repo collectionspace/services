@@ -27,6 +27,8 @@
  */
 package org.collectionspace;
 
+import java.io.PrintStream;
+
 import net.sf.ehcache.CacheException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -50,6 +52,10 @@ public class ImportAuthz {
     final private static String OPTIONS_HELP = "help";
 
     final private static String MSG_SEPARATOR = "--";
+    final private static String LOGGING_SEPARATOR_HEAD = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>";
+    final private static String LOGGING_SEPARATOR_TAIL = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+    final private static String LOGGING_INFO_PREFIX = "[INFO] ";
+    final private static String LOGGING_ERROR_PREFIX = "[ERROR] ";
 
     final private static boolean generateOnly(String param) {
     	boolean result = false;
@@ -58,6 +64,79 @@ public class ImportAuthz {
     	}
     	return result;
     }
+    
+    //
+    // Private logging methods.  We should try to get this code to use a logging utility like Log4j, Slf4j, etc.
+    // I'm not sure why we are not using a logging util?  But at least we're consolidating all calls to System.out and Sytem.err.
+    //
+    private static void logError(String errMessage) {
+    	System.out.println(LOGGING_ERROR_PREFIX + errMessage);
+    }
+    
+    private static void logInfo(PrintStream outStream, String infoMessage) {
+    	outStream.println(LOGGING_INFO_PREFIX + infoMessage);
+    }
+    
+    private static void logInfo(String infoMessage) {
+    	logInfo(System.out, infoMessage);
+    }
+    
+    private static void logConfiguration(String user,
+    		String password,
+    		String tenantBinding,
+    		String exportDir) {
+    	logInfo(LOGGING_SEPARATOR_HEAD);
+    	logInfo("Creating CollectionSpace authorization metadata using the following settings:");
+    	logInfo("\tuser=" + user);
+    	logInfo("\tpassword=" + password);
+    	logInfo("\ttenantBinding=" + tenantBinding);
+    	logInfo("\texportDir=" + exportDir);
+    	logInfo(LOGGING_SEPARATOR_TAIL);
+    }
+    
+    private static void printUsage(PrintStream outStream) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nUsage : java -cp <classpath> " + ImportAuthz.class.getName() + " <options>");
+        sb.append("\nOptions :");
+        sb.append("\n   -g  <" + OPTIONS_GENERATE_ONLY + "> generate only, do not seed AuthZ values in the security tables");        
+        sb.append("\n   -u  <" + OPTIONS_USERNAME + "> cspace username");
+        sb.append("\n   -p  <" + OPTIONS_PASSWORD + "> password");
+        sb.append("\n   -b  <" + OPTIONS_TENANT_BINDING + "> tenant binding file (fully qualified path)");
+        sb.append("\n   -edir  <" + OPTIONS_EXPORT_DIR + "> directory to export authz data into");
+        logInfo(sb.toString());
+    }
+    
+    private static void printUsage() {
+    	printUsage(System.out);
+    }
+    
+    private static void logInitialErrorCauseMsg(Throwable t) {
+        if (t != null) {
+            if (t.getCause() != null) {
+                logInitialErrorCauseMsg(t.getCause());
+            } else {
+            	logError(t.getMessage());
+            }
+        }
+    }
+
+    private static Options createOptions() {
+        Options options = new Options();
+        options.addOption("g", true, OPTIONS_GENERATE_ONLY);
+        options.addOption("u", true, OPTIONS_USERNAME);
+        options.addOption("p", true, OPTIONS_PASSWORD);
+        options.addOption("b", true, OPTIONS_TENANT_BINDING);
+        options.addOption("edir", true, OPTIONS_EXPORT_DIR);
+        options.addOption("h", true, OPTIONS_HELP);
+        return options;
+    }
+    //
+    // End of logging methods.
+    //
+    
+    //
+    // Create our AuthZ metadata
+    //
     public static void main(String[] args) {
 
         Options options = createOptions();
@@ -75,10 +154,10 @@ public class ImportAuthz {
             String password = line.getOptionValue("p");
             String tenantBinding = line.getOptionValue("b");
             String exportDir = line.getOptionValue("edir");
-            System.out.println("user=" + user
-                    + " password=" + password
-                    + " tenantBinding=" + tenantBinding
-                    + " exportDir=" + exportDir);
+            logConfiguration(user, password, tenantBinding, exportDir);
+            //
+            // Instantiate an AuthZ seed driver and ask it to generate our AuthZ metadata
+            //
             AuthorizationSeedDriver driver = new AuthorizationSeedDriver(
                     user, password, tenantBinding, exportDir);
             driver.generate();
@@ -88,54 +167,19 @@ public class ImportAuthz {
             //
             if (generateOnly(generate_only) == false) {
             	driver.seed();
-            } {
-            	System.out.println("WARNING: '-g' was set to 'true' so AuthZ tables were not seeded.");
+            } else {
+            	logError("WARNING: '-g' was set to 'true' so AuthZ tables were ***NOT*** seeded.");
             }
         } catch (ParseException exp) {
-            // oops, something went wrong
-            System.err.println("Parsing failed.  Reason: " + exp.getMessage());
+        	logError("Parsing failed.  Reason: " + exp.getMessage());
         } catch (Exception e) {
-            System.out.println("Error : " + e.getMessage());
-            System.out.println(MSG_SEPARATOR);
-            printUsage();
-            System.out.println(MSG_SEPARATOR);
-            System.out.println("Import failed: ");
-            printInitialErrorCauseMsg(e);
+        	logError("Error : " + e.getMessage());
+        	logError(MSG_SEPARATOR);
+            printUsage(System.err);
+            logError(MSG_SEPARATOR);
+            logError("Import failed: ");
+            logInitialErrorCauseMsg(e);
             System.exit(1);
         }
-
-    }
-
-    private static void printInitialErrorCauseMsg(Throwable t) {
-        if (t != null) {
-            if (t.getCause() != null) {
-                printInitialErrorCauseMsg(t.getCause());
-            } else {
-               System.out.println(t.getMessage());
-            }
-        }
-    }
-
-    private static Options createOptions() {
-        Options options = new Options();
-        options.addOption("g", true, OPTIONS_GENERATE_ONLY);
-        options.addOption("u", true, OPTIONS_USERNAME);
-        options.addOption("p", true, OPTIONS_PASSWORD);
-        options.addOption("b", true, OPTIONS_TENANT_BINDING);
-        options.addOption("edir", true, OPTIONS_EXPORT_DIR);
-        options.addOption("h", true, OPTIONS_HELP);
-        return options;
-    }
-
-    private static void printUsage() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\nUsage : java -cp <classpath> " + ImportAuthz.class.getName() + " <options>");
-        sb.append("\nOptions :");
-        sb.append("\n   -g  <" + OPTIONS_GENERATE_ONLY + "> generate only, do not seed AuthZ values in the security tables");        
-        sb.append("\n   -u  <" + OPTIONS_USERNAME + "> cspace username");
-        sb.append("\n   -p  <" + OPTIONS_PASSWORD + "> password");
-        sb.append("\n   -b  <" + OPTIONS_TENANT_BINDING + "> tenant binding file (fully qualified path)");
-        sb.append("\n   -edir  <" + OPTIONS_EXPORT_DIR + "> directory to export authz data into");
-        System.out.println(sb.toString());
     }
 }

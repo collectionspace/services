@@ -35,6 +35,7 @@ import java.util.Set;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
 
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -218,7 +219,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
         AccountPermission accountPermission = JpaStorageUtils.getAccountPermissions(JpaStorageUtils.CS_CURRENT_USER,
         		currentServiceName, workflowSubResource);
-        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", accountPermission);
+        org.collectionspace.services.authorization.ObjectFactory objectFactory =
+        	new org.collectionspace.services.authorization.ObjectFactory();
+        JAXBElement<AccountPermission> ap = objectFactory.createAccountPermission(accountPermission);
+        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", ap);
         ctx.addOutputPart(accountPermissionPart);
     }
 

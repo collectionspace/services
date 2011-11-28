@@ -58,7 +58,7 @@ import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.client.NuxeoClient;
+//import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.runtime.api.Framework;
 
@@ -79,6 +79,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 //    private final Logger profilerLogger = LoggerFactory.getLogger("remperf");
 //    private String foo = Profiler.createLogger();
 
+    public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
+    public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
+    
     /**
      * Instantiates a new repository java client impl.
      */
@@ -606,7 +609,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         DocumentFilter filter = handler.getDocumentFilter();
         String oldOrderBy = filter.getOrderByClause();
         if (isClauseEmpty(oldOrderBy) == true){
-            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);  //per http://issues.collectionspace.org/browse/CSPACE-705
+            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);  //per http://issues.collectionspace.org/browse/CSPACE-705 (Doesn't this conflict with what happens with the QueryContext instance that we create below?)
         }
         QueryContext queryContext = new QueryContext(ctx, handler);
         RepositoryInstance repoSession = null;
@@ -834,7 +837,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
     @Override
     public Hashtable<String, String> retrieveWorkspaceIds(String domainName) throws Exception {
-        return NuxeoConnector.getInstance().retrieveWorkspaceIds(domainName);
+        return NuxeoConnectorEmbedded.getInstance().retrieveWorkspaceIds(domainName);
     }
 
     @Override
@@ -842,20 +845,35 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         String domainId = null;
         try {
+        	//
+        	// First create the top-level domain directory
+        	//
             repoSession = getRepositorySession();
             DocumentRef parentDocRef = new PathRef("/");
             DocumentModel parentDoc = repoSession.getDocument(parentDocRef);
-            DocumentModel doc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
-                    domainName, "Domain");
-            doc.setPropertyValue("dc:title", domainName);
-            doc.setPropertyValue("dc:description", "A CollectionSpace domain "
+            DocumentModel domainDoc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
+                    domainName, NUXEO_CORE_TYPE_DOMAIN);
+            domainDoc.setPropertyValue("dc:title", domainName);
+            domainDoc.setPropertyValue("dc:description", "A CollectionSpace domain "
                     + domainName);
-            doc = repoSession.createDocument(doc);
-            domainId = doc.getId();
+            domainDoc = repoSession.createDocument(domainDoc);
+            domainId = domainDoc.getId();
             repoSession.save();
+            //
+            // Next, create a "Workspaces" root directory to contain the workspace folders for the individual service documents
+            //
+            DocumentModel workspacesRoot = repoSession.createDocumentModel(domainDoc.getPathAsString(),
+            		NuxeoUtils.Workspaces, NUXEO_CORE_TYPE_WORKSPACEROOT);
+            workspacesRoot.setPropertyValue("dc:title", NuxeoUtils.Workspaces);
+            workspacesRoot.setPropertyValue("dc:description", "A CollectionSpace workspaces directory for "
+                    + domainDoc.getPathAsString());
+            workspacesRoot = repoSession.createDocument(workspacesRoot);
+            String workspacesRootId = workspacesRoot.getId();
+            
             if (logger.isDebugEnabled()) {
-                logger.debug("created tenant domain name=" + domainName
-                        + " id=" + domainId);
+                logger.debug("Created tenant domain name=" + domainName
+                        + " id=" + domainId + " " +
+                        NuxeoUtils.Workspaces + " id=" + workspacesRootId);
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -910,7 +928,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             repoSession = getRepositorySession();
             DocumentRef parentDocRef = new PathRef(
                     "/" + domainName
-                    + "/" + NuxeoUtils.WORKSPACES);
+                    + "/" + NuxeoUtils.Workspaces);
             DocumentModel parentDoc = repoSession.getDocument(parentDocRef);
             DocumentModel doc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
                     workspaceName, "Workspace");
@@ -948,7 +966,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             repoSession = getRepositorySession();
             DocumentRef docRef = new PathRef(
                     "/" + tenantDomain
-                    + "/" + NuxeoUtils.WORKSPACES
+                    + "/" + NuxeoUtils.Workspaces
                     + "/" + workspaceName);
             DocumentModel workspace = repoSession.getDocument(docRef);
             workspaceId = workspace.getId();
@@ -979,9 +997,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // Authentication failures happen while trying to reuse the session
     	Profiler profiler = new Profiler("getRepositorySession():", 2);
     	profiler.start();
-        NuxeoClient client = NuxeoConnector.getInstance().getClient();
+        NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
         RepositoryInstance repoSession = client.openRepository();
-        if (logger.isTraceEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("getRepository() repository root: " + repoSession.getRootDocument());
         }
         profiler.stop();
@@ -995,7 +1013,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      */
     private void releaseRepositorySession(RepositoryInstance repoSession) {
         try {
-            NuxeoClient client = NuxeoConnector.getInstance().getClient();
+            NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
             // release session
             client.releaseRepository(repoSession);
         } catch (Exception e) {

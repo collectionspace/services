@@ -28,6 +28,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.InitHandler.Params.Field;
 import org.collectionspace.services.common.service.InitHandler.Params.Property;
@@ -49,7 +51,10 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
     final Logger logger = LoggerFactory.getLogger(ModifyFieldDatatypes.class);
 
     @Override
-    public void onRepositoryInitialized(ServiceBindingType sbt, List<Field> fields, List<Property> properties) throws Exception {
+    public void onRepositoryInitialized(DataSource dataSource,
+    		ServiceBindingType sbt, 
+    		List<Field> fields, 
+    		List<Property> properties) throws Exception {
         //todo: all post-init tasks for services, or delegate to services that override.
         int rows = 0;
         String sql = "";
@@ -63,7 +68,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
             for (Field field : fields) {
                 datatype = getDatatypeFromLogicalType(databaseProductType, field.getType());
                 // If the field is already of the desired datatype, skip it.
-                if (fieldHasDesiredDatatype(databaseProductType, field, datatype)) {
+                if (fieldHasDesiredDatatype(dataSource, databaseProductType, field, datatype)) {
                     logger.trace("Field " + field.getTable() + "." + field.getCol()
                             + " is already of desired datatype " + datatype);
                     continue;
@@ -93,7 +98,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                 //
                 // If this assumption is no longer valid, we might instead
                 // identify the relevant repository from the table name here.
-                rows = JDBCTools.executeUpdate(JDBCTools.NUXEO_REPOSITORY_NAME, sql);
+                rows = JDBCTools.executeUpdate(dataSource, sql);
             }
         } catch (Exception e) {
             throw e;
@@ -121,7 +126,8 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         return datatype;
     }
 
-    private boolean fieldHasDesiredDatatype(DatabaseProductType databaseProductType,
+    private boolean fieldHasDesiredDatatype(DataSource dataSource,
+    		DatabaseProductType databaseProductType,
             Field field, String datatype) {
         
         // FIXME: Consider instead using the database-agnostic
@@ -149,7 +155,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         }
 
         try {
-            conn = JDBCTools.getConnection(JDBCTools.NUXEO_REPOSITORY_NAME);
+            conn = JDBCTools.getConnection(dataSource);
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             while (rs.next()) {

@@ -15,12 +15,14 @@
 
     <type id="Folder" coretype="Folder">
       <subtypes>
+        <type>Picture</type>
         <type>Blob</type>
       </subtypes>
     </type>
     
     <type id="Workspace" coretype="Workspace">
       <subtypes>
+        <type>Picture</type>
         <type>Blob</type>
       </subtypes>
     </type>

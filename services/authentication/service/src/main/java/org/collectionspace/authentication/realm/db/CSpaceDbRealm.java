@@ -59,6 +59,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.security.auth.login.FailedLoginException;
@@ -68,6 +70,7 @@ import javax.sql.DataSource;
 //import org.apache.commons.logging.Log;
 //import org.apache.commons.logging.LogFactory;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.realm.CSpaceRealm;
 
@@ -405,16 +408,53 @@ public class CSpaceDbRealm implements CSpaceRealm {
     private Connection getConnection() throws LoginException, SQLException {
         InitialContext ctx = null;
         Connection conn = null;
+        String dataSourceName = getDataSourceName();
+        DataSource ds = null;
         try {
             ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(getDataSourceName());
+            try {
+            	ds = (DataSource) ctx.lookup(dataSourceName);
+            } catch (Exception e) {}
+            
+	        try {
+	        	Context envCtx = (Context) ctx.lookup("java:comp/env");
+	        	ds = (DataSource) envCtx.lookup(dataSourceName);
+	        } catch (Exception e) {}
+	        
+	        try {
+	        	Context envCtx = (Context) ctx.lookup("java:comp");
+	        	ds = (DataSource) envCtx.lookup(dataSourceName);
+	        } catch (Exception e) {}
+	        
+	        try {
+	        	Context envCtx = (Context) ctx.lookup("java:");
+	        	ds = (DataSource) envCtx.lookup(dataSourceName);
+	        } catch (Exception e) {}
+	        
+	        try {
+	        	Context envCtx = (Context) ctx.lookup("java");
+	        	ds = (DataSource) envCtx.lookup(dataSourceName);
+	        } catch (Exception e) {}
+	        
+	        try {
+	        	ds = (DataSource) ctx.lookup("java:/" + dataSourceName);
+	        } catch (Exception e) {}  
+
+	        if (ds == null) {
+            	ds = AuthN.getDataSource();
+	        }
+	        
             if (ds == null) {
-                throw new IllegalArgumentException("datasource not found: " + getDataSourceName());
+                throw new IllegalArgumentException("datasource not found: " + dataSourceName);
             }
+            
             conn = ds.getConnection();
+            if (conn == null) {
+            	conn = AuthN.getDataSource().getConnection();  //FIXME:REM - This is the result of some type of JNDI mess.  Should try to solve this problem and clean up this code.
+            }
             return conn;
         } catch (NamingException ex) {
-            LoginException le = new LoginException("Error looking up DataSource from: " + getDataSourceName());
+            LoginException le = new LoginException("Error looking up DataSource from: " + dataSourceName);
             le.initCause(ex);
             throw le;
         } finally {
@@ -422,6 +462,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
                 try {
                     ctx.close();
                 } catch (Exception e) {
+                	e.printStackTrace();
                 }
             }
         }

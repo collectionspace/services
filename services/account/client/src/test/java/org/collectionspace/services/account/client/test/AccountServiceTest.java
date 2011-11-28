@@ -29,6 +29,8 @@ import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
+import org.collectionspace.services.account.AccountListItem;
+
 import org.collectionspace.services.account.Status;
 import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
@@ -945,9 +947,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
             int statusCode = res.getStatus();
 
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-            List<AccountsCommonList.AccountListItem> items = list.getAccountListItem();
+            List<AccountListItem> items = list.getAccountListItem();
             Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
-            AccountsCommonList.AccountListItem item = items.get(0);
+            AccountListItem item = items.get(0);
             prebuiltAdminCSID = item.getCsid();
             if (logger.isDebugEnabled()) {
                 logger.debug("Found Admin Account with ID: " + prebuiltAdminCSID);
@@ -1418,11 +1420,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param list the list
      */
     private void printList(String testName, AccountsCommonList list) {
-        List<AccountsCommonList.AccountListItem> items =
+        List<AccountListItem> items =
                 list.getAccountListItem();
         int i = 0;
 
-        for (AccountsCommonList.AccountListItem item : items) {
+        for (AccountListItem item : items) {
             logger.debug(testName + ": list-item[" + i + "] csid="
                     + item.getCsid());
             logger.debug(testName + ": list-item[" + i + "] screenName="

@@ -50,6 +50,7 @@ import org.collectionspace.services.workflow.WorkflowResource;
 
 //import org.collectionspace.services.query.QueryResource;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 
@@ -85,6 +86,7 @@ public class CollectionSpaceJaxRsApplication extends Application
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
     private ResourceMap resourceMap = new ResourceMapImpl();
+    private ServletContext servletContext = null;
 
     public CollectionSpaceJaxRsApplication() {    	
     	//
@@ -145,6 +147,14 @@ public class CollectionSpaceJaxRsApplication extends Application
 
     public ResourceMap getResourceMap() {
         return resourceMap;
+    }
+    
+    public void setServletContext(ServletContext servletContext) {
+    	this.servletContext = servletContext;
+    }
+    
+    public ServletContext getServletContext() {
+    	return this.servletContext;
     }
 }
 

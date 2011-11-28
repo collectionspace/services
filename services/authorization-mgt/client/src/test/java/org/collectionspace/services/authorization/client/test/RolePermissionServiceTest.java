@@ -28,10 +28,10 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import javax.ws.rs.core.Response;
-import org.collectionspace.services.authorization.EffectType;
+import org.collectionspace.services.authorization.perms.EffectType;
 
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
@@ -478,7 +478,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         PermissionRole toDelete = readResponse.getEntity();
         readResponse.releaseConnection();        
         
-        rv = toDelete.getRoles().get(0);
+        rv = toDelete.getRole().get(0);
         ClientResponse<Response> res = null;
         try {
             res = client.delete(

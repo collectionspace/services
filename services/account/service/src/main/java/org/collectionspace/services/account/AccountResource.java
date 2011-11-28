@@ -29,6 +29,7 @@ import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.client.AccountClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.common.SecurityResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -105,7 +106,11 @@ public class AccountResource extends SecurityResourceBase {
     @GET
     @Produces("application/xml")
     public AccountsCommonList getAccountList(@Context UriInfo ui) {
-        return (AccountsCommonList)getList(ui, AccountsCommon.class);
+    	AccountsCommonList result = (AccountsCommonList)getList(ui, AccountsCommon.class);
+    	PayloadOutputPart ppo = new PayloadOutputPart(AccountsCommonList.class.getSimpleName(),
+    			result);
+    	System.out.println(ppo.asXML());
+    	return result;
     }
 
     @PUT

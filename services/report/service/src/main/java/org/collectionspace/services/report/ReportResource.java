@@ -52,6 +52,7 @@ import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.invocable.Invocable.InvocationError;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.common.storage.JDBCTools;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -84,7 +85,7 @@ import java.util.List;
 @Produces("application/xml")
 //@Produces("application/xml;charset=UTF-8")
 public class ReportResource extends ResourceBase {
-    private static String REPOSITORY_NAME = "NuxeoDS";
+    private static String REPOSITORY_NAME = JDBCTools.NUXEO_REPOSITORY_NAME;
     private static String REPORTS_FOLDER = "reports";
     private static String CSID_LIST_SEPARATOR = ",";
     final Logger logger = LoggerFactory.getLogger(ReportResource.class);
@@ -336,29 +337,9 @@ public class ReportResource extends ResourceBase {
         }
     }
 
-    private Connection getConnection() throws LoginException, SQLException {
-        InitialContext ctx = null;
-        Connection conn = null;
-        try {
-            ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(REPOSITORY_NAME);
-            if (ds == null) {
-                throw new IllegalArgumentException("datasource not found: " + REPOSITORY_NAME);
-            }
-            conn = ds.getConnection();
-            return conn;
-        } catch (NamingException ex) {
-            LoginException le = new LoginException("Error looking up DataSource from: " + REPOSITORY_NAME);
-            le.initCause(ex);
-            throw le;
-        } finally {
-            if (ctx != null) {
-                try {
-                    ctx.close();
-                } catch (Exception e) {
-                }
-            }
-        }
+    private Connection getConnection() throws NamingException, SQLException {
+    	return JDBCTools.getConnection(REPOSITORY_NAME);
     }
+
 
 }

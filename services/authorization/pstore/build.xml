@@ -195,14 +195,14 @@
     </target>
 
     <target name="deploy" depends="install"
-            description="deploy authorization service in ${jboss.server.cspace}">
-        <copy todir="${jboss.server.cspace}/cspace/services">
+            description="deploy authorization service in ${jee.server.cspace}">
+        <copy todir="${jee.server.cspace}/cspace/services">
             <fileset dir="${src}/main/resources/"/>
         </copy>
     </target>
 
     <target name="undeploy"
-            description="undeploy authorization service from ${jboss.server.cspace}"
+            description="undeploy authorization service from ${jee.server.cspace}"
             depends="check.db.scripts.deploy.dir" if="${db.scripts.deploy.dir.exists}">
         <delete>
             <fileset dir="${db.scripts.deploy.dir}"
@@ -219,7 +219,7 @@
     </target>
     
     <target name="check.db.scripts.deploy.dir">
-        <property name="db.scripts.deploy.dir" value="${jboss.server.cspace}/cspace/services/db/${db}"/>
+        <property name="db.scripts.deploy.dir" value="${jee.server.cspace}/cspace/services/db/${db}"/>
         <condition property="db.scripts.deploy.dir.exists">
             <available file="${db.scripts.deploy.dir}" type="dir"/>
         </condition>

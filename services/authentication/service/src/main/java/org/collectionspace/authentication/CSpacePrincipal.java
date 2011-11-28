@@ -32,7 +32,11 @@ import java.security.Principal;
 final public class CSpacePrincipal
         implements Principal, java.io.Serializable {
 
-    private String name;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1357683611240908638L;
+	private String name;
     private String tenantId;
 
     public CSpacePrincipal(String name) {

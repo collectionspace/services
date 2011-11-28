@@ -56,7 +56,7 @@
 
     <target name="undeploy"
         description="undeploys CollectionSpace-specific Nuxeo database template folders"
-        depends="undeploy-template-dirs, reset-nuxeo-config">
+        depends="undeploy-template-dirs">
     </target>
     
     <target name="undeploy-template-dirs"
@@ -71,6 +71,8 @@
         </delete>
     </target>
     
+	<!-- We can't process templates anymore since we're using an Embedded Nuxeo EP server -->
+	<!--
    <target name="reset-nuxeo-config"
     	description="resets the value of the database template folder in the active Nuxeo configuration file to an empty value"
         depends="check-propertyfile-task-exists, set-nuxeo-active-config, backup-nuxeo-config"
@@ -79,28 +81,41 @@
             <entry key="nuxeo.templates" operation="=" value=""/>
         </propertyfile>
     </target>
+	-->
     
     <!-- Utility targets -->
     
+	<!-- We can't process templates anymore since we're using an Embedded Nuxeo EP server -->
+	<!--
     <target name="set-nuxeo-active-config"
         description="Sets the path to the active Nuxeo configuration file"
         depends="set-nuxeo-active-config-with-env, set-nuxeo-active-config-without-env">
     </target>
+	-->
 
+	<!-- We can't process templates anymore since we're using an Embedded Nuxeo EP server -->
+	<!--
     <target name="set-nuxeo-active-config-with-env" if="env.NUXEO_CONF"
         description="Sets the path to the active Nuxeo configuration file, if set in the NUXEO_CONF environment variable">
         <property name="nuxeo.active.config.file" value="${env.NUXEO_CONF}"/>
     </target>
+	-->
 
+	<!-- We can't process templates anymore since we're using an Embedded Nuxeo EP server -->
+	<!--
     <target name="set-nuxeo-active-config-without-env" unless="env.NUXEO_CONF"
         description="Sets the path to the active Nuxeo configuration file, in the absence of a NUXEO_CONF environment variable">
         <property name="nuxeo.active.config.file" value="${nuxeo.main.config.file}"/>
     </target>
+	-->
 
+	<!-- We can't process templates anymore since we're using an Embedded Nuxeo EP server -->
+	<!--
     <target name="backup-nuxeo-config"
     	description="makes a single backup copy of the active, main Nuxeo configuration file, overwriting the previous backup">
         <copy file="${nuxeo.active.config.file}" tofile="${nuxeo.active.config.file}${backup.suffix}" overwrite="true"/>
     </target>
+	-->
     
     <target name="check-templates-dir-exists"
     	description="checks for the existence of a Nuxeo database template folder for the ${db} database">

@@ -36,7 +36,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
-import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;

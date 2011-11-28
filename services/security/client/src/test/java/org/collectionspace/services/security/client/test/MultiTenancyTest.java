@@ -37,11 +37,11 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
-import org.collectionspace.services.authorization.ActionType;
-import org.collectionspace.services.authorization.EffectType;
+import org.collectionspace.services.authorization.perms.ActionType;
+import org.collectionspace.services.authorization.perms.EffectType;
 
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;

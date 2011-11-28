@@ -18,19 +18,22 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
     @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
-            ServletContext sc = event.getServletContext();
-
-            //create repository select to stop jboss from jamming
+            //create logging repository select to stop jboss from jamming
             //our log on top of theirs
 //            LogManager.setRepositorySelector(new CollectionSpaceLog4jRepositorySelector(),
 //                    null);
 
-            ServiceMain svcMain = ServiceMain.getInstance(); //first access initializes as well
+        	//
+        	// Initialize/start the Nuxeo EP server instance and create/retrieve the service workspaces
+        	//
+        	ServletContext servletContext = event.getServletContext();
+            ServiceMain svcMain = ServiceMain.getInstance(servletContext);
             svcMain.retrieveAllWorkspaceIds();
 
         } catch (Exception e) {
             e.printStackTrace();
             //fail here
+            System.err.println("[ERROR] The CollectionSpace Services could not initialize.  Please see the log files for details.");
             throw new RuntimeException(e);
         }
     }

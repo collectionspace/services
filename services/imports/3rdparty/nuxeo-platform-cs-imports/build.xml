@@ -113,19 +113,15 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy imports doctype in ${jboss.server.nuxeo}">
+        description="deploy imports doctype in ${jee.server.nuxeo}">
         <copy file="${basedir}/target/${nuxeo.imports.jar}"
-        todir="${jboss.deploy.nuxeo.plugins}"/>
+        todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy imports doctype from ${jboss.server.nuxeo}">
+        description="undeploy imports doctype from ${jee.server.nuxeo}">
         <delete>
-            <fileset dir="${jboss.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.imports.jars.all}"/>
-            </fileset>
-            <!-- Legacy deployment location through release 0.6 -->
-            <fileset dir="${jboss.deploy.nuxeo.system}">
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
                 <include name="${nuxeo.imports.jars.all}"/>
             </fileset>
         </delete>

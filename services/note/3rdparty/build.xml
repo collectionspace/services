@@ -107,12 +107,12 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy note in ${jboss.server.nuxeo}">
+    description="deploy note in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-note/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy note from ${jboss.server.nuxeo}">
+    description="undeploy note from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-note/build.xml" target="undeploy" inheritall="false"/>
     </target>
 

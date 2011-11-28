@@ -221,16 +221,16 @@ public class AccountRoleDocumentHandler
         }
         if (subject.equals(SubjectType.ROLE)) {
             //FIXME: potential index out of bounds exception...negative test needed
-            AccountValue av = ar.getAccounts().get(0);
+            AccountValue av = ar.getAccount().get(0);
 
-            for (RoleValue rv : ar.getRoles()) {
+            for (RoleValue rv : ar.getRole()) {
                 AccountRoleRel arr = buildAccountRoleRel(av, rv, handleDelete);
                 arrl.add(arr);
             }
         } else if (SubjectType.ACCOUNT.equals(subject)) {
             //FIXME: potential index out of bounds exception...negative test needed
-        	RoleValue rv = ar.getRoles().get(0);
-            for (AccountValue av : ar.getAccounts()) {
+        	RoleValue rv = ar.getRole().get(0);
+            for (AccountValue av : ar.getAccount()) {
                 AccountRoleRel arr = buildAccountRoleRel(av, rv, handleDelete);
                 arrl.add(arr);
             }
@@ -264,7 +264,7 @@ public class AccountRoleDocumentHandler
         if (SubjectType.ROLE.equals(subject)) {
 
             List<AccountValue> avs = new ArrayList<AccountValue>();
-            ar.setAccounts(avs);
+            ar.setAccount(avs);
             AccountValue av = AuthorizationRoleRel.buildAccountValue(ar0);
             if (av != null) {
             	avs.add(av);
@@ -272,7 +272,7 @@ public class AccountRoleDocumentHandler
 
             //add roles
             List<RoleValue> rvs = new ArrayList<RoleValue>();
-            ar.setRoles(rvs);
+            ar.setRole(rvs);
             for (AccountRoleRel arr : arrl) {
             	RoleValue rv = AuthorizationRoleRel.buildRoleValue(arr);
             	if (rv != null) {
@@ -282,13 +282,13 @@ public class AccountRoleDocumentHandler
         } else if (SubjectType.ACCOUNT.equals(subject)) {
 
             List<RoleValue> rvs = new ArrayList<RoleValue>();
-            ar.setRoles(rvs);
+            ar.setRole(rvs);
             RoleValue rv = AuthorizationRoleRel.buildRoleValue(ar0);
             rvs.add(rv);
 
             //add accounts
             List<AccountValue> avs = new ArrayList<AccountValue>();
-            ar.setAccounts(avs);
+            ar.setAccount(avs);
             for (AccountRoleRel arr : arrl) {
                 AccountValue av = AuthorizationRoleRel.buildAccountValue(arr);
                 avs.add(av);

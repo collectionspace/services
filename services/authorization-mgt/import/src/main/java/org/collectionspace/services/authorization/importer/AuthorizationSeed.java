@@ -29,17 +29,17 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import org.collectionspace.services.authorization.ActionType;
+import org.collectionspace.services.authorization.perms.ActionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
-import org.collectionspace.services.authorization.EffectType;
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.perms.EffectType;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionRole;
-import org.collectionspace.services.authorization.PermissionsList;
+import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.URIResourceImpl;
@@ -60,18 +60,18 @@ public class AuthorizationSeed {
      * @throws Exception
      */
     public void seedPermissions(String permFileName, String permRoleFileName) throws Exception {
-        PermissionsList permList =
-                (PermissionsList) fromFile(PermissionsList.class,
-                permFileName);
-        if (logger.isDebugEnabled()) {
-            logger.debug("read permissions from " + permFileName);
-        }
         PermissionsRolesList permRoleList =
                 (PermissionsRolesList) fromFile(PermissionsRolesList.class,
                 permRoleFileName);
         if (logger.isDebugEnabled()) {
             logger.debug("read permissions-roles from " + permRoleFileName);
         }
+        PermissionsList permList =
+            (PermissionsList) fromFile(PermissionsList.class,
+            permFileName);
+	    if (logger.isDebugEnabled()) {
+	        logger.debug("read permissions from " + permFileName);
+	    }
 
         seedPermissions(permList, permRoleList);
     }
@@ -84,13 +84,13 @@ public class AuthorizationSeed {
      */
     public void seedPermissions(PermissionsList permList, PermissionsRolesList permRoleList)
             throws Exception {
-        for (Permission p : permList.getPermissions()) {
+        for (Permission p : permList.getPermission()) {
             if (logger.isTraceEnabled()) {
                 logger.trace("adding permission for res=" + p.getResourceName() +
                         " for tenant=" + p.getTenantId());
             }
-            for (PermissionRole pr : permRoleList.getPermissionRoles()) {
-                if (pr.getPermissions().get(0).getPermissionId().equals(p.getCsid())) {
+            for (PermissionRole pr : permRoleList.getPermissionRole()) {
+                if (pr.getPermission().get(0).getPermissionId().equals(p.getCsid())) {
                     addPermissionsForUri(p, pr);
                 }
             }
@@ -105,16 +105,16 @@ public class AuthorizationSeed {
     private void addPermissionsForUri(Permission perm,
             PermissionRole permRole) throws PermissionException {
         List<String> principals = new ArrayList<String>();
-        if (!perm.getCsid().equals(permRole.getPermissions().get(0).getPermissionId())) {
+        if (!perm.getCsid().equals(permRole.getPermission().get(0).getPermissionId())) {
             throw new IllegalArgumentException("permission ids do not"
-                    + " match for role=" + permRole.getRoles().get(0).getRoleName()
-                    + " with permissionId=" + permRole.getPermissions().get(0).getPermissionId()
+                    + " match for role=" + permRole.getRole().get(0).getRoleName()
+                    + " with permissionId=" + permRole.getPermission().get(0).getPermissionId()
                     + " for permission with csid=" + perm.getCsid());
         }
-        for (RoleValue roleValue : permRole.getRoles()) {
+        for (RoleValue roleValue : permRole.getRole()) {
             principals.add(roleValue.getRoleName());
         }
-        List<PermissionAction> permActions = perm.getActions();
+        List<PermissionAction> permActions = perm.getAction();
         for (PermissionAction permAction : permActions) {
             CSpaceAction action = URIResourceImpl.getAction(permAction.getName());
             URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),

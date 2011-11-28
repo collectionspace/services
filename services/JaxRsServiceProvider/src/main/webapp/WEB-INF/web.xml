@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <!--
     Document   : web.xml
     Created on : May 19, 2009, 1:31 PM
@@ -8,13 +7,19 @@
     Description:
         service layer web application
 -->
-<web-app>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">    
     <display-name>CollectionSpace Services</display-name>
-    <env-entry>
+    	
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>CollectionSpace realm</realm-name>
+    </login-config>
+
+	<env-entry>
         <description>Sets the logging context for the Tiger web-app</description>
         <env-entry-name>cspace-logging-context</env-entry-name>
-        <env-entry-value>CSpaceLoggingContext</env-entry-value>
         <env-entry-type>java.lang.String</env-entry-type>
+        <env-entry-value>CSpaceLoggingContext</env-entry-value>
     </env-entry>
 
     <context-param>
@@ -43,6 +48,11 @@
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
 
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <filter>
 		<filter-name>CSpaceFilter</filter-name>
         <filter-class>org.collectionspace.services.common.profile.CSpaceFilter</filter-class>
@@ -52,12 +62,12 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
     
-    <filter-mapping>
-        <filter-name>springSecurityFilterChain</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
 
-    <!-- Listeners -->
+    <!--
+    	***
+    	*** Servlet Context Listeners
+    	***
+    -->
 
     <!--
       - Loads the root application context of this web app at startup.
@@ -80,15 +90,17 @@
         <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
     </listener-->
 
-    <listener>
-        <listener-class>
-            org.collectionspace.services.jaxrs.CSpaceResteasyBootstrap
-        </listener-class>
-    </listener>
-
+	<!-- A general listener for the CollectionSpace services.  In particular, this listener starts the embedded Nuxeo EP server instance. -->
     <listener>
         <listener-class>
             org.collectionspace.services.common.CollectionSpaceServiceContextListener
+        </listener-class>
+    </listener>
+    
+	<!-- The CollectionSpace listener that starts up the RESTEasy/JAX-RS service framework. -->
+    <listener>
+        <listener-class>
+            org.collectionspace.services.jaxrs.CSpaceResteasyBootstrap
         </listener-class>
     </listener>
 

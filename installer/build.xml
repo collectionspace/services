@@ -18,27 +18,27 @@
     <target name="install"
     	description="Installer: Copy artifacts for CollectionSpace Nuxeo doctypes">
         <!-- cspace\server\cspace -->     
-        <copy todir="${jboss.server.cspace}/cspace">
+        <copy todir="${jee.server.cspace}/cspace">
             <fileset dir="${services.trunk}/${dist.server.cspace}/cspace"/>
         </copy>
         <!-- cspace\server\cspace\deploy -->     
-        <copy todir="${jboss.server.cspace}/deploy">
+        <copy todir="${jee.server.cspace}/deploy">
             <fileset dir="${services.trunk}/${dist.server.cspace}/deploy">
             	<include name="*"/>
             </fileset>
         </copy>
         <!-- cspace\server\cspace\lib -->      
-        <copy todir="${jboss.server.cspace}/lib">
+        <copy todir="${jee.server.cspace}/lib">
             <fileset dir="${services.trunk}/${dist.server.cspace}/lib"/>
         </copy>   
         <!-- cspace\server\cspace\nuxeo-client\lib -->     
-        <copy todir="${jboss.server.cspace}/nuxeo-client/lib">
+        <copy todir="${jee.server.cspace}/nuxeo-client/lib">
             <fileset dir="${services.trunk}/${dist.server.cspace}/nuxeo-client/lib">
             	<include name="*.jar"/>
 						</fileset>
         </copy>
         <!-- cspace\server\cspace\nuxeo-client\lib (5.2GA) -->      
-        <copy todir="${jboss.server.cspace}/nuxeo-client/lib">
+        <copy todir="${jee.server.cspace}/nuxeo-client/lib">
             <fileset dir="${services.trunk}/${dist.server.cspace}/nuxeo-client/lib/${nuxeo.release}">
             	<include name="*.jar"/>
 						</fileset>

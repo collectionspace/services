@@ -109,12 +109,12 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy taxonomy in ${jboss.server.nuxeo}">
+    description="deploy taxonomy in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-taxonomy/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy taxonomy from ${jboss.server.nuxeo}">
+    description="undeploy taxonomy from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-taxonomy/build.xml" target="undeploy" inheritall="false"/>
     </target>
 

@@ -24,7 +24,7 @@
 
 package org.collectionspace.services.authorization.storage;
 
-import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;

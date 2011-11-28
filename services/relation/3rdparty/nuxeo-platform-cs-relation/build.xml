@@ -113,19 +113,15 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy relation doctype in ${jboss.server.cspace}">
+        description="deploy relation doctype in ${jee.server.cspace}">
         <copy file="${basedir}/target/${nuxeo.relation.jar}"
-        todir="${jboss.deploy.nuxeo.plugins}"/>
+        todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy relation doctype from ${jboss.server.cspace}">
+        description="undeploy relation doctype from ${jee.server.cspace}">
         <delete>
-            <fileset dir="${jboss.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.relation.jars.all}"/>
-            </fileset>
-            <!-- Legacy deployment location through release 0.6 -->
-            <fileset dir="${jboss.deploy.nuxeo.system}">
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
                 <include name="${nuxeo.relation.jars.all}"/>
             </fileset>
         </delete>
