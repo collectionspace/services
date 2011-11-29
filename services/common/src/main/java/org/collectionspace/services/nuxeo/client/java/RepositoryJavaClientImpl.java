@@ -999,8 +999,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     	profiler.start();
         NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
         RepositoryInstance repoSession = client.openRepository();
-        if (logger.isDebugEnabled()) {
-            logger.debug("getRepository() repository root: " + repoSession.getRootDocument());
+        if (logger.isTraceEnabled()) {
+            logger.trace("Testing call to getRepository() repository root: " + repoSession.getRootDocument());
         }
         profiler.stop();
         return repoSession;

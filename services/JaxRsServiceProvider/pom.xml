@@ -345,7 +345,8 @@
             <version>2.2.2.SP8</version>
             <scope>provided</scope>
         </dependency>
-        <!-- nuxeo -->
+        
+        <!-- nuxeo -->        
         <dependency>
             <groupId>org.nuxeo.common</groupId>
             <artifactId>nuxeo-common</artifactId>
@@ -434,6 +435,12 @@
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-usermanager-api</artifactId>
 			<version>${nuxeo.core.version}</version>
+        </dependency>
+        <dependency>
+    		<groupId>org.nuxeo.ecm.platform</groupId>
+          	<artifactId>nuxeo-platform-commandline-executor</artifactId>
+            <version>${nuxeo.core.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
