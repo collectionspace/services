@@ -849,15 +849,15 @@
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-							<types:value>LenderGroupList/*/lender</types:value>
+							<types:value>lenderGroupList/*/lender</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-							<types:value>LenderGroupList/*/lendersAuthorizer</types:value>
+							<types:value>lenderGroupList/*/lendersAuthorizer</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
                <types:key>authRef</types:key>
-							 <types:value>LenderGroupList/*/lendersContact</types:value>
+							 <types:value>lenderGroupList/*/lendersContact</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
