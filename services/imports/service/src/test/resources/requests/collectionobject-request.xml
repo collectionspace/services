@@ -8,7 +8,32 @@
             <collectionobjects_common:assocEventNameType></collectionobjects_common:assocEventNameType>
             <collectionobjects_common:ownershipCategory>public</collectionobjects_common:ownershipCategory>
             <collectionobjects_common:objectProductionReasons/>
-            <collectionobjects_common:inscriptionDescriptionMethod></collectionobjects_common:inscriptionDescriptionMethod>
+            <textualInscriptionGroupList>
+                <textualInscriptionGroup>
+                    <collectionobjects_common:inscriptionContentScript>gothic-script</collectionobjects_common:inscriptionContentScript>
+                    <collectionobjects_common:inscriptionContentInscriber>urn:cspace:org.collectionspace.demo:orgauthority:name(organization):organization:name(screenmagicinc.)'Screen+Magic+Inc.'</collectionobjects_common:inscriptionContentInscriber>
+                    <collectionobjects_common:inscriptionContentTranslation>No, it's true, I'm not a baguette</collectionobjects_common:inscriptionContentTranslation>
+                    <collectionobjects_common:inscriptionContentType>label</collectionobjects_common:inscriptionContentType>
+                    <collectionobjects_common:inscriptionContentTransliteration>I'm a vegetarian</collectionobjects_common:inscriptionContentTransliteration>
+                    <collectionobjects_common:inscriptionContentDate></collectionobjects_common:inscriptionContentDate>
+                    <collectionobjects_common:inscriptionContent>Non, c'est vrai! Je ne suis pas une baguette</collectionobjects_common:inscriptionContent>
+                    <inscriptionContentInterpretation>It could mean a lot of things, but oddly no connection to ogres</inscriptionContentInterpretation>
+                    <collectionobjects_common:inscriptionContentLanguage>arabic</collectionobjects_common:inscriptionContentLanguage>
+                    <collectionobjects_common:inscriptionContentPosition>base</collectionobjects_common:inscriptionContentPosition>
+                    <collectionobjects_common:inscriptionContentMethod></collectionobjects_common:inscriptionContentMethod>
+               </textualInscriptionGroup>
+            </textualInscriptionGroupList>
+            <nonTextualInscriptionGroupList>
+                <nonTextualInscriptionGroup>
+                    <collectionobjects_common:inscriptionDescriptionDate></collectionobjects_common:inscriptionDescriptionDate>
+                    <collectionobjects_common:inscriptionDescriptionType>decoration</collectionobjects_common:inscriptionDescriptionType>
+                    <collectionobjects_common:inscriptionDescriptionPosition>bottom</collectionobjects_common:inscriptionDescriptionPosition>
+                    <collectionobjects_common:inscriptionDescriptionInscriber>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(reginabadet)'Regina+Badet'</collectionobjects_common:inscriptionDescriptionInscriber>
+                    <inscriptionDescriptionMethod></inscriptionDescriptionMethod>
+                    <inscriptionDescriptionInterpretation>No Idea</inscriptionDescriptionInterpretation>
+                    <inscriptionDescription>Big symbol at the base</inscriptionDescription>
+                </nonTextualInscriptionGroup>
+            </nonTextualInscriptionGroupList>
             <collectionobjects_common:fieldCollectionNote></collectionobjects_common:fieldCollectionNote>
             <collectionobjects_common:contentObjectGroupList>
               <contentObjectGroup>
@@ -19,7 +44,6 @@
             <collectionobjects_common:assocEventPersons>
               <assocEventPerson>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(maryannecasseta)'Mary+Anne+Cassata'</assocEventPerson>
             </collectionobjects_common:assocEventPersons>
-            <collectionobjects_common:inscriptionDescription>Big symbol at the base</collectionobjects_common:inscriptionDescription>
             <collectionobjects_common:dateEarliestSingleQualifier/>
             <collectionobjects_common:technicalAttributeGroupList>
               <technicalAttributeGroup>
@@ -28,11 +52,9 @@
                 <technicalAttributeMeasurementUnit>rpm</technicalAttributeMeasurementUnit>
               </technicalAttributeGroup>
             </collectionobjects_common:technicalAttributeGroupList>
-            <collectionobjects_common:inscriptionDescriptionInterpretation>No Idea</collectionobjects_common:inscriptionDescriptionInterpretation>
             <collectionobjects_common:dateText/>
             <collectionobjects_common:ownershipDates></collectionobjects_common:ownershipDates>
             <collectionobjects_common:dimensionSummary/>
-            <collectionobjects_common:inscriptionContentInterpretation>It could mean a lot of things, but oddly no connection to ogres</collectionobjects_common:inscriptionContentInterpretation>
             <collectionobjects_common:objectProductionOrganizationGroupList>
               <objectProductionOrganizationGroup>
                 <objectProductionOrganizationRole></objectProductionOrganizationRole>
@@ -76,7 +98,6 @@
               <briefDescription>Or it could be a petrified tree looking slightly like an ogre</briefDescription>
               <briefDescription>Or just a rock, looking a lot like a petrified tree</briefDescription>
             </collectionobjects_common:briefDescriptions>
-            <collectionobjects_common:inscriptionContentLanguage>arabic</collectionobjects_common:inscriptionContentLanguage>
             <collectionobjects_common:colors>
               <color></color>
             </collectionobjects_common:colors>
@@ -85,7 +106,6 @@
             </collectionobjects_common:fieldCollectors>
             <collectionobjects_common:ownersPersonalExperience>These object records are tedious to fill out</collectionobjects_common:ownersPersonalExperience>
             <collectionobjects_common:contentDescription>Content of a piece of rock?! .. well there might be diamonds and petrified fish in it</collectionobjects_common:contentDescription>
-            <collectionobjects_common:inscriptionDescriptionInscriber>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(reginabadet)'Regina+Badet'</collectionobjects_common:inscriptionDescriptionInscriber>
             <collectionobjects_common:objectProductionPeopleGroupList>
               <objectProductionPeopleGroup>
                 <objectProductionPeople></objectProductionPeople>
@@ -117,8 +137,6 @@
             <collectionobjects_common:forms>
               <form></form>
             </collectionobjects_common:forms>
-            <collectionobjects_common:inscriptionContentDate></collectionobjects_common:inscriptionContentDate>
-            <collectionobjects_common:inscriptionContent>Non, c'est vrai! Je ne suis pas une baguette</collectionobjects_common:inscriptionContent>
             <collectionobjects_common:assocPeopleGroupList/>
             <collectionobjects_common:dateEarliestSingle/>
             <collectionobjects_common:ownershipExchangeNote>none</collectionobjects_common:ownershipExchangeNote>
@@ -126,13 +144,8 @@
             <collectionobjects_common:assocEventOrganizations>
               <assocEventOrganization>urn:cspace:org.collectionspace.demo:orgauthority:name(organization):organization:name(7-eleven)'7-Eleven'</assocEventOrganization>
             </collectionobjects_common:assocEventOrganizations>
-            <collectionobjects_common:inscriptionContentType>label</collectionobjects_common:inscriptionContentType>
-            <collectionobjects_common:inscriptionContentTransliteration>I'm a vegetarian</collectionobjects_common:inscriptionContentTransliteration>
             <collectionobjects_common:objectNumber>CompleteObject001</collectionobjects_common:objectNumber>
-            <collectionobjects_common:inscriptionDescriptionPosition>bottom</collectionobjects_common:inscriptionDescriptionPosition>
-            <collectionobjects_common:inscriptionContentTranslation>No, it's true, I'm not a baguette</collectionobjects_common:inscriptionContentTranslation>
             <collectionobjects_common:dateAssociation/>
-            <collectionobjects_common:inscriptionDescriptionType>decoration</collectionobjects_common:inscriptionDescriptionType>
             <collectionobjects_common:dimensionMeasurementUnit/>
             <collectionobjects_common:contentScripts>
               <contentScript></contentScript>
@@ -151,7 +164,6 @@
             <collectionobjects_common:fieldColEventNames>
               <fieldColEventName>fieldCollectionEventName</fieldColEventName>
             </collectionobjects_common:fieldColEventNames>
-            <collectionobjects_common:inscriptionContentInscriber>urn:cspace:org.collectionspace.demo:orgauthority:name(organization):organization:name(screenmagicinc.)'Screen+Magic+Inc.'</collectionobjects_common:inscriptionContentInscriber>
             <collectionobjects_common:contentPersons>
               <contentPerson>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(gingerrogers)'Ginger+Rogers'</contentPerson>
             </collectionobjects_common:contentPersons>
@@ -174,7 +186,6 @@
                 <titleLanguage>swahili</titleLanguage>
               </titleGroup>
             </collectionobjects_common:titleGroupList>
-            <collectionobjects_common:inscriptionContentPosition>base</collectionobjects_common:inscriptionContentPosition>
             <collectionobjects_common:assocPersonGroupList/>
             <collectionobjects_common:assocOrganizationGroupList/>
             <collectionobjects_common:viewersPersonalExperience>Probably a horrible one, considering how uninteresting this object is</collectionobjects_common:viewersPersonalExperience>
@@ -202,7 +213,6 @@
             <collectionobjects_common:dimensionValueDate/>
             <collectionobjects_common:ownersReferences/>
             <collectionobjects_common:otherNumberList/>
-            <collectionobjects_common:inscriptionContentMethod></collectionobjects_common:inscriptionContentMethod>
             <collectionobjects_common:fieldCollectionPlace></collectionobjects_common:fieldCollectionPlace>
             <collectionobjects_common:viewersContributionNote>You got the basic details down - it was horrible, what else can I say</collectionobjects_common:viewersContributionNote>
             <collectionobjects_common:fieldCollectionMethods>
@@ -238,7 +248,6 @@
                 <techniqueType></techniqueType>
               </techniqueGroup>
             </collectionobjects_common:techniqueGroupList>
-            <collectionobjects_common:inscriptionDescriptionDate></collectionobjects_common:inscriptionDescriptionDate>
             <collectionobjects_common:assocConceptGroupList/>
             <collectionobjects_common:contentPeoples>
               <contentPeople></contentPeople>
@@ -252,7 +261,6 @@
             <collectionobjects_common:fieldCollectionSources>
               <fieldCollectionSource></fieldCollectionSource>
             </collectionobjects_common:fieldCollectionSources>
-            <collectionobjects_common:inscriptionContentScript>gothic-script</collectionobjects_common:inscriptionContentScript>
             <collectionobjects_common:sex>female</collectionobjects_common:sex>
             <collectionobjects_common:materialGroupList>
               <materialGroup>
