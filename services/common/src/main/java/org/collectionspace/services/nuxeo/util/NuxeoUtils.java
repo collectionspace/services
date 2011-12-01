@@ -91,7 +91,10 @@ public class NuxeoUtils {
     
     // Regular expressions pattern for identifying valid ORDER BY clauses.
     // FIXME: Currently supports only USASCII word characters in field names.
-    private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?(, \\w+(_\\w+)?:\\w+( ASC| DESC)?)*";    
+    //private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?(, \\w+(_\\w+)?:\\w+( ASC| DESC)?)*";    
+		// Allow paths so can sort on complex fields. CSPACE-4601
+    private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?(, \\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?)*";
+		
 
     public static void exportDocModel(DocumentModel src) {
     	DocumentReader reader = null;
