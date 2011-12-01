@@ -81,9 +81,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     private String lendersContactRefName = null;
     private String loanInContactRefName = null;
     private String borrowersAuthorizerRefName = null;
-    // FIXME: Value changed from 5 to 2 when repeatable / multivalue 'lenders'
-    // group was added to tenant-bindings.xml
-    private final int NUM_AUTH_REFS_EXPECTED = 2;
+    private final int NUM_AUTH_REFS_EXPECTED = 5;
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.currentDateUTC();
 
@@ -209,8 +207,6 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
 
         // FIXME: Add instance(s) of 'lenders' field when we can work with
         // repeatable / multivalued authority reference fields.  Be sure to
-        // change the NUM_AUTH_REFS_EXPECTED constant accordingly, or otherwise
-        // revise check for numbers of authority fields expected in readAndCheckAuthRefs.
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
