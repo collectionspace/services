@@ -458,7 +458,6 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
             "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
                
         // Check a sample of one or more person authority ref fields
-        // Assert.assertEquals(collectionObject.getInscriptionContentInscriber(), contentInscriberRefName);
         // Assert.assertEquals(collectionObject.getAssocPersons().getAssocPerson().get(0), assocPersonRefName);
         Assert.assertEquals(collectionObject.getOwners().getOwner().get(0), ownerRefName);
         Assert.assertEquals(collectionObject.getFieldCollectionSources().getFieldCollectionSource().get(0), fieldCollectionSourceRefName);

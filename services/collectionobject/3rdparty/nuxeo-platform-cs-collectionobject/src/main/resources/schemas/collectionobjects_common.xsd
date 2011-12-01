@@ -150,33 +150,54 @@
     </xs:element>
 
     <!-- Object description Inscription - Content Information -->
+    <xs:element name="textualInscriptionGroupList" type="textualInscriptionGroupList"/>
+    <xs:complexType name="textualInscriptionGroupList">
+        <xs:sequence>
+            <xs:element name="textualInscriptionGroup" type="textualInscriptionGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- FIXME Consider whether changes to field names below are required -->
     <!-- in response to the renaming of this group to Textual inscription -->
-    <xs:element name="inscriptionContent" type="xs:string"/>
-    <xs:element name="inscriptionContentInscriber" type="xs:string"/>
-    <xs:element name="inscriptionContentDate" type="xs:string"/>
-    <xs:element name="inscriptionContentInterpretation" type="xs:string"/>
-    <xs:element name="inscriptionContentLanguage" type="xs:string"/>
-    <xs:element name="inscriptionContentMethod" type="xs:string"/>
-    <xs:element name="inscriptionContentPosition" type="xs:string"/>
-    <xs:element name="inscriptionContentScript" type="xs:string"/>
-    <xs:element name="inscriptionContentTranslation" type="xs:string"/>
-    <xs:element name="inscriptionContentTransliteration" type="xs:string"/>
-    <xs:element name="inscriptionContentType" type="xs:string"/>
+    <xs:complexType name="textualInscriptionGroup">
+        <xs:sequence>
+            <xs:element name="inscriptionContent" type="xs:string"/>
+            <xs:element name="inscriptionContentInscriber" type="xs:string"/>
+            <xs:element name="inscriptionContentDate" type="xs:string"/>
+            <xs:element name="inscriptionContentInterpretation" type="xs:string"/>
+            <xs:element name="inscriptionContentLanguage" type="xs:string"/>
+            <xs:element name="inscriptionContentMethod" type="xs:string"/>
+            <xs:element name="inscriptionContentPosition" type="xs:string"/>
+            <xs:element name="inscriptionContentScript" type="xs:string"/>
+            <xs:element name="inscriptionContentTranslation" type="xs:string"/>
+            <xs:element name="inscriptionContentTransliteration" type="xs:string"/>
+            <xs:element name="inscriptionContentType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- Object Description Inscription - Description Information -->
+    <xs:element name="nonTextualInscriptionGroupList" type="nonTextualInscriptionGroupList"/>
+    <xs:complexType name="nonTextualInscriptionGroupList">
+        <xs:sequence>
+            <xs:element name="nonTextualInscriptionGroup" type="nonTextualInscriptionGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- FIXME Consider whether changes to field names below are required -->
     <!-- in response to the renaming of this group to Non-textual inscription -->
-    <xs:element name="inscriptionDescription" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionInscriber" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionDate" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionInterpretation" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionMethod" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionPosition" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionType" type="xs:string"/>
-
+    <xs:complexType name="nonTextualInscriptionGroup">
+        <xs:sequence>
+            <xs:element name="inscriptionDescription" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionInscriber" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionDate" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionInterpretation" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionMethod" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionPosition" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
     <!-- Object Description Material Information -->
 
     <xs:element name="materialGroupList" type="materialGroupList"/>
