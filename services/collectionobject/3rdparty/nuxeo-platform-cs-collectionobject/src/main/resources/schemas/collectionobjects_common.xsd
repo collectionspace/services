@@ -300,9 +300,7 @@
     </xs:element>
     <xs:element name="ownershipAccess" type="xs:string"/>
     <xs:element name="ownershipCategory" type="xs:string"/>
-    <!-- FIXME Make into a repeatable, structured date ("date units of information") -->
-    <!-- field, when structured dates are introduced -->
-    <xs:element name="ownershipDates" type="xs:string"/>
+    <xs:element name="ownershipDateGroupList" type="ownershipDateGroupList"/>
     <xs:element name="ownershipExchangeMethod" type="xs:string"/>
     <xs:element name="ownershipExchangeNote" type="xs:string"/>
     <xs:element name="ownershipExchangePriceCurrency" type="xs:string"/>
@@ -758,6 +756,13 @@
             <xs:element name="assocPlace" type="xs:string"/>
             <xs:element name="assocPlaceType" type="xs:string"/>
             <xs:element name="assocPlaceNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="ownershipDateGroupList">
+        <xs:sequence>
+            <xs:element name="ownershipDateGroup" type="structuredDateGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
