@@ -27,6 +27,7 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -277,10 +278,16 @@ public abstract class ResourceBase
         // perform a keyword search
         if (keywords != null && !keywords.isEmpty()) {
             String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-            DocumentFilter documentFilter = handler.getDocumentFilter();
-            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
-            if (logger.isDebugEnabled()) {
-                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+            if(Tools.isEmpty(whereClause)) {
+                if (logger.isDebugEnabled()) {
+                	logger.debug("The WHERE clause is empty for keywords: ["+keywords+"]");
+                }
+            } else {
+	            DocumentFilter documentFilter = handler.getDocumentFilter();
+	            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+	            }
             }
         }
         if (advancedSearch != null && !advancedSearch.isEmpty()) {
