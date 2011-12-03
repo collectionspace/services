@@ -65,7 +65,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern kwdTokenizer = Pattern.compile("(?:(['\"])(.*?)(?<!\\\\)(?>\\\\\\\\)*\\1|([^ ]+))");
 	private static Pattern unescapedDblQuotes = Pattern.compile("(?<!\\\\)\"");
 	private static Pattern unescapedSingleQuote = Pattern.compile("(?<!\\\\)'");
-	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)]");
+	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%]");
 	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
 
 	private static String getLikeForm() {
@@ -157,8 +157,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	@Override
 	public String createWhereClauseFromKeywords(String keywords) {
 		String result = null;
-		StringBuffer fullTextWhereClause = new StringBuffer(SEARCH_GROUP_OPEN);
-		// StringBuffer phraseWhereClause = new StringBuffer(SEARCH_GROUP_OPEN);
+		StringBuffer fullTextWhereClause = new StringBuffer();
 		// Split on unescaped double quotes to handle phrases
 		Matcher regexMatcher = kwdTokenizer.matcher(keywords.trim());
 		boolean addNOT = false;
@@ -177,16 +176,6 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 				addNOT = true;
 				continue;
 			}
-			if (newWordSet) {
-				fullTextWhereClause.append(ECM_FULLTEXT_LIKE + "'");
-				newWordSet = false;
-			} else {
-				fullTextWhereClause.append(SEARCH_TERM_SEPARATOR);
-			}
-			if(addNOT) {
-				fullTextWhereClause.append("-");	// Negate the next term
-				addNOT = false;
-			}
 			// Next comment block of questionable value...
 			
 			// ignore the special chars except single quote here - can't hurt
@@ -198,17 +187,36 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 			// which triggers the back-up search. We can think about whether
 			// stripping
 			// short words not in a quoted phrase should trigger the backup.
-			phrase = unescapedSingleQuote.matcher(phrase).replaceAll("\\\\'");
+			String escapedAndTrimmed = unescapedSingleQuote.matcher(phrase).replaceAll("\\\\'");
 			// If there are non-word chars in the phrase, we need to match the
 			// phrase exactly against the fulltext table for this object
 			// if(nonWordChars.matcher(trimmed).matches()) {
 			// }
 			// Replace problem chars with spaces. Patches CSPACE-4147,
 			// CSPACE-4106
-			phrase = kwdSearchProblemChars.matcher(phrase).replaceAll(" ");
-			phrase = kwdSearchHyphen.matcher(phrase).replaceAll(" ");
+			escapedAndTrimmed = kwdSearchProblemChars.matcher(escapedAndTrimmed).replaceAll(" ").trim();
+			escapedAndTrimmed = kwdSearchHyphen.matcher(escapedAndTrimmed).replaceAll(" ").trim();
+			if(escapedAndTrimmed.isEmpty()) {
+				if (logger.isDebugEnabled() == true) {
+					logger.debug("Phrase reduced to empty after replacements: " + phrase);
+				}
+				continue;
+			}
 
-			fullTextWhereClause.append(phrase);
+			if (fullTextWhereClause.length()==0) {
+				fullTextWhereClause.append(SEARCH_GROUP_OPEN);
+			}
+			if (newWordSet) {
+				fullTextWhereClause.append(ECM_FULLTEXT_LIKE + "'");
+				newWordSet = false;
+			} else {
+				fullTextWhereClause.append(SEARCH_TERM_SEPARATOR);
+			}
+			if(addNOT) {
+				fullTextWhereClause.append("-");	// Negate the next term
+				addNOT = false;
+			}
+			fullTextWhereClause.append(escapedAndTrimmed);
 			
 			if (logger.isTraceEnabled() == true) {
 				logger.trace("Current built whereClause is: "
@@ -216,71 +224,12 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 			}
 		}
 		if (fullTextWhereClause.length()==0) {
-			throw new RuntimeException(
-					"No usable keywords specified in string:[" + keywords + "]");
-		}
-		fullTextWhereClause.append("'" + SEARCH_GROUP_CLOSE);
-
-		result = fullTextWhereClause.toString();
-		if (logger.isDebugEnabled()) {
-			logger.debug("Final built WHERE clause is: " + result);
-		}
-
-		return result;
-	}
-
-	public String createWhereClauseFromKeywordsOld(String keywords) {
-		String result = null;
-		StringBuffer fullTextWhereClause = new StringBuffer(SEARCH_GROUP_OPEN);
-		// StringBuffer phraseWhereClause = new StringBuffer(SEARCH_GROUP_OPEN);
-		boolean phrasesToAdd = false;
-		// Split on unescaped double quotes to handle phrases
-		String[] phrases = unescapedDblQuotes.split(keywords.trim());
-		boolean first = true;
-		for (String phrase : phrases) {
-			String trimmed = phrase.trim();
-			// Ignore empty strings from match, or goofy input
-			if (trimmed.isEmpty())
-				continue;
-			// Add the phrase to the string to pass in for full text matching.
-			// Note that we can pass in a set of words and it will do the OR for
-			// us.
-			if (first) {
-				fullTextWhereClause.append(ECM_FULLTEXT_LIKE + "'");
-				first = false;
-			} else {
-				fullTextWhereClause.append(SEARCH_TERM_SEPARATOR);
+			if (logger.isDebugEnabled() == true) {
+				logger.debug("No usable keywords specified in string:[" + keywords + "]");
 			}
-			// ignore the special chars except single quote here - can't hurt
-			// TODO this should become a special function that strips things the
-			// fulltext will ignore, including non-word chars and too-short
-			// words,
-			// and escaping single quotes. Can return a boolean for anything
-			// stripped,
-			// which triggers the back-up search. We can think about whether
-			// stripping
-			// short words not in a quoted phrase should trigger the backup.
-			trimmed = unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'");
-			// If there are non-word chars in the phrase, we need to match the
-			// phrase exactly against the fulltext table for this object
-			// if(nonWordChars.matcher(trimmed).matches()) {
-			// }
-			// Replace problem chars with spaces. Patches CSPACE-4147,
-			// CSPACE-4106
-			trimmed = kwdSearchProblemChars.matcher(trimmed).replaceAll(" ");
-			trimmed = kwdSearchHyphen.matcher(trimmed).replaceAll(" ");
-
-			fullTextWhereClause.append(trimmed);
-			if (logger.isTraceEnabled() == true) {
-				logger.trace("Current built whereClause is: "
-						+ fullTextWhereClause.toString());
-			}
+		} else {
+			fullTextWhereClause.append("'" + SEARCH_GROUP_CLOSE);
 		}
-		if (first) {
-			throw new RuntimeException(
-					"No usable keywords specified in string:[" + keywords + "]");
-		}
-		fullTextWhereClause.append("'" + SEARCH_GROUP_CLOSE);
 
 		result = fullTextWhereClause.toString();
 		if (logger.isDebugEnabled()) {
