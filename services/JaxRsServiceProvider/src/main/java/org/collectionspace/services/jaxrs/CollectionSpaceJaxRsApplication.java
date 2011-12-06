@@ -92,8 +92,8 @@ public class CollectionSpaceJaxRsApplication extends Application
     	//
     	// Instantiate all our JaxRS resources
     	//
-    	ResourceBase resource;
         singletons.add(new SecurityInterceptor());
+        
         singletons.add(new AccountResource());
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());

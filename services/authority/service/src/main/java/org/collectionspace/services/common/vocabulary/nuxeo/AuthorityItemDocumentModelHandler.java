@@ -269,7 +269,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             // AuthorityResource.getRefPropName()
             String refNameProp = ServiceBindingUtils.AUTH_REF_PROP;
 
-            int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient,
+            int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient, this.getRepositorySession(),
                     oldRefNameOnUpdate, newRefNameOnUpdate, refNameProp);
             if (logger.isDebugEnabled()) {
                 logger.debug("Updated " + nUpdated + " instances of oldRefName to newRefName");

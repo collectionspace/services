@@ -27,16 +27,23 @@
  */
 package org.collectionspace.services.common.security;
 
+import java.security.Principal;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ServerResponse;
+import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
 import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 import org.jboss.resteasy.annotations.interception.SecurityPrecedence;
 import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
+import org.nuxeo.runtime.api.Framework;
 
+import javax.security.auth.Subject;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -58,11 +65,26 @@ import org.slf4j.LoggerFactory;
 @SecurityPrecedence
 @ServerInterceptor
 @Provider
-public class SecurityInterceptor implements PreProcessInterceptor {
+public class SecurityInterceptor implements PreProcessInterceptor, PostProcessInterceptor {
+	
+	static {
+		System.err.println("Static initializtion of: " + SecurityInterceptor.class.getCanonicalName());
+	}
 
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
 	private static final String ACCOUNT_PERMISSIONS = "accounts/*/accountperms";
+    //
+    // Use this thread specific member instance to hold our login context with Nuxeo
+    //
+    private static ThreadLocal<LoginContext> threadLocalLoginContext = null;
+    private static int frameworkLogins = 0;
+    //
+    // Error messages
+    //
+    private static final String ERROR_NUXEO_LOGOUT = "Attempt to logout when Nuxeo login context was null";
+    private static final String ERROR_UNBALANCED_LOGINS = "The number of Logins vs Logouts to the Nuxeo framework was unbalanced.";    
+	
 
 	/* (non-Javadoc)
 	 * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest, org.jboss.resteasy.core.ResourceMethod)
@@ -121,6 +143,11 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 				}
 			}
 			//
+			// Login to Nuxeo
+			//
+			nuxeoPreProcess(request, method);
+			
+			//
 			// We've passed all the checks.  Now just log the results
 			//
 			if (logger.isTraceEnabled()) {
@@ -132,6 +159,14 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 		
 		return null;
 	}
+	
+	@Override
+	public void postProcess(ServerResponse arg0) {
+		//
+		// Log out of the Nuxeo framework
+		//
+		nuxeoPostProcess(arg0);
+	}	
 
 	/**
 	 * checkActive check if account is active
@@ -173,4 +208,92 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 			throw new WebApplicationException(response);
 		}
 	}
+	//
+	// Nuxeo login support
+	//
+	public ServerResponse nuxeoPreProcess(HttpRequest arg0, ResourceMethod arg1)
+			throws Failure, WebApplicationException {
+		try {
+			nuxeoLogin();
+		} catch (LoginException e) {
+			String msg = "Unable to login to the Nuxeo framework";
+			logger.error(msg, e);
+			Response response = Response.status(
+					Response.Status.INTERNAL_SERVER_ERROR).entity(msg).type("text/plain").build();
+			throw new WebApplicationException(response);
+		}
+		
+		return null;
+	}
+	
+	public void nuxeoPostProcess(ServerResponse arg0) {
+		try {
+			nuxeoLogout();
+		} catch (LoginException e) {
+			String msg = "Unable to logout of the Nuxeo framework";
+			logger.error(msg, e);
+		}
+	}	
+
+    private synchronized void nuxeoLogin() throws LoginException {
+    	//
+    	// Login as the Nuxeo system/admin user
+    	nuxeoLogin(null);
+    }
+    
+    private void logLoginContext(LoginContext loginContext) {
+		logger.info("CollectionSpace services now logged in to Nuxeo with LoginContext: "
+				+ loginContext);
+		Subject subject = loginContext.getSubject();
+		Set<Principal> principals = subject.getPrincipals();
+		logger.debug("Nuxeo login performed with principals: ");
+		for (Principal principal : principals) {
+			logger.debug("[" + principal.getName() + "]");
+		}
+    }
+    
+    /*
+     * Login to Nuxeo and save the LoginContext instance in a thread local variable
+     */
+    private synchronized void nuxeoLogin(String user) throws LoginException {
+    	//
+    	// Use a ThreadLocal instance to keep track of the Nuxeo login context
+    	//
+    	if (threadLocalLoginContext == null) {
+    		threadLocalLoginContext = new ThreadLocal<LoginContext>();
+    		System.err.println("Created ThreadLocal instance: "
+    				+ threadLocalLoginContext.getClass().getCanonicalName()
+    				+ " - "
+    				+ threadLocalLoginContext.get());
+    	}
+    	LoginContext loginContext = threadLocalLoginContext.get();
+    	if (loginContext == null) {
+    		loginContext = Framework.loginAs(user);
+    		frameworkLogins++;
+    		threadLocalLoginContext.set(loginContext);
+    		System.err.println("Setting ThreadLocal instance: "
+    				+ threadLocalLoginContext.getClass().getCanonicalName()
+    				+ " - "
+    				+ threadLocalLoginContext.get());
+        	//
+        	// Debug message
+        	//
+    		if (logger.isDebugEnabled() == true) {
+    			logLoginContext(loginContext);
+    		}
+    	}
+    }
+    
+    public synchronized void nuxeoLogout() throws LoginException {
+    	LoginContext loginContext = threadLocalLoginContext != null ? threadLocalLoginContext.get() : null; 
+        if (loginContext != null) {
+            loginContext.logout();
+            frameworkLogins--;
+
+        } else {
+        	logger.warn(ERROR_NUXEO_LOGOUT);
+        }
+        
+        threadLocalLoginContext = null; //Clear the ThreadLocal to void Tomcat warnings associated with thread pools.
+    }	
 }

@@ -35,6 +35,8 @@ public class NuxeoConnectorEmbedded {
 
 	public final static String NUXEO_CLIENT_DIR = "nuxeo-client";
 	public final static String NUXEO_SERVER_DIR = "nuxeo-server";
+	private final static String ERROR_CONNECTOR_NOT_INITIALIZED = "NuxeoConnector is not initialized!";
+
 
 	private static final String HOST = "127.0.0.1";
 	private static final int PORT = 62474;
@@ -212,11 +214,6 @@ public class NuxeoConnectorEmbedded {
 			logger.debug("getRepositorySession() opened repository session");
 		}
 		return repoSession;
-
-		// Repository repository =
-		// Framework.getService(RepositoryManager.class).getDefaultRepository();
-		// session = repository.open();
-
 	}
 
 	/**
@@ -229,7 +226,7 @@ public class NuxeoConnectorEmbedded {
 	public NuxeoClientEmbedded getClient() throws Exception {
 		if (initialized == true) {
 			if (client.isConnected()) {
-				client.login();
+//				client.login();
 				return client;
 			} else {
 				client.forceConnect(this.HOST,
@@ -241,9 +238,23 @@ public class NuxeoConnectorEmbedded {
 				return client;
 			}
 		}
-		String msg = "NuxeoConnector is not initialized!";
-		logger.error(msg);
-		throw new IllegalStateException(msg);
+		//
+		// Nuxeo connection was not initialized
+		//
+		logger.error(ERROR_CONNECTOR_NOT_INITIALIZED);
+		throw new IllegalStateException(ERROR_CONNECTOR_NOT_INITIALIZED);
+	}
+	
+	void releaseClient() throws Exception {
+		if (initialized == true) {
+//			client.logout();
+		} else {
+			//
+			// Nuxeo connection was not initialized
+			//
+			logger.error(ERROR_CONNECTOR_NOT_INITIALIZED);
+			throw new IllegalStateException(ERROR_CONNECTOR_NOT_INITIALIZED);
+		}
 	}
 
 	/**

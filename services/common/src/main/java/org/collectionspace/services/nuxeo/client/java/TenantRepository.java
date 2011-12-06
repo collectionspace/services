@@ -24,6 +24,9 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.Hashtable;
+
+import javax.security.auth.login.LoginContext;
+
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.RepositoryClientConfigType;
@@ -33,6 +36,7 @@ import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.tenant.RepositoryDomainType;
+import org.nuxeo.runtime.api.Framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,9 +80,17 @@ public class TenantRepository {
      */
     synchronized public void setup(Hashtable<String, TenantBindingType> tenantBindings)
             throws Exception {
-        for (TenantBindingType tenantBinding : tenantBindings.values()) {
-            setup(tenantBinding);
-        }
+    	LoginContext loginContext = null;
+    	try {
+	    	loginContext = Framework.login();
+	        for (TenantBindingType tenantBinding : tenantBindings.values()) {
+	            setup(tenantBinding);
+	        }
+    	} finally {
+    		if (loginContext != null) {
+    			loginContext.logout();
+    		}
+    	}
     }
 
     /**

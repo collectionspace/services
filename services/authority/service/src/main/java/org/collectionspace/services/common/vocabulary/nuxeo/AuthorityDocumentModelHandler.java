@@ -25,16 +25,21 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import java.util.Map;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 /**
  * AuthorityDocumentModelHandler
@@ -118,14 +123,25 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         docModel.setProperty(schemaName, AuthorityJAXBSchema.REF_NAME, refName);
     }
 
-    public String getShortIdentifier(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) {
-        DocumentModel docModel = wrapDoc.getWrappedObject();
+    public String getShortIdentifier(String authCSID, String schemaName) throws Exception {
         String shortIdentifier = null;
+        RepositoryInstance repoSession = null;
+
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+    	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
         try {
+        	repoSession = nuxeoRepoClient.getRepositorySession();
+            DocumentWrapper<DocumentModel> wrapDoc = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, authCSID);
+            DocumentModel docModel = wrapDoc.getWrappedObject();
             shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         } catch (ClientException ce) {
             throw new RuntimeException("AuthorityDocHandler Internal Error: cannot get shortId!", ce);
+        } finally {
+        	if (repoSession != null) {
+        		nuxeoRepoClient.releaseRepositorySession(repoSession);
+        	}
         }
+        
         return shortIdentifier;
     }
 

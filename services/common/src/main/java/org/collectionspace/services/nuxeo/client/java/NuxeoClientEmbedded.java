@@ -59,6 +59,7 @@ import org.nuxeo.runtime.api.login.SecurityDomain;
 import org.nuxeo.runtime.config.AutoConfigurationService;
 import org.nuxeo.runtime.remoting.RemotingService;
 import org.nuxeo.runtime.services.streaming.StreamingService;
+import org.nuxeo.runtime.transaction.TransactionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +72,6 @@ public final class NuxeoClientEmbedded {
 	private Logger logger = LoggerFactory.getLogger(NuxeoClientEmbedded.class);
 	
     private LoginHandler loginHandler;
-    
-    private LoginContext loginContext = null;
 
     private final List<RepositoryInstance> repositoryInstances;
 
@@ -182,6 +181,7 @@ public final class NuxeoClientEmbedded {
         doConnect(locator);
     }
 
+    @Deprecated
     private void doConnect(InvokerLocator locator) throws Exception {
         this.locator = locator;
         try {
@@ -218,7 +218,10 @@ public final class NuxeoClientEmbedded {
                 adaptClientSecurityDomain(clientDomain);
             }
             // ----------------
-            login();
+//            login();
+            if (!multiThreadedLogin) {
+            	throw new RuntimeException("This coode is dead and should never be called?"); //FIXME: REM - If you're reading this, this was left here by mistake and should be removed.
+            }
         } catch (Exception e) {
             this.locator = null;
             throw e;
@@ -272,6 +275,7 @@ public final class NuxeoClientEmbedded {
         doDisconnect();
     }
 
+    @Deprecated
     private void doDisconnect() throws Exception {
         locator = null;
         serverName = null;
@@ -287,7 +291,10 @@ public final class NuxeoClientEmbedded {
             it.remove();
         }
         // logout
-        logout();
+//        logout();
+        if (!multiThreadedLogin) {
+        	throw new RuntimeException("This coode is dead and should never be called?"); //FIXME: REM - If you're reading this, this was left here by mistake and should be removed.
+        }
         repositoryMgr = null;
         fireDisconnected(this);
     }
@@ -350,31 +357,6 @@ public final class NuxeoClientEmbedded {
         this.loginHandler = loginHandler;
     }
 
-    public synchronized void login() throws LoginException {
-    	//
-    	// Login as the Nuxeo system/admin user
-    	this.login(null);
-    }
-    
-    public synchronized void login(String user) throws LoginException {    	
-    		loginContext = Framework.loginAs(user);
-    		if (logger.isDebugEnabled() == true) {
-    			Subject subject = loginContext.getSubject();
-    			Set<Principal> principals = subject.getPrincipals();
-    			logger.debug("Nuxeo login performed with principals: ");
-    			for (Principal principal : principals) {
-    				logger.debug("[" + principal.getName() + "]");
-    			}
-    		}
-    }
-
-    public synchronized void logout() throws LoginException {
-        if (loginContext != null) {
-            loginContext.logout();
-            loginContext = null;
-        }
-    }
-
     public RepositoryManager getRepositoryManager() throws Exception {
         if (repositoryMgr == null) {
             repositoryMgr = Framework.getService(RepositoryManager.class);
@@ -405,6 +387,11 @@ public final class NuxeoClientEmbedded {
     }
 
     public RepositoryInstance openRepository(String name) throws Exception {
+    	boolean startTransaction = TransactionHelper.startTransaction();
+    	if (startTransaction == false) {
+    		logger.warn("Could not start a Nuxeo transaction with the TransactionHelper class.");
+    	}
+    	
         Repository repository = null;
         if (name != null) {
         	repository = getRepositoryManager().getRepository(name);
@@ -422,6 +409,7 @@ public final class NuxeoClientEmbedded {
             repo.close();
         } finally {
             repositoryInstances.remove(repo);
+            TransactionHelper.commitOrRollbackTransaction();
         }
     }
 
@@ -457,6 +445,5 @@ public final class NuxeoClientEmbedded {
         for (Object listener : listeners) {
 //            ((ConnectionListener) listener).connected(client);
         }
-    }
-
+    }    
 }

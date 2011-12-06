@@ -67,6 +67,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import org.nuxeo.ecm.core.schema.types.Schema;
 
@@ -388,7 +389,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      */
     @Override
     public AuthorityRefList getAuthorityRefs(
-            DocumentWrapper<DocumentModel> docWrapper,
+            String csid,
             List<AuthRefConfigInfo> authRefsInfo) throws PropertyException {
 
         AuthorityRefList authRefList = new AuthorityRefList();
@@ -402,7 +403,6 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         commonList.setPageSize(pageSize);
         
         List<AuthorityRefList.AuthorityRefItem> list = authRefList.getAuthorityRefItem();
-        DocumentModel docModel = docWrapper.getWrappedObject();
 
         try {
         	int iFirstToUse = (int)(pageSize*pageNum);
@@ -411,18 +411,35 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	
         	ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps 
         		= new ArrayList<RefNameServiceUtils.AuthRefInfo>();
-           	RefNameServiceUtils.findAuthRefPropertiesInDoc(docModel, authRefsInfo, null, foundProps);
-           	// Slightly goofy pagination support - how many refs do we expect from one object?
-           	for(RefNameServiceUtils.AuthRefInfo ari:foundProps) {
-       			if((nFoundTotal >= iFirstToUse) && (nFoundInPage < pageSize)) {
-       				if(appendToAuthRefsList(ari, list)) {
-           				nFoundInPage++;
-               			nFoundTotal++;
-       				}
-       			} else {
-       				nFoundTotal++;
-       			}
-           	}
+        	
+        	boolean releaseRepoSession = false;
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+        	RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+        	RepositoryInstance repoSession = this.getRepositorySession();
+        	if (repoSession == null) {
+        		repoSession = repoClient.getRepositorySession();
+        		releaseRepoSession = true;
+        	}
+        	
+        	try {
+        		DocumentModel docModel = repoClient.getDoc(repoSession, ctx, csid).getWrappedObject();
+	           	RefNameServiceUtils.findAuthRefPropertiesInDoc(docModel, authRefsInfo, null, foundProps);
+	           	// Slightly goofy pagination support - how many refs do we expect from one object?
+	           	for(RefNameServiceUtils.AuthRefInfo ari:foundProps) {
+	       			if((nFoundTotal >= iFirstToUse) && (nFoundInPage < pageSize)) {
+	       				if(appendToAuthRefsList(ari, list)) {
+	           				nFoundInPage++;
+	               			nFoundTotal++;
+	       				}
+	       			} else {
+	       				nFoundTotal++;
+	       			}
+	           	}
+        	} finally {
+        		if (releaseRepoSession == true) {
+        			repoClient.releaseRepositorySession(repoSession);
+        		}
+        	}
         	
             // Set num of items in list. this is useful to our testing framework.
             commonList.setItemsInPage(nFoundInPage);

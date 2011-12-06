@@ -83,10 +83,9 @@ public abstract class DocumentModelHandler<T, TL>
     public String getUri(DocumentModel docModel) {
         return getServiceContextPath()+getCsid(docModel);
     }
-    
-    
-    public RepositoryClient getRepositoryClient(ServiceContext ctx) {
-        RepositoryClient repositoryClient = RepositoryClientFactory.getInstance().getClient(ctx.getRepositoryClientName());
+        
+    public RepositoryClient<PoxPayloadIn, PoxPayloadOut> getRepositoryClient(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+        RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient = RepositoryClientFactory.getInstance().getClient(ctx.getRepositoryClientName());
         return repositoryClient;
     }
 
@@ -95,6 +94,7 @@ public abstract class DocumentModelHandler<T, TL>
      * @return
      */
     public RepositoryInstance getRepositorySession() {
+    	
         return repositorySession;
     }
 
@@ -184,15 +184,14 @@ public abstract class DocumentModelHandler<T, TL>
      * @return the authority refs
      * @throws PropertyException the property exception
      */
-    abstract public AuthorityRefList getAuthorityRefs(
-            DocumentWrapper<DocumentModel> docWrapper,
-            List<AuthRefConfigInfo> authRefsInfo) throws PropertyException;    
+    abstract public AuthorityRefList getAuthorityRefs(String csid,
+    		List<AuthRefConfigInfo> authRefsInfo) throws PropertyException;    
 
     private void handleCoreValues(DocumentWrapper<DocumentModel> docWrapper, 
     		Action action)  throws ClientException {
     	DocumentModel documentModel = docWrapper.getWrappedObject();
         String now = GregorianCalendarDateTimeUtils.timestampUTC();
-    	ServiceContext ctx = getServiceContext();
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
     	String userId = ctx.getUserId();
     	if(action==Action.CREATE) {
             //

@@ -342,10 +342,9 @@ public abstract class ResourceBase
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
-            DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDoc(ctx, csid);
             DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> handler = (DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>) createDocumentHandler(ctx);
             List<AuthRefConfigInfo> authRefsInfo = RefNameServiceUtils.getConfiguredAuthorityRefs(ctx);
-            authRefList = handler.getAuthorityRefs(docWrapper, authRefsInfo);
+            authRefList = handler.getAuthorityRefs(csid, authRefsInfo);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.AUTH_REFS_FAILED, csid);
         }

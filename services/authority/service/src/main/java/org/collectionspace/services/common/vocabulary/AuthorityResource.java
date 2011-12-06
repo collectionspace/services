@@ -56,6 +56,7 @@ import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentMod
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
@@ -234,10 +235,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             throws DocumentNotFoundException, DocumentException {
         String shortIdentifier = null;
         try {
-            DocumentWrapper<DocumentModel> wrapDoc = getRepositoryClient(ctx).getDocFromCsid(ctx, authCSID);
             AuthorityDocumentModelHandler<?> handler =
                     (AuthorityDocumentModelHandler<?>) createDocumentHandler(ctx);
-            shortIdentifier = handler.getShortIdentifier(wrapDoc, authorityCommonSchemaName);
+            shortIdentifier = handler.getShortIdentifier(authCSID, authorityCommonSchemaName);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
@@ -801,14 +801,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
             ctx = createServiceContext(getItemServiceName(), queryParams);
             // We omit the parentShortId, only needed when doing a create...
-            RemoteDocumentModelHandlerImpl handler =
-                    (RemoteDocumentModelHandlerImpl) createItemDocumentHandler(ctx, parentcsid, null);
+            DocumentModelHandler handler =
+                    (DocumentModelHandler)createItemDocumentHandler(ctx, parentcsid, null);
 
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getAuthorityItemAuthRefs(item)", "GET_ITEM_AUTH_REFS", ctx);
 
-            DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDoc(ctx, itemcsid);
             List<RefNameServiceUtils.AuthRefConfigInfo> authRefsInfo = RefNameServiceUtils.getConfiguredAuthorityRefs(ctx);
-            authRefList = handler.getAuthorityRefs(docWrapper, authRefsInfo);
+            authRefList = handler.getAuthorityRefs(itemcsid, authRefsInfo);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED + " parentspecifier: " + parentspecifier + " itemspecifier:" + itemspecifier);
         }

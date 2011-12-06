@@ -57,8 +57,10 @@ import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -111,17 +113,19 @@ public class RelationDocumentModelHandler
         // we will also set those.
         // Note that this introduces another caching problem... 
         DocumentModel relationDocModel = wrapDoc.getWrappedObject();
-        ServiceContext ctx = getServiceContext();
-        DocumentModel subjectDocModel = getSubjectOrObjectDocModel(relationDocModel, ctx, SUBJ_DOC_MODEL);
-        DocumentModel objectDocModel = getSubjectOrObjectDocModel(relationDocModel, ctx, OBJ_DOC_MODEL);
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+        RepositoryInstance repoSession = this.getRepositorySession();
+        
+        DocumentModel subjectDocModel = getSubjectOrObjectDocModel(relationDocModel, SUBJ_DOC_MODEL);
+        DocumentModel objectDocModel = getSubjectOrObjectDocModel(relationDocModel, OBJ_DOC_MODEL);
 
         // Use values from the subject and object document models to populate the
         // relevant fields of the relation's own document model.
         if (subjectDocModel != null) {
-            populateSubjectOrObjectValues(relationDocModel, subjectDocModel, ctx, SUBJ_DOC_MODEL);
+            populateSubjectOrObjectValues(relationDocModel, subjectDocModel, SUBJ_DOC_MODEL);
         }
         if (objectDocModel != null) {
-            populateSubjectOrObjectValues(relationDocModel, objectDocModel, ctx, OBJ_DOC_MODEL);
+            populateSubjectOrObjectValues(relationDocModel, objectDocModel, OBJ_DOC_MODEL);
         }
     }
 
@@ -243,7 +247,8 @@ public class RelationDocumentModelHandler
     }
 
     // DocumentModel itemDocModel = docModelFromCSID(ctx, itemCsid);
-    protected RelationsDocListItem createRelationsDocListItem(ServiceContext ctx,
+    protected RelationsDocListItem createRelationsDocListItem(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             ServiceBindingType sbt,
             String itemCsid,
             TenantBindingConfigReaderImpl tReader,
@@ -252,7 +257,7 @@ public class RelationDocumentModelHandler
         item.setDocumentType(documentType);//this one comes from the record, as subjectDocumentType, objectDocumentType.
         item.setCsid(itemCsid);
 
-        DocumentModel itemDocModel = NuxeoUtils.getDocFromCsid(getRepositorySession(), ctx, itemCsid);    //null if not found.
+        DocumentModel itemDocModel = NuxeoUtils.getDocFromCsid(ctx, this.getRepositorySession(), itemCsid);    //null if not found.
         if (itemDocModel != null) {
             String itemDocType = itemDocModel.getDocumentType().getName();
             if (Tools.isBlank(documentType)) {
@@ -304,7 +309,10 @@ public class RelationDocumentModelHandler
     private final boolean OBJ_DOC_MODEL = false;
     
     private DocumentModel getSubjectOrObjectDocModel(
-    		DocumentModel relationDocModel, ServiceContext ctx, boolean fSubject) throws Exception {
+    		DocumentModel relationDocModel,
+    		boolean fSubject) throws Exception {
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+    	
         // Get the document model for the object of the relation.
     	String commonPartLabel = ctx.getCommonPartLabel();
         String csid = "";
@@ -322,7 +330,8 @@ public class RelationDocumentModelHandler
             // provided as an alternate identifier.
         }
         if (Tools.notBlank(csid)) {
-            DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDocFromCsid(ctx, csid);
+        	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)getRepositoryClient(ctx);
+            DocumentWrapper<DocumentModel> docWrapper = nuxeoRepoClient.getDocFromCsid(ctx, this.getRepositorySession(), csid);
             docModel = docWrapper.getWrappedObject();
         } else { //  if (Tools.isBlank(objectCsid)) {
             try {
@@ -344,10 +353,10 @@ public class RelationDocumentModelHandler
     private void populateSubjectOrObjectValues(
     		DocumentModel relationDocModel, 
     		DocumentModel subjectOrObjectDocModel,
-    		ServiceContext ctx,
     		boolean fSubject ) {
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+    	
         HashMap<String,Object> properties = new HashMap<String,Object>();
-
         try {
 	        String doctype = (String) subjectOrObjectDocModel.getType();
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_DOCTYPE:RelationJAXBSchema.OBJECT_DOCTYPE),

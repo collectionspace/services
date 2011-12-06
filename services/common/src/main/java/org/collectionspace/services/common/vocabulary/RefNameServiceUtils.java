@@ -37,9 +37,12 @@ import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.AbstractServiceContextImpl;
@@ -188,7 +191,7 @@ public class RefNameServiceUtils {
     
     private static ArrayList<String> refNameServiceTypes = null;
     
-    public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext ctx) {
+    public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	List<String> authRefFields =
                 ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
                 ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -200,14 +203,15 @@ public class RefNameServiceUtils {
     	return authRefsInfo;
     }
 
-
-    public static AuthorityRefDocList getAuthorityRefDocs(ServiceContext ctx,
-            RepositoryClient repoClient,
+    public static AuthorityRefDocList getAuthorityRefDocs(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             List<String> serviceTypes,
             String refName,
             String refPropName,
-            int pageSize, int pageNum, boolean computeTotal) throws DocumentException, DocumentNotFoundException {
-        AuthorityRefDocList wrapperList = new AuthorityRefDocList();
+            int pageSize, int pageNum, boolean computeTotal)
+            		throws DocumentException, DocumentNotFoundException {
+    	AuthorityRefDocList wrapperList = new AuthorityRefDocList();
         AbstractCommonList commonList = (AbstractCommonList) wrapperList;
         commonList.setPageNum(pageNum);
         commonList.setPageSize(pageSize);
@@ -217,23 +221,36 @@ public class RefNameServiceUtils {
         Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
         Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<String, List<AuthRefConfigInfo>>();
 
-        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, serviceTypes, refName, refPropName,
-        		queriedServiceBindings, authRefFieldsByService, pageSize, pageNum, computeTotal);
-
-        if (docList == null) { // found no authRef fields - nothing to process
-            return wrapperList;
-        }
-        // Set num of items in list. this is useful to our testing framework.
-        commonList.setItemsInPage(docList.size());
-        // set the total result size
-        commonList.setTotalItems(docList.totalSize());
-        
-        int nRefsFound = processRefObjsDocList(docList, refName, queriedServiceBindings, authRefFieldsByService,
-				       			list, null);
-        if(logger.isDebugEnabled()  && (nRefsFound < docList.size())) {
-        	logger.debug("Internal curiosity: got fewer matches of refs than # docs matched...");
-        }
-        return wrapperList;
+        RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)repoClient;
+    	RepositoryInstance repoSession = null;
+    	try {
+    		repoSession = nuxeoRepoClient.getRepositorySession();
+	        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
+	        		serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService, pageSize, pageNum, computeTotal);
+	
+	        if (docList == null) { // found no authRef fields - nothing to process
+	            return wrapperList;
+	        }
+	        // Set num of items in list. this is useful to our testing framework.
+	        commonList.setItemsInPage(docList.size());
+	        // set the total result size
+	        commonList.setTotalItems(docList.totalSize());
+	        
+	        int nRefsFound = processRefObjsDocList(docList, refName, queriedServiceBindings, authRefFieldsByService,
+					       			list, null);
+	        if(logger.isDebugEnabled() && (nRefsFound < docList.size())) {
+	        	logger.debug("Internal curiosity: got fewer matches of refs than # docs matched...");
+	        }
+    	} catch (Exception e) {
+			logger.error("Could not retrieve the Nuxeo repository", e);
+			wrapperList = null;
+		} finally {
+    		if (repoSession != null) {
+    			nuxeoRepoClient.releaseRepositorySession(repoSession);
+    		}
+    	}
+	       
+    	return wrapperList;
     }
     
     private static ArrayList<String> getRefNameServiceTypes() {
@@ -249,8 +266,10 @@ public class RefNameServiceUtils {
     // Seems like a good value - no real data to set this well.
     private static final int N_OBJS_TO_UPDATE_PER_LOOP = 100;
     
-    public static int updateAuthorityRefDocs(ServiceContext ctx,
-            RepositoryClient repoClient,
+    public static int updateAuthorityRefDocs(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
+            RepositoryInstance repoSession,
             String oldRefName,
             String newRefName,
             String refPropName ) {
@@ -268,7 +287,8 @@ public class RefNameServiceUtils {
         		// Note that we always ask the Repo for the first page, since each page we process
         		// should not be found in successive searches. Slightly inefficient, but more
         		// reliable (stateless).
-		        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, getRefNameServiceTypes(), oldRefName, refPropName,
+		        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
+		        		getRefNameServiceTypes(), oldRefName, refPropName,
 		        		queriedServiceBindings, authRefFieldsByService, pageSize, 0, false);
 		
 		        if((docList == null) 			// found no authRef fields - nothing to do
@@ -280,7 +300,7 @@ public class RefNameServiceUtils {
 		        int nRefsFoundThisPage = processRefObjsDocList(docList, oldRefName, queriedServiceBindings, authRefFieldsByService,
 						       			null, newRefName);
 		        if(nRefsFoundThisPage>0) {
-		        	((RepositoryJavaClientImpl)repoClient).saveDocListWithoutHandlerProcessing(ctx, docList, true);
+		        	((RepositoryJavaClientImpl)repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true);
 		        	nRefsFound += nRefsFoundThisPage;
 		        }
 		        pageNumProcessed++;
@@ -293,8 +313,10 @@ public class RefNameServiceUtils {
         return nRefsFound;
     }
     
-    private static DocumentModelList findAuthorityRefDocs(ServiceContext ctx,
-            RepositoryClient repoClient,
+    private static DocumentModelList findAuthorityRefDocs(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
+            RepositoryInstance repoSession,
             List<String> serviceTypes,
             String refName,
             String refPropName,
@@ -323,7 +345,8 @@ public class RefNameServiceUtils {
             return null;
         }
         // Now we have to issue the search
-        DocumentWrapper<DocumentModelList> docListWrapper = repoClient.findDocs(ctx,
+        RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)repoClient;
+        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
                 docTypes, query, pageSize, pageNum, computeTotal);
         // Now we gather the info for each document into the list and return
         DocumentModelList docList = docListWrapper.getWrappedObject();
@@ -379,7 +402,12 @@ public class RefNameServiceUtils {
                 whereClause.append("'");
             }
         }
+        
         String whereClauseStr = whereClause.toString(); // for debugging
+        if (logger.isTraceEnabled()) {
+        	logger.trace("The 'where' clause of the xyz method is: ", whereClauseStr);
+        }
+        
         if (fFirst) { // found no authRef fields - nothing to query
             return null;
         } else {
@@ -534,17 +562,19 @@ public class RefNameServiceUtils {
     		int pathStartIndex,		// Supports recursion and we work down the path
     		String refNameToMatch
     		) {
-    	if(pathStartIndex >= arci.pathEls.length) {
+    	if (pathStartIndex >= arci.pathEls.length) {
     		throw new ArrayIndexOutOfBoundsException("Index = "+pathStartIndex+" for path: "
     												+arci.pathEls.toString());
     	}
 		AuthRefInfo ari = null;
-   		if(prop == null)
+   		if (prop == null) {
    			return foundProps;
-   		if(prop instanceof StringProperty) {	// scalar string
+   		}
+   		
+   		if (prop instanceof StringProperty) {	// scalar string
 			addARIifMatches(refNameToMatch, arci, prop, foundProps);
    		} else if(prop instanceof List) {
-   			List<Property> propList = (List)prop;
+   			List<Property> propList = (List<Property>)prop;
    			// run through list. Must either be list of Strings, or Complex
    			for (Property listItemProp : propList) {
    				if(listItemProp instanceof StringProperty) {
@@ -583,9 +613,10 @@ public class RefNameServiceUtils {
 						+arci.pathEls.toString());
 		}
 
-    	if(ari != null) {
-    		foundProps.add(ari);
+    	if (ari != null) {
+    		foundProps.add(ari); //FIXME: REM - This is dead code.  'ari' is never touched after being initalized to null.  Why?
     	}
+    	
     	return foundProps;
     }
     

@@ -391,8 +391,9 @@ public class NuxeoUtils {
         return query.toString();
     }
     
-    static public DocumentModel getDocFromCsid(RepositoryInstance repoSession,
+    static public DocumentModel getDocFromCsid(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		RepositoryInstance repoSession,
     		String csid) throws Exception {
 	    DocumentModel result = null;
 	
