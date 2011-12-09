@@ -11,7 +11,10 @@
 <Context antiResourceLocking="false" privileged="true"
   path="/cspace-services" docBase="cspace-services">
 
-<Realm className="org.apache.catalina.realm.JAASRealm"    
+	<!-- 
+		Setup the security realm for the CollectionSpace services
+	 -->
+	<Realm className="org.apache.catalina.realm.JAASRealm"    
                appName="CSpaceJBossDBLoginModule" 
                userClassNames="org.collectionspace.authentication.CSpacePrincipal"       
                roleClassNames="org.collectionspace.authentication.CSpacePrincipal"/>
@@ -29,109 +32,61 @@
   <Listener className="org.nuxeo.runtime.tomcat.NuxeoLauncher" home="${catalina.base}/nxserver" />
   -->
 
-  <!-- Define JDBC datasources: the JNDI names will be: java:comp/env/jdbc/DATABASE_NAME.
+  <!-- Define Nuxeo's JDBC datasources: the JNDI names will be: java:comp/env/jdbc/DATABASE_NAME.
     For example java:comp/env/jdbc/nxsqldirectory This means you need to update corresponding
     JNDI bindings in nuxeo data source definitions in the config directory -->
-  <Resource name="jdbc/nxsqldirectory" auth="Container" type="javax.sql.DataSource"
-    maxActive="100" maxIdle="30" maxWait="10000" driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/nuxeo?relaxAutoCommit=true"
-    username="nuxeo" password="nuxpw" />
 
-  <Resource name="jdbc/nxrelations-default-jena" auth="Container"
-    type="javax.sql.DataSource" maxActive="100" maxIdle="30" maxWait="10000"
-    driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/nuxeo?relaxAutoCommit=true"
-    username="nuxeo" password="nuxpw" />
-
-  <Resource name="jdbc/comment-relations" auth="Container" type="javax.sql.DataSource"
-    maxActive="100" maxIdle="30" maxWait="10000" driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/nuxeo?relaxAutoCommit=true"
-    username="nuxeo" password="nuxpw" />
-
-  <Resource name="jdbc/nxaudit-logs" auth="Container" type="javax.sql.DataSource"
-    maxActive="100" maxIdle="30" maxWait="10000" driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/nuxeo?relaxAutoCommit=true"
-    username="nuxeo" password="nuxpw" />
-
-  <Resource name="jdbc/nxjbpm" auth="Container" type="javax.sql.DataSource"
-    maxActive="100" maxIdle="30" maxWait="10000" driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/nuxeo?relaxAutoCommit=true"
-    username="nuxeo" password="nuxpw" />
-
-  <Resource name="jdbc/placeful_service_ds" auth="Container" type="javax.sql.DataSource"
-    maxActive="100" maxIdle="30" maxWait="10000" driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/nuxeo?relaxAutoCommit=true"
-    username="nuxeo" password="nuxpw" />
-
-  <Resource name="jdbc/nxwebwidgets" auth="Container" type="javax.sql.DataSource"
-    maxActive="100" maxIdle="30" maxWait="10000" driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/nuxeo?relaxAutoCommit=true"
-    username="nuxeo" password="nuxpw" />
-
-  <Resource name="jdbc/nxuidsequencer" auth="Container" type="javax.sql.DataSource"
-    maxActive="100" maxIdle="30" maxWait="10000" driverClassName="com.mysql.jdbc.Driver"
-    url="jdbc:mysql://localhost:3306/nuxeo?relaxAutoCommit=true"
-    username="nuxeo" password="nuxpw" />
+  <ResourceLink name="jdbc/nxsqldirectory" global="jdbc/nuxeo" type="javax.sql.DataSource" />
+  <ResourceLink name="jdbc/nxrelations-default-jena" global="jdbc/nuxeo" type="javax.sql.DataSource" />
+  <ResourceLink name="jdbc/comment-relations" global="jdbc/nuxeo" type="javax.sql.DataSource" />
+  <ResourceLink name="jdbc/nxaudit-logs" global="jdbc/nuxeo" type="javax.sql.DataSource" />
+  <ResourceLink name="jdbc/nxjbpm" global="jdbc/nuxeo" type="javax.sql.DataSource" />
+  <ResourceLink name="jdbc/placeful_service_ds" global="jdbc/nuxeo" type="javax.sql.DataSource" />
+  <ResourceLink name="jdbc/nxwebwidgets" global="jdbc/nuxeo" type="javax.sql.DataSource" />
+  <ResourceLink name="jdbc/nxuidsequencer" global="jdbc/nuxeo" type="javax.sql.DataSource" />
 
   <Resource name="TransactionManager" auth="Container"
     type="javax.transaction.TransactionManager" factory="org.nuxeo.runtime.jtajca.NuxeoTransactionManagerFactory"
     transactionTimeoutSeconds="300" />
-
   <Transaction factory="org.nuxeo.runtime.jtajca.NuxeoUserTransactionFactory" />
-
   <Resource name="NuxeoConnectionManager" auth="Container"
     type="javax.resource.spi.ConnectionManager" factory="org.nuxeo.runtime.jtajca.NuxeoConnectionManagerFactory"
     minPoolSize="0" maxPoolSize="20"
     idleTimeoutMinutes="0" />
 
   <Resource auth="Container" name="Mail" type="javax.mail.Session"
-    mail.store.protocol="pop3" mail.pop3.host="pop3.nosuchhost.nosuchdomain.com"
-    mail.pop3.user="nobody" mail.transport.protocol="smtp"
-    mail.smtp.host="localhost" mail.smtp.port="25"
-    mail.smtp.starttls.enable="false" mail.smtp.auth="false"
-    mail.smtp.user="anonymous" password="password"
-    mail.from="noreply@nuxeo.com" mail.debug="false" />
-	
-    <!--
-	<Resource name="jdbc/CspaceDS"
-            auth="Container"
-            type="javax.sql.DataSource"
-            username="root"
-            password="admin"
-            driverClassName="com.mysql.jdbc.Driver"
-            url="jdbc:mysql://localhost:3306/cspace"
-            maxActive="8"
-            maxIdle="4"/>
-			
+	mail.store.protocol="pop3"
+	mail.pop3.host="pop3.nosuchhost.nosuchdomain.com"
+	mail.pop3.user="nobody"
+	mail.transport.protocol="smtp"
+	mail.smtp.host="localhost" mail.smtp.port="25"
+	mail.smtp.starttls.enable="false"
+	mail.smtp.auth="false"
+	mail.smtp.user="anonymous"
+	password="password" mail.from="noreply@nuxeo.com"
+	mail.debug="false" />
+
+	<!-- 
+		For CollectionSpace services
+	 -->
+    <Resource name="jdbc/CspaceDS"
+           auth="Container"
+           type="javax.sql.DataSource"
+           username="${db.user}"
+           password="${db.user.password}"
+           driverClassName="${db.jdbc.driver.class}"
+           url="jdbc:${db}://localhost:${db.port}/cspace"
+           maxActive="8"
+           maxIdle="4"/>
+		
 	<Resource name="jdbc/NuxeoDS"
-            auth="Container"
-            type="javax.sql.DataSource"
-            username="root"
-            password="admin"
-            driverClassName="com.mysql.jdbc.Driver"
-            url="jdbc:mysql://localhost:3306/nuxeo"
-            maxActive="8"
-            maxIdle="4"/>
-            -->
-            
-     <Resource name="jdbc/CspaceDS"
-            auth="Container"
-            type="javax.sql.DataSource"
-            username="${db.user}"
-            password="${db.user.password}"
-            driverClassName="${db.jdbc.driver.class}"
-            url="jdbc:${db}://localhost:${db.port}/cspace"
-            maxActive="8"
-            maxIdle="4"/>
-			
-	<Resource name="jdbc/NuxeoDS"
-            auth="Container"
-            type="javax.sql.DataSource"
-            username="${db.user}"
-            password="${db.user.password}"
-            driverClassName="${db.jdbc.driver.class}"
-            url="jdbc:${db}://localhost:${db.port}/nuxeo"
-            maxActive="8"
-            maxIdle="4"/>	
+           auth="Container"
+           type="javax.sql.DataSource"
+           username="${db.user}"
+           password="${db.user.password}"
+           driverClassName="${db.jdbc.driver.class}"
+           url="jdbc:${db}://localhost:${db.port}/nuxeo"
+           maxActive="8"
+           maxIdle="4"/>	
 
 </Context>

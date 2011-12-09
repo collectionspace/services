@@ -961,7 +961,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("createTenantSpace caught exception ", e);
+                logger.debug("Could not create tenant domain name=" + domainName + " caught exception ", e);
             }
             throw e;
         } finally {
@@ -969,6 +969,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 releaseRepositorySession(repoSession);
             }
         }
+        
         return domainId;
     }
 

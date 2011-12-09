@@ -110,6 +110,11 @@ public class TenantRepository {
                 createDomain(tenantBinding, repositoryDomain);
                 createWorkspaces(tenantBinding, repositoryDomain);
             }
+        } else {
+        	logger.error("ClientType in tenant binding for " + tenantBinding.getDisplayName() + " is misconfigured"
+        			+ clientType.name()
+        			+ "<>"
+        			+ ClientType.JAVA);
         }
     }
 
@@ -138,12 +143,12 @@ public class TenantRepository {
         if (domainId == null) {
             domainId = repositoryClient.createDomain(repositoryDomain.getStorageName());
             if (logger.isDebugEnabled()) {
-                logger.debug("created repository domain for " + domainName
+                logger.debug("Created repository domain for " + domainName
                         + " id=" + domainId);
             }
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug("found repository domain for " + domainName
+                logger.debug("Found repository domain for " + domainName
                         + " id=" + domainId);
             }
         }

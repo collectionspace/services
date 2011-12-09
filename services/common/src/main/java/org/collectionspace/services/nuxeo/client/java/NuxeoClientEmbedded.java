@@ -406,7 +406,11 @@ public final class NuxeoClientEmbedded {
 
     public void releaseRepository(RepositoryInstance repo) throws Exception {
         try {
+        	repo.save();
             repo.close();
+        } catch (Exception e) {
+        	logger.error("Could not save and/or release the repository.", e);
+        	throw e;
         } finally {
             repositoryInstances.remove(repo);
             TransactionHelper.commitOrRollbackTransaction();
