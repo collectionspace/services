@@ -92,10 +92,16 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	@Override
 	public ServerResponse preProcess(HttpRequest request, ResourceMethod method)
 	throws Failure, WebApplicationException {
+		final String servicesResource = "/cspace-services/"; // HACK - this is configured in war
+		final int servicesResourceLen = servicesResource.length();
 		String httpMethod = request.getHttpMethod();
 		String uriPath = request.getUri().getPath();
 		if (logger.isDebugEnabled()) {
-			logger.debug("received " + httpMethod + " on " + uriPath);
+			String fullRequest = request.getUri().getRequestUri().toString();
+			int servicesResourceIdx = fullRequest.indexOf(servicesResource);
+			String relativeRequest = (servicesResourceIdx<=0)? fullRequest
+												:fullRequest.substring(servicesResourceIdx+servicesResourceLen);
+			logger.debug("received " + httpMethod + " on " + relativeRequest);
 		}
 		String resName = SecurityUtils.getResourceName(request.getUri());
 		String resEntity = SecurityUtils.getResourceEntity(resName);

@@ -116,8 +116,8 @@ public class RelationDocumentModelHandler
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
         RepositoryInstance repoSession = this.getRepositorySession();
         
-        DocumentModel subjectDocModel = getSubjectOrObjectDocModel(relationDocModel, SUBJ_DOC_MODEL);
-        DocumentModel objectDocModel = getSubjectOrObjectDocModel(relationDocModel, OBJ_DOC_MODEL);
+        DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
+        DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
 
         // Use values from the subject and object document models to populate the
         // relevant fields of the relation's own document model.
@@ -309,6 +309,7 @@ public class RelationDocumentModelHandler
     private final boolean OBJ_DOC_MODEL = false;
     
     private DocumentModel getSubjectOrObjectDocModel(
+    		RepositoryInstance repoSession,
     		DocumentModel relationDocModel,
     		boolean fSubject) throws Exception {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
@@ -331,13 +332,13 @@ public class RelationDocumentModelHandler
         }
         if (Tools.notBlank(csid)) {
         	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)getRepositoryClient(ctx);
-            DocumentWrapper<DocumentModel> docWrapper = nuxeoRepoClient.getDocFromCsid(ctx, this.getRepositorySession(), csid);
+            DocumentWrapper<DocumentModel> docWrapper = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, csid);
             docModel = docWrapper.getWrappedObject();
         } else { //  if (Tools.isBlank(objectCsid)) {
             try {
             	refName = (String) relationDocModel.getProperty(commonPartLabel, 
             			(fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
-            	docModel = ResourceBase.getDocModelForRefName(refName, ctx.getResourceMap());
+            	docModel = ResourceBase.getDocModelForRefName(repoSession, refName, ctx.getResourceMap());
             } catch (Exception e) {
                 throw new InvalidDocumentException(
                         "Relation record must have a CSID or refName to identify the object of the relation.", e);

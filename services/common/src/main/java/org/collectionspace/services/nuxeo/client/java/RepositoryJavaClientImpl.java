@@ -170,9 +170,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         } catch (BadRequestException bre) {
             throw bre;
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
-            }
+                logger.error("Caught exception ", e);
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
@@ -356,8 +354,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     }
 
     public DocumentWrapper<DocumentModel> findDoc(
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryInstance repoSession,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             String whereClause)
             throws DocumentNotFoundException, DocumentException {
         DocumentWrapper<DocumentModel> wrapDoc = null;
@@ -411,7 +409,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         try {
             repoSession = getRepositorySession();
-            wrapDoc = findDoc(ctx, repoSession, whereClause);
+            wrapDoc = findDoc(repoSession, ctx, whereClause);
         } catch (Exception e) {
 			throw new DocumentException("Unable to create a Nuxeo repository session.", e);
 		} finally {
@@ -434,14 +432,17 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @throws DocumentException
      */
     @Override
-    public String findDocCSID(
+    public String findDocCSID(RepositoryInstance repoSession, 
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String whereClause)
             throws DocumentNotFoundException, DocumentException {
         String csid = null;
-        RepositoryInstance repoSession = null;
+        boolean releaseSession = false;
         try {
-        	repoSession = this.getRepositorySession();
-            DocumentWrapper<DocumentModel> wrapDoc = findDoc(ctx, repoSession, whereClause);
+        	if(repoSession== null) {
+        		repoSession = this.getRepositorySession();
+        		releaseSession = true;
+        	}
+            DocumentWrapper<DocumentModel> wrapDoc = findDoc(repoSession, ctx, whereClause);
             DocumentModel docModel = wrapDoc.getWrappedObject();
             csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
         } catch (DocumentNotFoundException dnfe) {
@@ -456,7 +457,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
             throw new DocumentException(e);
         } finally {
-        	if (repoSession != null) {
+        	if(releaseSession && (repoSession != null)) {
         		this.releaseRepositorySession(repoSession);
         	}
         }
@@ -481,6 +482,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             // force limit to 1, and ignore totalSize
             QueryContext queryContext = new QueryContext(ctx, whereClause);
             String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
+            if (logger.isDebugEnabled()) {
+                logger.debug("findDocs() NXQL: "+query);
+            }
             docList = repoSession.query(query, null, pageSize, pageNum, computeTotal);
             wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
         } catch (IllegalArgumentException iae) {
@@ -953,11 +957,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                     + domainDoc.getPathAsString());
             workspacesRoot = repoSession.createDocument(workspacesRoot);
             String workspacesRootId = workspacesRoot.getId();
+            repoSession.save();
             
             if (logger.isDebugEnabled()) {
                 logger.debug("Created tenant domain name=" + domainName
                         + " id=" + domainId + " " +
                         NuxeoUtils.Workspaces + " id=" + workspacesRootId);
+                logger.debug("Path to Domain: "+domainDoc.getPathAsString());
+                logger.debug("Path to Workspaces root: "+workspacesRoot.getPathAsString());
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -1011,10 +1018,24 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         String workspaceId = null;
         try {
             repoSession = getRepositorySession();
+            String parentDocRefPath = "/" + domainName + "/" + NuxeoUtils.Workspaces;
             DocumentRef parentDocRef = new PathRef(
                     "/" + domainName
                     + "/" + NuxeoUtils.Workspaces);
-            DocumentModel parentDoc = repoSession.getDocument(parentDocRef);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Fetching "+NuxeoUtils.Workspaces+", path=" + parentDocRefPath
+                        + " docRef:" + parentDocRef.toString());
+            }
+            DocumentModel parentDoc = null;
+            try {
+            	parentDoc = repoSession.getDocument(parentDocRef);
+            } catch(ClientException ce) {
+                logger.error("Failed to get "+NuxeoUtils.Workspaces+", path=" + parentDocRefPath
+                        + " docRef:" + parentDocRef.toString());
+            	// try again for debugging
+                parentDoc = repoSession.getDocument(parentDocRef);
+                //throw ce;
+            }
             DocumentModel doc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
                     workspaceName, "Workspace");
             doc.setPropertyValue("dc:title", workspaceName);

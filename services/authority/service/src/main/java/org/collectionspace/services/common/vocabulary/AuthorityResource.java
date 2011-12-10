@@ -58,11 +58,13 @@ import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocume
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -260,13 +262,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         String shortIdentifier;
     }
 
-    public String lookupParentCSID(String parentspecifier, String method, String op, MultivaluedMap<String, String> queryParams)
+    protected String lookupParentCSID(String parentspecifier, String method, String op, MultivaluedMap<String, String> queryParams)
             throws Exception {
         CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(parentspecifier, method, op, queryParams);
         return tempResult.CSID;
     }
 
-    public CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(String parentspecifier, String method, String op, MultivaluedMap<String, String> queryParams)
+    private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(String parentspecifier, String method, String op, MultivaluedMap<String, String> queryParams)
             throws Exception {
         CsidAndShortIdentifier result = new CsidAndShortIdentifier();
         Specifier parentSpec = getSpecifier(parentspecifier, method, op);
@@ -283,7 +285,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             parentShortIdentifier = parentSpec.value;
             String whereClause = buildWhereForAuthByName(parentSpec.value);
             ServiceContext ctx = createServiceContext(getServiceName(), queryParams);
-            parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
+            parentcsid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
         }
         result.CSID = parentcsid;
         result.shortIdentifier = parentShortIdentifier;
@@ -298,7 +300,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             itemcsid = itemSpec.value;
         } else {
             String itemWhereClause = buildWhereForAuthItemByName(itemSpec.value, parentcsid);
-            itemcsid = getRepositoryClient(ctx).findDocCSID(ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
+            itemcsid = getRepositoryClient(ctx).findDocCSID(null, ctx, itemWhereClause); //FIXME: REM - Should we be looking for the 'wf_deleted' query param and filtering on it?
         }
         return itemcsid;
     }
@@ -309,7 +311,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * Resource. They then call this method on that resource.
      */
     @Override
-   	public DocumentModel getDocModelForAuthorityItem(RefName.AuthorityItem item) 
+   	public DocumentModel getDocModelForAuthorityItem(RepositoryInstance repoSession, RefName.AuthorityItem item) 
    			throws Exception, DocumentNotFoundException {
     	if(item == null) {
     		return null;
@@ -318,11 +320,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         // Ensure we have the right context.
         ServiceContext ctx = createServiceContext(item.inAuthority.resource);
         
-        String parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
+        // HACK - this really must be moved to the doc handler, not here. No Nuxeo specific stuff here!
+        RepositoryJavaClientImpl client = (RepositoryJavaClientImpl)getRepositoryClient(ctx);
+        String parentcsid = client.findDocCSID(repoSession, ctx, whereClause);
 
         String itemWhereClause = buildWhereForAuthItemByName(item.getShortIdentifier(), parentcsid);
         ctx = createServiceContext(getItemServiceName());
-        DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).findDoc(ctx, itemWhereClause);
+        DocumentWrapper<DocumentModel> docWrapper = client.findDoc(repoSession, ctx, itemWhereClause);
         DocumentModel docModel = docWrapper.getWrappedObject();
         return docModel;
     }
@@ -462,7 +466,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 csid = spec.value;
             } else {
                 String whereClause = buildWhereForAuthByName(spec.value);
-                csid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
+                csid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause);
             }
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
@@ -739,30 +743,21 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), queryParams);
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS", ctx);
 
-            // Note that we have to create the service context for the Items, not the main service
-            // We omit the parentShortId, only needed when doing a create...
-            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid, null);
-            RepositoryClient repoClient = getRepositoryClient(ctx);
-            DocumentFilter myFilter = handler.getDocumentFilter();
             String serviceType = ServiceBindingUtils.SERVICE_TYPE_PROCEDURE;
             List<String> list = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
             if (list != null) {
                 serviceType = list.get(0);
             }
-            DocumentWrapper<DocumentModel> docWrapper = repoClient.getDoc(ctx, itemcsid);
-            DocumentModel docModel = docWrapper.getWrappedObject();
-            String refName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
-
             // Could be smarter about using the list from above, and/or allowing multiple
             ArrayList<String> serviceTypes = new ArrayList<String>(1);
             serviceTypes.add(serviceType);
             
-            authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(ctx,
-                    repoClient,
-                    serviceTypes,
-                    refName,
-                    getRefPropName(),
-                    myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/);
+            // Note that we have to create the service context for the Items, not the main service
+            // We omit the parentShortId, only needed when doing a create...
+            AuthorityItemDocumentModelHandler<?> handler = (AuthorityItemDocumentModelHandler<?>)
+            											createItemDocumentHandler(ctx, parentcsid, null);
+
+            authRefDocList = handler.getReferencingObjects(ctx, serviceTypes, getRefPropName(), itemcsid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }

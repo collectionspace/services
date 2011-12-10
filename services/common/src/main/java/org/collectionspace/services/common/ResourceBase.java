@@ -46,6 +46,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -357,7 +358,7 @@ public abstract class ResourceBase
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
      * the map, and pass it in.
      */
-    public static DocumentModel getDocModelForRefName(String refName, ResourceMap resourceMap) 
+    public static DocumentModel getDocModelForRefName(RepositoryInstance repoSession, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
     	// TODO - we need to generalize the idea of a refName to more than Authorities and Items. 
     	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
@@ -365,20 +366,20 @@ public abstract class ResourceBase
     		return null;
     	}
     	ResourceBase resource = resourceMap.get(item.inAuthority.resource);
-    	return resource.getDocModelForAuthorityItem(item);
+    	return resource.getDocModelForAuthorityItem(repoSession, item);
     }
 
     // THis is ugly, but prevents us parsing the refName twice. Once we make refName a little more
     // general, and less Authority(Item) specific, this will look better.
-   	public DocumentModel getDocModelForAuthorityItem(RefName.AuthorityItem item) 
+   	public DocumentModel getDocModelForAuthorityItem(RepositoryInstance repoSession, RefName.AuthorityItem item) 
    			throws Exception, DocumentNotFoundException {
    		logger.warn("Default (ResourceBase) getDocModelForAuthorityItem called - should not happen!");
    		return null;
    	}
 
-    public DocumentModel getDocModelForRefName(String refName) 
+    public DocumentModel getDocModelForRefName(RepositoryInstance repoSession, String refName) 
    			throws Exception, DocumentNotFoundException {
-    	return getDocModelForAuthorityItem(RefName.AuthorityItem.parse(refName));
+    	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
     }
 
 }

@@ -693,7 +693,7 @@ public class XmlReplay {
                         || (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.full)         ){
                         System.out.println("\r\n#---------------------#");
                     }
-                    System.out.println(leader+serviceResultRow+"\r\n");
+                    System.out.println(timeString()+" "+leader+serviceResultRow+"\r\n");
                     if (dump.payloads || (doingAuto&&hasError) ) {
                         if (Tools.notBlank(serviceResult.requestPayload)){
                             System.out.println("\r\n========== request payload ===============");
@@ -738,7 +738,12 @@ public class XmlReplay {
         return results;
     }
 
-
+		private static String timeString() {
+			java.util.Date date= new java.util.Date();
+	 		java.sql.Timestamp ts = new java.sql.Timestamp(date.getTime());
+			return ts.toString();
+		}
+		
 
     //======================== MAIN ===================================================================
 

@@ -29,13 +29,17 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
+import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.relation.IRelationsManager;
@@ -46,6 +50,7 @@ import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationResource;
@@ -54,11 +59,17 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.List;
@@ -334,6 +345,60 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         docModel.setProperty(authorityItemCommonSchemaName,
                 AuthorityItemJAXBSchema.IN_AUTHORITY, inAuthority);
     }
+    
+    
+    public AuthorityRefDocList getReferencingObjects(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		ArrayList<String> serviceTypes,
+    		String propertyName,
+            String itemcsid) throws Exception {
+        AuthorityRefDocList authRefDocList = null;
+    	RepositoryInstance repoSession = null;
+    	boolean releaseRepoSession = false;
+        
+    	try { 
+    		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+    		repoSession = this.getRepositorySession();
+    		if (repoSession == null) {
+    			repoSession = repoClient.getRepositorySession();
+    			releaseRepoSession = true;
+    		}
+            DocumentFilter myFilter = getDocumentFilter();
+
+    		try {
+    			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, itemcsid);
+    			DocumentModel docModel = wrapper.getWrappedObject();
+    			String refName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
+                authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(
+                		repoSession, ctx, repoClient,
+                        serviceTypes,
+                        refName,
+                        propertyName,
+                        myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/);
+    		} catch (PropertyException pe) {
+    			throw pe;
+    		} catch (DocumentException de) {
+    			throw de;
+    		} catch (Exception e) {
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("Caught exception ", e);
+    			}
+    			throw new DocumentException(e);
+    		} finally {
+    			if (releaseRepoSession && repoSession != null) {
+    				repoClient.releaseRepositorySession(repoSession);
+    			}
+    		}
+    	} catch (Exception e) {
+    		if (logger.isDebugEnabled()) {
+    			logger.debug("Caught exception ", e);
+    		}
+    		throw new DocumentException(e);
+    	}	        
+        return authRefDocList;
+    }
+
+
 
 
     /* (non-Javadoc)
@@ -432,6 +497,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         RelationsCommonList childrenListOuter = getRelations(null, thisCSID, predicate);
         List<RelationsCommonList.RelationListItem> childrenList = childrenListOuter.getRelationListItem();
 
+        if(logger.isTraceEnabled()) {
+            String dump = dumpLists(thisCSID, parentList, childrenList, null);
+            logger.trace("~~~~~~~~~~~~~~~~~~~~~~ showRelations ~~~~~~~~~~~~~~~~~~~~~~~~" + CR + dump);
+        }
+        
         //Assume that there are more children than parents.  Will be true for parent/child, but maybe not for other relations.
         //Now add all parents to our childrenList, to be able to return just one list of consolidated results.
         //Not optimal, but that's the current design spec.
@@ -478,6 +548,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         long siblingSize = siblingList.size();
         siblingListOuter.setTotalItems(siblingSize);
         siblingListOuter.setItemsInPage(siblingSize);
+        if(logger.isTraceEnabled()) {
+            String dump = dumpList(siblingList, "Siblings of: "+thisCSID);
+            logger.trace("~~~~~~~~~~~~~~~~~~~~~~ showSiblings ~~~~~~~~~~~~~~~~~~~~~~~~" + CR + dump);
+        }
 
         PayloadOutputPart relationsPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, siblingListOuter);
         ctx.addOutputPart(relationsPart);
@@ -492,6 +566,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         RelationsCommonList objectListOuter = getRelations(null, thisCSID, null);   //  nulls are wildcards:  subject=*, and predicate=*
         List<RelationsCommonList.RelationListItem> objectList = objectListOuter.getRelationListItem();
 
+        if(logger.isTraceEnabled()) {
+            String dump = dumpLists(thisCSID, subjectList, objectList, null);
+            logger.trace("~~~~~~~~~~~~~~~~~~~~~~ showAllRelations ~~~~~~~~~~~~~~~~~~~~~~~~" + CR + dump);
+        }
         //  MERGE LISTS:
         subjectList.addAll(objectList);
 
@@ -587,6 +665,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         List<RelationsCommonList.RelationListItem> childList = null;
         List<RelationsCommonList.RelationListItem> parentList = null;
         DocumentModel docModel = wrapDoc.getWrappedObject();
+		String itemRefName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
 
         ServiceContext ctx = getServiceContext();
         //Do magic replacement of ${itemCSID} and fix URI's.
@@ -629,36 +708,63 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         for (RelationsCommonList.RelationListItem inboundItem : inboundList) {
             // Note that the relations may specify the other (non-item) bit with a refName, not a CSID,
             // and so the CSID for those may be null
-            if (itemCSID.equals(inboundItem.getObject().getCsid())
-                    && inboundItem.getPredicate().equals(HAS_BROADER)) {
-                //then this is an item that says we have a child.  That child is inboundItem
-                RelationsCommonList.RelationListItem childItem =
-                        (childList == null) ? null : findInList(childList, inboundItem);
-                if (childItem != null) {
-                    removeFromList(childList, childItem);    //exists, just take it off delete list
-                } else {
-                    actionList.add(inboundItem);   //doesn't exist as a child, but is a child.  Add to additions list
-                }
-                ensureChildHasNoOtherParents(ctx, queryParams, inboundItem.getSubject().getCsid());
+            if(inboundItem.getPredicate().equals(HAS_BROADER)) {
+            	// Look for parents and children
+            	if(itemCSID.equals(inboundItem.getObject().getCsid())
+            			|| itemRefName.equals(inboundItem.getObject().getRefName())) {
+            		//then this is an item that says we have a child.  That child is inboundItem
+            		RelationsCommonList.RelationListItem childItem =
+            				(childList == null) ? null : findInList(childList, inboundItem);
+            		if (childItem != null) {
+                        if (logger.isTraceEnabled()) {
+                        	StringBuilder sb = new StringBuilder();
+                        	itemToString(sb, "== Child: ", childItem);
+                            logger.trace("Found inboundChild in current child list: " + sb.toString());
+                        }
+            			removeFromList(childList, childItem);    //exists, just take it off delete list
+            		} else {
+                        if (logger.isTraceEnabled()) {
+                        	StringBuilder sb = new StringBuilder();
+                        	itemToString(sb, "== Child: ", inboundItem);
+                            logger.trace("inboundChild not in current child list, will add: " + sb.toString());
+                        }
+            			actionList.add(inboundItem);   //doesn't exist as a child, but is a child.  Add to additions list
+            			String newChildCsid = inboundItem.getSubject().getCsid();
+            			if(newChildCsid == null) {
+            				String newChildRefName = inboundItem.getSubject().getRefName();
+            				if(newChildRefName==null) {
+            					throw new RuntimeException("Child with no CSID or refName!");
+            				}
+                            if (logger.isTraceEnabled()) {
+                            	logger.trace("Fetching CSID for child with only refname: "+newChildRefName);
+                            }
+                        	DocumentModel newChildDocModel = 
+                        		ResourceBase.getDocModelForRefName(this.getRepositorySession(), 
+                        				newChildRefName, getServiceContext().getResourceMap());
+                        	newChildCsid = getCsid(newChildDocModel);
+            			}
+                		ensureChildHasNoOtherParents(ctx, queryParams, newChildCsid);
+            		}
 
-            } else if (itemCSID.equals(inboundItem.getSubject().getCsid())
-                    && inboundItem.getPredicate().equals(HAS_BROADER)) {
-                //then this is an item that says we have a parent.  inboundItem is that parent.
-                RelationsCommonList.RelationListItem parentItem =
-                        (parentList == null) ? null : findInList(parentList, inboundItem);
-                if (parentItem != null) {
-                    removeFromList(parentList, parentItem);    //exists, just take it off delete list
+            	} else if (itemCSID.equals(inboundItem.getSubject().getCsid())
+                			|| itemRefName.equals(inboundItem.getSubject().getRefName())) {
+            		//then this is an item that says we have a parent.  inboundItem is that parent.
+            		RelationsCommonList.RelationListItem parentItem =
+            				(parentList == null) ? null : findInList(parentList, inboundItem);
+            		if (parentItem != null) {
+            			removeFromList(parentList, parentItem);    //exists, just take it off delete list
+            		} else {
+            			actionList.add(inboundItem);   //doesn't exist as a parent, but is a parent. Add to additions list
+            		}
                 } else {
-                    actionList.add(inboundItem);   //doesn't exist as a parent, but is a parent. Add to additions list
-                }
+                    logger.error("Parent/Child Element didn't link to this item. inboundItem: " + inboundItem);
+            	}
             } else {
-                logger.warn("Element didn't match parent or child, but may have partial fields that match. inboundItem: " + inboundItem);
-                //not dealing with: hasNarrower or any other predicate.
+                logger.warn("Non-parent relation ignored. inboundItem: " + inboundItem);
             }
         }
         if (logger.isTraceEnabled()) {
             String dump = dumpLists(itemCSID, parentList, childList, actionList);
-            //System.out.println("====dump====="+CR+dump);
             logger.trace("~~~~~~~~~~~~~~~~~~~~~~dump~~~~~~~~~~~~~~~~~~~~~~~~" + CR + dump);
         }
         if (fUpdate) {
@@ -683,6 +789,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
 
     private void ensureChildHasNoOtherParents(ServiceContext ctx, MultivaluedMap queryParams, String childCSID) {
+        logger.trace("ensureChildHasNoOtherParents for: " + childCSID );
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, childCSID);
         queryParams.putSingle(IRelationsManager.PREDICATE_QP, RelationshipType.HAS_BROADER.value());
         queryParams.putSingle(IRelationsManager.OBJECT_QP, null);  //null means ANY
@@ -692,36 +799,48 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         deleteRelations(parentList, ctx, "parentList-delete");
     }
 
+    
+    private void itemToString(StringBuilder sb, String prefix, RelationsCommonList.RelationListItem item ) {
+    	sb.append(prefix);
+   		sb.append((item.getCsid()!= null)?item.getCsid():"NO CSID");
+    	sb.append(": ["); 
+    	sb.append((item.getSubject().getCsid()!=null)?item.getSubject().getCsid():item.getSubject().getRefName());
+    	sb.append("]--");
+    	sb.append(item.getPredicate());
+    	sb.append("-->["); 
+    	sb.append((item.getObject().getCsid()!=null)?item.getObject().getCsid():item.getObject().getRefName());
+    	sb.append("]");
+    }
+    
     private String dumpLists(String itemCSID,
             List<RelationsCommonList.RelationListItem> parentList,
             List<RelationsCommonList.RelationListItem> childList,
             List<RelationsCommonList.RelationListItem> actionList) {
-        StringBuffer sb = new StringBuffer();
+    	StringBuilder sb = new StringBuilder();
         sb.append("itemCSID: " + itemCSID + CR);
-        sb.append(dumpList(parentList, "parentList"));
-        sb.append(dumpList(childList, "childList"));
-        sb.append(dumpList(actionList, "actionList"));
+        if(parentList!=null) {
+        	sb.append(dumpList(parentList, "parentList"));
+        }
+        if(childList!=null) {
+        	sb.append(dumpList(childList, "childList"));
+        }
+        if(actionList!=null) {
+        	sb.append(dumpList(actionList, "actionList"));
+        }
         return sb.toString();
     }
     private final static String CR = "\r\n";
     private final static String T = " ";
 
     private String dumpList(List<RelationsCommonList.RelationListItem> list, String label) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String s;
         if (list.size() > 0) {
             sb.append("=========== " + label + " ==========" + CR);
         }
         for (RelationsCommonList.RelationListItem item : list) {
-            s =
-                    T + item.getSubject().getCsid() //+T4 + item.getSubject().getUri()
-                    + T + item.getPredicate()
-                    + T + item.getObject().getCsid() //+T4  + item.getObject().getUri()
-                    + CR //+"subject:{"+item.getSubject()+"}\r\n object:{"+item.getObject()+"}"
-                    //+ CR + "relation-record: {"+item+"}"
-                    ;
-            sb.append(s);
-
+        	itemToString(sb, "==  ", item);
+        	sb.append(CR);
         }
         return sb.toString();
     }
@@ -820,10 +939,13 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
     private void deleteRelations(List<RelationsCommonList.RelationListItem> list, ServiceContext ctx, String listName) {
         try {
-            //if (list.size()>0){ logger.info("==== deleteRelations from : "+listName); }
             for (RelationsCommonList.RelationListItem item : list) {
                 RelationResource relationResource = new RelationResource();
-                //logger.info("==== TO DELETE: " + item.getCsid() + ": " + item.getSubject().getCsid() + "--" + item.getPredicate() + "-->" + item.getObject().getCsid());
+                if(logger.isTraceEnabled()) {
+                	StringBuilder sb = new StringBuilder();
+                	itemToString(sb, "==== TO DELETE: ", item);
+                	logger.trace(sb.toString());
+                }
                 Object res = relationResource.delete(item.getCsid());
             }
         } catch (Throwable t) {
@@ -845,30 +967,51 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return result;
     }
 
-    private RelationsCommonList.RelationListItem findInList(List<RelationsCommonList.RelationListItem> list, RelationsCommonList.RelationListItem item) {
+    // Note that the item argument may be sparse (only refName, no CSID for subject or object)
+    // But the list items must not be sparse
+    private RelationsCommonList.RelationListItem findInList(
+    		List<RelationsCommonList.RelationListItem> list, 
+    		RelationsCommonList.RelationListItem item) {
+    	RelationsCommonList.RelationListItem foundItem = null;
         for (RelationsCommonList.RelationListItem listItem : list) {
             if (itemsEqual(listItem, item)) {   //equals must be defined, else
-                return listItem;
+            	foundItem = listItem;
+            	break;
             }
         }
-        return null;
+        return foundItem;
     }
 
-    private boolean itemsEqual(RelationsCommonList.RelationListItem item, RelationsCommonList.RelationListItem item2) {
-        if (item == null || item2 == null) {
+    // Note that item2 may be sparse (only refName, no CSID for subject or object)
+    // But item1 must not be sparse 
+    private boolean itemsEqual(RelationsCommonList.RelationListItem item1, RelationsCommonList.RelationListItem item2) {
+        if (item1 == null || item2 == null) {
             return false;
         }
-        RelationsDocListItem subj1 = item.getSubject();
+        RelationsDocListItem subj1 = item1.getSubject();
         RelationsDocListItem subj2 = item2.getSubject();
-        RelationsDocListItem obj1 = item.getObject();
+        RelationsDocListItem obj1 = item1.getObject();
         RelationsDocListItem obj2 = item2.getObject();
+        String subj1Csid = subj1.getCsid();
+        String subj2Csid = subj2.getCsid();
+        String subj1RefName = subj1.getRefName();
+        String subj2RefName = subj2.getRefName();
 
-        return (subj1.getCsid().equals(subj2.getCsid()))
-                && (obj1.getCsid().equals(obj1.getCsid()))
-                && ((item.getPredicate().equals(item2.getPredicate()))
-                && (item.getRelationshipType().equals(item2.getRelationshipType())))
-                && (obj1.getDocumentType().equals(obj2.getDocumentType()))
-                && (subj1.getDocumentType().equals(subj2.getDocumentType()));
+        String obj1Csid = obj1.getCsid();
+        String obj2Csid = obj2.getCsid();
+        String obj1RefName = obj1.getRefName();
+        String obj2RefName = obj2.getRefName();
+
+        boolean isEqual = 
+        		   (subj1Csid.equals(subj2Csid) || ((subj2Csid==null)  && subj1RefName.equals(subj2RefName)))
+                && (obj1Csid.equals(obj1Csid)   || ((obj2Csid==null)   && obj1RefName.equals(obj2RefName)))
+                // predicate is proper, but still allow relationshipType
+                && (item1.getPredicate().equals(item2.getPredicate())
+                	||  ((item2.getPredicate()==null)  && item1.getRelationshipType().equals(item2.getRelationshipType())))
+                // Allow missing docTypes, so long as they do not conflict
+                && (obj1.getDocumentType().equals(obj2.getDocumentType()) || obj2.getDocumentType()==null)
+                && (subj1.getDocumentType().equals(subj2.getDocumentType()) || subj2.getDocumentType()==null);
+        return isEqual;
     }
 
     private void removeFromList(List<RelationsCommonList.RelationListItem> list, RelationsCommonList.RelationListItem item) {

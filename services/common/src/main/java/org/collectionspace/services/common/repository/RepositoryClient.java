@@ -34,6 +34,7 @@ import org.collectionspace.services.common.storage.StorageClient;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 /**
  * RepositoryClient is a generic Document Repository client
@@ -96,6 +97,7 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
      *            of the document to retrieve
      * @throws DocumentException
      */
+    @Deprecated
     public DocumentWrapper<DocumentModel> getDoc(
             ServiceContext<IT, OT> ctx, String id)
             throws DocumentNotFoundException, DocumentException;
@@ -124,7 +126,7 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
      * @param where NXQL where clause to get the document
      * @throws DocumentException
      */
-    public String findDocCSID(
+    public String findDocCSID(RepositoryInstance repoSession, 
             ServiceContext<IT, OT> ctx, String where)
             throws DocumentNotFoundException, DocumentException;
 

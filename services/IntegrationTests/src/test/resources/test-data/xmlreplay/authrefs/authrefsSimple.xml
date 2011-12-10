@@ -65,7 +65,7 @@
 			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}/refObjs</uri>
 			<response>
 				<expected level="ADDOK" />
-				<filename>authrefs/res/foo.res.xml</filename>
+				<filename>authrefs/res/refObjs.res.xml</filename>
 			 </response>
 		</test>
 

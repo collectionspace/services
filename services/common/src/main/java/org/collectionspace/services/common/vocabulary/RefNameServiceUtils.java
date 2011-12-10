@@ -204,6 +204,7 @@ public class RefNameServiceUtils {
     }
 
     public static AuthorityRefDocList getAuthorityRefDocs(
+    		RepositoryInstance repoSession,
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             List<String> serviceTypes,
@@ -222,9 +223,7 @@ public class RefNameServiceUtils {
         Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<String, List<AuthRefConfigInfo>>();
 
         RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)repoClient;
-    	RepositoryInstance repoSession = null;
     	try {
-    		repoSession = nuxeoRepoClient.getRepositorySession();
 	        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
 	        		serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService, pageSize, pageNum, computeTotal);
 	
@@ -244,10 +243,6 @@ public class RefNameServiceUtils {
     	} catch (Exception e) {
 			logger.error("Could not retrieve the Nuxeo repository", e);
 			wrapperList = null;
-		} finally {
-    		if (repoSession != null) {
-    			nuxeoRepoClient.releaseRepositorySession(repoSession);
-    		}
     	}
 	       
     	return wrapperList;
@@ -353,7 +348,7 @@ public class RefNameServiceUtils {
         return docList;
     }
     
-    private static final boolean READY_FOR_COMPLEX_QUERY = false;
+    private static final boolean READY_FOR_COMPLEX_QUERY = true;
     
     private static String computeWhereClauseForAuthorityRefDocs(
     		String escapedRefName,

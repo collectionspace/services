@@ -143,9 +143,6 @@
 			<filename>authrefs/updatePerson2.xml</filename>
 		</test>
 
-<!-- FIXME: Tests failed in Tomcat 6/Nuxeo 5.4.2 branch after merging from trunk through r6056: Aron -->
-<!-- These appear to be testing propagation of updates to display names in authRefs, following an update within a person record -->
-<!--
 	 <test ID="GetFirstUpdatedPerson">
 			<method>GET</method>
 			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
@@ -189,13 +186,6 @@
 				</vars>
 			 </response>
 		</test>
--->
-<!--
-{TEXT_DIFFERENT, L.path:/borrowersContact, R.path:/borrowersContact, status:TEXT_DIFFERENT,
-    L.trimmed:urn:cspace:core.collectionspace.org:personauthorities:name(TestPersonAuth):item:name(debbieDoNothingPerson)'Debbie Do Nothing Personality',
-    R.trimmed:urn:cspace:core.collectionspace.org:personauthorities:name(TestPersonAuth):item:name(debbieDoNothingPerson)'Debbie DoNothingPerson'}
--->
-<!--
 		<test ID="afterUpdateGetLoan5">
 			<method>GET</method>
 			<uri>/cspace-services/loansout/${loanout5.CSID}</uri>
@@ -220,7 +210,6 @@
 				</vars>
 			 </response>
 		</test>
--->
 
 	</testGroup>
 </xmlReplay>

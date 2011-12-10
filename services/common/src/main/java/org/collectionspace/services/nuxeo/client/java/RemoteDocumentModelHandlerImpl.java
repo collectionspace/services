@@ -51,6 +51,8 @@ import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -382,6 +384,57 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 
         return result;
     }
+    
+    /* 
+    public String getStringPropertyFromDoc(
+    		ServiceContext ctx,
+    		String csid,
+    		String propertyXPath ) throws DocumentNotFoundException, DocumentException {
+    	RepositoryInstance repoSession = null;
+    	boolean releaseRepoSession = false;
+    	String returnValue = null;
+
+    	try{ 
+    		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+    		repoSession = this.getRepositorySession();
+    		if (repoSession == null) {
+    			repoSession = repoClient.getRepositorySession();
+    			releaseRepoSession = true;
+    		}
+
+    		try {
+    			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
+    			DocumentModel docModel = wrapper.getWrappedObject();
+    			returnValue = (String) docModel.getPropertyValue(propertyXPath);
+    		} catch (PropertyException pe) {
+    			throw pe;
+    		} catch (DocumentException de) {
+    			throw de;
+    		} catch (Exception e) {
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("Caught exception ", e);
+    			}
+    			throw new DocumentException(e);
+    		} finally {
+    			if (releaseRepoSession && repoSession != null) {
+    				repoClient.releaseRepositorySession(repoSession);
+    			}
+    		}
+    	} catch (Exception e) {
+    		if (logger.isDebugEnabled()) {
+    			logger.debug("Caught exception ", e);
+    		}
+    		throw new DocumentException(e);
+    	}	        
+
+
+    	if (logger.isWarnEnabled() == true) {
+    		logger.warn("Returned DocumentModel instance was created with a repository session that is now closed.");
+    	}
+    	return returnValue;
+    }
+     */
+
     
 
     /* (non-Javadoc)

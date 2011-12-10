@@ -146,6 +146,12 @@ public class TenantRepository {
                 logger.debug("Created repository domain for " + domainName
                         + " id=" + domainId);
             }
+            if (logger.isTraceEnabled()) {
+                String checkDomainId = repositoryClient.getDomainId(repositoryDomain.getStorageName());
+                logger.trace("Fetched repository domain for " + domainName
+                        + " fetchedId=" + checkDomainId);
+                // Now try to fetch the workspace
+            }
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("Found repository domain for " + domainName
@@ -192,6 +198,15 @@ public class TenantRepository {
             }
             repositoryDomainName = repositoryDomainName.trim();
             if (!repositoryDomain.getName().equalsIgnoreCase(repositoryDomainName)) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("The service " + serviceName
+                            + " for tenant=" + tenantBinding.getName()
+                            + " declares a document repository: \""
+                            + repositoryDomainName
+                            + "\" that does not match the expected domain name: \""
+                            + repositoryDomain.getStorageName()
+                            +"\"");
+                }
                 continue;
             }
             String workspaceId = null;
