@@ -295,13 +295,10 @@
               <types:key>authRef</types:key>
 							<types:value>referenceGroupList/*/reference</types:value>
             </types:item>
-
-            <!-- NEEDS ATTENTION - thsi is no longer correct w.r.t. schema
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-							<types:value>dimensionList/*/measuredBy</types:value>
+              <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measuredBy</types:value>
             </types:item>
-            -->
             <!-- The following fields may become part of a repeatable sub-group, per JIRA(s) -->
             <!-- spawned from CSPACE-4490. -->
             <!-- As a result, they will fall into complexType structures. -->
@@ -1212,12 +1209,10 @@
               <types:key>authRef</types:key>
 							<types:value>subjectList|subject</types:value>
             </types:item>
-            <!-- NEEDS ATTENTION w.r.t. current schema
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-							<types:value>dimensionGroupList/*/measuredBy</types:value>
+              <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measuredBy</types:value>
             </types:item>
-            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
               <types:value>languageList|language</types:value>
