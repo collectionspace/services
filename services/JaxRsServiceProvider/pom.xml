@@ -424,7 +424,15 @@
         <dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-jtajca</artifactId>
+			<version>5.5-NXP-8140</version>
+			<!-- Until issue http://issues.collectionspace.org/browse/CSPACE-4639 is resolved, we
+				need to use this patched Nuxeo artifact that is only available on our public Maven
+				repository -see http://source.collectionspace.org:8081/artifactory
+				
+				Once the issue is resolved and a public version of the artifact becomes available, we
+				should revert this dependency's version to be the following:
 			<version>${nuxeo.core.version}</version>
+			-->
 			<exclusions>
 				<exclusion>
 					<artifactId>geronimo-transaction</artifactId>
