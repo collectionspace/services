@@ -65,7 +65,9 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern kwdTokenizer = Pattern.compile("(?:(['\"])(.*?)(?<!\\\\)(?>\\\\\\\\)*\\1|([^ ]+))");
 	private static Pattern unescapedDblQuotes = Pattern.compile("(?<!\\\\)\"");
 	private static Pattern unescapedSingleQuote = Pattern.compile("(?<!\\\\)'");
-	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%]");
+	//private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%]");
+	// HACK to work around Nuxeo regression that tokenizes on '.'. 
+	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%\\.]");
 	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
 
 	private static String getLikeForm() {

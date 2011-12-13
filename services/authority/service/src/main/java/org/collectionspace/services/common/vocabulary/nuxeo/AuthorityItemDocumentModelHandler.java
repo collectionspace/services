@@ -260,6 +260,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, updatedRefName);
         return updatedRefName;
     }
+    
+    protected String getRefPropName() {
+    	return ServiceBindingUtils.AUTH_REF_PROP;
+    }
 
     /**
      * Checks to see if the refName has changed, and if so, 
@@ -276,9 +280,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             }
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
             RepositoryClient repoClient = getRepositoryClient(ctx);
-            // FIXME HACK - this should be defined for each handler, as with 
-            // AuthorityResource.getRefPropName()
-            String refNameProp = ServiceBindingUtils.AUTH_REF_PROP;
+            String refNameProp = getRefPropName();
 
             int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient, this.getRepositorySession(),
                     oldRefNameOnUpdate, newRefNameOnUpdate, refNameProp);
