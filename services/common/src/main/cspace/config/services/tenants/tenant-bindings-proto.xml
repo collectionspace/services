@@ -922,13 +922,10 @@
               <types:key>termRef</types:key>
               <types:value>loanPurpose</types:value>
             </types:item>
-            <!-- The following term reference is within a nested complexType / multivalued group of fields -->
-            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
-							<types:value>loanedObjectStatusGroupList/*/loanedObjectStatus</types:value>
+							<types:value>loanStatusGroupList/*/loanStatus</types:value>
             </types:item>
-            -->
           </service:properties>
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/loanout" schemaLocation="http://collectionspace.org/services/loanout http://services.collectionspace.org/loanout/loansout_common.xsd" />
