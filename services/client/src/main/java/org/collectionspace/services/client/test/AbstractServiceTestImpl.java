@@ -662,12 +662,22 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         //
         // Read the updated object and make sure it was updated correctly.
         //
-        res = client.getWorkflow(resourceId);
-        assertStatusCode(res, testName);
-        logger.debug("Got workflow state of updated object with ID: " + resourceId);
-        input = new PoxPayloadIn(res.getEntity());
-        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
-        Assert.assertNotNull(workflowCommons);
+        int trials = 0;
+        while (trials < 30) {
+	        res = client.getWorkflow(resourceId);
+	        assertStatusCode(res, testName);
+	        logger.debug("Got workflow state of updated object with ID: " + resourceId);
+	        input = new PoxPayloadIn(res.getEntity());
+	        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+	        Assert.assertNotNull(workflowCommons);
+	        String currentWorkflowState = updatedWorkflowCommons.getCurrentLifeCycleState();
+	        if (currentWorkflowState.equalsIgnoreCase(lifeCycleState)) {
+	        	logger.debug("Expected workflow state found: " + lifeCycleState);
+	        	break;
+	        }
+	        trials++;
+        }
+        
         Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
     }
 
@@ -1061,16 +1071,29 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         input = new PoxPayloadIn(res.getEntity());
         WorkflowCommon updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
         Assert.assertNotNull(updatedWorkflowCommons);
-        //
-        // Read the updated object and make sure it was updated correctly.
-        //
-        res = client.readItemWorkflow(parentCsid, itemCsid);
-        assertStatusCode(res, testName);
-        logger.debug(
-                "Got workflow state of updated object with ID: " + itemCsid);
-        input = new PoxPayloadIn(res.getEntity());
-        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
-        Assert.assertNotNull(workflowCommons);
+        
+        int trials = 0;
+        boolean passed = false;
+        while (trials < 30) { //wait to see if the lifecycle transition will happen
+	        //
+	        // Read the updated object and make sure it was updated correctly.
+	        //
+	        res = client.readItemWorkflow(parentCsid, itemCsid);
+	        assertStatusCode(res, testName);
+	        logger.debug(
+	                "Got workflow state of updated object with ID: " + itemCsid);
+	        input = new PoxPayloadIn(res.getEntity());
+	        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+	        Assert.assertNotNull(workflowCommons);
+	        String currentState = updatedWorkflowCommons.getCurrentLifeCycleState();
+	        if (currentState.equalsIgnoreCase(lifeCycleState)) {
+	        	logger.debug("Expected workflow state found: " + lifeCycleState);
+	        	break;
+	        }
+	        logger.debug("Workflow state not yet updated for object with id: " + itemCsid + " state is=" +
+	        		currentState);
+	        trials++;
+        }
         Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
     }
 }
