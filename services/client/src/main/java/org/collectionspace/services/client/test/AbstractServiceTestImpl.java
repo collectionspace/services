@@ -799,9 +799,18 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
             //
             // Next, test that a GET with WorkflowClient.WORKFLOWSTATE_DELETED query param set to 'false' returns a 404
             //
-            CollectionSpacePoxClient client = this.assertPoxClient();
-            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
-            int result = res.getStatus();
+            int trials = 0;
+            int result = 0;
+            while (trials < 30) {
+	            CollectionSpacePoxClient client = this.assertPoxClient();
+	            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
+	            result = res.getStatus();
+	            if (result == STATUS_NOT_FOUND) {
+	            	logger.info("Workflow transition to 'deleted' is complete");
+	            	break;
+	            }
+	            trials++;
+            }
             Assert.assertEquals(result, STATUS_NOT_FOUND);
 
         } catch (UnsupportedOperationException e) {
