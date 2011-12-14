@@ -24,9 +24,11 @@
     
     <!-- Deploy-related targets -->
 
-    <target name="deploy"
+    <target name="deploy">
+	<!-- No longer possible with an embedded Nuxeo server
     	description="deploys a database template directory to Nuxeo"
 			depends="deploy-templates-dir">
+	-->
     </target>
     
     <target name="deploy-templates-dir"
