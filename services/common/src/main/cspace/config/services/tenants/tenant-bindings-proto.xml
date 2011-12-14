@@ -1623,6 +1623,16 @@
           </service:field>
         </service:params>
       </service:initHandler>
+      <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+          <types:key>objectNameProperty</types:key>
+          <types:value>displayName</types:value>
+        </types:item>
+        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+          <types:key>objectNumberProperty</types:key>
+          <types:value>shortIdentifier</types:value>
+        </types:item>
+      </service:properties>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" id="1" name="Organization" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="organizations-system" updated="" order="0">
           <service:content contentType="application/xml">
@@ -2132,6 +2142,16 @@
           </service:field>
         </service:params>
       </service:initHandler>
+      <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+          <types:key>objectNameProperty</types:key>
+          <types:value>displayName</types:value>
+        </types:item>
+        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+          <types:key>objectNumberProperty</types:key>
+          <types:value>shortIdentifier</types:value>
+        </types:item>
+      </service:properties>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" id="1" name="Taxon" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="taxon-system" updated="" order="0">
           <service:content contentType="application/xml">
