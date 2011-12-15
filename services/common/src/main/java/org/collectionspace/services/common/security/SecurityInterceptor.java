@@ -236,7 +236,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 		try {
 			nuxeoLogout();
 		} catch (LoginException e) {
-			String msg = "Unable to logout of the Nuxeo framework";
+			String msg = "Unable to logout of the Nuxeo framework.";
 			logger.error(msg, e);
 		}
 	}	
@@ -244,11 +244,12 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     private synchronized void nuxeoLogin() throws LoginException {
     	//
     	// Login as the Nuxeo system/admin user
+    	//
     	nuxeoLogin(null);
     }
     
     private void logLoginContext(LoginContext loginContext) {
-		logger.info("CollectionSpace services now logged in to Nuxeo with LoginContext: "
+		logger.trace("CollectionSpace services now logged in to Nuxeo with LoginContext: "
 				+ loginContext);
 		Subject subject = loginContext.getSubject();
 		Set<Principal> principals = subject.getPrincipals();
@@ -267,20 +268,24 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     	//
     	if (threadLocalLoginContext == null) {
     		threadLocalLoginContext = new ThreadLocal<LoginContext>();
-    		System.err.println("Created ThreadLocal instance: "
+    		if (logger.isTraceEnabled() == true) {
+    			logger.trace("Created ThreadLocal instance: "
     				+ threadLocalLoginContext.getClass().getCanonicalName()
     				+ " - "
     				+ threadLocalLoginContext.get());
+    		}
     	}
     	LoginContext loginContext = threadLocalLoginContext.get();
     	if (loginContext == null) {
     		loginContext = Framework.loginAs(user);
     		frameworkLogins++;
     		threadLocalLoginContext.set(loginContext);
-    		System.err.println("Setting ThreadLocal instance: "
-    				+ threadLocalLoginContext.getClass().getCanonicalName()
-    				+ " - "
-    				+ threadLocalLoginContext.get());
+    		if (logger.isTraceEnabled() == true) {
+	    		logger.trace("Setting ThreadLocal instance: "
+	    				+ threadLocalLoginContext.getClass().getCanonicalName()
+	    				+ " - "
+	    				+ threadLocalLoginContext.get());
+    		}
         	//
         	// Debug message
         	//

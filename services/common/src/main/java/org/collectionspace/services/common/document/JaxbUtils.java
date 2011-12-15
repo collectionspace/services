@@ -154,10 +154,10 @@ public class JaxbUtils {
         Class c = o.getClass();
         Method m = c.getMethod(methodName, argType);
         Object r = m.invoke(o, argValue);
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("completed invocation of " + methodName
-//                    + " for " + c.getName());
-//        }
+        if (logger.isTraceEnabled() == true) {
+            logger.trace("Completed invocation of " + methodName
+                    + " for " + c.getName() + "with value=" + argValue.toString());
+        }
         return r;
     }
 }

@@ -19,24 +19,17 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
@@ -58,9 +51,6 @@ import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-//import org.nuxeo.ecm.core.client.NuxeoClient;
-import org.nuxeo.ecm.core.schema.SchemaManager;
-import org.nuxeo.runtime.api.Framework;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +96,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 	    		// We don't wanted soft-deleted object, so throw an exception if this one is soft-deleted.
 	    		//
 	    		if (currentState.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-	    			String msg = "GET assertion that docModel not be in 'deleted' workflow state failed.";
+	    			String msg = "The GET assertion that docModel not be in 'deleted' workflow state failed.";
 	    			logger.debug(msg);
 	    			throw new DocumentNotFoundException(msg);
 	    		}
@@ -209,11 +199,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             	docModel = repoSession.getDocument(docRef);
                 assertWorkflowState(ctx, docModel);
             } catch (ClientException ce) {
-                String msg = "Could not find document with id=" + id;
-                logger.error(msg, ce);
+                String msg = logException(ce, "Could not find document with CSID=" + id);
                 throw new DocumentNotFoundException(msg, ce);
             }
-            //set reposession to handle the document
+            //
+            // Set repository session to handle the document
+            //
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(docModel);
             handler.handle(Action.GET, wrapDoc);
@@ -257,7 +248,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
             docList = repoSession.query(query, null, 1, 0, false);
             if (docList.size() != 1) {
-                throw new DocumentNotFoundException("No document found matching filter params.");
+                throw new DocumentNotFoundException("No document found matching filter params: " + query);
             }
             DocumentModel doc = docList.get(0);
 
@@ -298,9 +289,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             try {
                 doc = repoSession.getDocument(docRef);
             } catch (ClientException ce) {
-                String msg = "Could not find document with CSID=" + csid;
-                logger.error(msg, ce);
-                throw new DocumentNotFoundException(msg, ce);
+            	String msg = logException(ce, "Could not find document with CSID=" + csid);
+            	throw new DocumentNotFoundException(msg, ce);
             }
             wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
         } catch (IllegalArgumentException iae) {
@@ -375,7 +365,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                     logger.debug("findDoc: Query found: " + docList.size() + " items.");
                     logger.debug(" Query: " + query);
                 }
-                throw new DocumentNotFoundException("No document found matching filter params.");
+                throw new DocumentNotFoundException("No document found matching filter params: " + query);
             }
             DocumentModel doc = docList.get(0);
             wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
@@ -476,7 +466,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         try {
             if (docTypes == null || docTypes.size() < 1) {
                 throw new DocumentNotFoundException(
-                        "findDocs must specify at least one DocumentType.");
+                        "The findDocs() method must specify at least one DocumentType.");
             }
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
@@ -603,7 +593,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentNotFoundException(
                     "Unable to find workspace for service "
                     + ctx.getServiceName()
-                    + " check if the workspace exists in the Nuxeo repository");
+                    + " check if the workspace exists in the Nuxeo repository.");
         }
         
         RepositoryInstance repoSession = null;
@@ -757,6 +747,22 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         }
     }
 
+    private String logException(Exception e, String msg) {
+    	String result = null;
+    	
+    	String exceptionMessage = e.getMessage();
+    	exceptionMessage = exceptionMessage != null ? exceptionMessage : "<No details provided>";
+        result = msg = msg + ". Caught exception:" + exceptionMessage;
+        
+        if (logger.isTraceEnabled() == true) {
+        	logger.error(msg, e);
+        } else {
+        	logger.error(msg);
+        }
+    	
+    	return result;
+    }
+    
     /**
      * update given document in the Nuxeo repository
      *
@@ -769,28 +775,29 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @throws DocumentException
      */
     @Override
-    public void update(ServiceContext ctx, String id, DocumentHandler handler)
+    public void update(ServiceContext ctx, String csid, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "RepositoryJavaClient.update: handler is missing");
+                    "RepositoryJavaClient.update: document handler is missing.");
         }
         
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.UPDATE);
             repoSession = getRepositorySession();
-            DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
+            DocumentRef docRef = NuxeoUtils.createPathRef(ctx, csid);
             DocumentModel doc = null;
             try {
                 doc = repoSession.getDocument(docRef);
             } catch (ClientException ce) {
-                String msg = "Could not find document to update with id=" + id;
-                logger.error(msg, ce);
+            	String msg = logException(ce, "Could not find document to update with CSID=" + csid);
                 throw new DocumentNotFoundException(msg, ce);
             }
-            //set reposession to handle the document
+            //
+            // Set reposession to handle the document
+            //
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.UPDATE, wrapDoc);
@@ -886,7 +893,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             DocumentException {
 
         if (logger.isDebugEnabled()) {
-            logger.debug("deleting document with id=" + id);
+            logger.debug("Deleting document with CSID=" + id);
         }
         RepositoryInstance repoSession = null;
         try {
@@ -895,8 +902,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             try {
                 repoSession.removeDocument(docRef);
             } catch (ClientException ce) {
-                String msg = "could not find document to delete with id=" + id;
-                logger.error(msg, ce);
+            	String msg = logException(ce, "Could not find document to delete with CSID=" + id);
                 throw new DocumentNotFoundException(msg, ce);
             }
             repoSession.save();

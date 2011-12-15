@@ -347,6 +347,9 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             q.setParameter("objectId", id);
             int rcount = 0;
             em.getTransaction().begin();
+            if (logger.isDebugEnabled() == true) {
+            	logger.debug(q.toString());
+            }
             rcount = q.executeUpdate();
             if (logger.isDebugEnabled()) {
                 logger.debug("deleted " + rcount + " relationships for entity " + entityName
