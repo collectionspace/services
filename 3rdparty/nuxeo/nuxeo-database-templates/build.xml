@@ -56,9 +56,11 @@
     
     <!-- Undeploy-related targets -->
 
-    <target name="undeploy"
+    <target name="undeploy">
+	<!-- Obsolete now with an embedded Nuxeo server
         description="undeploys CollectionSpace-specific Nuxeo database template folders"
         depends="undeploy-template-dirs">
+	-->
     </target>
     
     <target name="undeploy-template-dirs"
