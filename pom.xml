@@ -53,6 +53,14 @@
 			</snapshots>
 		</repository>
 		<repository>
+			<id>libs-releases-local</id>
+			<name>libs-releases-local</name>
+			<url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>repo1</id>
 			<name>Maven repo1</name>
 			<url>http://repo1.maven.org/maven2</url>

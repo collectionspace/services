@@ -24,9 +24,11 @@
     
     <!-- Deploy-related targets -->
 
-    <target name="deploy"
+    <target name="deploy">
+	<!-- No longer possible with an embedded Nuxeo server
     	description="deploys a database template directory to Nuxeo"
 			depends="deploy-templates-dir">
+	-->
     </target>
     
     <target name="deploy-templates-dir"
@@ -54,9 +56,11 @@
     
     <!-- Undeploy-related targets -->
 
-    <target name="undeploy"
+    <target name="undeploy">
+	<!-- Obsolete now with an embedded Nuxeo server
         description="undeploys CollectionSpace-specific Nuxeo database template folders"
         depends="undeploy-template-dirs">
+	-->
     </target>
     
     <target name="undeploy-template-dirs"
