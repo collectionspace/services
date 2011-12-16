@@ -150,7 +150,10 @@ public class CSpaceDbRealm implements CSpaceRealm {
 
             password = rs.getString(1);
         } catch (SQLException ex) {
-            LoginException le = new LoginException("Query failed");
+        	if (logger.isTraceEnabled() == true) {
+        		logger.error("Could not open database to read AuthN tables.", ex);
+        	}
+            LoginException le = new LoginException("Authentication query failed: " + ex.getLocalizedMessage());
             le.initCause(ex);
             throw le;
         } catch (Exception ex) {

@@ -267,7 +267,7 @@ public class RefNameServiceUtils {
             RepositoryInstance repoSession,
             String oldRefName,
             String newRefName,
-            String refPropName ) {
+            String refPropName ) throws Exception {
         Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
         Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<String, List<AuthRefConfigInfo>>();
         int nRefsFound = 0;
@@ -300,9 +300,10 @@ public class RefNameServiceUtils {
 		        }
 		        pageNumProcessed++;
         	}
-        } catch(Exception e) {
+        } catch (Exception e) {
     		logger.error("Internal error updating the AuthorityRefDocs: " + e.getLocalizedMessage());
     		logger.debug(Tools.errorToString(e, true));
+    		throw e;
         }
 		logger.debug("updateAuthorityRefDocs replaced a total of: "+nRefsFound);
         return nRefsFound;

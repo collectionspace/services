@@ -62,6 +62,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.runtime.transaction.TransactionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -268,8 +269,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     /**
      * Checks to see if the refName has changed, and if so, 
      * uses utilities to find all references and update them.
+     * @throws Exception 
      */
-    protected void handleItemRefNameReferenceUpdate() {
+    protected void handleItemRefNameReferenceUpdate() throws Exception {
         if (newRefNameOnUpdate != null && oldRefNameOnUpdate != null) {
             // We have work to do.
             if (logger.isDebugEnabled()) {
