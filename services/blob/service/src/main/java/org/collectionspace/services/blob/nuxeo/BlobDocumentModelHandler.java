@@ -218,7 +218,7 @@ extends DocHandlerBase<BlobsCommon> {
 		        ctx.setInput(input);
 	        }
 //			this.setCommonPartProperties(documentModel, blobsCommon);
-			blobInput.setBlobCsid(documentModel.getName());
+			blobInput.setBlobCsid(documentModel.getName()); //Assumption here is that the documentModel "name" field is storing a CSID
 		}
 
 		super.fillAllParts(wrapDoc, action);

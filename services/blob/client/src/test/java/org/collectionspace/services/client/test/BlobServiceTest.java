@@ -23,6 +23,8 @@
 package org.collectionspace.services.client.test;
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -38,6 +40,8 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.blob.BlobsCommon;
+import org.collectionspace.services.blob.DimensionSubGroup;
+import org.collectionspace.services.blob.MeasuredPartGroup;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -54,11 +58,20 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
-public class BlobServiceTest extends AbstractServiceTestImpl {
+public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon> {
 
     private final String CLASS_NAME = BlobServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     private String knownResourceId = null;
+    
+    private final static String KNOWN_IMAGE_FILENAME = "01-03-09_1546.jpg";
+    private final static int WIDTH_DIMENSION_INDEX = 0;
+    private final static int HEIGHT_DIMENSION_INDEX = 1;
+    
+    private final static String KNOWN_IMAGE_SIZE = "56261";
+    private final static BigDecimal KNOWN_IMAGE_WIDTH = new BigDecimal(640.0);
+    private final static BigDecimal KNOWN_IMAGE_HEIGHT = new BigDecimal(480.0);
+    
     
     private boolean blobCleanup = true;
 
@@ -167,7 +180,50 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         } else {
         	logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
         }
-    }    
+    }
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createBlobWithURI"})
+    public void testImageDimensions(String testName) throws Exception {
+        logger.debug(testBanner(testName, CLASS_NAME));
+        setupCreate();
+        
+        String currentDir = this.getResourceDir();
+        String blobsDirPath = currentDir
+        		+ File.separator + BLOBS_DIR + File.separator + KNOWN_IMAGE_FILENAME;
+        File file = new File(blobsDirPath);
+        URL fileUrl = file.toURI().toURL();
+        String uri = fileUrl.toString();
+        
+        BlobClient client = new BlobClient();
+		ClientResponse<Response> res = null;
+		res = client.createBlobFromURI(uri);
+        assertStatusCode(res, testName);
+        
+        String blobCsid = extractId(res);
+        if (isBlobCleanup() == true) {
+        	allResourceIdsCreated.add(blobCsid);
+        }
+        
+        setupRead();
+        ClientResponse<String> readResponse = client.read(blobCsid);
+        assertStatusCode(readResponse, testName);
+        
+        BlobsCommon blobsCommon = this.extractCommonPartValue(readResponse);
+        Assert.assertTrue(blobsCommon != null);
+        Assert.assertEquals(blobsCommon.getLength(), KNOWN_IMAGE_SIZE, "The known image blob was not the expected size of " + KNOWN_IMAGE_SIZE);
+        
+        MeasuredPartGroup measuredImagePart = blobsCommon.getMeasuredPartGroupList().getMeasuredPartGroup().get(0);
+        Assert.assertEquals(measuredImagePart.getMeasuredPart(), BlobClient.IMAGE_MEASURED_PART_LABEL, "First measured part of the image blob was not the image itself.");
+        
+        List<DimensionSubGroup> dimensionSubGroupList = measuredImagePart.getDimensionSubGroupList().getDimensionSubGroup();
+        DimensionSubGroup widthDimension = dimensionSubGroupList.get(WIDTH_DIMENSION_INDEX);
+        Assert.assertEquals(widthDimension.getDimension(), BlobClient.IMAGE_WIDTH_LABEL, "First dimension item of the image blob was not the width.");
+        Assert.assertTrue(widthDimension.getValue().compareTo(KNOWN_IMAGE_WIDTH) == 0);
+        
+        DimensionSubGroup heightDimension = dimensionSubGroupList.get(HEIGHT_DIMENSION_INDEX);
+        Assert.assertEquals(heightDimension.getDimension(), BlobClient.IMAGE_HEIGHT_LABEL, "Second dimension item of the image blob was not the height.");
+        Assert.assertTrue(heightDimension.getValue().compareTo(KNOWN_IMAGE_HEIGHT) == 0);
+    }
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
     public void createBlobWithURI(String testName) throws Exception {

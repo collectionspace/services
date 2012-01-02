@@ -106,6 +106,7 @@ public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpacePro
      *
      * @return the common part name
      */
+    @Override
     public String getCommonPartName() {
         return getCommonPartName(getServiceName());
     }
@@ -301,29 +302,33 @@ public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpacePro
      */
     @Override
     public void setupHttpClient() {
-        this.httpClient = new HttpClient();
-        if (useAuth()) {
-            String user = properties.getProperty(USER_PROPERTY);
-            String password = properties.getProperty(PASSWORD_PROPERTY);
-            if (logger.isDebugEnabled()) {
-                logger.debug("setupHttpClient() using url=" + url + " user="
-                        + user + " password=" + password);
-            }
-
-            httpClient.getState().setCredentials(
-                    new AuthScope(url.getHost(), url.getPort(),
-                    AuthScope.ANY_REALM),
-                    new UsernamePasswordCredentials(user, password));
-            // JAXRS client library requires HTTP preemptive authentication
-            httpClient.getParams().setAuthenticationPreemptive(true);
-            if (logger.isDebugEnabled()) {
-                logger.debug("setupHttpClient: set preemptive authentication");
-            }
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("setupHttpClient() : no auth mode!");
-            }
-        }
+    	try {
+	        this.httpClient = new HttpClient();
+	        if (useAuth()) {
+	            String user = properties.getProperty(USER_PROPERTY);
+	            String password = properties.getProperty(PASSWORD_PROPERTY);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("setupHttpClient() using url=" + url + " user="
+	                        + user + " password=" + password);
+	            }
+	
+	            httpClient.getState().setCredentials(
+	                    new AuthScope(url.getHost(), url.getPort(),
+	                    AuthScope.ANY_REALM),
+	                    new UsernamePasswordCredentials(user, password));
+	            // JAXRS client library requires HTTP preemptive authentication
+	            httpClient.getParams().setAuthenticationPreemptive(true);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("setupHttpClient: set preemptive authentication");
+	            }
+	        } else {
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("setupHttpClient() : no auth mode!");
+	            }
+	        }
+    	} catch (Throwable e) {
+    		e.printStackTrace();
+    	}
     }
 
     /*

@@ -1532,17 +1532,17 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         return collectionobjectCommon;
     }
 
-    private Object extractPartValue(String testName, ClientResponse<String> res, String partLabel)
-        throws Exception {
-        Object obj = null;
-        PayloadInputPart payloadInputPart = extractPart(testName, res, partLabel);
-        if (payloadInputPart != null) {
-        	obj = payloadInputPart.getElementBody();
-        }
-        Assert.assertNotNull(obj,
-                testName + ": value of part " + partLabel + " was unexpectedly null.");
-        return obj;
-    }
+//    private Object extractPartValue(String testName, ClientResponse<String> res, String partLabel)
+//        throws Exception {
+//        Object obj = null;
+//        PayloadInputPart payloadInputPart = extractPart(testName, res, partLabel);
+//        if (payloadInputPart != null) {
+//        	obj = payloadInputPart.getElementBody();
+//        }
+//        Assert.assertNotNull(obj,
+//                testName + ": value of part " + partLabel + " was unexpectedly null.");
+//        return obj;
+//    }
 
     private PayloadInputPart extractPart(String testName, ClientResponse<String> res, String partLabel)
         throws Exception {

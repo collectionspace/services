@@ -12,6 +12,9 @@ package org.collectionspace.services.client;
 
 //import org.dom4j.Attribute;
 //import org.dom4j.Document;
+import java.io.File;
+import java.io.IOException;
+
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 //import org.dom4j.Namespace;
@@ -35,6 +38,17 @@ public class PoxPayloadIn extends PoxPayload<PayloadInputPart> {
 					xmlPayload +
 					"\n>>>> Payload In : END   >>>>\n");
 		}
+	}
+	
+	/**
+	 * Instantiates a new PoxPayloadIn, saves the xml, creates a DOM, and parses the parts.
+	 *
+	 * @param file the file
+	 * @throws DocumentException the document exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	public PoxPayloadIn(File file) throws DocumentException, IOException {
+		super(file);		
 	}
 	
 	/* (non-Javadoc)

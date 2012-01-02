@@ -120,7 +120,7 @@ public class FileUtils {
 				}
 				if (formFieldName.equalsIgnoreCase(FILE_FORM_FIELD)) {
 					if (item.isFormField() == true) {
-						logger.warn(FILE_FORM_FIELD + ": part is marked as a form field.");
+						logger.warn("Form field '" + FILE_FORM_FIELD + "': part is marked as a form field.");
 					}
 					String fileName = item.getName();
 					if (logger.isTraceEnabled() == true) {

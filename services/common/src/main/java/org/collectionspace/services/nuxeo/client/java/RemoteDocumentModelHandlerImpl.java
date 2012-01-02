@@ -57,6 +57,7 @@ import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
@@ -210,6 +211,9 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     }
     
     private void addAccountPermissionsPart() throws Exception {
+    	Profiler profiler = new Profiler("addAccountPermissionsPart():", 1);
+    	profiler.start();
+    	
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         String currentServiceName = ctx.getServiceName();
         String workflowSubResource = "/";
@@ -227,6 +231,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         JAXBElement<AccountPermission> ap = objectFactory.createAccountPermission(accountPermission);
         PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", ap);
         ctx.addOutputPart(accountPermissionPart);
+        
+        profiler.stop();
     }
 
     /* (non-Javadoc)

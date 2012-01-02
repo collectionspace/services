@@ -77,12 +77,13 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     static protected final String RESOURCE_PATH = "src" + File.separator
             + "test" + File.separator
             + "resources";
+    
     protected static final String BLOBS_DIR = "blobs";
     static protected final String DEFAULT_MIME = "application/octet-stream; charset=ISO-8859-1";
     static private final String NO_TEST_CLEANUP = "noTestCleanup";
     static protected final String NO_BLOB_CLEANUP = "noBlobCleanup";
     static protected final String NO_MEDIA_CLEANUP = "noMediaCleanup";
-    final static String NON_EXISTENT_KEYWORD = "jlmbsoqjlmbsoq";
+    private final static String NON_EXISTENT_KEYWORD = "jlmbsoqjlmbsoq";
 
     protected String getMimeType(File theFile) {
         String result = null;
@@ -108,7 +109,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
      *
      * @return the logger
      */
-    private Logger getLogger() {
+    protected Logger getLogger() {
         return this.logger;
     }
 

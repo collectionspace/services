@@ -39,6 +39,7 @@
                    maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
+    
     <xs:complexType name="measuredPartGroup">
         <xs:sequence>
             <xs:element name="measuredPart" type="xs:string"/>
