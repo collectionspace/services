@@ -264,17 +264,8 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         AccountRoleClient client = new AccountRoleClient();
         ClientResponse<AccountRole> res = client.read(
                 accValues.get("acc-role-user1").getAccountId());
-        int statusCode = res.getStatus();
+        assertStatusCode(res, testName);
         try {
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             AccountRole output = res.getEntity();
             Assert.assertNotNull(output);
         } finally {
@@ -330,16 +321,8 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         AccountRoleClient client = new AccountRoleClient();
         ClientResponse<AccountRole> res = client.read(
                 accValues.get("acc-role-user2").getAccountId());
-        int statusCode = res.getStatus();
+        assertStatusCode(res, testName);
         try {
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
             AccountRole output = res.getEntity();
 
             if(logger.isDebugEnabled()) {
@@ -394,16 +377,8 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         ClientResponse<AccountRole> res = roleClient.readRoleAccounts(
         		roleValues.get("ROLE_CO1").getRoleId());
-        int statusCode = res.getStatus();
+        assertStatusCode(res, testName);
         try {
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
             AccountRole output = res.getEntity();
             
             // Now verify that the role has 2 accounts associate to it.
@@ -739,10 +714,9 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             AccountClient client = new AccountClient();
             ClientResponse<AccountsCommonList> res =
                     client.readSearchList(null, this.prebuiltAdminUserId, null);
+            assertStatusCode(res, "findPrebuiltAdminAccount");
             AccountsCommonList list = res.getEntity();
-            int statusCode = res.getStatus();
-
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            
             List<AccountListItem> items = list.getAccountListItem();
             Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
             AccountListItem item = items.get(0);

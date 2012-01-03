@@ -422,17 +422,8 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         DimensionClient client = new DimensionClient();
         client.setAuth(true, userName, true, userName, true);
         ClientResponse<String> res = client.read(id);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(res, testName);
+        
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         return (DimensionsCommon) extractPart(input,
                 client.getCommonPartName(), DimensionsCommon.class);

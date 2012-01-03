@@ -366,17 +366,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         LocationAuthorityClient client = new LocationAuthorityClient();
     	String newID = null;
         ClientResponse<String> res = client.read(knownResourceId);
+        assertStatusCode(res, testName);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
 	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -414,17 +405,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<String> res = client.readByName(knownResourceShortIdentifer);
+        assertStatusCode(res, testName);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
 	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -459,18 +441,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
 	        // Check whether we've received a location.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        LocationsCommon location = (LocationsCommon) extractPart(input,
@@ -507,18 +479,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
 	        // Check whether location has expected displayName.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        LocationsCommon location = (LocationsCommon) extractPart(input,
@@ -543,15 +505,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        commonPart.setLabel(client.getItemCommonPartName());
 	    	res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-	        statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug("updateItem: status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        assertStatusCode(res, testName);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
@@ -578,15 +532,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        commonPart.setLabel(client.getItemCommonPartName());
 	    	res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-	        statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug("updateItem: status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        assertStatusCode(res, testName);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
@@ -620,24 +566,19 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // Perform setup.
-        // FIXME: create a setup configuration for this operation.
-    	setupUpdateWithWrongXmlSchema();
+        
+        // Perform setup for read.
+        setupRead();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
+        
+        // Perform setup for update.
+        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
+
         try {
-        	int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
 	
 	        // Check whether Location has expected displayName.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -654,15 +595,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        commonPart.setLabel(client.getItemCommonPartName());
 	    	res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-	        statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug("updateItem: status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
 	    } finally {
 	    	res.releaseConnection();
 	    }
@@ -760,18 +693,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         try {
         	AbstractCommonList list = res.getEntity();
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Optionally output additional data about list members for debugging.
 	        if(logger.isTraceEnabled()){
@@ -829,18 +753,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         } else {
         	Assert.fail("readItemList passed null csid and name!");
         }
+        assertStatusCode(res, testName);
         try {
         	AbstractCommonList list = res.getEntity();
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        List<AbstractCommonList.ListItem> items =
 	            list.getListItem();
@@ -899,11 +814,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         // Retrieve the contents of a resource to update.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<String> res = client.read(knownResourceId);
+        assertStatusCode(res, testName);
         try {
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": read status = " + res.getStatus());
-	        }
-	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 	
 	        if(logger.isDebugEnabled()){
 	            logger.debug("got LocationAuthority to update with ID: " + knownResourceId);
@@ -927,16 +839,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        commonPart.setLabel(client.getCommonPartName());
 	    	res.releaseConnection();
 	        res = client.update(knownResourceId, output);
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
+	        assertStatusCode(res, testName);
+
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
 	        LocationauthoritiesCommon updatedLocationAuthority =
@@ -973,12 +877,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
         try {
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": read status = " + res.getStatus());
-	        }
-	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-	
 	        if(logger.isDebugEnabled()){
 	            logger.debug("got Location to update with ID: " +
 	                knownItemResourceId +
@@ -1004,16 +904,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl { //FI
 	        commonPart.setLabel(client.getItemCommonPartName());
 	    	res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
+	        assertStatusCode(res, testName);
+
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
 	        LocationsCommon updatedLocation =

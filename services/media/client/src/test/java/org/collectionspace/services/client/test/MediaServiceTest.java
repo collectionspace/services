@@ -253,8 +253,8 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         setupReadList();
         MediaClient client = new MediaClient();
         ClientResponse<AbstractCommonList> res = client.readList();
-        AbstractCommonList list = res.getEntity();
         assertStatusCode(res, testName);
+        AbstractCommonList list = res.getEntity();
         // Optionally output additional data about list members for debugging.
         if(logger.isTraceEnabled()){
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);

@@ -450,16 +450,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         //elmo allowed to read
         client.setAuth(true, "elmo2010", true, "elmo2010", true);
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         DimensionsCommon dimension = (DimensionsCommon) extractPart(input,

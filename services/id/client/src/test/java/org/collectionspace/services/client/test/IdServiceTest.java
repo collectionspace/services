@@ -146,20 +146,7 @@ public class IdServiceTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
         ClientResponse<String> res = client.createId(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         String generatedId = res.getEntity();
         Assert.assertNotNull(generatedId);
@@ -172,7 +159,7 @@ public class IdServiceTest extends BaseServiceTest {
         // Assumes that the last part in the ID pattern generates values
         // that will always differ at each generation.
         res = client.createId(knownResourceId);
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         String secondGeneratedId = res.getEntity();
         Assert.assertNotNull(secondGeneratedId);
@@ -211,17 +198,7 @@ public class IdServiceTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(res, testName);
         String entity = res.getEntity();
         Assert.assertNotNull(entity);
         if (logger.isDebugEnabled()) {
@@ -252,26 +229,7 @@ public class IdServiceTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
         ClientResponse<String> res = client.readList();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(res, testName);
         String entity = res.getEntity();
         Assert.assertNotNull(entity);
         if (logger.isDebugEnabled()) {

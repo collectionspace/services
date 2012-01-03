@@ -363,16 +363,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         ClientResponse<String> res =
             orgAuthClient.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".read: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
@@ -394,14 +385,8 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         // and get the ID for the organization item
         ClientResponse<AuthorityRefList> res2 =
            orgAuthClient.getItemAuthorityRefs(knownResourceId, knownItemResourceId);
-        statusCode = res2.getStatus();
-
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res2, testName);
+        
         AuthorityRefList list = res2.getEntity();
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();

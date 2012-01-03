@@ -182,16 +182,7 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Get the common part of the response and verify that it is not null.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -249,16 +240,7 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         NoteClient client = new NoteClient();
         ClientResponse<NotesCommonList> res = client.readList();
         NotesCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
@@ -299,13 +281,7 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-        if(logger.isDebugEnabled()){
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
+        assertStatusCode(res, testName);
 
         // Get the common part of the response and verify that it is not null.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());

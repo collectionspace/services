@@ -247,15 +247,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
        ClientResponse<AuthorityRefDocList> refDocListResp =
         	orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
+        assertStatusCode(refDocListResp, testName);
 
-        int statusCode = refDocListResp.getStatus();
-
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         AuthorityRefDocList list = refDocListResp.getEntity();
 
         // Optionally output additional data about list members for debugging.

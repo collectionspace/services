@@ -711,16 +711,7 @@ public class MovementSortByTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         ClientResponse<String> res = client.read(csid);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Extract and return the common part of the record.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -764,17 +755,8 @@ public class MovementSortByTest extends BaseServiceTest {
 
         ClientResponse<AbstractCommonList> res =
                 client.readListSortedBy(sortFieldName);
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         return list;
 
@@ -791,17 +773,8 @@ public class MovementSortByTest extends BaseServiceTest {
 
         ClientResponse<AbstractCommonList> res =
                 client.keywordSearchSortedBy(keywords, sortFieldName);
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         return list;
 

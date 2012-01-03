@@ -233,16 +233,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         IntakeClient intakeClient = new IntakeClient();
         ClientResponse<String> res = intakeClient.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".read: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         IntakesCommon intake = (IntakesCommon) extractPart(input,
@@ -255,14 +246,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = intakeClient.getAuthorityRefs(knownResourceId);
-        statusCode = res2.getStatus();
+        assertStatusCode(res2, testName);
 
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         AuthorityRefList list = res2.getEntity();
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();

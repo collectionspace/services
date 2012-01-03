@@ -283,16 +283,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Get the common part of the response and verify that it is not null.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -376,17 +367,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         if(logger.isTraceEnabled()){
@@ -417,13 +399,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         MovementClient client = new MovementClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-        if(logger.isDebugEnabled()){
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
+        	        assertStatusCode(res, testName);
+        assertStatusCode(res, testName);
 
         // Extract the common part from the response.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -453,17 +430,9 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(movementCommon, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
+        assertStatusCode(res, testName);
 
-        // Check the status code of the response: does it match the expected response(s)?
-        int statusCode = res.getStatus();
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-       // Extract the updated common part from the response.
+        // Extract the updated common part from the response.
         input = new PoxPayloadIn(res.getEntity());
         payloadInputPart = input.getPart(client.getCommonPartName());
         MovementsCommon updatedMovementCommon = null;

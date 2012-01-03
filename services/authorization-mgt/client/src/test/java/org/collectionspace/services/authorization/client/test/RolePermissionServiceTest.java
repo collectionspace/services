@@ -272,17 +272,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         ClientResponse<PermissionRole> res = null;
         try {
             res = client.read(roleValues.get(getRoleName()).getRoleId());
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+            assertStatusCode(res, testName);
             PermissionRole output = (PermissionRole) res.getEntity();
             Assert.assertNotNull(output);
         } finally {
@@ -344,16 +334,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         try {
 
             res = client.read(roleValues.get(getRoleName() + NO_REL_SUFFIX).getRoleId());
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+            assertStatusCode(res, testName);
             PermissionRole output = (PermissionRole) res.getEntity();
 
             String sOutput = objectAsXmlString(output, PermissionRole.class);

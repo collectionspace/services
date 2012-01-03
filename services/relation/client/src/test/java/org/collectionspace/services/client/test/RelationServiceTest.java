@@ -384,16 +384,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         RelationClient client = new RelationClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Get the common part from the response and check that it is not null.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -457,18 +448,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         RelationClient client = new RelationClient();
         ClientResponse<RelationsCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         RelationsCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
         if(iterateThroughList && logger.isDebugEnabled()){
@@ -509,16 +491,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
                                                                   pageSize,
                                                                   pageNumber);
         RelationsCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
@@ -561,8 +534,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         // Retrieve an existing resource that we can update.
         RelationClient client = new RelationClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        logger.debug(testName + ": read status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
         logger.debug("Got object to update with ID: " + knownResourceId);
         
         // Extract the common part and verify that it is not null.
@@ -595,13 +567,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(relationCommon, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-            logger.debug(testName + ": status = " + statusCode);
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Extract the common part of the updated resource and verify that it is not null.
         input = new PoxPayloadIn(res.getEntity());

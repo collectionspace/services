@@ -273,8 +273,8 @@ public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon>
         setupReadList();
         BlobClient client = new BlobClient();
         ClientResponse<AbstractCommonList> res = client.readList();
-        AbstractCommonList list = res.getEntity();
         assertStatusCode(res, testName);
+        AbstractCommonList list = res.getEntity();
         if (logger.isDebugEnabled()) {
             List<AbstractCommonList.ListItem> items =
                 list.getListItem();

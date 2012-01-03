@@ -707,18 +707,8 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         //
         CollectionSpacePoxClient client = assertPoxClient();
         ClientResponse<AbstractCommonList> res = client.readIncludeDeleted(includeDeleted);
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-        //
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         //
         // Now check that list size is correct
         //
@@ -745,18 +735,8 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
                 null, /* partial terms */
                 null, /* keywords */
                 includeDeleted);
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-        //
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         result = list.getTotalItems();
 
@@ -857,7 +837,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
             // Send the search request and receive a response
             ClientResponse<AbstractCommonList> res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.FALSE);
             int result = res.getStatus();
-            Assert.assertEquals(result, STATUS_OK);
+            assertStatusCode(res, testName);
 
             AbstractCommonList list = res.getEntity();
             long itemsMatchedBySearch = list.getTotalItems();
@@ -870,7 +850,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
             // Send the search request and receive a response
             res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.TRUE);
             result = res.getStatus();
-            Assert.assertEquals(result, STATUS_OK);
+            assertStatusCode(res, testName);
 
             list = res.getEntity();
             itemsMatchedBySearch = list.getTotalItems();
@@ -1059,8 +1039,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         //
         AuthorityClient client = (AuthorityClient) this.getClientInstance();
         ClientResponse<String> res = client.readItemWorkflow(parentCsid, itemCsid);
-        assertStatusCode(
-                res, testName);
+        assertStatusCode(res, testName);
         logger.debug("Got object to update life cycle state with ID: " + itemCsid);
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         WorkflowCommon workflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);

@@ -282,16 +282,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         ContactClient client = new ContactClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         ContactsCommon contact = (ContactsCommon) extractPart(input,
@@ -344,17 +335,8 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         ContactClient client = new ContactClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
@@ -384,10 +366,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         ContactClient client = new ContactClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
@@ -440,14 +419,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         commonPart.setLabel(client.getCommonPartName());
 
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         input = new PoxPayloadIn(res.getEntity());
         ContactsCommon updatedContact =

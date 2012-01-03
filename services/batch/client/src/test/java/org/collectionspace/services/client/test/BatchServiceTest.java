@@ -117,12 +117,11 @@ public class BatchServiceTest extends AbstractServiceTestImpl {
         setupReadList();
         BatchClient client = new BatchClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         String bar = "\r\n\r\n=================================\r\n\r\n";
         System.out.println(bar+" res: "+res);
         AbstractCommonList  list = res.getEntity();
-
         System.out.println(bar+" list: "+list);
-        assertStatusCode(res, testName);
 
         if(logger.isTraceEnabled()){
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);

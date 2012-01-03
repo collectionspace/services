@@ -261,15 +261,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         ClientResponse<AuthorityRefDocList> refDocListResp =
                 personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
-
-        int statusCode = refDocListResp.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(refDocListResp, testName);
 
         AuthorityRefDocList list = refDocListResp.getEntity();
         List<AuthorityRefDocList.AuthorityRefDocItem> items =
@@ -301,15 +293,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         personAuthClient = new PersonAuthorityClient();
         refDocListResp =
                 personAuthClient.getReferencingObjects(personAuthCSID, depositorPersonCSID);
-
-        statusCode = refDocListResp.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(refDocListResp, testName);
 
         list = refDocListResp.getEntity();
         items = list.getAuthorityRefDocItem();
@@ -359,15 +343,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         ClientResponse<AuthorityRefDocList> refDocListResp =
                 personAuthClient.getReferencingObjects(personAuthCSID, insurerPersonCSID);
-
-        int statusCode = refDocListResp.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(refDocListResp, testName);
 
         AuthorityRefDocList list = refDocListResp.getEntity();
         List<AuthorityRefDocList.AuthorityRefDocItem> items =

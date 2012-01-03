@@ -717,17 +717,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         
         // Optionally output additional data about list members for debugging.
         // the expected response(s)?

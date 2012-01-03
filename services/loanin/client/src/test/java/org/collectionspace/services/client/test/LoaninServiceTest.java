@@ -301,18 +301,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LoaninClient client = new LoaninClient();
         ClientResponse<String> res = client.read(knownResourceId);
+        assertStatusCode(res, testName);
         PoxPayloadIn input = null;
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
             input = new PoxPayloadIn(res.getEntity());
         } finally {
             res.releaseConnection();
@@ -404,18 +395,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         AbstractCommonList list = null;
         LoaninClient client = new LoaninClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             list = res.getEntity();
         } finally {
             res.releaseConnection();
@@ -455,13 +436,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         LoaninClient client = new LoaninClient();
         ClientResponse<String> res = client.read(knownResourceId);
+        assertStatusCode(res, testName);
         PoxPayloadIn input = null;
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": read status = " + res.getStatus());
-            }
-            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
             if (logger.isDebugEnabled()) {
                 logger.debug("got object to update with ID: " + knownResourceId);
             }
@@ -492,15 +469,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(loaninCommon, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
             input = new PoxPayloadIn(res.getEntity());
         } finally {
             res.releaseConnection();

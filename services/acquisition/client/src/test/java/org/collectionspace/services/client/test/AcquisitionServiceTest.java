@@ -395,17 +395,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         if(logger.isTraceEnabled()){
@@ -440,14 +431,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         AcquisitionClient client = new AcquisitionClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 
         AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
@@ -467,14 +452,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(res, testName);
 
         input = new PoxPayloadIn(res.getEntity());
         AcquisitionsCommon updatedAcquisition =
@@ -934,16 +912,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
         ClientResponse<String> res = client.read(csid);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 

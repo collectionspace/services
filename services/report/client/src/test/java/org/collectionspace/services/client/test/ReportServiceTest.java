@@ -193,16 +193,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         ReportClient client = new ReportClient();
         ClientResponse<String> res = client.read(knownResourceId);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Get the common part of the response and verify that it is not null.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -274,17 +265,8 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         ReportClient client = new ReportClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         if(logger.isTraceEnabled()){
@@ -305,17 +287,8 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     	ReportClient client = new ReportClient();
     	ClientResponse<AbstractCommonList> res = client.readListFiltered(
     			testDocType, "single");
+        assertStatusCode(res, testName);
     	AbstractCommonList list = res.getEntity();
-    	int statusCode = res.getStatus();
-
-    	// Check the status code of the response: does it match
-    	// the expected response(s)?
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testName + ": status = " + statusCode);
-    	}
-    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
     	List<AbstractCommonList.ListItem> items =
     		list.getListItem();
@@ -332,17 +305,8 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
 		
 		// Now filter for something else, and ensure it is NOT returned
     	res = client.readListFiltered("Intake", "single");
+        assertStatusCode(res, testName);
     	list = res.getEntity();
-    	statusCode = res.getStatus();
-
-    	// Check the status code of the response: does it match
-    	// the expected response(s)?
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testName + ": status = " + statusCode);
-    	}
-    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
     	items = list.getListItem();
     	// We must NOT find the basic one we created
@@ -353,17 +317,8 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
 		
 		// Now filter for something else, and ensure it is NOT returned
     	res = client.readListFiltered(testDocType, "group");
+        assertStatusCode(res, testName);
     	list = res.getEntity();
-    	statusCode = res.getStatus();
-
-    	// Check the status code of the response: does it match
-    	// the expected response(s)?
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testName + ": status = " + statusCode);
-    	}
-    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
     	items = list.getListItem();
     	// We must NOT find the basic one we created
@@ -394,10 +349,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         ReportClient client = new ReportClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
         if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
         }
@@ -426,15 +378,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(reportCommon, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
-
-        // Check the status code of the response: does it match the expected response(s)?
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Extract the updated common part from the response.
         input = new PoxPayloadIn(res.getEntity());

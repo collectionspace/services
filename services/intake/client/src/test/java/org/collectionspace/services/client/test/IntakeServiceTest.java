@@ -295,16 +295,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         IntakeClient client = new IntakeClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
@@ -401,17 +392,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         IntakeClient client = new IntakeClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
@@ -447,10 +429,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         IntakeClient client = new IntakeClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
@@ -492,15 +471,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(res, testName);
+        
         input = new PoxPayloadIn(res.getEntity());
         IntakesCommon updatedIntake =
                 (IntakesCommon) extractPart(input,
@@ -556,14 +528,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         IntakeClient client = new IntakeClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         PayloadInputPart payloadInputPart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
         Element coreAsElement = null;
@@ -606,14 +572,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         input = new PoxPayloadIn(res.getEntity());
         PayloadInputPart updatedCorePart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
