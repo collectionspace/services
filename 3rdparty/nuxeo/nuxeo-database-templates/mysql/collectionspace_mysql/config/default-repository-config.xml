@@ -42,10 +42,6 @@
           
           <!-- Object Identification Information -->
           <!-- ================================= -->
-          
-          <!-- FIXME: The following field may be removed from this configuration when it is confirmed -->
-          <!-- that the App/UI layers are using a repeatable other number group. -->
-          <field type="largetext">collectionobjects_common:otherNumber</field> <!-- * -->
 
           <!-- FIXME: Change this to otherNumberValue if and when the field name itself is so changed. -->
           <field type="largetext">numberValue</field> <!-- * -->
@@ -173,8 +169,6 @@
           -->
   
           <field type="largetext">collectionobjects_common:objectNumber</field>
-          <field type="largetext">collectionobjects_common:otherNumber</field>
-          <field type="largetext">collectionobjects_common:otherNumberType</field>
           <field type="largetext">collectionobjects_common:numberOfObjects</field>
           <field type="largetext">collectionobjects_common:collection</field>
           <field type="largetext">collectionobjects_common:recordStatus</field>

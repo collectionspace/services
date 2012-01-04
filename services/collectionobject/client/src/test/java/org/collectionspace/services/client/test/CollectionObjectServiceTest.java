@@ -45,8 +45,8 @@ import org.collectionspace.services.collectionobject.MeasuredPartGroup;
 import org.collectionspace.services.collectionobject.MeasuredPartGroupList;
 import org.collectionspace.services.collectionobject.ObjectNameGroup;
 import org.collectionspace.services.collectionobject.ObjectNameList;
-import org.collectionspace.services.collectionobject.OtherNumber;
 import org.collectionspace.services.collectionobject.OtherNumberList;
+import org.collectionspace.services.collectionobject.OtherNumber;
 import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
@@ -1246,20 +1246,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private PoxPayloadOut createCollectionObjectInstance(String commonPartName,
             String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
-
-        //REM
-        OtherNumber remNumber = new OtherNumber();
-        remNumber.setNumberType("remNumber");
-        remNumber.setNumberValue("2271966-" + System.currentTimeMillis());
-        collectionObject.setRemNumber(remNumber);
         
         // Scalar fields
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setAge(AGE_VALUE); //test for null string
-        
-        // FIXME this can be removed when the repeatable other number list
-        // is supported by the application layers
-        collectionObject.setOtherNumber("urn:org.walkerart.id:123");
 
         // Repeatable structured groups
 

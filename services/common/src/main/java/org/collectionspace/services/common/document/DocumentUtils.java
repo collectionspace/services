@@ -445,9 +445,10 @@ public class DocumentUtils {
 	}
 
 	/**
-	 * isQualified check if the given dateVal is already qualified with given property name
-	 * e.g.  otherNumber|urn:org.collectionspace.id:24082390 is qualified with otherNumber
-	 * but urn:org.walkerart.id:123 is not qualified
+	 * isQualified check if the given dateVal is already qualified with given
+     * property name e.g. (in the example of a former 'otherNumber' field in
+     * CollectionObject) otherNumber|urn:org.collectionspace.id:24082390 is
+     * qualified with otherNumber but urn:org.walkerart.id:123 is not qualified
 	 * @param name of the property, e.g. otherNumber
 	 * @param dateVal of the property e.g. otherNumber
 	 * @return

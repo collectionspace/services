@@ -5,10 +5,7 @@
     <collectionobjects_naturalhistory:nh-note>In test-data</collectionobjects_naturalhistory:nh-note>
   </schema>
   <schema xmlns:collectionobjects_common="http://collectionspace.org/collectionobject/" name="collectionobjects_common">
-    <collectionobjects_common:remNumber>
-      <numberValue/>
-      <numberType/>
-    </collectionobjects_common:remNumber>
+    <collectionobjects_common:distinguishingFeatures/>
     <collectionobjects_common:sex>Male</collectionobjects_common:sex>
   </schema>
 </document>

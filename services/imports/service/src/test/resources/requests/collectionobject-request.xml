@@ -124,7 +124,6 @@
             <collectionobjects_common:dimensionValue/>
             <collectionobjects_common:fieldCollectionNumber></collectionobjects_common:fieldCollectionNumber>
             <collectionobjects_common:ageUnit>years</collectionobjects_common:ageUnit>
-            <collectionobjects_common:otherNumber/>
             <collectionobjects_common:dimension/>
             <collectionobjects_common:dateLatestQualifier/>
             <collectionobjects_common:contentEventNameGroupList>
@@ -189,10 +188,6 @@
             <collectionobjects_common:assocPersonGroupList/>
             <collectionobjects_common:assocOrganizationGroupList/>
             <collectionobjects_common:viewersPersonalExperience>Probably a horrible one, considering how uninteresting this object is</collectionobjects_common:viewersPersonalExperience>
-            <collectionobjects_common:remNumber>
-              <numberValue/>
-              <numberType/>
-            </collectionobjects_common:remNumber>
             <collectionobjects_common:comments>
               <comment>Seriously guys, it's just a piece of rock</comment>
             </collectionobjects_common:comments>
@@ -271,7 +266,6 @@
                 <materialComponentNote></materialComponentNote>
               </materialGroup>
             </collectionobjects_common:materialGroupList>
-            <collectionobjects_common:otherNumberType/>
             <collectionobjects_common:responsibleDepartments>
               <responsibleDepartment>antiquities</responsibleDepartment>
               <responsibleDepartment>decorative-arts</responsibleDepartment>

@@ -16,17 +16,10 @@
     xmlns="http://collectionspace.org/collectionobject/"
     targetNamespace="http://collectionspace.org/collectionobject/" version="0.1">
 
-    <xs:element name="remNumber" type="ns:otherNumber"/>
-
     <!-- Object identification information -->
 
     <xs:element name="objectNumber" type="xs:string"/>
     <xs:element name="otherNumberList" type="ns:otherNumberList"/>
-    <!-- Remove these two elements when the App/UI layer is using -->
-    <!-- the new repeatable 'otherNumbers' field: -->
-    <xs:element name="otherNumber" type="xs:string"/>
-    <xs:element name="otherNumberType" type="xs:string"/>
-    <!-- end of two elements to be removed -->
     <xs:element name="briefDescriptions">
         <xs:complexType>
             <xs:sequence>
@@ -507,7 +500,7 @@
             <xs:element name="valueQualifier" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-
+    
     <xs:complexType name="materialGroupList">
         <xs:sequence>
             <xs:element name="materialGroup" type="materialGroup" minOccurs="0"

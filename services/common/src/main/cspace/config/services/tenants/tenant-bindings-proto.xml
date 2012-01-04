@@ -4,6 +4,7 @@
     Description: Prototype tenant bindings, specifying the default services
                  layer configuration for a generic, out-of-the-box tenant.
                  These prototype bindings are merged with 'delta' bindings
+                 specifying the differences from the prototype configuration
                  for each actual tenant, resulting in 'merged' bindings
                  for that tenant.
     $LastChangedRevision$
@@ -321,9 +322,8 @@
                             <types:key>authRef</types:key>
                             <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measuredBy</types:value>
                         </types:item>
-                        <!-- The following fields may become part of a repeatable sub-group, per JIRA(s) -->
-                        <!-- spawned from CSPACE-4490. -->
-                        <!-- As a result, they will fall into complexType structures. -->
+                        <!-- The following fields may become part of repeatable sub-groups for -->
+                        <!-- associatedEvent and for owner, respectively, per JIRA(s) spawned from CSPACE-4490. -->
                         <!-- The names of ancestor elements below are anticipated, arbitrary and subject to change. -->
                         <!--
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ns2:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/collectionobject">
   <objectNumber>objectNumber</objectNumber>
-  <otherNumber>XXX</otherNumber>
-  <otherNumberType>otherNumberType</otherNumberType>
   <!-- briefDescription>briefDescription</briefDescription -->
   <comments>comments</comments>
   <distinguishingFeatures>distFeatures</distinguishingFeatures>

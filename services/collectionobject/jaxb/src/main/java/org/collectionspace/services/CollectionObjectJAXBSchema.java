@@ -9,7 +9,6 @@ package org.collectionspace.services;
  */
 public interface CollectionObjectJAXBSchema {
 	final static String OBJECT_NUMBER = "objectNumber";
-	final static String OTHER_NUMBER = "otherNumber";
 	final static String BRIEF_DESCRIPTION = "briefDescription";
 	final static String COMMENTS = "comments";
 	final static String DISTINGUISHING_FEATURES = "distinguishingFeatures";

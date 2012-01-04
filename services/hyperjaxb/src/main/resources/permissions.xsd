@@ -25,7 +25,7 @@
 				intakes
 				no need to give slash at the beginning or end
 				- attributeName could be an attribute of the service schema
-				e.g. otherNumber from collectionobjects_common
+				e.g. distinguishingFeatures from collectionobjects_common
 				- actionGroup is label that can be used by a client to "group" sets
 				of actions for operations
 				like searching for permissions by a specific actionGroup label.
