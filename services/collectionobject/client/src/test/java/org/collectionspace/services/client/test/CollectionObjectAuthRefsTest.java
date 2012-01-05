@@ -126,6 +126,13 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     private String fieldCollectionSourceRefName = null;
     private String fieldCollectorRefName = null;
 
+    // FIXME: As of 2012-01-04, the two assocEvent... fields
+    // and the ownerRefName field have been commented out in
+    // the list of authRef fields in CollectionObject, in tenant bindings,
+    // because those fields fall within to-be-created repeatable groups,
+    // per CSPACE-3229.
+    // As a result, the number of authority references expected to be found
+    // is currently 4, rather than 7. - Aron
     public String toString(){
         String result = "CollectionObjectauthRefsTest: "
                         + "\r\npersonAuthCSID: "+personAuthCSID
@@ -146,7 +153,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     }
 
     /** The number of authority references expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 7;
+    private final int NUM_AUTH_REFS_EXPECTED = 4;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
