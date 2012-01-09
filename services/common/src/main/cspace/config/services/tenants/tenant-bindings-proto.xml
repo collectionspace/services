@@ -701,6 +701,7 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="intakes_common" updated="" order="1">
                     <service:properties>
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>currentOwner</types:value>
@@ -711,16 +712,19 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
-                            <types:value>fieldCollectionSources|fieldCollectionSource</types:value>
+                            <types:value>fieldCollectionPlace</types:value>
                         </types:item>
-                        <!-- Collecting Event Authority field -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
-                            <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
+                            <types:value>fieldCollectionSources|fieldCollectionSource</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>fieldCollectors|fieldCollector</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>authRef</types:key>
+                            <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
@@ -732,17 +736,17 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
+                            <types:value>currentLocationGroupList/*/currentLocation</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>authRef</types:key>
                             <types:value>normalLocation</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>conditionCheckersOrAssessors|conditionCheckerOrAssessor</types:value>
                         </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
-                            <types:value>currentLocationGroupList/*/currentLocation</types:value>
-                        </types:item>
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>entryMethods|entryMethod</types:value>
@@ -757,19 +761,16 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
+                            <types:value>currentLocationGroupList/*/currentLocationFitness</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
                             <types:value>conditionCheckMethods|conditionCheckMethod</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>conditionCheckReasons|conditionCheckReason</types:value>
                         </types:item>
-                        <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
-                        <!--
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>termRef</types:key>
-                            <types:value>currentLocationGroupList/*/currentLocationFitness</types:value>
-                        </types:item>
-                        -->
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/intake" schemaLocation="http://collectionspace.org/services/intake http://services.collectionspace.org/intake/intakes_common.xsd" />
@@ -897,9 +898,18 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="loansin_common" updated="" order="1">
                     <service:properties>
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
-                            <types:value>loanInContact</types:value>
+                            <types:value>lenderGroupList/*/lender</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>authRef</types:key>
+                            <types:value>lenderGroupList/*/lendersAuthorizer</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>authRef</types:key>
+                            <types:value>lenderGroupList/*/lendersContact</types:value>                          
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
@@ -911,18 +921,15 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
-                            <types:value>lenderGroupList/*/lender</types:value>
+                            <types:value>loanInContact</types:value>
+                        </types:item>
+                        <!-- Fields containing term list / controlled vocabulary references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>loanPurpose</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
-                            <types:value>lenderGroupList/*/lendersAuthorizer</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
-                            <types:value>lenderGroupList/*/lendersContact</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
+                            <types:key>termRef</types:key>
                             <types:value>loanStatusGroupList/*/loanStatus</types:value>
                         </types:item>
                     </service:properties>
@@ -977,6 +984,7 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="loansout_common" updated="" order="1">
                     <service:properties>
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>borrower</types:value>
@@ -993,7 +1001,7 @@
                             <types:key>authRef</types:key>
                             <types:value>lendersContact</types:value>
                         </types:item>
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>loanPurpose</types:value>
@@ -1057,6 +1065,7 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="objectexit_common" updated="" order="1">
                     <service:properties>
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>currentOwner</types:value>
@@ -1065,7 +1074,7 @@
                             <types:key>authRef</types:key>
                             <types:value>depositor</types:value>
                         </types:item>
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>exitMethods|exitMethod</types:value>
@@ -1155,11 +1164,12 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="groups_common" updated="" order="1">
                     <service:properties>
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>owner</types:value>
                         </types:item>
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>responsibleDepartment</types:value>
@@ -1262,11 +1272,11 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="media_common" updated="" order="1">
                     <service:properties>
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>contributor</types:value>
                         </types:item>
-                        <!-- PlaceAuthority field -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>coverage</types:value>
@@ -1283,11 +1293,6 @@
                             <types:key>authRef</types:key>
                             <types:value>rightsHolder</types:value>
                         </types:item>
-                        <!-- Place Authority field -->
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
-                            <types:value>coverage</types:value>
-                        </types:item>
                         <!-- Subject Authority field -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
@@ -1300,6 +1305,7 @@
                             <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measuredBy</types:value>
                         </types:item>
                         -->
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>languageList|language</types:value>
@@ -1308,21 +1314,19 @@
                             <types:key>termRef</types:key>
                             <types:value>typeList|type</types:value>
                         </types:item>
-                        <!-- The following term references all fall within a nested complexType / multivalued group of fields -->
-                        <!-- The following fields will also become part of a repeatable sub-group, per CSPACE-3686. -->
-                        <!-- As a result, their parent field/hiearchical paths will change from those below. -->
+                        <!-- Commented out until we verify the correct path format for sub-groups -->
                         <!--
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
-                            <types:value>dimensionGroupList/*/dimension</types:value>
+                            <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/dimension</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
-                            <types:value>dimensionGroupList/*/measurementUnit</types:value>
+                            <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measurementUnit</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
-                            <types:value>dimensionGroupList/*/measurementMethod</types:value>
+                            <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measurementMethod</types:value>
                         </types:item>
                         -->
                     </service:properties>
@@ -1377,6 +1381,9 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="movements_common" updated="" order="1">
                     <service:properties>
+                        <!-- See CSPACE-4474 for possible additional authRef and termRef entries -->
+                        <!-- Fields containing authority term references -->
+                        <!-- Object Location Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>currentLocation</types:value>
@@ -1385,22 +1392,25 @@
                             <types:key>authRef</types:key>
                             <types:value>normalLocation</types:value>
                         </types:item>
+                        <!-- Movement Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>movementContact</types:value>
                         </types:item>
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
+                        <!-- Fields containing term list / controlled vocabulary references -->
+                        <!-- Object Location Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>currentLocationFitness</types:value>
                         </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>termRef</types:key>
-                            <types:value>reasonForMove</types:value>
-                        </types:item>
+                        <!-- Movement Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>movementMethods|movementMethod</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>reasonForMove</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
@@ -1742,53 +1752,31 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="organizations_common" updated="" order="1">
                     <service:properties>
+                        <!-- See CSPACE-3939 for potential additional authRef and termRef entries -->
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>contactNames|contactName</types:value>
                         </types:item>
-                        <!-- Organization's subBody field was removed here from authRef list per anticipated work on CSPACE-3939 -->
-                        <!-- Place Authority -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>foundingPlace</types:value>
                         </types:item>
-                        <!-- Concept Authority -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>groups|group</types:value>
                         </types:item>
-                        <!-- Concept Authority -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>functions|function</types:value>
                         </types:item>
-                        <!-- To be added per CSPACE-3939. Name is preliminary; please check organizations_common schema before enabling -->
-                        <!-- Commented out for now, as searching within a field in a complexType breaks searches for referenced objects -->
-                        <!-- THIS SHOULD PROBABLY NOT BE DONE THIS WAY (Patrick)
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
-                            <types:value>affiliatedPersonGroupList/*/affiliatedPerson</types:value>
-                        </types:item>
-                        -->
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
+                        <!-- Organization's subBody field was removed here from the authRef list -->
+                        <!-- per anticipated work on CSPACE-4685.-->
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>termStatus</types:value>
                         </types:item>
-                        <!-- To be added per CSPACE-3939. -->
-                        <!--
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                          <types:key>termRef</types:key>
-                          <types:value>nameType</types:value>
-                        </types:item>
-                        -->
-                        <!-- The following term reference falls within a nested complexType / multivalued group of fields -->
-                        <!--
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>termRef</types:key>
-                            <types:value>affiliatedPersonGroupList/*/affiliatedPersonType</types:value>
-                        </types:item>
-                        -->
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/organization" schemaLocation="http://collectionspace.org/services/organization http://services.collectionspace.org/organization/organizations_common.xsd" />
@@ -1934,79 +1922,48 @@
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/person" schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/persons_common.xsd" />
                     </service:content>
                     <service:properties>
-                        <!-- Place Authority reference -->
+                        <!-- See CSPACE-3938 for potential additional authRef and termRef entries -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>birthPlace</types:value>
                         </types:item>
-                        <!-- Place Authority reference -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>deathPlace</types:value>
                         </types:item>
-                        <!-- Concept Authority reference -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>groups|group</types:value>
                         </types:item>
-                        <!-- Concept Authority reference -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>nationalities|nationality</types:value>
                         </types:item>
-                        <!-- Concept Authority reference -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>occupations|occupation</types:value>
                         </types:item>
-                        <!-- Concept Authority reference -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>schoolsOrStyles|schoolOrStyle</types:value>
                         </types:item>
-                        <!-- To be added per CSPACE-3938 -->
-                        <!--
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
-                            <types:value>nameType</types:value>
-                        </types:item>
-                        -->
-                        <!-- The following authority reference is commented out for now, as searching within -->
-                        <!-- a field in a complexType breaks searches for referenced objects -->
-                        <!-- To be added per CSPACE-3938; field names are preliminary and should be checked before uncommenting -->
-                        <!-- NO - this should be implemented with relations.
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
-                            <types:value>affiliatedOrganizationGroupList/*/affiliatedOrganization</types:value>
-                        </types:item>
-                        -->
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-                        <!-- NEEDS ATTENTION - why are these not yet enabled? They look like they should be termRefs.
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                          <types:key>authRef</types:key>
-                          <types:value>termStatus</types:value>
+                            <types:key>termRef</types:key>
+                            <types:value>salutation</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                          <types:key>authRef</types:key>
-                          <types:value>salutation</types:value>
+                            <types:key>termRef</types:key>
+                            <types:value>title</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                          <types:key>authRef</types:key>
-                          <types:value>title</types:value>
+                            <types:key>termRef</types:key>
+                            <types:value>gender</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                          <types:key>authRef</types:key>
-                          <types:value>gender</types:value>
+                            <types:key>termRef</types:key>
+                            <types:value>termStatus</types:value>
                         </types:item>
-                        -->
-                        <!-- The following term reference falls within a nested complexType / multivalued group of fields -->
-                        <!-- NO. Do with relations -->
-                        <!--
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
-                            <types:value>affiliatedOrganizationGroupList/*/affiliatedOrganizationType</types:value>
-                        </types:item>
-                        -->
                     </service:properties>
                 </service:part>
                 <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
@@ -2135,14 +2092,14 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="locations_common" updated="" order="1">
                     <service:properties xmlns:service="http://collectionspace.org/services/common/service">
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>termRef</types:key>
-                            <types:value>termStatus</types:value>
-                        </types:item>
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>locationType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>termStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
@@ -2275,15 +2232,12 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="taxon_common" updated="" order="1">
                     <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>taxonAuthorGroupList/*/taxonAuthor</types:value>
                         </types:item>
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>termRef</types:key>
-                            <types:value>termStatus</types:value>
-                        </types:item>
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>taxonRank</types:value>
@@ -2294,19 +2248,20 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
+                            <types:value>taxonAuthorGroupList/*/taxonAuthorType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
                             <types:value>taxonomicStatus</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>taxonNameSource</types:value>
                         </types:item>
-                        <!-- The following term reference falls within a nested complexType / multivalued group of fields -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
-                            <types:value>taxonAuthorGroupList/*/taxonAuthorType</types:value>
+                            <types:value>termStatus</types:value>
                         </types:item>
-                        -->
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/taxonomy" schemaLocation="http://collectionspace.org/services/taxonomy http://services.collectionspace.org/taxonomy/taxon_common.xsd" />
@@ -2372,9 +2327,14 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="acquisitions_common" updated="" order="1">
                     <service:properties>
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>acquisitionAuthorizer</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>authRef</types:key>
+                            <types:value>acquisitionFundingList/*/acquisitionFundingSource</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
@@ -2384,16 +2344,15 @@
                             <types:key>authRef</types:key>
                             <types:value>acquisitionSources|acquisitionSource</types:value>
                         </types:item>
-                        <!-- Collecting Event Authority field -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
                         </types:item>
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>authRef</types:key>
-                            <types:value>acquisitionFundingList/*/acquisitionFundingSource</types:value>
+                            <types:key>termRef</types:key>
+                            <types:value>acquisitionFundingList/*/acquisitionFundingCurrency</types:value>
                         </types:item>
-                        <!-- CSPACE-4457: Identification of term list / controlled vocabulary fields -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>acquisitionMethod</types:value>
@@ -2416,15 +2375,8 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
-                            <types:value>groupPurchasePriceCurrency</types:value>
+                            <types:value>originalObjectPurchasePriceCurrency</types:value>
                         </types:item>
-                        <!-- The following term reference falls within a nested complexType / multivalued group of fields -->
-                        <!--
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>termRef</types:key>
-                            <types:value>AcquisitionFundingList/*/acquisitionFundingCurrency</types:value>
-                        </types:item>
-                        -->
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/acquisition" schemaLocation="http://collectionspace.org/services/acquisition http://services.collectionspace.org/acquisition/acquisitions_common.xsd" />
@@ -2644,6 +2596,7 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="contacts_common" updated="" order="1">
                     <service:properties>
+                        <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>addressGroupList/*/addressMunicipality</types:value>
@@ -2656,13 +2609,10 @@
                             <types:key>authRef</types:key>
                             <types:value>addressGroupList/*/addressCountry</types:value>
                         </types:item>
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>emailGroupList/*/emailType</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                            <types:key>termRef</types:key>
-                            <types:value>webAddressGroupList/*/webAddressType</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
@@ -2671,6 +2621,10 @@
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>faxNumberGroupList/*/faxNumberType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>webAddressGroupList/*/webAddressType</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
