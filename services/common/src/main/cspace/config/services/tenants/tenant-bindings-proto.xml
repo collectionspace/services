@@ -197,13 +197,10 @@
                             <types:key>authRef</types:key>
                             <types:value>contentPlaces|contentPlace</types:value>
                         </types:item>
-                        <!-- Commented out until we verify the correct path format for sub-groups -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measuredBy</types:value>
                         </types:item>
-                        -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>textualInscriptionGroupList/*/inscriptionContentInscriber</types:value>
@@ -383,17 +380,14 @@
                             <types:key>termRef</types:key>
                             <types:value>collection</types:value>
                         </types:item>
-                        <!-- Commented out until we verify the correct path format for sub-groups -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
-                            <types:value>titleGroupList/*/titleTranslationSubGroupList/*/titleLanguage</types:value>
+                            <types:value>titleGroupList/*/titleLanguage</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>titleGroupList/*/titleTranslationSubGroupList/*/titleTranslationLanguage</types:value>
                         </types:item>
-                        -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>titleGroupList/*/titleType</types:value>
@@ -427,8 +421,6 @@
                             <types:key>termRef</types:key>
                             <types:value>measuredPartGroupList/*/measuredPart</types:value>
                         </types:item>
-                        <!-- Commented out until we verify the correct path format for sub-groups -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/dimension</types:value>
@@ -441,7 +433,6 @@
                             <types:key>termRef</types:key>
                             <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measurementMethod</types:value>
                         </types:item>
-                        -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>forms|form</types:value>
@@ -1298,13 +1289,10 @@
                             <types:key>authRef</types:key>
                             <types:value>subjectList|subject</types:value>
                         </types:item>
-                        <!-- Commented out until we verify the correct path format for sub-groups -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
                             <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measuredBy</types:value>
                         </types:item>
-                        -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
@@ -1314,8 +1302,6 @@
                             <types:key>termRef</types:key>
                             <types:value>typeList|type</types:value>
                         </types:item>
-                        <!-- Commented out until we verify the correct path format for sub-groups -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
                             <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/dimension</types:value>
@@ -1328,7 +1314,6 @@
                             <types:key>termRef</types:key>
                             <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measurementMethod</types:value>
                         </types:item>
-                        -->
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/media" schemaLocation="http://collectionspace.org/services/media http://services.collectionspace.org/media/media_common.xsd" />
