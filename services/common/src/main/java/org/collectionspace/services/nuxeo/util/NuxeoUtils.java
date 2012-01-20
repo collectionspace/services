@@ -86,11 +86,15 @@ public class NuxeoUtils {
     // Base document type in Nuxeo is "Document"
     //
     public static final String BASE_DOCUMENT_TYPE = "Document";
-    public static final String WORKSPACES = "workspaces";
+//    public static final String WORKSPACES = "workspaces";
+    public static final String Workspaces = "Workspaces";
     
     // Regular expressions pattern for identifying valid ORDER BY clauses.
     // FIXME: Currently supports only USASCII word characters in field names.
-    private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?(, \\w+(_\\w+)?:\\w+( ASC| DESC)?)*";    
+    //private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?(, \\w+(_\\w+)?:\\w+( ASC| DESC)?)*";    
+		// Allow paths so can sort on complex fields. CSPACE-4601
+    private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?(, \\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?)*";
+		
 
     public static void exportDocModel(DocumentModel src) {
     	DocumentReader reader = null;
@@ -387,8 +391,9 @@ public class NuxeoUtils {
         return query.toString();
     }
     
-    static public DocumentModel getDocFromCsid(RepositoryInstance repoSession,
+    static public DocumentModel getDocFromCsid(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		RepositoryInstance repoSession,
     		String csid) throws Exception {
 	    DocumentModel result = null;
 	
@@ -414,6 +419,7 @@ public class NuxeoUtils {
         return result;
     }    
 
+    /*
     public static void printDocumentModel(DocumentModel docModel) throws Exception {
         String[] schemas = docModel.getDeclaredSchemas();
         for (int i = 0; schemas != null && i < schemas.length; i++) {
@@ -428,8 +434,8 @@ public class NuxeoUtils {
             logger.debug("Part-" + i + " schema =" + parts[i].getSchema().getName());
             propertyValues = parts[i].exportValues();
         }
-
     }
+    */
 
     /**
      * createPathRef creates a PathRef for given service context using given id
@@ -439,7 +445,7 @@ public class NuxeoUtils {
      */
     public static DocumentRef createPathRef(ServiceContext ctx, String id) {
         return new PathRef("/" + ctx.getRepositoryDomainStorageName() +
-                "/" + WORKSPACES +
+                "/" + Workspaces +
                 "/" + ctx.getRepositoryWorkspaceName() +
                 "/" + id);
     }

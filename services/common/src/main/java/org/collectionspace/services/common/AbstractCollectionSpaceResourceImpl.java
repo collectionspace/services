@@ -382,33 +382,35 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     }
 
     protected WebApplicationException bigReThrow(Exception e, String serviceMsg, String csid) throws WebApplicationException {
+    	boolean logException = true;
+    	WebApplicationException result = null;
         Response response;
-        if (logger.isDebugEnabled()) {
-            logger.debug(getClass().getName(), e);
-        }
+        
         String detail = Tools.errorToString(e, true);
         String detailNoTrace = Tools.errorToString(e, true, 3);
-        logger.error(getClass().getName()+" detail: "+detailNoTrace, e);
-
         if (e instanceof UnauthorizedException) {
             response = Response.status(Response.Status.UNAUTHORIZED).entity(serviceMsg + e.getMessage()).type("text/plain").build();
-            return new WebApplicationException(response);
+            result = new WebApplicationException(response);
 
         } else if (e instanceof DocumentNotFoundException) {
+        	//
+        	// Don't log this error unless we're in 'trace' mode
+        	//
+        	logException = false;
             response = Response.status(Response.Status.NOT_FOUND).entity(serviceMsg + " on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
-            return new WebApplicationException(response);
+            result = new WebApplicationException(response);
 
         } else if (e instanceof BadRequestException) {
             int code = ((BadRequestException) e).getErrorCode();
-            if (code == 0){
+            if (code == 0) {
                 code = Response.Status.BAD_REQUEST.getStatusCode();
             }
             // CSPACE-1110
             response = Response.status(code).entity(serviceMsg + e.getMessage()).type("text/plain").build();
             // return new WebApplicationException(e, code);
-            return new WebApplicationException(response);
+            result = new WebApplicationException(response);
 
-        } else if (e instanceof DocumentException){
+        } else if (e instanceof DocumentException) {
             int code = ((DocumentException) e).getErrorCode();
             if (code == 0){
                code = Response.Status.BAD_REQUEST.getStatusCode();
@@ -416,16 +418,29 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
             // CSPACE-1110
             response = Response.status(code).entity(serviceMsg + e.getMessage()).type("text/plain").build();
             // return new WebApplicationException(e, code);
-             return new WebApplicationException(response);
+            result = new WebApplicationException(response);
            
         } else if (e instanceof WebApplicationException) {
             // subresource may have already thrown this exception
             // so just pass it on
-            return (WebApplicationException) e;
+            result = (WebApplicationException) e;
 
         } else { // e is now instanceof Exception
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(serviceMsg + " detail: " + detailNoTrace).type("text/plain").build();
-            return new WebApplicationException(response);
+            result = new WebApplicationException(response);
         }
+        //
+        // Some exceptions like DocumentNotFoundException won't be logged unless we're in 'trace' mode
+        //
+        boolean traceEnabled = logger.isTraceEnabled();
+        if (logException == true || traceEnabled == true) {
+        	if (traceEnabled == true) {
+        		logger.error(getClass().getName() + " detail: " + detail, e);
+        	} else {
+        		logger.error(getClass().getName() + " detail: " + detailNoTrace);
+        	}
+        }
+        
+        return result;
     }
 }

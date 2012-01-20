@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="loansout">
+  <ns2:loansout_common xmlns:ns2="http://collectionspace.org/services/loanout" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <loanOutNumber>loanoutNumber-${loannum}</loanOutNumber>
+    <borrowersContact>${person}</borrowersContact>
+    <loanedObjectStatusGroupList>
+      <loanedObjectStatusGroup>
+        <loanedObjectStatus>returned</loanedObjectStatus>
+        <loanedObjectStatusNote>Left under the front mat.</loanedObjectStatusNote>
+      </loanedObjectStatusGroup>
+    </loanedObjectStatusGroupList>
+    <loanPurpose>Allow people in cold climes to share the magic of Surfboards of the 1960s.</loanPurpose>
+  </ns2:loansout_common>
+</document>
+

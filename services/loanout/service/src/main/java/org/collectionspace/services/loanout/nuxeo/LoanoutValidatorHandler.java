@@ -11,7 +11,7 @@ public class LoanoutValidatorHandler implements ValidatorHandler {
 	public void validate(Action action, ServiceContext ctx)
 			throws InvalidDocumentException {
 		// TODO Auto-generated method stub
-		System.out.println("LoanoutValidatorHandler executed.");
+		//System.out.println("LoanoutValidatorHandler executed.");
 
 	}
 

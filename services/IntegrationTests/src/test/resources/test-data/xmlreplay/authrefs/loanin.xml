@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="loansin">
+    <ns2:loansin_common xmlns:ns2="http://collectionspace.org/services/loanin"
+        xmlns:ns3="http://collectionspace.org/services/jaxb">
+        <loanInNumber>loaninNumber-${loannum}</loanInNumber>
+        <lenderGroupList>
+            <lenderGroup>
+                <lendersAuthorizationDate>October 29, 2009</lendersAuthorizationDate>
+                <lender>${person}</lender>
+            </lenderGroup>
+        </lenderGroupList>
+        <loanPurpose>For Surfboards of the 1960s exhibition.</loanPurpose>
+        <loanInConditions>Loan in conditions.</loanInConditions>
+    </ns2:loansin_common>
+</document>

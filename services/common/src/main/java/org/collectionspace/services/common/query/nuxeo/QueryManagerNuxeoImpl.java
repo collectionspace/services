@@ -29,15 +29,20 @@ package org.collectionspace.services.common.query.nuxeo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.client.NuxeoClient;
+//import org.nuxeo.ecm.core.client.NuxeoClient;
 
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
-import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
+//import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
+//import org.collectionspace.services.nuxeo.client.java.NxConnect;
+import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
+import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
+
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocableUtils;
@@ -57,10 +62,12 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	// words
 	private static Pattern nonWordChars = Pattern
 			.compile("[^\\p{L}\\p{M}\\p{N}_']");
+	private static Pattern kwdTokenizer = Pattern.compile("(?:(['\"])(.*?)(?<!\\\\)(?>\\\\\\\\)*\\1|([^ ]+))");
 	private static Pattern unescapedDblQuotes = Pattern.compile("(?<!\\\\)\"");
 	private static Pattern unescapedSingleQuote = Pattern.compile("(?<!\\\\)'");
-	private static Pattern kwdSearchProblemChars = Pattern
-			.compile("[\\:\\(\\)]");
+	//private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%]");
+	// HACK to work around Nuxeo regression that tokenizes on '.'. 
+	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%\\.]");
 	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
 
 	private static String getLikeForm() {
@@ -92,13 +99,13 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	@Override
 	@Deprecated
 	public void execQuery(String queryString) {
-		NuxeoClient client = null;
+		NuxeoClientEmbedded client = null;
 		try {
-			client = NuxeoConnector.getInstance().getClient();
+			client = NuxeoConnectorEmbedded.getInstance().getClient();
 			RepositoryInstance repoSession = client.openRepository();
 
 			DocumentModelList docModelList = repoSession
-					.query("SELECT * FROM Relation WHERE relation:relationtype.documentId1='updated-Subject-1'");
+					.query("SELECT * FROM Relation WHERE relations_common:subjectCsid='updated-Subject-1'");
 			// DocumentModelList docModelList =
 			// repoSession.query("SELECT * FROM Relation");
 			// DocumentModelList docModelList =
@@ -109,9 +116,9 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 				System.out.println(docModel.getPathAsString());
 				System.out.println(docModel.getName());
 				System.out.println(docModel.getPropertyValue("dc:title"));
-				// System.out.println("documentId1=" +
-				// docModel.getProperty("relation",
-				// "relationtype/documentId1").toString());
+				// System.out.println("subjectCsid=" +
+				// docModel.getProperty("relations_common",
+				// "subjectCsid").toString());
 			}
 
 		} catch (Exception e) {
@@ -152,26 +159,27 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	@Override
 	public String createWhereClauseFromKeywords(String keywords) {
 		String result = null;
-		StringBuffer fullTextWhereClause = new StringBuffer(SEARCH_GROUP_OPEN);
-		// StringBuffer phraseWhereClause = new StringBuffer(SEARCH_GROUP_OPEN);
-		boolean phrasesToAdd = false;
+		StringBuffer fullTextWhereClause = new StringBuffer();
 		// Split on unescaped double quotes to handle phrases
-		String[] phrases = unescapedDblQuotes.split(keywords.trim());
-		boolean first = true;
-		for (String phrase : phrases) {
-			String trimmed = phrase.trim();
+		Matcher regexMatcher = kwdTokenizer.matcher(keywords.trim());
+		boolean addNOT = false;
+		boolean newWordSet = true;
+		while (regexMatcher.find()) {
+			String phrase = regexMatcher.group();
+			// Not needed - already trimmed by split: 
+			// String trimmed = phrase.trim();
 			// Ignore empty strings from match, or goofy input
-			if (trimmed.isEmpty())
+			if (phrase.isEmpty())
 				continue;
-			// Add the phrase to the string to pass in for full text matching.
-			// Note that we can pass in a set of words and it will do the OR for
-			// us.
-			if (first) {
-				fullTextWhereClause.append(ECM_FULLTEXT_LIKE + "'");
-				first = false;
-			} else {
-				fullTextWhereClause.append(SEARCH_TERM_SEPARATOR);
+			// Note we let OR through as is
+			if("AND".equalsIgnoreCase(phrase)) {
+				continue;	// AND is default
+			} else if("NOT".equalsIgnoreCase(phrase)) {
+				addNOT = true;
+				continue;
 			}
+			// Next comment block of questionable value...
+			
 			// ignore the special chars except single quote here - can't hurt
 			// TODO this should become a special function that strips things the
 			// fulltext will ignore, including non-word chars and too-short
@@ -181,27 +189,49 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 			// which triggers the back-up search. We can think about whether
 			// stripping
 			// short words not in a quoted phrase should trigger the backup.
-			trimmed = unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'");
+			String escapedAndTrimmed = unescapedSingleQuote.matcher(phrase).replaceAll("\\\\'");
 			// If there are non-word chars in the phrase, we need to match the
 			// phrase exactly against the fulltext table for this object
 			// if(nonWordChars.matcher(trimmed).matches()) {
 			// }
 			// Replace problem chars with spaces. Patches CSPACE-4147,
 			// CSPACE-4106
-			trimmed = kwdSearchProblemChars.matcher(trimmed).replaceAll(" ");
-			trimmed = kwdSearchHyphen.matcher(trimmed).replaceAll(" ");
+			escapedAndTrimmed = kwdSearchProblemChars.matcher(escapedAndTrimmed).replaceAll(" ").trim();
+			escapedAndTrimmed = kwdSearchHyphen.matcher(escapedAndTrimmed).replaceAll(" ").trim();
+			if(escapedAndTrimmed.isEmpty()) {
+				if (logger.isDebugEnabled() == true) {
+					logger.debug("Phrase reduced to empty after replacements: " + phrase);
+				}
+				continue;
+			}
 
-			fullTextWhereClause.append(trimmed);
+			if (fullTextWhereClause.length()==0) {
+				fullTextWhereClause.append(SEARCH_GROUP_OPEN);
+			}
+			if (newWordSet) {
+				fullTextWhereClause.append(ECM_FULLTEXT_LIKE + "'");
+				newWordSet = false;
+			} else {
+				fullTextWhereClause.append(SEARCH_TERM_SEPARATOR);
+			}
+			if(addNOT) {
+				fullTextWhereClause.append("-");	// Negate the next term
+				addNOT = false;
+			}
+			fullTextWhereClause.append(escapedAndTrimmed);
+			
 			if (logger.isTraceEnabled() == true) {
 				logger.trace("Current built whereClause is: "
 						+ fullTextWhereClause.toString());
 			}
 		}
-		if (first) {
-			throw new RuntimeException(
-					"No usable keywords specified in string:[" + keywords + "]");
+		if (fullTextWhereClause.length()==0) {
+			if (logger.isDebugEnabled() == true) {
+				logger.debug("No usable keywords specified in string:[" + keywords + "]");
+			}
+		} else {
+			fullTextWhereClause.append("'" + SEARCH_GROUP_CLOSE);
 		}
-		fullTextWhereClause.append("'" + SEARCH_GROUP_CLOSE);
 
 		result = fullTextWhereClause.toString();
 		if (logger.isDebugEnabled()) {
@@ -296,4 +326,36 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 
 		return fFilteredChars;
 	}
+	
+	/**
+	 * Creates a query to filter a qualified (string) field according to a list of string values. 
+	 * @param qualifiedField The schema-qualified field to filter on
+	 * @param filterTerms the list of one or more strings to filter on
+	 * @param fExclude If true, will require qualifiedField NOT match the filters strings.
+	 * 					If false, will require qualifiedField does match one of the filters strings.
+	 * @return queryString
+	 */
+	@Override
+	public String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude) {
+    	// Start with the qualified termStatus field
+    	StringBuilder filterClause = new StringBuilder(qualifiedField);
+    	if(filterTerms.length == 1) {
+    		filterClause.append(fExclude?" <> '":" = '");
+    		filterClause.append(filterTerms[0]);
+    		filterClause.append('\'');  
+    	} else {
+    		filterClause.append(fExclude?" NOT IN (":" IN (");
+    		for(int i=0; i<filterTerms.length; i++) {
+    			if(i>0) {
+    				filterClause.append(',');
+    			}
+    			filterClause.append('\'');  
+    			filterClause.append(filterTerms[i]);
+    			filterClause.append('\'');  
+    		}
+    		filterClause.append(')');  
+    	}
+    	return filterClause.toString();
+	}
+
 }

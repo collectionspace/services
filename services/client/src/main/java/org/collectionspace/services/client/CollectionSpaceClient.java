@@ -30,7 +30,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
- *
+ *	LT - List Type
+ *	P - Proxy type
  */
 public interface CollectionSpaceClient<LT, P extends CollectionSpaceProxy<LT>> {
 
@@ -56,6 +57,11 @@ public interface CollectionSpaceClient<LT, P extends CollectionSpaceProxy<LT>> {
      * @return the base url
      */
     String getBaseURL();
+    
+    /*
+     * Returns the name of the service's common part type.
+     */
+    String getCommonPartName();
     
     String getServiceName();
 

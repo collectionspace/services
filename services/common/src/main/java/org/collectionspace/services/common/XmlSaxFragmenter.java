@@ -57,10 +57,7 @@ import java.io.StringWriter;
  *           &lt;nh-note/>
  *         &lt;/schema>
  *         &lt;schema name="collectionobjects_common">
- *           &lt;remNumber>
- *             &lt;numberValue/>
- *             &lt;numberType/>
- *           &lt;/remNumber>
+ *            &lt;distinguishingFeatures/>
  *         &lt;/schema>
  *       &lt;/document>
  *
@@ -68,10 +65,8 @@ import java.io.StringWriter;
  *        &lt;schema name="collectionobjects_naturalhistory">            &lt;nh-int/>
  *        &lt;nh-note/>
  *    plus some context information, and the second will pass String fragment =
- *        &lt;remNumber>
- *          &lt;numberValue/>
- *          &lt;numberType/>
- *        &lt;/remNumber>
+ *        &lt;distinguishingFeatures/>
+ *
  *
  * @author Laramie Crocker
  */

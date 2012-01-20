@@ -109,12 +109,12 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy movement in ${jboss.server.nuxeo}">
+    description="deploy movement in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-movement/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy movement from ${jboss.server.nuxeo}">
+    description="undeploy movement from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-movement/build.xml" target="undeploy" inheritall="false"/>
     </target>
 

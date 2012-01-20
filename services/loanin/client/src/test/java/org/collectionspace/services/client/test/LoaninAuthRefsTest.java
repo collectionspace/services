@@ -41,6 +41,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
@@ -80,9 +81,9 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     private String lendersContactRefName = null;
     private String loanInContactRefName = null;
     private String borrowersAuthorizerRefName = null;
-    // FIXME: Value changed from 5 to 2 when repeatable / multivalue 'lenders'
-    // group was added to tenant-bindings.xml
-    private final int NUM_AUTH_REFS_EXPECTED = 2;
+    private final int NUM_AUTH_REFS_EXPECTED = 5;
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -126,7 +127,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         LoaninClient loaninClient = new LoaninClient();
         PoxPayloadOut multipart = createLoaninInstance(
                 "loanInNumber-" + identifier,
-                "returnDate-" + identifier,
+                CURRENT_DATE_UTC,
 		lenderRefName,
                 lendersAuthorizerRefName,
                 lendersContactRefName,
@@ -206,8 +207,6 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
 
         // FIXME: Add instance(s) of 'lenders' field when we can work with
         // repeatable / multivalued authority reference fields.  Be sure to
-        // change the NUM_AUTH_REFS_EXPECTED constant accordingly, or otherwise
-        // revise check for numbers of authority fields expected in readAndCheckAuthRefs.
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
@@ -242,16 +241,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         LoaninClient loaninClient = new LoaninClient();
         ClientResponse<String> res = loaninClient.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".read: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Extract the common part from the response.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -272,14 +262,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 =
            loaninClient.getAuthorityRefs(knownResourceId);
-        statusCode = res2.getStatus();
-
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res2, testName);
         AuthorityRefList list = res2.getEntity();
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();

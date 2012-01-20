@@ -57,8 +57,10 @@ import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -111,17 +113,19 @@ public class RelationDocumentModelHandler
         // we will also set those.
         // Note that this introduces another caching problem... 
         DocumentModel relationDocModel = wrapDoc.getWrappedObject();
-        ServiceContext ctx = getServiceContext();
-        DocumentModel subjectDocModel = getSubjectOrObjectDocModel(relationDocModel, ctx, SUBJ_DOC_MODEL);
-        DocumentModel objectDocModel = getSubjectOrObjectDocModel(relationDocModel, ctx, OBJ_DOC_MODEL);
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+        RepositoryInstance repoSession = this.getRepositorySession();
+        
+        DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
+        DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
 
         // Use values from the subject and object document models to populate the
         // relevant fields of the relation's own document model.
         if (subjectDocModel != null) {
-            populateSubjectOrObjectValues(relationDocModel, subjectDocModel, ctx, SUBJ_DOC_MODEL);
+            populateSubjectOrObjectValues(relationDocModel, subjectDocModel, SUBJ_DOC_MODEL);
         }
         if (objectDocModel != null) {
-            populateSubjectOrObjectValues(relationDocModel, objectDocModel, ctx, OBJ_DOC_MODEL);
+            populateSubjectOrObjectValues(relationDocModel, objectDocModel, OBJ_DOC_MODEL);
         }
     }
 
@@ -197,38 +201,45 @@ public class RelationDocumentModelHandler
         String id = getCsid(docModel);
         relationListItem.setCsid(id);
 
-        relationListItem.setSubjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_ID_1));
+        relationListItem.setSubjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.SUBJECT_CSID));
 
-        String predicate = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.RELATIONSHIP_TYPE);
+        String predicate = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.RELATIONSHIP_TYPE);
         relationListItem.setRelationshipType(predicate);
         relationListItem.setPredicate(predicate); //predicate is new name for relationshipType.
-        relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
+        relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
 
-        relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_ID_2));
+        relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.OBJECT_CSID));
 
         relationListItem.setUri(serviceContextPath + id);
 
         //Now fill in summary info for the related docs: subject and object.
         String subjectCsid = relationListItem.getSubjectCsid();
-        String documentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_1);
-        RelationsDocListItem subject = createRelationsDocListItem(ctx, sbt, subjectCsid, tReader, documentType);
+        String subjectDocumentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.SUBJECT_DOCTYPE);
+        RelationsDocListItem subject = createRelationsDocListItem(ctx, sbt, subjectCsid, tReader, subjectDocumentType);
 
-        //Object o1 =  docModel.getProperty(ctx.getCommonPartLabel(), "subject");
-        //Object o2 =  docModel.getProperty(ctx.getCommonPartLabel(), "object");
-
-        String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.SUBJECT_URI);
+        String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.SUBJECT_URI);
         subject.setUri(subjectUri);
-        String subjectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.SUBJECT_REFNAME);
+        String subjectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.SUBJECT_REFNAME);
         subject.setRefName(subjectRefName);
         relationListItem.setSubject(subject);
 
         String objectCsid = relationListItem.getObjectCsid();
-        String documentType2 = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.DOCUMENT_TYPE_2);
-        RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, documentType2);
+        String objectDocumentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.OBJECT_DOCTYPE);
+        RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, objectDocumentType);
 
-        String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.OBJECT_URI);
+        String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.OBJECT_URI);
         object.setUri(objectUri);
-        String objectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), RelationJAXBSchema.OBJECT_REFNAME);
+        String objectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.OBJECT_REFNAME);
         object.setRefName(objectRefName);
         relationListItem.setObject(object);
 
@@ -236,39 +247,23 @@ public class RelationDocumentModelHandler
     }
 
     // DocumentModel itemDocModel = docModelFromCSID(ctx, itemCsid);
-    protected RelationsDocListItem createRelationsDocListItem(ServiceContext ctx,
+    protected RelationsDocListItem createRelationsDocListItem(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             ServiceBindingType sbt,
             String itemCsid,
             TenantBindingConfigReaderImpl tReader,
             String documentType) throws Exception {
         RelationsDocListItem item = new RelationsDocListItem();
-        item.setDocumentType(documentType);//this one comes from the record, as documentType1, documentType2.
-        // CSPACE-4037 REMOVING: item.setService(documentType);//this one comes from the record, as documentType1, documentType2.   Current app seems to use servicename for this.
+        item.setDocumentType(documentType);//this one comes from the record, as subjectDocumentType, objectDocumentType.
         item.setCsid(itemCsid);
 
-        DocumentModel itemDocModel = NuxeoUtils.getDocFromCsid(getRepositorySession(), ctx, itemCsid);    //null if not found.
+        DocumentModel itemDocModel = NuxeoUtils.getDocFromCsid(ctx, this.getRepositorySession(), itemCsid);    //null if not found.
         if (itemDocModel != null) {
             String itemDocType = itemDocModel.getDocumentType().getName();
-            // CSPACE-4037 REMOVING: item.setDocumentTypeFromModel(itemDocType);           //this one comes from the nuxeo documentType
-
-            //DEBUG: System.out.println("\r\n******** AuthorityItemDocumentModelHandlder documentType **************\r\n\tdocModel: "+itemDocType+"\r\n\tpayload: "+documentType);
-            //boolean usedDocumentTypeFromPayload = true;
-            /*if ( ! Tools.isBlank(documentType)){
-            if (documentType.equals(itemDocType)){
-            //usedDocumentTypeFromPayload = true;
-            }  else {
-            // Laramie20110510 CSPACE-3739  throw the exception for 3739, otherwise, don't throw it.
-            //throw new Exception("documentType supplied was wrong.  supplied: "+documentType+" required: "+itemDocType+ " itemCsid: "+itemCsid );
-            }
-            } else {
-            //usedDocumentTypeFromPayload = false;
-            item.setDocumentType(itemDocType);
-            }   */
             if (Tools.isBlank(documentType)) {
                 item.setDocumentType(itemDocType);
             }
 
-            // TODO: clean all the output statements out of here when CSPACE-4037 is done.
             //TODO: ensure that itemDocType is really the entry point, i.e. servicename==doctype
             //ServiceBindingType itemSbt2 = tReader.getServiceBinding(ctx.getTenantId(), itemDocType);
             String propName = "ERROR-FINDING-PROP-VALUE";
@@ -277,13 +272,11 @@ public class RelationDocumentModelHandler
                 propName = ServiceBindingUtils.getPropertyValue(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP);
                 String itemDocname = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NAME_PROP, itemDocModel);
                 if (propName == null || itemDocname == null) {
-                    //System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
                 } else {
                     item.setName(itemDocname);
-                    //System.out.println("=== found prop : "+ServiceBindingUtils.OBJ_NAME_PROP+"::"+propName+"="+itemDocname+" documentType: "+documentType);
                 }
             } catch (Throwable t) {
-                System.out.println("====Error finding objectNameProperty: " + itemDocModel + " field " + ServiceBindingUtils.OBJ_NAME_PROP + "=" + propName
+            	logger.error("====Error finding objectNameProperty: " + itemDocModel + " field " + ServiceBindingUtils.OBJ_NAME_PROP + "=" + propName
                         + " not found in itemDocType: " + itemDocType + " inner: " + t.getMessage());
             }
             propName = "ERROR-FINDING-PROP-VALUE";
@@ -292,12 +285,8 @@ public class RelationDocumentModelHandler
                 String itemDocnumber = ServiceBindingUtils.getMappedFieldInDoc(itemSbt, ServiceBindingUtils.OBJ_NUMBER_PROP, itemDocModel);
 
                 if (propName == null || itemDocnumber == null) {
-                    //System.out.println("=== prop NOT found: "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
-                    //                          +" documentType: "+documentType);
                 } else {
                     item.setNumber(itemDocnumber);
-                    //System.out.println("============ found prop : "+ServiceBindingUtils.OBJ_NUMBER_PROP+"::"+propName+"="+itemDocnumber
-                    //                          +" documentType: "+documentType);
                 }
             } catch (Throwable t) {
                 logger.error("====Error finding objectNumberProperty: " + ServiceBindingUtils.OBJ_NUMBER_PROP + "=" + propName
@@ -320,7 +309,11 @@ public class RelationDocumentModelHandler
     private final boolean OBJ_DOC_MODEL = false;
     
     private DocumentModel getSubjectOrObjectDocModel(
-    		DocumentModel relationDocModel, ServiceContext ctx, boolean fSubject) throws Exception {
+    		RepositoryInstance repoSession,
+    		DocumentModel relationDocModel,
+    		boolean fSubject) throws Exception {
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+    	
         // Get the document model for the object of the relation.
     	String commonPartLabel = ctx.getCommonPartLabel();
         String csid = "";
@@ -331,11 +324,6 @@ public class RelationDocumentModelHandler
         try {
             csid = (String) relationDocModel.getProperty(commonPartLabel, 
             		(fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID));
-            // FIXME: Remove this entire 'if' statement when legacy fields are removed from the Relation record:
-            if (Tools.isBlank(csid)) {
-                csid = (String) relationDocModel.getProperty(commonPartLabel, 
-					(fSubject?RelationJAXBSchema.DOCUMENT_ID_1:RelationJAXBSchema.DOCUMENT_ID_2));
-            }
         } catch (PropertyException pe) {
             // Per CSPACE-4468, ignore any property exception here.
             // The objectCsid and/or subjectCsid field in a relation record
@@ -343,13 +331,14 @@ public class RelationDocumentModelHandler
             // provided as an alternate identifier.
         }
         if (Tools.notBlank(csid)) {
-            DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDocFromCsid(ctx, csid);
+        	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)getRepositoryClient(ctx);
+            DocumentWrapper<DocumentModel> docWrapper = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, csid);
             docModel = docWrapper.getWrappedObject();
         } else { //  if (Tools.isBlank(objectCsid)) {
             try {
             	refName = (String) relationDocModel.getProperty(commonPartLabel, 
             			(fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
-            	docModel = ResourceBase.getDocModelForRefName(refName, ctx.getResourceMap());
+            	docModel = ResourceBase.getDocModelForRefName(repoSession, refName, ctx.getResourceMap());
             } catch (Exception e) {
                 throw new InvalidDocumentException(
                         "Relation record must have a CSID or refName to identify the object of the relation.", e);
@@ -365,23 +354,17 @@ public class RelationDocumentModelHandler
     private void populateSubjectOrObjectValues(
     		DocumentModel relationDocModel, 
     		DocumentModel subjectOrObjectDocModel,
-    		ServiceContext ctx,
     		boolean fSubject ) {
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+    	
         HashMap<String,Object> properties = new HashMap<String,Object>();
-
         try {
 	        String doctype = (String) subjectOrObjectDocModel.getType();
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_DOCTYPE:RelationJAXBSchema.OBJECT_DOCTYPE),
 	        					doctype);
-	        // FIXME: Remove the line below when legacy fields are removed from the Relation record:
-	        properties.put((fSubject?RelationJAXBSchema.DOCUMENT_TYPE_1:RelationJAXBSchema.DOCUMENT_TYPE_2), 
-	        					doctype);
 	
 	        String csid = (String) subjectOrObjectDocModel.getName();
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID),
-	        					csid);
-	        // FIXME: Remove the two lines immediately below when legacy fields are removed from the Relation record:
-	        properties.put((fSubject?RelationJAXBSchema.DOCUMENT_ID_1:RelationJAXBSchema.DOCUMENT_ID_2),
 	        					csid);
 	
 	        String uri = (String) subjectOrObjectDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,

@@ -16,11 +16,13 @@ import org.collectionspace.services.nuxeo.client.java.CommonList;
 //import org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler;
 //import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.Download;
+import org.collectionspace.services.common.document.DocumentException;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.io.FileUtils;
 
 public class BlobInput {
 	private final Logger logger = LoggerFactory.getLogger(BlobInput.class);
+	private final static String FILE_ACCESS_ERROR = "The following file is either missing or cannot be read: ";
 	
 	private String blobCsid = null;
 	private File blobFile = null;
@@ -144,16 +146,23 @@ public class BlobInput {
 
 		if (blobUrl.getProtocol().equalsIgnoreCase("http")) {
 			Download fetchedFile = new Download(blobUrl);
+			logger.debug("Starting blob download into temp file:" + fetchedFile.getFilePath());
 			while (fetchedFile.getStatus() == Download.DOWNLOADING) {
 				// Do nothing while we wait for the file to download
 			}
+			logger.debug("Finished blob download into temp file: " + fetchedFile.getFilePath());
+			
 			int status = fetchedFile.getStatus();
 			if (status == Download.COMPLETE) {
 				theBlobFile = fetchedFile.getFile();
-			}
+			} //FIXME: REM - We should throw an exception here if we couldn't download the file.
 		} else if (blobUrl.getProtocol().equalsIgnoreCase("file")) {
 			theBlobFile = FileUtils.toFile(blobUrl);
-//			theBlobFile = new File(theBlobUri);
+			if (theBlobFile.exists() == false || theBlobFile.canRead() == false) {
+				String msg = FILE_ACCESS_ERROR + theBlobFile.getAbsolutePath();
+				logger.equals(msg);
+				throw new DocumentException(msg);
+			}
 		} else {
 			
 		}

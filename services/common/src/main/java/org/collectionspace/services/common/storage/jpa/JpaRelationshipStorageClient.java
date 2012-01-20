@@ -36,7 +36,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
-import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
@@ -347,6 +347,9 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             q.setParameter("objectId", id);
             int rcount = 0;
             em.getTransaction().begin();
+            if (logger.isDebugEnabled() == true) {
+            	logger.debug(q.toString());
+            }
             rcount = q.executeUpdate();
             if (logger.isDebugEnabled()) {
                 logger.debug("deleted " + rcount + " relationships for entity " + entityName

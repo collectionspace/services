@@ -3,14 +3,13 @@
     <description>
         collectionspace services war
     </description>
-  <!-- set global properties for this build -->
+	<!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="cspace-services.war" value="${cspace.services.war}"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -140,19 +139,23 @@
     </target>
 
     <target name="deploy" depends="package"
-    description="deploy cspace services in ${jboss.server.cspace}">
-        <copy file="${basedir}/target/${cspace-services.war}" todir="${jboss.server.cspace}/deploy"/>
+    description="deploy cspace services in ${jee.server.cspace}">
+		<delete file="${catalina.context.cspace}"/> <!-- This is a Tomcat specific file that we seem to need to delete inorder for it to be replace with a more recent one during deployment -->
+		<delete dir="${jee.deploy.cspace}/${cspace.services.context}"/>
+        <copy file="${basedir}/target/${cspace.services.war}" todir="${jee.deploy.cspace}"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy cspace services from ${jboss.server.cspace}">
-        <delete file="${jboss.server.cspace}/deploy/${cspace-services.war}"/>
+    description="undeploy cspace services from ${jee.server.cspace}">
+		<delete file="${catalina.context.cspace}"/> <!-- This is a Tomcat specific file that we seem to need to delete inorder for it to be replace with a more recent one during deployment -->
+		<delete dir="${jee.deploy.cspace}/${cspace.services.context}"/>
+        <delete file="${jee.deploy.cspace}/${cspace.services.war}"/>
     </target>
 
     <target name="dist"
     description="generate distribution for cspace services" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.cspace}">
-            <fileset file="${basedir}/target/${cspace-services.war}"/>
+            <fileset file="${basedir}/target/${cspace.services.war}"/>
         </copy>
     </target>
 

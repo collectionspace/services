@@ -501,19 +501,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         } else {
             Assert.fail("readItemListByPartialTerm passed null csid!");
         }
+        assertStatusCode(res, testName);
         AbstractCommonList list = null;
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if(logger.isDebugEnabled()){
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             list = res.getEntity();
         } finally {
             res.releaseConnection();

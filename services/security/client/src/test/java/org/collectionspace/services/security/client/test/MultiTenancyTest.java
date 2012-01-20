@@ -37,11 +37,11 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
-import org.collectionspace.services.authorization.ActionType;
-import org.collectionspace.services.authorization.EffectType;
+import org.collectionspace.services.authorization.perms.ActionType;
+import org.collectionspace.services.authorization.perms.EffectType;
 
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
@@ -422,17 +422,8 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         DimensionClient client = new DimensionClient();
         client.setAuth(true, userName, true, userName, true);
         ClientResponse<String> res = client.read(id);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(res, testName);
+        
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         return (DimensionsCommon) extractPart(input,
                 client.getCommonPartName(), DimensionsCommon.class);

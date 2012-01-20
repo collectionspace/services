@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns3:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/jaxb" xmlns:ns3="http://collectionspace.org/services/collectionobject">
-<remNumber>
-<numberValue>2271966-1285644709415</numberValue>
-<numberType>remNumber</numberType>
-</remNumber>
 <objectNumber>objectNumber-1285644709375</objectNumber>
 <otherNumberList>
 <otherNumber>
@@ -15,7 +11,6 @@
 <numberType>ipaddress</numberType>
 </otherNumber>
 </otherNumberList>
-<otherNumber>urn:org.walkerart.id:123</otherNumber>
 <briefDescriptions>
 <briefDescription>Papier mache bird cow mask with horns, painted red with black and yellow spots. Puerto Rico. ca. 8&amp;quot; high, 6&amp;quot; wide, projects 10&amp;quot; (with horns).</briefDescription>
 <briefDescription>Acrylic rabbit mask with wings, painted red with green and aquamarine spots. Puerto Rico. ca. 8&amp;quot; high, 6&amp;quot; wide, projects 10&amp;quot; (with wings).</briefDescription>

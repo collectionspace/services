@@ -370,16 +370,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         String newID = null;
         ClientResponse<String> res = client.read(knownResourceId);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
                 PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -415,16 +406,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         ClientResponse<String> res = client.readByName(knownResourceShortIdentifer);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
                 PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -459,17 +441,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+            assertStatusCode(res, testName);
             // Check whether we've received an authority item record.
             PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
             TaxonCommon taxon = (TaxonCommon) extractPart(input,
@@ -518,17 +490,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+            assertStatusCode(res, testName);
             // Check whether taxon has expected displayName.
             PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
             TaxonCommon taxon = (TaxonCommon) extractPart(input,
@@ -553,16 +515,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
             commonPart.setLabel(client.getItemCommonPartName());
             res.releaseConnection();
             res = client.updateItem(knownResourceId, knownItemResourceId, output);
-            statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug("updateItem: status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+            assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
             TaxonCommon updatedTaxon =
@@ -588,16 +541,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
             commonPart.setLabel(client.getItemCommonPartName());
             res.releaseConnection();
             res = client.updateItem(knownResourceId, knownItemResourceId, output);
-            statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug("updateItem: status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+            assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
             updatedTaxon =
@@ -630,25 +574,19 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // Perform setup.
-        // FIXME: create a setup configuration for this operation.
-        setupUpdateWithWrongXmlSchema();
+
+        // Perform setup for read.
+        setupRead();
 
         // Submit the request to the service and store the response.
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
+        
+        // Perform setup for update.
+        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
+        
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
-
             // Check whether Taxonomy has expected displayName.
             PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
             TaxonCommon taxon = (TaxonCommon) extractPart(input,
@@ -664,15 +602,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
             commonPart.setLabel(client.getItemCommonPartName());
             res.releaseConnection();
             res = client.updateItem(knownResourceId, knownItemResourceId, output);
-            statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug("updateItem: status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
         } finally {
             res.releaseConnection();
         }
@@ -769,18 +699,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         ClientResponse<AbstractCommonList> res = client.readList();
         try {
+            assertStatusCode(res, testName);
         	AbstractCommonList list = res.getEntity();
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             // Optionally output additional data about list members for debugging.
             if(logger.isTraceEnabled()){
             	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
@@ -838,18 +758,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
             Assert.fail("readItemList passed null csid and name!");
         }
         try {
+            assertStatusCode(res, testName);
         	AbstractCommonList list = res.getEntity();
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             List<AbstractCommonList.ListItem> items =
                     list.getListItem();
             int nItemsReturned = items.size();
@@ -980,11 +890,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
         ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": read status = " + res.getStatus());
-            }
-            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
+            assertStatusCode(res, testName);
             if (logger.isDebugEnabled()) {
                 logger.debug("got Taxonomy to update with ID: "
                         + knownItemResourceId
@@ -1010,15 +916,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractServiceTestImpl { //FI
             commonPart.setLabel(client.getItemCommonPartName());
             res.releaseConnection();
             res = client.updateItem(knownResourceId, knownItemResourceId, output);
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
 
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());

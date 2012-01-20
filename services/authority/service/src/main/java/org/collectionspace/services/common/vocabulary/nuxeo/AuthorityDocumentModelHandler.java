@@ -25,16 +25,21 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import java.util.Map;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 /**
  * AuthorityDocumentModelHandler
@@ -80,6 +85,10 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         updateRefnameForAuthority(wrapDoc, authorityCommonSchemaName);//CSPACE-3178
     }
 
+    /**
+     * If no short identifier was provided in the input payload,
+     * generate a short identifier from the display name.
+     */
     private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
@@ -89,34 +98,50 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
             docModel.setProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER, generatedShortIdentifier);
         }
     }
-    
+ 
+    /**
+     * Generate a refName for the authority from the short identifier
+     * and display name.
+     * 
+     * All refNames for authorities are generated.  If a client supplies
+     * a refName, it will be overwritten during create (per this method) 
+     * or discarded during update (per filterReadOnlyPropertiesForPart).
+     * 
+     * @see #filterReadOnlyPropertiesForPart(Map<String, Object>, org.collectionspace.services.common.service.ObjectPartType)
+     * 
+     */
     protected void updateRefnameForAuthority(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        String suppliedRefName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.REF_NAME);
-        // CSPACE-3178:
-        // Temporarily accept client-supplied refName values, rather than always generating such values,
-        // Remove the surrounding 'if' statement when clients should no longer supply refName values.
-        if (suppliedRefName == null || suppliedRefName.isEmpty()) {
-            String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
-            String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
-            MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-            RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
-                    ctx.getServiceName(),
-                    shortIdentifier,
-                    displayName);
-            String refName = authority.toString();
-            docModel.setProperty(schemaName, AuthorityJAXBSchema.REF_NAME, refName);
-        }
+        String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+        String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
+        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
+        RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
+                ctx.getServiceName(),
+                shortIdentifier,
+                displayName);
+        String refName = authority.toString();
+        docModel.setProperty(schemaName, AuthorityJAXBSchema.REF_NAME, refName);
     }
 
-    public String getShortIdentifier(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) {
-        DocumentModel docModel = wrapDoc.getWrappedObject();
+    public String getShortIdentifier(String authCSID, String schemaName) throws Exception {
         String shortIdentifier = null;
+        RepositoryInstance repoSession = null;
+
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+    	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
         try {
+        	repoSession = nuxeoRepoClient.getRepositorySession();
+            DocumentWrapper<DocumentModel> wrapDoc = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, authCSID);
+            DocumentModel docModel = wrapDoc.getWrappedObject();
             shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
         } catch (ClientException ce) {
             throw new RuntimeException("AuthorityDocHandler Internal Error: cannot get shortId!", ce);
+        } finally {
+        	if (repoSession != null) {
+        		nuxeoRepoClient.releaseRepositorySession(repoSession);
+        	}
         }
+        
         return shortIdentifier;
     }
 
@@ -134,9 +159,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         if (partMeta.getLabel().equalsIgnoreCase(commonPartLabel)) {
             objectProps.remove(AuthorityJAXBSchema.CSID);
             objectProps.remove(AuthorityJAXBSchema.SHORT_IDENTIFIER);
-            // Enable when clients should no longer supply refName values
-            // objectProps.remove(AuthorityItemJAXBSchema.REF_NAME); // CSPACE-3178
-
+            objectProps.remove(AuthorityJAXBSchema.REF_NAME);
         }
     }
 }

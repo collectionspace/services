@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:authority-ref-list xmlns:ns2="http://collectionspace.org/services/jaxb"
+    xmlns:ns3="http://collectionspace.org/services/common/authorityref">
+    <pageNum>0</pageNum>
+    <pageSize>40</pageSize>
+    <itemsInPage>8</itemsInPage>
+    <totalItems>8</totalItems>
+</ns3:authority-ref-list>

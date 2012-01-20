@@ -36,6 +36,7 @@ import org.collectionspace.services.objectexit.ObjectExitResource;
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.imports.ImportsResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
+import org.collectionspace.services.concept.ConceptAuthorityResource;
 import org.collectionspace.services.place.PlaceAuthorityResource;
 import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
@@ -51,6 +52,7 @@ import org.collectionspace.services.workflow.WorkflowResource;
 
 //import org.collectionspace.services.query.QueryResource;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 
@@ -86,13 +88,14 @@ public class CollectionSpaceJaxRsApplication extends Application
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
     private ResourceMap resourceMap = new ResourceMapImpl();
+    private ServletContext servletContext = null;
 
     public CollectionSpaceJaxRsApplication() {    	
     	//
     	// Instantiate all our JaxRS resources
     	//
-    	ResourceBase resource;
         singletons.add(new SecurityInterceptor());
+        
         singletons.add(new AccountResource());
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
@@ -102,6 +105,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new OrgAuthorityResource());
         addResourceToMapAndSingletons(new LocationAuthorityResource());
         addResourceToMapAndSingletons(new TaxonomyAuthorityResource());
+        addResourceToMapAndSingletons(new ConceptAuthorityResource());
         addResourceToMapAndSingletons(new PlaceAuthorityResource());
         addResourceToMapAndSingletons(new AcquisitionResource());
         addResourceToMapAndSingletons(new ContactResource());
@@ -147,6 +151,14 @@ public class CollectionSpaceJaxRsApplication extends Application
 
     public ResourceMap getResourceMap() {
         return resourceMap;
+    }
+    
+    public void setServletContext(ServletContext servletContext) {
+    	this.servletContext = servletContext;
+    }
+    
+    public ServletContext getServletContext() {
+    	return this.servletContext;
     }
 }
 

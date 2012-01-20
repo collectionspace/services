@@ -109,12 +109,12 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy blob in ${jboss.server.nuxeo}">
+    description="deploy blob in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-blob/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy blob from ${jboss.server.nuxeo}">
+    description="undeploy blob from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-blob/build.xml" target="undeploy" inheritall="false"/>
     </target>
 

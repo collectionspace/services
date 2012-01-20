@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- CollectionSpace default (security) authorization provider schema (XSD) 
+	Entity(s) : permission Used for: $LastChangedRevision: 916 $ $LastChangedDate: 
+	2009-11-05 16:59:20 -0800 (Thu, 05 Nov 2009) $ -->
+
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	jaxb:version="2.1" elementFormDefault="unqualified"
+	xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
+	xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+	xmlns:ns="http://collectionspace.org/services/authorization/perms"
+	xmlns="http://collectionspace.org/services/authorization/perms"
+	targetNamespace="http://collectionspace.org/services/authorization/perms"
+	version="0.1"
+	jaxb:extensionBindingPrefixes="hj orm">
+
+	<xs:element name="permission" type="permission" />
+	<xs:complexType name="permission">
+		<xs:annotation>
+			<xs:documentation>
+				CspacePermissionConfig describes permission in CollectionSpace
+				- resourceName could be a service path, e.g. collectionobjects or
+				intakes
+				no need to give slash at the beginning or end
+				- attributeName could be an attribute of the service schema
+				e.g. distinguishingFeatures from collectionobjects_common
+				- actionGroup is label that can be used by a client to "group" sets
+				of actions for operations
+				like searching for permissions by a specific actionGroup label.
+				- action describes the actions that could be taken on given resource
+				(and attribute)
+				- effect describes the effect of the access control for the action
+				performed on the given resource (and attribute)
+            </xs:documentation>
+			<xs:appinfo>
+				<hj:entity>
+					<orm:table name="permissions" />
+				</hj:entity>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:sequence>
+
+			<xs:element name="description" type="xs:string" minOccurs="0"
+				maxOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="description" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="resourceName" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="resource_name" length="128"
+								nullable="false" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="attributeName" type="xs:string"
+				minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="attribute_name" length="128"
+								nullable="true" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="actionGroup" type="xs:string" minOccurs="0"
+				maxOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="action_group" length="128" nullable="true" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="action" type="permission_action"
+				minOccurs="1" maxOccurs="unbounded" />
+			<xs:element name="effect" type="effect_type" minOccurs="1"
+				maxOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="effect" length="32" nullable="false" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tenant_id" type="xs:string" minOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="tenant_id" length="128" nullable="false" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="createdAt" type="xs:dateTime">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="created_at" nullable="false" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="updatedAt" type="xs:dateTime">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="updated_at" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="csid" type="xs:string">
+			<xs:annotation>
+				<xs:appinfo>
+					<hj:id>
+						<orm:column name="csid" length="128" nullable="false" />
+					</hj:id>
+				</xs:appinfo>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="permission_action">
+		<xs:annotation>
+			<xs:appinfo>
+				<hj:entity>
+					<orm:table name="permissions_actions">
+					</orm:table>
+				</hj:entity>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="action_type" minOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="name" length="128" nullable="false" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="objectIdentity" type="xs:string"
+				minOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="objectIdentity" length="128"
+								nullable="false" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="objectIdentityResource" type="xs:string"
+				minOccurs="1">
+				<xs:annotation>
+					<xs:appinfo>
+						<hj:basic>
+							<orm:column name="objectIdentityResource" length="128"
+								nullable="false" />
+						</hj:basic>
+					</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="action_type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CREATE" />
+			<xs:enumeration value="READ" />
+			<xs:enumeration value="UPDATE" />
+			<xs:enumeration value="DELETE" />
+			<xs:enumeration value="SEARCH" />
+			<xs:enumeration value="START" />
+			<xs:enumeration value="STOP" />
+			<xs:enumeration value="RUN" />
+			<xs:enumeration value="ADMIN" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="effect_type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PERMIT" />
+			<xs:enumeration value="DENY" />
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>
+

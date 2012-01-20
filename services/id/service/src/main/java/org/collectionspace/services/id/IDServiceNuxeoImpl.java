@@ -123,8 +123,6 @@ public class IDServiceNuxeoImpl {      // implements IDService {
 				+ CollectionObjectJAXBSchema.OBJECT_NUMBER, co
 				.getObjectNumber());
 		queryParams.put(CO_NUXEO_SCHEMA_NAME + ":"
-				+ CollectionObjectJAXBSchema.OTHER_NUMBER, co.getOtherNumber());
-		queryParams.put(CO_NUXEO_SCHEMA_NAME + ":"
 				+ CollectionObjectJAXBSchema.BRIEF_DESCRIPTION, co
 				.getBriefDescription());
 		queryParams.put(CO_NUXEO_SCHEMA_NAME + ":"

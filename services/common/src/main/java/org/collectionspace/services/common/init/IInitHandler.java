@@ -6,6 +6,8 @@ import org.collectionspace.services.common.service.InitHandler.Params.Property;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
 /**
  * User: laramie
  * $LastChangedRevision$
@@ -13,5 +15,8 @@ import java.util.List;
  */
 
 public interface IInitHandler {
-    public void onRepositoryInitialized(ServiceBindingType sbt, List<Field> fields, List<Property> property) throws Exception;
+    public void onRepositoryInitialized(DataSource dataSource,
+    		ServiceBindingType sbt, 
+    		List<Field> fields, 
+    		List<Property> property) throws Exception;
 }

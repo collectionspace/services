@@ -10,8 +10,6 @@
       </templates>
       <rows>
         <row><widget>objectNumber</widget></row>
-        <row><widget>otherNumber</widget></row>
-        <row><widget>otherNumberType</widget></row>
         <!-- Repeatable fields are commented out for now until we -->
         <!-- identify how to represent these complex types in layouts. -->
         <!-- <row><widget>entryMethod</widget></row> -->
@@ -48,31 +46,6 @@
         </properties>
       </widget>
       
-      <widget name="otherNumber" type="text">
-        <labels>
-          <label mode="any">otherNumber</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="${CommonSchemaName}">otherNumber</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-      
-      <widget name="otherNumberType" type="text">
-        <labels>
-          <label mode="any">otherNumberType</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="${CommonSchemaName}">otherNumberType</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
 <!--
       <widget name="briefDescription" type="text">
         <labels>

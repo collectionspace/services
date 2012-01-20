@@ -34,6 +34,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCommonListUtils;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
@@ -65,7 +66,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
     private String LENDER_REF_NAME =
-            "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Harry Lender)'Harry Lender'";
+            "urn:cspace:org.collectionspace.demo:personauthorities:name(TestPersonAuth):item:name(HarryLender)'Harry Lender'";
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -298,18 +301,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LoaninClient client = new LoaninClient();
         ClientResponse<String> res = client.read(knownResourceId);
+        assertStatusCode(res, testName);
         PoxPayloadIn input = null;
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
             input = new PoxPayloadIn(res.getEntity());
         } finally {
             res.releaseConnection();
@@ -401,18 +395,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         AbstractCommonList list = null;
         LoaninClient client = new LoaninClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             list = res.getEntity();
         } finally {
             res.releaseConnection();
@@ -452,13 +436,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         LoaninClient client = new LoaninClient();
         ClientResponse<String> res = client.read(knownResourceId);
+        assertStatusCode(res, testName);
         PoxPayloadIn input = null;
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": read status = " + res.getStatus());
-            }
-            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
             if (logger.isDebugEnabled()) {
                 logger.debug("got object to update with ID: " + knownResourceId);
             }
@@ -477,7 +457,6 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 
         // Update the content of this resource.
         loaninCommon.setLoanInNumber("updated-" + loaninCommon.getLoanInNumber());
-        loaninCommon.setLoanReturnDate("updated-" + loaninCommon.getLoanReturnDate());
         loaninCommon.setLoanInNote("updated-" + loaninCommon.getLoanInNote());
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
@@ -490,15 +469,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(loaninCommon, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
             input = new PoxPayloadIn(res.getEntity());
         } finally {
             res.releaseConnection();
@@ -513,8 +485,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(updatedLoaninCommon);
 
         // Check selected fields in the updated common part.
-        Assert.assertEquals(updatedLoaninCommon.getLoanReturnDate(),
-                loaninCommon.getLoanReturnDate(),
+        Assert.assertEquals(updatedLoaninCommon.getLoanInNumber(),
+                loaninCommon.getLoanInNumber(),
                 "Data in updated object did not match submitted data.");
 
         if (logger.isDebugEnabled()) {
@@ -831,7 +803,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 
         LoansinCommon loaninCommon = new LoansinCommon();
         loaninCommon.setLoanInNumber(loaninNumber);
-        loaninCommon.setLoanReturnDate(returnDate);
+        loaninCommon.setLoanReturnDate(CURRENT_DATE_UTC);
         LenderGroupList lenderGroupList = new LenderGroupList();
         LenderGroup lenderGroup = new LenderGroup();
         lenderGroup.setLender(LENDER_REF_NAME);

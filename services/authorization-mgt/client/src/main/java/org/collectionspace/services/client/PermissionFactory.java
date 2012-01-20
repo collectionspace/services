@@ -26,10 +26,10 @@ package org.collectionspace.services.client;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.collectionspace.services.authorization.ActionType;
-import org.collectionspace.services.authorization.EffectType;
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.perms.ActionType;
+import org.collectionspace.services.authorization.perms.EffectType;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,7 @@ public class PermissionFactory {
             permission.setResourceName(resourceName);
         }
         if (useAction) {
-            permission.setActions(actionList);
+            permission.setAction(actionList);
         }
         if (useEffect) {
             permission.setEffect(effect);

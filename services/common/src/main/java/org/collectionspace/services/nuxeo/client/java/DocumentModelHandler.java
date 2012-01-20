@@ -24,6 +24,7 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.List;
+import java.util.Map;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -39,6 +40,7 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -81,10 +83,9 @@ public abstract class DocumentModelHandler<T, TL>
     public String getUri(DocumentModel docModel) {
         return getServiceContextPath()+getCsid(docModel);
     }
-    
-    
-    public RepositoryClient getRepositoryClient(ServiceContext ctx) {
-        RepositoryClient repositoryClient = RepositoryClientFactory.getInstance().getClient(ctx.getRepositoryClientName());
+        
+    public RepositoryClient<PoxPayloadIn, PoxPayloadOut> getRepositoryClient(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+        RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient = RepositoryClientFactory.getInstance().getClient(ctx.getRepositoryClientName());
         return repositoryClient;
     }
 
@@ -93,6 +94,7 @@ public abstract class DocumentModelHandler<T, TL>
      * @return
      */
     public RepositoryInstance getRepositorySession() {
+    	
         return repositorySession;
     }
 
@@ -182,15 +184,14 @@ public abstract class DocumentModelHandler<T, TL>
      * @return the authority refs
      * @throws PropertyException the property exception
      */
-    abstract public AuthorityRefList getAuthorityRefs(
-            DocumentWrapper<DocumentModel> docWrapper,
-		List<String> authRefFields) throws PropertyException;    
+    abstract public AuthorityRefList getAuthorityRefs(String csid,
+    		List<AuthRefConfigInfo> authRefsInfo) throws PropertyException;    
 
     private void handleCoreValues(DocumentWrapper<DocumentModel> docWrapper, 
     		Action action)  throws ClientException {
     	DocumentModel documentModel = docWrapper.getWrappedObject();
         String now = GregorianCalendarDateTimeUtils.timestampUTC();
-    	ServiceContext ctx = getServiceContext();
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
     	String userId = ctx.getUserId();
     	if(action==Action.CREATE) {
             //

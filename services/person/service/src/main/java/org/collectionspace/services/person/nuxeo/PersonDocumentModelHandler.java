@@ -163,24 +163,6 @@ public class PersonDocumentModelHandler
 		return newStr.toString();
     }
     
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
-     */
-    @Override
-    protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
-            throws Exception {
-    	Map<String, Object> unQObjectProperties = super.extractPart(docModel, schema, partMeta);
-    	
-    	// Add the CSID to the common part
-    	if (partMeta.getLabel().equalsIgnoreCase(COMMON_PART_LABEL)) {
-	    	String csid = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
-	    	unQObjectProperties.put("csid", csid);
-    	}
-    	
-    	return unQObjectProperties;
-    }
-    
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop

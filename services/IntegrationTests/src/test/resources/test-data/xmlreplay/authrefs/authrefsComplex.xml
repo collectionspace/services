@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+	<!-- 
+			 testGroup ID="person" is not live.  It works, but may not clean up correctly. 
+			 For now, use ID="updatePerson"
+	-->
+	<testGroup ID="AuthRefsComplex" autoDeletePOSTS="true">
+		<test ID="intake1" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/intakes/</uri>
+			<filename>authrefs/intake1.xml</filename>
+		</test>
+
+		<test ID="getIntakeAuthRefs">
+			<method>GET</method>
+			<uri>/cspace-services/intakes/${intake1.CSID}/authorityrefs</uri>
+			<response>
+				<expected level="ADDOK" />
+				<filename>authrefs/res/intakesAuthRefs.res.xml</filename>
+			 </response>
+		</test>
+
+	</testGroup>
+</xmlReplay>

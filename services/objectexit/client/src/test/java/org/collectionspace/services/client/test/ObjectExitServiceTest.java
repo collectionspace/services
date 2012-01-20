@@ -121,12 +121,11 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
         setupReadList();
         ObjectExitClient client = new ObjectExitClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         String bar = "\r\n\r\n=================================\r\n\r\n";
         System.out.println(bar+" res: "+res);
         AbstractCommonList list = res.getEntity();
-
         System.out.println(bar+" list: "+list);
-        assertStatusCode(res, testName);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;

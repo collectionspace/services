@@ -24,6 +24,7 @@
 package org.collectionspace.services.vocabulary.nuxeo;
 
 import org.collectionspace.services.client.VocabularyClient;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 
@@ -47,6 +48,11 @@ public class VocabularyItemDocumentModelHandler
         return VocabularyClient.SERVICE_PATH_COMPONENT;    // CSPACE-3932
     }
     
+    @Override
+    protected String getRefPropName() {
+    	return ServiceBindingUtils.TERM_REF_PROP;
+    }
+
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop

@@ -109,12 +109,12 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy person in ${jboss.server.nuxeo}">
+    description="deploy person in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy person from ${jboss.server.nuxeo}">
+    description="undeploy person from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="undeploy" inheritall="false"/>
     </target>
 

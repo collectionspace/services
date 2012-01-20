@@ -111,27 +111,29 @@
     </target>
 
     <target name="deploy" depends="install"
-            description="deploy authentication service in ${jboss.server.cspace}">
-        <copy file="${basedir}/target/${authentication.jar}" todir="${jboss.server.cspace}/lib"/>
-        <copy tofile="${jboss.server.cspace}/conf/login-config.xml.org"
-              file="${jboss.server.cspace}/conf/login-config.xml"
-              overwrite="false"/>
-        
-        <copy tofile="${jboss.server.cspace}/conf/login-config.xml"
+            description="deploy authentication service in ${jee.server.cspace}">
+        <copy file="${basedir}/target/${authentication.jar}" todir="${jee.server.cspace}/lib"/>
+        <!-- This is JBoss specific and no longer needed
+		<copy tofile="${jee.server.cspace}/conf/login-config.xml.org"
+              file="${jee.server.cspace}/conf/login-config.xml"
+              overwrite="false"/> -->
+        <!-- This is JBoss specific and no longer needed
+        <copy tofile="${jee.server.cspace}/conf/login-config.xml"
               file="${src}/main/resources/config/login-config.xml"
-              overwrite="true"/>
-        <copy todir="${jboss.server.cspace}/cspace/services">
+              overwrite="true"/> -->
+        <copy todir="${jee.server.cspace}/cspace/services">
             <fileset dir="${src}/main/resources/"/>
         </copy>
         <echo message="Check out Authentication Service Configuration Guide on wiki.collectionspace.org for more details" />
     </target>
 
     <target name="undeploy"
-            description="undeploy authentication service from ${jboss.server.cspace}">
-        <delete file="${jboss.server.cspace}/lib/${authentication.jar}"/>
-        <copy tofile="${jboss.server.cspace}/conf/login-config.xml"
-              file="${jboss.server.cspace}/conf/login-config.xml.org"
-              overwrite="true" failonerror="false" />
+            description="undeploy authentication service from ${jee.server.cspace}">
+        <delete file="${jee.server.cspace}/lib/${authentication.jar}"/>
+		<!-- This is JBoss specific and no longer needed
+        <copy tofile="${jee.server.cspace}/conf/login-config.xml"
+              file="${jee.server.cspace}/conf/login-config.xml.org"
+              overwrite="true" failonerror="false" /> -->
         <echo message="Check out Authentication Service Configuration Guide on wiki.collectionspace.org for more details"/>
     </target>
 

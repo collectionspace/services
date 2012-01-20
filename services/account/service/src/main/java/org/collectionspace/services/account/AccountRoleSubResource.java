@@ -32,9 +32,7 @@ import org.collectionspace.services.account.storage.AccountRoleDocumentHandler;
 //import org.collectionspace.services.authorization.AccountRolesList;
 //import org.collectionspace.services.authorization.AccountRolesList.AccountRoleListItem;
 import org.collectionspace.services.authorization.AccountRole;
-import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.AccountRoleRel;
-import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
@@ -173,11 +171,11 @@ public class AccountRoleSubResource
     	//
     	
     	//Preserve the original incoming list of roles
-    	List<RoleValue> inputRoleValues = input.getRoles();
+    	List<RoleValue> inputRoleValues = input.getRole();
 
     	//Change the role list to be just the Spring role
     	List<RoleValue> springRoles = new ArrayList<RoleValue>();
-    	input.setRoles(springRoles);
+    	input.setRole(springRoles);
     	RoleValue springAdminRole = new RoleValue();
     	springRoles.add(springAdminRole);
     	springAdminRole.setRoleId(AuthorizationCommon.ROLE_SPRING_ADMIN_ID);
@@ -195,14 +193,14 @@ public class AccountRoleSubResource
     		if (logger.isTraceEnabled() == true) {
     			logger.trace(AuthorizationCommon.ROLE_SPRING_ADMIN_NAME +
     					" relationship already exists for account: " +
-    					input.getAccounts().get(0).getAccountId(), e);
+    					input.getAccount().get(0).getAccountId(), e);
     		}
     	}
     	
     	//
     	// Now we'll add the account relationships for the original incoming roles.
     	//
-    	input.setRoles(inputRoleValues);
+    	input.setRole(inputRoleValues);
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input, subject);
         DocumentHandler handler = createDocumentHandler(ctx);        
         String bogusCsid = getStorageClient(ctx).create(ctx, handler);

@@ -432,16 +432,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
         ClientResponse<String> res = client.readByName(knownResourceShortIdentifer);
-        int statusCode = res.getStatus();
+        assertStatusCode(res, testName);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
                 client.getCommonPartName(), VocabulariesCommon.class);
@@ -463,15 +455,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     // Submit the request to the service and store the response.
     ClientResponse<PoxPayloadIn> res = client.read(knownResourceId);
     int statusCode = res.getStatus();
+    assertStatusCode(res, testName);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": status = " + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     //FIXME: remove the following try catch once Aron fixes signatures
     try {
     PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
@@ -496,16 +481,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Check whether we've received a vocabulary item.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -523,23 +499,17 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // Perform setup.
-        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
-        // setupUpdateWithWrongXmlSchema(testName);
 
+        // Perform setup for read.
+        setupRead();
+        
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+        assertStatusCode(res, testName);
+        
+        // Perform setup for update.
+        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
 
         // Check whether Person has expected displayName.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -554,7 +524,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartItemName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
+        int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -654,17 +624,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         if(logger.isTraceEnabled()){
@@ -699,17 +660,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         } else {
             Assert.fail("Internal Error: readItemList both vcsid and shortId are null!");
         }
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("  " + testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         List<AbstractCommonList.ListItem> items = list.getListItem();
         int nItemsReturned = items.size();
@@ -746,10 +698,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         VocabularyClient client = new VocabularyClient();
         ClientResponse<String> res =
                 client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         if (logger.isDebugEnabled()) {
             logger.debug("got Vocabulary to update with ID: " + knownResourceId);
@@ -773,15 +722,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("update: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Retrieve the updated resource and verify that its contents exist.
         input = new PoxPayloadIn(res.getEntity());
@@ -810,10 +751,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         VocabularyClient client = new VocabularyClient();
         ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         if (logger.isDebugEnabled()) {
             logger.debug("got VocabularyItem to update with ID: "
@@ -838,15 +776,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(vocabularyItem, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartItemName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("updateItem: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Retrieve the updated resource and verify that its contents exist.
         input = new PoxPayloadIn(res.getEntity());
@@ -874,17 +804,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + " read Vocab:" + knownResourceId + "/Item:"
-                    + knownItemResourceId + " status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         VocabularyitemsCommon vitem = (VocabularyitemsCommon) extractPart(input,
@@ -901,15 +821,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartItemName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Retrieve the updated resource and verify that the parent did not change
         res = client.readItem(knownResourceId, knownItemResourceId);

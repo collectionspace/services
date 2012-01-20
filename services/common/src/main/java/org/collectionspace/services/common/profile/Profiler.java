@@ -175,13 +175,9 @@ public class Profiler {
      * @param msg the message to be written to a log entry.
      */
     public void log(String msg) {
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debug(formatLogMessage(msg));
-        }
         if (getLogger().isTraceEnabled()) {
-            getLogger().trace("[TRACE] " + formatLogMessage(msg));
-        }
-        
+            getLogger().trace(formatLogMessage(msg));
+        }        
     }
 
     /**
@@ -192,11 +188,11 @@ public class Profiler {
      *                  false if it is not to be formatted.
      */
     public void log(String msg, boolean formatMsg) {
-        if (getLogger().isDebugEnabled()) {
+        if (getLogger().isTraceEnabled()) {
             if (formatMsg) {
-                getLogger().debug(formatLogMessage(msg));
+                getLogger().trace(formatLogMessage(msg));
             } else {
-                getLogger().debug(msg);
+                getLogger().trace(msg);
             }
         }
     }

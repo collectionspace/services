@@ -49,7 +49,7 @@ public class Download extends Observable implements Runnable {
     private int downloaded; // number of bytes downloaded
     private int status; // current status of download
     
-    public Download(URL url, String destDir) {
+    private void doDownload(URL url, String destDir) {
         size = -1;
         downloaded = 0;
         status = DOWNLOADING;
@@ -59,10 +59,19 @@ public class Download extends Observable implements Runnable {
         // Begin the download.
         download();
     }
+    
+    public Download(URL url, String destDir) {
+        doDownload(url, destDir);
+    }
 
-    // Constructor for Download.
+    // Constructor for Download.  File is uploaded to system temp directory.
     public Download(URL url) {
-    	this(url, System.getProperty("java.io.tmpdir") + UUID.randomUUID() + File.separator);    	
+    	String tmpdir = System.getProperty("java.io.tmpdir");
+    	if (tmpdir.endsWith(File.separator) == false) {
+    		tmpdir = tmpdir + File.separator;
+    	}
+    	doDownload(url, tmpdir
+    			+ UUID.randomUUID() + File.separator);
     }
     
     private void setDestDir(String destDir) {

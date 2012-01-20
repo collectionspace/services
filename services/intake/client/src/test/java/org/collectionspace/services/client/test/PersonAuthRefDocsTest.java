@@ -38,6 +38,7 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
@@ -84,6 +85,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     private String valuerRefName = null;
     private String valuerShortId = null;
     private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     @Override
     public String getServiceName() { 
@@ -128,7 +131,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         IntakeClient intakeClient = new IntakeClient();
         PoxPayloadOut multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
-                "entryDate-" + identifier,
+                CURRENT_DATE_UTC,
                 currentOwnerRefName,
                 depositorRefName,
                 conditionCheckerAssessorRefName,
@@ -258,15 +261,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         ClientResponse<AuthorityRefDocList> refDocListResp =
                 personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
-
-        int statusCode = refDocListResp.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(refDocListResp, testName);
 
         AuthorityRefDocList list = refDocListResp.getEntity();
         List<AuthorityRefDocList.AuthorityRefDocItem> items =
@@ -298,15 +293,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         personAuthClient = new PersonAuthorityClient();
         refDocListResp =
                 personAuthClient.getReferencingObjects(personAuthCSID, depositorPersonCSID);
-
-        statusCode = refDocListResp.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(refDocListResp, testName);
 
         list = refDocListResp.getEntity();
         items = list.getAuthorityRefDocItem();
@@ -356,15 +343,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         ClientResponse<AuthorityRefDocList> refDocListResp =
                 personAuthClient.getReferencingObjects(personAuthCSID, insurerPersonCSID);
-
-        int statusCode = refDocListResp.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(refDocListResp, testName);
 
         AuthorityRefDocList list = refDocListResp.getEntity();
         List<AuthorityRefDocList.AuthorityRefDocItem> items =

@@ -229,7 +229,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         String identifier = createIdentifier();
         RelationsCommon relationsCommon = createRelationsCommon(identifier);
         // Make the subject ID equal to the object ID
-        relationsCommon.setDocumentId1(relationsCommon.getDocumentId2());
+        relationsCommon.setSubjectCsid(relationsCommon.getObjectCsid());
         PoxPayloadOut multipart = createRelationInstance(relationsCommon);
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
@@ -384,16 +384,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         RelationClient client = new RelationClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Get the common part from the response and check that it is not null.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -457,18 +448,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         RelationClient client = new RelationClient();
         ClientResponse<RelationsCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         RelationsCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
         if(iterateThroughList && logger.isDebugEnabled()){
@@ -509,16 +491,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
                                                                   pageSize,
                                                                   pageNumber);
         RelationsCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
@@ -561,8 +534,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         // Retrieve an existing resource that we can update.
         RelationClient client = new RelationClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        logger.debug(testName + ": read status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
         logger.debug("Got object to update with ID: " + knownResourceId);
         
         // Extract the common part and verify that it is not null.
@@ -595,13 +567,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(relationCommon, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-            logger.debug(testName + ": status = " + statusCode);
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Extract the common part of the updated resource and verify that it is not null.
         input = new PoxPayloadIn(res.getEntity());
@@ -618,13 +584,13 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         final String msg2 =
                 "Data in updated object was not correctly computed.";
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentId1(), newSubjectId, msg);
+                updatedRelationCommon.getSubjectCsid(), newSubjectId, msg);
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentType1(), newSubjectDocType, msg2);
+                updatedRelationCommon.getSubjectDocumentType(), newSubjectDocType, msg2);
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentId2(), newObjectId, msg);
+                updatedRelationCommon.getObjectCsid(), newObjectId, msg);
         Assert.assertEquals(
-                updatedRelationCommon.getDocumentType2(), newObjectDocType, msg2);
+                updatedRelationCommon.getObjectDocumentType(), newObjectDocType, msg2);
         Assert.assertEquals(
                 updatedRelationCommon.getPredicateDisplayName(), relationCommon.getPredicateDisplayName(), msg);
 
@@ -936,21 +902,21 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
      * Fills the relation.
      *
      * @param relationCommon the relation
-     * @param documentId1 the document id1
-     * @param documentType1 the document type1
-     * @param documentId2 the document id2
-     * @param documentType2 the document type2
+     * @param subjectCsid the subject document id
+     * @param subjectDocumentType the subject document type
+     * @param objectCsid the object document id
+     * @param objectDocumentType the object document type
      * @param rt the rt
      */
     private void fillRelation(RelationsCommon relationCommon,
-            String documentId1, String documentType1,
-            String documentId2, String documentType2,
+            String subjectCsid, String subjectDocumentType,
+            String objectCsid, String objectDocumentType,
             String rt,
             String rtDisplayName) {
-        relationCommon.setDocumentId1(documentId1);
-        relationCommon.setDocumentType1(documentType1);
-        relationCommon.setDocumentId2(documentId2);
-        relationCommon.setDocumentType2(documentType2);
+        relationCommon.setSubjectCsid(subjectCsid);
+        relationCommon.setSubjectDocumentType(subjectDocumentType);
+        relationCommon.setObjectCsid(objectCsid);
+        relationCommon.setObjectDocumentType(objectDocumentType);
 
         relationCommon.setRelationshipType(rt);
         relationCommon.setPredicateDisplayName(rtDisplayName);

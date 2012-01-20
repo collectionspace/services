@@ -7,7 +7,7 @@
 
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:ns="http://collectionspace.org/services/hyperjaxb"
     xmlns="http://collectionspace.org/services/hyperjaxb"
@@ -15,6 +15,14 @@
     jaxb:extensionBindingPrefixes="hj"
     version="0.9">
     
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:globalBindings generateIsSetMethod="true" localScoping="toplevel">
+				<jaxb:serializable/>
+			</jaxb:globalBindings>
+		</xs:appinfo>
+	</xs:annotation>
+	    
     <xs:element name="abstract-common-list">
         <xs:complexType>
             <xs:annotation>

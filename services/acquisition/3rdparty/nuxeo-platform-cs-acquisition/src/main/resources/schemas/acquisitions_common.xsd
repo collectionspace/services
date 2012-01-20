@@ -21,13 +21,13 @@
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Acquisition+Schema -->
 
     <!--  Object Entry Information Group -->
-    <xs:element name="accessionDate" type="xs:string"/>
+    <xs:element name="accessionDate" type="xs:date"/>
     <xs:element name="acquisitionAuthorizer" type="xs:string"/>
-    <xs:element name="acquisitionAuthorizerDate" type="xs:string"/>
+    <xs:element name="acquisitionAuthorizerDate" type="xs:date"/>
     <xs:element name="acquisitionDates">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="acquisitionDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="acquisitionDate" type="xs:date" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

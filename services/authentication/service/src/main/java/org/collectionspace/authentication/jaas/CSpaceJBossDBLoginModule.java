@@ -87,6 +87,20 @@ public class CSpaceJBossDBLoginModule extends UsernamePasswordLoginModule {
         }
         return password;
     }
+    
+    @Override
+    public boolean commit() throws LoginException {
+    	boolean result;
+    	result = super.commit();
+    	return result;
+    }
+    
+    @Override
+    public boolean abort() throws LoginException {
+    	boolean result;
+    	result = super.abort();
+    	return result;
+    }
 
     /** Execute the rolesQuery against the dsJndiName to obtain the roles for
     the authenticated user.

@@ -36,12 +36,13 @@
                 <xs:element name="copyrightStatement" type="xs:string"/>
                 <xs:element name="coverage" type="xs:string"/>
                 <xs:element name="creator" type="xs:string"/>
-                <xs:element name="dateList" type="dateList"/>
+                <!--CSPACE-3937: Following field name changed from dateList and made repeatable in v.13 -->
+                <xs:element name="dateGroupList" type="dateGroupList"/>
                 <xs:element name="dateCreated" type="xs:string"/>
                 <xs:element name="dateModified" type="xs:string"/>
                 <xs:element name="description" type="xs:string"/>
-                <xs:element name="dimensionSummary" type="xs:string"/>
-                <xs:element name="dimensionGroupList" type="dimensionGroupList"/>
+                 <!-- Changed name of next field from dimensionGroupList (type="dimensionGroupList") in v1.13 when adding repeatable sub group -->
+                <xs:element name="measuredPartGroupList" type="measuredPartGroupList"/>
                 <xs:element name="filename" type="xs:string"/>
                 <xs:element name="format" type="xs:string"/>
                 <xs:element name="identificationNumber" type="xs:string"/>
@@ -50,8 +51,8 @@
                 <xs:element name="publisher" type="xs:string"/>
                 <xs:element name="relationList" type="relationList"/>
                 <xs:element name="rightsHolder" type="xs:string"/>
-			    <xs:element name="source" type="xs:string"/>
-			    <xs:element name="sourceUrl" type="xs:string"/>
+                <xs:element name="source" type="xs:string"/>
+                <xs:element name="sourceUrl" type="xs:string"/>
                 <xs:element name="subjectList" type="subjectList"/>
                 <xs:element name="title" type="xs:string"/>
                 <xs:element name="typeList" type="typeList"/>
@@ -60,22 +61,67 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
+    <xs:complexType name="dateGroupList">
+        <xs:sequence>
+            <xs:element name="dateGroup" type="dateGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="dateGroup">
+        <xs:sequence>
+            <xs:element name="dateDisplayDate" type="xs:string"/>
+            <xs:element name="dateAssociation" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+            <xs:element name="dateLatestYear" type="xs:integer"/>
+            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="dateLatestDay" type="xs:integer"/>
+            <xs:element name="dateLatestEra" type="xs:string"/>
+            <xs:element name="dateLatestCertainty" type="xs:string"/>
+            <xs:element name="dateLatestQualifier" type="xs:string"/>
+            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+            <xs:element name="datePeriod" type="xs:string"/>
+            <xs:element name="dateNote" type="xs:string"/>
+            <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+            <xs:element name="dateLatestScalarValue" type="xs:date"/>
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
     <xs:complexType name="dateList">
         <xs:sequence>
             <xs:element name="date" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="dimensionGroupList">
+    <!-- Changed names, as of v1.13: dimensionGroupList became measuredPartGroupList, dimensionGroup became measuredPartGroup. -->
+    <xs:complexType name="measuredPartGroupList">
         <xs:sequence>
-            <xs:element name="dimensionGroup" type="dimensionGroup" minOccurs="0"
+            <xs:element name="measuredPartGroup" type="measuredPartGroup" minOccurs="0"
                 maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="dimensionGroup">
+    <xs:complexType name="measuredPartGroup">
         <xs:sequence>
             <xs:element name="measuredPart" type="xs:string"/>
+            <xs:element name="dimensionSummary" type="xs:string"/>
+            <xs:element name="dimensionSubGroupList" type="dimensionSubGroupList"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dimensionSubGroupList">
+        <xs:sequence>
+            <xs:element name="dimensionSubGroup" type="dimensionSubGroup" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dimensionSubGroup">
+        <xs:sequence>
             <xs:element name="dimension" type="xs:string"/>
             <xs:element name="measuredBy" type="xs:string"/>
             <xs:element name="measurementUnit" type="xs:string"/>
@@ -109,6 +155,5 @@
             <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-
 </xs:schema>
 

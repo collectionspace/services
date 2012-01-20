@@ -4,7 +4,7 @@
     <persistence-unit name="org.collectionspace.services.account">
         <class>org.collectionspace.services.account.AccountsCommon</class>
         <class>org.collectionspace.services.account.AccountsCommonList</class>
-        <class>org.collectionspace.services.account.AccountsCommonList$AccountListItem</class>
+        <class>org.collectionspace.services.account.AccountListItem</class>
         <class>org.collectionspace.services.account.Tenant</class>
         <class>org.collectionspace.services.account.AccountTenant</class>
         <class>org.collectionspace.services.account.Status</class>

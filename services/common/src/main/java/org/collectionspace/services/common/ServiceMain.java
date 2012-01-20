@@ -13,8 +13,12 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
+import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
+import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.init.IInitHandler;
@@ -26,7 +30,9 @@ import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.types.PropertyItemType;
 import org.collectionspace.services.common.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
+//import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
+//import org.collectionspace.services.nuxeo.client.java.NxConnect;
+import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +45,19 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceMain {
 
+    final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
     /**
      * volatile is used here to assume about ordering (post JDK 1.5)
      */
     private static volatile ServiceMain instance = null;
-    final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
-    private NuxeoConnector nuxeoConnector;
+    private static volatile boolean initFailed = false;
+    
+    private NuxeoConnectorEmbedded nuxeoConnector;
+    private static ServletContext servletContext = null;
     private String serverRootDir = null;
     private ServicesConfigReaderImpl servicesConfigReader;
     private TenantBindingConfigReaderImpl tenantBindingConfigReader;
+    
     private static final String TENANT_ADMIN_ACCT_PREFIX = "admin@"; 
     private static final String TENANT_READER_ACCT_PREFIX = "reader@"; 
     private static final String ROLE_PREFIX = "ROLE_"; 
@@ -56,9 +66,33 @@ public class ServiceMain {
     private static final String TENANT_READER_ROLE_SUFFIX = "_TENANT_READER"; 
     private static final String DEFAULT_ADMIN_PASSWORD = "Administrator";
     private static final String DEFAULT_READER_PASSWORD = "reader";
+    private static final String SERVER_HOME_PROPERTY = "catalina.home";
     
     private ServiceMain() {
     	//empty
+    }
+    
+    /*
+     * FIXME: REM - This method is no longer necessary and can should be removed.
+     * 
+     * Set this singletons ServletContext without any call to initialize
+     */
+    @Deprecated
+    private static void setServletContext(ServletContext servletContext) {
+		if (servletContext != null) {
+	    	synchronized (ServiceMain.class) {
+	    		ServiceMain.servletContext = servletContext;
+	    	}
+		}
+    }
+    
+    public boolean inServletContext() {
+    	return ServiceMain.servletContext != null;
+    }
+    
+    public static ServiceMain getInstance(ServletContext servletContext) {
+    	ServiceMain.servletContext = servletContext;
+    	return ServiceMain.getInstance();
     }
     
     /**
@@ -67,12 +101,16 @@ public class ServiceMain {
      * @return
      */
     public static ServiceMain getInstance() {
-        if (instance == null) {
+        if (instance == null && initFailed == false) {
             synchronized (ServiceMain.class) {
-                if (instance == null) {
+                if (instance == null && initFailed == false) {
                     ServiceMain temp = new ServiceMain();
                     try {
+                    	//assume the worse
+                    	initFailed = true;
                         temp.initialize();
+                    	//celebrate success
+                        initFailed = false;
                     } catch (Exception e) {
                         instance = null;
                         if (e instanceof RuntimeException) {
@@ -85,27 +123,67 @@ public class ServiceMain {
                 }
             }
         }
+        
+        if (instance == null) {
+        	throw new RuntimeException("Could not initialize the CollectionSpace services.  Please see the CollectionSpace services log file(s) for details.");
+        }
+        
         return instance;
     }
 
     private void initialize() throws Exception {
+    	if (logger.isTraceEnabled() == true) {
+    		System.out.print("Pausing 5 seconds for you to attached the debugger");
+    		long startTime, currentTime;
+    		currentTime = startTime = System.currentTimeMillis();
+    		long stopTime = startTime + 5 * 1000; //5 seconds
+    		do {
+    			if (currentTime % 1000 == 0) {
+    				System.out.print(".");
+    			}
+    			currentTime = System.currentTimeMillis();
+    		} while (currentTime < stopTime);
+    			
+    		System.out.println();
+    		System.out.println("Resuming cspace services initialization.");
+    	}
+    	
+    	setDataSources();
     	setServerRootDir();
         readConfig();
         propagateConfiguredProperties();
+        //
+        // Create all the default user accounts
+        //
         try {
         	createDefaultAccounts();
         } catch(Exception e) {
-        	logger.error("Default Account setup failed on exception: " + e.getLocalizedMessage());
+        	logger.error("Default accounts setup failed with exception(s): " + e.getLocalizedMessage());
         }
-        try {
-            firePostInitHandlers();
-        } catch(Exception e) {
-            logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: " + e.getLocalizedMessage());
+        //
+        // Start up and initialize our embedded Nuxeo server instance
+        //
+        if (getClientType().equals(ClientType.JAVA)) {
+            nuxeoConnector = NuxeoConnectorEmbedded.getInstance();
+            nuxeoConnector.initialize(
+            		getServerRootDir(),
+            		getServicesConfigReader().getConfiguration().getRepositoryClient(),
+            		ServiceMain.servletContext);
+        } else {
+        	//
+        	// Exit if we don't have the correct/known client type
+        	//
+        	throw new RuntimeException("Unknown CollectionSpace services client type: " + getClientType());
         }
 
-        if (getClientType().equals(ClientType.JAVA)) {
-            nuxeoConnector = NuxeoConnector.getInstance();
-            nuxeoConnector.initialize(getServicesConfigReader().getConfiguration().getRepositoryClient());
+        try {
+        	//
+        	// Invoke all post-initialization handlers, passing in a DataSource instance of the Nuxeo db.
+        	// Typically, these handlers modify column types and add indexes to the Nuxeo db schema.
+        	//
+            firePostInitHandlers(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME));
+        } catch(Exception e) {
+            logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: " + e.getLocalizedMessage());
         }
     }
 
@@ -145,6 +223,10 @@ public class ServiceMain {
         }
     }
     
+    /*
+     * FIXME: REM - This method is way too big -over 300 lines!  We need to break it up into
+     * smaller, discrete, sub-methods.
+     */
     private void createDefaultAccounts() {
     	if (logger.isDebugEnabled()) {
     		logger.debug("ServiceMain.createDefaultAccounts starting...");
@@ -532,7 +614,7 @@ public class ServiceMain {
     	return TENANT_READER_ACCT_PREFIX+tenantName;
     }
 
-    private void firePostInitHandlers() throws Exception {
+    private void firePostInitHandlers(DataSource dataSource) throws Exception {
         Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
         //Loop through all tenants in tenant-bindings.xml
         for (TenantBindingType tbt: tenantBindingTypeMap.values()){
@@ -558,7 +640,7 @@ public class ServiceMain {
                     Object o = instantiate(initHandlerClassname, IInitHandler.class);
                     if (o != null && o instanceof IInitHandler){
                         IInitHandler handler = (IInitHandler)o;
-                        handler.onRepositoryInitialized(sbt, fields, props);
+                        handler.onRepositoryInitialized(dataSource, sbt, fields, props);
                         //The InitHandler may be the default one,
                         //  or specialized classes which still implement this interface and are registered in tenant-bindings.xml.
                     }
@@ -578,7 +660,7 @@ public class ServiceMain {
         return null;
     }
 
-    private Connection getConnection() throws LoginException, SQLException {
+    private Connection getConnection() throws NamingException, SQLException {
         return JDBCTools.getConnection(JDBCTools.CSPACE_REPOSITORY_NAME);
     }
 
@@ -602,7 +684,7 @@ public class ServiceMain {
     /**
      * @return the nuxeoConnector
      */
-    public NuxeoConnector getNuxeoConnector() {
+    public NuxeoConnectorEmbedded getNuxeoConnector() {
         return nuxeoConnector;
     }
     
@@ -613,10 +695,33 @@ public class ServiceMain {
         return serverRootDir;
     }
 
+    /*
+     * Save a copy of the DataSource instances that exist in our initial JNDI context.  For some reason, after starting up
+     * our instance of embedded Nuxeo, we can find our datasources.  Therefore, we need to preserve the datasources in these
+     * static members.
+     */
+    private void setDataSources() throws NamingException {
+    	//
+    	// As a side-effect of calling JDBCTools.getDataSource(...), the DataSource instance will be
+    	// cached in a static hash map of the JDBCTools class.  This will speed up lookups as well as protect our
+    	// code from JNDI lookup problems -for example, if the JNDI context gets stepped on or corrupted.
+    	//
+    	DataSource cspaceDataSource = JDBCTools.getDataSource(JDBCTools.CSPACE_REPOSITORY_NAME);
+    	DataSource nuxeoDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
+    	//
+    	// Set our AuthN's datasource to be the cspaceDataSource
+    	//
+    	AuthN.setDataSource(cspaceDataSource);
+    }
+    
     private void setServerRootDir() {
-        serverRootDir = System.getProperty("jboss.server.home.dir");
+        serverRootDir = System.getProperty(SERVER_HOME_PROPERTY);
         if (serverRootDir == null) {
             serverRootDir = "."; //assume server is started from server root, e.g. server/cspace
+            logger.warn("System property '" +
+            		SERVER_HOME_PROPERTY + "' was not set.  Using \"" +
+            		serverRootDir +
+            		"\" instead.");
         }
     }
 

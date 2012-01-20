@@ -37,12 +37,12 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class RepositoryClientFactory {
+public class RepositoryClientFactory<IT, OT> {
 
     private static final RepositoryClientFactory self = new RepositoryClientFactory();
     final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
     //clients key=client name, value=repository client
-    private Hashtable<String, RepositoryClient> clients = new Hashtable<String, RepositoryClient>();
+    private Hashtable<String, RepositoryClient<IT, OT>> clients = new Hashtable<String, RepositoryClient<IT, OT>>();
 
     private RepositoryClientFactory() {
         try{
@@ -53,10 +53,10 @@ public class RepositoryClientFactory {
             ClassLoader cloader = Thread.currentThread().getContextClassLoader();
 
             Class jclazz = cloader.loadClass(clientClassName);
-            Object jclient = jclazz.newInstance();
-            clients.put(clientName, (RepositoryClient) jclient);
+            RepositoryClient<IT, OT> jclient = (RepositoryClient<IT, OT>)jclazz.newInstance();
+            clients.put(clientName, jclient);
 
-        }catch(Exception e){
+        } catch(Exception e){
             throw new RuntimeException(e);
         }
     }
@@ -70,7 +70,7 @@ public class RepositoryClientFactory {
      * @param clientName name of the client as found in service binding
      * @return
      */
-    public RepositoryClient getClient(String clientName) {
+    public RepositoryClient<IT, OT> getClient(String clientName) {
         return clients.get(clientName);
     }
 }

@@ -129,10 +129,10 @@ public class CollectionObjectValidatorHandler extends ValidatorHandlerImpl<PoxPa
     // Private Methods
     //    
     private void validateCollectionobjectsCommon(CollectionobjectsCommon co) throws AssertionError {
-        assert(co != null);
+    	CS_ASSERT(co != null);
         String objectNumber = co.getObjectNumber();
-        assert(objectNumber != null);
-        assert(objectNumber.isEmpty() == false) : OBJECTNUMBER_NULL_ERROR;
+        CS_ASSERT(objectNumber != null);
+        CS_ASSERT(objectNumber.isEmpty() == false, OBJECTNUMBER_NULL_ERROR);
 
     }
 }

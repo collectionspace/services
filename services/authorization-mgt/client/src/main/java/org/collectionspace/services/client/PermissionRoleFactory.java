@@ -60,10 +60,10 @@ public class PermissionRoleFactory {
         if (usePermId) {
             ArrayList<PermissionValue> pvs = new ArrayList<PermissionValue>();
             pvs.add(pv);
-            permRole.setPermissions(pvs);
+            permRole.setPermission(pvs);
         }
         if (useRoleId) {
-            permRole.setRoles(rvs);
+            permRole.setRole(rvs);
         }
 
         return permRole;
@@ -90,10 +90,10 @@ public class PermissionRoleFactory {
         if (useRoleId) {
             ArrayList<RoleValue> rvs = new ArrayList<RoleValue>();
             rvs.add(rv);
-            permRole.setRoles(rvs);
+            permRole.setRole(rvs);
         }
         if (usePermId) {
-            permRole.setPermissions(pvs);
+            permRole.setPermission(pvs);
         }
 
         return permRole;

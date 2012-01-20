@@ -210,16 +210,7 @@ public class MovementAuthRefsTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         MovementClient movementClient = new MovementClient();
         ClientResponse<String> res = movementClient.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".read: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Extract and return the common part of the record.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -239,14 +230,8 @@ public class MovementAuthRefsTest extends BaseServiceTest {
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 =
            movementClient.getAuthorityRefs(knownResourceId);
-        statusCode = res2.getStatus();
+        assertStatusCode(res2, testName);
 
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         AuthorityRefList list = res2.getEntity();
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();

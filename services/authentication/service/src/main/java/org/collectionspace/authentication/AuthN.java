@@ -49,6 +49,8 @@
  */
 package org.collectionspace.authentication;
 
+import javax.sql.DataSource;
+
 import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.authentication.spring.SpringAuthNContext;
 
@@ -63,6 +65,7 @@ public class AuthN {
      * volatile is used here to assume about ordering (post JDK 1.5)
      */
     private static volatile AuthN self = new AuthN();
+    private static DataSource dataSource = null;
     private AuthNContext authnContext;
 
     private AuthN() {
@@ -73,6 +76,14 @@ public class AuthN {
 
     public final static AuthN get() {
         return self;
+    }
+    
+    public static void setDataSource(DataSource dataSource) {
+    	AuthN.dataSource = dataSource;
+    }
+    
+    public static DataSource getDataSource() {
+    	return AuthN.dataSource;
     }
 
     /**

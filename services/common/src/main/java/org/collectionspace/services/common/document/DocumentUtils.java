@@ -445,9 +445,10 @@ public class DocumentUtils {
 	}
 
 	/**
-	 * isQualified check if the given dateVal is already qualified with given property name
-	 * e.g.  otherNumber|urn:org.collectionspace.id:24082390 is qualified with otherNumber
-	 * but urn:org.walkerart.id:123 is not qualified
+	 * isQualified check if the given dateVal is already qualified with given
+     * property name e.g. (in the example of a former 'otherNumber' field in
+     * CollectionObject) otherNumber|urn:org.collectionspace.id:24082390 is
+     * qualified with otherNumber but urn:org.walkerart.id:123 is not qualified
 	 * @param name of the property, e.g. otherNumber
 	 * @param dateVal of the property e.g. otherNumber
 	 * @return
@@ -817,6 +818,7 @@ public class DocumentUtils {
 	 * @return true, if is list type
 	 */
 	public static boolean isListType(Property prop) {
+		// TODO simplify this to return (prop!=null && prop.getType().isListType());
 		boolean isList = false;
 		if (prop == null) {
 			return isList;
@@ -834,6 +836,7 @@ public class DocumentUtils {
 	 * @return true, if is complex type
 	 */
 	public static boolean isComplexType(Property prop) {
+		// TODO simplify this to return (prop!=null && prop.getType().isComplexType());
 		boolean isComplex = false;
 		if (prop == null) {
 			return isComplex;
@@ -853,6 +856,7 @@ public class DocumentUtils {
          *               false, if it is not a date type.
          */
         private static boolean isDateType(Type type) {
+    		// TODO simplify this to return ((SimpleType)type).getPrimitiveType() instanceof DateType;
             SimpleType st = (SimpleType) type;
             if (st.getPrimitiveType() instanceof DateType) {
                 return true;
@@ -1144,8 +1148,8 @@ public class DocumentUtils {
 				data.put(name, value);
 			} else	{
 				if (logger.isDebugEnabled() == true) {
-					logger.debug("Invalid input document. No such property was found " +
-							name + " in schema " + schemaName);
+					logger.debug("Invalid input document. No such property was found [" +
+							name + "] in schema " + schemaName);
 				}
 			}
 		}

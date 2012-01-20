@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.place</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>2.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -23,6 +23,7 @@
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
         </dependency>
+				<!--
         <dependency>
             <groupId>org.jvnet.jaxb2-commons</groupId>
             <artifactId>property-listener-injector</artifactId>
@@ -30,7 +31,8 @@
         <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>runtime</artifactId>
-        </dependency>
+				</dependency>
+				-->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.jaxb</artifactId>

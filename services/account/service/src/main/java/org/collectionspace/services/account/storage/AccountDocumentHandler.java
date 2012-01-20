@@ -31,7 +31,7 @@ import java.util.UUID;
 import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
-import org.collectionspace.services.account.AccountsCommonList.AccountListItem;
+import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.account.Status;
 
 import org.collectionspace.services.client.AccountClient;
@@ -157,7 +157,7 @@ public class AccountDocumentHandler
 
     	AccountsCommonList accList = this.extractPagingInfo(new AccountsCommonList(), wrapDoc);
 //        AccountsCommonList accList = new AccountsCommonList();
-        List<AccountsCommonList.AccountListItem> list = accList.getAccountListItem();
+        List<AccountListItem> list = accList.getAccountListItem();
 
         for (Object obj : wrapDoc.getWrappedObject()) {
             AccountsCommon account = (AccountsCommon) obj;

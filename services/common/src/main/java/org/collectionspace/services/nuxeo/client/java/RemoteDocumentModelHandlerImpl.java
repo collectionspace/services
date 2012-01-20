@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import java.util.Set;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
 
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -42,26 +44,33 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.dom4j.Element;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import org.nuxeo.ecm.core.schema.types.Schema;
 
@@ -111,12 +120,16 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	            String partLabel = part.getLabel();
                 try{
                     ObjectPartType partMeta = partsMetaMap.get(partLabel);
-        //            extractPart(docModel, partLabel, partMeta);
-                    Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
-                    addOutputPart(unQObjectProperties, partLabel, partMeta);
+                    // CSPACE-4030 - generates NPE if the part is missing.
+                    if(partMeta!=null) {
+	                    Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
+	                    if(unQObjectProperties!=null) {
+	                    	addOutputPart(unQObjectProperties, partLabel, partMeta);
+	                    }
+                    }
                 } catch (Throwable t){
 
-                    System.out.println("===============================\r\nUnable to addOutputPart: "+partLabel
+                    logger.error("Unable to addOutputPart: "+partLabel
                                                +" in serviceContextPath: "+this.getServiceContextPath()
                                                +" with URI: "+this.getServiceContext().getUriInfo().getPath()
                                                +" error: "+t);
@@ -198,6 +211,9 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     }
     
     private void addAccountPermissionsPart() throws Exception {
+    	Profiler profiler = new Profiler("addAccountPermissionsPart():", 1);
+    	profiler.start();
+    	
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         String currentServiceName = ctx.getServiceName();
         String workflowSubResource = "/";
@@ -210,8 +226,13 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
         AccountPermission accountPermission = JpaStorageUtils.getAccountPermissions(JpaStorageUtils.CS_CURRENT_USER,
         		currentServiceName, workflowSubResource);
-        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", accountPermission);
+        org.collectionspace.services.authorization.ObjectFactory objectFactory =
+        	new org.collectionspace.services.authorization.ObjectFactory();
+        JAXBElement<AccountPermission> ap = objectFactory.createAccountPermission(accountPermission);
+        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", ap);
         ctx.addOutputPart(accountPermissionPart);
+        
+        profiler.stop();
     }
 
     /* (non-Javadoc)
@@ -370,14 +391,65 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         return result;
     }
     
+    /* 
+    public String getStringPropertyFromDoc(
+    		ServiceContext ctx,
+    		String csid,
+    		String propertyXPath ) throws DocumentNotFoundException, DocumentException {
+    	RepositoryInstance repoSession = null;
+    	boolean releaseRepoSession = false;
+    	String returnValue = null;
+
+    	try{ 
+    		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+    		repoSession = this.getRepositorySession();
+    		if (repoSession == null) {
+    			repoSession = repoClient.getRepositorySession();
+    			releaseRepoSession = true;
+    		}
+
+    		try {
+    			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
+    			DocumentModel docModel = wrapper.getWrappedObject();
+    			returnValue = (String) docModel.getPropertyValue(propertyXPath);
+    		} catch (PropertyException pe) {
+    			throw pe;
+    		} catch (DocumentException de) {
+    			throw de;
+    		} catch (Exception e) {
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("Caught exception ", e);
+    			}
+    			throw new DocumentException(e);
+    		} finally {
+    			if (releaseRepoSession && repoSession != null) {
+    				repoClient.releaseRepositorySession(repoSession);
+    			}
+    		}
+    	} catch (Exception e) {
+    		if (logger.isDebugEnabled()) {
+    			logger.debug("Caught exception ", e);
+    		}
+    		throw new DocumentException(e);
+    	}	        
+
+
+    	if (logger.isWarnEnabled() == true) {
+    		logger.warn("Returned DocumentModel instance was created with a repository session that is now closed.");
+    	}
+    	return returnValue;
+    }
+     */
+
+    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getAuthorityRefs(org.collectionspace.services.common.document.DocumentWrapper, java.util.List)
      */
     @Override
     public AuthorityRefList getAuthorityRefs(
-            DocumentWrapper<DocumentModel> docWrapper,
-            List<String> authRefFieldNames) throws PropertyException {
+            String csid,
+            List<AuthRefConfigInfo> authRefsInfo) throws PropertyException {
 
         AuthorityRefList authRefList = new AuthorityRefList();
         AbstractCommonList commonList = (AbstractCommonList) authRefList;
@@ -390,107 +462,44 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         commonList.setPageSize(pageSize);
         
         List<AuthorityRefList.AuthorityRefItem> list = authRefList.getAuthorityRefItem();
-        DocumentModel docModel = docWrapper.getWrappedObject();
 
         try {
         	int iFirstToUse = (int)(pageSize*pageNum);
         	int nFoundInPage = 0;
         	int nFoundTotal = 0;
-            for (String authRefFieldName : authRefFieldNames) {
-
-                // FIXME: Can use the schema to validate field existence,
-                // to help avoid encountering PropertyExceptions.
-                String schemaName = DocumentUtils.getSchemaNamePart(authRefFieldName);
-                Schema schema = DocumentUtils.getSchemaFromName(schemaName);
-
-                String descendantAuthRefFieldName = DocumentUtils.getDescendantAuthRefFieldName(authRefFieldName);
-                if (descendantAuthRefFieldName != null && !descendantAuthRefFieldName.trim().isEmpty()) {
-                    authRefFieldName = DocumentUtils.getAncestorAuthRefFieldName(authRefFieldName);
-                }
-
-                String xpath = "//" + authRefFieldName;
-                Property prop = docModel.getProperty(xpath);
-                if (prop == null) {
-                    continue;
-                }
-
-                // If this is a single scalar field, with no children,
-                // add an item with its values to the authRefs list.
-                if (DocumentUtils.isSimpleType(prop)) {
-                	String refName = prop.getValue(String.class);
-                    if (refName == null) {
-                        continue;
-                    }
-                    refName = refName.trim();
-                    if (refName.isEmpty()) {
-                        continue;
-                    }
-                	if((nFoundTotal < iFirstToUse)
-                		|| (nFoundInPage >= pageSize)) {
-                		nFoundTotal++;
-                		continue;
-                	}
-            		nFoundTotal++;
-            		nFoundInPage++;
-            		appendToAuthRefsList(refName, schemaName, authRefFieldName, list);
-
-                    // Otherwise, if this field has children, cycle through each child.
-                    //
-                    // Whenever we find instances of the descendant field among
-                    // these children, add an item with its values to the authRefs list.
-                    //
-                    // FIXME: When we increase maximum repeatability depth, that is, the depth
-                    // between ancestor and descendant, we'll need to use recursion here,
-                    // rather than making fixed assumptions about hierarchical depth.
-                } else if ((DocumentUtils.isListType(prop) || DocumentUtils.isComplexType(prop))
-                        && prop.size() > 0) {
-                    
-                    Collection<Property> childProp = prop.getChildren();
-                    for (Property cProp : childProp) {
-                        if (DocumentUtils.isSimpleType(cProp) && cProp.getName().equals(descendantAuthRefFieldName)) {
-                        	String refName = cProp.getValue(String.class);
-                            if (refName == null) {
-                                continue;
-                            }
-                            refName = refName.trim();
-                            if (refName.isEmpty()) {
-                                continue;
-                            }
-                        	if((nFoundTotal < iFirstToUse)
-                            		|| (nFoundInPage >= pageSize)) {
-                        		nFoundTotal++;
-                        		continue;
-                        	}
-                    		nFoundTotal++;
-                    		nFoundInPage++;
-                            appendToAuthRefsList(refName, schemaName, descendantAuthRefFieldName, list);
-                        } else if ((DocumentUtils.isListType(cProp) || DocumentUtils.isComplexType(cProp))
-                            && prop.size() > 0) {
-                            Collection<Property> grandChildProp = cProp.getChildren();
-                            for (Property gProp : grandChildProp) {
-                                if (DocumentUtils.isSimpleType(gProp) && gProp.getName().equals(descendantAuthRefFieldName)) {
-                                	String refName = gProp.getValue(String.class);
-                                    if (refName == null) {
-                                        continue;
-                                    }
-                                    refName = refName.trim();
-                                    if (refName.isEmpty()) {
-                                        continue;
-                                    }
-                                	if((nFoundTotal < iFirstToUse)
-                                    		|| (nFoundInPage >= pageSize)) {
-                                		nFoundTotal++;
-                                		continue;
-                                	}
-                            		nFoundTotal++;
-                            		nFoundInPage++;
-                                    appendToAuthRefsList(refName, schemaName, descendantAuthRefFieldName, list);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        	
+        	ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps 
+        		= new ArrayList<RefNameServiceUtils.AuthRefInfo>();
+        	
+        	boolean releaseRepoSession = false;
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+        	RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+        	RepositoryInstance repoSession = this.getRepositorySession();
+        	if (repoSession == null) {
+        		repoSession = repoClient.getRepositorySession();
+        		releaseRepoSession = true;
+        	}
+        	
+        	try {
+        		DocumentModel docModel = repoClient.getDoc(repoSession, ctx, csid).getWrappedObject();
+	           	RefNameServiceUtils.findAuthRefPropertiesInDoc(docModel, authRefsInfo, null, foundProps);
+	           	// Slightly goofy pagination support - how many refs do we expect from one object?
+	           	for(RefNameServiceUtils.AuthRefInfo ari:foundProps) {
+	       			if((nFoundTotal >= iFirstToUse) && (nFoundInPage < pageSize)) {
+	       				if(appendToAuthRefsList(ari, list)) {
+	           				nFoundInPage++;
+	               			nFoundTotal++;
+	       				}
+	       			} else {
+	       				nFoundTotal++;
+	       			}
+	           	}
+        	} finally {
+        		if (releaseRepoSession == true) {
+        			repoClient.releaseRepositorySession(repoSession);
+        		}
+        	}
+        	
             // Set num of items in list. this is useful to our testing framework.
             commonList.setItemsInPage(nFoundInPage);
             // set the total result size
@@ -515,13 +524,21 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         return authRefList;
     }
 
-    private void appendToAuthRefsList(String refName, String schemaName,
-            String fieldName, List<AuthorityRefList.AuthorityRefItem> list)
+    private boolean appendToAuthRefsList(RefNameServiceUtils.AuthRefInfo ari, 
+    						List<AuthorityRefList.AuthorityRefItem> list)
             throws Exception {
-        if (DocumentUtils.getSchemaNamePart(fieldName).isEmpty()) {
-            fieldName = DocumentUtils.appendSchemaName(schemaName, fieldName);
-        }
-        list.add(authorityRefListItem(fieldName, refName));
+    	String fieldName = ari.getQualifiedDisplayName();
+    	try {
+	   		String refNameValue = (String)ari.getProperty().getValue();
+	   		AuthorityRefList.AuthorityRefItem item = authorityRefListItem(fieldName, refNameValue);
+	   		if(item!=null) {	// ignore garbage values.
+	   			list.add(item);
+	   			return true;
+	   		}
+    	} catch(PropertyException pe) {
+			logger.debug("PropertyException on: "+ari.getProperty().getPath()+pe.getLocalizedMessage());
+    	}
+    	return false;
     }
 
     private AuthorityRefList.AuthorityRefItem authorityRefListItem(String authRefFieldName, String refName) {
@@ -535,7 +552,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             ilistItem.setSourceField(authRefFieldName);
             ilistItem.setUri(termInfo.getRelativeUri());
         } catch (Exception e) {
-            // Do nothing upon encountering an Exception here.
+        	logger.error("Trouble parsing refName from value: "+refName+" in field: "+authRefFieldName+e.getLocalizedMessage());
+        	ilistItem = null;
         }
         return ilistItem;
     }

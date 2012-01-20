@@ -397,17 +397,8 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         PlaceAuthorityClient client = new PlaceAuthorityClient();
     	String newID = null;
         ClientResponse<String> res = client.read(knownResourceId);
+        assertStatusCode(res, testName);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
 	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -445,17 +436,8 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         ClientResponse<String> res = client.readByName(knownResourceShortIdentifer);
+        assertStatusCode(res, testName);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
 	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -490,19 +472,9 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
-	        // Check whether we've received a place.
+ 	        // Check whether we've received a place.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        PlacesCommon place = (PlacesCommon) extractPart(input,
 	                client.getItemCommonPartName(), PlacesCommon.class);
@@ -538,18 +510,8 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
 	        // Check whether place has expected displayName.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        PlacesCommon place = (PlacesCommon) extractPart(input,
@@ -568,18 +530,10 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
 	        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
 	        PayloadOutputPart commonPart = output.addPart(place, MediaType.APPLICATION_XML_TYPE);
 	        commonPart.setLabel(client.getItemCommonPartName());
-	    	res.releaseConnection();
+					res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-	        statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug("updateItem: status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
+					assertStatusCode(res, testName);
+ 	
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
 	        PlacesCommon updatedPlace =
@@ -604,18 +558,10 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
 	        output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
 	        commonPart = output.addPart(place, MediaType.APPLICATION_XML_TYPE);
 	        commonPart.setLabel(client.getItemCommonPartName());
-	    	res.releaseConnection();
+					res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-	        statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug("updateItem: status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
+					assertStatusCode(res, testName);
+ 	
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
 	        updatedPlace =
@@ -648,25 +594,17 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // Perform setup.
-        // FIXME: create a setup configuration for this operation.
-    	setupUpdateWithWrongXmlSchema();
+        // Perform setup for read.
+        setupRead();
 
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
+        
+        // Perform setup for update.
+        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
         try {
-        	int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
-	
 	        // Check whether Place has expected displayName.
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        PlacesCommon place = (PlacesCommon) extractPart(input,
@@ -680,18 +618,10 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
 	        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
 	        PayloadOutputPart commonPart = output.addPart(place, MediaType.APPLICATION_XML_TYPE);
 	        commonPart.setLabel(client.getItemCommonPartName());
-	    	res.releaseConnection();
+					res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-	        statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug("updateItem: status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	    } finally {
+					assertStatusCode(res, testName);
+ 	    } finally {
 	    	res.releaseConnection();
 	    }
     }
@@ -788,19 +718,9 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         // Submit the request to the service and store the response.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         try {
         	AbstractCommonList list = res.getEntity();
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
 	        // Optionally output additional data about list members for debugging.
 	        if(logger.isTraceEnabled()){
 	        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
@@ -857,19 +777,10 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         } else {
         	Assert.fail("readItemList passed null csid and name!");
         }
+        assertStatusCode(res, testName);
         try {
         	AbstractCommonList list = res.getEntity();
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
+ 	
 	        List<AbstractCommonList.ListItem> items =
 	            list.getListItem();
 	        int nItemsReturned = items.size();
@@ -927,12 +838,8 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         // Retrieve the contents of a resource to update.
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         ClientResponse<String> res = client.read(knownResourceId);
+        assertStatusCode(res, testName);
         try {
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": read status = " + res.getStatus());
-	        }
-	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-	
 	        if(logger.isDebugEnabled()){
 	            logger.debug("got PlaceAuthority to update with ID: " + knownResourceId);
 	        }
@@ -955,16 +862,7 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
 	        commonPart.setLabel(client.getCommonPartName());
 	    	res.releaseConnection();
 	        res = client.update(knownResourceId, output);
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
+	        assertStatusCode(res, testName);	
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());
 	        PlaceauthoritiesCommon updatedPlaceAuthority =
@@ -1001,12 +899,8 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
         PlaceAuthorityClient client = new PlaceAuthorityClient();
         ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
+				assertStatusCode(res, testName);
         try {
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": read status = " + res.getStatus());
-	        }
-	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-	
 	        if(logger.isDebugEnabled()){
 	            logger.debug("got Place to update with ID: " +
 	                knownItemResourceId +
@@ -1030,17 +924,9 @@ public class PlaceAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME
 	        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
 	        PayloadOutputPart commonPart = output.addPart(place, MediaType.APPLICATION_XML_TYPE);
 	        commonPart.setLabel(client.getItemCommonPartName());
-	    	res.releaseConnection();
+					res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+					assertStatusCode(res, testName);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
 	        input = new PoxPayloadIn(res.getEntity());

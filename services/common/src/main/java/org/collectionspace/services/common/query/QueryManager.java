@@ -64,6 +64,19 @@ public class QueryManager {
 	}
 	
 	/**
+	 * Creates a query to filter a qualified (string) field according to a list of string values. 
+	 * @param qualifiedField The schema-qualified field to filter on
+	 * @param filterTerms the list of one or more strings to filter on
+	 * @param fExclude If true, will require qualifiedField NOT match the filters strings.
+	 * 					If false, will require qualifiedField does match one of the filters strings.
+	 * @return queryString
+	 */
+	static public String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude) {
+		return queryManager.createWhereClauseToFilterFromStringList(qualifiedField, filterTerms, fExclude);
+	}
+
+	
+	/**
 	 * Creates a filtering where clause from docType, for invocables.
 	 * 
 	 * @param schema the schema name for this invocable type

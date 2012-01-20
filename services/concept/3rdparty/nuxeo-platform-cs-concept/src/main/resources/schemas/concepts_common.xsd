@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Concept schema (XSD)
+    
+    Entity  : Concept
+    Part    : Common
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision: 860 $
+    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/services/concept"
+    xmlns="http://collectionspace.org/services/concept"
+    targetNamespace="http://collectionspace.org/services/concept" version="0.1">
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Concept+Service+Home -->
+
+	<!--  Common Authority Information Group -->
+	<!--  inAuthority is the csid of the owning ConceptAuthority -->
+	<xs:element name="inAuthority" type="xs:string"/>
+	<xs:element name="shortIdentifier" type="xs:string"/>
+	<xs:element name="refName" type="xs:string"/>
+	<xs:element name="termStatus" type="xs:string"/>
+	<xs:element name="displayName" type="xs:string"/>
+	<xs:element name="displayNameComputed" type="xs:boolean"/>
+
+	<!--  Common Concept Information Group -->
+	<xs:element name="conceptType" type="xs:string"/>
+	<xs:element name="scopeNote" type="xs:string"/>
+	<xs:element name="scopeNoteSource" type="xs:string"/>
+	<xs:element name="scopeNoteSourceDetail" type="xs:string"/>
+	<xs:element name="remarks" type="xs:string"/>
+	<xs:element name="displayTermFlag" type="xs:string"/>
+	<xs:element name="otherNameFlags">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="otherNameFlag" type="xs:string"
+										minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<!--  List of Terms and alternates  -->
+	<xs:element name="conceptTermGroupList" type="conceptTermGroupList"/>
+	
+	<!--  List of Citations -->
+	<xs:element name="citationGroupList" type="citationGroupList"/>
+	
+	<!--  List of additional Concept Term sources  -->
+	<xs:element name="additionalTermSourceGroupList" 
+							type="additionalTermSourceGroupList"/>
+
+<!-- =================================================================
+	 Term Group repeating structure
+	 ================================================================= -->
+
+	<xs:complexType name="conceptTermGroupList">
+		<xs:sequence>
+			<xs:element name="conceptTermGroup" type="conceptTermGroup" minOccurs="0"
+						maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="conceptTermGroup">
+		<xs:sequence>
+			<!-- Note that preferred boolean is implicit, as 0-th element in list -->
+			<xs:element name="term" type="xs:string"/>
+			<xs:element name="termType" type="xs:string"/>
+			<xs:element name="termQualifier" type="xs:string"/>
+			<xs:element name="termLanguage" type="xs:string"/>
+			<xs:element name="historicalFlag" type="xs:string"/>
+			<xs:element name="source" type="xs:string"/>
+			<xs:element name="sourceDetail" type="xs:string"/>
+			<xs:element name="sourceUID" type="xs:string"/>
+			<xs:element name="termDate" type="structuredDateGroup"/>
+	 </xs:sequence>
+	</xs:complexType>
+
+<!-- =================================================================
+	 Citation Group repeating structure
+	 ================================================================= -->
+
+	<xs:complexType name="citationGroupList">
+		<xs:sequence>
+			<xs:element name="citationGroup" type="citationGroup" minOccurs="0"
+						maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="citationGroup">
+		<xs:sequence>
+			<xs:element name="source" type="xs:string"/>
+			<xs:element name="sourceDetail" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+<!-- =================================================================
+	 Additional Concept Source Group repeating structure
+	 ================================================================= -->
+
+	<xs:complexType name="additionalTermSourceGroupList">
+		<xs:sequence>
+			<xs:element name="additionalTermSourceGroup" 
+						type="additionalTermSourceGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="additionalTermSourceGroup">
+		<xs:sequence>
+			<xs:element name="source" type="xs:string"/>
+			<xs:element name="sourceDetail" type="xs:string"/>
+			<xs:element name="sourceUID" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+<!-- =================================================================
+	 Structured Date info. Copied from 
+	 .../services/common/jaxb/src/main/resources/commonStructuredDateGroup.xsd
+	 ================================================================= -->
+	<xs:complexType name="structuredDateGroup">
+		<xs:sequence>
+			<xs:element name="dateDisplayDate" type="xs:string"/>
+			<xs:element name="dateAssociation" type="xs:string"/>
+			<xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleEra" type="xs:string"/>
+			<xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+			<xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+			<xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+			<xs:element name="dateLatestYear" type="xs:integer"/>
+			<xs:element name="dateLatestMonth" type="xs:integer"/>
+			<xs:element name="dateLatestDay" type="xs:integer"/>
+			<xs:element name="dateLatestEra" type="xs:string"/>
+			<xs:element name="dateLatestCertainty" type="xs:string"/>
+			<xs:element name="dateLatestQualifier" type="xs:string"/>
+			<xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+			<xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+			<xs:element name="datePeriod" type="xs:string"/>
+			<xs:element name="dateNote" type="xs:string"/>
+			<xs:element name="dateEarliestScalarValue" type="xs:date"/>
+			<xs:element name="dateLatestScalarValue" type="xs:date"/>
+			<xs:element name="scalarValuesComputed" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+
+</xs:schema>

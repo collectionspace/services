@@ -38,6 +38,7 @@ import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
@@ -82,6 +83,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     private String insurerRefName = null;
     private String valuerRefName = null;
     private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
 	@Override
 	protected String getServiceName() {
@@ -126,7 +129,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         IntakeClient intakeClient = new IntakeClient();
         PoxPayloadOut multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
-                "entryDate-" + identifier,
+                CURRENT_DATE_UTC,
                 currentOwnerRefName,
                 // Use currentOwnerRefName twice to test fix for CSPACE-2863
                 currentOwnerRefName,    //depositorRefName,
@@ -244,15 +247,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
        ClientResponse<AuthorityRefDocList> refDocListResp =
         	orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
+        assertStatusCode(refDocListResp, testName);
 
-        int statusCode = refDocListResp.getStatus();
-
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         AuthorityRefDocList list = refDocListResp.getEntity();
 
         // Optionally output additional data about list members for debugging.

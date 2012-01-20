@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.authorization-mgt</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.12-SNAPSHOT</version>
+        <version>2.0-SNAPSHOT</version>
     </parent>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authorization-mgt.service</artifactId>
@@ -13,8 +13,6 @@
     <url>http://www.collectionspace.org</url>
 
     <properties>
-        <jboss.version>4.2.3.GA</jboss.version>
-        <jboss.ejb.version>3.0</jboss.ejb.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.2.RELEASE</spring.security.version>

@@ -26,6 +26,10 @@
 	<comments>
 		<comment>A virtual object to check authRefs</comment>
 	</comments>
-	<inscriptionDescriptionInscriber>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(pmadry)'Penelope Madry'</inscriptionDescriptionInscriber>
+    <nonTextualInscriptionGroupList>
+        <nonTextualInscriptionGroup>
+            <inscriptionDescriptionInscriber>urn:cspace:org.collectionspace.demo:personauthority:name(person):person:name(pmadry)'Penelope Madry'</inscriptionDescriptionInscriber>
+        </nonTextualInscriptionGroup>
+    </nonTextualInscriptionGroup>nonTextualInscriptionGroupList>
 </ns2:collectionobjects_common>
 </document>

@@ -95,6 +95,7 @@ public class PropertyItemUtils {
     		values = new ArrayList<String>();
     	for(PropertyItemType propItem:propItems) {
     		if(propName.equals(propItem.getKey())) {
+    			// TODO - the trim() belongs here, not down a few lines.
     			String value = propItem.getValue();
     			if(value!=null) {
     				values.add((qualPrefix!=null)?(qualPrefix+value):value.trim());

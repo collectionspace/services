@@ -39,24 +39,12 @@ import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingConfig;
 import org.collectionspace.services.common.types.PropertyItemType;
 
-import ch.elca.el4j.util.codingsupport.Reject;
-import ch.elca.el4j.services.xmlmerge.AbstractXmlMergeException;
-import ch.elca.el4j.services.xmlmerge.ConfigurationException;
 import ch.elca.el4j.services.xmlmerge.Configurer;
-import ch.elca.el4j.services.xmlmerge.XmlMerge;
 import ch.elca.el4j.services.xmlmerge.config.AttributeMergeConfigurer;
 import ch.elca.el4j.services.xmlmerge.config.ConfigurableXmlMerge;
-import ch.elca.el4j.services.xmlmerge.config.PropertyXPathConfigurer;
-import ch.elca.el4j.services.xmlmerge.merge.DefaultXmlMerge;
-
-import org.apache.commons.io.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.elca.el4j.services.xmlmerge.Configurer;
-import ch.elca.el4j.services.xmlmerge.config.AttributeMergeConfigurer;
-import ch.elca.el4j.services.xmlmerge.config.ConfigurableXmlMerge;
 
 /**
  * ServicesConfigReader reads service layer specific configuration
@@ -101,16 +89,35 @@ public class TenantBindingConfigReaderImpl
     
 	protected File getTenantsRootDir() {
 		File result = null;
-		String tenantsRootPath = getConfigRootDir() + File.separator + TENANT_BINDINGS_ROOTDIRNAME;
-		File tenantsRootDir = new File(tenantsRootPath);
-		if (tenantsRootDir.exists() == true) {
-			result = tenantsRootDir;
-			logger.debug("Tenants home directory is: " + tenantsRootDir.getAbsolutePath()); //FIXME: REM - Add proper if (logger.isDebug() == true) check
-		} else {
-			logger.error("Tenants home directory is missing.  Can't find: " + tenantsRootDir.getAbsolutePath()); //FIXME: REM - Add proper if (logger.isError() == true) check
+		String errMessage = null;
+		try {
+			String tenantsRootPath = getConfigRootDir() + File.separator + TENANT_BINDINGS_ROOTDIRNAME;
+			File tenantsRootDir = new File(tenantsRootPath);
+			if (tenantsRootDir.exists() == true) {
+				result = tenantsRootDir;
+				if (logger.isDebugEnabled() == true) {
+					logger.debug("The home directory for all tenants is at: " + result.getCanonicalPath());
+				}
+			} else {
+				errMessage = "The home directory for all tenants is missing or inaccesible: ";
+				try {
+					errMessage = errMessage + tenantsRootDir.getCanonicalPath();
+				} catch (IOException ioException) {
+					errMessage = errMessage + tenantsRootDir.getAbsolutePath();
+				}
+			}
+		} catch (IOException e) {
+			// Log this exception, but continue anyway.  Caller should handle the null result gracefully.
+			logger.equals(e);
 		}
+		
+		if (errMessage != null) {
+			logger.error(errMessage);
+		}
+		
 		return result;
 	}
+	
     /*
      * Take the directory of the prototype bindings and the directory of the delta bindings.  Merge the two and create (replace) a file
      * named "tenant-bindings.xml"
@@ -127,7 +134,7 @@ public class TenantBindingConfigReaderImpl
 			result = new ConfigurableXmlMerge(configurer).merge(inputStreamArray);
 		} catch (Exception e) {
 			logger.error("Could not merge tenant configuration delta file: " +
-					deltaFile.getAbsolutePath(), e);
+					deltaFile.getCanonicalPath(), e);
 		}
 		//
 		// Try to save the merge output to a file that is suffixed with ".merged.xml" in the same directory
@@ -136,7 +143,7 @@ public class TenantBindingConfigReaderImpl
 		if (result != null) {
 			File outputDir = deltaFile.getParentFile();
 			String mergedFileName = outputDir.getAbsolutePath() + File.separator +
-				this.TENANT_BINDINGS_FILENAME_PREFIX + MERGED_SUFFIX;			
+				TenantBindingConfigReaderImpl.TENANT_BINDINGS_FILENAME_PREFIX + MERGED_SUFFIX;			
 			File mergedOutFile = new File(mergedFileName);
 			try {
 				FileUtils.copyInputStreamToFile(result, mergedOutFile);
@@ -173,8 +180,8 @@ public class TenantBindingConfigReaderImpl
             tenantBindings.put(tenantBinding.getId(), tenantBinding);
             readDomains(tenantBinding);
             readServiceBindings(tenantBinding);
-            if (logger.isDebugEnabled()) {
-                logger.debug("read() added tenant id=" + tenantBinding.getId()
+            if (logger.isInfoEnabled()) {
+                logger.info("Finished reading tenant bindings for tenant id=" + tenantBinding.getId()
                         + " name=" + tenantBinding.getName());
             }
         }
@@ -289,8 +296,8 @@ public class TenantBindingConfigReaderImpl
                     docTypes.put(docTypeKey, serviceBinding);
                 }
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("readServiceBindings() added service "
+            if (logger.isTraceEnabled()) {
+                logger.trace("readServiceBindings() added service "
                         + " name=" + key
                         + " workspace=" + serviceBinding.getName());
             }
@@ -386,12 +393,12 @@ public class TenantBindingConfigReaderImpl
      * @return
      */
     public List<ServiceBindingType> getServiceBindingsByType(
-            String tenantId, String serviceType) {
+            String tenantId, List<String> serviceTypes) {
         ArrayList<ServiceBindingType> list = null;
         TenantBindingType tenant = tenantBindings.get(tenantId);
         if (tenant != null) {
             for (ServiceBindingType sb : tenant.getServiceBindings()) {
-                if (serviceType.equals(sb.getType())) {
+                if (serviceTypes.contains(sb.getType())) {
                     if (list == null) {
                         list = new ArrayList<ServiceBindingType>();
                     }

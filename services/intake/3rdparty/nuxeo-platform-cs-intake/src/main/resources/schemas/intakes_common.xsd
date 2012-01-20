@@ -24,7 +24,7 @@
     <xs:element name="currentOwner" type="xs:string"/>
     <xs:element name="depositor" type="xs:string"/>
     <xs:element name="depositorsRequirements" type="xs:string"/>
-    <xs:element name="entryDate" type="xs:string"/>
+    <xs:element name="entryDate" type="xs:date"/>
     <xs:element name="entryMethods">
         <xs:complexType>
             <xs:sequence>
@@ -36,7 +36,7 @@
     <xs:element name="entryNumber" type="xs:string"/>
     <xs:element name="entryReason" type="xs:string"/>
     <xs:element name="packingNote" type="xs:string"/>
-    <xs:element name="returnDate" type="xs:string"/>
+    <xs:element name="returnDate" type="xs:date"/>
     
     <!--  Object Collection Information Group -->
     <xs:element name="fieldCollectionDate" type="xs:string"/>
@@ -81,7 +81,7 @@
     <xs:element name="insuranceNote" type="xs:string"/>
     <xs:element name="insurancePolicyNumber" type="xs:string"/>
     <xs:element name="insuranceReferenceNumber" type="xs:string"/>
-    <xs:element name="insuranceRenewalDate" type="xs:string"/>
+    <xs:element name="insuranceRenewalDate" type="xs:date"/>
     <xs:element name="insurers">
         <xs:complexType>
             <xs:sequence>
@@ -94,11 +94,11 @@
 
     <xs:element name="currentLocationGroupList" type="currentLocationGroupList"/>
 
-    <xs:element name="locationDate" type="xs:string"/>
+    <xs:element name="locationDate" type="xs:date"/>
     <xs:element name="normalLocation" type="xs:string"/>
     
     <!-- Condition Check/Technical Assessment Information Group -->
-    <xs:element name="conditionCheckDate" type="xs:string"/>
+    <xs:element name="conditionCheckDate" type="xs:date"/>
     <xs:element name="conditionCheckMethods">
         <xs:complexType>
             <xs:sequence>

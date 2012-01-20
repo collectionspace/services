@@ -69,7 +69,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
 
     // Instance variables specific to this test.
     private String knownResourceId = null;
-    private final static String TIMESTAMP_UTC = GregorianCalendarDateTimeUtils.timestampUTC();
+    private final static String TIMESTAMP_UTC =
+            GregorianCalendarDateTimeUtils.timestampUTC();
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -282,16 +283,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Get the common part of the response and verify that it is not null.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -375,17 +367,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         if(logger.isTraceEnabled()){
@@ -416,13 +399,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         MovementClient client = new MovementClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-        if(logger.isDebugEnabled()){
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
+        	        assertStatusCode(res, testName);
+        assertStatusCode(res, testName);
 
         // Extract the common part from the response.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -452,17 +430,9 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         PayloadOutputPart commonPart = output.addPart(movementCommon, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
+        assertStatusCode(res, testName);
 
-        // Check the status code of the response: does it match the expected response(s)?
-        int statusCode = res.getStatus();
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-       // Extract the updated common part from the response.
+        // Extract the updated common part from the response.
         input = new PoxPayloadIn(res.getEntity());
         payloadInputPart = input.getPart(client.getCommonPartName());
         MovementsCommon updatedMovementCommon = null;
@@ -822,72 +792,6 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         }
 
         return multipart;
-    }
-
-    // FIXME Should be moved to a common class, as these are general utilities.
-    // FIXME Should be refactored to become a convenience variant of a
-    // general method to return a current datestamp or timestamp in any
-    // provided time zone.
-
-   /**
-    * Returns an ISO 8601 formatted timestamp of the
-    * current time instance in the UTC time zone.
-    */
-    public String datestampUTC() {
-        final String ISO_8601_DATE_FORMAT_PATTERN = "yyyy-MM-dd";
-        final DateFormat ISO_8601_DATE_FORMAT =
-            new SimpleDateFormat(ISO_8601_DATE_FORMAT_PATTERN);
-
-        final String UTC_TIMEZONE_IDENTIFIER = "UTC";
-        final TimeZone UTC_TIMEZONE = TimeZone.getTimeZone(UTC_TIMEZONE_IDENTIFIER);
-
-        Date timestamp = new Date();
-        return formatDate(timestamp, UTC_TIMEZONE, ISO_8601_DATE_FORMAT);
-    }
-
-   /**
-    * Returns an ISO 8601 formatted timestamp of the
-    * current time instance in the UTC time zone.
-    */
-    public String timestampUTC() {
-        final String ISO_8601_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-        final DateFormat ISO_8601_FORMAT =
-            new SimpleDateFormat(ISO_8601_FORMAT_PATTERN);
-
-        final String UTC_TIMEZONE_IDENTIFIER = "UTC";
-        final TimeZone UTC_TIMEZONE = TimeZone.getTimeZone(UTC_TIMEZONE_IDENTIFIER);
-
-        Date timestamp = new Date();
-        return formatDate(timestamp, UTC_TIMEZONE, ISO_8601_FORMAT);
-    }
-
-   /**
-    * Formats a provided date using a provided date formatter,
-    * in the default system time zone.
-    *
-    * @param date  A date to format.
-    * @param df    A date formatter to apply.
-    * @return      A formatted date string.
-    */
-    public String formatDate(Date date, DateFormat df) {
-        return formatDate(date, TimeZone.getDefault(), df);
-    }
-
-    // FIXME Add error handling.
-
-   /**
-    * Formats a provided date using a provided date formatter,
-    * in a provided time zone.
-    *
-    * @param date  A date to format.
-    * @param tz    The time zone qualifier for the date to format.
-    * @param df    A date formatter to apply.
-    *
-    * @return      A formatted date string.
-    */
-    public String formatDate(Date date, TimeZone tz, DateFormat df) {
-        df.setTimeZone(tz);
-        return df.format(date);
     }
 
 }

@@ -16,22 +16,14 @@
     xmlns="http://collectionspace.org/collectionobject/"
     targetNamespace="http://collectionspace.org/collectionobject/" version="0.1">
 
-    <xs:element name="remNumber" type="ns:otherNumber"/>
-
     <!-- Object identification information -->
 
     <xs:element name="objectNumber" type="xs:string"/>
     <xs:element name="otherNumberList" type="ns:otherNumberList"/>
-    <!-- Remove these two elements when the App/UI layer is using -->
-    <!-- the new repeatable 'otherNumbers' field: -->
-    <xs:element name="otherNumber" type="xs:string"/>
-    <xs:element name="otherNumberType" type="xs:string"/>
-    <!-- end of two elements to be removed -->
-    <xs:element name="briefDescriptions" type="xs:string">
+    <xs:element name="briefDescriptions">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="briefDescription" type="xs:string"
-                    minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="briefDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -83,12 +75,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <!-- Note: Penelope's repeatability spreadsheet identifies a Content Date -->
-    <!-- repeatable group, containing contentDate and dateAssociation fields. -->
-    <!-- Did not find the dateAssociation field in the wiki schemas, however.  -->
-    <!-- contentDate is itself a structured date field, containing a dateAssociation -->
-    <!-- field, so perhaps this may merely be a product of some confusion. -->
-    <xs:element name="contentDate" type="xs:string"/>
+    <xs:element name="contentDateGroup" type="structuredDateGroup"/>
     <xs:element name="contentDescription" type="xs:string"/>
     <xs:element name="contentEventNameGroupList" type="contentEventNameGroupList"/>
     <xs:element name="contentNote" type="xs:string"/>
@@ -144,18 +131,8 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="copyNumber" type="xs:string"/>
-    <!-- FIXME Move this dimensionSummary field into the repeatable Dimensions group in 1.3+ -->
-    <xs:element name="dimensionSummary" type="xs:string"/>
-    <xs:element name="dimensions" type="ns:dimensionList"/>
-    <!-- FIXME Remove these six elements when the App/UI layer is -->
-    <!-- using the new repeatable 'dimensions' field: -->
-    <xs:element name="dimension" type="xs:string"/>
-    <xs:element name="dimensionMeasuredPart" type="xs:string"/>
-    <xs:element name="dimensionMeasurementUnit" type="xs:string"/>
-    <xs:element name="dimensionValue" type="xs:string"/>
-    <xs:element name="dimensionValueDate" type="xs:string"/>
-    <xs:element name="dimensionValueQualifier" type="xs:string"/>
-    <!-- end of six elements to be removed -->
+    <!-- Changed name of next field from dimensions (type="dimensionList") in v1.13 when adding repeatable sub group -->
+    <xs:element name="measuredPartGroupList" type="measuredPartGroupList"/>
     <xs:element name="editionNumber" type="xs:string"/>
     <xs:element name="forms">
         <xs:complexType>
@@ -166,33 +143,54 @@
     </xs:element>
 
     <!-- Object description Inscription - Content Information -->
+    <xs:element name="textualInscriptionGroupList" type="textualInscriptionGroupList"/>
+    <xs:complexType name="textualInscriptionGroupList">
+        <xs:sequence>
+            <xs:element name="textualInscriptionGroup" type="textualInscriptionGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- FIXME Consider whether changes to field names below are required -->
     <!-- in response to the renaming of this group to Textual inscription -->
-    <xs:element name="inscriptionContent" type="xs:string"/>
-    <xs:element name="inscriptionContentInscriber" type="xs:string"/>
-    <xs:element name="inscriptionContentDate" type="xs:string"/>
-    <xs:element name="inscriptionContentInterpretation" type="xs:string"/>
-    <xs:element name="inscriptionContentLanguage" type="xs:string"/>
-    <xs:element name="inscriptionContentMethod" type="xs:string"/>
-    <xs:element name="inscriptionContentPosition" type="xs:string"/>
-    <xs:element name="inscriptionContentScript" type="xs:string"/>
-    <xs:element name="inscriptionContentTranslation" type="xs:string"/>
-    <xs:element name="inscriptionContentTransliteration" type="xs:string"/>
-    <xs:element name="inscriptionContentType" type="xs:string"/>
+    <xs:complexType name="textualInscriptionGroup">
+        <xs:sequence>
+            <xs:element name="inscriptionContent" type="xs:string"/>
+            <xs:element name="inscriptionContentInscriber" type="xs:string"/>
+            <xs:element name="inscriptionContentDate" type="xs:string"/>
+            <xs:element name="inscriptionContentInterpretation" type="xs:string"/>
+            <xs:element name="inscriptionContentLanguage" type="xs:string"/>
+            <xs:element name="inscriptionContentMethod" type="xs:string"/>
+            <xs:element name="inscriptionContentPosition" type="xs:string"/>
+            <xs:element name="inscriptionContentScript" type="xs:string"/>
+            <xs:element name="inscriptionContentTranslation" type="xs:string"/>
+            <xs:element name="inscriptionContentTransliteration" type="xs:string"/>
+            <xs:element name="inscriptionContentType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- Object Description Inscription - Description Information -->
+    <xs:element name="nonTextualInscriptionGroupList" type="nonTextualInscriptionGroupList"/>
+    <xs:complexType name="nonTextualInscriptionGroupList">
+        <xs:sequence>
+            <xs:element name="nonTextualInscriptionGroup" type="nonTextualInscriptionGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- FIXME Consider whether changes to field names below are required -->
     <!-- in response to the renaming of this group to Non-textual inscription -->
-    <xs:element name="inscriptionDescription" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionInscriber" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionDate" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionInterpretation" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionMethod" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionPosition" type="xs:string"/>
-    <xs:element name="inscriptionDescriptionType" type="xs:string"/>
-
+    <xs:complexType name="nonTextualInscriptionGroup">
+        <xs:sequence>
+            <xs:element name="inscriptionDescription" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionInscriber" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionDate" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionInterpretation" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionMethod" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionPosition" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
     <!-- Object Description Material Information -->
 
     <xs:element name="materialGroupList" type="materialGroupList"/>
@@ -214,9 +212,7 @@
     <xs:element name="objectComponentGroupList" type="objectComponentGroupList"/>
 
     <!-- Object Production Information -->
-
-    <xs:element name="objectProductionDateGroup" type="objectProductionDateGroup"/>
-
+    <xs:element name="objectProductionDateGroupList" type="objectProductionDateGroupList"/>
     <xs:element name="objectProductionNote" type="xs:string"/>
     <xs:element name="objectProductionOrganizationGroupList" type="objectProductionOrganizationGroupList"/>
     <xs:element name="objectProductionPeopleGroupList" type="objectProductionPeopleGroupList"/>
@@ -297,9 +293,7 @@
     </xs:element>
     <xs:element name="ownershipAccess" type="xs:string"/>
     <xs:element name="ownershipCategory" type="xs:string"/>
-    <!-- FIXME Make into a repeatable, structured date ("date units of information") -->
-    <!-- field, when structured dates are introduced -->
-    <xs:element name="ownershipDates" type="xs:string"/>
+    <xs:element name="ownershipDateGroupList" type="ownershipDateGroupList"/>
     <xs:element name="ownershipExchangeMethod" type="xs:string"/>
     <xs:element name="ownershipExchangeNote" type="xs:string"/>
     <xs:element name="ownershipExchangePriceCurrency" type="xs:string"/>
@@ -327,7 +321,7 @@
     <xs:element name="viewersPersonalExperience" type="xs:string"/>
     <xs:element name="viewersPersonalResponse" type="xs:string"/>
     <xs:element name="viewersReferences">
-            <xs:complexType>
+        <xs:complexType>
             <xs:sequence>
                 <xs:element name="viewersReference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
@@ -395,13 +389,13 @@
     </xs:complexType>
     <xs:complexType name="objectNameGroup">
         <xs:sequence>
-                <xs:element name="objectName" type="xs:string"/>
-                <xs:element name="objectNameCurrency" type="xs:string"/>
-                <xs:element name="objectNameLevel" type="xs:string"/>
-                <xs:element name="objectNameNote" type="xs:string"/>
-                <xs:element name="objectNameSystem" type="xs:string"/>
-                <xs:element name="objectNameType" type="xs:string"/>
-                <xs:element name="objectNameLanguage" type="xs:string"/>
+            <xs:element name="objectName" type="xs:string"/>
+            <xs:element name="objectNameCurrency" type="xs:string"/>
+            <xs:element name="objectNameLevel" type="xs:string"/>
+            <xs:element name="objectNameNote" type="xs:string"/>
+            <xs:element name="objectNameSystem" type="xs:string"/>
+            <xs:element name="objectNameType" type="xs:string"/>
+            <xs:element name="objectNameLanguage" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -433,7 +427,7 @@
             <xs:element name="titleTranslation" type="xs:string"/>
             <xs:element name="titleTranslationLanguage" type="xs:string"/>
         </xs:sequence>
-     </xs:complexType>
+    </xs:complexType>
 
     <xs:complexType name="contentEventNameGroupList">
         <xs:sequence>
@@ -458,7 +452,7 @@
         <xs:sequence>
             <xs:element name="contentObject" type="xs:string"/>
             <xs:element name="contentObjectType" type="xs:string"/>
-         </xs:sequence>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="contentOtherGroupList">
@@ -474,25 +468,39 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="dimensionList">
+    <!-- Changed names, as of v1.13: dimensionList became measuredPartGroupList, dimensionGroup became measuredPartGroup. -->
+    <xs:complexType name="measuredPartGroupList">
         <xs:sequence>
-            <xs:element name="dimensionGroup" type="dimensionGroup" minOccurs="0"
+            <xs:element name="measuredPartGroup" type="measuredPartGroup" minOccurs="0"
                 maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="dimensionGroup">
+    <xs:complexType name="measuredPartGroup">
         <xs:sequence>
             <xs:element name="measuredPart" type="xs:string"/>
+            <xs:element name="dimensionSummary" type="xs:string" />
+            <xs:element name="dimensionSubGroupList" type="dimensionSubGroupList"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dimensionSubGroupList">
+        <xs:sequence>
+            <xs:element name="dimensionSubGroup" type="dimensionSubGroup" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dimensionSubGroup">
+        <xs:sequence>
             <xs:element name="dimension" type="xs:string"/>
             <xs:element name="measuredBy" type="xs:string"/>
             <xs:element name="measurementUnit" type="xs:string"/>
             <xs:element name="measurementMethod" type="xs:string"/>
             <xs:element name="value" type="xs:decimal"/>
-            <xs:element name="valueDate" type="xs:string"/>
+            <xs:element name="valueDate" type="xs:dateTime"/>
             <xs:element name="valueQualifier" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-
+    
     <xs:complexType name="materialGroupList">
         <xs:sequence>
             <xs:element name="materialGroup" type="materialGroup" minOccurs="0"
@@ -509,11 +517,11 @@
         </xs:sequence>
     </xs:complexType>
     
-	<xs:complexType name="objectStatusList">
-		<xs:sequence>
-			<xs:element name="objectStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
-		</xs:sequence>
-	</xs:complexType>
+    <xs:complexType name="objectStatusList">
+        <xs:sequence>
+            <xs:element name="objectStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="technicalAttributeGroupList">
         <xs:sequence>
@@ -542,28 +550,10 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="objectProductionDateGroup">
+    <xs:complexType name="objectProductionDateGroupList">
         <xs:sequence>
-            <xs:element name="dateDisplayDate" type="xs:string"/>
-            <xs:element name="dateAssociation" type="xs:string"/>
-            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
-            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
-            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
-            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
-            <xs:element name="dateLatestYear" type="xs:integer"/>
-            <xs:element name="dateLatestMonth" type="xs:integer"/>
-            <xs:element name="dateLatestDay" type="xs:integer"/>
-            <xs:element name="dateLatestEra" type="xs:string"/>
-            <xs:element name="dateLatestCertainty" type="xs:string"/>
-            <xs:element name="dateLatestQualifier" type="xs:string"/>
-            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
-            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
-            <xs:element name="datePeriod" type="xs:string"/>
-            <xs:element name="dateNote" type="xs:string"/>
+            <xs:element name="objectProductionDateGroup" type="structuredDateGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -703,7 +693,7 @@
             <xs:element name="assocObject" type="xs:string"/>
             <xs:element name="assocObjectType" type="xs:string"/>
             <xs:element name="assocObjectNote" type="xs:string"/>
-         </xs:sequence>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="assocOrganizationGroupList">
@@ -761,6 +751,13 @@
             <xs:element name="assocPlaceNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
+    
+    <xs:complexType name="ownershipDateGroupList">
+        <xs:sequence>
+            <xs:element name="ownershipDateGroup" type="structuredDateGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="usageGroupList">
         <xs:sequence>
@@ -775,29 +772,48 @@
         </xs:sequence>
     </xs:complexType>
     
-	<xs:complexType name="referenceGroupList">
-		<xs:sequence>
-			<xs:element name="referenceGroup" type="referenceGroup" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
+    <xs:complexType name="referenceGroupList">
+        <xs:sequence>
+            <xs:element name="referenceGroup" type="referenceGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 	 
-	<xs:complexType name="referenceGroup">
-		<xs:sequence>
-			<xs:element name="reference" type="xs:string"/>
-			<xs:element name="referenceNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-    
-    <!-- Object Description Date Information -->
-    <!-- This appears to be a placeholder structured date -->
-    <xs:element name="dateAssociation" type="xs:string"/>
-    <xs:element name="dateEarliestSingle" type="xs:string"/>
-    <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
-    <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
-    <xs:element name="dateLatest" type="xs:string"/>
-    <xs:element name="dateLatestCertainty" type="xs:string"/>
-    <xs:element name="dateLatestQualifier" type="xs:string"/>
-    <xs:element name="datePeriod" type="xs:string"/>
-    <xs:element name="dateText" type="xs:string"/>
+    <xs:complexType name="referenceGroup">
+        <xs:sequence>
+            <xs:element name="reference" type="xs:string"/>
+            <xs:element name="referenceNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Before (re)using this generic complex type in any record type -->
+    <!-- other than CollectionObject, be sure to verify that Nuxeo handles -->
+    <!-- that correctly in its table creation/row linking. -->
+    <xs:complexType name="structuredDateGroup">
+        <xs:sequence>
+            <xs:element name="dateDisplayDate" type="xs:string"/>
+            <xs:element name="dateAssociation" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+            <xs:element name="dateLatestYear" type="xs:integer"/>
+            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="dateLatestDay" type="xs:integer"/>
+            <xs:element name="dateLatestEra" type="xs:string"/>
+            <xs:element name="dateLatestCertainty" type="xs:string"/>
+            <xs:element name="dateLatestQualifier" type="xs:string"/>
+            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+            <xs:element name="datePeriod" type="xs:string"/>
+            <xs:element name="dateNote" type="xs:string"/>
+            <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+            <xs:element name="dateLatestScalarValue" type="xs:date"/>
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>

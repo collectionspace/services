@@ -24,6 +24,7 @@
 package org.collectionspace.services.authorization;
 
 import java.util.StringTokenizer;
+import org.collectionspace.services.authorization.perms.ActionType;
 
 /**
  * A security resource that represents URI and method invoked on it

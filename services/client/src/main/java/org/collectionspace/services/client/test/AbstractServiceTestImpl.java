@@ -77,12 +77,13 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     static protected final String RESOURCE_PATH = "src" + File.separator
             + "test" + File.separator
             + "resources";
+    
     protected static final String BLOBS_DIR = "blobs";
     static protected final String DEFAULT_MIME = "application/octet-stream; charset=ISO-8859-1";
     static private final String NO_TEST_CLEANUP = "noTestCleanup";
     static protected final String NO_BLOB_CLEANUP = "noBlobCleanup";
     static protected final String NO_MEDIA_CLEANUP = "noMediaCleanup";
-    final static String NON_EXISTENT_KEYWORD = "jlmbsoqjlmbsoq";
+    private final static String NON_EXISTENT_KEYWORD = "jlmbsoqjlmbsoq";
 
     protected String getMimeType(File theFile) {
         String result = null;
@@ -108,7 +109,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
      *
      * @return the logger
      */
-    private Logger getLogger() {
+    protected Logger getLogger() {
         return this.logger;
     }
 
@@ -662,12 +663,22 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         //
         // Read the updated object and make sure it was updated correctly.
         //
-        res = client.getWorkflow(resourceId);
-        assertStatusCode(res, testName);
-        logger.debug("Got workflow state of updated object with ID: " + resourceId);
-        input = new PoxPayloadIn(res.getEntity());
-        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
-        Assert.assertNotNull(workflowCommons);
+        int trials = 0;
+        while (trials < 30) {
+	        res = client.getWorkflow(resourceId);
+	        assertStatusCode(res, testName);
+	        logger.debug("Got workflow state of updated object with ID: " + resourceId);
+	        input = new PoxPayloadIn(res.getEntity());
+	        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+	        Assert.assertNotNull(workflowCommons);
+	        String currentWorkflowState = updatedWorkflowCommons.getCurrentLifeCycleState();
+	        if (currentWorkflowState.equalsIgnoreCase(lifeCycleState)) {
+	        	logger.debug("Expected workflow state found: " + lifeCycleState);
+	        	break;
+	        }
+	        trials++;
+        }
+        
         Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
     }
 
@@ -696,18 +707,8 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         //
         CollectionSpacePoxClient client = assertPoxClient();
         ClientResponse<AbstractCommonList> res = client.readIncludeDeleted(includeDeleted);
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-        //
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         //
         // Now check that list size is correct
         //
@@ -734,18 +735,8 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
                 null, /* partial terms */
                 null, /* keywords */
                 includeDeleted);
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-        //
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         result = list.getTotalItems();
 
@@ -789,9 +780,18 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
             //
             // Next, test that a GET with WorkflowClient.WORKFLOWSTATE_DELETED query param set to 'false' returns a 404
             //
-            CollectionSpacePoxClient client = this.assertPoxClient();
-            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
-            int result = res.getStatus();
+            int trials = 0;
+            int result = 0;
+            while (trials < 30) {
+	            CollectionSpacePoxClient client = this.assertPoxClient();
+	            ClientResponse<String> res = client.readIncludeDeleted(csid, Boolean.FALSE);
+	            result = res.getStatus();
+	            if (result == STATUS_NOT_FOUND) {
+	            	logger.info("Workflow transition to 'deleted' is complete");
+	            	break;
+	            }
+	            trials++;
+            }
             Assert.assertEquals(result, STATUS_NOT_FOUND);
 
         } catch (UnsupportedOperationException e) {
@@ -837,7 +837,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
             // Send the search request and receive a response
             ClientResponse<AbstractCommonList> res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.FALSE);
             int result = res.getStatus();
-            Assert.assertEquals(result, STATUS_OK);
+            assertStatusCode(res, testName);
 
             AbstractCommonList list = res.getEntity();
             long itemsMatchedBySearch = list.getTotalItems();
@@ -850,7 +850,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
             // Send the search request and receive a response
             res = client.keywordSearchIncludeDeleted(KEYWORD, Boolean.TRUE);
             result = res.getStatus();
-            Assert.assertEquals(result, STATUS_OK);
+            assertStatusCode(res, testName);
 
             list = res.getEntity();
             itemsMatchedBySearch = list.getTotalItems();
@@ -1039,8 +1039,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         //
         AuthorityClient client = (AuthorityClient) this.getClientInstance();
         ClientResponse<String> res = client.readItemWorkflow(parentCsid, itemCsid);
-        assertStatusCode(
-                res, testName);
+        assertStatusCode(res, testName);
         logger.debug("Got object to update life cycle state with ID: " + itemCsid);
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         WorkflowCommon workflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
@@ -1061,16 +1060,29 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         input = new PoxPayloadIn(res.getEntity());
         WorkflowCommon updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
         Assert.assertNotNull(updatedWorkflowCommons);
-        //
-        // Read the updated object and make sure it was updated correctly.
-        //
-        res = client.readItemWorkflow(parentCsid, itemCsid);
-        assertStatusCode(res, testName);
-        logger.debug(
-                "Got workflow state of updated object with ID: " + itemCsid);
-        input = new PoxPayloadIn(res.getEntity());
-        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
-        Assert.assertNotNull(workflowCommons);
+        
+        int trials = 0;
+        boolean passed = false;
+        while (trials < 30) { //wait to see if the lifecycle transition will happen
+	        //
+	        // Read the updated object and make sure it was updated correctly.
+	        //
+	        res = client.readItemWorkflow(parentCsid, itemCsid);
+	        assertStatusCode(res, testName);
+	        logger.debug(
+	                "Got workflow state of updated object with ID: " + itemCsid);
+	        input = new PoxPayloadIn(res.getEntity());
+	        updatedWorkflowCommons = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+	        Assert.assertNotNull(workflowCommons);
+	        String currentState = updatedWorkflowCommons.getCurrentLifeCycleState();
+	        if (currentState.equalsIgnoreCase(lifeCycleState)) {
+	        	logger.debug("Expected workflow state found: " + lifeCycleState);
+	        	break;
+	        }
+	        logger.debug("Workflow state not yet updated for object with id: " + itemCsid + " state is=" +
+	        		currentState);
+	        trials++;
+        }
         Assert.assertEquals(updatedWorkflowCommons.getCurrentLifeCycleState(), lifeCycleState);
     }
 }

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+	<!-- 
+			 testGroup ID="person" is not live.  It works, but may not clean up correctly. 
+			 For now, use ID="updatePerson"
+	-->
+	<testGroup ID="AuthRefsSimple" autoDeletePOSTS="true">
+		<test ID="PersonAuth1" auth="admin@core.collectionspace.org">
+			<method>POST</method>
+			<uri>/cspace-services/personauthorities/</uri>
+			<filename>authrefs/newPersonAuthority.xml</filename>
+		</test>
+		<test ID="Person1">
+			<method>POST</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+			<filename>authrefs/newPerson1.xml</filename>
+		</test>
+		<test ID="Person2">
+			<method>POST</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+			<filename>authrefs/newPerson2.xml</filename>
+		</test>
+
+	 <test ID="GetPerson1">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
+		</test>
+
+	 <test ID="GetPerson2">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}</uri>
+		</test>
+
+		<test ID="loanout1" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">42</var>
+				<var ID="person">${GetPerson1.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout2" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">102</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="getLoan1AuthRefs">
+			<method>GET</method>
+			<uri>/cspace-services/loansout/${loanout1.CSID}/authorityrefs</uri>
+			<response>
+				<expected level="ADDOK" />
+				<filename>authrefs/res/foo.res.xml</filename>
+			 </response>
+		</test>
+
+		<test ID="getPerson1RefObjs">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}/refObjs</uri>
+			<response>
+				<expected level="ADDOK" />
+				<filename>authrefs/res/refObjs.res.xml</filename>
+			 </response>
+		</test>
+
+		<test ID="OrganizationAuth1">
+			<method>POST</method>
+			<uri>/cspace-services/orgauthorities/</uri>
+			<filename>authrefs/orgauthorities_common.xml</filename>
+		</test>
+ 
+		<test ID="Org1">
+			<method>POST</method>
+			<uri>/cspace-services/orgauthorities/${OrganizationAuth1.CSID}/items/</uri>
+			<filename>authrefs/organizations_common.xml</filename>
+			<vars>
+				<var ID="person1">${GetPerson1.got("//refName")}</var>
+				<var ID="person2">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="getOrg1AuthRefs">
+			<method>GET</method>
+			<uri>/cspace-services/orgauthorities/${OrganizationAuth1.CSID}/items/${Org1.CSID}/authorityrefs</uri>
+			<response>
+				<expected level="ADDOK" />
+				<filename>authrefs/res/foo.res.xml</filename>
+			 </response>
+		</test>
+
+	</testGroup>
+</xmlReplay>

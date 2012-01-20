@@ -53,6 +53,10 @@
     <run controlFile="batch/batch.xml" />
     <run controlFile="report/report.xml" />
     <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
+		<run controlFile="authrefs/authrefs.xml" testGroup="AuthRefs" />
+		<run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
+		<run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
+
     
 </xmlReplayMaster>
 

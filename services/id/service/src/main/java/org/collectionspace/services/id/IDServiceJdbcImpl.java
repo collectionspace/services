@@ -71,6 +71,8 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -219,7 +221,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  DocumentNotFoundException if the requested ID generator could not be found.
      */
     public void updateLastID(String csid, String lastId)
-            throws IllegalStateException, DocumentNotFoundException, LoginException, SQLException {
+            throws IllegalStateException, DocumentNotFoundException, NamingException, SQLException {
 
         logger.debug("> in updateLastID");
 
@@ -298,6 +300,7 @@ public class IDServiceJdbcImpl implements IDService {
                     conn.close();
                 }
             } catch (SQLException e) {
+            	logger.error("Error closing JDBC connection: ", e);
                 // Do nothing here
             }
         }
@@ -935,14 +938,14 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  LoginException
      * @throws  SQLException if a storage-related error occurred.
      */
-    public Connection getJdbcConnection() throws LoginException, SQLException {
+    public Connection getJdbcConnection() throws NamingException, SQLException {
 
         logger.debug("> in getJdbcConnection");
         
         Connection conn = null;
         try {
             conn = JDBCTools.getConnection(JDBCTools.NUXEO_REPOSITORY_NAME);
-        } catch (LoginException e) {
+        } catch (NamingException e) {
             throw e;
         } catch (SQLException e) {
             throw e;

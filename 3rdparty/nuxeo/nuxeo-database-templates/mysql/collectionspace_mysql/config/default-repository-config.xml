@@ -42,10 +42,6 @@
           
           <!-- Object Identification Information -->
           <!-- ================================= -->
-          
-          <!-- FIXME: The following field may be removed from this configuration when it is confirmed -->
-          <!-- that the App/UI layers are using a repeatable other number group. -->
-          <field type="largetext">collectionobjects_common:otherNumber</field> <!-- * -->
 
           <!-- FIXME: Change this to otherNumberValue if and when the field name itself is so changed. -->
           <field type="largetext">numberValue</field> <!-- * -->
@@ -173,12 +169,9 @@
           -->
   
           <field type="largetext">collectionobjects_common:objectNumber</field>
-          <field type="largetext">collectionobjects_common:otherNumber</field>
-          <field type="largetext">collectionobjects_common:otherNumberType</field>
           <field type="largetext">collectionobjects_common:numberOfObjects</field>
           <field type="largetext">collectionobjects_common:collection</field>
           <field type="largetext">collectionobjects_common:recordStatus</field>
-          <field type="largetext">collectionobjects_common:age</field>
           <field type="largetext">collectionobjects_common:ageQualifier</field>
           <field type="largetext">collectionobjects_common:ageUnit</field>
       
@@ -223,7 +216,6 @@
           <field type="largetext">collectionobjects_common:ownershipDates</field>
           <field type="largetext">collectionobjects_common:ownershipExchangeMethod</field>
           <field type="largetext">collectionobjects_common:ownershipExchangePriceCurrency</field>
-          <field type="largetext">collectionobjects_common:ownershipExchangePriceValue</field>
           <field type="largetext">collectionobjects_common:ownershipPlace</field>
           <field type="largetext">collectionobjects_common:fieldCollectionNumber</field>
           <field type="largetext">collectionobjects_common:fieldCollectionMethod</field>

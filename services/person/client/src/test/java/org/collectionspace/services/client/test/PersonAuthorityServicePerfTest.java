@@ -314,12 +314,8 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
             Assert.fail(testName+" passed null csid!");
         }
         AbstractCommonList list = null;
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             list = res.getEntity();
         } finally {
             res.releaseConnection();

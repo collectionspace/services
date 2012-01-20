@@ -5,6 +5,8 @@
 http://www.mysql.com/downloads/api-jdbc-stable.html
 -->
 
+<!-- REM: 11/22/2011 - After our move to Apache Tomcat, this file is obsolete?
+
 <datasources>
   <local-tx-datasource>
     <jndi-name>CspaceDS</jndi-name>

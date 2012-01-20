@@ -87,7 +87,7 @@ public class ImportsResource extends ResourceBase {
     	List<RepositoryDomainType> repositoryDomainList = tenantBinding.getRepositoryDomain();
     	if (repositoryDomainList.size() == 1) {
         	String domainName = repositoryDomainList.get(0).getStorageName().trim();
-        	result = "/" + domainName + "/" + NuxeoUtils.WORKSPACES;    		
+        	result = "/" + domainName + "/" + NuxeoUtils.Workspaces;    		
     	} else {
     		throw new ConfigurationException("Tenant bindings contains 0 or more than 1 repository domains.");
     	}

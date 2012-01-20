@@ -60,10 +60,10 @@
              <uri>/cspace-services/relations/</uri>
              <filename>relation/r-1.xml</filename>
              <vars>
-                <var ID="documentId1">${Person1.CSID}</var>
-                <var ID="documentId2">${Person2.CSID}</var>
-                <var ID="documentType1">Persons</var>
-                <var ID="documentType2">Persons</var>
+                <var ID="subjectCsid">${Person1.CSID}</var>
+                <var ID="objectCsid">${Person2.CSID}</var>
+                <var ID="subjectDocumentType">Persons</var>
+                <var ID="objectDocumentType">Persons</var>
                 <var ID="relationshipType">hasBroader</var>
              </vars>
         </test>
@@ -76,10 +76,10 @@
              <!-- Person2 and Person1 are switched in this record. 
                   Ultimately we don't want any hasNarrower actually stored.
              -->
-                <var ID="documentId1">${Person2.CSID}</var>
-                <var ID="documentId2">${Person1.CSID}</var>
-                <var ID="documentType1">Persons</var>
-                <var ID="documentType2">Persons</var>
+                <var ID="subjectCsid">${Person2.CSID}</var>
+                <var ID="objectCsid">${Person1.CSID}</var>
+                <var ID="subjectDocumentType">Persons</var>
+                <var ID="objectDocumentType">Persons</var>
                 <var ID="relationshipType">hasNarrower</var>
              </vars>
          </test>

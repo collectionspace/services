@@ -21,7 +21,7 @@
         <exec executable="echo">
         		<arg value="Installer: Executing CollectionObject Service's &apos;install&apos; target." />
 				</exec>
-        <copy todir="${jboss.deploy.nuxeo.plugins}">
+        <copy todir="${jee.deploy.nuxeo.plugins}">
             <fileset file="nuxeo/*.jar"/>
         </copy>
     </target>

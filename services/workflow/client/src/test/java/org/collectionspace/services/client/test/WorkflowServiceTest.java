@@ -103,8 +103,8 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
 //        setupReadList();
 //        WorkflowClient client = new WorkflowClient();
 //        ClientResponse<AbstractCommonList> res = client.readList();
-//        AbstractCommonList list = res.getEntity();
 //        assertStatusCode(res, testName);
+//        AbstractCommonList list = res.getEntity();
 //        if (logger.isDebugEnabled()) {
 //            List<AbstractCommonList.ListItem> items =
 //                list.getListItem();

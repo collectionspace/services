@@ -121,8 +121,8 @@ public class GroupServiceTest extends AbstractServiceTestImpl {
         setupReadList();
         GroupClient client = new GroupClient();
         ClientResponse<AbstractCommonList> res = client.readList();
-        AbstractCommonList list = res.getEntity();
         assertStatusCode(res, testName);
+        AbstractCommonList list = res.getEntity();
         if(logger.isTraceEnabled()){
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }

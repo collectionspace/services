@@ -13,6 +13,7 @@
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
     xmlns:ns="http://collectionspace.org/services/authorization"
@@ -35,21 +36,20 @@
     -->
     <xs:include schemaLocation="roles.xsd"/>
 
-    <xs:element name="roles_list">
-        <xs:complexType>
+    <xs:element name="roles_list" type="roles_list"/>
+    <xs:complexType name="roles_list">
+        <xs:annotation>
+            <xs:appinfo>
+                <hj:ignored/>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence>
             <xs:annotation>
-                <xs:appinfo>
-                    <hj:ignored/>
-                </xs:appinfo>
+                <xs:documentation>role list</xs:documentation>
             </xs:annotation>
-            <xs:sequence>
-                <xs:annotation>
-                    <xs:documentation>role list</xs:documentation>
-                </xs:annotation>
-                <xs:element name="role" type="ns:role" minOccurs="1" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+            <xs:element name="role" type="ns:role" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>
 

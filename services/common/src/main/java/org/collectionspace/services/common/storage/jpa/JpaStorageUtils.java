@@ -245,7 +245,7 @@ public class JpaStorageUtils {
         try {
         	List<AccountValue> accountValues = new ArrayList<AccountValue>();
         	accountValues.add(account);
-            result.setAccounts(accountValues);
+            result.setAccount(accountValues);
 
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
@@ -271,7 +271,7 @@ public class JpaStorageUtils {
 	            	PermissionRoleRel permRolRel = (PermissionRoleRel)resultList.next();
 	            	permissionValues.add(AuthorizationRoleRel.buildPermissionValue(permRolRel));
 	            }
-	            result.setPermissions(permissionValues);
+	            result.setPermission(permissionValues);
             }
         } catch (NoResultException nre) {
             if (em != null && em.getTransaction().isActive()) {

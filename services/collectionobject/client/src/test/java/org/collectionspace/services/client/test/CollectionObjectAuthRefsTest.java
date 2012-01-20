@@ -126,6 +126,13 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     private String fieldCollectionSourceRefName = null;
     private String fieldCollectorRefName = null;
 
+    // FIXME: As of 2012-01-04, the two assocEvent... fields
+    // and the ownerRefName field have been commented out in
+    // the list of authRef fields in CollectionObject, in tenant bindings,
+    // because those fields fall within to-be-created repeatable groups,
+    // per CSPACE-3229.
+    // As a result, the number of authority references expected to be found
+    // is currently 4, rather than 7. - Aron
     public String toString(){
         String result = "CollectionObjectauthRefsTest: "
                         + "\r\npersonAuthCSID: "+personAuthCSID
@@ -146,7 +153,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     }
 
     /** The number of authority references expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 7;
+    private final int NUM_AUTH_REFS_EXPECTED = 4;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
@@ -419,16 +426,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         ClientResponse<String> res = collectionObjectClient.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".read: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
@@ -437,14 +435,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
         // Get all of the auth refs and check that the expected number is returned
         ClientResponse<AuthorityRefList> res2 = collectionObjectClient.getAuthorityRefs(knownResourceId);
-        statusCode = res2.getStatus();
-        
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res2, testName);
+
         AuthorityRefList list = res2.getEntity();
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
@@ -458,7 +450,6 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
             "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
                
         // Check a sample of one or more person authority ref fields
-        // Assert.assertEquals(collectionObject.getInscriptionContentInscriber(), contentInscriberRefName);
         // Assert.assertEquals(collectionObject.getAssocPersons().getAssocPerson().get(0), assocPersonRefName);
         Assert.assertEquals(collectionObject.getOwners().getOwner().get(0), ownerRefName);
         Assert.assertEquals(collectionObject.getFieldCollectionSources().getFieldCollectionSource().get(0), fieldCollectionSourceRefName);

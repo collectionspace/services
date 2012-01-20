@@ -40,73 +40,73 @@
         <ant antfile="services/build.xml" target="dist" inheritAll="false"/>
 
         <!-- bundle up everything -->
-        <tar destfile="${basedir}/dist/${cspace.services.release}-${jboss.release}.tar.gz" compression="gzip">
+        <tar destfile="${basedir}/dist/${cspace.services.release}-${jee.release}.tar.gz" compression="gzip">
             <tarfileset dir="${basedir}/dist/cspace"
                         preserveLeadingSlashes="true">
             </tarfileset>
         </tar>
     </target>
 
-    <target name="dist-jboss-domains" depends="init"
-            description="create jboss distributions for cspace and nuxeo">
-        <antcall target="dist-jboss-cspace"/>
-        <antcall target="dist-jboss-nuxeo"/>
+    <target name="dist-jee-domains" depends="init"
+            description="create JEE distributions for cspace and nuxeo">
+        <antcall target="dist-jee-cspace"/>
+        <antcall target="dist-jee-nuxeo"/>
     </target>
 
-    <target name="dist-jboss-cspace" depends="dist"
-            description="generate jboss distribution for cspace">
-        <fail message="JBoss is not installed or ${jboss.dir} not found">
+    <target name="dist-jee-cspace" depends="dist"
+            description="generate JEE distribution for cspace">
+        <fail message="JEE container is not installed or ${jee.dir} not found">
             <condition>
                 <not>
-                    <available file="${jboss.dir}" type="dir"/>
+                    <available file="${jee.dir}" type="dir"/>
                 </not>
             </condition>
         </fail>
 
-        <fail message="CSpace is not deployed or ${jboss.deploy.cspace.services} not found">
+        <fail message="CSpace is not deployed or ${jee.deploy.cspace.services} not found">
             <condition>
                 <not>
-                    <available file="${jboss.deploy.cspace.services}" type="file"/>
+                    <available file="${jee.deploy.cspace.services}" type="file"/>
                 </not>
             </condition>
         </fail>
 
-        <tar destfile="${basedir}/dist/${jboss.release}-${domain.cspace}-${release.version}.tar.gz" compression="gzip">
-            <tarfileset dir="${jboss.dir}"
-                        prefix="${jboss.release}"
+        <tar destfile="${basedir}/dist/${jee.release}-${domain.cspace}-${release.version}.tar.gz" compression="gzip">
+            <tarfileset dir="${jee.dir}"
+                        prefix="${jee.release}"
                         preserveLeadingSlashes="true">
-                <exclude name="server/${jboss.domain.nuxeo}/**"/>
-                <exclude name="server/${jboss.domain.cspace}/log/**"/>
-                <exclude name="server/${jboss.domain.cspace}/tmp/**"/>
+                <exclude name="server/${jee.domain.nuxeo}/**"/>
+                <exclude name="server/${jee.domain.cspace}/log/**"/>
+                <exclude name="server/${jee.domain.cspace}/tmp/**"/>
             </tarfileset>
         </tar>
     </target>
 
-    <target name="dist-jboss-nuxeo" depends="dist"
+    <target name="dist-jee-nuxeo" depends="dist"
             description="generate nuxeo domain distribution" >
-        <fail message="JBoss is not installed or ${jboss.dir} not found">
+        <fail message="JEE server is not installed or ${jee.dir} not found">
             <condition>
                 <not>
-                    <available file="${jboss.dir}" type="dir"/>
+                    <available file="${jee.dir}" type="dir"/>
                 </not>
             </condition>
         </fail>
 
-        <fail message="Nuxeo is not deployed or ${jboss.deploy.nuxeo.plugins} not found">
+        <fail message="Nuxeo is not deployed or ${jee.deploy.nuxeo.plugins} not found">
             <condition>
                 <not>
-                    <available file="${jboss.deploy.nuxeo.plugins}" type="dir"/>
+                    <available file="${jee.deploy.nuxeo.plugins}" type="dir"/>
                 </not>
             </condition>
         </fail>
 
-        <tar destfile="${basedir}/dist/${jboss.release}-${domain.nuxeo}-${release.version}.tar.gz" compression="gzip">
-            <tarfileset dir="${jboss.dir}"
-                        prefix="${jboss.release}"
+        <tar destfile="${basedir}/dist/${jee.release}-${domain.nuxeo}-${release.version}.tar.gz" compression="gzip">
+            <tarfileset dir="${jee.dir}"
+                        prefix="${jee.release}"
                         preserveLeadingSlashes="true">
-                <exclude name="server/${jboss.domain.cspace}/**"/>
-                <exclude name="server/${jboss.domain.nuxeo}/log/**"/>
-                <exclude name="server/${jboss.domain.nuxeo}/tmp/**"/>
+                <exclude name="server/${jee.domain.cspace}/**"/>
+                <exclude name="server/${jee.domain.nuxeo}/log/**"/>
+                <exclude name="server/${jee.domain.nuxeo}/tmp/**"/>
             </tarfileset>
         </tar>
     </target>
@@ -232,16 +232,16 @@
         <ant antfile="services/build.xml" target="import" inheritAll="false"/>
     </target>
 
-    <target name="deploy" depends="checkvars,install,setup_nuxeo.conf,setup_cspaceds.cfg,setup_initdb.sql"
-            description="deploy services in ${jboss.server.cspace}">
+    <target name="deploy" depends="checkvars,install,setup_cspaceds.cfg,setup_initdb.sql"
+            description="deploy services in ${jee.server.cspace}">
         <!-- copy db scripts, etc. -->
-				<copy todir="${jboss.server.cspace}/cspace/services/scripts">
-					<fileset dir="${src}/main/resources/scripts/"/>
+		<copy todir="${jee.server.cspace}/cspace/services/scripts">
+			<fileset dir="${src}/main/resources/scripts/"/>
         </copy>
-        <!-- copy datasources, including default jboss ds -->
+        <!-- copy datasources, including default JEE datasource -->
 				<!--
 				Now handled in dependent targets
-        <copy todir="${jboss.deploy.cspace}">
+        <copy todir="${jee.deploy.cspace}">
 					<fileset dir="${src}/main/resources/config/${db}"/>
 				</copy>
 				-->
@@ -250,9 +250,9 @@
 
 			</target>
 
-		<target name="checkvars">
-				<fail unless="env.JBOSS_HOME" 
-							message="Required environment variable JBOSS_HOME has not been set."/>
+		<target name="checkvars">		
+				<fail unless="env.CSPACE_JEESERVER_HOME" 
+							message="Required environment variable CSPACE_JEESERVER_HOME has not been set."/>
 				<fail unless="env.DB_PASSWORD_CSPACE" 
 							message="Required environment variable DB_PASSWORD_CSPACE has not been set."/>
 				<fail unless="env.DB_PASSWORD_NUXEO" 
@@ -262,24 +262,11 @@
 		</target>
 
 
-		<target name="setup_nuxeo.conf"
-					 description="copy nuxeo.conf, replacing keyword to set DB dialect">
-			<property name="src.nuxeo.conf" value="${src}/main/resources/config/nuxeo.conf"/>
-			<delete file="${jboss.bin}/nuxeo.conf" failonerror="false" />
-			<copy file="${src.nuxeo.conf}" todir="${jboss.bin}">
-				<filterset>
-					<filter token="DB" value="${db}" />
-					<filter token="NUXEO_USER" value="${db.nuxeo.user}" />
-					<filter token="NUXEO_PW" value="${env.DB_PASSWORD_NUXEO}" />
-				</filterset>
-			</copy>
-    </target>
-
 		<target name="setup_cspaceds.cfg"
 					 description="copy cspace-ds.xml, replacing keywords">
 			<property name="src.cspaceds.cfg" value="${src}/main/resources/config/cspace-ds.xml"/>
-			<delete file="${jboss.deploy.cspace}/cspace-ds.xml" failonerror="false" />
-			<copy file="${src.cspaceds.cfg}" todir="${jboss.deploy.cspace}">
+			<delete file="${jee.deploy.cspace}/cspace-ds.xml" failonerror="false" />
+			<copy file="${src.cspaceds.cfg}" todir="${jee.deploy.cspace}">
 				<filterset>
 					<filter token="DB_CSPACE_URL" value="${db.jdbc.cspace.url}" />
 					<filter token="DB_NUXEO_URL" value="${db.jdbc.nuxeo.url}" />
@@ -296,16 +283,14 @@
     </target>
 
 		<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
-			<copy todir="${jboss.server.cspace}/cspace/services/db">
+			<copy todir="${jee.server.cspace}/cspace/services/db">
         <fileset dir="${src}/main/resources/db"/>
 				<filterset>
 					 <!-- Note: double-subs from ${db.xyz.password} fail -->
 					<filter token="DB_CSPACE_USER" value="${db.cspace.user}" />
 					<filter token="DB_NUXEO_USER" value="${db.nuxeo.user}" />
-					<filter token="DB_JBOSS_USER" value="${db.jboss.user}" />
 				  <filter token="DB_CSPACE_PASSWORD" value="${env.DB_PASSWORD_CSPACE}" />
 					<filter token="DB_NUXEO_PASSWORD" value="${env.DB_PASSWORD_NUXEO}" />
-					<filter token="DB_JBOSS_PASSWORD" value="${env.DB_PASSWORD_JBOSS}" />
 				</filterset>
 			</copy>
     </target>
@@ -313,20 +298,20 @@
  
 
     <target name="undeploy"
-            description="undeploy services from ${jboss.server.cspace}">
+            description="undeploy services from ${jee.server.cspace}">
         <ant antfile="services/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritAll="false"/>
 				<!-- Delete mysql-ds.xml to clean up pre-1.8 bundles -->
-				<delete failonerror="false" file="${jboss.deploy.cspace}/mysql-ds.xml"/>
-				<delete failonerror="false" file="${jboss.deploy.cspace}/jboss-ds.xml"/>
-        <delete failonerror="false" file="${jboss.deploy.cspace}/cspace-ds.xml"/>
-        <delete failonerror="false" dir="${jboss.server.cspace}/cspace/services"/>
-        <delete failonerror="false" dir="${jboss.server.cspace}/cspace/config/services"/>
+				<delete failonerror="false" file="${jee.deploy.cspace}/mysql-ds.xml"/>
+				<delete failonerror="false" file="${jee.deploy.cspace}/jee-ds.xml"/>
+        <delete failonerror="false" file="${jee.deploy.cspace}/cspace-ds.xml"/>
+        <delete failonerror="false" dir="${jee.server.cspace}/cspace/services"/>
+        <delete failonerror="false" dir="${jee.server.cspace}/cspace/config/services"/>
     </target>
 
 
     <target name="hotdeploy" depends="install"
-            description="deploy services in running ${jboss.server.cspace}">
+            description="deploy services in running ${jee.server.cspace}">
         <ant antfile="services/build.xml" target="hotdeploy" inheritAll="false"/>
     </target>
 

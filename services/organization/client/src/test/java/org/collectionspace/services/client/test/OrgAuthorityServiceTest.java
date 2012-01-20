@@ -553,17 +553,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         } else {
             Assert.fail("readInternal: Internal error. One of CSID or shortId must be non-null");
         }
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
                 PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -663,18 +654,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         } else {
             Assert.fail("readInternal: Internal error. One of authCSID or authShortId must be non-null");
         }
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             // Check whether we've received a organization.
             PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
             OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
@@ -720,24 +701,14 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         OrgAuthorityClient client = new OrgAuthorityClient();
         PoxPayloadIn input = null;
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-            // Check whether organization has expected displayName.
             input = new PoxPayloadIn(res.getEntity());
         } finally {
             res.releaseConnection();
         }
 
+        // Check whether organization has expected displayName.
         OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
                 client.getItemCommonPartName(), OrganizationsCommon.class);
         Assert.assertNotNull(organization);
@@ -769,17 +740,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         PayloadOutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug("updateItem: status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
         } finally {
@@ -812,17 +774,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug("updateItem: status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
         } finally {
@@ -856,25 +809,19 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        // Perform setup.
-        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
-        // setupUpdateWithWrongXmlSchema(testName, logger);
-
+        
+        // Perform setup for read.
+        setupRead();
+        
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
+        
+        // Perform setup for update.
+        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
+
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
-
             // Check whether organization has expected displayName.
             PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
             OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
@@ -888,18 +835,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
             PoxPayloadOut output = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
             PayloadOutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
             commonPart.setLabel(client.getItemCommonPartName());
-            res.releaseConnection();
             res = client.updateItem(knownResourceId, knownItemResourceId, output);
-            statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug("updateItem: status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
+            assertStatusCode(res, testName);
+       } finally {
             res.releaseConnection();
         }
     }
@@ -925,18 +863,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         ClientResponse<String> res =
                 client.readContact(knownResourceId, knownItemResourceId,
                 knownContactResourceId);
+        assertStatusCode(res, testName);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             // Check whether we've received a contact.
             PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
             ContactsCommon contact = (ContactsCommon) extractPart(input,
@@ -1079,19 +1007,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         try {
             AbstractCommonList list = res.getEntity();
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             // Optionally output additional data about list members for debugging.
             if (logger.isTraceEnabled()) {
                 AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
@@ -1143,19 +1061,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         } else {
             Assert.fail("readItemList passed null csid and name!");
         }
+        assertStatusCode(res, testName);
         try {
             AbstractCommonList list = res.getEntity();
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             List<AbstractCommonList.ListItem> items =
                     list.getListItem();
             int nItemsReturned = items.size();
@@ -1216,18 +1124,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         AbstractCommonList list = null;
         ClientResponse<AbstractCommonList> res =
                 client.readContactList(parentcsid, itemcsid);
+        assertStatusCode(res, testName);
         try {
             list = res.getEntity();
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
             List<AbstractCommonList.ListItem> listitems =
                 list.getListItem();
@@ -1279,12 +1178,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<String> res =
                 client.read(knownResourceId);
+        assertStatusCode(res, testName);
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": read status = " + res.getStatus());
-            }
-            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
             if (logger.isDebugEnabled()) {
                 logger.debug("got OrgAuthority to update with ID: " + knownResourceId);
             }
@@ -1307,15 +1202,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
             commonPart.setLabel(client.getCommonPartName());
             res.releaseConnection();
             res = client.update(knownResourceId, output);
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
 
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
@@ -1353,12 +1240,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
+        assertStatusCode(res, testName);
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": read status = " + res.getStatus());
-            }
-            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
             if (logger.isDebugEnabled()) {
                 logger.debug("got Organization to update with ID: "
                         + knownItemResourceId
@@ -1391,15 +1274,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
             commonPart.setLabel(client.getItemCommonPartName());
             res.releaseConnection();
             res = client.updateItem(knownResourceId, knownItemResourceId, output);
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
 
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
@@ -1439,12 +1314,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<String> res =
                 client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
+        assertStatusCode(res, testName);
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": read status = " + res.getStatus());
-            }
-            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
             if (logger.isDebugEnabled()) {
                 logger.debug("got Contact to update with ID: "
                         + knownContactResourceId
@@ -1480,15 +1351,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: 
             commonPart.setLabel(new ContactClient().getCommonPartName());
             res.releaseConnection();
             res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
 
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ns2:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/collectionobject">
   <objectNumber>objectNumber</objectNumber>
-  <otherNumber>XXX</otherNumber>
-  <otherNumberType>otherNumberType</otherNumberType>
   <!-- briefDescription>briefDescription</briefDescription -->
   <comments>comments</comments>
   <distinguishingFeatures>distFeatures</distinguishingFeatures>
@@ -42,29 +40,27 @@
   <copyNumber>copyNumber</copyNumber>
   <editionNumber>editionNumber</editionNumber>
   <form>form</form>
- <inscriptionContent>inscriptionContent</inscriptionContent>
-<inscriptionContentInscriber>inscriptionContentInscriber</inscriptionContentInscriber>
-<inscriptionContentDate>inscriptionContentDate</inscriptionContentDate>
-<inscriptionContentInterpretation>inscriptionContentInterpretation</inscriptionContentInterpretation>
-<inscriptionContentLanguage>inscriptionContentLanguage</inscriptionContentLanguage>
-<inscriptionContentMethod>inscriptionContentMethod</inscriptionContentMethod>
-<inscriptionContentPosition>inscriptionContentPosition</inscriptionContentPosition>
-<inscriptionContentScript>inscriptionContentScript</inscriptionContentScript>
-<inscriptionContentTranslation>inscriptionContentTranslation</inscriptionContentTranslation>
-<inscriptionContentTransliteration>inscriptionContentTransliteration</inscriptionContentTransliteration>
-<inscriptionContentType>inscriptionContentType</inscriptionContentType>  <inscriptionDescription>inscriptionDescription</inscriptionDescription>
-
-<inscriptionDescriptionInscriber>inscriptionDescriptionInscriber</inscriptionDescriptionInscriber>
-
-<inscriptionDescriptionDate>inscriptionDescriptionDate</inscriptionDescriptionDate>
-
-<inscriptionDescriptionInterpretation>inscriptionDescriptionInterpretation</inscriptionDescriptionInterpretation>
-
-<inscriptionDescriptionMethod>inscriptionDescriptionMethod</inscriptionDescriptionMethod>
-
-<inscriptionDescriptionPosition>inscriptionDescriptionPosition</inscriptionDescriptionPosition>
-
-<inscriptionDescriptionType>inscriptionDescriptionType</inscriptionDescriptionType>
+  <textualInscriptionGroupList>
+    <inscriptionContent>inscriptionContent</inscriptionContent>
+    <inscriptionContentInscriber>inscriptionContentInscriber</inscriptionContentInscriber>
+    <inscriptionContentDate>inscriptionContentDate</inscriptionContentDate>
+    <inscriptionContentInterpretation>inscriptionContentInterpretation</inscriptionContentInterpretation>
+    <inscriptionContentLanguage>inscriptionContentLanguage</inscriptionContentLanguage>
+    <inscriptionContentMethod>inscriptionContentMethod</inscriptionContentMethod>
+    <inscriptionContentPosition>inscriptionContentPosition</inscriptionContentPosition>
+    <inscriptionContentScript>inscriptionContentScript</inscriptionContentScript>
+    <inscriptionContentTranslation>inscriptionContentTranslation</inscriptionContentTranslation>
+    <inscriptionContentTransliteration>inscriptionContentTransliteration</inscriptionContentTransliteration>
+    <inscriptionContentType>inscriptionContentType</inscriptionContentType>  <inscriptionDescription>inscriptionDescription</inscriptionDescription>
+  </textualInscriptionGroupList>
+  <nonTextualInscriptionGroupList>
+    <inscriptionDescriptionInscriber>inscriptionDescriptionInscriber</inscriptionDescriptionInscriber>
+    <inscriptionDescriptionDate>inscriptionDescriptionDate</inscriptionDescriptionDate>
+    <inscriptionDescriptionInterpretation>inscriptionDescriptionInterpretation</inscriptionDescriptionInterpretation>
+    <inscriptionDescriptionMethod>inscriptionDescriptionMethod</inscriptionDescriptionMethod>
+    <inscriptionDescriptionPosition>inscriptionDescriptionPosition</inscriptionDescriptionPosition>
+    <inscriptionDescriptionType>inscriptionDescriptionType</inscriptionDescriptionType>
+  </nonTextualInscriptionGroupList>
   <material>material</material>
   <materialComponent>materialComponent</materialComponent>
   <materialComponentNote>materialComponentNote</materialComponentNote>

@@ -24,6 +24,9 @@ public class ServiceBindingUtils {
 	public static final String SERVICE_TYPE_PROP = "type";
 	public static final String SERVICE_TYPE_OBJECT = "object";
 	public static final String SERVICE_TYPE_PROCEDURE = "procedure";
+	public static final String SERVICE_TYPE_AUTHORITY = "authority";
+	public static final String SERVICE_TYPE_UTILITY = "utility";
+	public static final String SERVICE_TYPE_SECURITY = "security";
 	
     public static String getTenantQualifiedDocType(String tenantId, String docType) {
     	String result = docType + ServiceContext.TENANT_SUFFIX + tenantId;

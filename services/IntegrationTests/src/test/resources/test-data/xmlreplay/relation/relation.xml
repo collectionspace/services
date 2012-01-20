@@ -21,10 +21,10 @@
              <uri>/cspace-services/relations/</uri>
              <filename>relation/r-1.xml</filename>
              <vars>
-                <var ID="documentId1">${oe1.CSID}</var>
-                <var ID="documentId2">${oe2.CSID}</var>
-                <var ID="documentType1">objectexit</var>
-                <var ID="documentType2">objectexit</var>
+                <var ID="subjectCsid">${oe1.CSID}</var>
+                <var ID="objectCsid">${oe2.CSID}</var>
+                <var ID="subjectDocumentType">objectexit</var>
+                <var ID="objectDocumentType">objectexit</var>
                 <var ID="relationshipType">hasBroader</var>
              </vars>
          </test>
@@ -34,10 +34,10 @@
              <filename>relation/r-1.xml</filename>
              <vars>
                 <!-- switched oe2 and oe1 on this -->
-                <var ID="documentId1">${oe2.CSID}</var>
-                <var ID="documentId2">${oe1.CSID}</var>
-                <var ID="documentType1">objectexit</var>
-                <var ID="documentType2">objectexit</var>
+                <var ID="subjectCsid">${oe2.CSID}</var>
+                <var ID="objectCsid">${oe1.CSID}</var>
+                <var ID="subjectDocumentType">objectexit</var>
+                <var ID="objectDocumentType">objectexit</var>
                 <var ID="relationshipType">hasBroader</var>
              </vars>
          </test>
@@ -70,10 +70,10 @@
              <uri>/cspace-services/relations/</uri>
              <filename>relation/r-2.xml</filename>
              <vars>
-                <var ID="documentId1">${oe1.CSID}</var>
-                <var ID="documentId2">${itemCSID}</var>
-                <var ID="documentType1">ObjectExit</var>
-                <var ID="documentType2">ObjectExit</var>
+                <var ID="subjectCsid">${oe1.CSID}</var>
+                <var ID="objectCsid">${itemCSID}</var>
+                <var ID="subjectDocumentType">ObjectExit</var>
+                <var ID="objectDocumentType">ObjectExit</var>
                 <var ID="relationshipType">hasBroader</var>
              </vars>
          </test>
@@ -89,10 +89,10 @@
              <uri>/cspace-services/relations/</uri>
              <filename>relation/r-2.xml</filename>
              <vars>
-                <var ID="documentId1">1234-5678</var>
-                <var ID="documentId2">${itemCSID}</var>
-                <var ID="documentType1">ObjectExit</var>
-                <var ID="documentType2">ObjectExit</var>
+                <var ID="subjectCsid">1234-5678</var>
+                <var ID="objectCsid">${itemCSID}</var>
+                <var ID="subjectDocumentType">ObjectExit</var>
+                <var ID="objectDocumentType">ObjectExit</var>
                 <var ID="relationshipType">hasBroader</var>
              </vars>
          </test>

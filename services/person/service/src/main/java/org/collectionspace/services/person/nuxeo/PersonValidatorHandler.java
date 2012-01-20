@@ -59,25 +59,27 @@ public class PersonValidatorHandler implements ValidatorHandler {
             String msg = "";
             boolean invalid = false;
             
-            // Validation occurring on both creates and updates
-            String displayName = person.getDisplayName();
-            if (!person.isDisplayNameComputed() && ((displayName == null) || displayName.trim().isEmpty())) {
-                invalid = true;
-                msg += "displayName must be non-null and non-blank if displayNameComputed is false!";
-            }
-            
-            // Validation specific to creates or updates
-            if (action.equals(Action.CREATE)) {
-                String shortId = person.getShortIdentifier();
-                // Per CSPACE-2215, shortIdentifier values that are null (missing)
-                // oe the empty string are now legally accepted in create payloads.
-                // In either of those cases, a short identifier will be synthesized from
-                // a display name or supplied in another manner.
-                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
-                    invalid = true;
-                    msg += "shortIdentifier must only contain standard word characters";
-                }
-            } else if (action.equals(Action.UPDATE)) {
+            if(person != null) {	// No guarantee that there is a common part in every post/update.
+	            // Validation occurring on both creates and updates
+	            String displayName = person.getDisplayName();
+	            if (!person.isDisplayNameComputed() && ((displayName == null) || displayName.trim().isEmpty())) {
+	                invalid = true;
+	                msg += "displayName must be non-null and non-blank if displayNameComputed is false!";
+	            }
+	            
+	            // Validation specific to creates or updates
+	            if (action.equals(Action.CREATE)) {
+	                String shortId = person.getShortIdentifier();
+	                // Per CSPACE-2215, shortIdentifier values that are null (missing)
+	                // oe the empty string are now legally accepted in create payloads.
+	                // In either of those cases, a short identifier will be synthesized from
+	                // a display name or supplied in another manner.
+	                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
+	                    invalid = true;
+	                    msg += "shortIdentifier must only contain standard word characters";
+	                }
+	            } else if (action.equals(Action.UPDATE)) {
+	            }
             }
 
             if (invalid) {

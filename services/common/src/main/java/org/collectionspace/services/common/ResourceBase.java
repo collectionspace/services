@@ -27,6 +27,7 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -37,17 +38,21 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * $LastChangedRevision:  $
@@ -65,6 +70,10 @@ public abstract class ResourceBase
     //FIXME retrieve client type from configuration
     static ClientType CLIENT_TYPE;
 
+    /*
+     * REM - 11/14/2011 - I discovered this static block of code and don't understand why it exists.  However, a side-effect of this static block is that ServiceMain is trying
+     * to create a valid instance of entire CSpace services include an embedded Nuxeo instance.  This block of code seems goofy and unnecessary and probably should be removed?
+     */
     static {
         try {
             // I put this in a try-catch static block instead of file-level static var initializer so that static methods of
@@ -76,8 +85,7 @@ public abstract class ResourceBase
             System.out.println("Static initializer failed in ResourceBase because not running from deployment.  OK to use Resource classes statically for tests.");
         }
     }
-
-
+    
     //======================= CREATE ====================================================
     
     @POST
@@ -271,10 +279,16 @@ public abstract class ResourceBase
         // perform a keyword search
         if (keywords != null && !keywords.isEmpty()) {
             String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-            DocumentFilter documentFilter = handler.getDocumentFilter();
-            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
-            if (logger.isDebugEnabled()) {
-                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+            if(Tools.isEmpty(whereClause)) {
+                if (logger.isDebugEnabled()) {
+                	logger.debug("The WHERE clause is empty for keywords: ["+keywords+"]");
+                }
+            } else {
+	            DocumentFilter documentFilter = handler.getDocumentFilter();
+	            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+	            }
             }
         }
         if (advancedSearch != null && !advancedSearch.isEmpty()) {
@@ -329,12 +343,9 @@ public abstract class ResourceBase
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
-            DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDoc(ctx, csid);
             DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> handler = (DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>) createDocumentHandler(ctx);
-            List<String> authRefFields =
-                    ((MultipartServiceContextImpl) ctx).getCommonPartPropertyValues(
-                    ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
-            authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
+            List<AuthRefConfigInfo> authRefsInfo = RefNameServiceUtils.getConfiguredAuthorityRefs(ctx);
+            authRefList = handler.getAuthorityRefs(csid, authRefsInfo);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.AUTH_REFS_FAILED, csid);
         }
@@ -347,7 +358,7 @@ public abstract class ResourceBase
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
      * the map, and pass it in.
      */
-    public static DocumentModel getDocModelForRefName(String refName, ResourceMap resourceMap) 
+    public static DocumentModel getDocModelForRefName(RepositoryInstance repoSession, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
     	// TODO - we need to generalize the idea of a refName to more than Authorities and Items. 
     	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
@@ -355,20 +366,20 @@ public abstract class ResourceBase
     		return null;
     	}
     	ResourceBase resource = resourceMap.get(item.inAuthority.resource);
-    	return resource.getDocModelForAuthorityItem(item);
+    	return resource.getDocModelForAuthorityItem(repoSession, item);
     }
 
     // THis is ugly, but prevents us parsing the refName twice. Once we make refName a little more
     // general, and less Authority(Item) specific, this will look better.
-   	public DocumentModel getDocModelForAuthorityItem(RefName.AuthorityItem item) 
+   	public DocumentModel getDocModelForAuthorityItem(RepositoryInstance repoSession, RefName.AuthorityItem item) 
    			throws Exception, DocumentNotFoundException {
    		logger.warn("Default (ResourceBase) getDocModelForAuthorityItem called - should not happen!");
    		return null;
    	}
 
-    public DocumentModel getDocModelForRefName(String refName) 
+    public DocumentModel getDocModelForRefName(RepositoryInstance repoSession, String refName) 
    			throws Exception, DocumentNotFoundException {
-    	return getDocModelForAuthorityItem(RefName.AuthorityItem.parse(refName));
+    	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
     }
 
 }

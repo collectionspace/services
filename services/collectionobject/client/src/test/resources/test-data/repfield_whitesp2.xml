@@ -2,8 +2,6 @@
 <ns2:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/collectionobject">
 <objectNumber>objectNumber</objectNumber>
 
-<otherNumber>XXX</otherNumber>
-<otherNumberType>otherNumberType</otherNumberType>
 <briefDescriptions>
 <briefDescription>briefDescription1</briefDescription>
 <briefDescription>briefDescription2</briefDescription>

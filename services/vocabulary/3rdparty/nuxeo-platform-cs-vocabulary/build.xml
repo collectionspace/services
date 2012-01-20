@@ -113,19 +113,15 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy vocabulary doctype in ${jboss.server.nuxeo}">
+        description="deploy vocabulary doctype in ${jee.server.nuxeo}">
         <copy file="${basedir}/target/${nuxeo.vocabulary.jar}"
-        todir="${jboss.deploy.nuxeo.plugins}"/>
+        todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy vocabulary doctype from ${jboss.server.nuxeo}">
+        description="undeploy vocabulary doctype from ${jee.server.nuxeo}">
         <delete>
-            <fileset dir="${jboss.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.vocabulary.jars.all}"/>
-            </fileset>
-            <!-- Legacy deployment location through release 0.6 -->
-            <fileset dir="${jboss.deploy.nuxeo.system}">
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
                 <include name="${nuxeo.vocabulary.jars.all}"/>
             </fileset>
         </delete>

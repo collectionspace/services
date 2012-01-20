@@ -32,6 +32,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractCommonListUtils;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
@@ -62,17 +63,20 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
-
-	@Override
-	public String getServicePathComponent() {
-		return AcquisitionClient.SERVICE_PATH_COMPONENT;
-	}
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.timestampUTC();
 
 
-	@Override
-	protected String getServiceName() {
-		return AcquisitionClient.SERVICE_NAME;
-	}
+    @Override
+    public String getServicePathComponent() {
+        return AcquisitionClient.SERVICE_PATH_COMPONENT;
+    }
+
+
+    @Override
+    protected String getServiceName() {
+        return AcquisitionClient.SERVICE_NAME;
+    }
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -391,17 +395,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
         ClientResponse<AbstractCommonList> res = client.readList();
+        assertStatusCode(res, testName);
         AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         if(logger.isTraceEnabled()){
@@ -436,14 +431,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Retrieve the contents of a resource to update.
         AcquisitionClient client = new AcquisitionClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 
         AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
@@ -463,14 +452,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(res, testName);
 
         input = new PoxPayloadIn(res.getEntity());
         AcquisitionsCommon updatedAcquisition =
@@ -797,10 +779,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         AcquisitionDateList acqDatesList = new AcquisitionDateList();
         List<String> acqDates = acqDatesList.getAcquisitionDate();
-        // FIXME Use properly timestamps for representative acquisition
-        // dates in this example test record. The following are mere placeholders.
-        acqDates.add("First Acquisition Date -" + identifier);
-        acqDates.add("Second Acquisition Date-" + identifier);
+        acqDates.add(CURRENT_DATE_UTC);
+        acqDates.add(CURRENT_DATE_UTC);
         acquisition.setAcquisitionDates(acqDatesList);
 
         OwnerList ownersList = new OwnerList();
@@ -932,16 +912,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
         ClientResponse<String> res = client.read(csid);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 

@@ -58,10 +58,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
-    private String knownRoleName = "ROLE_USERS_TEST";
-    private String knownRoleDisplayName = "ROLE_DISPLAYNAME_USERS_TEST";
+    private String knownRoleName = "ROLE_USERS_MOCK";
+    private String knownRoleDisplayName = "ROLE_DISPLAYNAME_USERS_MOCK";
     private String verifyResourceId = null;
-    private String verifyRoleName = "collections_manager_test";
+    private String verifyRoleName = "collections_manager_mock";
 //    private List<String> allResourceIdsCreated = new ArrayList<String>();
 
     @Override
@@ -399,17 +399,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
         ClientResponse<Role> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(res, testName);
         Role output = (Role) res.getEntity();
         Assert.assertNotNull(output);
     }
@@ -424,17 +414,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
         ClientResponse<Role> res = client.read(verifyResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(res, testName);
         Role output = (Role) res.getEntity();
         Assert.assertNotNull(output);
 
@@ -497,17 +477,8 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
         ClientResponse<RolesList> res = client.readList();
+        assertStatusCode(res, testName);
         RolesList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
@@ -535,22 +506,14 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
         ClientResponse<RolesList> res = client.readSearchList("movingImage");
+        assertStatusCode(res, testName);
         RolesList list = res.getEntity();
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         int EXPECTED_ITEMS = 1;
         if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": received = " + list.getRoles().size()
+            logger.debug(testName + ": received = " + list.getRole().size()
                     + " expected=" + EXPECTED_ITEMS);
         }
-        Assert.assertEquals(EXPECTED_ITEMS, list.getRoles().size());
+        Assert.assertEquals(EXPECTED_ITEMS, list.getRole().size());
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         if (iterateThroughList && logger.isDebugEnabled()) {
@@ -587,22 +550,14 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         roleToUpdate.setDescription("updated role description");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
-            logger.debug(objectAsXmlString(roleToUpdate,
+            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
+            logger.debug(objectAsXmlString(objectFactory.createRole(roleToUpdate),
                     Role.class));
         }
         RoleClient client = new RoleClient();
         // Submit the request to the service and store the response.
         ClientResponse<Role> res = client.update(knownResourceId, roleToUpdate);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-
+        assertStatusCode(res, testName);
         Role roleUpdated = (Role) res.getEntity();
         Assert.assertNotNull(roleUpdated);
 
@@ -643,12 +598,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         ClientResponse<Role> roleRes = client.read(testResourceId);
-        statusCode = roleRes.getStatus();
-
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        assertStatusCode(roleRes, testName);
         Role roleRead = (Role) roleRes.getEntity();
         Assert.assertNotNull(roleRead);
         String mdProtection = roleRead.getMetadataProtection();
@@ -670,21 +620,14 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
 
     	// Submit the request to the service and store the response.
     	roleRes = client.update(testResourceId, roleToUpdate);
-    	statusCode = roleRes.getStatus();
-    	// Check the status code of the response: does it match the expected response(s)?
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testName + ": status = " + statusCode);
-    	}
-    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-
+        assertStatusCode(roleRes, testName);
     	Role roleUpdated = (Role) roleRes.getEntity();
     	Assert.assertNotNull(roleUpdated);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + "Updated role: ");
-            logger.debug(objectAsXmlString(roleUpdated,Role.class));
+            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
+            logger.debug(objectAsXmlString(objectFactory.createRole(roleUpdated),
+                    Role.class));            
         }
 
     	Assert.assertFalse(
@@ -711,7 +654,8 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         roleToUpdate.setDisplayName("UPDATED-ROLE_USERS_TEST");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
-            logger.debug(objectAsXmlString(roleToUpdate,
+            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
+            logger.debug(objectAsXmlString(objectFactory.createRole(roleToUpdate),
                     Role.class));
         }
         RoleClient client = new RoleClient();
@@ -914,7 +858,9 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
                 useRoleName);
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, role");
-            logger.debug(objectAsXmlString(role, Role.class));
+            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
+            logger.debug(objectAsXmlString(objectFactory.createRole(role),
+                    Role.class));
         }
         return role;
 
@@ -931,7 +877,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
 
         int i = 0;
 
-        for (Role role : list.getRoles()) {
+        for (Role role : list.getRole()) {
             logger.debug(testName + " role csid=" + role.getCsid()
                     + " name=" + role.getRoleName()
                     + " desc=" + role.getDescription());

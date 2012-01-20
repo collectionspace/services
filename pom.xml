@@ -1,407 +1,380 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
-    <artifactId>org.collectionspace.services</artifactId>
-    <version>1.12-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>services</name>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.collectionspace.services</groupId>
+	<artifactId>org.collectionspace.services</artifactId>
+	<version>2.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>services</name>
 
-    <properties>
-        <jboss.version>4.2.3.GA</jboss.version>
-        <jboss.ejb.version>3.0</jboss.ejb.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <nuxeo.platform.version>5.3.2</nuxeo.platform.version>
-        <nuxeo.core.version>1.6.2</nuxeo.core.version>
-        <cspace.services.version>1.12-SNAPSHOT</cspace.services.version>
-        <cspace.services.client.version>1.12-SNAPSHOT</cspace.services.client.version>
-    </properties>
-
-    <distributionManagement>
-        <repository>
-            <id>libs-releases-local</id>
-            <name>libs-releases-local</name>
-            <url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>libs-snapshots-local</id>
-            <name>libs-snapshots-local</name>
-            <url>http://source.collectionspace.org:8081/artifactory/libs-snapshots-local</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <modules>
-        <module>3rdparty</module>
-        <module>services</module>
-    </modules>
-
-    <repositories>
-        <repository>
-            <id>collectionspace-remote-repos</id>
-            <name>collectionspace-remote-repos</name>
-            <url>http://source.collectionspace.org:8081/artifactory/remote-repos</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>            
-        </repository>
-        <repository>
-            <id>repo1</id>
-            <name>Maven repo1</name>
-            <url>http://repo1.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>repo2</id>
-            <name>Maven repo2</name>
-            <url>http://repo2.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-<!--        <repository>
-            <id>maven1-repository.dev.java.net</id>
-            <name>Java.net Maven 1 Repository</name>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>-->
-
-        <repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>http://maven.restlet.org</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>jboss.org</id>
-            <url>http://repository.jboss.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <!-- some security binaries available under .com only perhaps due to licensing issues -->
-        <repository>
-            <id>jboss.com</id>
-            <url>http://repository.jboss.com/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>codehaus repo</id>
-            <name>codehaus repo</name>
-            <url>http://repository.codehaus.org</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>public-snapshot</id>
-            <url>http://maven.nuxeo.org/public-snapshot</url>
-            <!-- Nuxeo Snapshots Repository is disabled. -->
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>public</id>
-            <url>http://maven.nuxeo.org/public</url>
-            <!-- Nuxeo Releases Repository is disabled. -->
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>nuxeo-public</id>
-            <name>nuxeo-public</name>
-            <url>http://source.collectionspace.org:8081/artifactory/nuxeo-public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-<!-- This should no longer be needed since we're using only "releases" artifacts        
-        <repository>
-            <id>nuxeo-public-snapshot</id>
-            <name>nuxeo-public-snapshot</name>
-            <url>http://source.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </snapshots>
-        </repository>
--->
-
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <id>el4jReleaseRepositoryExternal</id>
-            <name>External release repository of the EL4J project</name>
-            <url>http://public-el4.elca-services.ch/el4j/maven2repository</url>
-        </repository>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
+		<nuxeo.general.release>5.5-RC1</nuxeo.general.release>
+		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
+		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
+		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>		
+<!--
+		<nuxeo.shell.version>5.5-I20111104_1115</nuxeo.shell.version>
+		<nuxeo.platform.version>5.5-I20111104_1115</nuxeo.platform.version>
+		<nuxeo.core.version>5.5-I20111104_1115</nuxeo.core.version>
+-->
+		<cspace.services.version>2.0-SNAPSHOT</cspace.services.version>
+		<cspace.services.client.version>2.0-SNAPSHOT</cspace.services.client.version>
+	</properties>
 
-    </repositories>
+	<distributionManagement>
+		<repository>
+			<id>libs-releases-local</id>
+			<name>libs-releases-local</name>
+			<url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
+		</repository>
+		<snapshotRepository>
+			<id>libs-snapshots-local</id>
+			<name>libs-snapshots-local</name>
+			<url>http://source.collectionspace.org:8081/artifactory/libs-snapshots-local</url>
+		</snapshotRepository>
+	</distributionManagement>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>collectionspace-plugins-remote-repos</id>
-            <name>collectionspace-plugins-remote-repos</name>
-            <url>http://source.collectionspace.org:8081/artifactory/plugins-remote-repos</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>repo1</id>
-            <name>Maven repo1</name>
-            <url>http://repo1.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>maven repo</id>
-            <name>maven repo</name>
-            <url>http://repo2.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>maven2-repository.dev.java.net</id>
-            <url>http://download.java.net/maven/2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>Codehaus Repository</id>
-            <url>http://repository.codehaus.org/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
+	<modules>
+		<module>3rdparty</module>
+		<module>services</module>
+	</modules>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.6.1</version>
-                    <configuration>
-                        <show>public</show>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>                    
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.3</version>
-                    <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <configuration> </configuration>
-                </plugin>
-                <!--                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <configuration>
-                        <dependencyLocationEnabled>false</dependencyLocationEnabled>
-                        <unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand>
-                    </configuration>
-                </plugin> -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-war-plugin</artifactId>
-                    <version>2.0</version>
-                    <configuration>
-                        <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-                        <archive>
-                            <manifest>
-                                <addClasspath>true</addClasspath>
-                            </manifest>
-                        </archive>
-                    </configuration>
-                </plugin>
+	<repositories>
+		<repository>
+			<id>collectionspace-remote-repos</id>
+			<name>collectionspace-remote-repos</name>
+			<url>http://source.collectionspace.org:8081/artifactory/remote-repos</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>libs-releases-local</id>
+			<name>libs-releases-local</name>
+			<url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>repo1</id>
+			<name>Maven repo1</name>
+			<url>http://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>repo2</id>
+			<name>Maven repo2</name>
+			<url>http://repo2.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Maven 2 Repository</name>
+			<url>http://download.java.net/maven/2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<!-- <repository> <id>maven1-repository.dev.java.net</id> <name>Java.net 
+			Maven 1 Repository</name> <url>http://download.java.net/maven/1</url> <layout>legacy</layout> 
+			<snapshots> <enabled>false</enabled> </snapshots> </repository> -->
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.2</version>
-                </plugin>
+		<repository>
+			<id>jboss.org</id>
+			<url>https://repository.jboss.org/nexus</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<!-- some security binaries available under .com only perhaps due to licensing 
+			issues -->
+		<repository>
+			<id>jboss.com</id>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>classpath</id>
-                            <goals>
-                                <goal>build-classpath</goal>
-                            </goals>
-                            <configuration>
-                                <outputFile>classpath</outputFile>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-    
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.5.8</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.5.8</version>
-            </dependency>
-      <dependency>
-        <groupId>javax.ejb</groupId>
-        <artifactId>ejb</artifactId>
-        <version>${jboss.ejb.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>jsr250-api</artifactId>
-        <version>1.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>javax.jms</groupId>
-        <artifactId>jms</artifactId>
-        <version>1.1</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>javax.transaction</groupId>
-        <artifactId>jta</artifactId>
-        <version>1.1</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>jboss</groupId>
-        <artifactId>jboss-annotations-ejb3</artifactId>
-        <version>3.0-RC8</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>jboss</groupId>
-        <artifactId>jboss-j2ee</artifactId>
-        <version>${jboss.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>javax.ejb</groupId>
-        <artifactId>ejb-api</artifactId>
-        <version>3.0</version>
-        <scope>provided</scope>
-      </dependency>
-<!--            <dependency>
-                <groupId>net.java.dev.jaxb2-commons</groupId>
-                <artifactId>jaxb-fluent-api</artifactId>
-                <version>2.0.2</version>
-            </dependency> -->
-<!--`            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>5.6</version>
-                <scope>test</scope>
-                <classifier>jdk15</classifier>
-            </dependency> -->
-<!--            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.5</version>
-                <scope>test</scope>
-            </dependency> -->
-        </dependencies>
-    </dependencyManagement>
+		<repository>
+			<id>codehaus repo</id>
+			<name>codehaus repo</name>
+			<url>http://repository.codehaus.org</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
+		<repository>
+			<id>public-snapshot</id>
+			<url>http://maven.nuxeo.org/public-snapshot</url>
+			<!-- Nuxeo Snapshots Repository is disabled. -->
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+				<!--<updatePolicy>never</updatePolicy> -->
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>public</id>
+			<url>http://maven.nuxeo.org/public</url>
+			<!-- Nuxeo Releases Repository is disabled. -->
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>nuxeo-public</id>
+			<name>nuxeo-public</name>
+			<url>http://source.collectionspace.org:8081/artifactory/nuxeo-public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<!-- This should no longer be needed since we're using only "releases" 
+			artifacts <repository> <id>nuxeo-public-snapshot</id> <name>nuxeo-public-snapshot</name> 
+			<url>http://source.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url> 
+			<releases> <enabled>false</enabled> </releases> <snapshots> <enabled>true</enabled> 
+			<updatePolicy>never</updatePolicy> </snapshots> </repository> -->
+
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<id>el4jReleaseRepositoryExternal</id>
+			<name>External release repository of the EL4J project</name>
+			<url>http://public-el4.elca-services.ch/el4j/maven2repository</url>
+		</repository>
+
+
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>collectionspace-plugins-remote-repos</id>
+			<name>collectionspace-plugins-remote-repos</name>
+			<url>http://source.collectionspace.org:8081/artifactory/plugins-remote-repos</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>repo1</id>
+			<name>Maven repo1</name>
+			<url>http://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>maven repo</id>
+			<name>maven repo</name>
+			<url>http://repo2.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>maven2-repository.dev.java.net</id>
+			<url>http://download.java.net/maven/2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>Codehaus Repository</id>
+			<url>http://repository.codehaus.org/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.6.1</version>
+					<configuration>
+						<show>public</show>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.3</version>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<configuration>
+					</configuration>
+				</plugin>
+				<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
+					<configuration> <dependencyLocationEnabled>false</dependencyLocationEnabled> 
+					<unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand> </configuration> 
+					</plugin> -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.0</version>
+					<configuration>
+						<warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+							</manifest>
+						</archive>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.2</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>classpath</id>
+							<goals>
+								<goal>build-classpath</goal>
+							</goals>
+							<configuration>
+								<outputFile>classpath</outputFile>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.5.8</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>1.5.8</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.ejb</groupId>
+				<artifactId>ejb</artifactId>
+				<version>${jboss.ejb.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.annotation</groupId>
+				<artifactId>jsr250-api</artifactId>
+				<version>1.0</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.jms</groupId>
+				<artifactId>jms</artifactId>
+				<version>1.1</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.transaction</groupId>
+				<artifactId>jta</artifactId>
+				<version>1.1</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jboss.remoting</groupId>
+				<artifactId>jboss-remoting</artifactId>
+				<version>2.5.1</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>jboss</groupId>
+				<artifactId>jboss-annotations-ejb3</artifactId>
+				<version>3.0-RC8</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.javaee</groupId>
+				<artifactId>jboss-javaee</artifactId>
+				<version>5.0.1.GA</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.ejb</groupId>
+				<artifactId>ejb-api</artifactId>
+				<version>3.0</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
 				<version>2.3.1</version>
-                <configuration> </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>dependencies</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <!--            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.6.1</version>
-                <configuration>
-                    <show>public</show>
-                </configuration>
-            </plugin> -->
-        </plugins>
-    </reporting>
+				<configuration>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>dependencies</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
+				<version>2.6.1</version> <configuration> <show>public</show> </configuration> 
+				</plugin> -->
+		</plugins>
+	</reporting>
 
 </project>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+	<!-- 
+			 testGroup ID="person" is not live.  It works, but may not clean up correctly. 
+			 For now, use ID="updatePerson"
+	-->
+	<testGroup ID="AuthRefs" autoDeletePOSTS="true">
+		<test ID="PersonAuth1" auth="admin@core.collectionspace.org">
+			<method>POST</method>
+			<uri>/cspace-services/personauthorities/</uri>
+			<filename>authrefs/newPersonAuthority.xml</filename>
+		</test>
+		<test ID="Person1">
+			<method>POST</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+			<filename>authrefs/newPerson1.xml</filename>
+		</test>
+		<test ID="Person2">
+			<method>POST</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+			<filename>authrefs/newPerson2.xml</filename>
+		</test>
+
+	 <test ID="GetPerson1">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
+		</test>
+
+	 <test ID="GetPerson2">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}</uri>
+		</test>
+
+		<test ID="loanout1" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">42</var>
+				<var ID="person">${GetPerson1.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout2" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">102</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout3" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">103</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout4" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">104</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout5" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">105</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout6" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">106</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout7" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">107</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout8" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">108</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout9" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">109</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="loanout10" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansout/</uri>
+			<filename>authrefs/loanout.xml</filename>
+			<vars>
+				<var ID="loannum">110</var>
+				<var ID="person">${GetPerson2.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="UpdatePerson1">
+			<method>PUT</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
+			<filename>authrefs/updatePerson1.xml</filename>
+		</test>
+
+		<test ID="UpdatePerson2">
+			<method>PUT</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}</uri>
+			<filename>authrefs/updatePerson2.xml</filename>
+		</test>
+
+	 <test ID="GetFirstUpdatedPerson">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
+			<response>
+				<expected level="ADDOK" />
+				<filename>authrefs/updatePerson1.xml</filename>
+			</response>
+		</test>
+
+	 <test ID="GetSecondUpdatedPerson">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}</uri>
+			<response>
+				<expected level="ADDOK" />
+				<filename>authrefs/updatePerson2.xml</filename>
+			</response>
+		</test>
+
+		<test ID="afterUpdateGetLoan1">
+			<method>GET</method>
+			<uri>/cspace-services/loansout/${loanout1.CSID}</uri>
+			<response>
+				<expected level="ADDOK" />
+				<label>loansout_common</label>
+				<filename>authrefs/res/loanout.res.xml</filename>
+				<vars>
+					<var ID="person">${GetFirstUpdatedPerson.got("//refName")}</var>
+				</vars>
+			 </response>
+		</test>
+		
+		<test ID="afterUpdateGetLoan2">
+			<method>GET</method>
+			<uri>/cspace-services/loansout/${loanout2.CSID}</uri>
+			<response>
+				<expected level="ADDOK" />
+				<label>loansout_common</label>
+				<filename>authrefs/res/loanout.res.xml</filename>
+				<vars>
+					<var ID="person">${GetSecondUpdatedPerson.got("//refName")}</var>
+				</vars>
+			 </response>
+		</test>
+		<test ID="afterUpdateGetLoan5">
+			<method>GET</method>
+			<uri>/cspace-services/loansout/${loanout5.CSID}</uri>
+			<response>
+				<expected level="ADDOK" />
+				<label>loansout_common</label>
+				<filename>authrefs/res/loanout.res.xml</filename>
+				<vars>
+					<var ID="person">${GetSecondUpdatedPerson.got("//refName")}</var>
+				</vars>
+			 </response>
+		</test>
+		<test ID="afterUpdateGetLoan9">
+			<method>GET</method>
+			<uri>/cspace-services/loansout/${loanout9.CSID}</uri>
+			<response>
+				<expected level="ADDOK" />
+				<label>loansout_common</label>
+				<filename>authrefs/res/loanout.res.xml</filename>
+				<vars>
+					<var ID="person">${GetSecondUpdatedPerson.got("//refName")}</var>
+				</vars>
+			 </response>
+		</test>
+
+	</testGroup>
+</xmlReplay>

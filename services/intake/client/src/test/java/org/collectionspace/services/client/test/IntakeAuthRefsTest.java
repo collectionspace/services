@@ -39,6 +39,7 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
@@ -81,6 +82,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     private String insurerRefName = null;
     private String valuerRefName = null;
     private final int NUM_AUTH_REFS_EXPECTED = 5;
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
 	@Override
 	protected String getServiceName() {
@@ -126,7 +129,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         IntakeClient intakeClient = new IntakeClient();
         PoxPayloadOut multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
-                "entryDate-" + identifier,
+                CURRENT_DATE_UTC,
                 currentOwnerRefName,
                 depositorRefName,
                 conditionCheckerOrAssessorRefName,
@@ -230,16 +233,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         IntakeClient intakeClient = new IntakeClient();
         ClientResponse<String> res = intakeClient.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".read: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         IntakesCommon intake = (IntakesCommon) extractPart(input,
@@ -252,14 +246,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = intakeClient.getAuthorityRefs(knownResourceId);
-        statusCode = res2.getStatus();
+        assertStatusCode(res2, testName);
 
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         AuthorityRefList list = res2.getEntity();
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();

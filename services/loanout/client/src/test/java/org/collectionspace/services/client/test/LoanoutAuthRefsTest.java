@@ -40,6 +40,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.authorityref.AuthorityRefList.AuthorityRefItem;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoansoutCommon;
 //import org.collectionspace.services.loanout.LoansoutCommonList;
@@ -82,6 +83,9 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     // authority - as an authRef to tests below, and increase the
     // number of expected authRefs to 4.
     private final int NUM_AUTH_REFS_EXPECTED = 4;
+    
+    private final static String CURRENT_DATE_UTC =
+            GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -125,7 +129,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         LoanoutClient loanoutClient = new LoanoutClient();
         PoxPayloadOut multipart = createLoanoutInstance(
                 "loanOutNumber-" + identifier,
-                "returnDate-" + identifier,
+                CURRENT_DATE_UTC,
                 borrowerRefName,
                 borrowersContactRefName,
                 lendersAuthorizerRefName,
@@ -232,16 +236,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         LoanoutClient loanoutClient = new LoanoutClient();
         ClientResponse<String> res = loanoutClient.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".read: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        assertStatusCode(res, testName);
 
         // Extract the common part from the response.
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -260,14 +255,8 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 =
            loanoutClient.getAuthorityRefs(knownResourceId);
-        statusCode = res2.getStatus();
+        assertStatusCode(res2, testName);
 
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         AuthorityRefList list = res2.getEntity();
 
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
