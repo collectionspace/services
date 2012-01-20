@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="concepts">
+	<ns2:concepts_common xmlns:ns2="http://collectionspace.org/services/concept">
+		<shortIdentifier>concept1</shortIdentifier>
+		<displayName>Concept Number 1</displayName>
+		<displayNameComputed>false</displayNameComputed>
+		<termStatus>Imagined</termStatus>
+		<conceptTermGroupList>
+			<conceptTermGroup>
+				<term>Another term</term>
+				<termType>alternate</termType>
+				<source>My Imagination</source>
+			</conceptTermGroup>
+		</conceptTermGroupList>
+	</ns2:concepts_common>
+</document>
+
+
+
