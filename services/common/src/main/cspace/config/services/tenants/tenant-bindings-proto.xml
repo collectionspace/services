@@ -138,7 +138,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/common/service">
                 <types:item xmlns:types="http://collectionspace.org/services/common/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>objectName</types:value>
+                    <types:value>objectNameList/[0]/objectName</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/common/types">
                     <types:key>objectNumberProperty</types:key>
@@ -650,7 +650,7 @@
                 <service:params>
                     <service:SchemaName>intakes</service:SchemaName>
                     <service:DublinCoreTitle>intakes</service:DublinCoreTitle>
-                    <service:SummaryFields> entryNumber|depositor|currentOwner|uri|csid</service:SummaryFields>
+                    <service:SummaryFields>entryNumber|depositor|currentOwner|uri|csid</service:SummaryFields>
                     <service:AbstractCommonListClassname />
                     <service:CommonListItemClassname />
                     <service:ListResultsItemMethodName>getIntakeListItem</service:ListResultsItemMethodName>
@@ -671,14 +671,11 @@
                 </service:params>
             </service:DocHandlerParams> 
             <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.intake.nuxeo.IntakeValidatorHandler</service:validatorHandler>
-            <service:properties xmlns:service="http://collectionspace.org/services/common/service">
-                <!-- What to use for name??? -->
-                <!--
-                <types:item>
+             <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>objectName</types:value>
+                    <types:value>currentOwner</types:value>
                 </types:item>
-                -->
                 <types:item xmlns:types="http://collectionspace.org/services/common/types">
                     <types:key>objectNumberProperty</types:key>
                     <types:value>entryNumber</types:value>
@@ -869,13 +866,10 @@
                 -->
             </tenant:properties>
             <service:properties xmlns:service="http://collectionspace.org/services/common/service">
-                <!-- What to use for name??? -->
-                <!--
-                <types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>objectName</types:value>
+                    <types:value>lenderGroupList/[0]/lender</types:value>
                 </types:item>
-                -->
                 <types:item xmlns:types="http://collectionspace.org/services/common/types">
                     <types:key>objectNumberProperty</types:key>
                     <types:value>loanInNumber</types:value>
@@ -967,6 +961,16 @@
                 </service:params>
             </service:DocHandlerParams>
             <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.loanout.nuxeo.LoanoutValidatorHandler</service:validatorHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>borrower</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>loanOutNumber</types:value>
+                </types:item>
+            </service:properties>
             <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Loanout" version="0.1">
                 <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="loansout-system" updated="" order="0">
                     <service:content contentType="application/xml">
@@ -1255,6 +1259,16 @@
                 </service:params>
             </service:DocHandlerParams>
             <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.media.nuxeo.MediaValidatorHandler</service:validatorHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>title</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>identificationNumber</types:value>
+                </types:item>
+            </service:properties>
             <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Media" version="0.1">
                 <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="media-system" updated="" order="0">
                     <service:content contentType="application/xml">
@@ -1358,6 +1372,16 @@
                 </service:params>
             </service:DocHandlerParams>
             <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.movement.nuxeo.MovementValidatorHandler</service:validatorHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>currentLocation</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>movementReferenceNumber</types:value>
+                </types:item>
+            </service:properties>
             <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Movement" version="0.1">
                 <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="movements-system" updated="" order="0">
                     <service:content contentType="application/xml">
@@ -2292,13 +2316,10 @@
             </service:DocHandlerParams>
             <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.acquisition.nuxeo.AcquisitionValidatorHandler</service:validatorHandler>
             <service:properties xmlns:service="http://collectionspace.org/services/common/service">
-                <!-- What to use for name??? -->
-                <!--
-                <types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>objectName</types:value>
+                    <types:value>acquisitionSources/[0]</types:value>
                     </types:item>
-                -->
                 <types:item xmlns:types="http://collectionspace.org/services/common/types">
                     <types:key>objectNumberProperty</types:key>
                     <types:value>acquisitionReferenceNumber</types:value>
