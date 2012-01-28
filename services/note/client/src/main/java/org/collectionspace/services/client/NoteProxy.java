@@ -22,12 +22,25 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/notes/")
 @Produces({"application/xml;charset=UTF-8"})
 @Consumes({"application/xml"})
-public interface NoteProxy extends CollectionSpaceProxy<NotesCommonList> {
-
+public interface NoteProxy extends CollectionSpacePoxProxy<NotesCommonList> {
     @GET
     @Produces({"application/xml"})
     ClientResponse<NotesCommonList> readList();
     
+	@Override
+	@GET
+    @Produces({"application/xml"})
+    ClientResponse<NotesCommonList> readIncludeDeleted(
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
+
+    @Override
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<NotesCommonList> keywordSearchIncludeDeleted(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
+            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+    
+    /*
     //(C)reate
     @POST
     ClientResponse<Response> create(String payload);
@@ -46,4 +59,5 @@ public interface NoteProxy extends CollectionSpaceProxy<NotesCommonList> {
     @DELETE
     @Path("/{csid}")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
+    */
 }

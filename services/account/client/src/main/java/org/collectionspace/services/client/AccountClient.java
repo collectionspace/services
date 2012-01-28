@@ -27,16 +27,18 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+import org.jboss.resteasy.client.ClientResponse;
+
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * A AccountClient.
 
  * @version $Revision:$
  */
-public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList, AccountProxy> {
+public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList, AccountsCommon,
+		AccountsCommon, AccountProxy> {
     public static final String SERVICE_NAME = "accounts";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;

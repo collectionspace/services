@@ -33,7 +33,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * $LastChangedDate: $
  */
  
-public class NoteClient extends AbstractServiceClientImpl<NotesCommonList, NoteProxy> {
+public class NoteClient extends AbstractPoxServiceClientImpl<NotesCommonList, NoteProxy> {
 
     public static final String SERVICE_NAME = "notes";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -64,38 +64,5 @@ public class NoteClient extends AbstractServiceClientImpl<NotesCommonList, NoteP
      */
     public ClientResponse<NotesCommonList> readList() {
         return getProxy().readList();
-    }
-
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.Note#getNote(java.lang.String)
-     */
-
-    public ClientResponse<String> read(String csid) {
-        return getProxy().read(csid);
-    }
-
-    /**
-     * @param multipart
-     * @param note
-     * @return
-     * @see org.collectionspace.services.client.Note#createNote(org.collectionspace.services.Note)
-     */
-    public ClientResponse<Response> create(PoxPayloadOut multipart) {
-        String payload = multipart.toXML();
-        return getProxy().create(payload);
-    }
-
-    /**
-     * @param csid
-     * @param multipart
-     * @return
-     * @see org.collectionspace.services.client.Note#updateNote(java.lang.Long, org.collectionspace.services.Note)
-     */
-    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
-        String payload = multipart.toXML();
-        return getProxy().update(csid, payload);
-
     }
 }

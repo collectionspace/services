@@ -13,8 +13,8 @@
 
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+  elementFormDefault="unqualified"
   xmlns:ns="http://collectionspace.org/services/dimension"
   xmlns="http://collectionspace.org/services/dimension"
   targetNamespace="http://collectionspace.org/services/dimension"
@@ -64,10 +64,8 @@
                                     <xs:element name="dimension" type="xs:string"
                                         minOccurs="1" />
                                     <!-- uri to retrive dimension details -->
-                                    <xs:element name="uri" type="xs:anyURI"
-                                        minOccurs="1" />
-                                    <xs:element name="csid" type="xs:string"
-                                        minOccurs="1" />
+                                    <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string" minOccurs="1" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>

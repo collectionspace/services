@@ -24,6 +24,7 @@ package org.collectionspace.services.account.client.test;
 
 import java.util.List;
 import javax.ws.rs.core.Response;
+import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -35,8 +36,6 @@ import org.collectionspace.services.account.Status;
 import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -51,14 +50,13 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 917 $
  * $LastChangedDate: 2009-11-06 12:20:28 -0800 (Fri, 06 Nov 2009) $
  */
-public class AccountServiceTest extends AbstractServiceTestImpl {
+public class AccountServiceTest extends AbstractServiceTestImpl<AccountsCommonList, AccountsCommon, AccountsCommon, AccountsCommon> {
 
     /** The Constant logger. */
     private final String CLASS_NAME = AccountServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+
     // Instance variables specific to this test.
-    /** The known resource id. */
-    private String knownResourceId = null;
     private String prebuiltAdminCSID = null;
     private String prebuiltAdminUserId = "admin@core.collectionspace.org";
     private String knownUserId = "barney";
@@ -94,17 +92,16 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getAbstractCommonList(
-            ClientResponse<AbstractCommonList> response) {
+    protected AccountsCommonList getCommonList(
+            ClientResponse<AccountsCommonList> response) {
         //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
         throw new UnsupportedOperationException();
     }
+    
+    protected Class<AccountsCommonList> getCommonListType() {
+    	return (Class<AccountsCommonList>) AccountsCommonList.class;
+    }    
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    	    dependsOnMethods = {"readList"})
     @Override
     public void readPaginatedList(String testName) throws Exception {
         //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
@@ -114,64 +111,16 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup, such as initializing the type of service request
-        // (e.g. CREATE, DELETE), its valid and expected status codes, and
-        // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate();
-
-        AccountClient client = new AccountClient();
-        // Submit the request to the service and store the response.
-        AccountsCommon account =
-                createAccountInstance(knownUserId, knownUserId, knownUserPassword,
-                "barney@dinoland.com", client.getTenantId(),
-                true, false, true, true);
-        ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        knownResourceId = extractId(res);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": knownResourceId=" + knownResourceId);
-        }
-    }
-
+    
     /**
      * Creates the for unique user.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"CRUDTests"})
     public void createForUniqueUser(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -186,8 +135,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -197,13 +146,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void createWithInvalidTenant(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -217,10 +161,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
-
     }
 
     /**
@@ -229,13 +172,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void createWithoutUser(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -249,8 +187,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -260,13 +198,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void createWithInvalidEmail(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -280,8 +213,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -291,13 +224,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void createWithoutScreenName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -311,8 +239,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -322,13 +250,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void createWithInvalidPassword(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -342,8 +265,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -353,13 +276,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void createWithMostInvalid(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -373,23 +291,16 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
-    //to not cause uniqueness violation for account, createList is removed
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
-     */
+    //
+    // To avoid uniqueness violations for accounts, createList is removed
+    //
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -398,9 +309,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
                 client.getTenantId(), true, false, true, true);
         ClientResponse<Response> res = client.create(account1);
         int statusCode = res.getStatus();
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
         allResourceIdsCreated.add(extractId(res));
 
         AccountsCommon account2 =
@@ -408,10 +319,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
                 client.getTenantId(), true, false, true, true);
         res = client.create(account2);
         statusCode = res.getStatus();
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
         allResourceIdsCreated.add(extractId(res));
 
         AccountsCommon account3 =
@@ -419,19 +330,18 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
                 client.getTenantId(), true, false, true, true);
         res = client.create(account3);
         statusCode = res.getStatus();
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
         allResourceIdsCreated.add(extractId(res));
     }
 
-    // Failure outcomes
+    //
+    // Tests with expected failure outcomes
+    //
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
-     */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
         //FIXME: Should this test really be empty?  If so, please comment accordingly.
@@ -454,92 +364,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     }
 
     // ---------------------------------------------------------------
-    // CRUD tests : READ tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        AccountsCommon output = (AccountsCommon) res.getEntity();
-        Assert.assertNotNull(output);
-    }
-
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommon> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-
-    // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
-    public void readList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadList();
-
-        // Submit the request to the service and store the response.
-        AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        AccountsCommonList list = res.getEntity();
-
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            printList(testName, list);
-        }
-    }
 
     /**
      * Search screen name.
@@ -547,13 +374,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void searchScreenName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupReadList();
 
@@ -561,15 +383,26 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommonList> res =
                 client.readSearchList("tom", null, null);
-        assertStatusCode(res, testName);
-        
-        AccountsCommonList list = res.getEntity();
-        Assert.assertEquals(1, list.getAccountListItem().size());
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            printList(testName, list);
+        try {
+	        assertStatusCode(res, testName);	        
+	        AccountsCommonList list = res.getEntity();	
+	        Assert.assertEquals(1, list.getAccountListItem().size());
+	        // Optionally output additional data about list members for debugging.
+	        boolean iterateThroughList = true;
+	        if (iterateThroughList && logger.isDebugEnabled()) {
+	            printList(testName, list);
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
+    }
+
+    @Override
+    @Test(dataProvider = "testName")
+    public void searchWorkflowDeleted(String testName) throws Exception {
+        // Fixme: null test for now, overriding test in base class
     }
 
     /**
@@ -578,28 +411,27 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void searchUserId(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommonList> res =
-                client.readSearchList(null, "tom", null);
-        assertStatusCode(res, testName);
-        
-        AccountsCommonList list = res.getEntity();
-        Assert.assertEquals(1, list.getAccountListItem().size());
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            printList(testName, list);
+        ClientResponse<AccountsCommonList> res = client.readSearchList(null, "tom", null);
+        try {
+	        assertStatusCode(res, testName);	        
+	        AccountsCommonList list = res.getEntity();
+	        Assert.assertEquals(1, list.getAccountListItem().size());
+	        // Optionally output additional data about list members for debugging.
+	        boolean iterateThroughList = true;
+	        if (iterateThroughList && logger.isDebugEnabled()) {
+	            printList(testName, list);
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
     }
 
@@ -609,28 +441,27 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void searchEmail(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommonList> res =
-                client.readSearchList(null, null, "dinoland");
-        assertStatusCode(res, testName);
-        
-        AccountsCommonList list = res.getEntity();
-        Assert.assertEquals(2, list.getAccountListItem().size());
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            printList(testName, list);
+        ClientResponse<AccountsCommonList> res = client.readSearchList(null, null, "dinoland");
+        try {
+	        assertStatusCode(res, testName);	        
+	        AccountsCommonList list = res.getEntity();
+	        Assert.assertEquals(2, list.getAccountListItem().size());
+	        // Optionally output additional data about list members for debugging.
+	        boolean iterateThroughList = true;
+	        if (iterateThroughList && logger.isDebugEnabled()) {
+	            printList(testName, list);
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
     }
 
@@ -640,85 +471,33 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void searchScreenNameEmail(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommonList> res =
-                client.readSearchList("tom", null, "jerry");
-        assertStatusCode(res, testName);
-        
-        AccountsCommonList list = res.getEntity();
-        Assert.assertEquals(1, list.getAccountListItem().size());
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            printList(testName, list);
+        ClientResponse<AccountsCommonList> res = client.readSearchList("tom", null, "jerry");
+        try {
+	        assertStatusCode(res, testName);
+	        AccountsCommonList list = res.getEntity();
+	        Assert.assertEquals(1, list.getAccountListItem().size());
+	        // Optionally output additional data about list members for debugging.
+	        boolean iterateThroughList = true;
+	        if (iterateThroughList && logger.isDebugEnabled()) {
+	            printList(testName, list);
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
     }
 
-    // Failure outcomes
-    // None at present.
     // ---------------------------------------------------------------
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read", "readList", "readNonExistent"})
-    public void update(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdate();
-
-        AccountClient client = new AccountClient();
-        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
-        AccountsCommon accountFound =
-                (AccountsCommon) res.getEntity();
-        Assert.assertNotNull(accountFound);
-
-        //create a new account object to test partial updates
-        AccountsCommon accountToUpdate = new AccountsCommon();
-        accountToUpdate.setCsid(knownResourceId);
-        accountToUpdate.setUserId(accountFound.getUserId());
-        // Update the content of this resource.
-        accountToUpdate.setEmail("updated-" + accountFound.getEmail());
-        if (logger.isDebugEnabled()) {
-            logger.debug("updated object");
-            logger.debug(objectAsXmlString(accountFound,
-                    AccountsCommon.class));
-        }
-
-        // Submit the request to the service and store the response.
-        res = client.update(knownResourceId, accountToUpdate);
-        assertStatusCode(res, testName);
-
-        AccountsCommon accountUpdated = (AccountsCommon) res.getEntity();
-        Assert.assertNotNull(accountUpdated);
-
-        Assert.assertEquals(accountUpdated.getEmail(),
-                accountToUpdate.getEmail(),
-                "Data in updated object did not match submitted data.");
-    }
 
     /**
      * Update password.
@@ -726,19 +505,17 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void updatePassword(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdate();
 
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": got object to update password with ID: " + knownResourceId);
@@ -761,7 +538,14 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, accountToUpdate);
-        assertStatusCode(res, testName);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         AccountsCommon accountUpdated = (AccountsCommon) res.getEntity();
         Assert.assertNotNull(accountUpdated);
@@ -777,13 +561,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void updatePasswordWithoutUser(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdate();
 
@@ -806,8 +585,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
 
     }
@@ -818,18 +597,16 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void updateInvalidPassword(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdate();
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": got object to update password with ID: " + knownResourceId);
@@ -856,45 +633,53 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
-
     }
     
     private void findPrebuiltAdminAccount() {
     	// Search for the prebuilt admin user and then hold its CSID
-    	if(prebuiltAdminCSID == null) {
+    	if (prebuiltAdminCSID == null) {
             setupReadList();
             AccountClient client = new AccountClient();
             ClientResponse<AccountsCommonList> res =
                     client.readSearchList(null, this.prebuiltAdminUserId, null);
-            assertStatusCode(res, "findPrebuiltAdminAccount");
-            AccountsCommonList list = res.getEntity();
-            List<AccountListItem> items = list.getAccountListItem();
-            Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
-            AccountListItem item = items.get(0);
-            prebuiltAdminCSID = item.getCsid();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found Admin Account with ID: " + prebuiltAdminCSID);
+            try {
+	            assertStatusCode(res, "findPrebuiltAdminAccount");
+	            AccountsCommonList list = res.getEntity();
+	            List<AccountListItem> items = list.getAccountListItem();
+	            Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
+	            AccountListItem item = items.get(0);
+	            prebuiltAdminCSID = item.getCsid();
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("Found Admin Account with ID: " + prebuiltAdminCSID);
+	            }
+            } finally {
+            	if (res != null) {
+                    res.releaseConnection();
+                }
             }
     	}
     }
     
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"read", "readList", "readNonExistent"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
 	public void verifyMetadataProtection(String testName) throws Exception {
     	findPrebuiltAdminAccount();
     	// Try to update the metadata - it should just get ignored
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdate();
 
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(prebuiltAdminCSID);
-        assertStatusCode(res, testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Did get on Admin Account to update with ID: " + prebuiltAdminCSID);
+        }
         AccountsCommon accountFound = (AccountsCommon) res.getEntity();
         Assert.assertNotNull(accountFound);
 
@@ -913,14 +698,15 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         res = client.update(prebuiltAdminCSID, accountToUpdate);
         int statusCode = res.getStatus();
-
-        // Comment below was not understood - but preserved in case it is
-        // important - during work on CSPACE-4572, which replaced several
-        // lines of status code checking with the call below.
-        //
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         // Note that the error is not returned, it is just ignored
-        assertStatusCode(res, testName);
-        
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+
         AccountsCommon accountUpdated = (AccountsCommon) res.getEntity();
         Assert.assertNotNull(accountUpdated);
 
@@ -929,83 +715,86 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     }
     
     
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"read", "readList", "readNonExistent"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
 	public void verifyProtectionReadOnly(String testName) throws Exception {
-
-    	if (logger.isDebugEnabled()) {
-    		logger.debug(testBanner(testName, CLASS_NAME));
-    	}
-    	
         setupCreate();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
-        AccountsCommon account = 
-        	createAccountInstance("mdTest", "mdTest", "mdTestPW", "md@test.com", 
+        AccountsCommon account = createAccountInstance("mdTest", "mdTest", "mdTestPW", "md@test.com", 
         			client.getTenantId(), true, false, true, true);
         account.setMetadataProtection(AccountClient.IMMUTABLE);
         account.setRolesProtection(AccountClient.IMMUTABLE);
         ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        String testResourceId = extractId(res);
-        allResourceIdsCreated.add(testResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": testResourceId=" + testResourceId);
+        String testResourceId = null;
+        try {
+        	assertStatusCode(res, testName);
+	        // Store the ID returned from this create operation
+	        // for additional tests below.
+	        testResourceId = extractId(res);
+	        allResourceIdsCreated.add(testResourceId);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": testResourceId=" + testResourceId);
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
+        
         setupRead();
 
         // Submit the request to the service and store the response.
         ClientResponse<AccountsCommon> accountRes = client.read(testResourceId);
-        assertStatusCode(accountRes, testName);
-
-        AccountsCommon accountRead = (AccountsCommon) accountRes.getEntity();
-        Assert.assertNotNull(accountRead);
-        String mdProtection = accountRead.getMetadataProtection();
-        String rolesProtection = accountRead.getRolesProtection();
-        if (logger.isTraceEnabled()) {
-            logger.trace(testName + ": metadataProtection=" + mdProtection);
-            logger.trace(testName + ": rolesProtection=" + rolesProtection);
+        try {
+	        assertStatusCode(accountRes, testName);
+	        AccountsCommon accountRead = (AccountsCommon) accountRes.getEntity();
+	        Assert.assertNotNull(accountRead);
+	        String mdProtection = accountRead.getMetadataProtection();
+	        String rolesProtection = accountRead.getRolesProtection();
+	        if (logger.isTraceEnabled()) {
+	            logger.trace(testName + ": metadataProtection=" + mdProtection);
+	            logger.trace(testName + ": rolesProtection=" + rolesProtection);
+	        }
+	    	Assert.assertFalse(account.getMetadataProtection().equals(mdProtection),
+	    			"Account allowed create to set the metadata protection flag.");
+	    	Assert.assertFalse(account.getRolesProtection().equals(rolesProtection),
+	    			"Account allowed create to set the perms protection flag.");
+        } finally {
+        	if (accountRes != null) {
+        		accountRes.releaseConnection();
+            }
         }
-    	Assert.assertFalse(account.getMetadataProtection().equals(mdProtection),
-    			"Account allowed create to set the metadata protection flag.");
-    	Assert.assertFalse(account.getRolesProtection().equals(rolesProtection),
-    			"Account allowed create to set the perms protection flag.");
         
     	setupUpdate();
 
-    	AccountsCommon accountToUpdate = 
-		    	createAccountInstance("mdTest", "mdTest", "mdTestPW", "md@test.com", 
+    	AccountsCommon accountToUpdate = createAccountInstance("mdTest", "mdTest", "mdTestPW", "md@test.com", 
 		    			client.getTenantId(), true, false, true, true);
     	accountToUpdate.setMetadataProtection(AccountClient.IMMUTABLE);
     	accountToUpdate.setRolesProtection(AccountClient.IMMUTABLE);
 
     	// Submit the request to the service and store the response.
     	accountRes = client.update(testResourceId, accountToUpdate);
-        assertStatusCode(accountRes, testName);
-
-    	AccountsCommon accountUpdated = (AccountsCommon) accountRes.getEntity();
-    	Assert.assertNotNull(accountUpdated);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + "Updated account: ");
-            logger.debug(objectAsXmlString(accountUpdated,AccountsCommon.class));
-        }
-
-    	Assert.assertFalse(
-    			AccountClient.IMMUTABLE.equalsIgnoreCase(accountUpdated.getMetadataProtection()),
-    			"Account allowed update of the metadata protection flag.");
-    	Assert.assertFalse(
-    			AccountClient.IMMUTABLE.equalsIgnoreCase(accountUpdated.getRolesProtection()),
-    			"Account allowed update of the roles protection flag.");
+    	try {
+    		assertStatusCode(accountRes, testName);
+	    	AccountsCommon accountUpdated = (AccountsCommon) accountRes.getEntity();
+	    	Assert.assertNotNull(accountUpdated);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + "Updated account: ");
+	            logger.debug(objectAsXmlString(accountUpdated,AccountsCommon.class));
+	        }
+	    	Assert.assertFalse(
+	    			AccountClient.IMMUTABLE.equalsIgnoreCase(accountUpdated.getMetadataProtection()),
+	    			"Account allowed update of the metadata protection flag.");
+	    	Assert.assertFalse(
+	    			AccountClient.IMMUTABLE.equalsIgnoreCase(accountUpdated.getRolesProtection()),
+	    			"Account allowed update of the roles protection flag.");
+    	} finally {
+    		if (accountRes != null) {
+    			accountRes.releaseConnection();
+            }
+    	}
     }
-
-
 
     /**
      * Deactivate.
@@ -1013,19 +802,17 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"updatePasswordWithoutUser"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"updatePasswordWithoutUser"})
     public void deactivate(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdate();
 
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 
         if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
@@ -1047,7 +834,14 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, accountToUpdate);
-        assertStatusCode(res, testName);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         AccountsCommon accountUpdated = (AccountsCommon) res.getEntity();
         Assert.assertNotNull(accountUpdated);
@@ -1055,7 +849,6 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(accountUpdated.getStatus(),
                 accountToUpdate.getStatus(),
                 "Data in updated object did not match submitted data.");
-
     }
 
     // Failure outcomes
@@ -1085,17 +878,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
-     */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"deactivate", "readNonExistent", "testSubmitRequest"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"deactivate", "CRUDTests"})
     public void updateNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdateNonExistent();
 
@@ -1116,9 +901,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     /**
@@ -1127,13 +912,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"deactivate", "readNonExistent", "testSubmitRequest"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"deactivate", "CRUDTests"})
     public void updateWrongUser(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupUpdate();
 
         // Submit the request to the service and store the response.
@@ -1142,7 +922,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in updateAccount(), below.
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 
         if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
@@ -1166,8 +949,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
@@ -1175,101 +958,23 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
-     */
+    
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"testSubmitRequest", "updateWrongUser"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDelete();
-
-        // Submit the request to the service and store the response.
-        AccountClient client = new AccountClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"delete"})
-    public void deleteNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDeleteNonExistent();
-
-        // Submit the request to the service and store the response.
-        AccountClient client = new AccountClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-
-    // ---------------------------------------------------------------
-    // Search tests
-    // ---------------------------------------------------------------
-    
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void searchWorkflowDeleted(String testName) throws Exception {
-        // Fixme: null test for now, overriding test in base class
+    	// Do nothing because this test is not ready to delete the "knownResourceId".
+    	// Instead, the method localDelete() will get called later in the dependency chain. The
+    	// method localDelete() has a dependency on the test "updateWrongUser".  Once the "updateWrongUser"
+    	// test is run, the localDelete() test/method will get run.  The localDelete() test/method in turn
+    	// calls the inherited delete() test/method.
     }
     
-    // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-    /**
-     * Tests the code for manually submitting data that is used by several
-     * of the methods above.
-     * @throws Exception 
-     */
-    @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() throws Exception {
-
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url
-                    + " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests", "updateWrongUser"})
+    public void localDelete(String testName) throws Exception {
+    	// Because of issues with TestNG not allowing @Test annotations on on override methods,
+    	// and because we want the "updateWrongUser" to run before the "delete" test, we need
+    	// this method.  This method will call super.delete() after all the dependencies have been
+    	// met.
+    	super.delete(testName);
     }
 
     // ---------------------------------------------------------------
@@ -1299,8 +1004,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
             logger.debug(objectAsXmlString(account,
                     AccountsCommon.class));
         }
+        
         return account;
-
     }
 
 
@@ -1310,11 +1015,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @param list the list
      */
-    private void printList(String testName, AccountsCommonList list) {
+    @Override
+    protected void printList(String testName, AccountsCommonList list) {
+    	AccountsCommonList acl = (AccountsCommonList)list;
         List<AccountListItem> items =
-                list.getAccountListItem();
+                acl.getAccountListItem();
         int i = 0;
-
         for (AccountListItem item : items) {
             logger.debug(testName + ": list-item[" + i + "] csid="
                     + item.getCsid());
@@ -1323,7 +1029,49 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ": list-item[" + i + "] URI="
                     + item.getUri());
             i++;
-
         }
     }
+
+	@Override
+	protected AccountsCommon createInstance(String commonPartName,
+			String identifier) {
+		AccountClient client = new AccountClient();
+        AccountsCommon account =
+                createAccountInstance(knownUserId, knownUserId, knownUserPassword,
+                "barney@dinoland.com", client.getTenantId(),
+                true, false, true, true);
+        return account;
+	}
+
+    /*
+     * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+     * refer to this method in their @Test annotation declarations.
+     */
+    @Override
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+    public void CRUDTests(String testName) {
+    	// Do nothing.  Simply here to for a TestNG execution order for our tests
+    }
+
+	@Override
+	protected AccountsCommon updateInstance(AccountsCommon accountsCommon) {
+		AccountsCommon result = new AccountsCommon();
+		
+		result.setCsid(knownResourceId);
+		result.setUserId(accountsCommon.getUserId());
+        // Update the content of this resource.
+		result.setEmail("updated-" + accountsCommon.getEmail());
+		
+		return result;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(AccountsCommon original,
+			AccountsCommon updated) throws Exception {
+        Assert.assertEquals(original.getEmail(), updated.getEmail(),
+                "Data in updated object did not match submitted data.");
+	}
+	
 }

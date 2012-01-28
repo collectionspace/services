@@ -22,10 +22,8 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +51,7 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 753 $
  * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
  */
-public class PersonAuthoritySearchTest extends BaseServiceTest {
+public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = PersonAuthoritySearchTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -157,7 +155,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getAbstractCommonList(
+    protected AbstractCommonList getCommonList(
                     ClientResponse<AbstractCommonList> response) {
     return response.getEntity(AbstractCommonList.class);
     }
@@ -225,12 +223,8 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     /**
      * Reads an item list by partial term.
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"readListByPartialTerm"})
+    @Test(dataProvider="testName", groups = {"readListByPartialTerm"})
     public void partialTermMatch(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
         String partialTerm = getPartialTermCommon();
         if (logger.isDebugEnabled()) {
@@ -249,12 +243,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * of an all-lowercase variation of the expected match, to test case-insensitive
      * matching.
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
+    @Test(dataProvider="testName", groups = {"readListByPartialTerm"},
+    		dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchCaseInsensitiveLowerCase(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
 
         final String partialTerm = getPartialTermCommon().toLowerCase();
@@ -275,12 +266,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * of an all-uppercase variation of the expected match, to test case-insensitive
      * matching.
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchCaseInsensitiveUpperCase(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
 
         final String partialTerm = getPartialTermCommon().toUpperCase();
@@ -300,12 +288,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * Reads an item list by partial term, with a partial term that is of
      * the minimum character length that may be expected to be matched.
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchMinimumLength(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
         String partialTerm = getPartialTermMinimumLength();
         if (logger.isDebugEnabled()) {
@@ -324,12 +309,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * Reads an item list by partial term, with a partial term that contains
      * at least one Unicode UTF-8 character (outside the USASCII range).
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchUTF8(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
         String partialTerm = getPartialTermUtf8();
         String ptEncoded;
@@ -355,12 +337,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * Reads an item list by partial term, with a partial term that contains
      * at least one Unicode UTF-8 character (outside the USASCII range).
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchQuote(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
         String partialTerm = getPartialTermQuote();
         if (logger.isDebugEnabled()) {
@@ -378,12 +357,8 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     /**
      * Finds terms by keywords.
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            groups = {"readListByKwdTerm"})
+    @Test(dataProvider="testName", groups = {"readListByKwdTerm"})
     public void keywordTermMatch(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
         String kwdTerm = getKwdTerm();
         if (logger.isDebugEnabled()) {
@@ -400,12 +375,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     /**
      * Finds terms by keywords.
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    @Test(dataProvider="testName",
         groups = {"readListByKwdTerm"}, dependsOnMethods = {"keywordTermMatch"})
     public void keywordTermMatchUTF8(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
         String kwdTerm = getKwdTermUTF8();
         if (logger.isDebugEnabled()) {
@@ -427,12 +399,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * Reads an item list by partial term, with a partial term that is not
      * expected to be matched by any term in any resource.
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    @Test(dataProvider="testName",
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchOnNonexistentTerm(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
         int ZERO_MATCHES_EXPECTED = 0;
         String partialTerm = getPartialTermNonExistent();
@@ -452,12 +421,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * Reads an item list by partial term, with a partial term that is not
      * expected to be matched by any term in any resource.
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"readListByKwdTerm"}, dependsOnMethods = {"keywordTermMatch"})
+    @Test(dataProvider="testName", groups = {"readListByKwdTerm"},
+    		dependsOnMethods = {"keywordTermMatch"})
     public void keywordTermMatchOnNonexistentTerm(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         int numMatchesFound = 0;
         int ZERO_MATCHES_EXPECTED = 0;
         String kwdTerm = getKwdTermNonExistent();
@@ -501,12 +467,14 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         } else {
             Assert.fail("readItemListByPartialTerm passed null csid!");
         }
-        assertStatusCode(res, testName);
         AbstractCommonList list = null;
         try {
+            assertStatusCode(res, testName);
             list = res.getEntity();
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         List<AbstractCommonList.ListItem> items = list.getListItem();
@@ -572,7 +540,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
 
         String testName = "createAuthority";
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
+            logger.debug(getTestBanner(testName, CLASS_NAME));
         }
 
         // Perform setup.
@@ -592,18 +560,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     	String newID = null;
     	ClientResponse<Response> res = client.create(multipart);
         try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if(logger.isDebugEnabled()){
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
     	} finally {
-            res.releaseConnection();
+    		if (res != null) {
+                res.releaseConnection();
+            }
     	}
         // Store the refname from the first resource created
         // for additional tests below.
@@ -684,19 +646,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         String newID = null;
         ClientResponse<Response> res = client.createItem(authorityCsid, multipart);
         try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if(logger.isDebugEnabled()){
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         // Store the ID returned from the first item resource created

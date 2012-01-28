@@ -27,17 +27,17 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-
-//import org.collectionspace.services.authorization.AccountRolesList;
-import org.collectionspace.services.authorization.AccountRole;
 import org.jboss.resteasy.client.ClientResponse;
+
+import org.collectionspace.services.authorization.AccountRole;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
  * A AccountRoleClient.
 
  * @version $Revision:$
  */
-public class AccountRoleClient extends AbstractServiceClientImpl<AccountRole, AccountRoleProxy> {
+public class AccountRoleClient extends AbstractServiceClientImpl<AbstractCommonList, AccountRole, AccountRole, AccountRoleProxy> {
 	public static final String SERVICE_NAME = "accountroles";
 
 	@Override
@@ -92,7 +92,16 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AccountRole, Ac
     public ClientResponse<Response> create(String csid, AccountRole accRole) {
         return getProxy().create(csid, accRole);
     }
-
+    
+    /*
+     * 
+     * Updates on AccountRole entities is not supported.
+     * 
+     */
+	@Override
+	public ClientResponse<AccountRole> update(String csid, AccountRole payload) {
+		throw new RuntimeException("You cannot update an AccountRole object.  You must delete and recreate it instead.");
+	}
 
     /**
      * @param csid
@@ -103,4 +112,18 @@ public class AccountRoleClient extends AbstractServiceClientImpl<AccountRole, Ac
     public ClientResponse<Response> delete(String csid, AccountRole accRole) {
         return getProxy().delete(csid, "delete", accRole);
     }
+
+    /*
+     * Not supported.
+     */
+	@Override
+	public ClientResponse<Response> create(AccountRole payload) {
+		// Use the create(String csid, AccountRole accRole) method instead
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ClientResponse<AbstractCommonList> readList() {
+		throw new UnsupportedOperationException();
+	}
 }

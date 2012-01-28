@@ -25,15 +25,18 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
+
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 
 /**
  *	LT - List Type
+ *  REQUEST_PT - Request payload type
+ *  RESPONSE_PT - Response payload type
  *	P - Proxy type
  */
-public interface CollectionSpaceClient<LT, P extends CollectionSpaceProxy<LT>> {
+public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P extends CollectionSpaceProxy<CLT>> {
 
     public static final String AUTH_PROPERTY = "cspace.auth";
     public static final String PASSWORD_PROPERTY = "cspace.password";
@@ -150,6 +153,12 @@ public interface CollectionSpaceClient<LT, P extends CollectionSpaceProxy<LT>> {
      * Common proxied service calls
      */
 
+	public ClientResponse<Response> create(REQUEST_TYPE payload);
+	
+	public ClientResponse<RESPONSE_TYPE> read(String csid);
+
+    public ClientResponse<RESPONSE_TYPE> update(String csid, REQUEST_TYPE payload);
+	
     /**
      * Read list.
      *
@@ -157,9 +166,11 @@ public interface CollectionSpaceClient<LT, P extends CollectionSpaceProxy<LT>> {
      * @param pageNumber the page number
      * @return the client response
      */
-    public ClientResponse<AbstractCommonList> readList(
+    public ClientResponse<CLT> readList(
     		Long pageSize,
     		Long pageNumber);
+    
+    public ClientResponse<CLT> readList();
 
     /**
      * Read list.
@@ -169,7 +180,7 @@ public interface CollectionSpaceClient<LT, P extends CollectionSpaceProxy<LT>> {
      * @param pageNumber the page number
      * @return the client response
      */
-    public ClientResponse<AbstractCommonList> readList(
+    public ClientResponse<CLT> readList(
             String sortBy,
             Long pageSize,
             Long pageNumber);

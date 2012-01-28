@@ -26,10 +26,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
+
 /**
  * The Class VocabularyClient.
  */
-public class VocabularyClient extends AuthorityClientImpl<VocabularyProxy> {
+public class VocabularyClient extends AuthorityClientImpl<VocabularyitemsCommon, VocabularyProxy> {
 	public static final String SERVICE_NAME = "vocabularies";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -73,4 +75,14 @@ public class VocabularyClient extends AuthorityClientImpl<VocabularyProxy> {
     public String getCommonPartItemName() {
         return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
     }
+
+	@Override
+    public void setInAuthority(VocabularyitemsCommon item, String inAuthorityCsid) {
+		item.setInAuthority(inAuthorityCsid);
+	}
+	
+	@Override
+	public String getInAuthority(VocabularyitemsCommon item) {
+		return item.getInAuthority();
+	}
 }

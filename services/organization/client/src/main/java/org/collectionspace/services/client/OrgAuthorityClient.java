@@ -26,10 +26,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.organization.OrganizationsCommon;
+
 /**
  * The Class OrgAuthorityClient.
  */
-public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrgAuthorityProxy> {
+public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrganizationsCommon, OrgAuthorityProxy> {
 	public static final String SERVICE_NAME = "orgauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -66,4 +68,14 @@ public class OrgAuthorityClient extends AuthorityWithContactsClientImpl<OrgAutho
     public String getItemCommonPartName() {
         return getCommonPartName(SERVICE_ITEM_NAME);
     }
+
+	@Override
+	public String getInAuthority(OrganizationsCommon item) {
+		return item.getInAuthority();
+	}
+
+	@Override
+	public void setInAuthority(OrganizationsCommon item, String inAuthorityCsid) {
+		item.setInAuthority(inAuthorityCsid);
+	}
 }

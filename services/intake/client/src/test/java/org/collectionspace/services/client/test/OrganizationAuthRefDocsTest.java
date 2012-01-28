@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 1327 $
  * $LastChangedDate: 2010-02-12 10:35:11 -0800 (Fri, 12 Feb 2010) $
  */
-public class OrganizationAuthRefDocsTest extends BaseServiceTest {
+public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = OrganizationAuthRefDocsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -103,7 +103,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
+	protected AbstractCommonList getCommonList(
 			ClientResponse<AbstractCommonList> response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
@@ -114,10 +114,6 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     // Success outcomes
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createIntakeWithAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
@@ -150,9 +146,9 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
 	        if(logger.isDebugEnabled()){
 	            logger.debug(testName + ": status = " + statusCode);
 	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
         	res.releaseConnection();
         }
@@ -183,8 +179,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         ClientResponse<Response> res = orgAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
         orgAuthCSID = extractId(res);
         
@@ -226,8 +222,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
@@ -236,10 +232,6 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createIntakeWithAuthRefs"})
     public void readAndCheckAuthRefDocs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
         
@@ -247,9 +239,16 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
        ClientResponse<AuthorityRefDocList> refDocListResp =
         	orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
-        assertStatusCode(refDocListResp, testName);
-
-        AuthorityRefDocList list = refDocListResp.getEntity();
+       AuthorityRefDocList list = null;
+       try {
+    	   assertStatusCode(refDocListResp, testName);
+    	   list = refDocListResp.getEntity();
+    	   Assert.assertNotNull(list);
+       } finally {
+    	   if (refDocListResp != null) {
+    		   refDocListResp.releaseConnection();
+           }
+       }
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
@@ -352,8 +351,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
-            multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new IntakeClient().getCommonPartName());
+            multipart.addPart(new IntakeClient().getCommonPartName(), intake);
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, intake common");

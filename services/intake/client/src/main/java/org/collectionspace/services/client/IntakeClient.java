@@ -48,7 +48,6 @@ public class IntakeClient extends AbstractCommonListPoxServiceClientImpl<IntakeP
 
     @Override
     public Class<IntakeProxy> getProxyClass() {
-        // TODO Auto-generated method stub
         return IntakeProxy.class;
     }
 }

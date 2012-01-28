@@ -10,9 +10,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 /*
  * P - Proxy type
  */
-public abstract class AuthorityClientImpl<P extends AuthorityProxy>
-	extends AbstractCommonListPoxServiceClientImpl<P>
-	implements AuthorityClient<P> {
+public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
+	extends AbstractPoxServiceClientImpl<AbstractCommonList, P>
+	implements AuthorityClient<AUTHORITY_ITEM_TYPE, P> {
 
 	private static final String INCLUDE_DELETE_TRUE = Boolean.TRUE.toString();
 	/*

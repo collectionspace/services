@@ -24,7 +24,6 @@ package org.collectionspace.services.client.test;
 
 import java.util.List;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.dom4j.Element;
 
@@ -34,7 +33,6 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.EntryMethodList;
 import org.collectionspace.services.intake.FieldCollectionEventNameList;
@@ -58,13 +56,11 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class IntakeServiceTest extends AbstractServiceTestImpl {
+public class IntakeServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, IntakesCommon> {
 
     /** The logger. */
     private final String CLASS_NAME = IntakeServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(IntakeServiceTest.class);
-    /** The known resource id. */
-    private String knownResourceId = null;
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.currentDateUTC();
 
@@ -78,85 +74,9 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         return IntakeClient.SERVICE_NAME;
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-    protected AbstractCommonList getAbstractCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
-    }
-
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
-    
-    // Success outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup, such as initializing the type of service request
-        // (e.g. CREATE, DELETE), its valid and expected status codes, and
-        // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate();
-
-        // Submit the request to the service and store the response.
-        IntakeClient client = new IntakeClient();
-        String identifier = createIdentifier();
-        PoxPayloadOut multipart = createInstance(identifier);
-        ClientResponse<Response> res = client.create(multipart);
-
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Store the ID returned from the first resource created
-        // for additional tests below.
-        if (knownResourceId == null) {
-            knownResourceId = extractId(res);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownResourceId=" + knownResourceId);
-            }
-        }
-
-        // Store the IDs from every resource created by tests,
-        // so they can be deleted after tests have been run.
-        allResourceIdsCreated.add(extractId(res));
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    public void createList(String testName) throws Exception {
-        for (int i = 0; i < 3; i++) {
-            create(testName);
-        }
-    }
-
-    // Failure outcomes
-    // Placeholders until the three tests below can be uncommented.
     
     // See Issue CSPACE-401.
     /* (non-Javadoc)
@@ -276,50 +196,20 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     
-    // Success outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        IntakeClient client = new IntakeClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        IntakesCommon intakeCommons = null;
-        if (payloadInputPart != null) {
-            intakeCommons = (IntakesCommon) payloadInputPart.getBody();
-        }
-//        IntakesCommon intake = (IntakesCommon) extractPart(input,
-//                client.getCommonPartName(), IntakesCommon.class);
-        Assert.assertNotNull(intakeCommons);
-
+	protected void compareReadInstances(IntakesCommon original, IntakesCommon fromRead) throws Exception {
         // Verify the number and contents of values in repeatable fields,
         // as created in the instance record used for testing.
         List<String> entryMethods =
-                intakeCommons.getEntryMethods().getEntryMethod();
+        		fromRead.getEntryMethods().getEntryMethod();
         Assert.assertTrue(entryMethods.size() > 0);
         Assert.assertNotNull(entryMethods.get(0));
 
         List<String> fieldCollectionEventNames =
-                intakeCommons.getFieldCollectionEventNames().getFieldCollectionEventName();
+        		fromRead.getFieldCollectionEventNames().getFieldCollectionEventName();
         Assert.assertTrue(fieldCollectionEventNames.size() > 0);
         Assert.assertNotNull(fieldCollectionEventNames.get(0));
 
-        CurrentLocationGroupList currentLocationGroupList = intakeCommons.getCurrentLocationGroupList();
+        CurrentLocationGroupList currentLocationGroupList = fromRead.getCurrentLocationGroupList();
         Assert.assertNotNull(currentLocationGroupList);
         List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
         Assert.assertNotNull(currentLocationGroups);
@@ -331,184 +221,34 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
         if (logger.isDebugEnabled()) {
             logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
-                    + "UTF-8 data received=" + intakeCommons.getEntryNote());
+                    + "UTF-8 data received=" + fromRead.getEntryNote());
         }
-        Assert.assertEquals(intakeCommons.getEntryNote(), getUTF8DataFragment(),
-                "UTF-8 data retrieved '" + intakeCommons.getEntryNote()
+        Assert.assertEquals(fromRead.getEntryNote(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + fromRead.getEntryNote()
                 + "' does not match expected data '" + getUTF8DataFragment());
-    }
-
+	}
+    
     // Failure outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
-     */
+
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        IntakeClient client = new IntakeClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    public void delete(String testName) throws Exception {
+    	// Do nothing because this test is not ready to delete the "knownResourceId".
+    	// Instead, the method localDelete() will get called later in the dependency chain. The
+    	// method localDelete() has a dependency on the test "verifyReadOnlyCoreFields".  Once the "verifyReadOnlyCoreFields"
+    	// test is run, the localDelete() test/method will get run.  The localDelete() test/method in turn
+    	// calls the inherited delete() test/method.
+    }
+    
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests", "verifyReadOnlyCoreFields"})
+    public void localDelete(String testName) throws Exception {
+    	// Because of issues with TestNG not allowing @Test annotations on on override methods,
+    	// and because we want the "updateWrongUser" to run before the "delete" test, we need
+    	// this method.  This method will call super.delete() after all the dependencies have been
+    	// met.
+    	super.delete(testName);
     }
 
-    // ---------------------------------------------------------------
-    // CRUD tests : READ_LIST tests
-    // ---------------------------------------------------------------
-    
-    // Success outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
-    public void readList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadList();
-
-        // Submit the request to the service and store the response.
-        IntakeClient client = new IntakeClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        AbstractCommonList list = res.getEntity();
-
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
-        }
-
-    }
-
-    // Failure outcomes
-    // None at present.
-    
-    // ---------------------------------------------------------------
-    // CRUD tests : UPDATE tests
-    // ---------------------------------------------------------------
-    
-    // Success outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
-    public void update(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdate();
-
-        // Retrieve the contents of a resource to update.
-        IntakeClient client = new IntakeClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        IntakesCommon intakeCommons = null;
-        if (payloadInputPart != null) {
-            intakeCommons = (IntakesCommon) payloadInputPart.getBody();
-        }
-//        IntakesCommon intake = (IntakesCommon) extractPart(input,
-//                client.getCommonPartName(), IntakesCommon.class);
-        Assert.assertNotNull(intakeCommons);
-
-        // Update the content of this resource.
-        intakeCommons.setEntryNumber("updated-" + intakeCommons.getEntryNumber());
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(intakeCommons, IntakesCommon.class));
-        }
-
-        CurrentLocationGroupList currentLocationGroupList = intakeCommons.getCurrentLocationGroupList();
-        Assert.assertNotNull(currentLocationGroupList);
-        List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
-        Assert.assertNotNull(currentLocationGroups);
-        Assert.assertTrue(currentLocationGroups.size() > 0);
-        CurrentLocationGroup currentLocationGroup = currentLocationGroups.get(0);
-        Assert.assertNotNull(currentLocationGroup);
-        String currentLocationNote = currentLocationGroup.getCurrentLocationNote();
-        Assert.assertNotNull(currentLocationNote);
-        String updatedCurrentLocationNote = "updated-" + currentLocationNote;
-        currentLocationGroups.get(0).setCurrentLocationNote(updatedCurrentLocationNote);
-        intakeCommons.setCurrentLocationGroupList(currentLocationGroupList);
-
-        // Create an output payload to send to the service, and add teh common part
-        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart = output.addPart(intakeCommons, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
-        
-        // Submit the request to the service and store the response.
-        res = client.update(knownResourceId, output);
-        assertStatusCode(res, testName);
-        
-        input = new PoxPayloadIn(res.getEntity());
-        IntakesCommon updatedIntake =
-                (IntakesCommon) extractPart(input,
-                client.getCommonPartName(), IntakesCommon.class);
-
-        Assert.assertNotNull(updatedIntake);
-
-        Assert.assertEquals(updatedIntake.getEntryNumber(),
-                intakeCommons.getEntryNumber(),
-                "Data in updated object did not match submitted data.");
-
-        currentLocationGroupList = updatedIntake.getCurrentLocationGroupList();
-        Assert.assertNotNull(currentLocationGroupList);
-        currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
-        Assert.assertNotNull(currentLocationGroups);
-        Assert.assertTrue(currentLocationGroups.size() > 0);
-        Assert.assertNotNull(currentLocationGroups.get(0));
-        Assert.assertEquals(updatedCurrentLocationNote,
-                currentLocationGroups.get(0).getCurrentLocationNote(),
-                "Data in updated object did not match submitted data.");
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("UTF-8 data sent=" + intakeCommons.getEntryNote() + "\n"
-                    + "UTF-8 data received=" + updatedIntake.getEntryNote());
-        }
-        Assert.assertTrue(updatedIntake.getEntryNote().contains(getUTF8DataFragment()),
-                "UTF-8 data retrieved '" + updatedIntake.getEntryNote()
-                + "' does not contain expected data '" + getUTF8DataFragment());
-        Assert.assertEquals(updatedIntake.getEntryNote(),
-                intakeCommons.getEntryNote(),
-                "Data in updated object did not match submitted data.");
-
-    }
-
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests"})
     public void verifyReadOnlyCoreFields(String testName) throws Exception {
         // TODO These should be in some core client utils
         final String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
@@ -519,16 +259,16 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         final String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
         final String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdate();
 
         // Retrieve the contents of a resource to update.
         IntakeClient client = new IntakeClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         PayloadInputPart payloadInputPart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
@@ -572,7 +312,14 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, output);
-        assertStatusCode(res, testName);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         input = new PoxPayloadIn(res.getEntity());
         PayloadInputPart updatedCorePart = input.getPart(COLLECTIONSPACE_CORE_SCHEMA);
@@ -718,136 +465,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
     }
      */
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateNonExistent();
-
-        // Submit the request to the service and store the response.
-        // Note: The ID used in this 'create' call may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-        IntakeClient client = new IntakeClient();
-        PoxPayloadOut multipart = createInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res =
-                client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-
-    // ---------------------------------------------------------------
-    // CRUD tests : DELETE tests
-    // ---------------------------------------------------------------
-    
-    // Success outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "verifyReadOnlyCoreFields"})
-    public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDelete();
-
-        // Submit the request to the service and store the response.
-        IntakeClient client = new IntakeClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-
-    // Failure outcomes
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"delete"})
-    public void deleteNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDeleteNonExistent();
-
-        // Submit the request to the service and store the response.
-        IntakeClient client = new IntakeClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-    
-    /**
-     * Tests the code for manually submitting data that is used by several
-     * of the methods above.
-     */
-    @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() {
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url
-                    + " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
-    }
-
-    // ---------------------------------------------------------------
-    // Utility methods used by tests above
     // ---------------------------------------------------------------
     
     /* (non-Javadoc)
@@ -925,4 +544,79 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
+
+	@Override
+	protected PoxPayloadOut createInstance(String commonPartName,
+			String identifier) {
+		return this.createInstance(identifier);
+	}
+
+	@Override
+	protected IntakesCommon updateInstance(IntakesCommon intakesCommon) {
+		IntakesCommon result = new IntakesCommon();
+		
+		result.setEntryNumber("updated-" + intakesCommon.getEntryNumber());
+		result.setEntryNote(intakesCommon.getEntryNote());
+
+        CurrentLocationGroupList currentLocationGroupList = intakesCommon.getCurrentLocationGroupList();
+        Assert.assertNotNull(currentLocationGroupList);
+        List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
+        Assert.assertNotNull(currentLocationGroups);
+        Assert.assertTrue(currentLocationGroups.size() > 0);
+        CurrentLocationGroup currentLocationGroup = currentLocationGroups.get(0);
+        Assert.assertNotNull(currentLocationGroup);
+        String currentLocationNote = currentLocationGroup.getCurrentLocationNote();
+        Assert.assertNotNull(currentLocationNote);
+        String updatedCurrentLocationNote = "updated-" + currentLocationNote;
+        currentLocationGroups.get(0).setCurrentLocationNote(updatedCurrentLocationNote);
+        result.setCurrentLocationGroupList(currentLocationGroupList);
+        
+        return result;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(IntakesCommon original,
+			IntakesCommon updated) throws Exception {
+        Assert.assertEquals(updated.getEntryNumber(),
+        		original.getEntryNumber(),
+                "Data in updated object did not match submitted data.");
+        
+        CurrentLocationGroupList currentLocationGroupList = updated.getCurrentLocationGroupList();
+        Assert.assertNotNull(currentLocationGroupList);
+        List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
+        Assert.assertNotNull(currentLocationGroups);
+        Assert.assertTrue(currentLocationGroups.size() > 0);
+        Assert.assertNotNull(currentLocationGroups.get(0));
+        
+        String updatedCurrentLocationNote = original.getCurrentLocationGroupList()
+        		.getCurrentLocationGroup().get(0).getCurrentLocationNote();
+        Assert.assertEquals(updatedCurrentLocationNote,
+                currentLocationGroups.get(0).getCurrentLocationNote(),
+                "Data in updated object did not match submitted data.");
+        
+        Assert.assertEquals(updated.getEntryNote(), original.getEntryNote(),
+                "Data in updated object did not match submitted data.");
+        //
+        // UTF-8 Checks
+        //
+        if (logger.isDebugEnabled()) {
+            logger.debug("UTF-8 data sent=" + original.getEntryNote() + "\n"
+                    + "UTF-8 data received=" + updated.getEntryNote());
+        }
+        Assert.assertTrue(updated.getEntryNote().contains(getUTF8DataFragment()),
+                "UTF-8 data retrieved '" + updated.getEntryNote()
+                + "' does not contain expected data '" + getUTF8DataFragment());        
+	}
+
+    /*
+     * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+     * refer to this method in their @Test annotation declarations.
+     */
+    @Override
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+	public void CRUDTests(String testName) {
+		// TODO Auto-generated method stub		
+	}
 }

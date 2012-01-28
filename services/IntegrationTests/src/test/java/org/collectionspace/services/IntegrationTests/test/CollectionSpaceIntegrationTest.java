@@ -42,10 +42,7 @@ import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.relation.RelationsCommon;
-import org.collectionspace.services.relation.RelationshipType;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 
 /**
  * The Class CollectionSpaceIntegrationTest.

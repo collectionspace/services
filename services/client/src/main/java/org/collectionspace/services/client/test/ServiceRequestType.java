@@ -25,9 +25,6 @@ package org.collectionspace.services.client.test;
 import java.util.Arrays;
 import javax.ws.rs.core.Response;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * ServiceRequestType, identifies types of service requests
  * and the valid HTTP status codes that can be returned from

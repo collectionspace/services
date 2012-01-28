@@ -66,17 +66,7 @@ public class IdServiceTest extends BaseServiceTest {
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new IdClient();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-        throw new UnsupportedOperationException(
-            "IdServiceTest.getAbstractCommonList method is not currently supported.");
+    	return (CollectionSpaceClient) new IdClient();
     }
 
     // ---------------------------------------------------------------
@@ -87,11 +77,6 @@ public class IdServiceTest extends BaseServiceTest {
     
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        };
-
         // Perform setup.
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
@@ -108,9 +93,9 @@ public class IdServiceTest extends BaseServiceTest {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
         
         String newID = extractId(res);
         
@@ -133,11 +118,6 @@ public class IdServiceTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
     public void createId(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        };
-
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
@@ -146,27 +126,37 @@ public class IdServiceTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
         ClientResponse<String> res = client.createId(knownResourceId);
-        assertStatusCode(res, testName);
-
-        String generatedId = res.getEntity();
-        Assert.assertNotNull(generatedId);
-        Assert.assertFalse(generatedId.isEmpty());
-        if (logger.isDebugEnabled()) {
-            logger.debug("generated ID=" + generatedId);
+        String generatedId = null;
+        try {
+	        assertStatusCode(res, testName);
+	        generatedId = res.getEntity();
+	        Assert.assertNotNull(generatedId);
+	        Assert.assertFalse(generatedId.isEmpty());
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("generated ID=" + generatedId);
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-                        
         // Create a second ID.  Verify that it is different from the first.
         // Assumes that the last part in the ID pattern generates values
         // that will always differ at each generation.
         res = client.createId(knownResourceId);
-        assertStatusCode(res, testName);
-
-        String secondGeneratedId = res.getEntity();
-        Assert.assertNotNull(secondGeneratedId);
-        Assert.assertFalse(secondGeneratedId.isEmpty());
-        Assert.assertFalse(secondGeneratedId.equals(generatedId));
-        if (logger.isDebugEnabled()) {
-            logger.debug("second generated ID=" + secondGeneratedId);
+        try {
+	        assertStatusCode(res, testName);
+	        String secondGeneratedId = res.getEntity();
+	        Assert.assertNotNull(secondGeneratedId);
+	        Assert.assertFalse(secondGeneratedId.isEmpty());
+	        Assert.assertFalse(secondGeneratedId.equals(generatedId));
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("second generated ID=" + secondGeneratedId);
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
         
     }
@@ -183,11 +173,6 @@ public class IdServiceTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        };
-
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
         
@@ -198,7 +183,17 @@ public class IdServiceTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+
         String entity = res.getEntity();
         Assert.assertNotNull(entity);
         if (logger.isDebugEnabled()) {
@@ -218,18 +213,32 @@ public class IdServiceTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
     public void readList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        };
-
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ_LIST);
 
         // Submit the request to the service and store the response.
         IdClient client = new IdClient();
         ClientResponse<String> res = client.readList();
-        assertStatusCode(res, testName);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+
         String entity = res.getEntity();
         Assert.assertNotNull(entity);
         if (logger.isDebugEnabled()) {
@@ -244,11 +253,6 @@ public class IdServiceTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "createId", "read", "readList"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.DELETE);
 
@@ -262,9 +266,9 @@ public class IdServiceTest extends BaseServiceTest {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------

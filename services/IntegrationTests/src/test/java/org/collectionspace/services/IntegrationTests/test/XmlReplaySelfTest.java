@@ -28,7 +28,6 @@ import org.collectionspace.services.IntegrationTests.xmlreplay.XmlReplay;
 import org.collectionspace.services.IntegrationTests.xmlreplay.XmlReplayTest;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

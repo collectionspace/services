@@ -113,6 +113,12 @@ public class Profiler {
         setStartTime(currentTime());
     }
 
+    private void stopTimer() {
+        setStopTime(currentTime());
+        setElapsedTime(getStopTime() - getStartTime());
+        addToCumulativeTime(getElapsedTime());
+    }
+    
     /**
      * Stores and logs the stop time, and the elapsed and cumulative timings
      * from one or more cycles of start and stop.
@@ -120,12 +126,8 @@ public class Profiler {
      * Logs using a default message.
      */
     public void stop() {
-        // FIXME: Need to store values before constructing default stop message,
-        // hence has some redundant code with stop(msg) below.  Perhaps can be consolidated.
-        setStopTime(currentTime());
-        setElapsedTime(elapsedTime());
-        addToCumulativeTime(elapsedTime());
-        stop(defaultStopMessage());
+    	stopTimer();
+        log(defaultStopMessage());
     }
 
     /**
@@ -135,9 +137,7 @@ public class Profiler {
      * @param msg the message to log.
      */
     public void stop(String msg) {
-        setStopTime(currentTime());
-        setElapsedTime(elapsedTime());
-        addToCumulativeTime(elapsedTime());
+    	stopTimer();
         log(msg);
     }
 

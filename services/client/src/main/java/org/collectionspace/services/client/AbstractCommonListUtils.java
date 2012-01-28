@@ -1,4 +1,4 @@
-package org.collectionspace.services.common;
+package org.collectionspace.services.client;
 
 import java.util.List;
 

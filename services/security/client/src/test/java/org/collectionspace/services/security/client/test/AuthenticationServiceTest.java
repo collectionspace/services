@@ -23,15 +23,13 @@
 package org.collectionspace.services.security.client.test;
 
 import java.util.List;
-
 import javax.ws.rs.core.Response;
-
-//import org.apache.commons.codec.binary.Base64;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
@@ -42,15 +40,11 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * AuthenticationServiceTest uses CollectionObject service to test
@@ -59,15 +53,14 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 434 $ $LastChangedDate: 2009-07-28 14:34:15 -0700 (Tue,
  * 28 Jul 2009) $
  */
-public class AuthenticationServiceTest extends AbstractServiceTestImpl {
+public class AuthenticationServiceTest extends BaseServiceTest<AbstractCommonList> {
 
+    private final Logger logger = LoggerFactory.getLogger(AuthenticationServiceTest.class);
     /** The known resource id. */
-    private String knownResourceId = null;
     private String barneyAccountId = null; //active
     private String georgeAccountId = null; //inactive
     /** The logger. */
     private final String CLASS_NAME = AuthenticationServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTest#getServicePathComponent()
@@ -98,23 +91,13 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getAbstractCommonList(
+    protected AbstractCommonList getCommonList(
             ClientResponse<AbstractCommonList> response) {
         throw new UnsupportedOperationException(); //Since this test does not support lists, this method is not needed.
     }
 
     @Test(dataProvider = "testName")
-    @Override
-    public void readPaginatedList(String testName) throws Exception {
-        // Test not supported.
-    }
-
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createActiveAccount(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
@@ -134,9 +117,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": barney status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from this create operation
         // for additional tests below.
@@ -148,12 +131,8 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName")
     public void createInactiveAccount(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupCreate();
 
@@ -171,9 +150,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": george status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from this create operation
         // for additional tests below.
@@ -198,9 +177,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
         res1.releaseConnection();
     }
 
@@ -208,17 +187,14 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTest#create()
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createActiveAccount"})
-    @Override
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createActiveAccount"})
     public void create(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
+
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "barney", true, "barney08", true);
-        String identifier = BaseServiceTest.createIdentifier();
+        String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
@@ -237,18 +213,16 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createActiveAccount"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createActiveAccount"})
     public void createWithoutAuthn(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
+        
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
         String pass = collectionObjectClient.getProperty(collectionObjectClient.PASSWORD_PROPERTY);
         collectionObjectClient.setAuth(false, user, true, pass, true);
-        String identifier = BaseServiceTest.createIdentifier();
+        String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
@@ -262,14 +236,12 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     }
 
-    @Test(dataProvider = "testName", dependsOnMethods = {"createInactiveAccount"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createInactiveAccount"})
     public void createWithInactiveAccount(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
-        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "george", true, "george08", true);
-        String identifier = BaseServiceTest.createIdentifier();
+        String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
@@ -286,15 +258,13 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     /**
      * Creates the collection object instance without password.
      */
-    @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createActiveAccount"})
     public void createWithoutPassword(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
-        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
         collectionObjectClient.setAuth(true, user, true, "", false);
-        String identifier = BaseServiceTest.createIdentifier();
+        String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
@@ -308,14 +278,12 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     /**
      * Creates the collection object with unknown user
      */
-    @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createActiveAccount"})
     public void createWithUnknownUser(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
-        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "foo", true, "bar", true);
-        String identifier = BaseServiceTest.createIdentifier();
+        String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
@@ -329,15 +297,13 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     /**
      * Creates the collection object instance with incorrect password.
      */
-    @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createActiveAccount"})
     public void createWithIncorrectPassword(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
-        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
         collectionObjectClient.setAuth(true, user, true, "bar", true);
-        String identifier = BaseServiceTest.createIdentifier();
+        String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
@@ -353,12 +319,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
     public void createWithIncorrectUserPassword(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
-        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "foo", true, "bar", true);
-        String identifier = BaseServiceTest.createIdentifier();
+        String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
@@ -375,12 +338,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
     public void createWithoutTenant(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
-        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "babybop", true, "babybop09", true);
-        String identifier = BaseServiceTest.createIdentifier();
+        String identifier = createIdentifier();
         PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
@@ -392,24 +352,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         res.releaseConnection();
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#delete()
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    public void delete(String testName) {
-        setupDelete();
-
-    }
-
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create", "createWithInactiveAccount"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"create", "createWithInactiveAccount"})
     public void deleteAccounts(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupDelete();
         AccountClient accountClient = new AccountClient();
@@ -420,29 +365,19 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": barney status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
 
         res = accountClient.delete(georgeAccountId);
         statusCode = res.getStatus();
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": george status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         res.releaseConnection();
     }
     
-    // ---------------------------------------------------------------
-    // Search tests
-    // ---------------------------------------------------------------
-    
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void searchWorkflowDeleted(String testName) throws Exception {
-        // Fixme: null test for now, overriding test in base class
-    } 
-
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
@@ -517,107 +452,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#createList()
-     */
-    @Override
-    public void createList(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithEmptyEntityBody()
-     */
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithMalformedXml()
-     */
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithWrongXmlSchema()
-     */
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#read()
-     */
-    @Override
-    public void read(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#readNonExistent()
-     */
-    @Override
-    public void readNonExistent(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#readList()
-     */
-    @Override
-    public void readList(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#update()
-     */
-    @Override
-    public void update(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithEmptyEntityBody()
-     */
-    @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithMalformedXml()
-     */
-    @Override
-    public void updateWithMalformedXml(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithWrongXmlSchema()
-     */
-    @Override
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#updateNonExistent()
-     */
-    @Override
-    public void updateNonExistent(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTest#deleteNonExistent()
-     */
-    @Override
-    public void deleteNonExistent(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
+	@Override
+	protected Class<AbstractCommonList> getCommonListType() {
+		// TODO Auto-generated method stub
+		return null;
+	}	
 }

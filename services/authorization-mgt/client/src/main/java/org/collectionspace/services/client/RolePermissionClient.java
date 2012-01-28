@@ -27,14 +27,8 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-
-
-import org.collectionspace.services.authorization.PermissionRole;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.collectionspace.services.authorization.PermissionRole;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -42,7 +36,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class RolePermissionClient extends AbstractServiceClientImpl<PermissionRole, RolePermissionProxy> {
+public class RolePermissionClient extends AbstractServiceClientImpl<PermissionRole, PermissionRole, PermissionRole, RolePermissionProxy> {
     @Override
     public String getServiceName() { 
     	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498
@@ -109,4 +103,20 @@ public class RolePermissionClient extends AbstractServiceClientImpl<PermissionRo
     public ClientResponse<Response> delete(String csid, PermissionRole permRole) {
         return getProxy().delete(csid, "delete", permRole);
     }
+
+	@Override
+	public ClientResponse<Response> create(PermissionRole payload) {
+		throw new UnsupportedOperationException(); //method not supported nor needed
+	}
+
+	@Override
+	public ClientResponse<PermissionRole> update(String csid,
+			PermissionRole payload) {
+		throw new UnsupportedOperationException(); //method not supported nor needed
+	}
+
+	@Override
+	public ClientResponse<PermissionRole> readList() {
+		throw new UnsupportedOperationException(); //method not supported nor needed
+	}
 }

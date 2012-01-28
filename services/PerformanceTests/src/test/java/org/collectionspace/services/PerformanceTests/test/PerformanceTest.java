@@ -38,11 +38,11 @@ import org.slf4j.LoggerFactory;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.util.HttpResponseCodes;
 
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**

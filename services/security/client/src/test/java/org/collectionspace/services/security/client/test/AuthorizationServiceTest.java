@@ -32,14 +32,16 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.jboss.resteasy.client.ClientResponse;
+
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
-
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -63,22 +65,18 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
-import org.collectionspace.services.client.test.AbstractServiceTestImpl;
+import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 
 /**
  * AuthorizationServiceTest, carries out tests against a
@@ -91,14 +89,11 @@ import org.testng.annotations.BeforeClass;
  * $LastChangedRevision: 917 $
  * $LastChangedDate: 2009-11-06 12:20:28 -0800 (Fri, 06 Nov 2009) $
  */
-public class AuthorizationServiceTest extends AbstractServiceTestImpl {
+public class AuthorizationServiceTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = AuthorizationServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     // Instance variables specific to this test.
-    private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList();
-    //key for accValues is userId
     private Hashtable<String, AccountValue> accValues = new Hashtable<String, AccountValue>();
     //key for permValues is id as there could be several perms for the same resource
     private Hashtable<String, PermissionValue> permValues = new Hashtable<String, PermissionValue>();
@@ -238,35 +233,17 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
+    	// This method is meaningless to this test.
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-    protected AbstractCommonList getAbstractCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-        throw new UnsupportedOperationException();
-    }
-
-    @Test(dataProvider = "testName")
-    @Override
-    public void readPaginatedList(String testName) throws Exception {
-        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-    }
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
 
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName")
     public void create(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -287,8 +264,8 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.CREATED.getStatusCode());
         knownResourceId = extractId(res);
         if (logger.isDebugEnabled()) {
@@ -304,8 +281,8 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " (verify not allowed): status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
         
         //Finally, verify that elmo has no access to Intakes
@@ -320,8 +297,8 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " (verify create intake not allowed): status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
         
     }
@@ -354,14 +331,10 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
-
     
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    @Test(dataProvider = "testName",
     	    dependsOnMethods = {"delete"})
     public void verifyCreateWithFlippedRoles(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -386,8 +359,8 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.CREATED.getStatusCode());
         knownResourceId = extractId(res);
         if (logger.isDebugEnabled()) {
@@ -402,46 +375,19 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " (verify not allowed): status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
         restoreInitialAccountRoles();
-    }
-
-    //to not cause uniqueness violation for permRole, createList is removed
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    public void createList(String testName) throws Exception {
-    }
-
-    // Failure outcomes
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-    }
-
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupRead();
 
@@ -450,186 +396,120 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         //elmo allowed to read
         client.setAuth(true, "elmo2010", true, "elmo2010", true);
         ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        DimensionsCommon dimension = (DimensionsCommon) extractPart(input,
-                client.getCommonPartName(), DimensionsCommon.class);
-        Assert.assertNotNull(dimension);
+        try {
+        	assertStatusCode(res, testName);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        DimensionsCommon dimension = (DimensionsCommon) extractPart(input,
+	                client.getCommonPartName(), DimensionsCommon.class);
+	        Assert.assertNotNull(dimension);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    @Test(dataProvider = "testName",
     	    dependsOnMethods = {"read"})
     public void readLockedOut(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
-        setupRead();
+    	setupForbidden();
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
         //lockedOut allowed to read
         client.setAuth(true, "lockedOut", true, "lockedOut", true);
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + " (test lockedOut): status = " + statusCode);
+        try {
+        	assertStatusCode(res, testName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
     }
 
-    // Failure outcomes
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void readNonExistent(String testName) throws Exception {
-
-        // Perform setup.
-        setupReadNonExistent();
-    }
-
-    // ---------------------------------------------------------------
-    // CRUD tests : READ_LIST tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
-    public void readList(String testName) throws Exception {
-        setupReadList();
-    }
-
-    // Failure outcomes
-    // None at present.
-    // ---------------------------------------------------------------
-    // CRUD tests : UPDATE tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read", "readList", "readNonExistent"})
-    public void update(String testName) throws Exception {
-        setupUpdate();
-
-    }
-
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read", "readList", "readNonExistent"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"read"})
     public void updateNotAllowed(String testName) throws Exception {
+        setupForbidden();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        setupUpdate();
-
+        // Create a new client and change its AuthN credentials
         DimensionClient client = new DimensionClient();
-
         //elmo not allowed to update
         client.setAuth(true, "elmo2010", true, "elmo2010", true);
-
+        //
+        // Create a new dimension object
+        //
         DimensionsCommon dimension = new DimensionsCommon();
         dimension.setDimension("dimensionType");
         // Update the content of this resource.
         dimension.setMeasurementUnit("updated-" + dimension.getMeasurementUnit());
         dimension.setValueDate("updated-" + dimension.getValueDate());
-        // Submit the request to the service and store the response.
+        //
+        // Create and submit the request to the service and store the response.
+        //
         PoxPayloadOut output = new PoxPayloadOut(DimensionClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
-
+        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), dimension);
         ClientResponse<String> res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+        	assertStatusCode(res, testName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
-        
+        //
+        // Create another new client with new credentials
+        //
         client = new DimensionClient();
-
         //lockedOut not allowed to update
         client.setAuth(true, "lockedOut", true, "lockedOut", true);
+        //
+        // Try the update again.
+        //
         res = client.update(knownResourceId, output);
-        statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": (lockedOut) status = " + statusCode);
+        try {
+        	assertStatusCode(res, testName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
         
-    }
-
-    // Failure outcomes
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithMalformedXml(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"readNonExistent", "testSubmitRequest"})
-    public void updateNonExistent(String testName) throws Exception {
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"updateNotAllowed"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"updateNotAllowed"})
     public void deleteNotAllowed(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
-        setupDelete();
-
-        // Submit the request to the service and store the response.
+        setupForbidden();
+        //
+        // Create a new client and change the AuthN credentials
+        //
         DimensionClient client = new DimensionClient();
         //bigbird can not delete
         client.setAuth(true, "bigbird2010", true, "bigbird2010", true);
+        //
+        // Try to make a DELETE request
+        //
         ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+        	assertStatusCode(res, testName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
-
     }
 
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"deleteNotAllowed"})
+    @Test(dataProvider = "testName",
+    	dependsOnMethods = {"deleteNotAllowed"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupDelete();
 
@@ -637,46 +517,13 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         DimensionClient client = new DimensionClient();
 
         ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+        	assertStatusCode(res, testName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-    }
-
-    // Failure outcomes
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void deleteNonExistent(String testName) throws Exception {
-        //ignoring this test as the service side returns 200 now even if it does
-        //not find a record in the db
-    }
-    
-    // ---------------------------------------------------------------
-    // Search tests
-    // ---------------------------------------------------------------
-    
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void searchWorkflowDeleted(String testName) throws Exception {
-        // Fixme: null test for now, overriding test in base class
-    } 
-
-    // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-    /**
-     * Tests the code for manually submitting data that is used by several
-     * of the methods above.
-     */
-    @Test(dependsOnMethods = {"create"})
-    public void testSubmitRequest() throws Exception {
     }
 
     // ---------------------------------------------------------------
@@ -706,7 +553,6 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private void deletePermissionRoles() {
-
         List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
         bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
         deletePermissionRole(permValues.get(bigbirdPermId), bigbirdRoleValues);
@@ -714,7 +560,6 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
         elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
         deletePermissionRole(permValues.get(elmoPermId), elmoRoleValues);
-
     }
 
     private void deleteAccountRoles() {
@@ -765,8 +610,6 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         }
     }
 
-
-
     private void deletePermissions() {
         //delete entities
         for (PermissionValue pv : permValues.values()) {
@@ -794,127 +637,126 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
     private String createPermission(String resName,
             List<PermissionAction> actions, EffectType effect) {
+    	String result = null;
+    	
         setupCreate();
         PermissionClient permClient = new PermissionClient();
         Permission permission = PermissionFactory.createPermissionInstance(resName,
-                "default permissions for " + resName,
-                actions, effect, true, true, true);
+                "default permissions for " + resName, actions, effect, true, true, true);
         ClientResponse<Response> res = permClient.create(permission);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug("createPermission: resName=" + resName
-                    + " status = " + statusCode);
+        try {
+        	assertStatusCode(res, "CreatePermission");
+        	result = extractId(res);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
-        return extractId(res);
+
+        return result;
     }
 
     private void deletePermission(String permId) {
         setupDelete();
         PermissionClient permClient = new PermissionClient();
         ClientResponse<Response> res = permClient.delete(permId);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug("deletePermission: delete permission id="
-                    + permId + " status=" + statusCode);
+        try {
+        	assertStatusCode(res, "DeletePermission");
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
     }
 
     private String createRole(String roleName) {
+    	String result = null;
+    	
         setupCreate();
         RoleClient roleClient = new RoleClient();
-
         Role role = RoleFactory.createRoleInstance(roleName,
         		roleName, //the display name
                 "role for " + roleName, true);
         ClientResponse<Response> res = roleClient.create(role);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug("createRole: name=" + roleName
-                    + " status = " + statusCode);
+        try {
+        	assertStatusCode(res, "CreateRole");
+        	result = extractId(res);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
-        return extractId(res);
+        
+        return result;
     }
 
     private void deleteRole(String roleId) {
         setupDelete();
         RoleClient roleClient = new RoleClient();
         ClientResponse<Response> res = roleClient.delete(roleId);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleteRole: delete role id=" + roleId
-                    + " status=" + statusCode);
+        try {
+        	assertStatusCode(res, "DeleteRole");
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
     }
 
     private String createAccount(String userName, String email) {
+    	String result = null;
+    	
         setupCreate();
         AccountClient accountClient = new AccountClient();
         AccountsCommon account = AccountFactory.createAccountInstance(
                 userName, userName, userName, email, accountClient.getTenantId(),
                 true, false, true, true);
         ClientResponse<Response> res = accountClient.create(account);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug("createAccount: userName=" + userName
-                    + " status = " + statusCode);
+        try {
+        	assertStatusCode(res, "CreateAccount");
+        	result = extractId(res);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
-        return extractId(res);
+        
+        return result;
     }
 
     private void deleteAccount(String accId) {
         setupDelete();
         AccountClient accClient = new AccountClient();
         ClientResponse<Response> res = accClient.delete(accId);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleteAccount: delete account id="
-                    + accId + " status=" + statusCode);
+        try {
+        	assertStatusCode(res, "DeleteAccount");
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
     }
 
     private String createAccountRole(AccountValue av,
             Collection<RoleValue> rvs) {
+    	String result = null;
+    	
         setupCreate();
-
         // Submit the request to the service and store the response.
         AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
                 av, rvs, true, true);
         AccountRoleClient client = new AccountRoleClient();
         ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
-        int statusCode = res.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("createAccountRole: status = " + statusCode);
+        try {
+        	assertStatusCode(res, "CreateAccountRole");
+        	result = extractId(res);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
-        return extractId(res);
+        
+        return result;
     }
 
     private void deleteAccountRole(AccountValue av,
@@ -926,23 +768,19 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         AccountRoleClient client = new AccountRoleClient();
         AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
                 av, rvs, true, true);
-        ClientResponse<Response> res = client.delete(
-                av.getAccountId());
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleteAccountRole: status = " + statusCode);
+        ClientResponse<Response> res = client.delete(av.getAccountId());
+        try {
+        	assertStatusCode(res, "DeleteAccountRole");
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
     }
 
-    private String createPermissionRole(PermissionValue pv,
-            Collection<RoleValue> rvs) {
+    private String createPermissionRole(PermissionValue pv, Collection<RoleValue> rvs) {
+    	String result = null;
+    	
         setupCreate();
         List<RoleValue> rvls = new ArrayList<RoleValue>();
         rvls.addAll(rvs);
@@ -950,16 +788,16 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
                 pv, rvls, true, true);
         PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<Response> res = client.create(pv.getPermissionId(), permRole);
-        int statusCode = res.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("createPermissionRole: status = " + statusCode);
+        try {
+        	assertStatusCode(res, "CreatePermissionRole");
+        	result = extractId(res);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
-        return extractId(res);
+        
+        return result;
     }
 
     private void deletePermissionRole(PermissionValue pv,
@@ -975,16 +813,17 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
                 pv, rvls, true, true);
         ClientResponse<Response> res = client.delete(pv.getPermissionId());
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("deletePermissionRole : status = " + statusCode);
+        try {
+        	assertStatusCode(res, "DeletePermissionRole");
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
     }
+
+	@Override
+	protected Class<AbstractCommonList> getCommonListType() {
+		throw new UnsupportedOperationException();
+	}
 }

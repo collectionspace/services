@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class MovementAuthRefsTest extends BaseServiceTest {
+public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = MovementAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -69,7 +69,6 @@ public class MovementAuthRefsTest extends BaseServiceTest {
 
     // Instance variables specific to this test.
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
-    private String knownResourceId = null;
     private List<String> movementIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
@@ -92,7 +91,7 @@ public class MovementAuthRefsTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
+	protected AbstractCommonList getCommonList(
 			ClientResponse<AbstractCommonList> response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
@@ -101,12 +100,8 @@ public class MovementAuthRefsTest extends BaseServiceTest {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider="testName")
     public void createWithAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
@@ -136,9 +131,9 @@ public class MovementAuthRefsTest extends BaseServiceTest {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
@@ -164,8 +159,8 @@ public class MovementAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+            invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
 
@@ -190,8 +185,8 @@ public class MovementAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
@@ -200,39 +195,45 @@ public class MovementAuthRefsTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         MovementClient movementClient = new MovementClient();
         ClientResponse<String> res = movementClient.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        // Extract and return the common part of the record.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        PayloadInputPart payloadInputPart = input.getPart(movementClient.getCommonPartName());
         MovementsCommon movementCommon = null;
-        if (payloadInputPart != null) {
-        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
-        }
-        Assert.assertNotNull(movementCommon);
-        if(logger.isDebugEnabled()){
-            logger.debug(objectAsXmlString(movementCommon, MovementsCommon.class));
+        try {
+	        assertStatusCode(res, testName);
+	        // Extract and return the common part of the record.
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PayloadInputPart payloadInputPart = input.getPart(movementClient.getCommonPartName());
+	        if (payloadInputPart != null) {
+	        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
+	        }
+	        Assert.assertNotNull(movementCommon);
+	        if(logger.isDebugEnabled()){
+	            logger.debug(objectAsXmlString(movementCommon, MovementsCommon.class));
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
         // Check a couple of fields
         // FIXME
         Assert.assertEquals(movementCommon.getMovementContact(), movementContactRefName);
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 =
-           movementClient.getAuthorityRefs(knownResourceId);
-        assertStatusCode(res2, testName);
-
-        AuthorityRefList list = res2.getEntity();
+        ClientResponse<AuthorityRefList> res2 = movementClient.getAuthorityRefs(knownResourceId);
+        AuthorityRefList list = null;
+        try {
+            assertStatusCode(res2, testName);
+        	list = res2.getEntity();
+        } finally {
+        	if (res2 != null) {
+        		res2.releaseConnection();
+            }
+        }
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();

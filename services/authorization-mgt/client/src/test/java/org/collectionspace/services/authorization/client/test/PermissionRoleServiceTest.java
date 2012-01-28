@@ -28,7 +28,6 @@ import java.util.Hashtable;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
@@ -65,16 +64,14 @@ import org.testng.annotations.BeforeClass;
  * $LastChangedRevision: 917 $
  * $LastChangedDate: 2009-11-06 12:20:28 -0800 (Fri, 06 Nov 2009) $
  */
-public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
+public class PermissionRoleServiceTest extends AbstractServiceTestImpl<PermissionRole, PermissionRole,
+		PermissionRole, PermissionRole> {
 
     /** The Constant logger. */
     private final static String CLASS_NAME = PermissionRoleServiceTest.class.getName();
     private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+
     // Instance variables specific to this test.
-    /** The known resource id. */
-    private String knownResourceId = null;
-    /** The all resource ids created. */
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
     final private static String TEST_MARKER = "_PermissionRoleServiceTest";
     final private static String TEST_SERVICE_NAME = "fakeservice";
     final private static String NO_REL_SUFFIX = "-no-rel";
@@ -152,8 +149,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getAbstractCommonList(
-            ClientResponse<AbstractCommonList> response) {
+    protected PermissionRole getCommonList(
+            ClientResponse<PermissionRole> response) {
         //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
         throw new UnsupportedOperationException();
     }
@@ -161,7 +158,6 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
      */
-    @Test(dataProvider = "testName")
     @Override
     public void readPaginatedList(String testName) throws Exception {
         //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
@@ -175,13 +171,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      */
 
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
@@ -200,14 +191,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": status = " + statusCode);
             }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-            res.releaseConnection();
-            // Store the ID returned from this create operation
-            // for additional tests below.
-            //this is is not important in case of this relationship
-            knownResourceId = extractId(res);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+            
+            knownResourceId = extractId(res); //This is meaningless in this test, see getKnowResourceId() method for details
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -223,8 +211,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
         //Should this really be empty?
     }
@@ -264,13 +252,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupRead();
 
@@ -280,7 +264,17 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         try {
             res = client.read(
                     permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId());
-            assertStatusCode(res, testName);
+            int statusCode = res.getStatus();
+
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+
             PermissionRole output = (PermissionRole) res.getEntity();
             Assert.assertNotNull(output);
         } finally {
@@ -298,10 +292,6 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void readNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupReadNonExistent();
 
@@ -317,9 +307,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": status = " + statusCode);
             }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
                 res.releaseConnection();
@@ -327,13 +317,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         }
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"CRUDTests"})
     public void readNoRelationship(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupRead();
 
@@ -343,8 +329,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         try {
             res = client.read(
                     permValues.get(TEST_SERVICE_NAME + TEST_MARKER + NO_REL_SUFFIX).getPermissionId());
+            // Check the status code of the response: does it match
+            // the expected response(s)?
             assertStatusCode(res, testName);
-            
             PermissionRole output = (PermissionRole) res.getEntity();
 
             String sOutput = objectAsXmlString(output, PermissionRole.class);
@@ -367,8 +354,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      */
 
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
         //Should this really be empty?
     }
@@ -383,8 +370,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read", "readList", "readNonExistent"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
         //Should this really be empty?
     }
@@ -420,8 +407,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"readNonExistent", "testSubmitRequest"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"readNonExistent", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
         //Should this really be empty?
     }
@@ -434,13 +421,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"read"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupDelete();
 
@@ -461,9 +444,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         		toDelete.getPermission().get(0).getPermissionId(), toDelete);
         try {
             int statusCode = res.getStatus();
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             if (res != null) {
                 res.releaseConnection();
@@ -491,9 +474,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         res = client.delete(toDelete.getPermission().get(0).getPermissionId());
         try {
             int statusCode = res.getStatus();
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             res.releaseConnection();
         }
@@ -521,36 +504,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         // Fixme: null test for now, overriding test in base class
     }
 
-    // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-    /**
-     * Tests the code for manually submitting data that is used by several
-     * of the methods above.
-     * @throws Exception 
-     */
-    @Test(dependsOnMethods = {"create"})
-    public void testSubmitRequest() throws Exception { //FIXME: REM - This is testing /permissions not /permissions/permroles
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId());
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url
-                    + " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
-
+    @Override
+    protected String getKnowResourceId() {
+    	return permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId();
     }
-
+    
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
@@ -613,7 +571,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      */
     private String createPermission(String resName, EffectType effect) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner("createPermission"));
+            logger.debug(getTestBanner("createPermission"));
         }
         setupCreate();
         PermissionClient permClient = new PermissionClient();
@@ -631,9 +589,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
                 logger.debug("createPermission: resName=" + resName
                         + " status = " + statusCode);
             }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
             id = extractId(res);
         } finally {
             if (res != null) {
@@ -650,7 +608,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      */
     private void deletePermission(String permId) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner("deletePermission"));
+            logger.debug(getTestBanner("deletePermission"));
         }
         setupDelete();
         PermissionClient permClient = new PermissionClient();
@@ -662,9 +620,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
                 logger.debug("deletePermission: delete permission id="
                         + permId + " status=" + statusCode);
             }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             res.releaseConnection();
         }
@@ -679,7 +637,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      */
     private String createRole(String roleName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner("createRole"));
+            logger.debug(getTestBanner("createRole"));
         }
         setupCreate();
         RoleClient roleClient = new RoleClient();
@@ -696,9 +654,9 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
                 logger.debug("createRole: name=" + roleName
                         + " status = " + statusCode);
             }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
 
             id = extractId(res);
         } finally {
@@ -714,7 +672,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      */
     private void deleteRole(String roleId) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner("deleteRole"));
+            logger.debug(getTestBanner("deleteRole"));
         }
         setupDelete();
         RoleClient roleClient = new RoleClient();
@@ -726,12 +684,48 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
                 logger.debug("deleteRole: delete role id=" + roleId
                         + " status=" + statusCode);
             }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             res.releaseConnection();
         }
     }
-    
+
+	@Override
+	protected PermissionRole createInstance(String commonPartName,
+			String identifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected PermissionRole updateInstance(PermissionRole commonPartObject) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(PermissionRole original,
+			PermissionRole updated) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected Class<PermissionRole> getCommonListType() {
+		return PermissionRole.class;
+	}
+
+    /*
+     * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+     * refer to this method in their @Test annotation declarations.
+     */
+    @Override
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+    public void CRUDTests(String testName) {
+    	// Do nothing.  Simply here to for a TestNG execution order for our tests
+    }	
 }

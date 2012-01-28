@@ -26,8 +26,7 @@
     <!--
     Avoid XmlRootElement nightmare:
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
--->
-
+	-->
 
     <xs:include schemaLocation="permissions.xsd"/>
    
@@ -46,87 +45,6 @@
 	        </xs:sequence>
 	    </xs:complexType>
 	</xs:element>
-
-    <xs:element name="foo_permissions_list">
-	    <xs:complexType>
-	        <xs:annotation>
-	            <xs:appinfo>
-	                <hj:ignored/>
-	            </xs:appinfo>
-	        </xs:annotation>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-		            <xs:sequence>
-		                <xs:element name="permissions-list-item" maxOccurs="unbounded">
-		                    <xs:complexType>
-		                        <xs:annotation>
-		                            <xs:appinfo>
-		                                <hj:ignored/>
-		                            </xs:appinfo>
-		                        </xs:annotation>
-		                        <xs:sequence>
-		                            <xs:element name="screenName" type="xs:string" minOccurs="1"/>
-		                            <xs:element name="personRefName" type="xs:string" minOccurs="1" />
-		                            <xs:element name="email" type="xs:string" minOccurs="1" />
-		                            <!-- uri to retrive collection object details -->
-		                            <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
-		                            <xs:element name="csid" type="xs:string" minOccurs="1" />
-		                        </xs:sequence>
-		                    </xs:complexType>
-		                </xs:element>
-		            </xs:sequence>
-                </xs:extension>
-            </xs:complexContent>        
-	    </xs:complexType>
-	</xs:element>
-	
-    <!-- This is the base class for paginated lists -->
-    <xs:complexType name="abstractCommonList">
-        <xs:annotation>
-            <xs:appinfo>
-                <jaxb:class ref="org.collectionspace.services.hyperjaxb.AbstractCommonList"/>
-            </xs:appinfo>
-        </xs:annotation>
-    </xs:complexType>
-	
-    <xs:element name="foo-common-list">
-        <xs:complexType>
-            <xs:annotation>
-                <xs:documentation>
-                    AccountsCommonList contains information about one or more
-                    accounts. An instance of this type could be returned on
-                    index and search operations.
-                </xs:documentation>
-                <xs:appinfo>
-                    <hj:ignored/>
-                </xs:appinfo>
-            </xs:annotation>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-		            <xs:sequence>
-		                <xs:element name="foo-list-item" maxOccurs="unbounded">
-		                    <xs:complexType>
-		                        <xs:annotation>
-		                            <xs:appinfo>
-		                                <hj:ignored/>
-		                            </xs:appinfo>
-		                        </xs:annotation>
-		                        <xs:sequence>
-		                            <xs:element name="screenName" type="xs:string" minOccurs="1"/>
-		                            <xs:element name="personRefName" type="xs:string" minOccurs="1" />
-		                            <xs:element name="email" type="xs:string" minOccurs="1" />
-		                            <!-- uri to retrive collection object details -->
-		                            <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
-		                            <xs:element name="csid" type="xs:string" minOccurs="1" />
-		                        </xs:sequence>
-		                    </xs:complexType>
-		                </xs:element>
-		            </xs:sequence>
-                </xs:extension>
-            </xs:complexContent>        
-        </xs:complexType>
-    </xs:element>
-	
 
 </xs:schema>
 

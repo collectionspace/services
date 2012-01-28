@@ -1,5 +1,7 @@
 package org.collectionspace.services.client;
 
-public interface TestServiceProxy extends CollectionSpaceProxy<Object> {
+import org.collectionspace.services.jaxb.AbstractCommonList;
+
+public interface TestServiceProxy extends CollectionSpaceProxy<AbstractCommonList> {
 
 }

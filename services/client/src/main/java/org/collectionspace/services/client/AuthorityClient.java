@@ -1,18 +1,18 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
+import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 
 /*
  * LT - List type
  * ILT - Authority item list type
  * P - Proxy type
  */
-public interface AuthorityClient<P extends AuthorityProxy> 
+public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy> 
 	extends CollectionSpacePoxClient<AbstractCommonList, P> {
 
     /** The uri path element for items in an authority */
@@ -23,6 +23,12 @@ public interface AuthorityClient<P extends AuthorityProxy>
 	 */
 	
     String getItemCommonPartName();
+    
+    // Get the inAuthorityCsid (the item's parent)
+    String getInAuthority(AUTHORITY_ITEM_TYPE item);
+	
+    // Get the inAuthorityCsid (the item's parent)
+    void setInAuthority(AUTHORITY_ITEM_TYPE item, String inAuthorityCsid);
 	
     //(C)reate Item
     ClientResponse<Response> createItem(String vcsid, PoxPayloadOut poxPayloadOut);

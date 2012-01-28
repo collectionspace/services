@@ -10,9 +10,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
  * ILT - Authority item list type
  * P - Proxy type
  */
-public abstract class AuthorityWithContactsClientImpl<P extends AuthorityWithContactsProxy>
-	extends AuthorityClientImpl<P>
-	implements AuthorityWithContactsClient<P> {
+public abstract class AuthorityWithContactsClientImpl<AUTHORITY_ITEM_TYPE, P extends AuthorityWithContactsProxy>
+	extends AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P>
+	implements AuthorityWithContactsClient<AUTHORITY_ITEM_TYPE, P> {
 	
 	@Override
     public ClientResponse<Response> createContact(String parentcsid,

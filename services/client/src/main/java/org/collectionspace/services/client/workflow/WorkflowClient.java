@@ -16,8 +16,11 @@
  */
 package org.collectionspace.services.client.workflow;
 
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.client.AbstractPoxServiceClientImpl;
+import org.collectionspace.services.client.AbstractCommonListPoxServiceClientImpl;
+import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * WorkflowClient.java
@@ -26,7 +29,7 @@ import org.collectionspace.services.client.AbstractPoxServiceClientImpl;
  * $LastChangedDate: 2010-05-17 18:25:37 -0700 (Mon, 17 May 2010) $
  *
  */
-public class WorkflowClient extends AbstractPoxServiceClientImpl<AbstractCommonList, WorkflowProxy> {
+public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<WorkflowProxy> {
 	public static final String SERVICE_NAME = "workflow";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -53,11 +56,29 @@ public class WorkflowClient extends AbstractPoxServiceClientImpl<AbstractCommonL
 	@Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
-    }    
+    }
 
 	@Override
 	public Class<WorkflowProxy> getProxyClass() {
 		// TODO Auto-generated method stub
 		return WorkflowProxy.class;
 	}
+
+	/*
+	 * Proxied service calls
+	 */
+	
+	@Override
+	public ClientResponse<AbstractCommonList> readList() {
+        throw new UnsupportedOperationException();
+	}
+	
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#delete(java.lang.String)
+     */
+    @Override
+	public ClientResponse<Response> delete(String csid) {
+        throw new UnsupportedOperationException();
+    }
+	
 }

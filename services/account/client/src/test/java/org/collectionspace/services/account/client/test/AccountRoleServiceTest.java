@@ -22,17 +22,13 @@
  */
 package org.collectionspace.services.account.client.test;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
-import javax.ws.rs.core.Response;
 
-//import org.collectionspace.services.authorization.AccountRolesList;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountListItem;
-
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.Role;
@@ -46,17 +42,17 @@ import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 
+import javax.ws.rs.core.Response;
+import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 
 /**
  * AccountServiceTest, carries out tests against a
@@ -65,18 +61,15 @@ import org.testng.annotations.BeforeClass;
  * $LastChangedRevision: 917 $
  * $LastChangedDate: 2009-11-06 12:20:28 -0800 (Fri, 06 Nov 2009) $
  */
-public class AccountRoleServiceTest extends AbstractServiceTestImpl {
+public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole, AccountRole, AccountRole, AccountRole> {
 
     /** The Constant logger. */
     private final static String CLASS_NAME = AccountRoleServiceTest.class.getName();
     private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     // Instance variables specific to this test.
-    /** The known resource id. */
-    private String knownResourceId = null;
     private String prebuiltAdminCSID = null;
     private String prebuiltAdminUserId = "admin@core.collectionspace.org";
     /** The all resource ids created. */
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
     /** The acc values. */
     private Hashtable<String, AccountValue> accValues = new Hashtable<String, AccountValue>();
     /** The role values. */
@@ -137,183 +130,58 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         return new AccountRoleClient();
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-    protected AbstractCommonList getAbstractCommonList(
-            ClientResponse<AbstractCommonList> response) {
-        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-        throw new UnsupportedOperationException();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
-     */
-    @Test(dataProvider = "testName")
-    @Override
-    public void readPaginatedList(String testName) throws Exception {
-        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-    }
-
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            testBanner(testName, CLASS_NAME);
-        }
-        // Perform setup, such as initializing the type of service request
-        // (e.g. CREATE, DELETE), its valid and expected status codes, and
-        // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate();
-
-        // Submit the request to the service and store the response.
+    
+    public void createList(String testName) throws Exception {
+    	// Do nothing.  We do not support list creation in this test yet.
+    }
+    
+	@Override
+	protected AccountRole createInstance(String commonPartName,
+			String identifier) {
+		AccountRole result = null;
+		
+        // Use a known Account to associate the AccountRole instance to
+        AccountValue av = accValues.get("acc-role-user1");
+        AccountRole accRole = createAccountRoleInstance(av,
+                roleValues.values(), true, true);
+        
+        result = accRole;
+        return result;
+	}
+	
+	@Override
+	public void create(String testName) throws Exception {
+		setupCreate();
         AccountValue av = accValues.get("acc-role-user1");
         AccountRole accRole = createAccountRoleInstance(av,
                 roleValues.values(), true, true);
         AccountRoleClient client = new AccountRoleClient();
         ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
         try {
-            int statusCode = res.getStatus();
-
+        	assertStatusCode(res, testName);
+            knownResourceId = av.getAccountId();
             if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-            // Store the ID returned from this create operation
-            // for additional tests below.
-            //this is is not important in case of this relationship
-            knownResourceId = extractId(res);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownResourceId=" + knownResourceId);
+                logger.debug(testName + ": Created an AccountRole instance for account with knownResourceId="
+                		+ knownResourceId);
             }
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
-    }
-
-    //to not cause uniqueness violation for accRole, createList is removed
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    @Override
-    public void createList(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    // Failure outcomes
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
-     */
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
+	}
 
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    public void read(String testName) throws Exception {
 
-        if (logger.isDebugEnabled()) {
-            testBanner(testName, CLASS_NAME);
-        }
-
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        AccountRoleClient client = new AccountRoleClient();
-        ClientResponse<AccountRole> res = client.read(
-                accValues.get("acc-role-user1").getAccountId());
-        assertStatusCode(res, testName);
-        try {
-            AccountRole output = res.getEntity();
-            Assert.assertNotNull(output);
-        } finally {
-            res.releaseConnection();
-        }
-    }
-
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void readNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            testBanner(testName, CLASS_NAME);
-        }
-
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        AccountRoleClient client = new AccountRoleClient();
-        ClientResponse<AccountRole> res = client.read(this.NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-        try {
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
-            res.releaseConnection();
-        }
-    }
-
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"CRUDTests"})
     public void readNoRelationship(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            testBanner(testName, CLASS_NAME);
-        }
-
         // Perform setup.
         setupRead();
 
@@ -321,17 +189,20 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         AccountRoleClient client = new AccountRoleClient();
         ClientResponse<AccountRole> res = client.read(
                 accValues.get("acc-role-user2").getAccountId());
-        assertStatusCode(res, testName);
         try {
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            assertStatusCode(res, testName);
             AccountRole output = res.getEntity();
-
             if(logger.isDebugEnabled()) {
             	org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();
             	String sOutput = objectAsXmlString(objectFactory.createAccountRole(output), AccountRole.class);
                 logger.debug(testName + " received " + sOutput);
             }
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
     }
     
@@ -340,56 +211,56 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * After we've performed this setup, our call to "/role/{csid}/accountroles" should contain an AccountRole that has
      * a list of 1 account -the test user account we associated during setup.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    	    dependsOnMethods = {"delete"})
+    @Test(dataProvider = "testName",
+    	    dependsOnMethods = {"CRUDTests"})
     public void readRoleAccounts(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            testBanner(testName, CLASS_NAME);
-        }
-
 		/*
 		 * Setup a temp local scope for local variables that we need to create the AccountRole for
 		 * the setup of the read tests.
 		 */
         {
-	        setupCreate();
-
 	        // Associate "acc-role-user2" with all the roles.
 	        AccountValue av = accValues.get("acc-role-user2");
 	        AccountRole accRole = createAccountRoleInstance(av,
 	                roleValues.values(), true, true);
 	        AccountRoleClient client = new AccountRoleClient();
+	        setupCreate();	        
 	        ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
-	        int statusCode = res.getStatus();
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        try {
+	        	assertStatusCode(res, testName);
+	        } finally {
+	        	if (res != null) {
+	        		res.releaseConnection();
+	        	}
+	        }
         }
 
         //
         // Now read the list of accounts associated with the role "ROLE_CO1".
         // There should be just the "acc-role-user2" account.
         //
-        setupRead();        
         RoleClient roleClient = new RoleClient();
         
         // Submit the request to the service and store the response.
+        setupRead();        
         ClientResponse<AccountRole> res = roleClient.readRoleAccounts(
         		roleValues.get("ROLE_CO1").getRoleId());
-        assertStatusCode(res, testName);
         try {
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            assertStatusCode(res, testName);
             AccountRole output = res.getEntity();
             
             // Now verify that the role has 2 accounts associate to it.
             Assert.assertEquals(output.getAccount().size(), 1);
-
             String sOutput = objectAsXmlString(output, AccountRole.class);
             if(logger.isDebugEnabled()) {
                 logger.debug(testName + " received " + sOutput);
             }
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
     }    
 
@@ -397,15 +268,20 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
-     */
+
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //
+    	// There is no such thing as a list of AccountRole resources
+    	//
     }
+    
+    @Override
+    public void readPaginatedList(String testName) throws Exception {
+        //
+    	// There is no such thing as a list of AccountRole resources
+    	//
+    }    
 
     // Failure outcomes
     // None at present.
@@ -413,169 +289,124 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
-     */
+
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //
+    	// AccountRole entities cannot be updated.  You must delete and recreate them
+    	//
     }
 
-    // Failure outcomes
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
-     */
     @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void updateWithMalformedXml(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"readNonExistent", "testSubmitRequest"})
+    @Test(dataProvider = "testName",
+    	dependsOnMethods = {"CRUDTests"})
     public void updateNonExistent(String testName) throws Exception {
-        //FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //
+    	// AccountRole entities cannot be updated.  You must delete and recreate them
+    	//
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
-     */
+    
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            testBanner(testName, CLASS_NAME);
-        }
-
-        // Perform setup.
-        setupDelete();
-        
         //
-        // Lookup a know account, and delete all of its role relationships
+        // First, lookup the known account and delete all of its role relationships
         //
         AccountRoleClient client = new AccountRoleClient();
+        setupRead();        
         ClientResponse<AccountRole> readResponse = client.read(
                 accValues.get("acc-role-user1").getAccountId());
         AccountRole toDelete = null;
         try {
+        	assertStatusCode(readResponse, testName);
         	toDelete = readResponse.getEntity();
-        } catch (Throwable e) {
-        	e.printStackTrace();
+        	Assert.assertNotNull(toDelete);
         } finally {
-        	readResponse.releaseConnection();
+        	if (readResponse != null) {
+        		readResponse.releaseConnection();
+        	}
         }
 
+        setupDelete();                
         ClientResponse<Response> res = client.delete(
-                toDelete.getAccount().get(0).getAccountId(), toDelete);
+                toDelete.getAccount().get(0).getAccountId(), toDelete); // delete form #1
         try {
-            int statusCode = res.getStatus();
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        	assertStatusCode(readResponse, testName);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
-        
         //
-        // recreate 'acc-role-user1' account and roles
+        // Recreate 'acc-role-user1' account and roles for the next test
         //
-//        create(testName);
-        
-        /*
-        setupDelete();
-        
+        create(testName);
+                
         //
-        // Lookup a know account, and delete all of its role relationships
+        // Lookup a known account and delete all of its role relationships again
         //
+        setupRead();
         readResponse = client.read(
-                accValues.get("acc-role-user1").getAccountId());
+        		accValues.get("acc-role-user1").getAccountId());
         toDelete = null;
         try {
         	toDelete = readResponse.getEntity();
-        } catch (Throwable e) {
-        	e.printStackTrace();
         } finally {
-        	readResponse.releaseConnection();
+        	if (readResponse != null) {
+        		readResponse.releaseConnection();
+        	}
         }
 
-        res = client.delete(toDelete.getAccount().get(0).getAccountId());
+        setupDelete();        
+        res = client.delete(toDelete.getAccount().get(0).getAccountId()); // delete form #2
         try {
             int statusCode = res.getStatus();
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
         } finally {
             res.releaseConnection();
         }
-        */
-        
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    	    dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName",
+    	    dependsOnMethods = {"CRUDTests"})
 	public void deleteLockedAccount(String testName) throws Exception {
-
-    	if (logger.isDebugEnabled()) {
-    		testBanner(testName, CLASS_NAME);
-    	}
-    	
     	findPrebuiltAdminAccount();
 
     	// Perform setup.
-        EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
-        REQUEST_TYPE = ServiceRequestType.DELETE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE);
+        testExpectedStatusCode = Response.Status.FORBIDDEN.getStatusCode();
+        testRequestType = ServiceRequestType.DELETE;
+        testSetup(testExpectedStatusCode, testRequestType);
 
     	AccountRoleClient client = new AccountRoleClient();
     	ClientResponse<Response> res = client.delete(prebuiltAdminCSID);
     	try {
     		int statusCode = res.getStatus();
-    		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+    				invalidStatusCodeMessage(testRequestType, statusCode));
+    		Assert.assertEquals(statusCode, testExpectedStatusCode);
     	} finally {
-    		res.releaseConnection();
+    		if (res != null) {
+    			res.releaseConnection();
+    		}
     	}
     }
 
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
-     */
+    //
+    // Tests with expected failure outcomes
+    //
+
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void deleteNonExistent(String testName) throws Exception {
         //ignoring this test as the service side returns 200 now even if it does
         //not find a record in the db
+    	
+    	//FIXME: REM - 1/9/2012, need to find out why a 200 status code is returned and fix this.
     }
     
     // ---------------------------------------------------------------
@@ -583,43 +414,14 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void searchWorkflowDeleted(String testName) throws Exception {
         // Fixme: null test for now, overriding test in base class
     }    
 
     // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-    /**
-     * Tests the code for manually submitting data that is used by several
-     * of the methods above.
-     * @throws Exception 
-     */
-    @Test(dependsOnMethods = {"create"})
-    public void testSubmitRequest() throws Exception {  //FIXME:  REM - This is not testing a submit /accounts/*/accountroles, but instead just to /accounts
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(accValues.get("acc-role-user1").getAccountId());
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url
-                    + " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
-    }
-
-    // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+
     /**
      * Creates the account role instance.
      *
@@ -665,7 +467,6 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
 
-
         for (AccountValue pv : accValues.values()) {
             deleteAccount(pv.getAccountId());
         }
@@ -683,46 +484,47 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @return the string
      */
     private String createAccount(String userName, String email) {
-
-        if (logger.isDebugEnabled()) {
-            testBanner("createAccount");
-        }
-
-        setupCreate();
-
         AccountClient accClient = new AccountClient();
         AccountsCommon account = AccountFactory.createAccountInstance(
                 userName, userName, userName, email, accClient.getTenantId(),
                 true, false, true, true);
+        String result = null;
+        
+        setupCreate();
         ClientResponse<Response> res = accClient.create(account);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug("createAccount: userName=" + userName
-                    + " status = " + statusCode);
+        try {
+        	assertStatusCode(res, "CreateAccount");
+        	result = extractId(res);
+        } finally {
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
-        return extractId(res);
+
+        return result;
     }
 
     private void findPrebuiltAdminAccount() {
     	// Search for the prebuilt admin user and then hold its CSID
-    	if(prebuiltAdminCSID == null) {
+    	if (prebuiltAdminCSID == null) {
             setupReadList();
             AccountClient client = new AccountClient();
             ClientResponse<AccountsCommonList> res =
                     client.readSearchList(null, this.prebuiltAdminUserId, null);
-            assertStatusCode(res, "findPrebuiltAdminAccount");
-            AccountsCommonList list = res.getEntity();
-            
-            List<AccountListItem> items = list.getAccountListItem();
-            Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
-            AccountListItem item = items.get(0);
-            prebuiltAdminCSID = item.getCsid();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Found Admin Account with ID: " + prebuiltAdminCSID);
+            try {
+	            assertStatusCode(res, "findPrebuiltAdminAccount");
+	            AccountsCommonList list = res.getEntity();
+	            List<AccountListItem> items = list.getAccountListItem();
+	            Assert.assertEquals(1, items.size(), "Found more than one Admin account!");
+	            AccountListItem item = items.get(0);
+	            prebuiltAdminCSID = item.getCsid();
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("Found Admin Account with ID: " + prebuiltAdminCSID);
+	            }
+            } finally {
+                if (res != null) {
+                    res.releaseConnection();
+                }            	
             }
     	}
     }
@@ -733,26 +535,15 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @param accId the acc id
      */
     private void deleteAccount(String accId) {
-
-        if (logger.isDebugEnabled()) {
-            testBanner("deleteAccount");
-        }
-
-        setupDelete();
-
         AccountClient accClient = new AccountClient();
+        setupDelete();
         ClientResponse<Response> res = accClient.delete(accId);
-        int statusCode = res.getStatus();
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("deleteAccount: delete account id="
-                        + accId + " status=" + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        	assertStatusCode(res, "DeleteAccount");
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
     }
 
@@ -763,26 +554,24 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @return the string
      */
     private String createRole(String roleName) {
-        if (logger.isDebugEnabled()) {
-            testBanner("createRole");
-        }
-        setupCreate();
+    	String result = null;
+    	
         RoleClient roleClient = new RoleClient();
-
         Role role = RoleFactory.createRoleInstance(roleName,
         		roleName, //the display name
                 "role for " + roleName, true);
+        setupCreate();
         ClientResponse<Response> res = roleClient.create(role);
-        int statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug("createRole: name=" + roleName
-                    + " status = " + statusCode);
+        try {
+        	assertStatusCode(res, "CreateRole");
+        	result = extractId(res);
+        } finally {
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        res.releaseConnection();
-        return extractId(res);
+        
+        return result;
     }
 
     /**
@@ -791,23 +580,15 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @param roleId the role id
      */
     private void deleteRole(String roleId) {
-        if (logger.isDebugEnabled()) {
-            testBanner("deleteRole");
-        }
         setupDelete();
         RoleClient roleClient = new RoleClient();
         ClientResponse<Response> res = roleClient.delete(roleId);
-        int statusCode = res.getStatus();
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("deleteRole: delete role id=" + roleId
-                        + " status=" + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        	assertStatusCode(res, "DeleteRole");
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
     }
 
@@ -815,5 +596,44 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
 	protected String getServiceName() {
 		// AccountRoles service is a sub-service of the Account service, so we return Account's service name
 		return AccountClient.SERVICE_NAME;
+	}
+
+    /*
+     * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+     * refer to this method in their @Test annotation declarations.
+     */
+    @Override
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+    public void CRUDTests(String testName) {
+    	// Do nothing.  Simply here to for a TestNG execution order for our tests
+    }
+
+	@Override
+	protected AccountRole updateInstance(AccountRole commonPartObject) {
+        //
+    	// AccountRole entities cannot be updated.  You must delete and recreate them
+    	//
+		return null;
+	}
+
+	@Override
+	protected void compareReadInstances(AccountRole original, AccountRole updated)
+			throws Exception {
+		// FIXME: Should add field checks here.
+	}
+
+	@Override
+	protected void compareUpdatedInstances(AccountRole original,
+			AccountRole updated) throws Exception {
+        //
+    	// AccountRole entities cannot be updated.  You must delete and recreate them
+    	//
+	}
+
+	@Override
+	protected Class<AccountRole> getCommonListType() {
+		return AccountRole.class;
 	}
 }

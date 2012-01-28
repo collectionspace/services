@@ -35,7 +35,7 @@ import org.collectionspace.services.authorization.PermissionRole;
 
  * @version $Revision:$
  */
-public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRole, PermissionRoleProxy> {
+public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRole, PermissionRole, PermissionRole, PermissionRoleProxy> {
 	@Override
 	public String getServiceName() {
 		throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3497
@@ -104,4 +104,20 @@ public class PermissionRoleClient extends AbstractServiceClientImpl<PermissionRo
     public ClientResponse<Response> delete(String csid, PermissionRole permRole) {
     	return getProxy().delete(csid, "delete", permRole);
     }
+
+	@Override
+	public ClientResponse<Response> create(PermissionRole payload) {
+		throw new UnsupportedOperationException(); //method not supported nor needed
+	}
+
+	@Override
+	public ClientResponse<PermissionRole> update(String csid,
+			PermissionRole payload) {
+		throw new UnsupportedOperationException(); //method not supported nor needed
+	}
+
+	@Override
+	public ClientResponse<PermissionRole> readList() {
+		throw new UnsupportedOperationException(); //method not supported nor needed
+	}
 }

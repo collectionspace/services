@@ -33,6 +33,7 @@ import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.slf4j.Logger;
@@ -91,6 +92,15 @@ public class RelationResource extends ResourceBase {
 
             String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType);
             handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            //
+            // Handle keyword clause
+            //
+            String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);            
+            if (keywords != null && keywords.isEmpty() == false) {
+            	String keywordClause = QueryManager.createWhereClauseFromKeywords(keywords);
+            	handler.getDocumentFilter().appendWhereClause(keywordClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            }
+            
             return (RelationsCommonList)finish_getList(ctx, handler);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);

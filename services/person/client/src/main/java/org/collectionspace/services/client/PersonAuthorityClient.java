@@ -26,10 +26,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.person.PersonsCommon;
+
 /**
  * The Class PersonAuthorityClient.
  */
-public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonAuthorityProxy> {
+public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<PersonsCommon, PersonAuthorityProxy> {
 	public static final String SERVICE_NAME = "personauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -70,5 +72,15 @@ public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<Perso
 	@Override
 	public Class<PersonAuthorityProxy> getProxyClass() {
 		return PersonAuthorityProxy.class;
+	}
+
+	@Override
+	public String getInAuthority(PersonsCommon item) {
+		return item.getInAuthority();
+	}
+
+	@Override
+	public void setInAuthority(PersonsCommon item, String inAuthorityCsid) {
+		item.setInAuthority(inAuthorityCsid);
 	}
 }

@@ -26,9 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -37,7 +37,6 @@ import org.collectionspace.services.client.PoxPayloadOut;
 
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.contact.AddressGroup;
 import org.collectionspace.services.contact.AddressGroupList;
 import org.collectionspace.services.contact.ContactsCommon;
@@ -64,7 +63,7 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 753 $
  * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
  */
-public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: Test classes for Vocab, Person, Org, and Location should have a base class!
+public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<PersonauthoritiesCommon, PersonsCommon> { //FIXME: Test classes for Vocab, Person, Org, and Location should have a base class!
 
     /** The logger. */
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
@@ -95,21 +94,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
     final String TEST_BIRTH_DATE = "May 26, 1907";
     /** The test death date. */
     final String TEST_DEATH_DATE = "June 11, 1979";
-    // Hold some values for a recently created item to verify upon read.
-    private String knownResourceId = null;
-    private String knownResourceShortIdentifer = null;
     //private String knownResourceRefName = null;
-    private String knownItemResourceId = null;
     private String knownItemResourceShortIdentifer = null;
     // The resource ID of an item resource used for partial term matching tests.
     private String knownItemPartialTermResourceId = null;
     /** The known contact resource id. */
     private String knownContactResourceId = null;
-    /** The n items to create in list. */
-    private int nItemsToCreateInList = 3;
-    /** The all item resource ids created. */
-    private Map<String, String> allItemResourceIdsCreated =
-            new HashMap<String, String>();
     /** The all contact resource ids created. */
     private Map<String, String> allContactResourceIdsCreated =
             new HashMap<String, String>();
@@ -142,13 +132,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"create"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    groups = {"create"})
     public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
@@ -166,24 +152,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         String newID = null;
         ClientResponse<Response> res = client.create(multipart);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            //
-            // Specifically:
-            // Does it fall within the set of valid status codes?
-            // Does it exactly match the expected status code?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
-
-            newID = PersonAuthorityClientUtils.extractId(res);
+        	assertStatusCode(res, testName);
+            newID = extractId(res);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
         // Save values for additional tests
         if (knownResourceId == null) {
@@ -221,56 +195,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
     }
 
     /**
-     * Creates the item.
-     *
-     * @param testName the test name
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"create"}, dependsOnMethods = {"create"})
-    public void createItem(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        setupCreate();
-        String newID = createItemInAuthority(knownResourceId, null ); //knownResourceRefName);
-    }
-
-    /**
-     * Creates the item with an empty short identifier.
-     *
-     * @param testName the test name
-     */
-    /*
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    groups = {"create"}, dependsOnMethods = {"create"})
-    public void createItemWithEmptyShortId(String testName) {
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    setupCreate();
-    
-    // Fill the property map
-    String shortId = "";
-    Map<String, String> fieldProperties = new HashMap<String,String>();
-    fieldProperties.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
-    fieldProperties.put(PersonJAXBSchema.DISPLAY_NAME, "Rod Beck");
-    fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED, "false");
-    fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, "RodBeck");
-    
-    final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
-    String newID = createItemInAuthority(knownResourceId, knownResourceRefName,
-    shortId, fieldProperties, NULL_REPEATABLE_FIELD_PROPERTIES);
-    allResourceIdsCreated.add(newID);
-    }
-     */
-    /**
      * Creates an item in an authority, using test data.
      *
      * @param vcsid the vcsid
      * @param authRefName the auth ref name
      * @return the string
      */
-    private String createItemInAuthority(String vcsid, String authRefName) {
+    @Override
+    protected String createItemInAuthority(String vcsid) {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
@@ -330,27 +262,19 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(vcsid, null /*authRefName*/, itemFieldProperties,
                 itemRepeatableFieldProperties, client.getItemCommonPartName());
-
-        String newID = null;
+        setupCreate();
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
+        String newID = null;
         try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        	assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
 
         // Store the ID returned from the first item resource created
@@ -368,7 +292,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         // Store the IDs from any item resources created
         // by tests, along with the IDs of their parents, so these items
         // can be deleted after all tests have been run.
-        allItemResourceIdsCreated.put(newID, vcsid);
+        allResourceItemIdsCreated.put(newID, vcsid);
 
         return newID;
     }
@@ -378,12 +302,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      *
      * @param testName the test name
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"create"}, dependsOnMethods = {"createItem"})
+    @Test(dataProvider = "testName", groups = {"create"},
+    		dependsOnMethods = {"createItem"})
     public void createContact(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
         String newID = createContactInItem(knownResourceId, knownItemResourceId);
     }
@@ -401,32 +322,23 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ":...");
         }
-
-        setupCreate();
-
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         String identifier = createIdentifier();
         PoxPayloadOut multipart = ContactClientUtils.createContactInstance(parentcsid,
                 itemcsid, identifier, new ContactClient().getCommonPartName());
 
-        String newID = null;
+        setupCreate();
         ClientResponse<Response> res =
                 client.createContact(parentcsid, itemcsid, multipart);
+        String newID = null;
         try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        	assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
 
         // Store the ID returned from the first contact resource created
@@ -446,136 +358,17 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         return newID;
     }
 
-    // Failure outcomes
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
-     */
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /*
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    groups = {"create"}, dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupCreateWithEmptyEntityBody();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()) {
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    groups = {"create"}, dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithMalformedXml(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupCreateWithMalformedXml();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA; // Constant from base class.
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    groups = {"create"}, dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupCreateWithWrongXmlSchema();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-     */
     /**
      * Attempts to create an authority with an short identifier that contains
      * non-word characters.
      *
      * @param testName the test name
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"create", "nonWordCharsInShortId"})
+    @Test(dataProvider = "testName", groups = {"create", "nonWordCharsInShortId"})
     public void createWithShortIdNonWordChars(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        EXPECTED_STATUS_CODE = STATUS_BAD_REQUEST;
-        REQUEST_TYPE = ServiceRequestType.CREATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE);
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
 
         // Create the payload to be included in the body of the request
         PersonAuthorityClient client = new PersonAuthorityClient();
@@ -591,17 +384,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         // Check the status code of the response: does it match
         // the expected response(s)?
         try {
-            int statusCode = res.getStatus();
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
+        	assertStatusCode(res, testName);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
-
     }
 
     /**
@@ -610,18 +398,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      *
      * @param testName the test name
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"create", "nonWordCharsInShortId"}, dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", groups = {"create", "nonWordCharsInShortId"},
+    		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractServiceTestImpl.create"})
     public void createItemWithShortIdNonWordChars(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        EXPECTED_STATUS_CODE = STATUS_BAD_REQUEST;
-        REQUEST_TYPE = ServiceRequestType.CREATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE);
+        testExpectedStatusCode = STATUS_BAD_REQUEST;
+        testRequestType = ServiceRequestType.CREATE;
+        testSetup(testExpectedStatusCode, testRequestType);
 
         PersonAuthorityClient client = new PersonAuthorityClient();
-
         // Create the payload to be included in the body of the request
         String shortId = "7-Eleven";
         Map<String, String> fieldProperties = new HashMap<String, String>();
@@ -638,22 +422,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Send the request and receive a response
         ClientResponse<Response> res = client.createItem(knownResourceId, multipart);
-
         // Check the status code of the response: does it match
         // the expected response(s)?
         try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        	assertStatusCode(res, testName);
         } finally {
-            res.releaseConnection();
-
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
     }
 
@@ -665,32 +441,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"createList"}, dependsOnGroups = {"create"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    groups = {"createList"}, dependsOnGroups = {"create"})
     public void createList(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         for (int i = 0; i < nItemsToCreateInList; i++) {
             create(testName);
-        }
-    }
-
-    /**
-     * Creates the item list.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"createList"}, dependsOnMethods = {"createList"})
-    public void createItemList(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Add items to the initially-created, known parent record.
-        for (int j = 0; j < nItemsToCreateInList; j++) {
-            createItem(testName);
         }
     }
 
@@ -700,8 +455,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"createList"}, dependsOnMethods = {"createItemList"})
+    @Test(dataProvider = "testName", groups = {"createList"},
+    		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.createItemList"})
     public void createContactList(String testName) throws Exception {
         // Add contacts to the initially-created, known item record.
         for (int j = 0; j < nItemsToCreateInList; j++) {
@@ -717,8 +472,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"read"}, dependsOnGroups = {"create"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    groups = {"read"}, dependsOnGroups = {"create"})
     public void read(String testName) throws Exception {
         readInternal(testName, knownResourceId, null);
     }
@@ -729,22 +484,18 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"read"}, dependsOnMethods = {"read"})
+    @Override
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    groups = {"read"}, dependsOnMethods = {"read"})
     public void readByName(String testName) throws Exception {
         readInternal(testName, null, knownResourceShortIdentifer);
     }
 
     protected void readInternal(String testName, String CSID, String shortId) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<String> res = null;
+        setupRead();
         if (CSID != null) {
             res = client.read(CSID);
         } else if (shortId != null) {
@@ -752,8 +503,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         } else {
             Assert.fail("readInternal: Internal error. One of CSID or shortId must be non-null");
         }
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             //FIXME: remove the following try catch once Aron fixes signatures
             try {
                 PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
@@ -764,32 +515,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
                 throw new RuntimeException(e);
             }
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-    }
-
-    /**
-     * Read item.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readItem"}, dependsOnGroups = {"read"})
-    public void readItem(String testName) throws Exception {
-        readItemInternal(testName, knownResourceId, null, knownItemResourceId, null);
-    }
-
-    /**
-     * Read item in Named Auth.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readItem"}, dependsOnMethods = {"readItem"})
-    public void readItemInNamedAuth(String testName) throws Exception {
-        readItemInternal(testName, null, knownResourceShortIdentifer, knownItemResourceId, null);
     }
 
     /**
@@ -798,20 +527,33 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readItem"}, dependsOnMethods = {"readItem"})
+    @Test(dataProvider = "testName", groups = {"readItem", "readNamedItemInNamedAuth"},
+    		dependsOnMethods = {"readItemInNamedAuth"})
     public void readNamedItem(String testName) throws Exception {
         readItemInternal(testName, knownResourceId, null, null, knownItemResourceShortIdentifer);
     }
 
+    /**
+     * Read item in Named Auth.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider = "testName", groups = {"readItem"},
+    		dependsOnMethods = {"readItem"})
+    public void readItemInNamedAuth(String testName) throws Exception {
+        readItemInternal(testName, null, knownResourceShortIdentifer, knownItemResourceId, null);
+    }
+
+    
     /**
      * Read Named item in Named Auth.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readItem"}, dependsOnMethods = {"readItem"})
+    @Test(dataProvider = "testName", groups = {"readItem"},
+    		dependsOnMethods = {"readNamedItem"})
     public void readNamedItemInNamedAuth(String testName) throws Exception {
         readItemInternal(testName, null, knownResourceShortIdentifer, null, knownItemResourceShortIdentifer);
     }
@@ -821,15 +563,13 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
             throws Exception {
 
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
             logger.debug("Reading:" + ((authCSID != null) ? authCSID : authShortId) + "/"
                     + ((itemCSID != null) ? authCSID : itemShortId));
         }
-        // Perform setup.
-        setupRead();
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        setupRead();
         ClientResponse<String> res = null;
         if (authCSID != null) {
             if (itemCSID != null) {
@@ -850,8 +590,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         } else {
             Assert.fail("readInternal: Internal error. One of authCSID or authShortId must be non-null");
         }
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             // Check whether we've received a person.
             PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
             PersonsCommon person = (PersonsCommon) extractPart(input,
@@ -871,9 +611,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
             List<String> groups = person.getGroups().getGroup();
             Assert.assertTrue(groups.size() > 0);
             Assert.assertNotNull(groups.get(0));
-
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
     }
 
@@ -883,13 +624,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"update"}, dependsOnMethods = {"updateItem"})
-    public void verifyItemDisplayNames(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
+    @Test(dataProvider = "testName", groups = {"update"},
+    		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.updateItem"})
+    public void verifyItemDisplayName(String testName) throws Exception {
         // Perform setup.
         setupUpdate();
 
@@ -897,11 +634,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         PersonAuthorityClient client = new PersonAuthorityClient();
         PoxPayloadIn input = null;
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
+            // Check whether person has expected displayName.
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         PersonsCommon person = (PersonsCommon) extractPart(input,
@@ -938,15 +678,16 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getItemCommonPartName());
+        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), person);
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         PersonsCommon updatedPerson =
@@ -973,15 +714,16 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Submit the updated resource to the service and store the response.
         output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getItemCommonPartName());
+        commonPart = output.addPart(client.getItemCommonPartName(), person);
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         updatedPerson =
@@ -1011,32 +753,28 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"update"}, dependsOnMethods = {"verifyItemDisplayNames"})
+    @Test(dataProvider = "testName", groups = {"update"},
+    		dependsOnMethods = {"verifyItemDisplayName"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         // Perform setup for read.
         setupRead();
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        assertStatusCode(res, testName);
-        
-        // Perform setup for update.
-        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
-
         PoxPayloadIn input = null;
         try {
+            assertStatusCode(res, testName);
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-
+        //
+        // Make an invalid UPDATE request -i.e., if we don't want the display name computed, then
+        // we need to supply one.
+        //
         PersonsCommon person = (PersonsCommon) extractPart(input,
                 client.getItemCommonPartName(), PersonsCommon.class);
         Assert.assertNotNull(person);
@@ -1046,14 +784,15 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getItemCommonPartName());
+        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), person);
+        setupUpdateWithInvalidBody();
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        assertStatusCode(res, testName);
         try {
-            // intentionally empty try block
+            assertStatusCode(res, testName);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
     }
 
@@ -1063,13 +802,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readItem"}, dependsOnMethods = {"readItem"})
+    @Test(dataProvider = "testName", groups = {"readItem"},
+    		dependsOnMethods = {"createContact", "org.collectionspace.services.client.test.AbstractAuthorityServiceTest.readItem"})
     public void readContact(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupRead();
 
@@ -1079,12 +814,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         ClientResponse<String> res =
                 client.readContact(knownResourceId, knownItemResourceId,
                 knownContactResourceId);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             // Check whether we've received a contact.
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         ContactsCommon contact = (ContactsCommon) extractPart(input,
@@ -1100,85 +837,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
     }
 
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"read"}, dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
-            res.releaseConnection();
-        }
-    }
-
-    /**
-     * Read item non existent.
-     *
-     * @param testName the test name
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readItem"}, dependsOnMethods = {"readItem"})
-    public void readItemNonExistent(String testName) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
-            res.releaseConnection();
-        }
-    }
-
     /**
      * Read contact non existent.
      *
      * @param testName the test name
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readItem"}, dependsOnMethods = {"readContact"})
+    @Test(dataProvider = "testName", groups = {"readItem"},
+    		dependsOnMethods = {"readContact"})
     public void readContactNonExistent(String testName) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupReadNonExistent();
 
@@ -1187,73 +853,36 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         ClientResponse<String> res =
                 client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
-    // Success outcomes
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readList"}, dependsOnGroups = {"createList", "read"})
-    public void readList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadList();
-
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        AbstractCommonList list = null;
-        ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        try {
-            list = res.getEntity();
-        } finally {
-            res.releaseConnection();
-        }
-
-        // Optionally output additional data about list members for debugging.
-        if (logger.isTraceEnabled()) {
-            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
-        }
-    }
 
     /**
      * Read item list.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readList"}, dependsOnMethods = {"readList"})
+    @Override
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    groups = {"readList"}, dependsOnMethods = {"readList"})
     public void readItemList(String testName) {
-        readItemList(knownResourceId, null, testName);
+        readItemList(knownAuthorityWithItems, null, testName);
     }
 
     /**
      * Read item list by authority name.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"readList"}, dependsOnMethods = {"readItemList"})
-    public void readItemListByAuthorityName(String testName) {
-        readItemList(null, knownResourceShortIdentifer, testName);
+    @Override
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    groups = {"readList"}, dependsOnMethods = {"readItemList"})
+    public void readItemListByName(String testName) {
+        readItemList(null, READITEMS_SHORT_IDENTIFIER, testName);
     }
 
     /**
@@ -1263,10 +892,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param name the name
      */
     private void readItemList(String vcsid, String name, String testName) {
-
-        // Perform setup.
         setupReadList();
-
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<AbstractCommonList> res = null;
@@ -1277,24 +903,22 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         } else {
             Assert.fail("readItemList passed null csid and name!");
         }
-        assertStatusCode(res, testName);
         AbstractCommonList list = null;
         try {
+            assertStatusCode(res, testName);
             list = res.getEntity();
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
-        List<AbstractCommonList.ListItem> items =
-                list.getListItem();
+        List<AbstractCommonList.ListItem> items = list.getListItem();
         int nItemsReturned = items.size();
-        // There will be one item created, associated with a
-        // known parent resource, by the createItem test.
-        //
-        // In addition, there will be 'nItemsToCreateInList'
-        // additional items created by the createItemList test,
+        // There will be 'nItemsToCreateInList'
+        // items created by the createItemList test,
         // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList + 1;
+        int nExpectedItems = nItemsToCreateInList;
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Expected "
                     + nExpectedItems + " items; got: " + nItemsReturned);
@@ -1317,7 +941,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
     /**
      * Read contact list.
      */
-    @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
+    @Test(groups = {"readList"},
+    		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.readItemList"})
     public void readContactList() {
         readContactList(knownResourceId, knownItemResourceId);
     }
@@ -1339,11 +964,13 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         AbstractCommonList list = null;
         ClientResponse<AbstractCommonList> res =
                 client.readContactList(parentcsid, itemcsid);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             list = res.getEntity();
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         List<AbstractCommonList.ListItem> listitems =
@@ -1379,25 +1006,24 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"update"}, dependsOnGroups = {"readItem", "readList"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    groups = {"update"}, dependsOnGroups = {"readItem", "readList"})
     public void update(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdate();
-
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
         PoxPayloadIn input = null;
+        setupRead();
         ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("got PersonAuthority to update with ID: " + knownResourceId);
+            }
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
@@ -1414,15 +1040,17 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
+        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), personAuthority);
+        setupUpdate();
         res = client.update(knownResourceId, output);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         PersonauthoritiesCommon updatedPersonAuthority =
@@ -1442,26 +1070,28 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"update"}, dependsOnMethods = {"update"})
+    @Override
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    groups = {"update"}, dependsOnMethods = {"update"})
     public void updateItem(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdate();
-
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
         PoxPayloadIn input = null;
+        setupRead();
         ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("got Person to update with ID: "
+                        + knownItemResourceId
+                        + " in PersonAuthority: " + knownResourceId);
+            }
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         PersonsCommon person = (PersonsCommon) extractPart(input,
@@ -1484,15 +1114,17 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getItemCommonPartName());
+        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), person);
+        setupUpdate();
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         PersonsCommon updatedPerson =
@@ -1517,30 +1149,35 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"update"}, dependsOnMethods = {"updateItem"})
+    @Test(dataProvider = "testName", groups = {"update"},
+    		dependsOnMethods = {"readContact", "testContactSubmitRequest",
+    			"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.updateItem"})
     public void updateContact(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdate();
+    	String contactsCommonLabel = new ContactClient().getCommonPartName();
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
         PoxPayloadIn input = null;
+        setupRead();
         ClientResponse<String> res =
                 client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("got Contact to update with ID: "
+                        + knownContactResourceId
+                        + " in item: " + knownItemResourceId
+                        + " in parent: " + knownResourceId);
+            }
             input = new PoxPayloadIn(res.getEntity());
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         ContactsCommon contact = (ContactsCommon) extractPart(input,
-                new ContactClient().getCommonPartName(), ContactsCommon.class);
+                contactsCommonLabel, ContactsCommon.class);
         Assert.assertNotNull(contact);
 
         // Verify the contents of this resource
@@ -1563,19 +1200,20 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(ContactClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE); //FIXME: REM - Replace with output.addPart(contact, client.getCommonPartName())
-        commonPart.setLabel(client.getCommonPartName());
+        PayloadOutputPart commonPart = output.addPart(contactsCommonLabel, contact);
+        setupUpdate();
         res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             // Retrieve the updated resource and verify that its contents exist.
             input = new PoxPayloadIn(res.getEntity());;
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        ContactsCommon updatedContact =
-                (ContactsCommon) extractPart(input,
-                new ContactClient().getCommonPartName(), ContactsCommon.class);
+        ContactsCommon updatedContact = (ContactsCommon) extractPart(input,
+                contactsCommonLabel, ContactsCommon.class);
         Assert.assertNotNull(updatedContact);
 
         // Verify that the updated resource received the correct data.
@@ -1584,217 +1222,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
                 "Data in updated object did not match submitted data.");
     }
 
-    // Failure outcomes
-    // Placeholders until the three tests below can be uncommented.
-    // See Issue CSPACE-401.
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
-     */
-    @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
-     */
-    @Override
-    public void updateWithMalformedXml(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
-     */
-    @Override
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-        //Should this really be empty?
-    }
-
-    /*	//FIXME: REM - Can we kill all this dead code please?
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupUpdateWithEmptyEntityBody(testName, logger);
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateWithMalformedXml(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupUpdateWithMalformedXml();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug(testName + ": url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-    
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-    groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-    
-    if (logger.isDebugEnabled()) {
-    logger.debug(testBanner(testName, CLASS_NAME));
-    }
-    // Perform setup.
-    setupUpdateWithWrongXmlSchema();
-    
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
-    
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-    logger.debug("updateWithWrongXmlSchema: url=" + url +
-    " status=" + statusCode);
-    }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-     */
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateNonExistent();
-
-        // Submit the request to the service and store the response.
-        // Note: The ID(s) used when creating the request payload may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        String displayName = "displayName-NON_EXISTENT_ID";
-        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-                displayName, "NON_EXISTENT_SHORT_ID", client.getCommonPartName());
-        ClientResponse<String> res =
-                client.update(NON_EXISTENT_ID, multipart);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
-            res.releaseConnection();
-        }
-    }
-
-    /**
-     * Update non existent item.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"update"}, dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
-    public void updateNonExistentItem(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupUpdateNonExistent();
-
-        // Submit the request to the service and store the response.
-        // Note: The ID used in this 'create' call may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        Map<String, String> nonexMap = new HashMap<String, String>();
-        nonexMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, "nonEX");
-        nonexMap.put(PersonJAXBSchema.FORE_NAME, "John");
-        nonexMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
-        nonexMap.put(PersonJAXBSchema.GENDER, "male");
-        Map<String, List<String>> nonexRepeatablesMap = new HashMap<String, List<String>>();
-        PoxPayloadOut multipart =
-                PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID,
-                null, //PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
-                nonexMap, nonexRepeatablesMap, client.getItemCommonPartName());
-        ClientResponse<String> res =
-                client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
-            res.releaseConnection();
-        }
-    }
-
     /**
      * Update non existent contact.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"update"}, dependsOnMethods = {"updateContact", "testContactSubmitRequest"})
+    @Test(dataProvider = "testName", groups = {"update"},
+    		dependsOnMethods = {"updateContact", "testContactSubmitRequest"})
     public void updateNonExistentContact(String testName) throws Exception {
         // Currently a no-op test
     }
@@ -1811,16 +1246,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"delete"}, dependsOnGroups = {"update"})
+    @Test(dataProvider = "testName", groups = {"delete"},
+    		dependsOnMethods = {"updateContact"})
     public void deleteContact(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDelete();
-
         if (logger.isDebugEnabled()) {
             logger.debug("parentcsid =" + knownResourceId
                     + " itemcsid = " + knownItemResourceId
@@ -1829,167 +1257,38 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        setupDelete();
         ClientResponse<Response> res =
                 client.deleteContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        	assertStatusCode(res, testName);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
     }
 
-    /**
-     * Delete item.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"delete"}, dependsOnMethods = {"deleteContact"})
-    public void deleteItem(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDelete();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("parentcsid =" + knownResourceId
-                    + " itemcsid = " + knownItemResourceId);
-        }
-
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
-            res.releaseConnection();
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
-     */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDelete();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("parentcsid =" + knownResourceId);
-        }
-
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
-            res.releaseConnection();
-        }
+    	// Do nothing.  See localDelete().  This ensure proper test order.
+    }
+    
+    @Test(dataProvider = "testName", dependsOnMethods = {"localDeleteItem"})    
+    public void localDelete(String testName) throws Exception {
+    	super.delete(testName);
     }
 
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
-     */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"delete"}, dependsOnMethods = {"delete"})
-    public void deleteNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDeleteNonExistent();
-
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
-            res.releaseConnection();
-        }
+    public void deleteItem(String testName) throws Exception {
+    	// Do nothing.  We need to wait until after the test "localDelete" gets run.  When it does,
+    	// its dependencies will get run first and then we can call the base class' delete method.
     }
-
-    /**
-     * Delete non existent item.
-     *
-     * @param testName the test name
-     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"delete"}, dependsOnMethods = {"deleteItem"})
-    public void deleteNonExistentItem(String testName) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDeleteNonExistent();
-
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<Response> res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
-        try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        } finally {
-            res.releaseConnection();
-        }
+    
+    @Test(dataProvider = "testName", groups = {"delete"},
+    	dependsOnMethods = {"verifyIllegalItemDisplayName", "testContactSubmitRequest", "deleteContact"})
+    public void localDeleteItem(String testName) throws Exception {
+    	super.deleteItem(testName);
     }
 
     /**
@@ -1997,93 +1296,29 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
      *
      * @param testName the test name
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    groups = {"delete"}, dependsOnMethods = {"deleteContact"})
+    @Test(dataProvider = "testName", groups = {"delete"},
+    		dependsOnMethods = {"deleteContact"})
     public void deleteNonExistentContact(String testName) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDeleteNonExistent();
-
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        setupDeleteNonExistent();
         ClientResponse<Response> res =
                 client.deleteContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         try {
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        	assertStatusCode(res, testName);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
-    }
-
-    // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-    /**
-     * Tests the code for manually submitting data that is used by several
-     * of the methods above.
-     */
-    @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() {
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url
-                    + " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
-    }
-
-    /**
-     * Test item submit request.
-     */
-    @Test(dependsOnMethods = {"createItem", "readItem", "testSubmitRequest"})
-    public void testItemSubmitRequest() {
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getItemResourceURL(knownResourceId, knownItemResourceId);
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("testItemSubmitRequest: url=" + url
-                    + " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
     }
 
     /**
      * Test contact submit request.
      */
-    @Test(dependsOnMethods = {"createContact", "readContact", "testItemSubmitRequest"})
-    public void testContactSubmitRequest() {
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createContact", "readContact", "testItemSubmitRequest"})
+    public void testContactSubmitRequest(String testName) {
 
         // Expected status code: 200 OK
         final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
@@ -2097,7 +1332,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         // Check the status code of the response: does it match
         // the expected response(s)?
         if (logger.isDebugEnabled()) {
-            logger.debug("testItemSubmitRequest: url=" + url
+            logger.debug("testContactSubmitRequest: url=" + url
                     + " status=" + statusCode);
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
@@ -2144,7 +1379,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
             res.releaseConnection();
         }
         // Clean up item resources.
-        for (Map.Entry<String, String> entry : allItemResourceIdsCreated.entrySet()) {
+        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
             itemResourceId = entry.getKey();
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
@@ -2240,4 +1475,76 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXM
         return getContactServiceRootURL(parentResourceIdentifier,
                 itemResourceIdentifier) + "/" + contactResourceIdentifier;
     }
+
+	@Override
+	public void authorityTests(String testName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected PersonsCommon updateItemInstance(PersonsCommon authorityItem) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void compareUpdatedItemInstances(PersonsCommon original,
+			PersonsCommon updated) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected PoxPayloadOut createInstance(String commonPartName,
+			String identifier) {
+        String shortId = identifier;
+        String displayName = "displayName-" + shortId;
+        PoxPayloadOut result =
+                PersonAuthorityClientUtils.createPersonAuthorityInstance(
+                displayName, shortId, commonPartName);
+        return result;
+	}
+	
+	@Override
+	protected PoxPayloadOut createNonExistenceInstance(String commonPartName,
+			String identifier) {
+        String displayName = "displayName-NON_EXISTENT_ID";
+        PoxPayloadOut result = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+                displayName, "NON_EXISTENT_SHORT_ID", commonPartName);
+        return result;
+	}
+	
+    protected PoxPayloadOut createNonExistenceItemInstance(String commonPartName, String identifier) {
+        Map<String, String> nonexMap = new HashMap<String, String>();
+        nonexMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, "nonEX");
+        nonexMap.put(PersonJAXBSchema.FORE_NAME, "John");
+        nonexMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
+        nonexMap.put(PersonJAXBSchema.GENDER, "male");
+        Map<String, List<String>> nonexRepeatablesMap = new HashMap<String, List<String>>();
+        PoxPayloadOut result =
+                PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID,
+                null, //PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
+                nonexMap, nonexRepeatablesMap, commonPartName);
+        return result;
+    }
+	
+
+	@Override
+	protected PersonauthoritiesCommon updateInstance(
+			PersonauthoritiesCommon commonPartObject) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(PersonauthoritiesCommon original,
+			PersonauthoritiesCommon updated) throws Exception {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	protected void verifyReadItemInstance(PersonsCommon item) throws Exception {
+		// Do nothing for now.  Add more 'read' validation checks here if applicable.
+	}
 }

@@ -131,9 +131,14 @@ public class WorkflowDocumentModelHandler
             result = TRANSITION_APPROVE;
         } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
             result = TRANSITION_UNDELETE;
-        }
+        } else {
+        	logger.warn("An attempt was made to transition a document to an unknown workflow state = "
+        			+ state);
+        }        
+        
         return result;
     }
+    
     /*
      * Handle Update (PUT)
      */
@@ -143,8 +148,22 @@ public class WorkflowDocumentModelHandler
             ObjectPartType partMeta, Action action,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception {
-        WorkflowCommon workflowsCommon = (WorkflowCommon) part.getBody();
-        docModel.followTransition(getTransitionFromState(workflowsCommon.getCurrentLifeCycleState()));
+    	String toState = null;
+    	
+    	try {
+	        WorkflowCommon workflowsCommon = (WorkflowCommon) part.getBody();
+	        toState = getTransitionFromState(workflowsCommon.getCurrentLifeCycleState());
+	        docModel.followTransition(toState);
+    	} catch (Exception e) {
+    		String msg = "Unable to follow workflow transition to state = "
+    				+ toState;
+    		if (logger.isDebugEnabled() == true) {
+    			logger.debug(msg, e);
+    		}
+    		ClientException ce = new ClientException("Unable to follow workflow transition to state = "
+    				+ toState);
+    		throw ce;
+    	}
     }
 }
 

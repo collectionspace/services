@@ -22,9 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-
-import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -39,7 +36,6 @@ import org.collectionspace.services.dimension.DimensionsCommon;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
-public class WorkflowServiceTest extends AbstractServiceTestImpl {
+public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, WorkflowCommon> {
 
     private final String CLASS_NAME = WorkflowServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -70,158 +66,96 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
         return new DimensionClient();
     }
 
-    @Override
-    protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
-    }
+    //
+    // Test overrides
+    //
+    
+	@Override
+	public void create(String testName) throws Exception {
+		String csid = this.createTestObject(testName);
+		if (this.knownResourceId == null) {
+			this.knownResourceId = csid;
+		}
+	}
 
     @Override
-    public void createList(String testName) throws Exception {
-    	//empty N/A
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
         setupRead();
         DimensionClient client = new DimensionClient();
         ClientResponse<String> res = client.getWorkflow(knownResourceId);
-        assertStatusCode(res, testName);
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        WorkflowCommon workflowsCommon = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
-        if (logger.isDebugEnabled() == true) {
-        	logger.debug("Workflow payload is: " + input.getXmlPayload());
+        try {
+	        assertStatusCode(res, testName);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        WorkflowCommon workflowsCommon = (WorkflowCommon) extractPart(input, WorkflowClient.SERVICE_COMMONPART_NAME, WorkflowCommon.class);
+	        if (logger.isDebugEnabled() == true) {
+	        	logger.debug("Workflow payload is: " + input.getXmlPayload());
+	        }
+	        Assert.assertNotNull(workflowsCommon);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertNotNull(workflowsCommon);
     }
-
-//    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createList", "read"})
-//    public void readList(String testName) throws Exception {
-//        logger.debug(testBanner(testName, CLASS_NAME));
-//        setupReadList();
-//        WorkflowClient client = new WorkflowClient();
-//        ClientResponse<AbstractCommonList> res = client.readList();
-//        assertStatusCode(res, testName);
-//        AbstractCommonList list = res.getEntity();
-//        if (logger.isDebugEnabled()) {
-//            List<AbstractCommonList.ListItem> items =
-//                list.getListItem();
-//            int i = 0;
-//            for(AbstractCommonList.ListItem item : items){
-//                logger.debug(testName + ": list-item[" + i + "] " +
-//                        item.toString());
-//                i++;
-//            }
-//        }
-//    }
+    
+    //
+    // FIXME: REM - This test should be a subclass of BaseServiceTest and *not* AbstractPoxServiceTestImpl
+    //
     
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
         setupUpdate();
         updateLifeCycleState(testName, knownResourceId, WorkflowClient.WORKFLOWSTATE_APPROVED);
     }    
 
-
     @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupUpdateNonExistent();
-        // Submit the request to the service and store the response.
-        // Note: The ID used in this 'create' call may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-        WorkflowClient client = new WorkflowClient();
-        PoxPayloadOut multipart = createDimensionInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
-        assertStatusCode(res, testName);
-    }
-
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupDelete();
-        WorkflowClient client = new WorkflowClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        assertStatusCode(res, testName);
+    	// Do nothing.  N/A
     }
-
-    // ---------------------------------------------------------------
-    // Failure outcome tests : means we expect response to fail, but test to succeed
-    // ---------------------------------------------------------------
-
-    // Failure outcome
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupReadNonExistent();
-        WorkflowClient client = new WorkflowClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        assertStatusCode(res, testName);
-    }
-
-    // Failure outcome
-    @Override
-//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"delete"})
-    public void deleteNonExistent(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupDeleteNonExistent();
-        WorkflowClient client = new WorkflowClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        assertStatusCode(res, testName);
-    }
-
-    // Failure outcomes
-    // Placeholders until the tests below can be implemented. See Issue CSPACE-401.
-
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-    }
-
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithMalformedXml(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-    }
-    
-    // ---------------------------------------------------------------
-    // Search tests
-    // ---------------------------------------------------------------
-    
+        
     public void searchWorkflowDeleted(String testName) throws Exception {
+    	// Do nothing.  N/A
     }    
 
-    // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
+	@Override
+	public void readList(String testName) throws Exception {
+		// Do nothing.  N/A
+	}	
+		
+	@Override
+    public void readPaginatedList(String testName) throws Exception {
+		// Do nothing.  N/A
+	}
 
-//    @Test(dependsOnMethods = {"create", "read"})
+	@Override
+	public void CRUDTests(String testName) {
+		// TODO Auto-generated method stub		
+	}
+
+	@Override
+	protected WorkflowCommon updateInstance(WorkflowCommon commonPartObject) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(WorkflowCommon original,
+			WorkflowCommon updated) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+    
+	/*
+	 * (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
+	 */
+	@Override
+	public void createList(String testName) throws Exception {
+		//empty N/A
+	}
+    
     public void testSubmitRequest() {
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode(); // Expected status code: 200 OK
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        int statusCode = submitRequest(method, url);
-        logger.debug("testSubmitRequest: url=" + url + " status=" + statusCode);
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
+    	// Do nothing.  N/A
     }
 
     // ---------------------------------------------------------------
@@ -230,17 +164,35 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
     
     @Override
     protected PoxPayloadOut createInstance(String identifier) {
-    	return createDimensionInstance(identifier);
+        String dimensionsCommonPartName = new DimensionClient().getCommonPartName();
+    	return createInstance(identifier, dimensionsCommonPartName);
     }    
     
+	@Override
+	protected PoxPayloadOut createInstance(String commonPartName,
+			String identifier) {
+		return createDimensionInstance(commonPartName, identifier);
+	}
+    
+	/*
+	 * We're using a DimensionsCommon instance to test the workflow service.
+	 */
     private PoxPayloadOut createDimensionInstance(String dimensionValue) {
+        String commonPartName = new DimensionClient().getCommonPartName();
+        return createDimensionInstance(commonPartName, dimensionValue);
+    }
+	
+	/*
+	 * We're using a DimensionsCommon instance to test the workflow service.
+	 */
+    private PoxPayloadOut createDimensionInstance(String commonPartName,
+    		String dimensionValue) {
         String measurementUnit = "measurementUnit-" + dimensionValue;
-        String dimensionsCommonPartName = new DimensionClient().getCommonPartName();
         DimensionsCommon dimensionsCommon = new DimensionsCommon();
         
         dimensionsCommon.setMeasurementUnit(measurementUnit);
         PoxPayloadOut multipart = new PoxPayloadOut(DimensionClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(dimensionsCommonPartName, dimensionsCommon);
+        PayloadOutputPart commonPart = multipart.addPart(commonPartName, dimensionsCommon);
 
         if (logger.isDebugEnabled()) {
             logger.debug("To be created, Dimensions common: " + commonPart.asXML());
@@ -249,24 +201,5 @@ public class WorkflowServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
-
-	@Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-	public void create(String testName) throws Exception {
-		String csid = this.createTestObject(testName);
-		if (this.knownResourceId == null) {
-			this.knownResourceId = csid;
-		}
-	}
-
-	
-	@Override
-	public void readList(String testName) throws Exception {
-	}	
-		
-	@Override
-    public void readPaginatedList(String testName) throws Exception {
-		//empty N/A
-	}
 	
 }

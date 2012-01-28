@@ -56,7 +56,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -71,7 +70,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 1327 $
  * $LastChangedDate: 2010-02-12 10:35:11 -0800 (Fri, 12 Feb 2010) $
  */
-public class CollectionObjectAuthRefsTest extends BaseServiceTest {
+public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     @Override
     protected CollectionSpaceClient getClientInstance() {
@@ -97,9 +96,6 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
     /** The organization authority name. */
     final String ORG_AUTHORITY_NAME = "TestOrgAuth";
-    
-    /** The known resource id. */
-    private String knownResourceId = null;
     
     /** The collection object ids created. */
     private List<String> collectionObjectIdsCreated = new ArrayList<String>();
@@ -154,16 +150,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
     /** The number of authority references expected. */
     private final int NUM_AUTH_REFS_EXPECTED = 4;
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
-    }
-
+    
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -174,14 +161,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
-    public void createWithAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
-        
+    @Test(dataProvider="testName")
+    public void createWithAuthRefs(String testName) throws Exception {        
         // Create all the person refs and entities
         createPersonRefs();
 
@@ -206,27 +187,21 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
-
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        String newCsid = null;
+        try {
+        	assertStatusCode(res, testName);
+        	newCsid = extractId(res);
+        } finally {
+        	if (res != null) {
+        		res.releaseConnection();
+        	}
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = extractId(res);
+            knownResourceId = newCsid;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -251,8 +226,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         personAuthRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
@@ -278,8 +253,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
@@ -345,8 +320,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = orgAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
         orgAuthCSID = extractId(res);
         orgAuthRefName = OrgAuthorityClientUtils.getAuthorityRefName(orgAuthCSID, null);
@@ -372,8 +347,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
@@ -413,31 +388,41 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    @Test(dataProvider="testName",
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
-
-        // Submit the request to the service and store the response.
+        //
+        // First read the object
+        //
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         ClientResponse<String> res = collectionObjectClient.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
-        		collectionObjectClient.getCommonPartName(), CollectionobjectsCommon.class);
-        Assert.assertNotNull(collectionObject);
-
-        // Get all of the auth refs and check that the expected number is returned
+        CollectionobjectsCommon collectionObject = null;
+        try {
+	        assertStatusCode(res, testName);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        collectionObject = (CollectionobjectsCommon) extractPart(input,
+	        		collectionObjectClient.getCommonPartName(), CollectionobjectsCommon.class);
+	        Assert.assertNotNull(collectionObject);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
+        //
+        // Next, get all of the auth refs and check that the expected number is returned
+        //
         ClientResponse<AuthorityRefList> res2 = collectionObjectClient.getAuthorityRefs(knownResourceId);
-        assertStatusCode(res2, testName);
-
-        AuthorityRefList list = res2.getEntity();
+        AuthorityRefList list = null;
+        try {
+	        assertStatusCode(res2, testName);        
+	        list = res2.getEntity();
+        } finally {
+        	if (res2 != null) {
+        		res2.releaseConnection();
+            }
+        }
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();

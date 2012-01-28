@@ -24,6 +24,7 @@ package org.collectionspace.services.client;
  *
  */
 public class GroupClient extends AbstractCommonListPoxServiceClientImpl<GroupProxy> {
+	
 	public static final String SERVICE_NAME = "groups";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -42,8 +43,6 @@ public class GroupClient extends AbstractCommonListPoxServiceClientImpl<GroupPro
 
 	@Override
 	public Class<GroupProxy> getProxyClass() {
-		// TODO Auto-generated method stub
 		return GroupProxy.class;
 	}
-
 }

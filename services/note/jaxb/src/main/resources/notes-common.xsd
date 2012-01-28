@@ -1,88 +1,74 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<!--
-    Contact schema (XSD)
-    
-    Entity  : Contact
-    Part    : Common
-    Used for: JAXB binding between XML and Java objects
+<!-- Contact schema (XSD) Entity : Contact Part : Common Used for: JAXB binding 
+	between XML and Java objects $LastChangedRevision: 1929 $ $LastChangedDate: 
+	2010-04-28 01:50:27 -0700 (Wed, 28 Apr 2010) $ -->
 
-    $LastChangedRevision: 1929 $
-    $LastChangedDate: 2010-04-28 01:50:27 -0700 (Wed, 28 Apr 2010) $
--->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+	elementFormDefault="unqualified"
+	xmlns:ns="http://collectionspace.org/services/note"
+	xmlns="http://collectionspace.org/services/note"
+	targetNamespace="http://collectionspace.org/services/note"
+	version="0.1">
 
-<xs:schema 
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="1.0" elementFormDefault="unqualified"
-  xmlns:ns="http://collectionspace.org/services/note"
-  xmlns="http://collectionspace.org/services/note"
-  targetNamespace="http://collectionspace.org/services/note"
-  version="0.1"
->
+	<!-- Avoid XmlRootElement nightmare: See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html -->
+	<!-- See http://wiki.collectionspace.org/display/collectionspace/Contact+Schema -->
 
-<!--
-    Avoid XmlRootElement nightmare:
-    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
--->
-<!-- See http://wiki.collectionspace.org/display/collectionspace/Contact+Schema -->    
-    
-    <!-- This is the base class for subitems -->
-    <xs:complexType name="subitem">
-        <xs:annotation>
-            <xs:appinfo>
-                <jaxb:class ref="org.collectionspace.services.common.subitem.Subitem"/>
-            </xs:appinfo>
-        </xs:annotation>
-    </xs:complexType>
-    
-    <xs:element name="notes_common">
-        <xs:complexType>
-            <xs:complexContent>
-               <xs:extension base="subitem">                    
-									<xs:sequence>
-											<xs:element name="content" type="xs:string" />
-											<xs:element name="author" type="xs:string" />
-											<xs:element name="date" type="xs:string" />
-									</xs:sequence>
-               </xs:extension>
-            </xs:complexContent>                    
-        </xs:complexType>
-    </xs:element>
-    
-    <!-- This is the base class for subitems -->
-    <xs:complexType name="abstractCommonList">
-        <xs:annotation>
-            <xs:appinfo>
-                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
-            </xs:appinfo>
-        </xs:annotation>
-    </xs:complexType>
-    
-    <!-- note records, as in Nuxeo repository -->
-    <xs:element name="notes-common-list">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-                    <xs:sequence>
-                        <xs:element name="note-list-item" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="content" type="xs:string"
-                                        minOccurs="1" />
-                                    <!-- uri to retrive note details -->
-                                    <xs:element name="uri" type="xs:anyURI"
-                                        minOccurs="1" />
-                                    <xs:element name="csid" type="xs:string"
-                                        minOccurs="1" />
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:extension>
-            </xs:complexContent>                    
-        </xs:complexType>
-    </xs:element>
-    
+	<!-- This is the base class for subitems -->
+	<xs:complexType name="subitem">
+		<xs:annotation>
+			<xs:appinfo>
+				<jaxb:class ref="org.collectionspace.services.common.subitem.Subitem" />
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:complexType>
+
+	<xs:element name="notes_common">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="subitem">
+					<xs:sequence>
+						<xs:element name="content" type="xs:string" />
+						<xs:element name="author" type="xs:string" />
+						<xs:element name="date" type="xs:string" />
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- This is the base class for subitems -->
+	<xs:complexType name="abstractCommonList">
+		<xs:annotation>
+			<xs:appinfo>
+				<jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList" />
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:complexType>
+
+	<!-- note records, as in Nuxeo repository -->
+	<xs:element name="notes-common-list">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="abstractCommonList">
+					<xs:sequence>
+						<xs:element name="note-list-item" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="content" type="xs:string"
+										minOccurs="1" />
+									<!-- uri to retrive note details -->
+									<xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+									<xs:element name="csid" type="xs:string" minOccurs="1" />
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
 </xs:schema>
 

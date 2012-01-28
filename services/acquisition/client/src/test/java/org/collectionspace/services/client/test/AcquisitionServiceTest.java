@@ -26,12 +26,12 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AcquisitionClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
@@ -54,24 +54,20 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 621 $
  * $LastChangedDate: 2009-09-02 16:49:01 -0700 (Wed, 02 Sep 2009) $
  */
-public class AcquisitionServiceTest extends AbstractServiceTestImpl {
+public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, AcquisitionsCommon> {
 
     /** The logger. */
     private final String CLASS_NAME = AcquisitionServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    /** The known resource id. */
-    private String knownResourceId = null;
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.timestampUTC();
-
 
     @Override
     public String getServicePathComponent() {
         return AcquisitionClient.SERVICE_PATH_COMPONENT;
     }
-
 
     @Override
     protected String getServiceName() {
@@ -94,13 +90,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
@@ -124,9 +115,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
@@ -146,8 +137,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-       dependsOnMethods = {"create"})
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+//       dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
         for(int i = 0; i < 3; i++){
             create(testName);
@@ -166,11 +157,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     // Verify that record creation occurs successfully when there is NO whitespace
     // between the acquisitionFunding tag and its first child element tag
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2578group"})
+        dependsOnMethods = {"CRUDTests"}, groups = {"cspace2578group"})
     public void createFromXmlNoWhitespaceAfterRepeatableGroupTag(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         String testDataDir = System.getProperty("test-data.fileName");
         String newId =
             createFromXmlFile(testName, testDataDir + "/cspace-2578-no-whitespace.xml", false);
@@ -185,11 +173,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     // fixes, and also after the issue is resolved, to help detect any regressions.
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2578group"})
+        dependsOnMethods = {"CRUDTests"}, groups = {"cspace2578group"})
     public void createFromXmlWhitespaceAfterRepeatableGroupTag(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         String testDataDir = System.getProperty("test-data.fileName");
         String newId =
             createFromXmlFile(testName, testDataDir + "/cspace-2578-whitespace.xml", false);
@@ -293,14 +278,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create"})
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+//        dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        
         // Perform setup.
         setupRead();
 
@@ -315,9 +295,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         AcquisitionsCommon acquisitionObject = (AcquisitionsCommon) extractPart(input,
@@ -347,14 +327,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+//        dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         // Perform setup.
         setupReadNonExistent();
 
@@ -368,9 +343,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -381,28 +356,30 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createList", "read"})
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+//        dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
         ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        AbstractCommonList list = res.getEntity();
-
-        // Optionally output additional data about list members for debugging.
-        if(logger.isTraceEnabled()){
-        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
+        try {
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        assertStatusCode(res, testName);
+	        AbstractCommonList list = res.getEntity();
+	
+	        // Optionally output additional data about list members for debugging.
+	        if (logger.isTraceEnabled() == true){
+	        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-
     }
     
     // Failure outcomes
@@ -417,21 +394,19 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+//        dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        
         // Perform setup.
         setupUpdate();
 
         // Retrieve the contents of a resource to update.
         AcquisitionClient client = new AcquisitionClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 
@@ -452,7 +427,13 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
-        assertStatusCode(res, testName);
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         input = new PoxPayloadIn(res.getEntity());
         AcquisitionsCommon updatedAcquisition =
@@ -615,14 +596,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"update", "testSubmitRequest"})
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+//        dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        
         // Perform setup.
         setupUpdateNonExistent();
 
@@ -640,9 +616,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -653,14 +629,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "read", "update"})
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+//        dependsOnMethods = {"create", "read", "update"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        
         // Perform setup.
         setupDelete();
 
@@ -674,9 +645,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // Failure outcomes
@@ -684,14 +655,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"delete"})
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+//        dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        
         // Perform setup.
         setupDeleteNonExistent();
 
@@ -705,53 +671,13 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-    /**
-     * Tests the code for manually submitting data that is used by several
-     * of the methods above.
-     * @throws Exception
-     */
-
-    @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() throws Exception {
-        testSubmitRequest(knownResourceId);
-    }
-
-    /**
-     * Test submit request.
-     *
-     * @param resourceId the resource id
-     * @throws Exception the exception
-     */
-    private void testSubmitRequest(String resourceId) throws Exception {
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(resourceId);
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url
-                    + " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
-    }
-
-    // ---------------------------------------------------------------
-    // Utility methods used by tests above
     // ---------------------------------------------------------------
 
     @Override
@@ -867,9 +793,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
         String newId = extractId(res);
         allResourceIdsCreated.add(newId);
         return newId;
@@ -912,20 +838,60 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
         ClientResponse<String> res = client.read(csid);
-        assertStatusCode(res, testName);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": Reading Common part ...");
+        AcquisitionsCommon acquisition = null;
+        try {
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        assertStatusCode(res, testName);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": Reading Common part ...");
+	        }
+	        acquisition = (AcquisitionsCommon) extractPart(input,
+	                client.getCommonPartName(), AcquisitionsCommon.class);
+	        Assert.assertNotNull(acquisition);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        AcquisitionsCommon acquisition =
-                (AcquisitionsCommon) extractPart(input,
-                client.getCommonPartName(), AcquisitionsCommon.class);
-        Assert.assertNotNull(acquisition);
 
         return acquisition;
      }
 
+
+	@Override
+	protected PoxPayloadOut createInstance(String commonPartName,
+			String identifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected AcquisitionsCommon updateInstance(
+			AcquisitionsCommon commonPartObject) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(AcquisitionsCommon original,
+			AcquisitionsCommon updated) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+    /*
+     * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+     * refer to this method in their @Test annotation declarations.
+     */
+    @Override
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+    public void CRUDTests(String testName) {
+    	// Do nothing.  Simply here to for a TestNG execution order for our tests
+    }	
 }
 

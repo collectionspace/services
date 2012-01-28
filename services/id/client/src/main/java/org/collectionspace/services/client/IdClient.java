@@ -9,7 +9,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
-public class IdClient extends AbstractServiceClientImpl<String, IdProxy> {
+public class IdClient extends AbstractServiceClientImpl<String, String, String, IdProxy> {
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
@@ -57,4 +57,8 @@ public class IdClient extends AbstractServiceClientImpl<String, IdProxy> {
     public ClientResponse<String> createId(String csid) {
         return getProxy().createId(csid);
     }
+
+	@Override
+	public ClientResponse<String> update(String csid, String payload) {
+		throw new UnsupportedOperationException("ID client does not support an update operation.");	}
 }

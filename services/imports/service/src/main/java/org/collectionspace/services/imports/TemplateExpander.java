@@ -24,7 +24,6 @@
 
 package org.collectionspace.services.imports;
 
-import java.io.*;
 import java.util.UUID;
 
 import org.collectionspace.services.common.IFragmentHandler;
@@ -37,8 +36,6 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.hibernate.sql.Template;
-import org.testng.annotations.Test;
 import org.xml.sax.InputSource;
 
 /** This class expands templates specifically for the imports service.

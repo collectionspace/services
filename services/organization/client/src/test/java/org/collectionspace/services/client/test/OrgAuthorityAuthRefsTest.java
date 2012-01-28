@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
+public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
    /** The logger. */
     private final String CLASS_NAME = OrgAuthorityAuthRefsTest.class.getName();
@@ -80,19 +80,10 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 		return OrgAuthorityClient.SERVICE_NAME;
 	}
 
-    private String knownResourceId = null;
+    protected String knownItemResourceId = null;
+	
     private String knownResourceRefName = null;
-    
-    /** The known item id. */
-    private String knownItemResourceId = null;
-    
-    /** The all resource ids created. */
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
-    
-    /** The all item resource ids created. */
-    private Map<String, String> allItemResourceIdsCreated =
-        new HashMap<String, String>();
-    
+            
     /** The person ids created. */
     private List<String> personIdsCreated = new ArrayList<String>();
     
@@ -128,7 +119,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
+	protected AbstractCommonList getCommonList(
 			ClientResponse<AbstractCommonList> response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
@@ -143,12 +134,8 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider="testName")
     public void createWithAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Create a new Organization Authority resource.
@@ -173,9 +160,9 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 	        if(logger.isDebugEnabled()){
 	            logger.debug(testName + ": status = " + statusCode);
 	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	            invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
 	
 	        // Store the IDs from every resource created by tests,
 	        // so they can be deleted after tests have been run.
@@ -228,7 +215,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 
         // Store the IDs from every item created by tests,
         // so they can be deleted after tests have been run.
-        allItemResourceIdsCreated.put(knownItemResourceId, knownResourceId);
+        allResourceItemIdsCreated.put(knownItemResourceId, knownResourceId);
     }
     
     /**
@@ -244,8 +231,8 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     	ClientResponse<Response> res = personAuthClient.create(multipart);
         try {
             int statusCode = res.getStatus();
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, STATUS_CREATED);
             personAuthCSID = extractId(res);
         } finally {
@@ -291,8 +278,8 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     	try {
 	        int statusCode = res.getStatus();
 	
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
 	        Assert.assertEquals(statusCode, STATUS_CREATED);
 	    	result = extractId(res);
     	} finally {
@@ -310,7 +297,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         // Organization authority as its parent Organization resource.
 
         String subBodyResourceId = createSubBodyOrganization("Test SubBody Organization");
-        allItemResourceIdsCreated.put(subBodyResourceId, knownResourceId);
+        allResourceItemIdsCreated.put(subBodyResourceId, knownResourceId);
         subBodyRefName = OrgAuthorityClientUtils.getOrgRefName(knownResourceId, subBodyResourceId, null);
     }
 
@@ -331,8 +318,8 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     	ClientResponse<Response> res = orgAuthClient.createItem(knownResourceId, multipart);
     	try {
             int statusCode = res.getStatus();
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, STATUS_CREATED);
             result = extractId(res);
     	} finally {
@@ -349,28 +336,29 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    @Test(dataProvider="testName",
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-        ClientResponse<String> res =
-            orgAuthClient.readItem(knownResourceId, knownItemResourceId);
-        assertStatusCode(res, testName);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
-            orgAuthClient.getItemCommonPartName(), OrganizationsCommon.class);
-        Assert.assertNotNull(organization);
-        if(logger.isDebugEnabled()){
-            logger.debug(objectAsXmlString(organization, OrganizationsCommon.class));
+        ClientResponse<String> res = orgAuthClient.readItem(knownResourceId, knownItemResourceId);
+        OrganizationsCommon organization = null;
+        try {
+	        assertStatusCode(res, testName);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        organization = (OrganizationsCommon) extractPart(input,
+	            orgAuthClient.getItemCommonPartName(), OrganizationsCommon.class);
+	        Assert.assertNotNull(organization);
+	        if (logger.isDebugEnabled()){
+	            logger.debug(objectAsXmlString(organization, OrganizationsCommon.class));
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
         // Check one or more of the authority fields in the Organization item
         Assert.assertEquals(organization.getContactNames().getContactName().get(0),
@@ -385,9 +373,15 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         // and get the ID for the organization item
         ClientResponse<AuthorityRefList> res2 =
            orgAuthClient.getItemAuthorityRefs(knownResourceId, knownItemResourceId);
-        assertStatusCode(res2, testName);
-        
-        AuthorityRefList list = res2.getEntity();
+        AuthorityRefList list = null;
+        try {
+	        assertStatusCode(res2, testName);
+	        list = res2.getEntity();
+        } finally {
+        	if (res2 != null) {
+        		res2.releaseConnection();
+            }
+        }
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
@@ -456,7 +450,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         String itemResourceId;
         OrgAuthorityClient client = new OrgAuthorityClient();
         // Clean up item resources.
-        for (Map.Entry<String, String> entry : allItemResourceIdsCreated.entrySet()) {
+        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
             itemResourceId = entry.getKey();
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation

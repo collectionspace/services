@@ -25,13 +25,12 @@ package org.collectionspace.services.client.test;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BatchClient;
-import org.collectionspace.services.client.BatchProxy;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.batch.BatchCommon;
 
@@ -50,12 +49,11 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
-public class BatchServiceTest extends AbstractServiceTestImpl {
+public class BatchServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, BatchCommon> {
 
     private final String CLASS_NAME = BatchServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     final String SERVICE_PATH_COMPONENT = "batch";
-    private String knownResourceId = null;
 
     @Override
 	public String getServicePathComponent() {
@@ -72,188 +70,22 @@ public class BatchServiceTest extends AbstractServiceTestImpl {
         return new BatchClient();
     }
 
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void create(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupCreate();
-        BatchClient client = new BatchClient();
-        PoxPayloadOut multipart = createBatchInstance(createIdentifier());
-        ClientResponse<Response> res = client.create(multipart);
-        assertStatusCode(res, testName);
-        if (knownResourceId == null) {
-            knownResourceId = extractId(res);  // Store the ID returned from the first resource created for additional tests below.
-            logger.debug(testName + ": knownResourceId=" + knownResourceId);
-        }
-        allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
-    public void createList(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        for (int i = 0; i < 3; i++) {
-            create(testName);
-        }
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
-    public void read(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupRead();
-        BatchClient client = new BatchClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        BatchCommon batch = (BatchCommon) extractPart(input, client.getCommonPartName(), BatchCommon.class);
-        Assert.assertNotNull(batch);
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createList", "read"})
-    public void readList(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupReadList();
-        BatchClient client = new BatchClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        String bar = "\r\n\r\n=================================\r\n\r\n";
-        System.out.println(bar+" res: "+res);
-        AbstractCommonList  list = res.getEntity();
-        System.out.println(bar+" list: "+list);
-
-        if(logger.isTraceEnabled()){
-        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
-        }
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"read"})
-    public void update(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupUpdate();
-        BatchClient client = new BatchClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-        logger.debug("got object to update with ID: " + knownResourceId);
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        BatchCommon batch = (BatchCommon) extractPart(input, client.getCommonPartName(), BatchCommon.class);
-        Assert.assertNotNull(batch);
-
-        batch.setName("updated-" + batch.getName());
-        logger.debug("Object to be updated:"+objectAsXmlString(batch, BatchCommon.class));
-        PoxPayloadOut output = new PoxPayloadOut(BatchClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(batch, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
-        res = client.update(knownResourceId, output);
-        assertStatusCode(res, testName);
-        input = new PoxPayloadIn(res.getEntity());
-        BatchCommon updatedBatch = (BatchCommon) extractPart(input, client.getCommonPartName(), BatchCommon.class);
-        Assert.assertNotNull(updatedBatch);
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupUpdateNonExistent();
-        // Submit the request to the service and store the response.
-        // Note: The ID used in this 'create' call may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-        BatchClient client = new BatchClient();
-        PoxPayloadOut multipart = createBatchInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
-        assertStatusCode(res, testName);
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
-    public void delete(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupDelete();
-        BatchClient client = new BatchClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        assertStatusCode(res, testName);
-    }
-
-    // ---------------------------------------------------------------
-    // Failure outcome tests : means we expect response to fail, but test to succeed
-    // ---------------------------------------------------------------
-
-    // Failure outcome
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupReadNonExistent();
-        BatchClient client = new BatchClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        assertStatusCode(res, testName);
-    }
-
-    // Failure outcome
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"delete"})
-    public void deleteNonExistent(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupDeleteNonExistent();
-        BatchClient client = new BatchClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        assertStatusCode(res, testName);
-    }
-
-    // Failure outcomes
-    // Placeholders until the tests below can be implemented. See Issue CSPACE-401.
-
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-    }
-
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithMalformedXml(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-    }
-
-    // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-
-    @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() {
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode(); // Expected status code: 200 OK
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        int statusCode = submitRequest(method, url);
-        logger.debug("testSubmitRequest: url=" + url + " status=" + statusCode);
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-    }
-
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
     
     @Override
     protected PoxPayloadOut createInstance(String identifier) {
-    	BatchClient client = new BatchClient();
     	return createBatchInstance(identifier);
     }
     
+	@Override
+	protected PoxPayloadOut createInstance(String commonPartName,
+			String identifier) {
+		PoxPayloadOut result = createBatchInstance(identifier);
+		return result;
+	}
+
     private PoxPayloadOut createBatchInstance(String exitNumber) {
         String identifier = "batchNumber-" + exitNumber;
         BatchCommon batch = new BatchCommon();
@@ -269,4 +101,33 @@ public class BatchServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
+
+	@Override
+	protected BatchCommon updateInstance(BatchCommon batchCommon) {
+		BatchCommon result = new BatchCommon();
+		
+		result.setName("updated-" + batchCommon.getName());
+		result.setNotes("updated-" + batchCommon.getNotes());
+		
+		return result;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(BatchCommon original,
+			BatchCommon updated) throws Exception {
+		Assert.assertEquals(updated.getName(), original.getName());
+		Assert.assertEquals(updated.getNotes(), original.getNotes());
+	}
+
+    /*
+     * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+     * refer to this method in their @Test annotation declarations.
+     */
+    @Override
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+    public void CRUDTests(String testName) {
+    	// Do nothing.  Simply here to for a TestNG execution order for our tests
+    }	
 }

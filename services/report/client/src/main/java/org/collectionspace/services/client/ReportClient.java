@@ -56,6 +56,10 @@ public class ReportClient extends AbstractCommonListPoxServiceClientImpl<ReportP
 		return ReportProxy.class;
 	}
 	
+	/*
+	 * Proxied service calls
+	 */
+	
     /**
      * @return
      * @see org.collectionspace.services.client.ReportProxy#getReport()

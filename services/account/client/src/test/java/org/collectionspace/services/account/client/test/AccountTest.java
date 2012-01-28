@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 
 import javax.persistence.Query;
@@ -22,7 +21,6 @@ import org.collectionspace.services.account.Status;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +40,8 @@ public class AccountTest {
 
     @BeforeMethod
     public void init() {
-
         emf = Persistence.createEntityManagerFactory("org.collectionspace.services.account");
-
         em = emf.createEntityManager();
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("created entity manager");
-//        }
     }
 
     @AfterMethod
@@ -57,7 +50,6 @@ public class AccountTest {
             em.close();
         }
     }
-
 
     @SuppressWarnings("unchecked")
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class)

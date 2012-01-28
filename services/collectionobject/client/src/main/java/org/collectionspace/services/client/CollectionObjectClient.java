@@ -61,7 +61,6 @@ public class CollectionObjectClient extends AbstractCommonListPoxServiceClientIm
         return CollectionObjectProxy.class;
     }
 
-
     /**
      * Roundtrip.
      * 
@@ -77,19 +76,4 @@ public class CollectionObjectClient extends AbstractCommonListPoxServiceClientIm
         getLogger().debug("<<<<Roundtrip stop.");
         return result;
     }
-
-    /**
-     * Keyword search.
-     * 
-     * @param keywords the keywords
-     * 
-     * @see org.collectionspace.services.client.CollectionObjectProxy#keywordSearch()
-     * @return the client response< collectionobjects common list>
-     */
-    /*
-    public ClientResponse<CollectionobjectsCommonList> keywordSearch(String keywords) {
-        return getProxy().keywordSearch(keywords);
-    }
-     * 
-     */
 }

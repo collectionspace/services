@@ -39,8 +39,30 @@ public interface ServiceTest {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
 
+    /*
+     * We use this method to force a TestNG execution order for our tests.  The "leaf" methods
+     * should look something like this:
+     * 
+	    //
+	    // For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+	    // refer to this method in their @Test annotation declarations.
+	    //
+	    @Test(dataProvider = "testName",
+	    		dependsOnMethods = {
+	        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+	    public void CRUDTests() {
+	    	// Do nothing.  Simply here to for a TestNG execution order for our tests
+	    }
+	 *
+	 * For an example, see the CollectionObjectServiceTest class.
+	 * 
+     */    
+    public void CRUDTests(String testName);
+    
     // Success outcomes
 
+    public void searchWorkflowDeleted(String testName) throws Exception;
+    
     /**
      * Tests creation of a new resource.
      *
@@ -49,7 +71,7 @@ public interface ServiceTest {
      * @throws Exception 
      */
     public void create(String testName) throws Exception;
-
+    
     /**
      * Tests creation of a list of two or more new resources by repeatedly
      * calling create(), and relies on the latter's test assertion(s).
@@ -189,7 +211,6 @@ public interface ServiceTest {
      * @throws Exception 
      */
     public void updateNonExistent(String testName) throws Exception;
-
 
     // ---------------------------------------------------------------
     // CRUD tests : DELETE tests

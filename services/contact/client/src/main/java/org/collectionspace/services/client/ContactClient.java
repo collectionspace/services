@@ -21,6 +21,7 @@ package org.collectionspace.services.client;
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
+ * 
  */
 public class ContactClient extends AbstractCommonListPoxServiceClientImpl<ContactProxy> {
 

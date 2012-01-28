@@ -26,13 +26,13 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoanStatusGroup;
@@ -42,7 +42,6 @@ import org.collectionspace.services.loanout.LoansoutCommon;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +53,12 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class LoanoutServiceTest extends AbstractServiceTestImpl {
+public class LoanoutServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, LoansoutCommon> {
 
     /** The logger. */
     private final String CLASS_NAME = LoanoutServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     /** The known resource id. */
-    private String knownResourceId = null;
     private final static String CURRENT_DATE_UTC =
         GregorianCalendarDateTimeUtils.currentDateUTC();
 
@@ -76,7 +74,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getAbstractCommonList(
+    protected AbstractCommonList getCommonList(
             ClientResponse<AbstractCommonList> response) {
         return response.getEntity(AbstractCommonList.class);
     }
@@ -89,12 +87,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
@@ -117,9 +111,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
@@ -139,8 +133,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
         for (int i = 0; i < 3; i++) {
             create(testName);
@@ -270,29 +264,30 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupRead();
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        // Get the common part of the response and verify that it is not null.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         LoansoutCommon loanoutCommon = null;
-        if (payloadInputPart != null) {
-            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+        try {
+	        assertStatusCode(res, testName);
+	        // Get the common part of the response and verify that it is not null.
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+	        if (payloadInputPart != null) {
+	            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+	        }
+	        Assert.assertNotNull(loanoutCommon);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertNotNull(loanoutCommon);
 
         // Check selected fields in the common part.
         Assert.assertNotNull(loanoutCommon.getLoanOutNumber());
@@ -321,13 +316,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupReadNonExistent();
 
@@ -341,9 +332,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -354,25 +345,27 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
         ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        AbstractCommonList list = res.getEntity();
-
+        AbstractCommonList list = null;
+        try {
+	        assertStatusCode(res, testName);
+	        list = res.getEntity();
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()){
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
 
@@ -388,29 +381,30 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
-        setupUpdate();
+        setupRead();
 
         // Retrieve the contents of a resource to update.
         LoanoutClient client = new LoanoutClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        // Extract the common part from the response.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         LoansoutCommon loanoutCommon = null;
-        if (payloadInputPart != null) {
-            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+        try {
+	        assertStatusCode(res, testName);
+	        // Extract the common part from the response.
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+	        if (payloadInputPart != null) {
+	            loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+	        }
+	        Assert.assertNotNull(loanoutCommon);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertNotNull(loanoutCommon);
 
         // Update the content of this resource.
         loanoutCommon.setLoanOutNumber("updated-" + loanoutCommon.getLoanOutNumber());
@@ -432,21 +426,28 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         }
         loanoutCommon.setLoanOutNote("updated-" + loanoutCommon.getLoanOutNote());
 
+        setupUpdate();
+        
         // Submit the updated resource in an update request to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart = output.addPart(loanoutCommon, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
-        res = client.update(knownResourceId, output);
-        assertStatusCode(res, testName);
+        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), loanoutCommon);
 
-        // Extract the updated common part from the response.
-        input = new PoxPayloadIn(res.getEntity());
-        payloadInputPart = input.getPart(client.getCommonPartName());
+        res = client.update(knownResourceId, output);
         LoansoutCommon updatedLoanoutCommon = null;
-        if (payloadInputPart != null) {
-            updatedLoanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+        try {
+	        assertStatusCode(res, testName);
+	        // Extract the updated common part from the response.
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+	        if (payloadInputPart != null) {
+	            updatedLoanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+	        }
+	        Assert.assertNotNull(updatedLoanoutCommon);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertNotNull(updatedLoanoutCommon);
 
         // Check selected fields in the updated resource.
         Assert.assertEquals(updatedLoanoutCommon.getLoanOutNumber(),
@@ -598,13 +599,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update", "testSubmitRequest"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdateNonExistent();
 
@@ -621,9 +618,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -634,13 +631,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupDelete();
 
@@ -654,9 +647,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // Failure outcomes
@@ -664,13 +657,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"delete"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupDeleteNonExistent();
 
@@ -684,9 +673,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -696,7 +685,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
      */
-    @Test(dependsOnMethods = {"create", "read"})
+//    @Test(dependsOnMethods = {"create", "read"})
     public void testSubmitRequest() {
 
         // Expected status code: 200 OK
@@ -773,8 +762,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
-                multipart.addPart(loanoutCommon, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new LoanoutClient().getCommonPartName());
+                multipart.addPart(new LoanoutClient().getCommonPartName(), loanoutCommon);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, loanout common");
@@ -789,4 +777,30 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
     protected String getServiceName() {
         return LoanoutClient.SERVICE_NAME;
     }
+
+	@Override
+	public void CRUDTests(String testName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected PoxPayloadOut createInstance(String commonPartName,
+			String identifier) {
+        PoxPayloadOut result = createLoanoutInstance(identifier);
+        return result;
+	}
+
+	@Override
+	protected LoansoutCommon updateInstance(LoansoutCommon commonPartObject) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(LoansoutCommon original,
+			LoansoutCommon updated) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 }

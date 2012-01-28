@@ -24,19 +24,15 @@ package org.collectionspace.services.client.test;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.client.BlobProxy;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.blob.BlobsCommon;
@@ -58,11 +54,10 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
-public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon> {
+public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, BlobsCommon> {
 
     private final String CLASS_NAME = BlobServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    private String knownResourceId = null;
     
     private final static String KNOWN_IMAGE_FILENAME = "01-03-09_1546.jpg";
     private final static int WIDTH_DIMENSION_INDEX = 0;
@@ -86,12 +81,12 @@ public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon>
 	}
     
     @Override
-    protected CollectionSpaceClient<AbstractCommonList, BlobProxy> getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() {
         return new BlobClient();
     }
 
     @Override
-    protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
         return response.getEntity(AbstractCommonList.class);
     }
 
@@ -113,23 +108,7 @@ public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon>
     private boolean isBlobCleanup() {
     	return blobCleanup;
     }
-    
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void create(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupCreate();
-        BlobClient client = new BlobClient();
-        PoxPayloadOut multipart = createBlobInstance(createIdentifier());
-        ClientResponse<Response> res = client.create(multipart);
-        assertStatusCode(res, testName);
-        if (knownResourceId == null) {
-            knownResourceId = extractId(res);  // Store the ID returned from the first resource created for additional tests below.
-            logger.debug(testName + ": knownResourceId=" + knownResourceId);
-        }
-        allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they can be deleted after tests have been run.
-    }
-    
+        
     /**
      * Looks in the .../src/test/resources/blobs directory for files from which to create Blob
      * instances.
@@ -168,10 +147,16 @@ public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon>
 				            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
 				            res = client.createBlobFromFormData(form);
 		        		}
-			            assertStatusCode(res, testName);
-			            if (isBlobCleanup() == true) {
-			            	allResourceIdsCreated.add(extractId(res));
-			            }
+		        		try {
+				            assertStatusCode(res, testName);
+				            if (isBlobCleanup() == true) {
+				            	allResourceIdsCreated.add(extractId(res));
+				            }
+		        		} finally {
+		        			if (res != null) {
+		                        res.releaseConnection();
+		                    }
+		        		}
 	        		}
 	        	}
 	        } else {
@@ -182,9 +167,11 @@ public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon>
         }
     }
     
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createBlobWithURI"})
+    /*
+     * For a known image file, make sure we're getting back the correct metadata about it.
+     */
+    @Test(dataProvider = "testName", dependsOnMethods = {"createBlobWithURI"})
     public void testImageDimensions(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
         setupCreate();
         
         String currentDir = this.getResourceDir();
@@ -193,23 +180,40 @@ public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon>
         File file = new File(blobsDirPath);
         URL fileUrl = file.toURI().toURL();
         String uri = fileUrl.toString();
-        
+        //
+        // Create the blob
+        //
         BlobClient client = new BlobClient();
 		ClientResponse<Response> res = null;
 		res = client.createBlobFromURI(uri);
-        assertStatusCode(res, testName);
-        
-        String blobCsid = extractId(res);
-        if (isBlobCleanup() == true) {
-        	allResourceIdsCreated.add(blobCsid);
-        }
-        
+		String blobCsid = null;
+		try {
+	        assertStatusCode(res, testName);	        
+	        blobCsid = extractId(res);
+	        if (isBlobCleanup() == true) {
+	        	allResourceIdsCreated.add(blobCsid);
+	        }
+		} finally {
+			if (res != null) {
+                res.releaseConnection();
+            }
+		}
+        //
+		// Read the blob back to get the new dimension data
+		//
         setupRead();
         ClientResponse<String> readResponse = client.read(blobCsid);
-        assertStatusCode(readResponse, testName);
+        BlobsCommon blobsCommon = null;
+        try {
+        	assertStatusCode(readResponse, testName);
+            blobsCommon = this.extractCommonPartValue(readResponse);
+            Assert.assertNotNull(blobsCommon);
+        } finally {
+        	if (readResponse != null) {
+        		readResponse.releaseConnection();
+            }
+        }
         
-        BlobsCommon blobsCommon = this.extractCommonPartValue(readResponse);
-        Assert.assertTrue(blobsCommon != null);
         Assert.assertEquals(blobsCommon.getLength(), KNOWN_IMAGE_SIZE, "The known image blob was not the expected size of " + KNOWN_IMAGE_SIZE);
         
         MeasuredPartGroup measuredImagePart = blobsCommon.getMeasuredPartGroupList().getMeasuredPartGroup().get(0);
@@ -225,182 +229,22 @@ public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon>
         Assert.assertTrue(heightDimension.getValue().compareTo(KNOWN_IMAGE_HEIGHT) == 0);
     }
     
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURI(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
     	createBlob(testName, true /*with URI*/, null);
     }
     
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURL(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
     	createBlob(testName, true /*with URI*/, "http://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");
     }    
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"createBlobWithURI"})
     public void createBlobWithPost(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
     	createBlob(testName, false /*with POST*/, null);
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
-    public void createList(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        for (int i = 0; i < 3; i++) {
-            create(testName);
-        }
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create"})
-    public void read(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupRead();
-        BlobClient client = new BlobClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        BlobsCommon blob = (BlobsCommon) extractPart(input, client.getCommonPartName(), BlobsCommon.class);
-        Assert.assertNotNull(blob);
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createList", "read"})
-    public void readList(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupReadList();
-        BlobClient client = new BlobClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        AbstractCommonList list = res.getEntity();
-        if (logger.isDebugEnabled()) {
-            List<AbstractCommonList.ListItem> items =
-                list.getListItem();
-            int i = 0;
-            for(AbstractCommonList.ListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] " +
-                        item.toString());
-                i++;
-            }
-        }
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"read"})
-    public void update(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupUpdate();
-        BlobClient client = new BlobClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-        logger.debug("got object to update with ID: " + knownResourceId);
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        BlobsCommon blob = (BlobsCommon) extractPart(input, client.getCommonPartName(), BlobsCommon.class);
-        Assert.assertNotNull(blob);
-
-        blob.setName("updated-" + blob.getName());
-        logger.debug("Object to be updated:"+objectAsXmlString(blob, BlobsCommon.class));
-        PoxPayloadOut output = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(blob, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
-        res = client.update(knownResourceId, output);
-        assertStatusCode(res, testName);
-        input = new PoxPayloadIn(res.getEntity());
-        BlobsCommon updatedBlob = (BlobsCommon) extractPart(input, client.getCommonPartName(), BlobsCommon.class);
-        Assert.assertNotNull(updatedBlob);
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupUpdateNonExistent();
-        // Submit the request to the service and store the response.
-        // Note: The ID used in this 'create' call may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-        BlobClient client = new BlobClient();
-        PoxPayloadOut multipart = createBlobInstance(NON_EXISTENT_ID);
-        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
-        assertStatusCode(res, testName);
-    }
-
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
-    public void delete(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupDelete();
-        BlobClient client = new BlobClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        assertStatusCode(res, testName);
-    }
-
-    // ---------------------------------------------------------------
-    // Failure outcome tests : means we expect response to fail, but test to succeed
-    // ---------------------------------------------------------------
-
-    // Failure outcome
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupReadNonExistent();
-        BlobClient client = new BlobClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        assertStatusCode(res, testName);
-    }
-
-    // Failure outcome
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"delete"})
-    public void deleteNonExistent(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
-        setupDeleteNonExistent();
-        BlobClient client = new BlobClient();
-        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        assertStatusCode(res, testName);
-    }
-
-    // Failure outcomes
-    // Placeholders until the tests below can be implemented. See Issue CSPACE-401.
-
-    @Override
-    public void createWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    @Override
-    public void createWithMalformedXml(String testName) throws Exception {
-    }
-
-    @Override
-    public void createWithWrongXmlSchema(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithMalformedXml(String testName) throws Exception {
-    }
-
-    @Override
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
-    }
-
-    // ---------------------------------------------------------------
-    // Utility tests : tests of code used in tests above
-    // ---------------------------------------------------------------
-
-    @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() {
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode(); // Expected status code: 200 OK
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        int statusCode = submitRequest(method, url);
-        logger.debug("testSubmitRequest: url=" + url + " status=" + statusCode);
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
     }
 
     // ---------------------------------------------------------------
@@ -413,12 +257,12 @@ public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon>
     }    
     
     private PoxPayloadOut createBlobInstance(String exitNumber) {
+    	BlobClient client = new BlobClient();
         String identifier = "blobNumber-" + exitNumber;
         BlobsCommon blob = new BlobsCommon();
         blob.setName(identifier);
         PoxPayloadOut multipart = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new BlobClient().getCommonPartName());
+        PayloadOutputPart commonPart = multipart.addPart(client.getCommonPartName(), blob);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, blob common");
@@ -427,4 +271,37 @@ public class BlobServiceTest extends AbstractGenericServiceTestImpl<BlobsCommon>
 
         return multipart;
     }
+
+	@Override
+	protected PoxPayloadOut createInstance(String commonPartName,
+			String identifier) {
+		return createInstance(identifier);
+	}
+
+    /*
+     * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+     * refer to this method in their @Test annotation declarations.
+     */
+    @Override
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+    public void CRUDTests(String testName) {
+    	// Do nothing.  Simply here to for a TestNG execution order for our tests
+    }
+
+	@Override
+	protected BlobsCommon updateInstance(BlobsCommon blobsCommon) {
+		BlobsCommon result = new BlobsCommon();
+		
+        result.setName("updated-" + blobsCommon.getName());
+		
+		return result;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(BlobsCommon original,
+			BlobsCommon updated) throws Exception {
+		Assert.assertEquals(updated.getName(), original.getName());
+	}
 }

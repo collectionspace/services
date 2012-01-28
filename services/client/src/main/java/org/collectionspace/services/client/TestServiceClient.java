@@ -22,12 +22,18 @@
  */
 package org.collectionspace.services.client;
 
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.client.ClientResponse;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+
 /**
  * A CollectionObjectClient.
 
  * @version $Revision:$
  */
-public class TestServiceClient extends AbstractServiceClientImpl<Object, TestServiceProxy> {
+
+public final class TestServiceClient extends AbstractServiceClientImpl<AbstractCommonList, Object, Object, TestServiceProxy> {
 
     /**
      *
@@ -49,5 +55,25 @@ public class TestServiceClient extends AbstractServiceClientImpl<Object, TestSer
 	public Class<TestServiceProxy> getProxyClass() {
 		// TODO Auto-generated method stub
 		return TestServiceProxy.class;
+	}
+
+	@Override
+	public ClientResponse<Response> create(Object payload) {
+        throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ClientResponse<Object> update(String csid, Object payload) {
+        throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ClientResponse<Object> read(String csid) {
+        throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ClientResponse<AbstractCommonList> readList() {
+        throw new UnsupportedOperationException();
 	} 
 }

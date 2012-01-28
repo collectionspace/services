@@ -238,7 +238,7 @@
     <xs:complexType name="abstractCommonList">
         <xs:annotation>
             <xs:appinfo>
-                <jaxb:class ref="org.collectionspace.services.hyperjaxb.AbstractCommonList"/>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
             </xs:appinfo>
         </xs:annotation>
     </xs:complexType>

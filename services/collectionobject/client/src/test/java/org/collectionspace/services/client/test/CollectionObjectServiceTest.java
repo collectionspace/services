@@ -29,12 +29,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 //import org.collectionspace.services.client.AbstractServiceClientImpl;
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.BriefDescriptionList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
@@ -52,7 +51,6 @@ import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.collectionobject.TitleTranslationSubGroup;
 import org.collectionspace.services.collectionobject.TitleTranslationSubGroupList;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -69,16 +67,12 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
+public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, CollectionobjectsCommon> {
 
     /** The logger. */
     private final String CLASS_NAME = CollectionObjectServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     
-    // Instance variables specific to this test.
-    /** The known resource id. */
-    private String knownResourceId = null;
-
     private final String OBJECT_NAME_VALUE = "an object name";
     private final BigInteger AGE_VALUE = new BigInteger("55");
     private final String MEASURED_PART = "light box frame";
@@ -108,83 +102,37 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     protected CollectionSpaceClient getClientInstance() {
     	return new CollectionObjectClient();
     }
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-     */
-    @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AbstractCommonList.class);
-    }
- 
+     
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+    // Expected success outcomes
+    
+    /*
+     * For convenience and terseness, this test method is the base of the test execution dependency chain.  Other test methods may
+     * refer to this method in their @Test annotation declarations.
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup, such as initializing the type of service request
-        // (e.g. CREATE, DELETE), its valid and expected status codes, and
-        // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate();
-
-        // Submit the request to the service and store the response.
-        CollectionObjectClient client = new CollectionObjectClient();
-        String identifier = createIdentifier();
-        PoxPayloadOut multipart =
-                createCollectionObjectInstance(client.getCommonPartName(), identifier);
-        ClientResponse<Response> res = client.create(multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Store the ID returned from the first resource created
-        // for additional tests below.
-        if (knownResourceId == null) {
-            knownResourceId = extractId(res);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownResourceId=" + knownResourceId);
-            }
-        }
-
-        // Store the IDs from every resource created by tests,
-        // so they can be deleted after tests have been run.
-        allResourceIdsCreated.add(extractId(res));
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})    
+    public void CRUDTests(String testName) {
+    	// Do nothing.  Simply here to for a TestNG execution order for our tests
     }
-
-
+        
     /*
      * Tests to diagnose and verify the fixed status of CSPACE-1026,
      * "Whitespace at certain points in payload cause failure"
      */
+    
     /**
      * Creates the from xml cambridge.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    @Test(dataProvider = "testName",
+        dependsOnMethods = {"CRUDTests"})
     public void createFromXmlCambridge(String testName) throws Exception {
         String newId =
             createFromXmlFile(testName, "./test-data/testCambridge.xml", true);
@@ -202,11 +150,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // Verify that record creation occurs successfully when the first value instance
     // of a single, repeatable String scalar field is non-blank.
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2242group"})
+        dependsOnMethods = {"CRUDTests"}, groups = {"cspace2242group"})
     public void createFromXmlNonBlankFirstValueInstance(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         String newId =
             createFromXmlFile(testName, "./test-data/cspace-2242-first-value-instance-nonblank.xml", true);
         CollectionobjectsCommon collectionObject = readCollectionObjectCommonPart(newId);
@@ -219,11 +164,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // Verify that record creation occurs successfully when the first value instance
     // of a single, repeatable String scalar field is blank.
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2242group"})
+        dependsOnMethods = {"CRUDTests"}, groups = {"cspace2242group"})
     public void createFromXmlBlankFirstValueInstance(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         String newId =
             createFromXmlFile(testName, "./test-data/cspace-2242-first-value-instance-blank.xml", true);
         CollectionobjectsCommon collectionObject = readCollectionObjectCommonPart(newId);
@@ -235,11 +177,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
      // Verify that values are preserved when enclosed in double quote marks.
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace3237group"})
+        dependsOnMethods = {"CRUDTests"}, groups = {"cspace3237group"})
     public void doubleQuotesEnclosingFieldContents(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         String newId =
             createFromXmlFile(testName, "./test-data/cspace-3237-double-quotes.xml", true);
         CollectionobjectsCommon collectionObject = readCollectionObjectCommonPart(newId);
@@ -265,7 +204,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+        dependsOnMethods = {"CRUDTests"})
     public void createFromXmlRFWS1(String testName) throws Exception {
     	String testDataDir = System.getProperty("test-data.fileName");
         String newId =
@@ -281,7 +220,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+        dependsOnMethods = {"CRUDTests"})
     public void createFromXmlRFWS2(String testName) throws Exception {
     	String testDataDir = System.getProperty("test-data.fileName");
         String newId =
@@ -297,7 +236,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+        dependsOnMethods = {"CRUDTests"})
     public void createFromXmlRFWS3(String testName) throws Exception {
     	String testDataDir = System.getProperty("test-data.fileName");
         String newId =
@@ -313,7 +252,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+        dependsOnMethods = {"CRUDTests"})
     public void createFromXmlRFWS4(String testName) throws Exception {
     	String testDataDir = System.getProperty("test-data.fileName");
         String newId =
@@ -335,7 +274,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+        dependsOnMethods = {"CRUDTests"})
     public void createWithNullValueRepeatableField(String testName) throws Exception {
     	String testDataDir = System.getProperty("test-data.fileName");
     	String newId =
@@ -355,7 +294,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"}, groups={"utf8-create"})
+        dependsOnMethods = {"CRUDTests"}, groups={"utf8-create"})
     public void createWithUTF8Data(String testName) throws Exception {
     	String testDataDir = System.getProperty("test-data.fileName");
     	String newId =
@@ -371,16 +310,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             logger.debug("Received distinguishingFeatures: " + distinguishingFeatures);
         }
         Assert.assertTrue(distinguishingFeatures.equals(UTF8_DATA_SAMPLE));
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.ServiceTest#createList()
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    public void createList(String testName) throws Exception {
-    	this.createPaginatedList(testName, DEFAULT_LIST_SIZE);
     }
 
     // Failure outcomes
@@ -406,6 +335,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?
     }
 
     /* (non-Javadoc)
@@ -523,9 +453,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithRequiredValuesNullOrEmpty(String testName) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         setupCreate();
 
         // Build a payload with invalid content, by omitting a
@@ -559,8 +486,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
 
         // FIXME: Consider splitting off the following into its own test method.
@@ -589,257 +516,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
-
     }
-
-
-    // ---------------------------------------------------------------
-    // CRUD tests : READ tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Extract the common part.
-        CollectionobjectsCommon collectionobjectCommon = extractCommonPartValue(testName, res);
-
-        // Verify the number and contents of values in repeatable fields,
-        // as created in the instance record used for testing.
-        MeasuredPartGroupList measuredPartGroupList = collectionobjectCommon.getMeasuredPartGroupList();
-        Assert.assertNotNull(measuredPartGroupList, "Measured part group list was null");
-        List<MeasuredPartGroup> measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
-        Assert.assertNotNull(measuredPartGroups, "Measured part groups were null");
-        Assert.assertTrue(measuredPartGroups.size() > 0, "No measured part groups were returned");
-        MeasuredPartGroup mpGroup = measuredPartGroups.get(0);
-        Assert.assertNotNull(mpGroup.getMeasuredPart(), "Measured part was null");
-        Assert.assertEquals(mpGroup.getMeasuredPart(), MEASURED_PART,
-                "Measured part value returned didn't match expected value");
-        
-        DimensionSubGroupList dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
-        Assert.assertNotNull(dimensionSubGroupList, "Dimension subgroup list was null");
-        List<DimensionSubGroup> dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
-        Assert.assertNotNull(dimensionSubGroups, "Dimension subgroups were null");
-        Assert.assertTrue(dimensionSubGroups.size() > 0, "No dimension subgroups were returned");
-        DimensionSubGroup lengthDimension = dimensionSubGroups.get(0);
-        Assert.assertNotNull(lengthDimension, "Length dimension was null");
-        Assert.assertTrue(lengthDimension.getValue().compareTo(DIMENSION_VALUE_LENGTH) == 0,
-                "Dimension length value returned didn't match expected value");
-        
-        /* No longer part of the "default" domain service tests for the CollectionObject record.
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": Reading Natural History part ...");
-        }
-
-        // Currently checking only that the natural history part is non-null;
-        // can add specific field-level checks as warranted.
-        Object conh = extractPartValue(testName, res, getNHPartName());
-        Assert.assertNotNull(conh);
-        */
-    }
-
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-
     
-    // ---------------------------------------------------------------
-    // CRUD tests : READ_LIST tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList", "read"})
-    public void readList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupReadList();
-
-        // Submit the request to the service and store the response.
-        CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        AbstractCommonList list = res.getEntity();
-        
-        // Optionally output additional data about list members for debugging.
-        // the expected response(s)?
-        if(logger.isTraceEnabled()){
-        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
-        }
-        
-    }
-
-    // Failure outcomes
-    // None at present.
-    // ---------------------------------------------------------------
-    // CRUD tests : UPDATE tests
-    // ---------------------------------------------------------------
-    // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
-    public void update(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
-        // Read an existing resource that will be updated.
-        ClientResponse<String> res = updateRetrieve(testName, knownResourceId);
-
-        // Extract its common part.
-        CollectionobjectsCommon collectionObjectCommon = extractCommonPartValue(testName, res);
-
-        // Change the content of one or more fields in the common part.
-
-        collectionObjectCommon.setObjectNumber("updated-" + collectionObjectCommon.getObjectNumber());
-
-        // Change the object name in the first value instance in the
-        // object name repeatable group.
-        ObjectNameList objNameList = collectionObjectCommon.getObjectNameList();
-        List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
-        Assert.assertNotNull(objNameGroups);
-        Assert.assertTrue(objNameGroups.size() >= 1);
-        String objectName = objNameGroups.get(0).getObjectName();
-        Assert.assertEquals(objectName, OBJECT_NAME_VALUE);
-        String updatedObjectName = "updated-" + objectName;
-        objNameGroups.get(0).setObjectName(updatedObjectName);
-        collectionObjectCommon.setObjectNameList(objNameList);
-
-        // Replace the existing value instances in the dimensions repeatable group
-        // with entirely new value instances, also changing the number of such instances.
-        MeasuredPartGroupList measuredPartGroupList = collectionObjectCommon.getMeasuredPartGroupList();
-        Assert.assertNotNull(measuredPartGroupList);
-        List<MeasuredPartGroup> measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
-        Assert.assertNotNull(measuredPartGroups);
-        Assert.assertTrue(measuredPartGroups.size() > 0);
-        MeasuredPartGroup mpGroup = measuredPartGroups.get(0);
-        Assert.assertNotNull(mpGroup.getMeasuredPart());
-        
-        DimensionSubGroupList dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
-        Assert.assertNotNull(dimensionSubGroupList);
-        List<DimensionSubGroup> dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
-        Assert.assertNotNull(dimensionSubGroups);
-        int originalDimensionSubGroupSize = dimensionSubGroups.size();
-        Assert.assertTrue(dimensionSubGroups.size() > 0);
-        dimensionSubGroups.clear();
-        
-        DimensionSubGroup heightDimension = new DimensionSubGroup();
-        heightDimension.setDimension("height");
-        heightDimension.setMeasurementUnit(UPDATED_MEASUREMENT_UNIT);
-        dimensionSubGroups.add(heightDimension);
-        
-        int updatedDimensionGroupSize = dimensionSubGroups.size();
-        Assert.assertTrue(updatedDimensionGroupSize > 0);
-        Assert.assertTrue(updatedDimensionGroupSize != originalDimensionSubGroupSize);
-        
-        collectionObjectCommon.setMeasuredPartGroupList(measuredPartGroupList);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("sparse update that will be sent in update request:");
-            logger.debug(objectAsXmlString(collectionObjectCommon,
-                    CollectionobjectsCommon.class));
-        }
-
-        // Send the changed resource to be updated and read the updated resource
-        // from the response.
-        res = updateSend(testName, knownResourceId, collectionObjectCommon);
-
-        // Extract its common part.
-        CollectionobjectsCommon updatedCollectionobjectCommon = extractCommonPartValue(testName, res);
-
-        // Read the updated common part and verify that the resource was correctly updated.
-        objNameList = updatedCollectionobjectCommon.getObjectNameList();
-        Assert.assertNotNull(objNameList);
-        objNameGroups = objNameList.getObjectNameGroup();
-        Assert.assertNotNull(objNameGroups);
-        Assert.assertTrue(objNameGroups.size() >= 1);
-        Assert.assertEquals(updatedObjectName,
-                objNameGroups.get(0).getObjectName(),
-                "Data in updated object did not match submitted data.");
-        
-        measuredPartGroupList = collectionObjectCommon.getMeasuredPartGroupList();
-        Assert.assertNotNull(measuredPartGroupList);
-        measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
-        Assert.assertNotNull(measuredPartGroups);
-        Assert.assertTrue(measuredPartGroups.size() > 0);
-        mpGroup = measuredPartGroups.get(0);
-        Assert.assertNotNull(mpGroup.getMeasuredPart());
-        
-        dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
-        Assert.assertNotNull(dimensionSubGroupList);
-        dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
-        Assert.assertNotNull(dimensionSubGroups);
-        Assert.assertTrue(dimensionSubGroups.size() > 0);
-        Assert.assertTrue(dimensionSubGroups.size() == updatedDimensionGroupSize);
-        Assert.assertEquals(UPDATED_MEASUREMENT_UNIT,
-                dimensionSubGroups.get(0).getMeasurementUnit(),
-                "Data in updated object did not match submitted data.");
-
-    }
-
     /**
      * Update retrieve.
      *
@@ -857,9 +538,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
         if(logger.isDebugEnabled()){
             logger.debug("got object to update with ID: " + knownResourceId);
         }
@@ -887,9 +568,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
         return res;
     }
 
@@ -901,7 +582,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+    	dependsOnMethods = {"CRUDTests"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
     	//FIXME: Should this test really be empty?
     }
@@ -916,7 +597,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+    	dependsOnMethods = {"CRUDTests"})
     public void updateWithMalformedXml(String testName) throws Exception {
     	//FIXME: Should this test really be empty?
     }
@@ -926,7 +607,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+    	dependsOnMethods = {"CRUDTests"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
     	//FIXME: Should this test really be empty?
     }
@@ -1020,17 +701,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     }
 */
 
-    /* (non-Javadoc)
- * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
- */
-@Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update", "testSubmitRequest"})
+    @Override
     public void updateNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdateNonExistent();
 
@@ -1040,7 +712,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in updateCollectionObject(), below.
         CollectionObjectClient client = new CollectionObjectClient();
         PoxPayloadOut multipart =
-                createCollectionObjectInstance(client.getCommonPartName(), NON_EXISTENT_ID);
+                createInstance(client.getCommonPartName(), NON_EXISTENT_ID);
         ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
@@ -1049,9 +721,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
    /**
@@ -1066,21 +738,20 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     * @param testName  The name of this test method.  This name is supplied
     *     automatically, via reflection, by a TestNG 'data provider' in
     *     a base class.
- * @throws Exception 
+    * @throws Exception 
     */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"CRUDTests"})
     public void updateWithRequiredValuesNullOrEmpty(String testName) throws Exception {
-  
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         // Read an existing record for updating.
         ClientResponse<String> res = updateRetrieve(testName, knownResourceId);
-
-        // Extract its common part.
-        CollectionobjectsCommon collectionObjectCommon = extractCommonPartValue(testName, res);
+        CollectionobjectsCommon collectionObjectCommon = null;
+        try {
+	        // Extract its common part.
+	        collectionObjectCommon = extractCommonPartValue(res);
+        } finally {
+        	res.releaseConnection();
+        }
 
         // Update the common part with invalid content, by setting a value to
         // the empty String, in a field that requires a non-empty value,
@@ -1096,125 +767,119 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         setupUpdate();
         PoxPayloadOut output = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(collectionObjectCommon, MediaType.APPLICATION_XML_TYPE);
         CollectionObjectClient client = new CollectionObjectClient();
-        commonPart.setLabel(client.getCommonPartName());
+        output.addPart(client.getCommonPartName(), collectionObjectCommon);
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Read the response and verify that the update attempt failed.
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
-
+        
+        try {
+	        int statusCode = res.getStatus();
+	        // Read the response and verify that the update attempt failed.
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+        } finally {
+        	res.releaseConnection();
+        }
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
-     */
+    
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupDelete();
-
-        // Submit the request to the service and store the response.
-        CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    	//
+    	// Create an object to delete, save the current 'knownResourceId' since we don't want to delete it yet
+    	// and temporarily set it to the csid of the resource we just created.
+    	//
+    	String tempCsid = knownResourceId;
+    	// the super.delete() method uses the knownResourceId member
+        knownResourceId = newCollectionObject(true);
+        
+        try {
+        	super.delete(testName);
+        } finally {
+        	// reset the 'knownResourceId'
+        	knownResourceId = tempCsid;
+        }        
     }
 
-    // Failure outcomes
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
-     */
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"delete"})
-    public void deleteNonExistent(String testName) throws Exception {
+    //
+    // Expected failure outcome tests
+    //
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
+    @Override
+    public void deleteNonExistent(String testName) throws Exception {
         // Perform setup.
         setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above
     // ---------------------------------------------------------------
+    
     /**
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
      * @throws Exception 
      */
 
-    @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() throws Exception {
-        testSubmitRequest(knownResourceId);
-    }
-
-    /**
-     * Test submit request.
-     *
-     * @param resourceId the resource id
-     * @throws Exception the exception
-     */
-    private void testSubmitRequest(String resourceId) throws Exception {
-
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
-        // Submit the request to the service and store the response.
-        String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(resourceId);
-        int statusCode = submitRequest(method, url);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url
-                    + " status=" + statusCode);
-        }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
-    }
-
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+        
+    private ClientResponse<Response> newCollectionObject() {
+    	ClientResponse<Response> result = null;
+    	
+        CollectionObjectClient client = new CollectionObjectClient();
+        String identifier = createIdentifier();
+        PoxPayloadOut multipart =
+                createInstance(client.getCommonPartName(), identifier);
+        result = client.create(multipart);
+        
+        return result;
+    }
+    
+    private String newCollectionObject(boolean assertStatus) {
+    	String result = null;
+    	
+    	ClientResponse<Response> res = newCollectionObject();
+    	try {
+	        int statusCode = res.getStatus();
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
+	        result = extractId(res);
+    	} finally {
+    		res.releaseConnection();
+    	}
+
+    	return result;
+    }
+            
+    @Override
+    protected PoxPayloadOut createInstance(String identifier) {
+    	String commonPartName = CollectionObjectClient.SERVICE_COMMON_PART_NAME;
+    	return createInstance(commonPartName, identifier);
+    }
+    
     /**
      * Creates the collection object instance.
      *
@@ -1222,17 +887,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private PoxPayloadOut createCollectionObjectInstance(String commonPartName,
+    @Override
+    protected PoxPayloadOut createInstance(String commonPartName,
             String identifier) {
         return createCollectionObjectInstance(commonPartName,
                 "objectNumber-" + identifier,
                 "objectName-" + identifier);
-    }
-    
-    @Override
-    protected PoxPayloadOut createInstance(String identifier) {
-    	String commonPartName = CollectionObjectClient.SERVICE_COMMON_PART_NAME;
-    	return createCollectionObjectInstance(commonPartName, identifier);
     }
 
     /**
@@ -1246,11 +906,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private PoxPayloadOut createCollectionObjectInstance(String commonPartName,
             String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
-        
+
         // Scalar fields
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setAge(AGE_VALUE); //test for null string
-
+        
         // Repeatable structured groups
 
         TitleGroupList titleGroupList = new TitleGroupList();
@@ -1364,8 +1024,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                         CollectionobjectsNaturalhistory.class));
             }
         }
+        
         return multipart;
-
     }
 
     /**
@@ -1393,8 +1053,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             logger.debug(objectAsXmlString(collectionObject,
                     CollectionobjectsCommon.class));
         }
+        
         return multipart;
-
     }
 
     /**
@@ -1458,9 +1118,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
         String newId = extractId(res);
         allResourceIdsCreated.add(newId);
         return newId;
@@ -1486,56 +1146,16 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Extract the common part.
-        CollectionobjectsCommon collectionObject = extractCommonPartValue(testName, res);
+        CollectionobjectsCommon collectionObject = extractCommonPartValue(res);
         Assert.assertNotNull(collectionObject);
 
         return collectionObject;
      }
-
-    private CollectionobjectsCommon extractCommonPartValue(String testName, ClientResponse<String> res)
-        throws Exception {
-        CollectionObjectClient client = new CollectionObjectClient();
-        PayloadInputPart payloadInputPart = extractPart(testName, res, client.getCommonPartName());
-        Object obj = null;
-        if (payloadInputPart != null) {
-        	obj = payloadInputPart.getBody();
-        }
-        Assert.assertNotNull(obj,
-                testName + ": body of " + client.getCommonPartName() + " part was unexpectedly null.");
-        CollectionobjectsCommon collectionobjectCommon = (CollectionobjectsCommon) obj;
-        Assert.assertNotNull(collectionobjectCommon,
-                testName + ": " + client.getCommonPartName() + " part was unexpectedly null.");
-        return collectionobjectCommon;
-    }
-
-//    private Object extractPartValue(String testName, ClientResponse<String> res, String partLabel)
-//        throws Exception {
-//        Object obj = null;
-//        PayloadInputPart payloadInputPart = extractPart(testName, res, partLabel);
-//        if (payloadInputPart != null) {
-//        	obj = payloadInputPart.getElementBody();
-//        }
-//        Assert.assertNotNull(obj,
-//                testName + ": value of part " + partLabel + " was unexpectedly null.");
-//        return obj;
-//    }
-
-    private PayloadInputPart extractPart(String testName, ClientResponse<String> res, String partLabel)
-        throws Exception {
-        if (logger.isDebugEnabled()) {
-           logger.debug(testName + ": Reading part " + partLabel + " ...");
-        }
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        PayloadInputPart payloadInputPart = input.getPart(partLabel);
-        Assert.assertNotNull(payloadInputPart,
-                testName + ": part " + partLabel + " was unexpectedly null.");
-        return payloadInputPart;
-    }
 
 	@Override
 	protected String getServicePathComponent() {
@@ -1543,4 +1163,119 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 		return CollectionObjectClient.SERVICE_PATH_COMPONENT;
 	}
 
+	@Override
+	protected CollectionobjectsCommon updateInstance(CollectionobjectsCommon collectionObjectCommon) {
+        collectionObjectCommon.setObjectNumber("updated-" + collectionObjectCommon.getObjectNumber());
+
+        // Change the object name in the first value instance in the
+        // object name repeatable group.
+        ObjectNameList objNameList = collectionObjectCommon.getObjectNameList();
+        List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
+        Assert.assertNotNull(objNameGroups);
+        Assert.assertTrue(objNameGroups.size() >= 1);
+        String objectName = objNameGroups.get(0).getObjectName();
+        Assert.assertEquals(objectName, OBJECT_NAME_VALUE);
+        String updatedObjectName = "updated-" + objectName;
+        objNameGroups.get(0).setObjectName(updatedObjectName);
+        collectionObjectCommon.setObjectNameList(objNameList);
+
+        // Replace the existing value instances in the dimensions repeatable group
+        // with entirely new value instances, also changing the number of such instances.
+        MeasuredPartGroupList measuredPartGroupList = collectionObjectCommon.getMeasuredPartGroupList();
+        Assert.assertNotNull(measuredPartGroupList);
+        List<MeasuredPartGroup> measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
+        Assert.assertNotNull(measuredPartGroups);
+        Assert.assertTrue(measuredPartGroups.size() > 0);
+        MeasuredPartGroup mpGroup = measuredPartGroups.get(0);
+        Assert.assertNotNull(mpGroup.getMeasuredPart());
+        
+        DimensionSubGroupList dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
+        Assert.assertNotNull(dimensionSubGroupList);
+        List<DimensionSubGroup> dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
+        Assert.assertNotNull(dimensionSubGroups);
+        int originalDimensionSubGroupSize = dimensionSubGroups.size();
+        Assert.assertTrue(dimensionSubGroups.size() > 0);
+        dimensionSubGroups.clear();
+        
+        DimensionSubGroup heightDimension = new DimensionSubGroup();
+        heightDimension.setDimension("height");
+        heightDimension.setMeasurementUnit(UPDATED_MEASUREMENT_UNIT);
+        dimensionSubGroups.add(heightDimension);
+        
+        int updatedDimensionGroupSize = dimensionSubGroups.size();
+        Assert.assertTrue(updatedDimensionGroupSize > 0);
+        Assert.assertTrue(updatedDimensionGroupSize != originalDimensionSubGroupSize);
+        
+        collectionObjectCommon.setMeasuredPartGroupList(measuredPartGroupList);
+        
+        return collectionObjectCommon;
+	}
+
+	@Override
+	protected void compareReadInstances(CollectionobjectsCommon original,
+			CollectionobjectsCommon fromRead) throws Exception {
+		// Verify the number and contents of values in repeatable fields,
+		// as created in the instance record used for testing.
+		MeasuredPartGroupList measuredPartGroupList = fromRead.getMeasuredPartGroupList();
+		Assert.assertNotNull(measuredPartGroupList, "Measured part group list was null");
+		List<MeasuredPartGroup> measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
+		Assert.assertNotNull(measuredPartGroups, "Measured part groups were null");
+		Assert.assertTrue(measuredPartGroups.size() > 0, "No measured part groups were returned");
+		MeasuredPartGroup mpGroup = measuredPartGroups.get(0);
+		Assert.assertNotNull(mpGroup.getMeasuredPart(), "Measured part was null");
+		Assert.assertEquals(mpGroup.getMeasuredPart(), MEASURED_PART,
+				"Measured part value returned didn't match expected value");
+
+		DimensionSubGroupList dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
+		Assert.assertNotNull(dimensionSubGroupList, "Dimension subgroup list was null");
+		List<DimensionSubGroup> dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
+		Assert.assertNotNull(dimensionSubGroups, "Dimension subgroups were null");
+		Assert.assertTrue(dimensionSubGroups.size() > 0, "No dimension subgroups were returned");
+		DimensionSubGroup lengthDimension = dimensionSubGroups.get(0);
+		Assert.assertNotNull(lengthDimension, "Length dimension was null");
+		Assert.assertTrue(lengthDimension.getValue().compareTo(DIMENSION_VALUE_LENGTH) == 0,
+				"Dimension length value returned didn't match expected value");
+	}
+	
+	@Override
+	protected void compareUpdatedInstances(CollectionobjectsCommon original,
+			CollectionobjectsCommon updated) throws Exception {
+		
+        ObjectNameList objNameList = updated.getObjectNameList();
+        Assert.assertNotNull(objNameList);
+        List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
+        Assert.assertNotNull(objNameGroups);
+        Assert.assertTrue(objNameGroups.size() >= 1);
+        Assert.assertEquals(original.getObjectNameList().getObjectNameGroup().get(0).getObjectName(),
+                objNameGroups.get(0).getObjectName(),
+                "Data in updated object did not match submitted data.");
+        //
+        // Get the dimension group size of the original
+        //
+        MeasuredPartGroupList measuredPartGroupList = original.getMeasuredPartGroupList();
+        List<MeasuredPartGroup> measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
+        MeasuredPartGroup mpGroup = measuredPartGroups.get(0);
+        DimensionSubGroupList dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
+        List<DimensionSubGroup> dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
+        int updatedDimensionGroupSize = dimensionSubGroups.size();
+        //
+        // Now get the dimension group size of the updated
+        //
+        measuredPartGroupList = updated.getMeasuredPartGroupList();
+        Assert.assertNotNull(measuredPartGroupList);
+        measuredPartGroups = measuredPartGroupList.getMeasuredPartGroup();
+        Assert.assertNotNull(measuredPartGroups);
+        Assert.assertTrue(measuredPartGroups.size() > 0);
+        mpGroup = measuredPartGroups.get(0);
+        Assert.assertNotNull(mpGroup.getMeasuredPart());
+        dimensionSubGroupList = mpGroup.getDimensionSubGroupList();
+        Assert.assertNotNull(dimensionSubGroupList);
+        dimensionSubGroups = dimensionSubGroupList.getDimensionSubGroup();
+        Assert.assertNotNull(dimensionSubGroups);
+		Assert.assertTrue(dimensionSubGroups.size() == updatedDimensionGroupSize);
+		
+        Assert.assertEquals(UPDATED_MEASUREMENT_UNIT,
+                dimensionSubGroups.get(0).getMeasurementUnit(),
+                "Data in updated object did not match submitted data.");
+	}
 }

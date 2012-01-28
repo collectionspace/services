@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -64,7 +63,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 1327 $
  * $LastChangedDate: 2010-02-12 10:35:11 -0800 (Fri, 12 Feb 2010) $
  */
-public class IntakeAuthRefsTest extends BaseServiceTest {
+public class IntakeAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = IntakeAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -102,7 +101,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
+	protected AbstractCommonList getCommonList(
 			ClientResponse<AbstractCommonList> response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
@@ -113,10 +112,6 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     // Success outcomes
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createWithAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
@@ -148,9 +143,9 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
@@ -173,8 +168,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         
@@ -213,42 +208,49 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
 
     // Success outcomes
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    @Test(dataProvider="testName",
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         IntakeClient intakeClient = new IntakeClient();
         ClientResponse<String> res = intakeClient.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        IntakesCommon intake = (IntakesCommon) extractPart(input,
-        		intakeClient.getCommonPartName(), IntakesCommon.class);
-        Assert.assertNotNull(intake);
-        // Check a couple of fields
-        Assert.assertEquals(intake.getCurrentOwner(), currentOwnerRefName);
-        Assert.assertEquals(intake.getConditionCheckersOrAssessors().getConditionCheckerOrAssessor().get(0), conditionCheckerOrAssessorRefName);
-        Assert.assertEquals(intake.getInsurers().getInsurer().get(0), insurerRefName);
+        try {
+	        assertStatusCode(res, testName);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        IntakesCommon intake = (IntakesCommon) extractPart(input,
+	        		intakeClient.getCommonPartName(), IntakesCommon.class);
+	        Assert.assertNotNull(intake);
+	        // Check a couple of fields
+	        Assert.assertEquals(intake.getCurrentOwner(), currentOwnerRefName);
+	        Assert.assertEquals(intake.getConditionCheckersOrAssessors().getConditionCheckerOrAssessor().get(0), conditionCheckerOrAssessorRefName);
+	        Assert.assertEquals(intake.getInsurers().getInsurer().get(0), insurerRefName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = intakeClient.getAuthorityRefs(knownResourceId);
-        assertStatusCode(res2, testName);
-
-        AuthorityRefList list = res2.getEntity();
+        AuthorityRefList list = null;
+        try {
+	        assertStatusCode(res2, testName);
+	        list = res2.getEntity();
+        } finally {
+        	if (res2 != null) {
+        		res2.releaseConnection();
+            }
+        }
         
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
@@ -350,8 +352,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
-            multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new IntakeClient().getCommonPartName());
+            multipart.addPart(new IntakeClient().getCommonPartName(), intake);
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, intake common");

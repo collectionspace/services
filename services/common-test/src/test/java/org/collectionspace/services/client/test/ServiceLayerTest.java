@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.TestServiceClient;
 
 import org.slf4j.Logger;
@@ -61,15 +62,15 @@ public class ServiceLayerTest {
             logger.debug("Client properties read from the properties path;\n"
                     + "possibly from the command line or a properties file:");
             logger.debug("url = "
-                    + serviceClient.getProperty(serviceClient.URL_PROPERTY));
+                    + serviceClient.getProperty(CollectionSpaceClient.URL_PROPERTY));
             logger.debug("secure (SSL) = "
-                    + serviceClient.getProperty(serviceClient.SSL_PROPERTY));
+                    + serviceClient.getProperty(CollectionSpaceClient.SSL_PROPERTY));
             logger.debug("useAuth = "
-                    + serviceClient.getProperty(serviceClient.AUTH_PROPERTY));
+                    + serviceClient.getProperty(CollectionSpaceClient.AUTH_PROPERTY));
             logger.debug("user = "
-                    + serviceClient.getProperty(serviceClient.USER_PROPERTY));
+                    + serviceClient.getProperty(CollectionSpaceClient.USER_PROPERTY));
             logger.debug("password = "
-                    + serviceClient.getProperty(serviceClient.PASSWORD_PROPERTY));
+                    + serviceClient.getProperty(CollectionSpaceClient.PASSWORD_PROPERTY));
         }
     }
 
@@ -77,7 +78,7 @@ public class ServiceLayerTest {
     public void servicesExist() {
         
         if (logger.isDebugEnabled()) {
-            logger.debug(BaseServiceTest.testBanner("servicesExist", CLASS_NAME));
+            logger.debug(BaseServiceTest.getTestBanner("servicesExist", CLASS_NAME));
         }
         //use ID service that should always be present in a working service layer
         String url = serviceClient.getBaseURL() + "idgenerators";
@@ -105,7 +106,7 @@ public class ServiceLayerTest {
     @Test
     public void methodNotAllowed() {
         if (logger.isDebugEnabled()) {
-            logger.debug(BaseServiceTest.testBanner("methodNotAllowed", CLASS_NAME));
+            logger.debug(BaseServiceTest.getTestBanner("methodNotAllowed", CLASS_NAME));
         }
         // Delete is not allowed on the root URL of the id service
         String url = serviceClient.getBaseURL() + "idgenerators";
@@ -132,7 +133,7 @@ public class ServiceLayerTest {
     @Test
     public void nonexistentService() {
         if (logger.isDebugEnabled()) {
-            logger.debug(BaseServiceTest.testBanner("nonexistentService", CLASS_NAME));
+            logger.debug(BaseServiceTest.getTestBanner("nonexistentService", CLASS_NAME));
         }
         String url = serviceClient.getBaseURL() + "nonexistent-service";
         GetMethod method = new GetMethod(url);
@@ -158,7 +159,7 @@ public class ServiceLayerTest {
 //    @Test
     public void serviceSecure() {
         if (logger.isDebugEnabled()) {
-            logger.debug(BaseServiceTest.testBanner("serviceSecure", CLASS_NAME));
+            logger.debug(BaseServiceTest.getTestBanner("serviceSecure", CLASS_NAME));
         }
         String url = serviceClient.getBaseURL() + "collectionobjects";
         GetMethod method = new GetMethod(url);
@@ -190,7 +191,7 @@ public class ServiceLayerTest {
     @Test
     public void traceSupported() {
         if (logger.isDebugEnabled()) {
-            logger.debug(BaseServiceTest.testBanner("traceSupported", CLASS_NAME));
+            logger.debug(BaseServiceTest.getTestBanner("traceSupported", CLASS_NAME));
         }
         String url = serviceClient.getBaseURL() + "collectionobjects";
         TraceMethod method = new TraceMethod(url);
@@ -221,7 +222,7 @@ public class ServiceLayerTest {
     @Test
     public void headSupported() {
         if (logger.isDebugEnabled()) {
-            logger.debug(BaseServiceTest.testBanner("headSupported", CLASS_NAME));
+            logger.debug(BaseServiceTest.getTestBanner("headSupported", CLASS_NAME));
         }
         String url = serviceClient.getBaseURL() + "intakes";
         HeadMethod method = new HeadMethod(url);

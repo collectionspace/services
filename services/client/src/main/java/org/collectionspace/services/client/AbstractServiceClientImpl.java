@@ -37,7 +37,7 @@ import org.apache.commons.httpclient.auth.AuthScope; //import org.collectionspac
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.workflow.WorkflowCommon;
+
 import org.jboss.resteasy.client.ClientResponse; //import org.collectionspace.services.common.context.ServiceContext;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
@@ -52,9 +52,14 @@ import org.slf4j.LoggerFactory;
  * http://issues.collectionspace.org/browse/CSPACE-1684
  * @param <CommonListType> 
  * @param <ListType> 
+ * 
+ * CLT - List type
+ * REQUEST_PT - Request payload type
+ * RESPONSE_PT - Response payload type
+ * P - Proxy type
  */
-public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpaceProxy<LT>>
-	implements CollectionSpaceClient<LT, P> {
+public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P extends CollectionSpaceProxy<CLT>>
+	implements CollectionSpaceClient<CLT, REQUEST_PT, RESPONSE_PT, P> {
 
     /** The logger. */
     protected final Logger logger = LoggerFactory.getLogger(AbstractServiceClientImpl.class);
@@ -99,6 +104,13 @@ public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpacePro
 			}
 		}
 		return result;
+    }
+    
+    /*
+     * Subclasses can override this method to return their AbstractCommonList subclass
+     */
+    protected Class<CLT> getCommonListType() {
+    	return (Class<CLT>) AbstractCommonList.class;
     }
     
     /**
@@ -427,6 +439,7 @@ public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpacePro
      * these methods with their specific "common" list return types.  Otherwise, only the info
      * in the AbstractCommonList type will be returned to the callers
      */
+
     
     /*
      * (non-Javadoc)
@@ -436,7 +449,7 @@ public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpacePro
      * .lang.String, java.lang.String)
      */
     @Override
-    public ClientResponse<AbstractCommonList> readList(Long pageSize,
+    public ClientResponse<CLT> readList(Long pageSize,
     		Long pageNumber) {
         return getProxy().readList(pageSize, pageNumber);
     }
@@ -449,7 +462,7 @@ public abstract class AbstractServiceClientImpl<LT, P extends CollectionSpacePro
      * .lang.String, java.lang.String)
      */
     @Override
-    public ClientResponse<AbstractCommonList> readList(String sortBy, Long pageSize,
+    public ClientResponse<CLT> readList(String sortBy, Long pageSize,
             Long pageNumber) {
         return getProxy().readList(sortBy, pageSize, pageNumber);
     }

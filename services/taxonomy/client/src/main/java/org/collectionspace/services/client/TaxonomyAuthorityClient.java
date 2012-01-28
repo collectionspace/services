@@ -26,10 +26,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.taxonomy.TaxonCommon;
+
 /**
  * The Class TaxonomyAuthorityClient.
  */
-public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyAuthorityProxy> {
+public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonCommon, TaxonomyAuthorityProxy> {
 
     public static final String SERVICE_NAME = "taxonomyauthority";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -67,4 +69,14 @@ public class TaxonomyAuthorityClient extends AuthorityClientImpl<TaxonomyAuthori
     public Class<TaxonomyAuthorityProxy> getProxyClass() {
         return TaxonomyAuthorityProxy.class;
     }
+
+	@Override
+	public String getInAuthority(TaxonCommon item) {
+		return item.getInAuthority();
+	}
+
+	@Override
+	public void setInAuthority(TaxonCommon item, String inAuthorityCsid) {
+		item.setInAuthority(inAuthorityCsid);
+	}
 }

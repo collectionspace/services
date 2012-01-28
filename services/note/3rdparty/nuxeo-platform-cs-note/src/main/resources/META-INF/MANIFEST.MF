@@ -17,6 +17,7 @@ Require-Bundle: org.nuxeo.runtime,
  org.collectionspace.collectionspace_core
 Provide-Package: org.collectionspace.note
 Nuxeo-Component: OSGI-INF/core-types-contrib.xml,
+ OSGI-INF/life-cycle-contrib.xml,
  OSGI-INF/ecm-types-contrib.xml,
  OSGI-INF/layouts-contrib.xml
 

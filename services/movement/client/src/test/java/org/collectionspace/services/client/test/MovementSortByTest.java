@@ -27,17 +27,16 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.MovementJAXBSchema;
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
@@ -58,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 2562 $
  * $LastChangedDate: 2010-06-22 23:26:51 -0700 (Tue, 22 Jun 2010) $
  */
-public class MovementSortByTest extends BaseServiceTest {
+public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = MovementSortByTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -86,7 +85,7 @@ public class MovementSortByTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getAbstractCommonList(
+    protected AbstractCommonList getCommonList(
             ClientResponse<AbstractCommonList> response) {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
@@ -101,14 +100,9 @@ public class MovementSortByTest extends BaseServiceTest {
      * Tests whether a list of records, sorted by a String field in
      * ascending order, is returned in the expected order.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createList"})
     public void sortByStringFieldAscending(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         String sortFieldName = qualifySortFieldName(MovementJAXBSchema.MOVEMENT_NOTE);
         if (logger.isDebugEnabled()) {
             logger.debug("Sorting on field name=" + sortFieldName);
@@ -154,14 +148,9 @@ public class MovementSortByTest extends BaseServiceTest {
      * This verifies that summary list results from keyword searches, in
      * addition to 'read list' requests, can be returned in sorted order.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createList"})
     public void sortKeywordSearchResultsByStringFieldAscending(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         String sortFieldName = qualifySortFieldName(MovementJAXBSchema.MOVEMENT_NOTE);
         if (logger.isDebugEnabled()) {
             logger.debug("Sorting on field name=" + sortFieldName);
@@ -204,14 +193,9 @@ public class MovementSortByTest extends BaseServiceTest {
      * Tests whether a list of records, sorted by a String field in
      * descending order, is returned in the expected order.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createList"})
     public void sortByStringFieldDescending(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         String sortFieldName =
                 asDescendingSort(qualifySortFieldName(MovementJAXBSchema.MOVEMENT_NOTE));
         if (logger.isDebugEnabled()) {
@@ -255,14 +239,9 @@ public class MovementSortByTest extends BaseServiceTest {
      * Tests whether a list of records, sorted by a dateTime field in
      * ascending order, is returned in the expected order.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createList"})
     public void sortByDateTimeFieldAscending(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         String sortFieldName = qualifySortFieldName(MovementJAXBSchema.LOCATION_DATE);
         if (logger.isDebugEnabled()) {
             logger.debug("Sorting on field name=" + sortFieldName);
@@ -294,14 +273,9 @@ public class MovementSortByTest extends BaseServiceTest {
      * Tests whether a list of records, sorted by a dateTime field in
      * descending order, is returned in the expected order.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createList"})
     public void sortByDateTimeFieldDescending(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         String sortFieldName =
                 asDescendingSort(qualifySortFieldName(MovementJAXBSchema.LOCATION_DATE));
         if (logger.isDebugEnabled()) {
@@ -334,14 +308,9 @@ public class MovementSortByTest extends BaseServiceTest {
      * Tests whether a list of records, sorted by two different fields in
      * ascending order, is returned in the expected order.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createList"})
     public void sortByTwoFieldsAscending(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         String firstSortFieldName = qualifySortFieldName(MovementJAXBSchema.MOVEMENT_NOTE);
         String secondSortFieldName = qualifySortFieldName(MovementJAXBSchema.LOCATION_DATE);
         if (logger.isDebugEnabled()) {
@@ -392,14 +361,9 @@ public class MovementSortByTest extends BaseServiceTest {
      * Tests whether a list of records, sorted by one different fields in
      * descending order and a second field in ascending order, is returned in the expected order.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"createList"})
+    @Test(dataProvider = "testName",
+    		dependsOnMethods = {"createList"})
     public void sortByOneFieldAscendingOneFieldsDescending(String testName) throws Exception {
-
-       if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-
         String firstSortFieldName =
                 asDescendingSort(qualifySortFieldName(MovementJAXBSchema.LOCATION_DATE));
         String secondSortFieldName = qualifySortFieldName(MovementJAXBSchema.MOVEMENT_NOTE);
@@ -453,12 +417,8 @@ public class MovementSortByTest extends BaseServiceTest {
      * as expected: the query parameter is simply ignored, and a list
      * of records is returned, unsorted, with a success result.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName")
     public void sortWithEmptySortFieldName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
@@ -466,17 +426,13 @@ public class MovementSortByTest extends BaseServiceTest {
         final String EMPTY_SORT_FIELD_NAME = "";
         ClientResponse<AbstractCommonList> res =
                 client.readListSortedBy(EMPTY_SORT_FIELD_NAME);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+        	assertStatusCode(res, testName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
     }
 
     // Failure outcomes
@@ -486,41 +442,29 @@ public class MovementSortByTest extends BaseServiceTest {
      * handled as expected.  The field name provided in this test is valid,
      * but has not been qualified by being prefixed by a schema name and delimiter.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName")
     public void sortWithUnqualifiedFieldName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         testSetup(STATUS_BAD_REQUEST, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         ClientResponse<AbstractCommonList> res =
                 client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+        	assertStatusCode(res, testName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
     }
 
     /*
      * Tests whether a request to sort by an invalid identifier for the
      * sort order (ascending or descending) is handled as expected.
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName")
     public void sortWithInvalidSortOrderIdentifier(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         testSetup(STATUS_BAD_REQUEST, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
@@ -529,39 +473,14 @@ public class MovementSortByTest extends BaseServiceTest {
         ClientResponse<AbstractCommonList> res =
                 client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE
                 + " " + INVALID_SORT_ORDER_IDENTIFIER);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+        	assertStatusCode(res, testName);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
     }
-
-    /*
-     * Tests whether a request to sort by a malformed field name is
-     * handled as expected.
-     */
-/*
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
-    public void sortWithMalformedFieldName(String testName) throws Exception {
-
-    // FIXME: Implement this stub method.
-
-    // FIXME: Consider splitting this test into various tests, with
-    // different malformed field name formats that might confuse parsers
-    // and/or validation code.
-
-    // FIXME: Consider fixing DocumentFilter.setSortOrder() to return
-    // an error response to this test case, then revise this test case
-    // to expect that response.
-
-    }
-*/
 
     // ---------------------------------------------------------------
     // Cleanup of resources created during testing
@@ -590,7 +509,7 @@ public class MovementSortByTest extends BaseServiceTest {
         MovementClient movementClient = new MovementClient();
         for (String resourceId : movementIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            movementClient.delete(resourceId);
+            movementClient.delete(resourceId).releaseConnection();
         }
     }
 
@@ -664,7 +583,7 @@ public class MovementSortByTest extends BaseServiceTest {
 
         String testName = "createList";
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
+            logger.debug(getTestBanner(testName, CLASS_NAME));
         }
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
@@ -674,7 +593,8 @@ public class MovementSortByTest extends BaseServiceTest {
     }
 
     private void create(String movementNote, String locationDate) throws Exception {
-
+    	String result = null;
+    	
         String testName = "create";
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
@@ -683,42 +603,42 @@ public class MovementSortByTest extends BaseServiceTest {
                 movementNote, locationDate);
         MovementClient client = new MovementClient();
         ClientResponse<Response> res = client.create(multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+        	assertStatusCode(res, testName);
+            // Store the IDs from every resource created by tests,
+            // so they can be deleted after tests have been run.
+        	result = extractId(res);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Store the IDs from every resource created by tests,
-        // so they can be deleted after tests have been run.
-        movementIdsCreated.add(extractId(res));
+        
+        if (result != null) {
+        	movementIdsCreated.add(result);
+        }
     }
 
     private MovementsCommon read(String csid) throws Exception {
-
         String testName = "read";
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         ClientResponse<String> res = client.read(csid);
-        assertStatusCode(res, testName);
-
-        // Extract and return the common part of the record.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         MovementsCommon movementCommon = null;
-        if (payloadInputPart != null) {
-        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
+        try {
+        	assertStatusCode(res, testName);
+	        // Extract and return the common part of the record.
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+	        if (payloadInputPart != null) {
+	        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         return movementCommon;
@@ -735,8 +655,7 @@ public class MovementSortByTest extends BaseServiceTest {
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
-            multipart.addPart(movementCommon, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new MovementClient().getCommonPartName());
+            multipart.addPart(new MovementClient().getCommonPartName(), movementCommon);
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, movement common");
             logger.debug(objectAsXmlString(movementCommon, MovementsCommon.class));
@@ -746,17 +665,22 @@ public class MovementSortByTest extends BaseServiceTest {
     }
 
     private AbstractCommonList readSortedList(String sortFieldName) throws Exception {
-
         String testName = "readSortedList";
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
 
-        ClientResponse<AbstractCommonList> res =
-                client.readListSortedBy(sortFieldName);
-        assertStatusCode(res, testName);
-        AbstractCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readListSortedBy(sortFieldName);
+        AbstractCommonList list = null;
+        try {
+        	assertStatusCode(res, testName);
+        	list = res.getEntity();
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }        
 
         return list;
 
@@ -764,7 +688,8 @@ public class MovementSortByTest extends BaseServiceTest {
 
     private AbstractCommonList keywordSearchSortedBy(String keywords,
             String sortFieldName) throws Exception {
-
+    	AbstractCommonList result = null;
+    	
         String testName = "keywordSearchSortedBy";
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
@@ -773,11 +698,17 @@ public class MovementSortByTest extends BaseServiceTest {
 
         ClientResponse<AbstractCommonList> res =
                 client.keywordSearchSortedBy(keywords, sortFieldName);
-        assertStatusCode(res, testName);
-        AbstractCommonList list = res.getEntity();
+        AbstractCommonList list = null;
+        try {
+	        assertStatusCode(res, testName);
+	        list = res.getEntity();
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
 
         return list;
-
     }
 
 }

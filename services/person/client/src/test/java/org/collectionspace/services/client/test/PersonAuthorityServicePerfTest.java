@@ -50,7 +50,7 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 753 $
  * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
  */
-public class PersonAuthorityServicePerfTest extends BaseServiceTest {
+public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = PersonAuthorityServicePerfTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -114,7 +114,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
+	protected AbstractCommonList getCommonList(
 			ClientResponse<AbstractCommonList> response) {
         return response.getEntity(AbstractCommonList.class);
     }
@@ -163,16 +163,13 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     	String newID = null;
     	ClientResponse<Response> res = client.create(multipart);
         try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
+            assertStatusCode(res, testName);
             newID = PersonAuthorityClientUtils.extractId(res);
             logger.info("{}: succeeded.", testName);
     	} finally {
-            res.releaseConnection();
+    		if (res != null) {
+                res.releaseConnection();
+            }
     	}
         // Store the refname from the first resource created
         // for additional tests below.
@@ -217,16 +214,12 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
         String newID = null;
         ClientResponse<Response> res = client.createItem(authId, multipart);
         try {
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+            assertStatusCode(res, "createItem");
             newID = PersonAuthorityClientUtils.extractId(res);
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         // Store the IDs from any item resources created
@@ -264,11 +257,8 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     /**
      * Reads an item list by partial term.
      */
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider="testName")
     public void partialTermMatch(String testName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         for(int i=0; i<partialTerms.length; i++) {
         	long startTime = System.currentTimeMillis();
             int numMatchesFound = readItemListWithFilters(testName, authId, 
@@ -314,11 +304,13 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
             Assert.fail(testName+" passed null csid!");
         }
         AbstractCommonList list = null;
-        assertStatusCode(res, testName);
         try {
+            assertStatusCode(res, testName);
             list = res.getEntity();
         } finally {
-            res.releaseConnection();
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         List<AbstractCommonList.ListItem> items = list.getListItem();

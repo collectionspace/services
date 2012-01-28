@@ -1,17 +1,17 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
-
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
+import org.collectionspace.services.jaxb.AbstractCommonList;
+
 /*
- * LT = List type
+ * CLT = List type
  * P = Proxy type
  */
-public abstract class AbstractPoxServiceClientImpl<LT extends AbstractCommonList, P extends CollectionSpacePoxProxy<LT>>
-	extends AbstractServiceClientImpl<LT, P> 
-	implements CollectionSpacePoxClient<LT, P> {
+public abstract class AbstractPoxServiceClientImpl<CLT extends AbstractCommonList, P extends CollectionSpacePoxProxy<CLT>>
+	extends AbstractServiceClientImpl<CLT, PoxPayloadOut, String, P> 
+	implements CollectionSpacePoxClient<CLT, P> {
 	
     @Override
     public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
@@ -22,7 +22,18 @@ public abstract class AbstractPoxServiceClientImpl<LT extends AbstractCommonList
 	public ClientResponse<String> read(String csid) {
         return getProxy().read(csid);
     }
-
+    
+    public ClientResponse<CLT> readList() {
+    	CollectionSpaceProxy<CLT> proxy = (CollectionSpaceProxy<CLT>)getProxy();
+    	return proxy.readList();
+    }    
+    
+    @Override
+    public ClientResponse<CLT> readIncludeDeleted(Boolean includeDeleted) {
+    	CollectionSpacePoxProxy<CLT> proxy = getProxy();
+    	return proxy.readIncludeDeleted(includeDeleted.toString());
+    }
+    
     @Override
 	public ClientResponse<String> readIncludeDeleted(String csid, Boolean includeDeleted) {
         return getProxy().readIncludeDeleted(csid, includeDeleted.toString());
@@ -33,21 +44,16 @@ public abstract class AbstractPoxServiceClientImpl<LT extends AbstractCommonList
         return getProxy().update(csid, xmlPayload.getBytes());
     }
     
-    @Override
-    public ClientResponse<LT> readIncludeDeleted(Boolean includeDeleted) {
-    	CollectionSpacePoxProxy<LT> proxy = getProxy();
-    	return proxy.readIncludeDeleted(includeDeleted.toString());
-    }
 
     @Override
-    public ClientResponse<LT> keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted) {
-        CollectionSpacePoxProxy<LT> proxy = getProxy();
+    public ClientResponse<CLT> keywordSearchIncludeDeleted(String keywords, Boolean includeDeleted) {
+        CollectionSpacePoxProxy<CLT> proxy = getProxy();
         return proxy.keywordSearchIncludeDeleted(keywords, includeDeleted.toString());
     }
 
     @Override
-    public ClientResponse<LT> advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted) {
-        CollectionSpacePoxProxy<LT> proxy = getProxy();
+    public ClientResponse<CLT> advancedSearchIncludeDeleted(String whereClause, Boolean includeDeleted) {
+        CollectionSpacePoxProxy<CLT> proxy = getProxy();
         return proxy.advancedSearchIncludeDeleted(whereClause, includeDeleted.toString());
     }
 

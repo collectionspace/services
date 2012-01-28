@@ -36,7 +36,7 @@ import org.jboss.resteasy.client.ClientResponse;
  */
 public class DimensionClient extends AbstractPoxServiceClientImpl<DimensionsCommonList, DimensionProxy> {
 	public static final String SERVICE_NAME = "dimensions";
-	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;

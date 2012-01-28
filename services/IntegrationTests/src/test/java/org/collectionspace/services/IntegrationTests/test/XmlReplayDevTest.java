@@ -36,12 +36,11 @@ public class XmlReplayDevTest extends XmlReplayTest {
              List<List<ServiceResult>> list = replay.runMaster(masterFile);
              logTestForGroup(list, "XmlReplayMasterTest");
         } else {
-            System.out.println("XmlReplayDevTest skipping local dev test "+masterFile+" because it doesn't exist in "+replay.getBaseDir()+".  This is expected behavior on a production installation.");
+            System.out.println("XmlReplayDevTest skipping local dev test "
+            		+ masterFile+" because it doesn't exist in "
+            		+ replay.getBaseDir()
+            		+ ".  This is expected behavior on a production installation.");
         }
-
-
-       //used for testing load.
-       // bigLoop(masterFile);
     }
 
     private void bigLoop(String masterFile){
@@ -57,7 +56,7 @@ public class XmlReplayDevTest extends XmlReplayTest {
         while (!quitNow) {
             Thread.yield();
         }
-        System.out.println("DONE. workers: "+MAXWORKERS+" time: "+(System.currentTimeMillis()-start));
+        System.out.println("DONE. workers: " + MAXWORKERS+" time: " + (System.currentTimeMillis()-start));
         for (Long l: stats){
             System.out.println(""+l);
         }

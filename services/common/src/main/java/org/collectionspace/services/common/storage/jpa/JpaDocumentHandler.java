@@ -5,7 +5,7 @@ import java.util.List;
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.hyperjaxb.AbstractCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 public abstract class JpaDocumentHandler<T, TL, WT, WLT>
 	extends AbstractDocumentHandlerImpl<T, TL, WT, WLT>{

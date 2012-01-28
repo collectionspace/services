@@ -26,13 +26,13 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.contact.AddressGroup;
 import org.collectionspace.services.contact.AddressGroupList;
 import org.collectionspace.services.contact.ContactsCommon;
@@ -43,7 +43,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,13 +54,12 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 917 $
  * $LastChangedDate: 2009-11-06 12:20:28 -0800 (Fri, 06 Nov 2009) $
  */
-public class ContactServiceTest extends AbstractServiceTestImpl {
+public class ContactServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, ContactsCommon> {
 
     private final String CLASS_NAME = ContactServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(ContactServiceTest.class);
     // Instance variables specific to this test.
 //    final String SERVICE_PATH_COMPONENT = "contacts";
-    private String knownResourceId = null;
 
     @Override
     public String getServicePathComponent() {
@@ -85,7 +83,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-    protected AbstractCommonList getAbstractCommonList(
+    protected AbstractCommonList getCommonList(
             ClientResponse<AbstractCommonList> response) {
         return response.getEntity(AbstractCommonList.class);
     }
@@ -101,13 +99,10 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
@@ -131,9 +126,9 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
@@ -150,8 +145,8 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     }
 
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
         for (int i = 0; i < 3; i++) {
             create(testName);
@@ -269,52 +264,26 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupRead();
 
         // Submit the request to the service and store the response.
         ContactClient client = new ContactClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        ContactsCommon contact = (ContactsCommon) extractPart(input,
-                client.getCommonPartName(), ContactsCommon.class);
-        Assert.assertNotNull(contact);
-    }
-
-    // Failure outcomes
-    @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
-    public void readNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
+        try {
+	        assertStatusCode(res, testName);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        ContactsCommon contact = (ContactsCommon) extractPart(input,
+	                client.getCommonPartName(), ContactsCommon.class);
+	        Assert.assertNotNull(contact);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        // Perform setup.
-        setupReadNonExistent();
-
-        // Submit the request to the service and store the response.
-        ContactClient client = new ContactClient();
-        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // ---------------------------------------------------------------
@@ -322,28 +291,29 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"read"})
     public void readList(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
         ContactClient client = new ContactClient();
         ClientResponse<AbstractCommonList> res = client.readList();
-        assertStatusCode(res, testName);
-        AbstractCommonList list = res.getEntity();
-
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
+        try {
+	        assertStatusCode(res, testName);
+	        AbstractCommonList list = res.getEntity();
+	
+	        // Optionally output additional data about list members for debugging.
+	        boolean iterateThroughList = false;
+	        if (iterateThroughList && logger.isDebugEnabled()) {
+	            AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-
     }
 
     // Failure outcomes
@@ -353,28 +323,32 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdate();
-
-        // Submit the request to the service and store the response.
+        //
+        // First read the object that will be updated
+        //
         ContactClient client = new ContactClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
+        ContactsCommon contact = null;
+        try {
+	        assertStatusCode(res, testName);
+	        
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("got object to update with ID: " + knownResourceId);
+	        }
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        contact = (ContactsCommon) extractPart(input,
+	                client.getCommonPartName(), ContactsCommon.class);
+	        Assert.assertNotNull(contact);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        ContactsCommon contact = (ContactsCommon) extractPart(input,
-                client.getCommonPartName(), ContactsCommon.class);
-        Assert.assertNotNull(contact);
         
         if(logger.isDebugEnabled()){
             logger.debug("contact common before updating");
@@ -412,20 +386,25 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
             logger.debug("to be updated object");
             logger.debug(BaseServiceTest.objectAsXmlString(contact, ContactsCommon.class));
         }
-        
-        // Submit the request to the service and store the response.
+        //
+        // Next, send the update to the server
+        //
         PoxPayloadOut output = new PoxPayloadOut(ContactClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
+        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), contact);
 
         res = client.update(knownResourceId, output);
-        assertStatusCode(res, testName);
-
-        input = new PoxPayloadIn(res.getEntity());
-        ContactsCommon updatedContact =
-                (ContactsCommon) extractPart(input,
-                client.getCommonPartName(), ContactsCommon.class);
-        Assert.assertNotNull(updatedContact);
+        ContactsCommon updatedContact = null;
+        try {
+	        assertStatusCode(res, testName);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        updatedContact = (ContactsCommon) extractPart(input,
+	                client.getCommonPartName(), ContactsCommon.class);
+	        Assert.assertNotNull(updatedContact);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
         
         if (logger.isDebugEnabled()) {
             logger.debug("object after update");
@@ -549,13 +528,9 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     }
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update", "testSubmitRequest"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupUpdateNonExistent();
 
@@ -574,9 +549,9 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -584,13 +559,9 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupDelete();
 
@@ -604,20 +575,16 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // Failure outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"delete"})
+//    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+//    dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         setupDeleteNonExistent();
 
@@ -631,9 +598,9 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -643,7 +610,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
      */
-    @Test(dependsOnMethods = {"create", "read"})
+//    @Test(dependsOnMethods = {"create", "read"})
     public void testSubmitRequest() {
 
         // Expected status code: 200 OK
@@ -661,6 +628,39 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
                     + " status=" + statusCode);
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
-
     }
+    
+    @Override
+    public void readWorkflow(String testName) throws Exception {
+    	// Not applicable for the Contact service
+    }
+    
+    @Override
+    public void searchWorkflowDeleted(String testName) throws Exception {
+    	// Not applicable for the Contact service
+    }
+
+	@Override
+	protected PoxPayloadOut createInstance(String commonPartName,
+			String identifier) {
+		return ContactClientUtils.createContactInstance(identifier, commonPartName);
+	}
+
+	@Override
+	protected ContactsCommon updateInstance(ContactsCommon commonPartObject) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void compareUpdatedInstances(ContactsCommon original,
+			ContactsCommon updated) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void CRUDTests(String testName) {
+		// TODO Auto-generated method stub		
+	}
 }

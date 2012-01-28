@@ -77,7 +77,7 @@ public class VocabularyClientUtils {
     				+"\" in personAuthority: \"" + vcsid +"\"");
     	}
     	PoxPayloadOut multipart = createVocabularyItemInstance(null, //vocabularyRefName,
-    				itemMap, client.getCommonPartItemName());
+    				itemMap, client.getItemCommonPartName());
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();

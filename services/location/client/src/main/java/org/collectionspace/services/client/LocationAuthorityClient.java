@@ -26,10 +26,12 @@
  */
 package org.collectionspace.services.client;
 
+import org.collectionspace.services.location.LocationsCommon;
+
 /**
  * The Class LocationAuthorityClient.
  */
-public class LocationAuthorityClient extends AuthorityClientImpl<LocationAuthorityProxy> {
+public class LocationAuthorityClient extends AuthorityClientImpl<LocationsCommon, LocationAuthorityProxy> {
 	public static final String SERVICE_NAME = "locationauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -65,5 +67,15 @@ public class LocationAuthorityClient extends AuthorityClientImpl<LocationAuthori
 	@Override
 	public Class<LocationAuthorityProxy> getProxyClass() {
 		return LocationAuthorityProxy.class;
+	}
+
+	@Override
+	public String getInAuthority(LocationsCommon item) {
+		return item.getInAuthority();
+	}
+
+	@Override
+	public void setInAuthority(LocationsCommon item, String inAuthorityCsid) {
+		item.setInAuthority(inAuthorityCsid);
 	}
 }

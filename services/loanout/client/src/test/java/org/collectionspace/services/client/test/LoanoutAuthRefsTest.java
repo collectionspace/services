@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
@@ -39,11 +38,9 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.authorityref.AuthorityRefList.AuthorityRefItem;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoansoutCommon;
-//import org.collectionspace.services.loanout.LoansoutCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -61,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class LoanoutAuthRefsTest extends BaseServiceTest {
+public class LoanoutAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = LoanoutAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -99,7 +96,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
+	protected AbstractCommonList getCommonList(
 			ClientResponse<AbstractCommonList> response) {
     	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
@@ -110,10 +107,6 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     // Success outcomes
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createWithAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
@@ -146,9 +139,9 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
@@ -174,8 +167,8 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+            invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         
@@ -216,8 +209,8 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
@@ -226,26 +219,29 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         LoanoutClient loanoutClient = new LoanoutClient();
         ClientResponse<String> res = loanoutClient.read(knownResourceId);
-        assertStatusCode(res, testName);
-
-        // Extract the common part from the response.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        LoansoutCommon loanoutCommon = (LoansoutCommon) extractPart(input,
-            loanoutClient.getCommonPartName(), LoansoutCommon.class);
-        Assert.assertNotNull(loanoutCommon);
-        if(logger.isDebugEnabled()){
-            logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
+        LoansoutCommon loanoutCommon = null;
+        try {
+	        assertStatusCode(res, testName);
+	        // Extract the common part from the response.
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        loanoutCommon = (LoansoutCommon) extractPart(input,
+	            loanoutClient.getCommonPartName(), LoansoutCommon.class);
+	        Assert.assertNotNull(loanoutCommon);
+	        if(logger.isDebugEnabled()){
+	            logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
+	        }
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
+        
         // Check a couple of fields
         Assert.assertEquals(loanoutCommon.getBorrower(), borrowerRefName);
         Assert.assertEquals(loanoutCommon.getBorrowersContact(), borrowersContactRefName);
@@ -253,11 +249,16 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(loanoutCommon.getLendersContact(), lendersContactRefName);
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 =
-           loanoutClient.getAuthorityRefs(knownResourceId);
-        assertStatusCode(res2, testName);
-
-        AuthorityRefList list = res2.getEntity();
+        ClientResponse<AuthorityRefList> res2 = loanoutClient.getAuthorityRefs(knownResourceId);
+        AuthorityRefList list = null;
+        try {
+	        assertStatusCode(res2, testName);
+	        list = res2.getEntity();
+        } finally {
+        	if (res2 != null) {
+        		res2.releaseConnection();
+            }
+        }
 
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
@@ -343,30 +344,35 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
-   private PoxPayloadOut createLoanoutInstance(String loanoutNumber,
+    private PoxPayloadOut createLoanoutInstance(String loanoutNumber,
     		String returnDate,
-                String borrower,
-                String borrowersContact,
-                String lendersAuthorizer,
-                String lendersContact) {
-        LoansoutCommon loanoutCommon = new LoansoutCommon();
-        loanoutCommon.setLoanOutNumber(loanoutNumber);
-        loanoutCommon.setLoanReturnDate(returnDate);
-        loanoutCommon.setBorrower(borrower);
-        loanoutCommon.setBorrowersContact(borrowersContact);
-        loanoutCommon.setLendersAuthorizer(lendersAuthorizer);
-        loanoutCommon.setLendersContact(lendersContact);
+    		String borrower,
+    		String borrowersContact,
+    		String lendersAuthorizer,
+    		String lendersContact) {
+    	LoansoutCommon loanoutCommon = new LoansoutCommon();
+    	loanoutCommon.setLoanOutNumber(loanoutNumber);
+    	loanoutCommon.setLoanReturnDate(returnDate);
+    	loanoutCommon.setBorrower(borrower);
+    	loanoutCommon.setBorrowersContact(borrowersContact);
+    	loanoutCommon.setLendersAuthorizer(lendersAuthorizer);
+    	loanoutCommon.setLendersContact(lendersContact);
 
-        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart =
-            multipart.addPart(loanoutCommon, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new LoanoutClient().getCommonPartName());
+    	PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+    	PayloadOutputPart commonPart =
+    			multipart.addPart(new LoanoutClient().getCommonPartName(), loanoutCommon);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("to be created, loanout common");
-            logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
-        }
+    	if(logger.isDebugEnabled()){
+    		logger.debug("to be created, loanout common");
+    		logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
+    	}
 
-        return multipart;
+    	return multipart;
+    }
+
+    @Override
+    protected Class<AbstractCommonList> getCommonListType() {
+    	// TODO Auto-generated method stub
+    	return null;
     }
 }

@@ -30,13 +30,14 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-//import org.collectionspace.services.authorization.AccountRolesList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.authorization.AccountRole;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -46,7 +47,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/accounts")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface AccountRoleProxy extends CollectionSpaceProxy<AccountRole> {
+public interface AccountRoleProxy extends CollectionSpaceProxy<AbstractCommonList> {
 
     //(C)reate
     @POST
@@ -71,6 +72,11 @@ public interface AccountRoleProxy extends CollectionSpaceProxy<AccountRole> {
             @QueryParam("_method") String method,
             AccountRole accRole);
 
+    //(U)pdate
+    @PUT
+    @Path("/{csid}/accountroles")
+    ClientResponse<AccountRole> update(@PathParam("csid") String csid, AccountRole role);
+    
     //(D)elete
     @Override
 	@DELETE

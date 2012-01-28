@@ -29,12 +29,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.CollectionObjectJAXBSchema;
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.common.AbstractCommonListUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -52,7 +52,7 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 1327 $ $LastChangedDate: 2010-02-12 10:35:11 -0800
  * (Fri, 12 Feb 2010) $
  */
-public class CollectionObjectSearchTest extends BaseServiceTest {
+public class CollectionObjectSearchTest extends BaseServiceTest<AbstractCommonList> {
 
 	/** The logger. */
 	private final String CLASS_NAME = CollectionObjectSearchTest.class
@@ -125,19 +125,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 	protected CollectionSpaceClient getClientInstance() {
 		return new CollectionObjectClient();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.collectionspace.services.client.test.BaseServiceTest#
-	 * getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
-	 */
-	@Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-		return response.getEntity(AbstractCommonList.class);
-	}
-
+	
 	/**
 	 * Creates one or more resources containing a "noise" keyword, which should
 	 * NOT be retrieved by keyword searches.
@@ -163,11 +151,6 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, groups = { "advancedSearch" })
 	public void advancedSearch(String testName) throws Exception {
-
-		if (logger.isDebugEnabled()) {
-			logger.debug(testBanner(testName, CLASS_NAME));
-		}
-
 		// Create one or more keyword retrievable resources, each containing
 		// a specified keyword.
 		String theKeyword = KEYWORD + "COW";
@@ -189,9 +172,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 		if (logger.isDebugEnabled()) {
 			logger.debug(testName + ": status = " + statusCode);
 		}
-		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(testRequestType, statusCode));
+		Assert.assertEquals(statusCode, testExpectedStatusCode);
 
 		// Verify that the number of resources matched by the search
 		// is identical to the expected result
@@ -202,11 +185,6 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, groups = { "oneKeyword" })
 	public void searchWithOneKeyword(String testName) throws Exception {
-
-		if (logger.isDebugEnabled()) {
-			logger.debug(testBanner(testName, CLASS_NAME));
-		}
-
 		// Create one or more keyword retrievable resources, each containing
 		// a specified keyword.
 		long numKeywordRetrievableResources = (long) (numNoiseWordResources * pctNonNoiseWordResources);
@@ -228,9 +206,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 		if (logger.isDebugEnabled()) {
 			logger.debug(testName + ": status = " + statusCode);
 		}
-		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(testRequestType, statusCode));
+		Assert.assertEquals(statusCode, testExpectedStatusCode);
 
 		// Verify that the number of resources matched by the search
 		// is identical to the expected result
@@ -242,11 +220,6 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
 	public void searchWithTwoKeywordsInSameField(String testName)
 			throws Exception {
-
-		if (logger.isDebugEnabled()) {
-			logger.debug(testBanner(testName, CLASS_NAME));
-		}
-
 		// Create one or more keyword retrievable resources, each containing
 		// two specified keywords.
 		long numKeywordRetrievableResources = (long) (numNoiseWordResources * pctNonNoiseWordResources);
@@ -272,9 +245,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 		if (logger.isDebugEnabled()) {
 			logger.debug(testName + ": status = " + statusCode);
 		}
-		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(testRequestType, statusCode));
+		Assert.assertEquals(statusCode, testExpectedStatusCode);
 
 		// Verify that the number of resources matched by the search
 		// is identical to the expected result
@@ -293,9 +266,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 		if (logger.isDebugEnabled()) {
 			logger.debug(testName + ": status = " + statusCode);
 		}
-		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(testRequestType, statusCode));
+		Assert.assertEquals(statusCode, testExpectedStatusCode);
 
 		// Verify that the number of resources matched by the search
 		// is identical to the expected result
@@ -308,11 +281,6 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
 	public void searchWithTwoKeywordsAcrossTwoFields(String testName)
 			throws Exception {
-
-		if (logger.isDebugEnabled()) {
-			logger.debug(testBanner(testName, CLASS_NAME));
-		}
-
 		// Create one or more keyword retrievable resources, each containing
 		// two specified keywords.
 		long numKeywordRetrievableResources = 5;
@@ -338,9 +306,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 		if (logger.isDebugEnabled()) {
 			logger.debug(testName + ": status = " + statusCode);
 		}
-		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(testRequestType, statusCode));
+		Assert.assertEquals(statusCode, testExpectedStatusCode);
 
 		// Verify that the number of resources matched by the search
 		// is identical to the expected result
@@ -359,9 +327,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 		if (logger.isDebugEnabled()) {
 			logger.debug(testName + ": status = " + statusCode);
 		}
-		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(testRequestType, statusCode));
+		Assert.assertEquals(statusCode, testExpectedStatusCode);
 
 		// Verify that the number of resources matched by the search
 		// is identical to the expected result
@@ -384,11 +352,6 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 	// }
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, groups = { "utf8" })
 	public void searchWithUTF8Keyword(String testName) {
-
-		if (logger.isDebugEnabled()) {
-			logger.debug(testBanner(testName, CLASS_NAME));
-		}
-
 		// Create one or more keyword retrievable resources, each containing
 		// two specified keywords.
 		long numKeywordRetrievableResources = 2;
@@ -410,9 +373,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 		if (logger.isDebugEnabled()) {
 			logger.debug(testName + ": status = " + statusCode);
 		}
-		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(testRequestType, statusCode));
+		Assert.assertEquals(statusCode, testExpectedStatusCode);
 
 		// Verify that the number of resources matched by the search
 		// is identical to the expected result
@@ -426,11 +389,6 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
 	public void keywordSearchNonExistentKeyword(String testName)
 			throws Exception {
-
-		if (logger.isDebugEnabled()) {
-			logger.debug(testBanner(testName, CLASS_NAME));
-		}
-
 		// Set the expected status code and group of valid status codes
 		testSetup(STATUS_OK, ServiceRequestType.SEARCH);
 
@@ -443,9 +401,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 		if (logger.isDebugEnabled()) {
 			logger.debug(testName + ": status = " + statusCode);
 		}
-		Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-		Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+		Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(testRequestType, statusCode));
+		Assert.assertEquals(statusCode, testExpectedStatusCode);
 
 		// Verify that the number of resources matched by the search
 		// is identical to the expected result
@@ -506,7 +464,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 			ClientResponse<Response> res = client.create(multipart);
 			try {
 				int statusCode = res.getStatus();
-				Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+				Assert.assertEquals(statusCode, testExpectedStatusCode);
 				String id = extractId(res);
 				allResourceIdsCreated.add(id);
 				if (logger.isDebugEnabled()) {

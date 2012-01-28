@@ -44,9 +44,6 @@ import org.collectionspace.services.blob.BlobsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -59,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
-public class BlobAuthRefsTest extends BaseServiceTest {
+public class BlobAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = BlobAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -87,39 +84,43 @@ public class BlobAuthRefsTest extends BaseServiceTest {
     }
 
     @Override
-    protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
     private PoxPayloadOut createBlobInstance(String depositorRefName) {
+    	BlobClient blobClient = new BlobClient();
         this.depositorRefName = depositorRefName;
         this.blobName = "testblob-"+createIdentifier();
         BlobsCommon blob = new BlobsCommon();
         blob.setName(this.blobName);
 
         PoxPayloadOut multipart = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new BlobClient().getCommonPartName());
+        PayloadOutputPart commonPart = multipart.addPart(blobClient.getCommonPartName(), blob);
         logger.debug("to be created, blob common: " + objectAsXmlString(blob, BlobsCommon.class));
         return multipart;
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName")
     public void createWithAuthRefs(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
-        String identifier = createIdentifier(); // Submit the request to the service and store the response.
         createPersonRefs();// Create all the person refs and entities
         // Create a new Loans In resource. One or more fields in this resource will be PersonAuthority
         //    references, and will refer to Person resources by their refNames.
         BlobClient blobClient = new BlobClient();
         PoxPayloadOut multipart = createBlobInstance(depositorRefName);
         ClientResponse<Response> res = blobClient.create(multipart);
-        assertStatusCode(res, testName);
-        if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
-            knownResourceId = extractId(res);
+        try {
+	        assertStatusCode(res, testName);
+	        if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
+	            knownResourceId = extractId(res);
+	        }
+	        blobIdsCreated.add(extractId(res));// Store the IDs from every resource created; delete on cleanup
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
         }
-        blobIdsCreated.add(extractId(res));// Store the IDs from every resource created; delete on cleanup
     }
 
     protected void createPersonRefs() {
@@ -127,22 +128,30 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
-        assertStatusCode(res, "createPersonRefs (not a surefire test)");
-        personAuthCSID = extractId(res);
-        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        // Create temporary Person resources, and their corresponding refNames by which they can be identified.
-        String csid = "";
-
-        csid = createPerson("Owen the Cur", "Owner", "owenCurOwner", authRefName);
-        personIdsCreated.add(csid);
-        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-
-        csid = createPerson("Davenport", "Depositor", "davenportDepositor", authRefName);
-        personIdsCreated.add(csid);
-        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        try {
+	        assertStatusCode(res, "createPersonRefs (not a surefire test)");
+	        personAuthCSID = extractId(res);
+	        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+	        // Create temporary Person resources, and their corresponding refNames by which they can be identified.
+	        String csid = "";
+	
+	        csid = createPerson("Owen the Cur", "Owner", "owenCurOwner", authRefName);
+	        personIdsCreated.add(csid);
+	        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+	
+	        csid = createPerson("Davenport", "Depositor", "davenportDepositor", authRefName);
+	        personIdsCreated.add(csid);
+	        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
     }
 
     protected String createPerson(String firstName, String surName, String shortId, String authRefName) {
+    	String result = null;
+    	
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -150,8 +159,16 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        assertStatusCode(res, "createPerson (not a surefire test)");
-        return extractId(res);
+        try {
+        	assertStatusCode(res, "createPerson (not a surefire test)");
+        	result = extractId(res);
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
+        
+        return result;
     }
 
     // @Test annotation commented out by Aron 2010-12-02 until blob payload is set to the
@@ -162,36 +179,48 @@ public class BlobAuthRefsTest extends BaseServiceTest {
     //
     // @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
-        logger.debug(testBanner(testName, CLASS_NAME));
         testSetup(STATUS_OK, ServiceRequestType.READ);
         BlobClient blobClient = new BlobClient();
         ClientResponse<String> res = blobClient.read(knownResourceId);
-        assertStatusCode(res, testName);
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        BlobsCommon blob = (BlobsCommon) extractPart(input, blobClient.getCommonPartName(), BlobsCommon.class);
-        Assert.assertNotNull(blob);
-        logger.debug(objectAsXmlString(blob, BlobsCommon.class));
+        BlobsCommon blob = null;
+        try {
+	        assertStatusCode(res, testName);
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+	        blob = (BlobsCommon) extractPart(input, blobClient.getCommonPartName(), BlobsCommon.class);
+	        Assert.assertNotNull(blob);
+	        logger.debug(objectAsXmlString(blob, BlobsCommon.class));
+        } finally {
+        	if (res != null) {
+                res.releaseConnection();
+            }
+        }
 
         // Check a couple of fields
         Assert.assertEquals(blob.getName(), blobName);
 
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = blobClient.getAuthorityRefs(knownResourceId);
-        assertStatusCode(res2, testName);
-        AuthorityRefList list = res2.getEntity();
-        List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
-        int numAuthRefsFound = items.size();
-        logger.debug("Authority references, found " + numAuthRefsFound);
-        //Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-        //                    "Did not find all expected authority references! " +
-        //                    "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
-        if (logger.isDebugEnabled()) {
-            int i = 0;
-            for (AuthorityRefList.AuthorityRefItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] Field:" + item.getSourceField() + "= " + item.getAuthDisplayName() + item.getItemDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] refName=" + item.getRefName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
-                i++;
+        try {
+	        assertStatusCode(res2, testName);
+	        AuthorityRefList list = res2.getEntity();
+	        List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
+	        int numAuthRefsFound = items.size();
+	        logger.debug("Authority references, found " + numAuthRefsFound);
+	        //Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
+	        //                    "Did not find all expected authority references! " +
+	        //                    "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
+	        if (logger.isDebugEnabled()) {
+	            int i = 0;
+	            for (AuthorityRefList.AuthorityRefItem item : items) {
+	                logger.debug(testName + ": list-item[" + i + "] Field:" + item.getSourceField() + "= " + item.getAuthDisplayName() + item.getItemDisplayName());
+	                logger.debug(testName + ": list-item[" + i + "] refName=" + item.getRefName());
+	                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
+	                i++;
+	            }
+	        }
+        } finally {
+        	if (res2 != null) {
+        		res2.releaseConnection();
             }
         }
     }
@@ -230,5 +259,4 @@ public class BlobAuthRefsTest extends BaseServiceTest {
             }
         }
     }
-
 }

@@ -2,7 +2,6 @@ package org.collectionspace.services.client;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +20,6 @@ import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 
 public class LocationAuthorityClientUtils {
     private static final Logger logger =
@@ -36,15 +34,16 @@ public class LocationAuthorityClientUtils {
      */
     public static PoxPayloadOut createLocationAuthorityInstance(
     		String displayName, String shortIdentifier, String headerLabel ) {
+    	
         LocationauthoritiesCommon locationAuthority = new LocationauthoritiesCommon();
         locationAuthority.setDisplayName(displayName);
         locationAuthority.setShortIdentifier(shortIdentifier);
         // String refName = createLocationAuthRefName(shortIdentifier, displayName);
         // locationAuthority.setRefName(refName);
         locationAuthority.setVocabType("LocationAuthority"); //FIXME: REM - Should this really be hard-coded?
+        
         PoxPayloadOut multipart = new PoxPayloadOut(LocationAuthorityClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(locationAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(headerLabel);
+        PayloadOutputPart commonPart = multipart.addPart(headerLabel, locationAuthority);
 
         if(logger.isDebugEnabled()){
         	logger.debug("to be created, locationAuthority common ", 

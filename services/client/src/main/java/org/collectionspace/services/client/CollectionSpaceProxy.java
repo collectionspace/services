@@ -38,7 +38,6 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -46,7 +45,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * The Interface CollectionSpaceProxy.
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-public interface CollectionSpaceProxy<LT> {
+public interface CollectionSpaceProxy<CLT> {
 
     //(D)elete
     @DELETE
@@ -75,6 +74,10 @@ public interface CollectionSpaceProxy<LT> {
      * (R)read List operations
      */
     
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<CLT> readList();
+    
     /**
      * Read list.
      *
@@ -84,7 +87,7 @@ public interface CollectionSpaceProxy<LT> {
      */
     @GET
     @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> readList(
+    ClientResponse<CLT> readList(
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
     	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);
         
@@ -98,7 +101,7 @@ public interface CollectionSpaceProxy<LT> {
      */
     @GET
     @Produces({"application/xml"})
-    ClientResponse<AbstractCommonList> readList(
+    ClientResponse<CLT> readList(
             @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortBy,
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
     	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);    

@@ -42,7 +42,6 @@ public class LoanoutClient extends AbstractCommonListPoxServiceClientImpl<Loanou
 
     @Override
     public Class<LoanoutProxy> getProxyClass() {
-        // TODO Auto-generated method stub
         return LoanoutProxy.class;
     }
 
