@@ -498,6 +498,7 @@
             <xs:element name="value" type="xs:decimal"/>
             <xs:element name="valueDate" type="xs:dateTime"/>
             <xs:element name="valueQualifier" type="xs:string"/>
+            <xs:element name="dimensionNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
     
