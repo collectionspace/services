@@ -1,0 +1,418 @@
+<?xml version="1.0"?>
+<component name="config:default-repository">
+	<extension target="org.nuxeo.ecm.core.repository.RepositoryService"
+		point="repository">
+		<repository name="default"
+			factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
+			<repository name="default">
+		        <clustering enabled="false" delay="1000" />
+		        <binaryStore path="" />
+				<!-- The transactional datasource for Nuxeo -->
+				<xa-datasource>@XA_DATASOURCE@</xa-datasource>				
+				<property name="URL">@DB_URL@</property>
+				<property name="DatabaseName">nuxeo</property>
+				<property name="User">@NUXEO_USER@</property>
+				<property name="Password">@NUXEO_PW@</property>
+
+				<schema>
+					<field type="largetext">imd:user_comment</field> <!-- Needed for large image metadata (image_metadata) that gets inserted 
+						here. -->
+					<field type="largetext">note</field>
+					<field type="largetext">webp:content</field>
+					<field type="largetext">webc:welcomeText</field>
+					<field type="largetext">comment:comment</field>
+					<field type="largetext">post</field>
+					<field type="largetext">mail:mail</field>
+
+					<!-- Text fields that may possibly not require largetext -->
+					<!-- designation and might need further review are marked as follows: -->
+					<!-- * -->
+
+					<!-- =========================================================== -->
+					<!-- Acquisition -->
+					<!-- =========================================================== -->
+
+					<field type="largetext">acquisitionFundingSourceProvisos</field>
+					<field type="largetext">acquisitions_common:acquisitionNote</field>
+					<field type="largetext">acquisitions_common:acquisitionProvisos</field>
+					<field type="largetext">acquisitions_common:acquisitionReason</field>
+					<field type="largetext">acquisitions_common:creditLine</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Blob -->
+					<!-- =========================================================== -->
+
+					<!-- No largetext fields identified to date -->
+
+
+					<!-- =========================================================== -->
+					<!-- CollectionObject / Cataloging -->
+					<!-- =========================================================== -->
+
+					<!-- Object Identification Information -->
+					<!-- ================================= -->
+
+					<!-- FIXME: Change this to otherNumberValue if and when the field name 
+						itself is so changed. -->
+					<field type="largetext">numberValue</field> <!-- * -->
+
+					<!-- FIXME: multivalued field - need to verify schema and field name -->
+					<field type="largetext">collectionobjects_common:briefDescriptions
+					</field>
+
+					<!-- FIXME: multivalued field - need to verify schema and field name -->
+					<field type="largetext">collectionobjects_common:comments</field>
+
+					<field type="largetext">collectionobjects_common:distinguishingFeatures
+					</field>
+
+					<field type="largetext">objectNameNote</field>
+
+					<field type="largetext">title</field>
+					<field type="largetext">titleTranslation</field>
+
+					<!-- Object Description Information -->
+					<!-- ============================== -->
+
+					<field type="largetext">collectionobjects_common:ageQualifier</field>
+					<field type="largetext">collectionobjects_common:color</field>
+					<field type="largetext">collectionobjects_common:contentDescription
+					</field>
+					<field type="largetext">collectionobjects_common:contentNote</field>
+					<field type="largetext">collectionobjects_common:contentObject</field>
+					<field type="largetext">collectionobjects_common:copyNumber</field> <!-- * -->
+					<field type="largetext">collectionobjects_common:editionNumber</field> <!-- * -->
+
+					<!-- FIXME: Will become group repeatable in a post-1.3 release -->
+					<!-- Remove the schema name(s) from the value(s) below when this occurs. -->
+					<field type="largetext">collectionobjects_common:inscriptionContent
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionContentInterpretation
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionContentTranslation
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionContentTransliteration
+					</field>
+
+					<!-- FIXME: Will become group repeatable in a post-1.3 release -->
+					<!-- Remove the schema name(s) from the value(s) below when this occurs. -->
+					<field type="largetext">collectionobjects_common:inscriptionDescriptionInterpretation
+					</field>
+
+					<field type="largetext">materialComponentNote</field>
+					<field type="largetext">materialName</field>  <!-- * -->
+
+					<!-- FIXME: multivalued field - need to verify schema and field name -->
+					<field type="largetext">collectionobjects_common:physicalDescription
+					</field>
+
+					<field type="largetext">objectComponentInformation</field>
+
+					<!-- Object Production Information -->
+					<!-- ============================= -->
+
+					<field type="largetext">collectionobjects_common:objectProductionNote
+					</field>
+
+					<!-- FIXME: multivalued field - need to verify schema and field name -->
+					<field type="largetext">collectionobjects_common:objectProductionReason
+					</field>
+
+					<!-- Object History and Association Information -->
+					<!-- ========================================== -->
+
+					<field type="largetext">assocActivityNote</field>
+					<field type="largetext">assocConceptNote</field>
+					<field type="largetext">assocCulturalContextNote</field>
+					<field type="largetext">assocDateNote</field>
+
+					<!-- FIXME: Will become group repeatable in a post-1.3 release. -->
+					<!-- Remove the schema name(s) from the value(s) below when this occurs. -->
+					<field type="largetext">collectionobjects_common:assocEventName</field>   <!-- * -->
+					<field type="largetext">collectionobjects_common:assocEventNote</field>
+					<field type="largetext">collectionobjects_common:assocEventType</field>   <!-- * -->
+
+					<field type="largetext">assocObject</field>
+					<field type="largetext">assocOrganizationNote</field>
+					<field type="largetext">assocPeopleNote</field>
+					<field type="largetext">assocPersonNote</field>
+					<field type="largetext">assocPlaceNote</field>
+
+					<field type="largetext">collectionobjects_common:objectHistoryNote
+					</field>
+					<field type="largetext">collectionobjects_common:ownershipExchangeNote
+					</field>
+					<field type="largetext">usageNote</field>
+
+					<!-- Object Owner's Contribution Information -->
+					<!-- ======================================= -->
+
+					<field type="largetext">collectionobjects_common:ownersPersonalExperience
+					</field>
+					<field type="largetext">collectionobjects_common:ownersPersonalResponse
+					</field>
+
+					<!-- FIXME: multivalued field - need to verify schema and field name -->
+					<field type="largetext">collectionobjects_common:ownersReference</field>
+
+					<field type="largetext">collectionobjects_common:ownersContributionNote
+					</field>
+
+					<!-- Object Viewer's Contribution Information -->
+					<!-- ======================================== -->
+
+					<field type="largetext">collectionobjects_common:viewersRole</field>
+					<field type="largetext">collectionobjects_common:viewersPersonalExperience
+					</field>
+					<field type="largetext">collectionobjects_common:viewersPersonalResponse
+					</field>
+
+					<!-- FIXME: multivalued field - need to verify schema and field name -->
+					<field type="largetext">collectionobjects_common:viewersReference</field>
+
+					<field type="largetext">collectionobjects_common:viewersContributionNote
+					</field>
+
+					<!-- Reference Information -->
+					<!-- ===================== -->
+
+					<field type="largetext">collectionobjects_common:catalogNumber</field> <!-- * -->
+
+					<!-- Object Collection Information -->
+					<!-- ============================= -->
+
+					<field type="largetext">collectionobjects_common:fieldCollectionNote
+					</field>
+					<field type="largetext">collectionobjects_common:fieldCollectionNumber
+					</field> <!-- * -->
+
+					<!-- Additional non-text fields configured as 'largetext' to avoid the 
+						following error when Nuxeo is configured to use MySQL: com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException. 
+						message: Row size too large. The maximum row size for the used table type, 
+						not counting BLOBs, is 65535. Some of the fields below may be repeatable 
+						or in repeatable groups, and the schema and field names below might thus 
+						require verification to match actual values. -->
+
+					<field type="largetext">collectionobjects_common:objectNumber</field>
+					<field type="largetext">collectionobjects_common:numberOfObjects</field>
+					<field type="largetext">collectionobjects_common:collection</field>
+					<field type="largetext">collectionobjects_common:recordStatus</field>
+					<field type="largetext">collectionobjects_common:age</field>
+					<field type="largetext">collectionobjects_common:ageQualifier</field>
+					<field type="largetext">collectionobjects_common:ageUnit</field>
+
+					<field type="largetext">collectionobjects_common:contentDate</field>
+					<field type="largetext">collectionobjects_common:contentLanguages</field>
+					<field type="largetext">collectionobjects_common:contentOrganizations
+					</field>
+
+					<field type="largetext">collectionobjects_common:dimensionSummary</field>
+
+					<!-- FIXME: The set of dimensions-related fields below may be removed -->
+					<!-- altogether when it is confirmed that the App/UI layers are using -->
+					<!-- a repeatable dimensions group. -->
+					<field type="largetext">collectionobjects_common:dimension</field>
+					<field type="largetext">collectionobjects_common:dimensionMeasuredPart
+					</field>
+					<field type="largetext">collectionobjects_common:dimensionMeasurementUnit
+					</field>
+					<field type="largetext">collectionobjects_common:dimensionValue</field>
+					<field type="largetext">collectionobjects_common:dimensionValueDate
+					</field>
+					<field type="largetext">collectionobjects_common:dimensionValueQualifier
+					</field>
+
+					<field type="largetext">collectionobjects_common:editionNumber</field>
+
+					<field type="largetext">collectionobjects_common:inscriptionContentInscriber
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionContentDate
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionContentLanguage
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionContentMethod
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionContentPosition
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionContentScript
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionContentType
+					</field>
+
+					<field type="largetext">collectionobjects_common:inscriptionDescription
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionDescriptionInscriber
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionDescriptionDate
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionDescriptionMethod
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionDescriptionPosition
+					</field>
+					<field type="largetext">collectionobjects_common:inscriptionDescriptionType
+					</field>
+
+					<field type="largetext">collectionobjects_common:objectStatus</field>
+					<field type="largetext">collectionobjects_common:phase</field>
+					<field type="largetext">collectionobjects_common:sex</field>
+					<field type="largetext">collectionobjects_common:ownershipAccess</field>
+					<field type="largetext">collectionobjects_common:ownershipCategory
+					</field>
+					<field type="largetext">collectionobjects_common:ownershipDates</field>
+					<field type="largetext">collectionobjects_common:ownershipExchangeMethod
+					</field>
+					<field type="largetext">collectionobjects_common:ownershipExchangePriceCurrency
+					</field>
+					<field type="largetext">collectionobjects_common:ownershipExchangePriceValue
+					</field>
+					<field type="largetext">collectionobjects_common:ownershipPlace</field>
+					<field type="largetext">collectionobjects_common:fieldCollectionNumber
+					</field>
+					<field type="largetext">collectionobjects_common:fieldCollectionMethod
+					</field>
+					<field type="largetext">collectionobjects_common:fieldCollectionPlace
+					</field>
+					<field type="largetext">collectionobjects_common:fieldCollectionDate
+					</field>
+
+					<!-- FIXME: This sample set of date field can be removed when Cataloging -->
+					<!-- records are using structured date fields, or earlier when it is 
+						confirmed that -->
+					<!-- the App/UI layers are not using this vestigial part of the Cataloging 
+						schema. -->
+					<field type="largetext">collectionobjects_common:dateAssociation</field>
+					<field type="largetext">collectionobjects_common:dateEarliestSingle
+					</field>
+					<field type="largetext">collectionobjects_common:dateEarliestSingleCertainty
+					</field>
+					<field type="largetext">collectionobjects_common:dateEarliestSingleQualifier
+					</field>
+					<field type="largetext">collectionobjects_common:dateLatest</field>
+					<field type="largetext">collectionobjects_common:dateLatestCertainty
+					</field>
+					<field type="largetext">collectionobjects_common:dateLatestQualifier
+					</field>
+					<field type="largetext">collectionobjects_common:datePeriod</field>
+					<field type="largetext">collectionobjects_common:dateText</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Contact -->
+					<!-- =========================================================== -->
+					<field type="largetext">contacts_common:addressPlace</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Group -->
+					<!-- =========================================================== -->
+					<field type="largetext">groups_common:scopeNote</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Intake -->
+					<!-- =========================================================== -->
+
+					<field type="largetext">intakes_common:entryNote</field>
+					<field type="largetext">intakes_common:packingNote</field>
+					<field type="largetext">intakes_common:fieldCollectionNote</field>
+					<field type="largetext">intakes_common:insuranceNote</field>
+					<field type="largetext">intakes_common:conditionCheckNote</field>
+					<field type="largetext">currentLocationNote</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Loan In -->
+					<!-- =========================================================== -->
+
+					<field type="largetext">loansin_common:loanInConditions</field>
+					<field type="largetext">loansin_common:loanInNote</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Loan Out -->
+					<!-- =========================================================== -->
+
+					<field type="largetext">loansout_common:specialConditionsOfLoan</field>
+					<field type="largetext">loansout_common:loanOutNote</field>
+					<field type="largetext">loansout_common:loanPurpose</field>
+					<field type="largetext">loanedObjectStatusNote</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Movement / Location and Movement Control -->
+					<!-- =========================================================== -->
+
+					<field type="largetext">movements_common:currentLocationNote</field>
+					<field type="largetext">movements_common:movementNote</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Media / Media Handling -->
+					<!-- =========================================================== -->
+
+					<field type="largetext">media_common:copyrightStatement</field>
+					<field type="largetext">media_common:description</field>
+					<field type="largetext">media_common:title</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Note -->
+					<!-- =========================================================== -->
+
+					<field type="largetext">notes_common:content</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Object Exit -->
+					<!-- =========================================================== -->
+
+					<field type="largetext">objectexit_common:exitNote</field>
+					<field type="largetext">objectexit_common:packingNote</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Organization -->
+					<!-- =========================================================== -->
+
+					<field type="largetext">shortName</field>
+					<field type="largetext">longName</field>
+					<field type="largetext">nameAdditions</field>
+					<field type="largetext">historyNote</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Person -->
+					<!-- =========================================================== -->
+					<field type="largetext">persons_common:bioNote</field>
+					<field type="largetext">persons_common:nameNote</field>
+
+
+					<!-- =========================================================== -->
+					<!-- Relation -->
+					<!-- =========================================================== -->
+
+					<!-- No largetext fields identified to date -->
+
+
+					<!-- =========================================================== -->
+					<!-- Storage Location / Location -->
+					<!-- =========================================================== -->
+					<field type="largetext">locations_common:name</field>
+					<!-- conditionNote will be made part of a repeatable group of fields 
+						in a future release -->
+					<field type="largetext">locations_common:conditionNote</field>
+					<field type="largetext">locations_common:securityNote</field>
+					<field type="largetext">locations_common:accessNote</field>
+
+				</schema>
+			</repository>
+		</repository>
+	</extension>
+
+	<extension target="org.nuxeo.ecm.core.api.repository.RepositoryManager"
+		point="repositories">
+		<documentation>The default repository</documentation>
+		<repository name="default" label="Default Repository" />
+	</extension>
+</component>
