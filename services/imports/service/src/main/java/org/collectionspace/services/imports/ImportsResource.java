@@ -107,30 +107,9 @@ public class ImportsResource extends ResourceBase {
     }
 
     @Override
-    //public Class<ImportsCommon> getCommonPartClass() {
-    public Class getCommonPartClass() {
-    	try {
-            return Class.forName("org.collectionspace.services.imports.ImportsCommon");//.class;
-        } catch (ClassNotFoundException e){
-            return null;
-        }
+    public Class<?> getCommonPartClass() {
+		return ImportsCommon.class;
     }
-
-
-    /* KRUFT:
-
-      1) here is how you can deal with poxpayloads:
-  	        //PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-        	//ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
-      2) here are some notes:
-            //First, save the import request to a local file.
-            // It may be huge. To accept a stream, send it as an upload request; see acceptUpload()
-      3) useful for debugging:
-              System.out.println("\r\n\r\n\r\n=====================\r\n   RUNNING create with xmlPayload: \r\n"+xmlPayload);
-    */
-
-
-    //public static final String TEMPLATE_DIR = "/src/trunk/services/imports/service/src/main/resources/templates";
 
     private static String _templateDir = null;
     public static String getTemplateDir(){

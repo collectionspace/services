@@ -4,10 +4,8 @@ import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
-import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-//import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
@@ -17,17 +15,18 @@ import org.nuxeo.ecm.core.io.impl.plugins.DocumentModelWriter;
 
 // based loosely on package org.nuxeo.ecm.shell.commands.io.ImportCommand;
 public class ImportCommand {
-    private static final Log log = LogFactory.getLog(ImportCommand.class);
+    private static final Log logger = LogFactory.getLog(ImportCommand.class);
 
     public String run(String src, String dest) throws Exception {
         File file = new File(src);
         ///cspace way of configuring client and auth:
         NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
-        RepositoryInstance  repository = client.openRepository();
+        RepositoryInstance  repoSession = client.openRepository();
         try {
-            return importTree(repository, file, dest);
+            return importTree(repoSession, file, dest);
         } finally {
-            repository.close();
+//            repository.close();
+            client.releaseRepository(repoSession);
         }
     }
 
