@@ -1,7 +1,7 @@
 /**
  *  This document is a part of the source code and related artifacts
  *  for CollectionSpace, an open source collections management system
- *  for museums and related institutions:
+ *  for museums and related institutions.
 
  *  http://www.collectionspace.org
  *  http://wiki.collectionspace.org

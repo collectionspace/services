@@ -85,6 +85,12 @@ public class AuthorizationGen {
     private Role cspaceAdminRole;
     private Hashtable<String, TenantBindingType> tenantBindings =
             new Hashtable<String, TenantBindingType>();
+	//
+    // Store the list of default roles, perms, and roleperms
+    //
+    private List<PermissionRole> allPermRoleList = null;
+	private List<Permission> allPermList;
+	private List<Role> allRoleList;
 
     public void initialize(String tenantRootDirPath) throws Exception {
         TenantBindingConfigReaderImpl tenantBindingConfigReader =
@@ -237,9 +243,11 @@ public class AuthorizationGen {
     }
 
     public List<Permission> getDefaultPermissions() {
-        List<Permission> allPermList = new ArrayList<Permission>();
-        allPermList.addAll(adminPermList);
-        allPermList.addAll(readerPermList);
+    	if (allPermList == null) {
+	        allPermList = new ArrayList<Permission>();
+	        allPermList.addAll(adminPermList);
+	        allPermList.addAll(readerPermList);
+    	}
         return allPermList;
     }
 
@@ -275,25 +283,33 @@ public class AuthorizationGen {
     }
 
     private Role buildTenantRole(String tenantId, String name, String type) {
-        Role role = new Role();
-        role.setCreatedAtItem(new Date());
-        role.setDisplayName(name);
-        role.setRoleName(ROLE_PREFIX +
-        		tenantId + "_" +
-        		role.getDisplayName());
-        String id = UUID.randomUUID().toString();
-        role.setCsid(id);
-        role.setDescription("generated tenant "+type+" role");
-        role.setTenantId(tenantId);
-        role.setMetadataProtection(RoleClient.IMMUTABLE);
-        role.setPermsProtection(RoleClient.IMMUTABLE);
+    	Role role = null;
+    	
+    	String roleName = ROLE_PREFIX + tenantId + "_" + name;
+    	role = AuthorizationStore.getRoleByName(roleName, tenantId);
+    	if (role == null) {
+    		// the role doesn't exist already, so we need to create it
+	        role = new Role();
+	        role.setCreatedAtItem(new Date());
+	        role.setDisplayName(name);
+	        role.setRoleName(roleName);
+	        String id = UUID.randomUUID().toString();
+	        role.setCsid(id);
+			role.setDescription("generated tenant " + type + " role");
+	        role.setTenantId(tenantId);
+	        role.setMetadataProtection(RoleClient.IMMUTABLE);
+	        role.setPermsProtection(RoleClient.IMMUTABLE);
+    	}
+        
         return role;
     }
 
     public List<Role> getDefaultRoles() {
-        List<Role> allRoleList = new ArrayList<Role>();
-        allRoleList.addAll(adminRoles);
-        allRoleList.addAll(readerRoles);
+    	if (allRoleList == null) {
+	        allRoleList = new ArrayList<Role>();
+	        allRoleList.addAll(adminRoles);
+	        allRoleList.addAll(readerRoles);
+    	}
         return allRoleList;
     }
 
@@ -380,9 +396,11 @@ public class AuthorizationGen {
     }
 
     public List<PermissionRole> getDefaultPermissionRoles() {
-        List<PermissionRole> allPermRoleList = new ArrayList<PermissionRole>();
-        allPermRoleList.addAll(adminPermRoleList);
-        allPermRoleList.addAll(readerPermRoleList);
+    	if (allPermRoleList  == null) {
+	        allPermRoleList = new ArrayList<PermissionRole>();
+	        allPermRoleList.addAll(adminPermRoleList);
+	        allPermRoleList.addAll(readerPermRoleList);
+    	}
         return allPermRoleList;
     }
 
@@ -405,10 +423,7 @@ public class AuthorizationGen {
 
     public void exportDefaultRoles(String fileName) {
         RolesList rList = new RolesList();
-        List<Role> allRoleList = new ArrayList<Role>();
-        allRoleList.addAll(adminRoles);
-        allRoleList.addAll(readerRoles);
-        rList.setRole(allRoleList);
+        rList.setRole(this.getDefaultRoles());
         //
         // Since it is missing the @XMLRootElement annotation, create a JAXBElement wrapper for the RoleList instance
         // so we can have it marshalled it correctly.
@@ -423,10 +438,7 @@ public class AuthorizationGen {
 
     public void exportDefaultPermissions(String fileName) {
         PermissionsList pcList = new PermissionsList();
-        List<Permission> allPermList = new ArrayList<Permission>();
-        allPermList.addAll(adminPermList);
-        allPermList.addAll(readerPermList);
-        pcList.setPermission(allPermList);
+        pcList.setPermission(this.getDefaultPermissions());
         org.collectionspace.services.authorization.ObjectFactory objectFactory =
         	new org.collectionspace.services.authorization.ObjectFactory();
         toFile(pcList, PermissionsList.class,
@@ -439,10 +451,7 @@ public class AuthorizationGen {
 
     public void exportDefaultPermissionRoles(String fileName) {
         PermissionsRolesList psrsl = new PermissionsRolesList();
-        List<PermissionRole> allPermRoleList = new ArrayList<PermissionRole>();
-        allPermRoleList.addAll(adminPermRoleList);
-        allPermRoleList.addAll(readerPermRoleList);
-        psrsl.setPermissionRole(allPermRoleList);
+        psrsl.setPermissionRole(this.getDefaultAdminPermissionRoles());
         toFile(psrsl, PermissionsRolesList.class,
                 fileName);
         if (logger.isDebugEnabled()) {

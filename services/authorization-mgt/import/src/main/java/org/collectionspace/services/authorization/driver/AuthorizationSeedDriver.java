@@ -37,6 +37,7 @@ import org.collectionspace.services.authorization.importer.AuthorizationGen;
 import org.collectionspace.services.authorization.importer.AuthorizationSeed;
 import org.collectionspace.services.authorization.importer.AuthorizationStore;
 import org.collectionspace.services.authorization.storage.PermissionRoleUtil;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -128,8 +129,9 @@ public class AuthorizationSeedDriver {
             setupSpring();
             status = beginTransaction("seedData");
             AuthorizationSeed authzSeed = new AuthorizationSeed();
-            authzSeed.seedPermissions(exportDir + File.separator + PERMISSION_FILE,
-                    exportDir + File.separator + PERMISSION_ROLE_FILE);
+            authzSeed.seedPermissions(authzGen.getDefaultPermissions(), authzGen.getDefaultPermissionRoles());
+//            authzSeed.seedPermissions(exportDir + File.separator + PERMISSION_FILE,
+//                    exportDir + File.separator + PERMISSION_ROLE_FILE);
             if (logger.isDebugEnabled()) {
                 logger.debug("authorization seeding completed ");
             }
@@ -186,7 +188,19 @@ public class AuthorizationSeedDriver {
     private void store() throws Exception {
         AuthorizationStore authzStore = new AuthorizationStore();
         for (Role role : authzGen.getDefaultRoles()) {
-            authzStore.store(role);
+        	try {
+        		authzStore.store(role);
+        	} catch (Exception e) {
+        		//
+        		// If the role already exists, read it in and replace the instance
+        		// we're trying to import with the exist one.  This will ensure that the rest
+        		// of import uses the correct CSID.
+        		if (e.getCause() instanceof ConstraintViolationException) {
+        			Role existingRole = authzStore.getRoleByName(role.getRoleName(), role.getTenantId());
+        			//
+        			role = existingRole;
+        		}
+        	}
         }
 
         for (Permission perm : authzGen.getDefaultPermissions()) {

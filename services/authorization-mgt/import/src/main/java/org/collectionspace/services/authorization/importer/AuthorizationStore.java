@@ -30,6 +30,10 @@ package org.collectionspace.services.authorization.importer;
 import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+
+import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.storage.RoleStorageConstants;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
@@ -41,9 +45,35 @@ import org.slf4j.LoggerFactory;
  */
 public class AuthorizationStore {
 
-    private final Logger logger = LoggerFactory.getLogger(AuthorizationStore.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthorizationStore.class);
     private final static String PERSISTENCE_UNIT = "org.collectionspace.services.authorization";
 
+    static public Role getRoleByName(String roleName, String tenantId) {
+    	Role theRole = null;
+    	
+    	try {
+    		theRole = (Role)JpaStorageUtils.getEnityByKey(Role.class.getName(),
+    				RoleStorageConstants.ROLE_NAME, roleName, tenantId);
+    	} catch (Exception e) {
+    		if (logger.isTraceEnabled() == true) {
+    			logger.trace("Could not retrieve role with name =" + roleName, e);
+    		}
+    	}
+    	
+    	return theRole;
+    }
+    
+    static public Permission getPermission(Permission permission) {
+    	Permission result = null;
+    	//
+    	// We need to perform a DB lookup to see if this permission already exists.  If so,
+    	// we should return the existing permission.
+    	//
+    	result = permission;
+    	
+    	return result;
+    }
+    
     /**
      * store the given entity
      * @param entity

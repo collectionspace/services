@@ -165,7 +165,7 @@ extends DocHandlerBase<BlobsCommon> {
 		// fall into this block of code.  Otherwise, we'll just call our parent to deal with a plain-old-blob payload.
 		//
 		if (derivativeTerm != null || getContentFlag == true) {
-			BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession,
+			BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession, //FIXME: REM - If the blob's binary has been removed from the file system, then this call will return null.  We need to at least spit out a meaningful error/warning message
 					blobRepositoryId, derivativeTerm, getContentFlag);
 			if (getContentFlag == true) {
 				blobInput.setContentStream(blobOutput.getBlobInputStream());

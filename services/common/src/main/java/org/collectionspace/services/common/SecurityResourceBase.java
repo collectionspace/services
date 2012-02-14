@@ -1,6 +1,5 @@
 package org.collectionspace.services.common;
 
-import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;

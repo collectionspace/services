@@ -45,6 +45,7 @@ import org.jboss.security.Base64Utils;
  */
 public class SecurityUtils {
 
+	private static final String ADMIN_TENANT_ID = "0";
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
     public static final String URI_PATH_SEPARATOR = "/";
     public static final int MIN_PASSWORD_LENGTH = 8;
@@ -205,16 +206,22 @@ public class SecurityUtils {
      * @return
      */
     public static boolean isCSpaceAdmin() {
-        String tenantId = AuthN.get().getCurrentTenantId();
+    	boolean result = false;
+    	
+    	String tenantId = null;
+    	try {
+    		tenantId = AuthN.get().getCurrentTenantId();
+    	} catch (Throwable e) {
+    		tenantId = ADMIN_TENANT_ID;
+    	}
+    	
         if (tenantId != null) {
-            if (!"0".equals(tenantId)) {
-                return false;
-            } else {
-                return true;
+            if (ADMIN_TENANT_ID.equals(tenantId) == true) {
+                result = true;
             }
-        } else {
-            return false;
         }
+        
+        return result;
     }
     
     public static String createPasswordHash(String hashAlgorithm, String hashEncoding, String hashCharset, String username, String password)

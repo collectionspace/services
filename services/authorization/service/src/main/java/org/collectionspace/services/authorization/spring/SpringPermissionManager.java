@@ -26,13 +26,16 @@ package org.collectionspace.services.authorization.spring;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.spi.CSpacePermissionManager;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionNotFoundException;
+
 import org.springframework.security.acls.model.AccessControlEntry;
 import org.springframework.security.acls.model.AclDataAccessException;
 import org.springframework.security.acls.model.AlreadyExistsException;
@@ -97,7 +100,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                             + " oid=" + oid.toString()
                             + " perm=" + p.toString(), aex);
                 }
-                //keep going
+                throw new PermissionException("Permission already exists", aex);
             } catch (Exception ex) {
                 String msg = "addpermissions(res,action,prin[], grant) failed,"
                         + " oid=" + oid.toString()

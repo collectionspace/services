@@ -11,7 +11,7 @@
  *  Licensed under the Educational Community License (ECL), Version 2.0.
  *  You may not use this file except in compliance with this License.
 
- *  You may obtain a copy of the ECL 2.0 License at
+ *  You may obtain a copy of the ECL 2.0 License at:
 
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
 
@@ -34,17 +34,13 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.authorization.AccountValue;
-import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
-import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.URIResourceImpl;
@@ -64,10 +60,14 @@ import org.slf4j.LoggerFactory;
 public class JpaStorageUtils {
 
     final private static Logger logger = LoggerFactory.getLogger(JpaStorageUtils.class);
+    
     /** The Constant CS_PERSISTENCE_UNIT. */
     public final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
     private final static String CS_AUTHZ_PERSISTENCE_UNIT = "org.collectionspace.services.authorization";
     public final static String CS_CURRENT_USER = "0";
+    
+    // This is the column name for ID field of all the JPA objects
+    public static final String CSID_LABEL = "csid";
 
     /**
      * getEntity for given id and class
@@ -295,7 +295,70 @@ public class JpaStorageUtils {
         }
         return result;
     }
+    
+    public static Object getEnityByKey(String entityName, String key, String value,
+            String tenantId) {
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        Object o = null;
+        
+        if (entityName == null) {
+            throw new IllegalArgumentException("entityName is required");
+        }
+        if (key == null) {
+            throw new IllegalArgumentException("id is required");
+        }
+        if (tenantId == null) {
+            throw new IllegalArgumentException("tenantId is required");
+        }
+        try {
+            StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+            queryStrBldr.append(entityName);
+            queryStrBldr.append(" a");
+            queryStrBldr.append(" WHERE " + key + " = :" + key);
+            boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+            if (!csAdmin) {
+                queryStrBldr.append(" AND tenantId = :tenantId");
+            }
+            emf = getEntityManagerFactory();
+            em = emf.createEntityManager();
+            String queryStr = queryStrBldr.toString(); //for debugging
+            Query q = em.createQuery(queryStr);
+            q.setParameter(key, value);
+            if (!csAdmin) {
+                q.setParameter("tenantId", tenantId);
+            }
+            o = q.getSingleResult();
+        } catch (NoResultException nre) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Could not find entity with key ={" + key + "=" + value + "}", nre);
+            }
+            //returns null
+        } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not find entity(2) with id=" + key, e);
+            }
+            //returns null
+        } finally {
+            if (em != null) {
+                releaseEntityManagerFactory(emf);
+            }
+        }
+        
+        return o;
+    }
 
+    public static Object getEntity(String entityName, String id,
+            String tenantId) {
+    	return getEnityByKey(entityName, CSID_LABEL, id, tenantId);
+    }
+    
     /**
      * getEntity 
      * @param entityName fully qualified entity name
@@ -303,7 +366,8 @@ public class JpaStorageUtils {
      * @param tenantId
      * @return null if entity is not found
      */
-    public static Object getEntity(String entityName, String id,
+    @Deprecated
+    public static Object oldgetEntity(String entityName, String id,
             String tenantId) {
         EntityManagerFactory emf = null;
         EntityManager em = null;

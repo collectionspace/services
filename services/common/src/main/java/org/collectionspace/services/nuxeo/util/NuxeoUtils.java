@@ -86,9 +86,11 @@ public class NuxeoUtils {
     // Base document type in Nuxeo is "Document"
     //
     public static final String BASE_DOCUMENT_TYPE = "Document";
-//    public static final String WORKSPACES = "workspaces";
-    public static final String Workspaces = "Workspaces";
+    public static final String WORKSPACE_DOCUMENT_TYPE = "Workspace";
     
+    public static final String Workspaces = "Workspaces";
+    public static final String workspaces = "workspaces"; // to make it easier to migrate older versions of the CollectionSpace services -i.e., pre v2.0.
+        
     // Regular expressions pattern for identifying valid ORDER BY clauses.
     // FIXME: Currently supports only USASCII word characters in field names.
     //private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?(, \\w+(_\\w+)?:\\w+( ASC| DESC)?)*";    

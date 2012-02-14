@@ -17,7 +17,9 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -1015,6 +1017,35 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         return domainId;
     }
 
+    /*
+	 * Returns the workspaces root directory for a given domain.
+	 */
+	private DocumentModel getWorkspacesRoot(RepositoryInstance repoSession,
+			String domainName) throws Exception {
+		DocumentModel result = null;
+		
+		String domainPath = "/" + domainName;
+		DocumentRef parentDocRef = new PathRef(domainPath);
+		DocumentModelList domainChildrenList = repoSession.getChildren(
+				parentDocRef);
+		Iterator<DocumentModel> witer = domainChildrenList.iterator();
+		while (witer.hasNext()) {
+			DocumentModel childNode = witer.next();
+			if (NuxeoUtils.Workspaces.equalsIgnoreCase(childNode.getName())) {
+				result = childNode;
+				logger.trace("Found workspaces directory at: " + result.getPathAsString());
+				break;
+			}
+		}
+		
+		if (result == null) {
+			throw new ClientException("Could not find workspace root directory in: "
+					+ domainPath);
+		}
+
+		return result;
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.repository.RepositoryClient#createWorkspace(java.lang.String, java.lang.String)
      */
@@ -1024,26 +1055,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         String workspaceId = null;
         try {
             repoSession = getRepositorySession();
-            String parentDocRefPath = "/" + domainName + "/" + NuxeoUtils.Workspaces;
-            DocumentRef parentDocRef = new PathRef(
-                    "/" + domainName
-                    + "/" + NuxeoUtils.Workspaces);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Fetching "+NuxeoUtils.Workspaces+", path=" + parentDocRefPath
-                        + " docRef:" + parentDocRef.toString());
-            }
-            DocumentModel parentDoc = null;
-            try {
-            	parentDoc = repoSession.getDocument(parentDocRef);
-            } catch(ClientException ce) {
-                logger.error("Failed to get "+NuxeoUtils.Workspaces+", path=" + parentDocRefPath
-                        + " docRef:" + parentDocRef.toString());
-            	// try again for debugging
-                parentDoc = repoSession.getDocument(parentDocRef);
-                //throw ce;
-            }
+            DocumentModel parentDoc = getWorkspacesRoot(repoSession, domainName);            
             DocumentModel doc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
-                    workspaceName, "Workspace");
+                    workspaceName, NuxeoUtils.WORKSPACE_DOCUMENT_TYPE);
             doc.setPropertyValue("dc:title", workspaceName);
             doc.setPropertyValue("dc:description", "A CollectionSpace workspace for "
                     + workspaceName);
@@ -1051,7 +1065,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             workspaceId = doc.getId();
             repoSession.save();
             if (logger.isDebugEnabled()) {
-                logger.debug("created workspace name=" + workspaceName
+                logger.debug("Created workspace name=" + workspaceName
                         + " id=" + workspaceId);
             }
         } catch (Exception e) {

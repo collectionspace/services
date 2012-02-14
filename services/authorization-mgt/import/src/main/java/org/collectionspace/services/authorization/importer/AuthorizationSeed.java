@@ -25,13 +25,17 @@ package org.collectionspace.services.authorization.importer;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import org.collectionspace.services.authorization.perms.ActionType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.springframework.security.acls.model.AlreadyExistsException;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.perms.EffectType;
@@ -84,19 +88,31 @@ public class AuthorizationSeed {
      */
     public void seedPermissions(PermissionsList permList, PermissionsRolesList permRoleList)
             throws Exception {
-        for (Permission p : permList.getPermission()) {
+    	
+    	seedPermissions(permList.getPermission(), permRoleList.getPermissionRole());
+    }
+    
+    /**
+     * seedPermissions seed permissions from given permisison and permission role lists
+     * @param permList
+     * @param permRoleList
+     * @throws Exception
+     */
+    public void seedPermissions(List<Permission> permList, List<PermissionRole> permRoleList)
+            throws Exception {
+        for (Permission p : permList) {
             if (logger.isTraceEnabled()) {
                 logger.trace("adding permission for res=" + p.getResourceName() +
                         " for tenant=" + p.getTenantId());
             }
-            for (PermissionRole pr : permRoleList.getPermissionRole()) {
+            for (PermissionRole pr : permRoleList) {
                 if (pr.getPermission().get(0).getPermissionId().equals(p.getCsid())) {
                     addPermissionsForUri(p, pr);
                 }
             }
         }
     }
-
+    
     /**
      * addPermissionsForUri add permissions from given permission configuration
      * with assumption that resource is of type URI
@@ -116,11 +132,20 @@ public class AuthorizationSeed {
         }
         List<PermissionAction> permActions = perm.getAction();
         for (PermissionAction permAction : permActions) {
-            CSpaceAction action = URIResourceImpl.getAction(permAction.getName());
-            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
-                    perm.getResourceName(), action);
-            boolean grant = perm.getEffect().equals(EffectType.PERMIT) ? true : false;
-            AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]), grant);
+        	try {
+	            CSpaceAction action = URIResourceImpl.getAction(permAction.getName());
+	            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
+	                    perm.getResourceName(), action);
+	            boolean grant = perm.getEffect().equals(EffectType.PERMIT) ? true : false;
+	            AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]), grant);
+        	} catch (PermissionException e) {
+        		//
+        		// Only throw the exception if it is *not* an already-exists exception
+        		//
+        		if (e.getCause() instanceof AlreadyExistsException == false) {
+        			throw e;
+        		}
+        	}
         }
     }
 
