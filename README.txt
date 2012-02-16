@@ -12,3 +12,5 @@ Contact & Support
 Training
 GitHub Enterprise
 Site Status
+
+The quick brown fox jumped over the lazy dog.
