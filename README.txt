@@ -15,3 +15,5 @@ Site Status
 
 The quick brown fox jumped over the lazy dog.
 Another change using SmartGit client.
+
+All good boys deserve fudge.
