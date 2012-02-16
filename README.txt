@@ -19,3 +19,5 @@ Another change using SmartGit client.
 All good boys deserve fudge.
 
 All SSH keys deserve better.
+
+All SSH keys deserve fudge.
