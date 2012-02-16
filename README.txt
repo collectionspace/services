@@ -1,2 +1,4 @@
-This change should only appear in the trunk.  Currently r1624.  This is another test of the patching mechanism.
+This change should appear only in the trunk.  Currently git r1624.  This is another test of the patching mechanism.
 Changed, 20101018
+
+Nothing changed?
