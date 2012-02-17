@@ -19,3 +19,6 @@ Another change using SmartGit client.
 All good boys deserve fudge.
 
 All SSH keys deserve better.
+
+Make 1
+Make 2
