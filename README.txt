@@ -28,4 +28,6 @@ Make 5
 Make 6
 
 Make 7
+
 Make 8
+Make 9 in detached head again.
