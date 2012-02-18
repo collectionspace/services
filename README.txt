@@ -25,7 +25,7 @@ Make 2
 Make 3
 Make 4
 Make 5
-Make 6
+Make 6 - Edited on github
 
 Make 7
 
