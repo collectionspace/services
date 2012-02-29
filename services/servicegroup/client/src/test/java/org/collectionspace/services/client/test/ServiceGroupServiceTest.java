@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.ServiceGroupClient;
 import org.collectionspace.services.client.ServiceGroupProxy;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -48,12 +49,12 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
-public class ServiceGroupServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, ServicegroupsCommon> {
+public class ServiceGroupServiceTest extends BaseServiceTest<AbstractCommonList> {
 
     private final String CLASS_NAME = ServiceGroupServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     final String SERVICE_PATH_COMPONENT = "servicegroups";
-    private String knownResourceId = null;
+    private String readGroupName = "procedure";
 
     @Override
 	public String getServicePathComponent() {
@@ -74,57 +75,90 @@ public class ServiceGroupServiceTest extends AbstractPoxServiceTestImpl<Abstract
     protected AbstractCommonList getCommonList(ClientResponse<AbstractCommonList> response) {
         return response.getEntity(AbstractCommonList.class);
     }
-
-    // ---------------------------------------------------------------
-    // Utility methods used by tests above
-    // ---------------------------------------------------------------
     
-    @Override
-    protected PoxPayloadOut createInstance(String identifier) {
-    	ServiceGroupClient client = new ServiceGroupClient();
-    	return createInstance(client.getCommonPartName(), identifier);
-    }
-    
-	@Override
-	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
-		return createServiceGroupInstance(identifier);
-	}
-    
-    private PoxPayloadOut createServiceGroupInstance(String uid) {
-        String identifier = "name-" + uid;
-        ServicegroupsCommon servicegroup = new ServicegroupsCommon();
-        servicegroup.setName(identifier);
-        PoxPayloadOut multipart = new PoxPayloadOut(ServiceGroupClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(servicegroup, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new ServiceGroupClient().getCommonPartName());
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be created, servicegroup common");
-            logger.debug(objectAsXmlString(servicegroup, ServicegroupsCommon.class));
-        }
-
-        return multipart;
-    }
-
-	@Override
-	public void CRUDTests(String testName) {
-		// TODO Auto-generated method stub
+	public ServicegroupsCommon extractCommonPartValue(CollectionSpaceClient client,
+			ClientResponse<String> res) throws Exception {
 		
-	}
-
-	@Override
-	protected ServicegroupsCommon updateInstance(ServicegroupsCommon servicegroupsCommon) {
-		ServicegroupsCommon result = new ServicegroupsCommon();
-		
-        result.setName("updated-" + servicegroupsCommon.getName());
+		ServicegroupsCommon result = null;
+		PayloadInputPart payloadInputPart = extractPart(res, client.getCommonPartName());
+		if (payloadInputPart != null) {
+			result = (ServicegroupsCommon) payloadInputPart.getBody();
+		}
+		Assert.assertNotNull(result,
+				"Part or body of part " + client.getCommonPartName() + " was unexpectedly null.");
 		
 		return result;
 	}
 
-	@Override
-	protected void compareUpdatedInstances(ServicegroupsCommon original,
-			ServicegroupsCommon updated) throws Exception {
-		Assert.assertEquals(updated.getName(), original.getName());
-	}
+    protected PayloadInputPart extractPart(ClientResponse<String> res, String partLabel)
+            throws Exception {
+            if (getLogger().isDebugEnabled()) {
+            	getLogger().debug("Reading part " + partLabel + " ...");
+            }
+            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            PayloadInputPart payloadInputPart = input.getPart(partLabel);
+            Assert.assertNotNull(payloadInputPart,
+                    "Part " + partLabel + " was unexpectedly null.");
+            return payloadInputPart;
+    }
+
+
+    @Test(dataProvider = "testName", dependsOnMethods = {"readList"})    
+    public void read(String testName) throws Exception {
+        // Perform setup.
+        setupRead();
+
+        // Submit the request to the service and store the response.
+    	CollectionSpaceClient client = this.getClientInstance();
+        ClientResponse<String> res = client.read(readGroupName);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+
+        ServicegroupsCommon output = extractCommonPartValue(client, res);
+        Assert.assertNotNull(output);
+
+        //
+        // Now compare with the expected field values
+        //
+        Assert.assertEquals(output.getName(), readGroupName, 
+                "Display name in updated object did not match submitted data.");
+    }
+    
+        
+    @Test(dataProvider = "testName")    
+    public void readList(String testName) throws Exception {
+        // Perform setup.
+        setupReadList();
+
+        // Submit the request to the service and store the response.
+        CollectionSpaceClient client = this.getClientInstance();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+
+        // Optionally output additional data about list members for debugging.
+        boolean iterateThroughList = true;
+        if (iterateThroughList && logger.isTraceEnabled()) {
+        	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, getLogger(), testName);
+        }
+    }
+    
+    
 }

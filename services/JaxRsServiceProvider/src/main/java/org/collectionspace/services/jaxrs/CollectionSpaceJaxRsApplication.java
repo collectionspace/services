@@ -42,6 +42,7 @@ import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.report.ReportResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
 import org.collectionspace.services.dimension.DimensionResource;
+import org.collectionspace.services.servicegroup.ServiceGroupResource;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
@@ -97,6 +98,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new AccountResource());
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
+        singletons.add(new ServiceGroupResource());
 
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());

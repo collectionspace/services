@@ -33,6 +33,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ServiceGroupClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -68,6 +69,10 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
         return ServiceGroupClient.SERVICE_NAME;
     }
 
+    public String getServicePathComponent(){
+        return ServiceGroupClient.SERVICE_NAME.toLowerCase();
+    }
+
     @Override
     protected String getVersionString() {
     	final String lastChangeRevision = "$LastChangedRevision: 2108 $";
@@ -91,30 +96,37 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 
 
     //======================= GET ====================================================
-    /*
+    // NOTE that csid is not a good name for the specifier, but if we name it anything else, 
+    // our AuthZ gets confused!!!
     @GET
-    @Path("{groupname}")
+    @Path("{csid}")
     public byte[] get(
             @Context UriInfo ui,
-            @PathParam("csid") String csid) {
+            @PathParam("csid") String groupname) {
         PoxPayloadOut result = null;
-        ensureCSID(csid, READ);
+        ensureCSID(groupname, ResourceBase.READ);
         try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
-            result = Need to fetch info and prepare it.
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            ServicegroupsCommon common = new ServicegroupsCommon();
+            common.setName(groupname);
+            String uri = "/" + getServicePathComponent() + "/" + groupname;
+            common.setUri(uri);
+            result = new PoxPayloadOut(getServicePathComponent());
+            result.addPart("ServicegroupsCommon", common);
+            
+            /* If we cannot get the result, then...
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                         ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
                 throw new WebApplicationException(response);
             }
+            */
         } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
+            throw bigReThrow(e, ServiceMessages.READ_FAILED, groupname);
         }
 
         return result.getBytes();
     }
-    */
 
 
     //======================= GET without specifier: List  =====================================

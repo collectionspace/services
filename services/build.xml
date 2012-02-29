@@ -158,6 +158,7 @@
         <ant antfile="id/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="note/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="servicegroup/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="group/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="imports/build.xml" target="deploy" inheritAll="false"/>
@@ -201,6 +202,7 @@
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="imports/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="group/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="servicegroup/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="note/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="id/build.xml" target="undeploy" inheritAll="false"/>
@@ -233,6 +235,7 @@
         <ant antfile="relation/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="id/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="servicegroup/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="group/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="dist" inheritAll="false"/>

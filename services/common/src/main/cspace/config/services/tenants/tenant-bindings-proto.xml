@@ -63,6 +63,15 @@
     </tenant:serviceBindings>	
     <!-- end id service meta-data -->
         
+    <!-- begin servicegroup service meta-data -->
+		<!-- Servicegroup is a task service that has no representation in the repo, 
+				 but provides tools like keyword search across many types of services. 
+		  -->
+    <tenant:serviceBindings id="servicegroups" name="servicegroups" type="utility" version="0.1">
+           <!-- other URI paths through which this service could be accessed -->
+    </tenant:serviceBindings>
+    <!-- end servicegroup service meta-data -->
+
     <!-- begin collectionobject service meta-data -->
     <tenant:serviceBindings id="CollectionObjects" name="CollectionObjects" type="object" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/collectionobjects/*/workflow/</service:uriPath>
