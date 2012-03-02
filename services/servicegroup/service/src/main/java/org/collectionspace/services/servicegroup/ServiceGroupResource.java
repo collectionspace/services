@@ -25,6 +25,7 @@ package org.collectionspace.services.servicegroup;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.collectionspace.services.ServiceGroupListItemJAXBSchema;
 import org.collectionspace.services.client.IQueryManager;
@@ -34,8 +35,10 @@ import org.collectionspace.services.client.ServiceGroupClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
@@ -43,6 +46,8 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.common.service.ServiceObjectType;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -106,7 +111,18 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
         PoxPayloadOut result = null;
         ensureCSID(groupname, ResourceBase.READ);
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            TenantBindingConfigReaderImpl tReader =
+                    ServiceMain.getInstance().getTenantBindingConfigReader();
+            // We need to get all the procedures, authorities, and objects.
+            List<ServiceBindingType> servicebindings = tReader.getServiceBindingsByType(ctx.getTenantId(), groupname);
+            if (servicebindings == null || servicebindings.isEmpty()) {
+            	// 404 if there are no mappings.
+                Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                        ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(groupname)).type("text/plain").build();
+                throw new WebApplicationException(response);
+            }
+        	//Otherwise, build the response with a list
             ServicegroupsCommon common = new ServicegroupsCommon();
             common.setName(groupname);
             String uri = "/" + getServicePathComponent() + "/" + groupname;
@@ -114,13 +130,19 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
             result = new PoxPayloadOut(getServicePathComponent());
             result.addPart("ServicegroupsCommon", common);
             
-            /* If we cannot get the result, then...
-            if (result == null) {
-                Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                        ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
-                throw new WebApplicationException(response);
-            }
-            */
+        	ServicegroupsCommon.HasDocTypes wrapper = common.getHasDocTypes();
+        	if(wrapper==null) {
+        		wrapper = new ServicegroupsCommon.HasDocTypes();
+        		common.setHasDocTypes(wrapper);
+        	}
+        	List<String> hasDocTypes = wrapper.getHasDocType();
+        	for(ServiceBindingType binding:servicebindings) {
+        		ServiceObjectType serviceObj = binding.getObject();
+        		if(serviceObj!=null) {
+	                String docType = serviceObj.getName();
+	                hasDocTypes.add(docType);
+        		}
+        	}
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, groupname);
         }

@@ -393,6 +393,18 @@ public class TenantBindingConfigReaderImpl
      * @return
      */
     public List<ServiceBindingType> getServiceBindingsByType(
+            String tenantId, String serviceType) {
+    	List<String> serviceTypes = new ArrayList<String>(1);
+    	serviceTypes.add(serviceType);
+    	return getServiceBindingsByType(tenantId, serviceTypes);
+    }
+    /**
+     * getServiceBinding gets service binding for given tenant for a given service
+     * @param tenantId
+     * @param serviceName
+     * @return
+     */
+    public List<ServiceBindingType> getServiceBindingsByType(
             String tenantId, List<String> serviceTypes) {
         ArrayList<ServiceBindingType> list = null;
         TenantBindingType tenant = tenantBindings.get(tenantId);
