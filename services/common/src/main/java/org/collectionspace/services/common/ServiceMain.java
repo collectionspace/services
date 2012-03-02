@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.naming.NamingException;
-import javax.security.auth.login.LoginException;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
@@ -29,14 +28,10 @@ import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.types.PropertyItemType;
 import org.collectionspace.services.common.types.PropertyType;
-import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-//import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
-//import org.collectionspace.services.nuxeo.client.java.NxConnect;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Main class for Services layer. It reads configuration and performs service
@@ -176,15 +171,6 @@ public class ServiceMain {
         	throw new RuntimeException("Unknown CollectionSpace services client type: " + getClientType());
         }
 
-        try {
-        	//
-        	// Invoke all post-initialization handlers, passing in a DataSource instance of the Nuxeo db.
-        	// Typically, these handlers modify column types and add indexes to the Nuxeo db schema.
-        	//
-            firePostInitHandlers(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME));
-        } catch(Exception e) {
-            logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: " + e.getLocalizedMessage());
-        }
     }
 
     /**
@@ -614,7 +600,8 @@ public class ServiceMain {
     	return TENANT_READER_ACCT_PREFIX+tenantName;
     }
 
-    private void firePostInitHandlers(DataSource dataSource) throws Exception {
+    public void firePostInitHandlers() throws Exception {
+    	DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
         Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
         //Loop through all tenants in tenant-bindings.xml
         for (TenantBindingType tbt: tenantBindingTypeMap.values()){
@@ -649,8 +636,10 @@ public class ServiceMain {
         }
     }
 
-
-    public Object instantiate(String clazz, Class castTo) throws Exception {
+    /*
+     * A generic mechanism for instantiating a instance/object from a class name.
+     */
+    public Object instantiate(String clazz, Class<?> castTo) throws Exception {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         clazz = clazz.trim();
         Class<?> c = tccl.loadClass(clazz);
