@@ -22,7 +22,7 @@ All SSH keys deserve better.
 
 Make 1 - Edited on github
 Make 2
-Make 3
+Make 3 - Edited locally
 Make 4
 Make 5
 Make 6 - Edited on github
