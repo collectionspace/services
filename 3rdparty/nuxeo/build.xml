@@ -129,11 +129,6 @@
             </filterset>
         </copy>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
-    		<!--
-				<ant antfile="nuxeo-platform-quote/build.xml" target="deploy" inheritall="false"/>
-				<ant antfile="nuxeo-platform-quote-api/build.xml" target="deploy" inheritall="false"/>
-				-->
-        <ant antfile="nuxeo-database-templates/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
@@ -142,9 +137,8 @@
         <delete dir="${jee.server.cspace}/nuxeo-server/config"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/lib"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
-				<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
-				<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="nuxeo-database-templates/build.xml" target="undeploy" inheritall="false"/>
+		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
+		<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"

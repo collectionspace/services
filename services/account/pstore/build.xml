@@ -184,6 +184,9 @@
             </classpath>
 					</sql> -->
     </target>
+	
+	<!-- We are copying only the scripts that are committed to the source tree.  We're *not* copying the ones that
+	get generated in the target folder -->
     <target name="deploy" depends="install"
             description="deploy account service in ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/cspace/services">

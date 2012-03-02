@@ -3,11 +3,9 @@
  */
 package org.collectionspace.services.common;
 
-import org.collectionspace.services.common.log.CollectionSpaceLog4jRepositorySelector;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import org.apache.log4j.LogManager;
 
 /**
  * CollectionSpaceServiceContextListener is a ServletContextListener that helps initialize
@@ -18,11 +16,6 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
     @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
-            //create logging repository select to stop jboss from jamming
-            //our log on top of theirs
-//            LogManager.setRepositorySelector(new CollectionSpaceLog4jRepositorySelector(),
-//                    null);
-
         	//
         	// Initialize/start the Nuxeo EP server instance and create/retrieve the service workspaces
         	//
@@ -30,6 +23,12 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
             ServiceMain svcMain = ServiceMain.getInstance(servletContext);
             svcMain.retrieveAllWorkspaceIds();
 
+        	//
+        	// Invoke all post-initialization handlers, passing in a DataSource instance of the Nuxeo db.
+        	// Typically, these handlers modify column types and add indexes to the Nuxeo db schema.
+        	//
+        	svcMain.firePostInitHandlers();
+            
         } catch (Exception e) {
             e.printStackTrace();
             //fail here
