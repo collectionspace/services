@@ -158,7 +158,7 @@
                 <xs:element name="referenceGroupList" type="referenceGroupList"/>
 
                 <!--  Object Collection Information Group -->
-                <xs:element name="fieldCollectionDate" type="xs:string"/>
+                <xs:element name="fieldCollectionDateGroup" type="structuredDateGroup"/>
                 <xs:element name="fieldCollectionMethods" type="fieldCollectionMethodList"/>
                 <xs:element name="fieldCollectionNote" type="xs:string"/>
                 <xs:element name="fieldCollectionNumber" type="xs:string"/>
@@ -396,7 +396,7 @@
         <xs:sequence>
             <xs:element name="inscriptionContent" type="xs:string"/>
             <xs:element name="inscriptionContentInscriber" type="xs:string"/>
-            <xs:element name="inscriptionContentDate" type="xs:string"/>
+            <xs:element name="inscriptionContentDateGroup" type="structuredDateGroup"/>
             <xs:element name="inscriptionContentInterpretation" type="xs:string"/>
             <xs:element name="inscriptionContentLanguage" type="xs:string"/>
             <xs:element name="inscriptionContentMethod" type="xs:string"/>
@@ -422,7 +422,7 @@
         <xs:sequence>
             <xs:element name="inscriptionDescription" type="xs:string"/>
             <xs:element name="inscriptionDescriptionInscriber" type="xs:string"/>
-            <xs:element name="inscriptionDescriptionDate" type="xs:string"/>
+            <xs:element name="inscriptionDescriptionDateGroup" type="structuredDateGroup"/>
             <xs:element name="inscriptionDescriptionInterpretation" type="xs:string"/>
             <xs:element name="inscriptionDescriptionMethod" type="xs:string"/>
             <xs:element name="inscriptionDescriptionPosition" type="xs:string"/>
@@ -623,7 +623,11 @@
     </xs:complexType>
     <xs:complexType name="assocDateGroup">
         <xs:sequence>
-            <xs:element name="assocDate" type="xs:string"/>
+            <!-- CSPACE-4775: Renamed assocDate to assocStructuredDateGroup. This doesn't follow the convention where the -->
+            <!-- structured date field would normally be named assocDateGroup, because a complexType by that name already exists. -->
+            <!-- The app layer doesn't handle the duplicated name well, and it's more invasive to change the name of the complexType -->
+            <!-- than to use an unconventional name for the field, which we'd be renaming anyway. -->
+            <xs:element name="assocStructuredDateGroup" type="structuredDateGroup"/>
             <xs:element name="assocDateType" type="xs:string"/>
             <xs:element name="assocDateNote" type="xs:string"/>
         </xs:sequence>
