@@ -23,10 +23,17 @@
 package org.collectionspace.services.common.security;
 
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.List;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.StringTokenizer;
+
+import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.CSpaceResource;
+import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.common.service.ServiceObjectType;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
@@ -186,6 +193,21 @@ public class SecurityUtils {
 	    }
 		
 		return result;
+	}
+    
+	public static List<ServiceBindingType> getReadableServiceBindingsForCurrentUser(
+			List<ServiceBindingType> serviceBindings) {
+		ArrayList<ServiceBindingType> readableList = 
+				new ArrayList<ServiceBindingType>(serviceBindings.size());
+		AuthZ authZ = AuthZ.get();
+    	for(ServiceBindingType binding:serviceBindings) {
+    		String resourceName = binding.getName().toLowerCase();
+    		CSpaceResource res = new URIResourceImpl(resourceName, "GET");
+    		if (authZ.isAccessAllowed(res) == true) {
+    			readableList.add(binding);
+    		}
+    	}
+    	return readableList;
 	}
     
     /**

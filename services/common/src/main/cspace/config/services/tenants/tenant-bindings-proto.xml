@@ -68,7 +68,8 @@
 				 but provides tools like keyword search across many types of services. 
 		  -->
     <tenant:serviceBindings id="servicegroups" name="servicegroups" type="utility" version="0.1">
-           <!-- other URI paths through which this service could be accessed -->
+      <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
+      <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler</service:documentHandler>
     </tenant:serviceBindings>
     <!-- end servicegroup service meta-data -->
 

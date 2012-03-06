@@ -157,5 +157,19 @@ public class ServiceBindingUtils {
     				"getMappedFieldInDoc: Problem fetching: "+propName+" logicalfieldName: "+logicalFieldName+" docModel: "+docModel, ce);
     	}
     } 
+    
+    private static ArrayList<String> commonServiceTypes = null;
+    
+    public static ArrayList<String> getCommonServiceTypes() {
+    	if(commonServiceTypes == null) {
+    		commonServiceTypes = new ArrayList<String>();
+    		commonServiceTypes.add(SERVICE_TYPE_AUTHORITY);
+    		commonServiceTypes.add(SERVICE_TYPE_OBJECT);
+    		commonServiceTypes.add(SERVICE_TYPE_PROCEDURE);
+    	}
+    	return commonServiceTypes;
+    }
+    
+
 
 }

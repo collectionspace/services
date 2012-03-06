@@ -39,19 +39,30 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.ServiceObjectType;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -68,7 +79,9 @@ import javax.ws.rs.core.UriInfo;
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
-	
+
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+    
     @Override
     public String getServiceName(){
         return ServiceGroupClient.SERVICE_NAME;
@@ -96,58 +109,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 
     @Override
     public ServiceContextFactory<PoxPayloadIn, PoxPayloadOut> getServiceContextFactory() {
-        return RemoteServiceContextFactory.get();
-    }
-
-
-    //======================= GET ====================================================
-    // NOTE that csid is not a good name for the specifier, but if we name it anything else, 
-    // our AuthZ gets confused!!!
-    @GET
-    @Path("{csid}")
-    public byte[] get(
-            @Context UriInfo ui,
-            @PathParam("csid") String groupname) {
-        PoxPayloadOut result = null;
-        ensureCSID(groupname, ResourceBase.READ);
-        try {
-	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            TenantBindingConfigReaderImpl tReader =
-                    ServiceMain.getInstance().getTenantBindingConfigReader();
-            // We need to get all the procedures, authorities, and objects.
-            List<ServiceBindingType> servicebindings = tReader.getServiceBindingsByType(ctx.getTenantId(), groupname);
-            if (servicebindings == null || servicebindings.isEmpty()) {
-            	// 404 if there are no mappings.
-                Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                        ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(groupname)).type("text/plain").build();
-                throw new WebApplicationException(response);
-            }
-        	//Otherwise, build the response with a list
-            ServicegroupsCommon common = new ServicegroupsCommon();
-            common.setName(groupname);
-            String uri = "/" + getServicePathComponent() + "/" + groupname;
-            common.setUri(uri);
-            result = new PoxPayloadOut(getServicePathComponent());
-            result.addPart("ServicegroupsCommon", common);
-            
-        	ServicegroupsCommon.HasDocTypes wrapper = common.getHasDocTypes();
-        	if(wrapper==null) {
-        		wrapper = new ServicegroupsCommon.HasDocTypes();
-        		common.setHasDocTypes(wrapper);
-        	}
-        	List<String> hasDocTypes = wrapper.getHasDocType();
-        	for(ServiceBindingType binding:servicebindings) {
-        		ServiceObjectType serviceObj = binding.getObject();
-        		if(serviceObj!=null) {
-	                String docType = serviceObj.getName();
-	                hasDocTypes.add(docType);
-        		}
-        	}
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.READ_FAILED, groupname);
-        }
-
-        return result.getBytes();
+        return MultipartServiceContextFactory.get();
     }
 
 
@@ -191,4 +153,91 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
     }
 
     
+    //======================= GET ====================================================
+    // NOTE that csid is not a good name for the specifier, but if we name it anything else, 
+    // our AuthZ gets confused!!!
+    @GET
+    @Path("{csid}")
+    public byte[] get(
+            @Context UriInfo ui,
+            @PathParam("csid") String groupname) {
+        PoxPayloadOut result = null;
+        ensureCSID(groupname, ResourceBase.READ);
+        try {
+	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            TenantBindingConfigReaderImpl tReader =
+                    ServiceMain.getInstance().getTenantBindingConfigReader();
+            // We need to get all the procedures, authorities, and objects.
+	        ArrayList<String> groupsList = null;  
+	        if("common".equalsIgnoreCase(groupname)) {
+	        	groupsList = ServiceBindingUtils.getCommonServiceTypes();
+	        } else {
+	        	groupsList = new ArrayList<String>();
+	        	groupsList.add(groupname);
+	        }
+            List<ServiceBindingType> servicebindings = tReader.getServiceBindingsByType(ctx.getTenantId(), groupsList);
+            if (servicebindings == null || servicebindings.isEmpty()) {
+            	// 404 if there are no mappings.
+                Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                        ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(groupname)).type("text/plain").build();
+                throw new WebApplicationException(response);
+            }
+        	//Otherwise, build the response with a list
+            ServicegroupsCommon common = new ServicegroupsCommon();
+            common.setName(groupname);
+            String uri = "/" + getServicePathComponent() + "/" + groupname;
+            common.setUri(uri);
+            result = new PoxPayloadOut(getServicePathComponent());
+            result.addPart("ServicegroupsCommon", common);
+            
+        	ServicegroupsCommon.HasDocTypes wrapper = common.getHasDocTypes();
+        	if(wrapper==null) {
+        		wrapper = new ServicegroupsCommon.HasDocTypes();
+        		common.setHasDocTypes(wrapper);
+        	}
+        	List<String> hasDocTypes = wrapper.getHasDocType();
+        	for(ServiceBindingType binding:servicebindings) {
+        		ServiceObjectType serviceObj = binding.getObject();
+        		if(serviceObj!=null) {
+	                String docType = serviceObj.getName();
+	                hasDocTypes.add(docType);
+        		}
+        	}
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED, groupname);
+        }
+
+        return result.getBytes();
+    }
+
+
+    @GET
+    @Path("{csid}/items")
+    public AbstractCommonList getItems(
+            @Context UriInfo ui,
+            @PathParam("csid") String serviceGroupName) {
+        ensureCSID(serviceGroupName, ResourceBase.READ);
+        AbstractCommonList list = null;
+        try {
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+	        ServiceGroupDocumentModelHandler handler = (ServiceGroupDocumentModelHandler)
+	        				createDocumentHandler(ctx);
+	        ArrayList<String> groupsList = null;  
+	        if("common".equalsIgnoreCase(serviceGroupName)) {
+	        	groupsList = ServiceBindingUtils.getCommonServiceTypes();
+	        } else {
+	        	groupsList = new ArrayList<String>();
+	        	groupsList.add(serviceGroupName);
+	        }
+            list = handler.getItemsForGroup(ctx, groupsList, keywords);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED, serviceGroupName);
+        }
+
+        return list;
+    }
+
+
 }
