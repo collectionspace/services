@@ -583,7 +583,7 @@
     
     <!-- begin blob service meta-data -->
 		<!-- This should likely be type="object" -->
-    <tenant:serviceBindings id="Blobs" name="Blobs" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Blobs" name="Blobs" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/blobs/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:documentHandler>
@@ -1103,7 +1103,7 @@
     <!-- end objectexit service meta-data -->
     
     <!-- begin batch service meta-data -->
-    <tenant:serviceBindings id="Batch" name="Batch" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Batch" name="Batch" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/batch/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler</service:documentHandler>
@@ -1194,7 +1194,7 @@
     <!-- end group service meta-data -->
     
     <!-- begin imports service meta-data -->
-    <tenant:serviceBindings id="Imports" name="Imports" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Imports" name="Imports" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/imports/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.imports.nuxeo.ImportsDocumentModelHandler</service:documentHandler>
@@ -1446,7 +1446,7 @@
     <!-- end movement service meta-data -->
     
     <!-- begin Workflow service meta-data -->
-    <tenant:serviceBindings id="Workflow" name="Workflow" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Workflow" name="Workflow" type="utility" version="0.1">
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler</service:documentHandler>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.workflow.nuxeo.WorkflowValidatorHandler</service:validatorHandler>
@@ -1466,7 +1466,7 @@
     <!-- end Workflow service meta-data -->
         
     <!-- begin report service meta-data -->
-    <tenant:serviceBindings id="Reports" name="Reports" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Reports" name="Reports" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/reports/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
