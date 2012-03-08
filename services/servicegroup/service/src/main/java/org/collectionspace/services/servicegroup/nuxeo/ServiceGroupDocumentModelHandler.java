@@ -108,8 +108,8 @@ public class ServiceGroupDocumentModelHandler
 	        int pageSize = myFilter.getPageSize();
 	        int pageNum = myFilter.getStartPage();
 	        final boolean computeTotal = true; 
-	        list.setPageNum(pageSize);
-	        list.setPageSize(pageNum);
+	        list.setPageNum(pageNum);
+	        list.setPageSize(pageSize);
 
     		try {
     	        Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
