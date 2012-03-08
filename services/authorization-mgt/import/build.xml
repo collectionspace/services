@@ -124,7 +124,7 @@
     <target name="import-windows" if="osfamily-windows" depends="setup_hibernate.cfg">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
-            <arg value="mvn.bat" />
+            <arg value="mvn.bat" /> <!-- To debug, change command here to be 'mvnDebug.bat' -->
             <arg value="exec:java" />
             <arg value="-f" />
             <arg value="${basedir}/pom.xml" />
