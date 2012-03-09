@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
+<!-- 
+    Copyright: Regents of the University of California 2012
     Document   : tenants-bindings.xml
     Description: Prototype tenant bindings, specifying the default services
                  layer configuration for a generic, out-of-the-box tenant.
