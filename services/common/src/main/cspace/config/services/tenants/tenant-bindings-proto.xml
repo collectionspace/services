@@ -1151,6 +1151,10 @@
               <service:element>title</service:element>
               <service:xpath>title</service:xpath>
             </service:ListResultField>
+            <service:ListResultField>
+              <service:element>owner</service:element>
+              <service:xpath>owner</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -1160,6 +1164,10 @@
           <types:key>objectNameProperty</types:key>
           <types:value>title</types:value>
         </types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/common/types">
+						<types:key>objectNumberProperty</types:key>
+						<types:value>title</types:value>
+				</types:item>
       </service:properties>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Group" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="group-system" updated="" order="0">
