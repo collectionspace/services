@@ -2170,7 +2170,6 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
         <service:params>
           <service:ListResultsFields>
-						<!-- The default fields should probably be omitted here -->
             <service:ListResultField>
               <service:element>displayName</service:element>
               <service:xpath>displayName</service:xpath>
@@ -2186,10 +2185,6 @@
             <service:ListResultField>
               <service:element>vocabType</service:element>
               <service:xpath>vocabType</service:xpath>
-            </service:ListResultField>
-            <service:ListResultField>
-              <service:element>taxonFullName</service:element>
-              <service:xpath>taxonFullName</service:xpath>
             </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
@@ -2238,6 +2233,10 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>taxonFullName</service:element>
+              <service:xpath>taxonFullName</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
