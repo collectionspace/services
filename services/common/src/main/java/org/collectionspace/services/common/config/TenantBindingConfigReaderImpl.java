@@ -177,6 +177,14 @@ public class TenantBindingConfigReaderImpl
         tenantBindingTypeList = readTenantConfigs(protoBindingsFile, tenantDirs);
         
         for (TenantBindingType tenantBinding : tenantBindingTypeList) {
+        	if(tenantBindings.get(tenantBinding.getId()) != null) {
+        		TenantBindingType tenantBindingOld = tenantBindings.get(tenantBinding.getId());
+                logger.error("Ignoring duplicate binding definition for tenant id=" 
+                		+ tenantBinding.getId()
+                        + " existing name=" + tenantBindingOld.getName()
+                        + " conflicting (ignored) name=" + tenantBinding.getName());
+                continue;
+        	}
             tenantBindings.put(tenantBinding.getId(), tenantBinding);
             readDomains(tenantBinding);
             readServiceBindings(tenantBinding);
