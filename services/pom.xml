@@ -50,6 +50,7 @@
         <module>person</module>
         <module>id</module>
         <module>collectionobject</module>
+        <module>servicegroup</module>
         <module>group</module>
         <module>intake</module>
         <module>loanin</module>

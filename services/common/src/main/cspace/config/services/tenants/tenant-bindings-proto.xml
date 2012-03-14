@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
+<!-- 
+    Copyright: Regents of the University of California 2012
     Document   : tenants-bindings.xml
     Description: Prototype tenant bindings, specifying the default services
                  layer configuration for a generic, out-of-the-box tenant.
@@ -63,6 +64,16 @@
     </tenant:serviceBindings>	
     <!-- end id service meta-data -->
         
+    <!-- begin servicegroup service meta-data -->
+		<!-- Servicegroup is a task service that has no representation in the repo, 
+				 but provides tools like keyword search across many types of services. 
+		  -->
+    <tenant:serviceBindings id="servicegroups" name="servicegroups" type="utility" version="0.1">
+      <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
+      <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler</service:documentHandler>
+    </tenant:serviceBindings>
+    <!-- end servicegroup service meta-data -->
+
     <!-- begin collectionobject service meta-data -->
     <tenant:serviceBindings id="CollectionObjects" name="CollectionObjects" type="object" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/collectionobjects/*/workflow/</service:uriPath>
@@ -573,7 +584,7 @@
     
     <!-- begin blob service meta-data -->
 		<!-- This should likely be type="object" -->
-    <tenant:serviceBindings id="Blobs" name="Blobs" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Blobs" name="Blobs" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/blobs/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:documentHandler>
@@ -1093,7 +1104,7 @@
     <!-- end objectexit service meta-data -->
     
     <!-- begin batch service meta-data -->
-    <tenant:serviceBindings id="Batch" name="Batch" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Batch" name="Batch" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/batch/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler</service:documentHandler>
@@ -1141,6 +1152,10 @@
               <service:element>title</service:element>
               <service:xpath>title</service:xpath>
             </service:ListResultField>
+            <service:ListResultField>
+              <service:element>owner</service:element>
+              <service:xpath>owner</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -1148,8 +1163,12 @@
       <service:properties xmlns:service="http://collectionspace.org/services/common/service">
         <types:item xmlns:types="http://collectionspace.org/services/common/types">
           <types:key>objectNameProperty</types:key>
-          <types:value>title</types:value>
+          <types:value>groups_common:owner</types:value>
         </types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/common/types">
+						<types:key>objectNumberProperty</types:key>
+						<types:value>groups_common:title</types:value>
+				</types:item>
       </service:properties>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Group" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="group-system" updated="" order="0">
@@ -1184,7 +1203,7 @@
     <!-- end group service meta-data -->
     
     <!-- begin imports service meta-data -->
-    <tenant:serviceBindings id="Imports" name="Imports" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Imports" name="Imports" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/imports/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.imports.nuxeo.ImportsDocumentModelHandler</service:documentHandler>
@@ -1436,7 +1455,7 @@
     <!-- end movement service meta-data -->
     
     <!-- begin Workflow service meta-data -->
-    <tenant:serviceBindings id="Workflow" name="Workflow" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Workflow" name="Workflow" type="utility" version="0.1">
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler</service:documentHandler>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.workflow.nuxeo.WorkflowValidatorHandler</service:validatorHandler>
@@ -1456,7 +1475,7 @@
     <!-- end Workflow service meta-data -->
         
     <!-- begin report service meta-data -->
-    <tenant:serviceBindings id="Reports" name="Reports" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Reports" name="Reports" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/reports/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
@@ -1888,6 +1907,14 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>foreName</service:element>
+              <service:xpath>foreName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>surName</service:element>
+              <service:xpath>surName</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2062,6 +2089,10 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>name</service:element>
+              <service:xpath>name</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2202,6 +2233,10 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>taxonFullName</service:element>
+              <service:xpath>taxonFullName</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
