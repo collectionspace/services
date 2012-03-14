@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    PlaceAuthority schema (XSD)
+    
+    Entity  : PlaceAuthority
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+    
+    $LastChangedRevision: 1055 $
+    $LastChangedDate: 2009-12-09 12:25:15 -0800 (Wed, 09 Dec 2009) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
+    xmlns:ns="http://collectionspace.org/services/place"
+    xmlns="http://collectionspace.org/services/place"
+    targetNamespace="http://collectionspace.org/services/place"
+    version="0.1"
+    >
+    
+    <!--
+        Avoid XmlRootElement nightmare:
+        See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+    -->
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Place+Service+Home -->    
+    
+    <!-- PlaceAuthority  -->
+    <xs:element name="placeauthorities_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Common identifier -->
+                <xs:element name="csid" type="xs:string" />
+                
+                <!--  PlaceAuthority Information Group -->
+                <xs:element name="displayName" type="xs:string"/>
+								<xs:element name="shortIdentifier" type="xs:string"/>
+                <xs:element name="refName" type="xs:string"/>
+                <xs:element name="vocabType" type="xs:string"/>
+                <xs:element name="source" type="xs:string"/>
+                <xs:element name="description" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+
