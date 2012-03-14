@@ -58,6 +58,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.MediaType;
 
 // The modified Nuxeo ImportCommand from nuxeo's shell:
 
@@ -285,33 +286,33 @@ public class ImportsResource extends ResourceBase {
     		Map<String, List<InputPart>> partsMap = partFormData.getFormDataMap();
     		List<InputPart> fileParts = partsMap.get("file");
     		for (InputPart part : fileParts){
-                String mediaType = part.getMediaType().toString();
-                System.out.println("Media type is:" + mediaType);
-                if (mediaType.equalsIgnoreCase("text/xml")){
-                    InputSource inputSource = new InputSource(part.getBody(InputStream.class, null));
-                    String result = createFromInputSource(inputSource);
-                    resultBuf.append(result);
-                    continue;
-                }
-    			if (mediaType.equalsIgnoreCase("application/zip")){
-                    fileStream = part.getBody(InputStream.class, null);
+                    String mediaType = part.getMediaType().toString();
+                    System.out.println("Media type is:" + mediaType);
+                    if (mediaType.equalsIgnoreCase(MediaType.APPLICATION_XML)){
+                        InputSource inputSource = new InputSource(part.getBody(InputStream.class, null));
+                        String result = createFromInputSource(inputSource);
+                        resultBuf.append(result);
+                        continue;
+                    }
+                    if (mediaType.equalsIgnoreCase("application/zip")){
+                        fileStream = part.getBody(InputStream.class, null);
 
-                    File zipfile = FileUtils.createTmpFile(fileStream, getServiceName() + "_");
-                    String zipfileName = zipfile.getCanonicalPath();
-                    System.out.println("Imports zip file saved to:" + zipfileName);
+                        File zipfile = FileUtils.createTmpFile(fileStream, getServiceName() + "_");
+                        String zipfileName = zipfile.getCanonicalPath();
+                        System.out.println("Imports zip file saved to:" + zipfileName);
 
-                    String baseOutputDir = FileTools.createTmpDir("imports-").getCanonicalPath();
-                    File indir = new File(baseOutputDir+"/in");
-                    indir.mkdir();
-                    ZipTools.unzip(zipfileName, indir.getCanonicalPath());
-                    String result = "\r\n<zipResult>Zipfile " + zipfileName + "extracted to: " + indir.getCanonicalPath()+"</zipResult>";
-                    System.out.println(result);
+                        String baseOutputDir = FileTools.createTmpDir("imports-").getCanonicalPath();
+                        File indir = new File(baseOutputDir+"/in");
+                        indir.mkdir();
+                        ZipTools.unzip(zipfileName, indir.getCanonicalPath());
+                        String result = "\r\n<zipResult>Zipfile " + zipfileName + "extracted to: " + indir.getCanonicalPath()+"</zipResult>";
+                        System.out.println(result);
 
-                    long start = System.currentTimeMillis();
-                    //TODO: now call import service...
-                    resultBuf.append(result);
-                    continue;
-                }
+                        long start = System.currentTimeMillis();
+                        //TODO: now call import service...
+                        resultBuf.append(result);
+                        continue;
+                    }
     		}
 	    	javax.ws.rs.core.Response.ResponseBuilder rb = javax.ws.rs.core.Response.ok();
 	    	rb.entity(resultBuf.toString());
