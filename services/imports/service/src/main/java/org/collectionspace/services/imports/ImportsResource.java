@@ -165,13 +165,14 @@ public class ImportsResource extends ResourceBase {
         ImportCommand importCommand = new ImportCommand();
 //        String destWorkspaces = "/default-domain/workspaces";
         String destWorkspaces = getWorkspaces();
-        String report = "NORESULTS";
+        String result = "";
         try {
+            String report = "NORESULTS";
             report = importCommand.run(outputDir, destWorkspaces);
+            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg><report>"+report+"</report></import>";
         } catch (Exception e){
-            report =  "<?xml ?><import><msg>ERROR</msg><report></report>"+Tools.errorToString(e, true)+"</import>";
+            result =  "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"+Tools.errorToString(e, true)+"</report></import>";
         }
-        String result = "<?xml ?><import><msg>SUCCESS</msg><report></report>"+report+"</import>";
         return result;
     }
 
@@ -187,8 +188,14 @@ public class ImportsResource extends ResourceBase {
          ImportCommand importCommand = new ImportCommand();
 //         String destWorkspaces = "/default-domain/workspaces";
          String destWorkspaces = getWorkspaces();
-         String report = importCommand.run(outputDir, destWorkspaces);
-         String result = "<?xml ?><import><msg>SUCCESS</msg><report></report>"+report+"</import>";
+         String result = "";
+         try {
+            String report = "NORESULTS";
+            report = importCommand.run(outputDir, destWorkspaces);
+            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg><report>"+report+"</report></import>";
+         } catch (Exception e){
+            result = "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"+Tools.errorToString(e, true)+"</report></import>";
+         }
          return result;
      }
 
@@ -288,7 +295,7 @@ public class ImportsResource extends ResourceBase {
     		for (InputPart part : fileParts){
                     String mediaType = part.getMediaType().toString();
                     System.out.println("Media type is:" + mediaType);
-                    if (mediaType.equalsIgnoreCase(MediaType.APPLICATION_XML)){
+                    if (mediaType.equalsIgnoreCase(MediaType.APPLICATION_XML) || mediaType.equalsIgnoreCase(MediaType.TEXT_XML)){
                         InputSource inputSource = new InputSource(part.getBody(InputStream.class, null));
                         String result = createFromInputSource(inputSource);
                         resultBuf.append(result);
@@ -323,8 +330,24 @@ public class ImportsResource extends ResourceBase {
 		return response;
     }
 
-    String page = "<html><body><form enctype='multipart/form-data' action='/cspace-services/imports?type=xml' method='POST'>"
-                + "Choose a file to import: <input name='file' type='file' /><br /><input type='submit' value='Upload File' /></form></body></html>";
+    String page = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+                + "<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>\n"
+                + "  <head>\n"
+                + "    <title>CollectionSpace Import</title>\n"
+                + "    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n"
+                + "    <meta http-equiv='Accept' content='multipart/form-data,application/xml,text/xml' />\n"
+                + "    <meta http-equiv='Accept-Charset' content='utf-8' />\n"
+                + "  </head>\n"
+                + "  <body>\n"
+                + "    <form enctype='multipart/form-data' accept-charset='utf-8' \n"
+                + "        action='/cspace-services/imports?type=xml' method='post'>\n"
+                + "      Choose a file to import:"
+                + "      <input name='file' type='file' accept='application/xml,text/xml' />\n"
+                + "      <br />\n"
+                + "      <input type='submit' value='Upload File' />\n"
+                + "    </form>\n"
+                + "  </body>\n"
+                + "</html>\n";
     @GET
     @Produces("text/html")
 	public String getInputForm(@QueryParam("form") String form) {
