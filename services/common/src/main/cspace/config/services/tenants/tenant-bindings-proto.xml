@@ -1425,6 +1425,11 @@
               <types:key>authRef</types:key>
               <types:value>movementContact</types:value>
             </types:item>
+                         <!-- Inventory Control Information group -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>inventoryContactList|inventoryContact</types:value>
+            </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <!-- Object Location Information group -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -1439,6 +1444,15 @@
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
                             <types:value>reasonForMove</types:value>
+            </types:item>
+                        <!-- Inventory Control Information group -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>inventoryActionRequired</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>frequencyForInventory</types:value>
             </types:item>
           </service:properties>
           <service:content contentType="application/xml">
