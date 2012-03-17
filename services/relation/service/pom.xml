@@ -55,6 +55,11 @@
             <artifactId>org.collectionspace.services.taxonomy.client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.concept.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
       <!-- javax -->
 

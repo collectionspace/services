@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="concepts">
+<ns2:concepts_common xmlns:ns2="http://collectionspace.org/services/concept" xmlns:ns3="http://collectionspace.org/services/jaxb">
+	<shortIdentifier>wood</shortIdentifier>
+	<displayName>Wood</displayName>
+	<displayNameComputed>false</displayNameComputed>
+</ns2:concepts_common>
+</document>
+	
