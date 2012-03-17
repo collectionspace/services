@@ -58,6 +58,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.MediaType;
 
 // The modified Nuxeo ImportCommand from nuxeo's shell:
 
@@ -164,13 +165,14 @@ public class ImportsResource extends ResourceBase {
         ImportCommand importCommand = new ImportCommand();
 //        String destWorkspaces = "/default-domain/workspaces";
         String destWorkspaces = getWorkspaces();
-        String report = "NORESULTS";
+        String result = "";
         try {
+            String report = "NORESULTS";
             report = importCommand.run(outputDir, destWorkspaces);
+            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg><report>"+report+"</report></import>";
         } catch (Exception e){
-            report =  "<?xml ?><import><msg>ERROR</msg><report></report>"+Tools.errorToString(e, true)+"</import>";
+            result =  "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"+Tools.errorToString(e, true)+"</report></import>";
         }
-        String result = "<?xml ?><import><msg>SUCCESS</msg><report></report>"+report+"</import>";
         return result;
     }
 
@@ -186,8 +188,14 @@ public class ImportsResource extends ResourceBase {
          ImportCommand importCommand = new ImportCommand();
 //         String destWorkspaces = "/default-domain/workspaces";
          String destWorkspaces = getWorkspaces();
-         String report = importCommand.run(outputDir, destWorkspaces);
-         String result = "<?xml ?><import><msg>SUCCESS</msg><report></report>"+report+"</import>";
+         String result = "";
+         try {
+            String report = "NORESULTS";
+            report = importCommand.run(outputDir, destWorkspaces);
+            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg><report>"+report+"</report></import>";
+         } catch (Exception e){
+            result = "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"+Tools.errorToString(e, true)+"</report></import>";
+         }
          return result;
      }
 
@@ -285,33 +293,33 @@ public class ImportsResource extends ResourceBase {
     		Map<String, List<InputPart>> partsMap = partFormData.getFormDataMap();
     		List<InputPart> fileParts = partsMap.get("file");
     		for (InputPart part : fileParts){
-                String mediaType = part.getMediaType().toString();
-                System.out.println("Media type is:" + mediaType);
-                if (mediaType.equalsIgnoreCase("text/xml")){
-                    InputSource inputSource = new InputSource(part.getBody(InputStream.class, null));
-                    String result = createFromInputSource(inputSource);
-                    resultBuf.append(result);
-                    continue;
-                }
-    			if (mediaType.equalsIgnoreCase("application/zip")){
-                    fileStream = part.getBody(InputStream.class, null);
+                    String mediaType = part.getMediaType().toString();
+                    System.out.println("Media type is:" + mediaType);
+                    if (mediaType.equalsIgnoreCase(MediaType.APPLICATION_XML) || mediaType.equalsIgnoreCase(MediaType.TEXT_XML)){
+                        InputSource inputSource = new InputSource(part.getBody(InputStream.class, null));
+                        String result = createFromInputSource(inputSource);
+                        resultBuf.append(result);
+                        continue;
+                    }
+                    if (mediaType.equalsIgnoreCase("application/zip")){
+                        fileStream = part.getBody(InputStream.class, null);
 
-                    File zipfile = FileUtils.createTmpFile(fileStream, getServiceName() + "_");
-                    String zipfileName = zipfile.getCanonicalPath();
-                    System.out.println("Imports zip file saved to:" + zipfileName);
+                        File zipfile = FileUtils.createTmpFile(fileStream, getServiceName() + "_");
+                        String zipfileName = zipfile.getCanonicalPath();
+                        System.out.println("Imports zip file saved to:" + zipfileName);
 
-                    String baseOutputDir = FileTools.createTmpDir("imports-").getCanonicalPath();
-                    File indir = new File(baseOutputDir+"/in");
-                    indir.mkdir();
-                    ZipTools.unzip(zipfileName, indir.getCanonicalPath());
-                    String result = "\r\n<zipResult>Zipfile " + zipfileName + "extracted to: " + indir.getCanonicalPath()+"</zipResult>";
-                    System.out.println(result);
+                        String baseOutputDir = FileTools.createTmpDir("imports-").getCanonicalPath();
+                        File indir = new File(baseOutputDir+"/in");
+                        indir.mkdir();
+                        ZipTools.unzip(zipfileName, indir.getCanonicalPath());
+                        String result = "\r\n<zipResult>Zipfile " + zipfileName + "extracted to: " + indir.getCanonicalPath()+"</zipResult>";
+                        System.out.println(result);
 
-                    long start = System.currentTimeMillis();
-                    //TODO: now call import service...
-                    resultBuf.append(result);
-                    continue;
-                }
+                        long start = System.currentTimeMillis();
+                        //TODO: now call import service...
+                        resultBuf.append(result);
+                        continue;
+                    }
     		}
 	    	javax.ws.rs.core.Response.ResponseBuilder rb = javax.ws.rs.core.Response.ok();
 	    	rb.entity(resultBuf.toString());
@@ -322,8 +330,24 @@ public class ImportsResource extends ResourceBase {
 		return response;
     }
 
-    String page = "<html><body><form enctype='multipart/form-data' action='/cspace-services/imports?type=xml' method='POST'>"
-                + "Choose a file to import: <input name='file' type='file' /><br /><input type='submit' value='Upload File' /></form></body></html>";
+    String page = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
+                + "<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>\n"
+                + "  <head>\n"
+                + "    <title>CollectionSpace Import</title>\n"
+                + "    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n"
+                + "    <meta http-equiv='Accept' content='multipart/form-data,application/xml,text/xml' />\n"
+                + "    <meta http-equiv='Accept-Charset' content='utf-8' />\n"
+                + "  </head>\n"
+                + "  <body>\n"
+                + "    <form enctype='multipart/form-data' accept-charset='utf-8' \n"
+                + "        action='/cspace-services/imports?type=xml' method='post'>\n"
+                + "      Choose a file to import:"
+                + "      <input name='file' type='file' accept='application/xml,text/xml' />\n"
+                + "      <br />\n"
+                + "      <input type='submit' value='Upload File' />\n"
+                + "    </form>\n"
+                + "  </body>\n"
+                + "</html>\n";
     @GET
     @Produces("text/html")
 	public String getInputForm(@QueryParam("form") String form) {
