@@ -471,7 +471,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                         "The findDocs() method must specify at least one DocumentType.");
             }
             DocumentModelList docList = null;
-            // force limit to 1, and ignore totalSize
             QueryContext queryContext = new QueryContext(ctx, whereClause);
             String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
             if (logger.isDebugEnabled()) {

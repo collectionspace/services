@@ -105,6 +105,8 @@ public class ServiceGroupDocumentModelHandler
 		            }
 	            }
 	        }
+	        // Make sure we pick up workflow state, etc. 
+	        whereClause = myFilter.getWhereClause();
 	        int pageSize = myFilter.getPageSize();
 	        int pageNum = myFilter.getStartPage();
 	        final boolean computeTotal = true; 

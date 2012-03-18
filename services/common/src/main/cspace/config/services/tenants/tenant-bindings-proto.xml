@@ -1152,6 +1152,10 @@
               <service:element>title</service:element>
               <service:xpath>title</service:xpath>
             </service:ListResultField>
+            <service:ListResultField>
+              <service:element>owner</service:element>
+              <service:xpath>owner</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -1159,8 +1163,12 @@
       <service:properties xmlns:service="http://collectionspace.org/services/common/service">
         <types:item xmlns:types="http://collectionspace.org/services/common/types">
           <types:key>objectNameProperty</types:key>
-          <types:value>title</types:value>
+          <types:value>groups_common:owner</types:value>
         </types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/common/types">
+						<types:key>objectNumberProperty</types:key>
+						<types:value>groups_common:title</types:value>
+				</types:item>
       </service:properties>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Group" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="group-system" updated="" order="0">
@@ -1417,6 +1425,11 @@
               <types:key>authRef</types:key>
               <types:value>movementContact</types:value>
             </types:item>
+                         <!-- Inventory Control Information group -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>inventoryContactList|inventoryContact</types:value>
+            </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <!-- Object Location Information group -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -1431,6 +1444,15 @@
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
                             <types:value>reasonForMove</types:value>
+            </types:item>
+                        <!-- Inventory Control Information group -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>inventoryActionRequired</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>frequencyForInventory</types:value>
             </types:item>
           </service:properties>
           <service:content contentType="application/xml">
@@ -1899,6 +1921,14 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>foreName</service:element>
+              <service:xpath>foreName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>surName</service:element>
+              <service:xpath>surName</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2073,6 +2103,10 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>name</service:element>
+              <service:xpath>name</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2213,6 +2247,10 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>taxonFullName</service:element>
+              <service:xpath>taxonFullName</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>

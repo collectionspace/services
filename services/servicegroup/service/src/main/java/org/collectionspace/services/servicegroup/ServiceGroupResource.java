@@ -221,7 +221,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
-	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
 	        ServiceGroupDocumentModelHandler handler = (ServiceGroupDocumentModelHandler)
 	        				createDocumentHandler(ctx);
 	        ArrayList<String> groupsList = null;  
