@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    PlaceAuthority schema (XSD)
+    
+    Entity  : PlaceAuthority
+    Part    : Common
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision: 928 $
+    $LastChangedDate: 2009-11-10 12:25:58 -0800 (Tue, 10 Nov 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/place"
+  xmlns="http://collectionspace.org/services/place"
+  targetNamespace="http://collectionspace.org/services/place"
+  version="0.1"
+>
+
+<!-- Flattened version of jaxb schema for nuxeo -->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Place+Service+Home -->    
+
+		<!--  PlaceAuthority Information Group -->
+		<xs:element name="displayName" type="xs:string"/>
+		<xs:element name="shortIdentifier" type="xs:string"/>
+		<xs:element name="refName" type="xs:string"/>
+		<xs:element name="vocabType" type="xs:string"/>
+		<xs:element name="source" type="xs:string"/>
+		<xs:element name="description" type="xs:string"/>
+
+</xs:schema>
+
