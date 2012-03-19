@@ -301,7 +301,6 @@ public class ImportsResource extends ResourceBase {
                         // FIXME For an alternate approach, potentially preferable, see:
                         // http://stackoverflow.com/questions/4586222/right-way-of-formatting-an-input-stream
                         String str = encodeAmpersands(part.getBodyAsString());
-                        byte[] buf = str.getBytes("UTF8");
                         InputStream stream = new ByteArrayInputStream(str.getBytes("UTF8"));
                         InputSource inputSource = new InputSource(stream);
                         // InputSource inputSource = new InputSource(part.getBody(InputStream.class, null));
