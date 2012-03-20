@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.ecm.platform.place.LifeCycleManagerExtensions">
+
+  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
+             point="types">
+    <types>
+      <type name="Placeauthority">default</type>
+      <type name="Placeitem">default</type>
+    </types>
+  </extension>
+
+</component>
