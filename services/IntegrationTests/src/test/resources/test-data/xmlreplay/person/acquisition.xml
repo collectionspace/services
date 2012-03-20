@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="acquisitions">
+	<ns3:acquisitions_common xmlns:ns3="http://collectionspace.org/services/acquisition">
+		<acquisitionDates>
+			<acquisitionDate>2010-11-15T07:30:24Z</acquisitionDate>
+		</acquisitionDates>
+		<acquisitionReferenceNumber>${acqNum}</acquisitionReferenceNumber>
+		<owners>
+			<owner>${owner}</owner>
+		</owners>
+	</ns3:acquisitions_common>
+</document>
+
+

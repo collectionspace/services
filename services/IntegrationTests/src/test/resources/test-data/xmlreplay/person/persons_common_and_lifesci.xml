@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="persons">
+  <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <shortIdentifier>${shortIdentifier}</shortIdentifier>
+    <displayName>${foreName} ${surName}</displayName>
+    <displayNameComputed>false</displayNameComputed>
+    <shortDisplayName>>${foreName} ${surName}</shortDisplayName>
+    <shortDisplayNameComputed>false</shortDisplayNameComputed>
+		<foreName>${foreName}</foreName>
+		<surName>${surName}</surName>
+	</ns2:persons_common>
+	<ns4:persons_naturalhistory xmlns:ns4="http://collectionspace.org/services/person/domain/naturalhistory" xmlns:ns3="http://collectionspace.org/services/jaxb">
+		<entityType>${entityType}</entityType>
+		<lifeSpan>${lifeSpan}</lifeSpan>
+	</ns4:persons_naturalhistory>
+</document>
+
+
