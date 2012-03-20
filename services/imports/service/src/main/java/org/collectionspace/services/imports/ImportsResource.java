@@ -52,6 +52,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -296,7 +298,12 @@ public class ImportsResource extends ResourceBase {
                     String mediaType = part.getMediaType().toString();
                     System.out.println("Media type is:" + mediaType);
                     if (mediaType.equalsIgnoreCase(MediaType.APPLICATION_XML) || mediaType.equalsIgnoreCase(MediaType.TEXT_XML)){
-                        InputSource inputSource = new InputSource(part.getBody(InputStream.class, null));
+                        // FIXME For an alternate approach, potentially preferable, see:
+                        // http://stackoverflow.com/questions/4586222/right-way-of-formatting-an-input-stream
+                        String str = encodeAmpersands(part.getBodyAsString());
+                        InputStream stream = new ByteArrayInputStream(str.getBytes("UTF8"));
+                        InputSource inputSource = new InputSource(stream);
+                        // InputSource inputSource = new InputSource(part.getBody(InputStream.class, null));
                         String result = createFromInputSource(inputSource);
                         resultBuf.append(result);
                         continue;
