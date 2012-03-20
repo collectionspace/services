@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="persons">
+  <pers:persons_common xmlns:pers="http://collectionspace.org/services/person">
+    <shortIdentifier>${shortIdentifier}</shortIdentifier>
+    <displayName>${foreName} ${surName}</displayName>
+    <displayNameComputed>false</displayNameComputed>
+    <shortDisplayName>>${foreName} ${surName}</shortDisplayName>
+    <shortDisplayNameComputed>false</shortDisplayNameComputed>
+		<foreName>${foreName}</foreName>
+		<surName>${surName}</surName>
+	</pers:persons_common>
+	<pnh:persons_naturalhistory xmlns:pnh="http://collectionspace.org/services/person/domain/naturalhistory">
+		<entityType>${entityType}</entityType>
+		<lifeSpan>${lifeSpan}</lifeSpan>
+	</pnh:persons_naturalhistory>
+	<relns:relations-common-list xmlns:relns="http://collectionspace.org/services/relation">
+    <relation-list-item>
+			<subjectCsid>${childCSID}</subjectCsid>
+      <relationshipType>hasBroader</relationshipType>
+      <predicate>hasBroader</predicate>
+			<objectCsid>${parentCSID}</objectCsid>
+      <subject>
+        <csid>${childCSID}</csid>
+        <name>${foreName} ${surName}</name>
+        <documentType>PersonTenant2</documentType>
+      </subject>
+      <object>
+        <csid>${parentCSID}</csid>
+        <name>${parentName}</name>
+        <documentType>PersonTenant2</documentType>
+      </object>
+    </relation-list-item>
+	</relns:relations-common-list>
+</document>
+
+

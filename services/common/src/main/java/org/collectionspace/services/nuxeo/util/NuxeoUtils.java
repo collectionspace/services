@@ -363,7 +363,10 @@ public class NuxeoUtils {
      */
     static public final String buildNXQLQuery(ServiceContext ctx, QueryContext queryContext) throws Exception {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
-        query.append(NuxeoUtils.getTenantQualifiedDocType(queryContext)); // Nuxeo doctype must be tenant qualified.
+        // Since we have a tenant qualification in the WHERE clause, we do not need 
+        // tenant-specific doc types
+        // query.append(NuxeoUtils.getTenantQualifiedDocType(queryContext)); // Nuxeo doctype must be tenant qualified.
+        query.append(queryContext.getDocType());
         appendNXQLWhere(query, queryContext);
         appendNXQLOrderBy(query, queryContext);
         return query.toString();
@@ -385,8 +388,11 @@ public class NuxeoUtils {
             } else {
                 query.append(",");
             }
-            String tqDocType = getTenantQualifiedDocType(queryContext, docType);
-            query.append(tqDocType); // Nuxeo doctype must be tenant qualified.
+            // Since we have a tenant qualification in the WHERE clause, we do not need 
+            // tenant-specific doc types
+            // String tqDocType = getTenantQualifiedDocType(queryContext, docType);
+            // query.append(tqDocType); // Nuxeo doctype must be tenant qualified.
+            query.append(docType);
         }
         appendNXQLWhere(query, queryContext);
         // FIXME add 'order by' clause here, if appropriate
