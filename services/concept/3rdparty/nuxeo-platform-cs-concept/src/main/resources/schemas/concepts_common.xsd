@@ -25,60 +25,32 @@
 	<xs:element name="termStatus" type="xs:string"/>
 	<xs:element name="displayName" type="xs:string"/>
 	<xs:element name="displayNameComputed" type="xs:boolean"/>
+    <xs:element name="shortDisplayName" type="xs:string"/>
+    <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
+    <xs:element name="source" type="xs:string"/>
+    <xs:element name="sourcePage" type="xs:string"/>
+    <xs:element name="description" type="xs:string"/>
 
 	<!--  Common Concept Information Group -->
 	<xs:element name="conceptType" type="xs:string"/>
+	<xs:element name="sourceTermID" type="xs:string"/>
+	<xs:element name="termLanguage" type="xs:string"/>
+	<xs:element name="preferred" type="xs:boolean"/>
+	<xs:element name="preferredForLang" type="xs:string"/>
+	<xs:element name="historicFlag" type="xs:string"/>
+	<xs:element name="termType" type="xs:string"/>
+	<xs:element name="qualifier" type="xs:string"/>
 	<xs:element name="scopeNote" type="xs:string"/>
 	<xs:element name="scopeNoteSource" type="xs:string"/>
 	<xs:element name="scopeNoteSourceDetail" type="xs:string"/>
-	<xs:element name="remarks" type="xs:string"/>
-	<xs:element name="displayTermFlag" type="xs:string"/>
-	<xs:element name="otherNameFlags">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="otherNameFlag" type="xs:string"
-										minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	
-	<!--  List of Terms and alternates 
-	<xs:element name="conceptTermGroupList" type="conceptTermGroupList"/>
-				-->
 	
 	<!--  List of Citations -->
 	<xs:element name="citationGroupList" type="citationGroupList"/>
 	
 	<!--  List of additional Concept Term sources  -->
-	<xs:element name="additionalTermSourceGroupList" 
-							type="additionalTermSourceGroupList"/>
+	<xs:element name="additionalSourceGroupList" 
+							type="additionalSourceGroupList"/>
 
-<!-- =================================================================
-	 Term Group repeating structure
-	 =================================================================
-
-	<xs:complexType name="conceptTermGroupList">
-		<xs:sequence>
-			<xs:element name="conceptTermGroup" type="conceptTermGroup" minOccurs="0"
-						maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="conceptTermGroup">
-		<xs:sequence>
-			<xs:element name="term" type="xs:string"/>
-			<xs:element name="termType" type="xs:string"/>
-			<xs:element name="termQualifier" type="xs:string"/>
-			<xs:element name="termLanguage" type="xs:string"/>
-			<xs:element name="historicalFlag" type="xs:string"/>
-			<xs:element name="source" type="xs:string"/>
-			<xs:element name="sourceDetail" type="xs:string"/>
-			<xs:element name="sourceUID" type="xs:string"/>
-			<xs:element name="termDate" type="structuredDateGroup"/>
-	 </xs:sequence>
-	</xs:complexType>
-
-	 -->
 <!-- =================================================================
 	 Citation Group repeating structure
 	 ================================================================= -->
@@ -92,27 +64,27 @@
 
 	<xs:complexType name="citationGroup">
 		<xs:sequence>
-			<xs:element name="source" type="xs:string"/>
-			<xs:element name="sourceDetail" type="xs:string"/>
+			<xs:element name="citationSource" type="xs:string"/>
+			<xs:element name="citationSourceDetail" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 
 <!-- =================================================================
-	 Additional Concept Source Group repeating structure
+	 Additional Source Group repeating structure
 	 ================================================================= -->
 
-	<xs:complexType name="additionalTermSourceGroupList">
+	<xs:complexType name="additionalSourceGroupList">
 		<xs:sequence>
-			<xs:element name="additionalTermSourceGroup" 
-						type="additionalTermSourceGroup" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="additionalSourceGroup" 
+						type="additionalSourceGroup" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 
-	<xs:complexType name="additionalTermSourceGroup">
+	<xs:complexType name="additionalSourceGroup">
 		<xs:sequence>
-			<xs:element name="source" type="xs:string"/>
-			<xs:element name="sourceDetail" type="xs:string"/>
-			<xs:element name="sourceUID" type="xs:string"/>
+			<xs:element name="additionalSource" type="xs:string"/>
+			<xs:element name="additionalSourceDetail" type="xs:string"/>
+			<xs:element name="additionalSourceUID" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 
