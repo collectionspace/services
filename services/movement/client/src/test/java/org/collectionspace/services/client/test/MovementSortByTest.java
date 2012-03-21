@@ -72,6 +72,11 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
     private final String SORT_FIELD_SEPARATOR = ", ";
     private final Locale LOCALE = Locale.US;
     private final String LOCATION_DATE_EL_NAME = "locationDate";
+    private final Comparator<String> CASE_INSENSITIVE_STRING_COMPARATOR =
+            String.CASE_INSENSITIVE_ORDER;
+    private final Collator LOCALE_SPECIFIC_COLLATOR = Collator.getInstance(LOCALE);
+
+
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -112,29 +117,32 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
-        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         int i = 0;
         for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
-            // sort order by retrieving full records, using the
-            // IDs provided in the summary list items. amd then retriving
+            // sort order by using the IDs provided in the summary list
+            // items to retrieve full records, amd then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             values.add(i, movement.getMovementNote());
-            if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] movementNote=" + values.get(i));
+            if (logger.isTraceEnabled()) {
+                logger.trace("list-item[" + i + "] movementNote=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
-            // is equal to or greater than its value in the previous record,
-            // using a locale-specific collator.
+            // is equal to or greater than its value in the previous record.
             //
             // (Note: when used with certain text, this test case could potentially
             // reflect inconsistencies, if any, between Java's collator and the
             // collator used for ordering by the database.  To help avoid this,
             // it might be useful to keep test strings fairly generic.)
             if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
-                Assert.assertTrue(localeSpecificCollator.compare(values.get(i), values.get(i - 1)) >= 0);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
+                }
+                // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(values.get(i), values.get(i - 1)) >= 0);
+                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) >= 0);
+                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -160,29 +168,32 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
-        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         int i = 0;
         for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
-            // sort order by retrieving full records, using the
-            // IDs provided in the summary list items. amd then retriving
+            // sort order by using the IDs provided in the summary list
+            // items to retrieve full records, amd then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             values.add(i, movement.getMovementNote());
-            if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] movementNote=" + values.get(i));
+            if (logger.isTraceEnabled()) {
+                logger.trace("list-item[" + i + "] movementNote=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
-            // is equal to or greater than its value in the previous record,
-            // using a locale-specific collator.
+            // is equal to or greater than its value in the previous record.
             //
             // (Note: when used with certain text, this test case could potentially
             // reflect inconsistencies, if any, between Java's collator and the
             // collator used for ordering by the database.  To help avoid this,
             // it might be useful to keep test strings fairly generic.)
             if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
-                Assert.assertTrue(localeSpecificCollator.compare(values.get(i), values.get(i - 1)) >= 0);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
+                }
+                // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(values.get(i), values.get(i - 1)) >= 0);
+                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) >= 0);
+                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -206,29 +217,32 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
-        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         int i = 0;
         for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
-            // sort order by retrieving full records, using the
-            // IDs provided in the summary list items. amd then retriving
+            // sort order by using the IDs provided in the summary list
+            // items to retrieve full records, amd then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             values.add(i, movement.getMovementNote());
-            if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] movementNote=" + values.get(i));
+            if (logger.isTraceEnabled()) {
+                logger.trace("list-item[" + i + "] movementNote=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
-            // is less than or equal to than its value in the previous record,
-            // using a locale-specific collator.
+            // is less than or equal to than its value in the previous record.
             //
             // (Note: when used with certain text, this test case could potentially
-            // reflect inconsistencies, if any, between Java's collator and the
-            // collator used for ordering by the database.  To help avoid this,
+            // reflect inconsistencies, if any, between Java's comparator or collator,
+            // and the collator used for ordering by the database.  To help avoid this,
             // it might be useful to keep test strings fairly generic.)
             if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
-                Assert.assertTrue(localeSpecificCollator.compare(values.get(i), values.get(i - 1)) <= 0);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
+                }
+                // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(values.get(i), values.get(i - 1)) <= 0);
+                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) <= 0);
+                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) <= 0);
             }
             i++;
         }
@@ -251,19 +265,22 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
-        Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
         for (AbstractCommonList.ListItem item : items) {
         	String locDate = 
         		AbstractCommonListUtils.ListItemGetElementValue(item, LOCATION_DATE_EL_NAME);
         	values.add(i, locDate);
-            if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] locationDate=" + values.get(i));
+            if (logger.isTraceEnabled()) {
+                logger.trace("list-item[" + i + "] locationDate=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
             // is equal to or greater than its value in the previous record.
             if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
-                Assert.assertTrue(comparator.compare(values.get(i), values.get(i - 1)) >= 0);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
+                }
+                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) >= 0);
+                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -286,19 +303,22 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 list.getListItem();
 
         ArrayList<String> values = new ArrayList<String>();
-        Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
         for (AbstractCommonList.ListItem item : items) {
         	String locDate = 
         		AbstractCommonListUtils.ListItemGetElementValue(item, LOCATION_DATE_EL_NAME);
         	values.add(i, locDate);
-            if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] locationDate=" + values.get(i));
+            if (logger.isTraceEnabled()) {
+                logger.trace("list-item[" + i + "] locationDate=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
             // is less than or equal to its value in the previous record.
             if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
-                Assert.assertTrue(comparator.compare(values.get(i), values.get(i - 1)) <= 0);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
+                }
+                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) <= 0);
+                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) <= 0);
             }
             i++;
         }
@@ -323,14 +343,12 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
 
         ArrayList<String> firstFieldValues = new ArrayList<String>();
         ArrayList<String> secondFieldValues = new ArrayList<String>();
-        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
-        Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
         for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
-            // sort order by retrieving full records, using the
-            // IDs provided in the summary list items. amd then retriving
+            // sort order by using the IDs provided in the summary list
+            // items to retrieve full records, amd then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             firstFieldValues.add(i, movement.getMovementNote());
@@ -342,14 +360,19 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
             // Verify that the value of the specified field in the current record
             // is less than or greater than its value in the previous record.
             if (i > 0 && firstFieldValues.get(i) != null && firstFieldValues.get(i - 1) != null) {
-                Assert.assertTrue(localeSpecificCollator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) >= 0);
+                // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) >= 0);
+                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) >= 0);
+                Assert.assertTrue(firstFieldValues.get(i).compareTo(firstFieldValues.get(i - 1)) >= 0);
                 // If the value of the first sort field in the current record is identical to
                 // its value in the previous record, verify that the value of the second sort
-                // field is equal to or greater than its value in the previous record,
-                // using a locale-specific collator.
-                if (localeSpecificCollator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
+                // field is equal to or greater than its value in the previous record.
+                // if (LOCALE_SPECIFIC_COLLATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
+                // if (CASE_INSENSITIVE_STRING_COMPARATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
+                if (firstFieldValues.get(i).compareTo(firstFieldValues.get(i - 1)) == 0) {
                     if (i > 0 && secondFieldValues.get(i) != null && secondFieldValues.get(i - 1) != null) {
-                        Assert.assertTrue(comparator.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
+                        // Assert.assertTrue(comparator.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
+                        // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
+                        Assert.assertTrue(secondFieldValues.get(i).compareTo(secondFieldValues.get(i - 1)) >= 0);
                     }
                 }
             }
@@ -363,7 +386,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
      */
     @Test(dataProvider = "testName",
     		dependsOnMethods = {"createList"})
-    public void sortByOneFieldAscendingOneFieldsDescending(String testName) throws Exception {
+    public void sortByOneFieldAscendingOneFieldDescending(String testName) throws Exception {
         String firstSortFieldName =
                 asDescendingSort(qualifySortFieldName(MovementJAXBSchema.LOCATION_DATE));
         String secondSortFieldName = qualifySortFieldName(MovementJAXBSchema.MOVEMENT_NOTE);
@@ -377,14 +400,12 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
 
         ArrayList<String> firstFieldValues = new ArrayList<String>();
         ArrayList<String> secondFieldValues = new ArrayList<String>();
-        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
-        Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
         for (AbstractCommonList.ListItem item : items) {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
-            // sort order by retrieving full records, using the
-            // IDs provided in the summary list items. amd then retriving
+            // sort order by using the IDs provided in the summary list
+            // items to retrieve full records, amd then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             firstFieldValues.add(i, movement.getLocationDate());
@@ -396,14 +417,17 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
             // Verify that the value of the specified field in the current record
             // is less than or equal to than its value in the previous record.
             if (i > 0 && firstFieldValues.get(i) != null && firstFieldValues.get(i - 1) != null) {
-                Assert.assertTrue(comparator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) <= 0);
+                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) <= 0);
+                Assert.assertTrue(firstFieldValues.get(i).compareTo(firstFieldValues.get(i - 1)) <= 0);
                 // If the value of the first sort field in the current record is identical to
                 // its value in the previous record, verify that the value of the second sort
                 // field is equal to or greater than its value in the previous record,
                 // using a locale-specific collator.
-                if (comparator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
+                // if (comparator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
+                if (firstFieldValues.get(i).compareTo(firstFieldValues.get(i - 1)) == 0) {
                     if (i > 0 && secondFieldValues.get(i) != null && secondFieldValues.get(i - 1) != null) {
-                        Assert.assertTrue(localeSpecificCollator.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
+                        // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
+                        Assert.assertTrue(secondFieldValues.get(i).compareTo(secondFieldValues.get(i - 1)) >= 0);
                     }
                 }
             }
