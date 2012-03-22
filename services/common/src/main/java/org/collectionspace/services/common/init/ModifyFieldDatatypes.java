@@ -142,21 +142,20 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         Statement stmt = null;
         ResultSet rs = null;
 
-        if (databaseProductType == DatabaseProductType.MYSQL) {
-            sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS "
-                    + "WHERE TABLE_SCHEMA = '" + getDatabaseName(field) + "'"
-                    + " AND TABLE_NAME = '" + getTableName(field) + "'"
-                    + " AND COLUMN_NAME = '" + field.getCol() + "'";
-        } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-            sql = "SELECT data_type FROM information_schema.columns "
-                    + "WHERE table_catalog = '" + getDatabaseName(field) + "'"
-                    + " AND table_name = '" + getTableName(field) + "'"
-                    + " AND column_name = '" + field.getCol() + "'";
-        }
-
         try {
             conn = JDBCTools.getConnection(dataSource);
             stmt = conn.createStatement();
+            if (databaseProductType == DatabaseProductType.MYSQL) {
+                sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS "
+                    + "WHERE TABLE_SCHEMA = '" + JDBCTools.getDatabaseName(conn) + "'"
+                    + " AND TABLE_NAME = '" + getTableName(field) + "'"
+                    + " AND COLUMN_NAME = '" + field.getCol() + "'";
+            } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+                sql = "SELECT data_type FROM information_schema.columns "
+                    + "WHERE table_catalog = '" + JDBCTools.getDatabaseName(conn) + "'"
+                    + " AND table_name = '" + getTableName(field) + "'"
+                    + " AND column_name = '" + field.getCol() + "'";
+            }
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 currentDatatype = rs.getString(1);
