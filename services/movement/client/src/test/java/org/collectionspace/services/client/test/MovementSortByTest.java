@@ -140,9 +140,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
                 }
-                // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(values.get(i), values.get(i - 1)) >= 0);
-                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) >= 0);
-                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) >= 0);
+                Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(values.get(i), values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -191,9 +189,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
                 }
-                // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(values.get(i), values.get(i - 1)) >= 0);
-                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) >= 0);
-                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) >= 0);
+                Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(values.get(i), values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -240,9 +236,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
                 }
-                // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(values.get(i), values.get(i - 1)) <= 0);
-                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) <= 0);
-                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) <= 0);
+                Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(values.get(i), values.get(i - 1)) <= 0);
             }
             i++;
         }
@@ -279,8 +273,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
                 }
-                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) >= 0);
-                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) >= 0);
+                Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -317,8 +310,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Comparing " + values.get(i) + " with previous value " + values.get(i - 1) + "...");
                 }
-                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) <= 0);
-                Assert.assertTrue(values.get(i).compareTo(values.get(i - 1)) <= 0);
+                Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(values.get(i), values.get(i - 1)) <= 0);
             }
             i++;
         }
@@ -360,19 +352,13 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
             // Verify that the value of the specified field in the current record
             // is less than or greater than its value in the previous record.
             if (i > 0 && firstFieldValues.get(i) != null && firstFieldValues.get(i - 1) != null) {
-                // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) >= 0);
-                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) >= 0);
-                Assert.assertTrue(firstFieldValues.get(i).compareTo(firstFieldValues.get(i - 1)) >= 0);
+                Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) >= 0);
                 // If the value of the first sort field in the current record is identical to
                 // its value in the previous record, verify that the value of the second sort
                 // field is equal to or greater than its value in the previous record.
-                // if (LOCALE_SPECIFIC_COLLATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
-                // if (CASE_INSENSITIVE_STRING_COMPARATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
-                if (firstFieldValues.get(i).compareTo(firstFieldValues.get(i - 1)) == 0) {
+                if (LOCALE_SPECIFIC_COLLATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
                     if (i > 0 && secondFieldValues.get(i) != null && secondFieldValues.get(i - 1) != null) {
-                        // Assert.assertTrue(comparator.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
-                        // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
-                        Assert.assertTrue(secondFieldValues.get(i).compareTo(secondFieldValues.get(i - 1)) >= 0);
+                        Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
                     }
                 }
             }
@@ -417,17 +403,14 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
             // Verify that the value of the specified field in the current record
             // is less than or equal to than its value in the previous record.
             if (i > 0 && firstFieldValues.get(i) != null && firstFieldValues.get(i - 1) != null) {
-                // Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) <= 0);
-                Assert.assertTrue(firstFieldValues.get(i).compareTo(firstFieldValues.get(i - 1)) <= 0);
+                Assert.assertTrue(CASE_INSENSITIVE_STRING_COMPARATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) <= 0);
                 // If the value of the first sort field in the current record is identical to
                 // its value in the previous record, verify that the value of the second sort
                 // field is equal to or greater than its value in the previous record,
                 // using a locale-specific collator.
-                // if (comparator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
-                if (firstFieldValues.get(i).compareTo(firstFieldValues.get(i - 1)) == 0) {
+                if (CASE_INSENSITIVE_STRING_COMPARATOR.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
                     if (i > 0 && secondFieldValues.get(i) != null && secondFieldValues.get(i - 1) != null) {
-                        // Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
-                        Assert.assertTrue(secondFieldValues.get(i).compareTo(secondFieldValues.get(i - 1)) >= 0);
+                        Assert.assertTrue(LOCALE_SPECIFIC_COLLATOR.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
                     }
                 }
             }
@@ -584,16 +567,16 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
         // constraining tests to only test records, in list or search results.
         final String TEST_RECORD_SPECIFIC_STRING = CLASS_NAME + " " + TEST_SPECIFIC_KEYWORD;
         return new Object[][]{
-                    {1, "Aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-01-29T00:00:05Z"},
-                    {10, "Zounds! " + TEST_RECORD_SPECIFIC_STRING, "2010-08-31T00:00:00Z"},
-                    {3, "Aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2010-08-30T00:00:00Z"},
-                    {7, "Bat fling off wall. " + TEST_RECORD_SPECIFIC_STRING, "2010-08-30T00:00:00Z"},
-                    {4, "Aardvarks and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-01-29T08:00:00Z"},
-                    {5, "Aardvarks and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"},
-                    {2, "Aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"},
-                    {9, "Zounds! " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"}, // Identical to next record
-                    {8, "Zounds! " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"},
-                    {6, "Bat flies off ball. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"}
+                    {1, "aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-01-29T00:00:05Z"},
+                    {10, "zounds! " + TEST_RECORD_SPECIFIC_STRING, "2010-08-31T00:00:00Z"},
+                    {3, "aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2010-08-30T00:00:00Z"},
+                    {7, "bat fling off wall. " + TEST_RECORD_SPECIFIC_STRING, "2010-08-30T00:00:00Z"},
+                    {4, "aardvarks and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-01-29T08:00:00Z"},
+                    {5, "aardvarks and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"},
+                    {2, "aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"},
+                    {9, "zounds! " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"}, // Identical to next record
+                    {8, "zounds! " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"},
+                    {6, "bat flies off ball. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"}
                 };
     }
 
