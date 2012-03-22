@@ -122,7 +122,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by using the IDs provided in the summary list
-            // items to retrieve full records, amd then obtaining
+            // items to retrieve full records, and then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             values.add(i, movement.getMovementNote());
@@ -171,7 +171,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by using the IDs provided in the summary list
-            // items to retrieve full records, amd then obtaining
+            // items to retrieve full records, and then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             values.add(i, movement.getMovementNote());
@@ -218,7 +218,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by using the IDs provided in the summary list
-            // items to retrieve full records, amd then obtaining
+            // items to retrieve full records, and then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             values.add(i, movement.getMovementNote());
@@ -340,7 +340,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by using the IDs provided in the summary list
-            // items to retrieve full records, amd then obtaining
+            // items to retrieve full records, and then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             firstFieldValues.add(i, movement.getMovementNote());
@@ -391,7 +391,7 @@ public class MovementSortByTest extends BaseServiceTest<AbstractCommonList> {
             // Because movementNote is not currently a summary field
             // (returned in summary list items), we will need to verify
             // sort order by using the IDs provided in the summary list
-            // items to retrieve full records, amd then obtaining
+            // items to retrieve full records, and then obtaining
             // the value of that field from each of those records.
             MovementsCommon movement = read(AbstractCommonListUtils.ListItemGetCSID(item));
             firstFieldValues.add(i, movement.getLocationDate());
