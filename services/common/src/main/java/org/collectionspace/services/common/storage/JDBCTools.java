@@ -52,6 +52,7 @@ public class JDBCTools {
 
     //todo: make sure this will get instantiated in the right order
     final static Logger logger = LoggerFactory.getLogger(JDBCTools.class);
+    private static String JDBC_URL_DATABASE_SEPARATOR = "\\/";
         
     public static DataSource getDataSource(String repositoryName) throws NamingException {
     	DataSource result = null;
@@ -252,6 +253,36 @@ public class JDBCTools {
 
     private static String getDefaultRepositoryName() {
         return DEFAULT_REPOSITORY_NAME;
+    }
+    
+    /**
+     * Returns the catalog name for an open JDBC connection.
+     * 
+     * @param conn an open JDBC Connection
+     * @return the catalog name.
+     * @throws SQLException 
+     */
+    public static String getDatabaseName(Connection conn) throws Exception {
+        String databaseName = "";
+        if (conn == null) {
+            return databaseName;
+        }
+        DatabaseMetaData metadata = conn.getMetaData();
+        String urlStr = metadata.getURL();
+        
+        // Format of the PostgreSQL JDBC URL:
+        // http://jdbc.postgresql.org/documentation/80/connect.html
+        if (getDatabaseProductType() == DatabaseProductType.POSTGRESQL) {
+            String tokens[] = urlStr.split(JDBC_URL_DATABASE_SEPARATOR);
+            databaseName = tokens[tokens.length - 1];
+            // Format of the MySQL JDBC URL:
+            // http://dev.mysql.com/doc/refman/5.1/en/connector-j-reference-configuration-properties.html
+            // FIXME: the last token could contain optional parameters, not accounted for here.
+        } else if (getDatabaseProductType() == DatabaseProductType.MYSQL) {
+            String tokens[] = urlStr.split(JDBC_URL_DATABASE_SEPARATOR);
+            databaseName = tokens[tokens.length - 1];
+        }
+        return databaseName;
     }
 
     /**
