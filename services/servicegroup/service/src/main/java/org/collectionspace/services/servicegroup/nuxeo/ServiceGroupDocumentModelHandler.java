@@ -212,6 +212,7 @@ public class ServiceGroupDocumentModelHandler
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             String docType = docModel.getDocumentType().getName();
+            docType = ServiceBindingUtils.getUnqualifiedTenantDocType(docType);
             ServiceBindingType sb = queriedServiceBindings.get(docType);
             if (sb == null) {
                 throw new RuntimeException(

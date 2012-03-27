@@ -743,14 +743,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), queryParams);
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS", ctx);
 
-            String serviceType = ServiceBindingUtils.SERVICE_TYPE_PROCEDURE;
-            List<String> list = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
-            if (list != null) {
-                serviceType = list.get(0);
+            List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
+            if(serviceTypes == null || serviceTypes.isEmpty()) {
+            	serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
             }
-            // Could be smarter about using the list from above, and/or allowing multiple
-            ArrayList<String> serviceTypes = new ArrayList<String>(1);
-            serviceTypes.add(serviceType);
             
             // Note that we have to create the service context for the Items, not the main service
             // We omit the parentShortId, only needed when doing a create...

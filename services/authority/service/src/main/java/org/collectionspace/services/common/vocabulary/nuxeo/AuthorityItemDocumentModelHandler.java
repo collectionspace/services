@@ -353,7 +353,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     public AuthorityRefDocList getReferencingObjects(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-    		ArrayList<String> serviceTypes,
+    		List<String> serviceTypes,
     		String propertyName,
             String itemcsid) throws Exception {
         AuthorityRefDocList authRefDocList = null;
