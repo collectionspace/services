@@ -39,7 +39,7 @@
     <xs:element name="returnDate" type="xs:date"/>
     
     <!--  Object Collection Information Group -->
-    <xs:element name="fieldCollectionDate" type="xs:string"/>
+    <xs:element name="fieldCollectionDate" type="xs:date"/>
     <xs:element name="fieldCollectionMethods">
         <xs:complexType>
             <xs:sequence>
