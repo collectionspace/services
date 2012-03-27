@@ -26,7 +26,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -105,23 +108,37 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         }
     }
 
-    // TODO: Consider refactoring this method to a general-purpose mechanism for retrieving
-    // datatypes appropriate to a particular database product, that corresponds
-    // to logical datatypes such as "LARGETEXT".
-    //
-    // Currently, this is hard-coded to a single logical datatype.
     private String getDatatypeFromLogicalType(DatabaseProductType databaseProductType, String logicalDatatype) throws Exception {
+        final Map<DatabaseProductType,Map<String,String>> DATABASE_DATATYPES =
+                new HashMap<DatabaseProductType,Map<String,String>>();
+        // Define the logical datatypes and database-specific datatypes associated
+        // with each database system.
         final String LARGE_TEXT_DATATYPE = "LARGETEXT";
+        final String[] DATATYPES = { LARGE_TEXT_DATATYPE };
+        // final String DATE_DATATYPE = "DATE";
+        // final String[] DATATYPES = { LARGE_TEXT_DATATYPE, DATE_DATATYPE };
+        final DatabaseProductType[] DATABASE_PRODUCT_TYPES =
+            { DatabaseProductType.POSTGRESQL, DatabaseProductType.MYSQL };
+        Map<String,String> postgresqlDatatypeMap = new HashMap<String,String>();
+        postgresqlDatatypeMap.put("LARGETEXT", "text");
+        // postgresqlDatatypeMap.put("DATE", "date");
+        DATABASE_DATATYPES.put(DatabaseProductType.POSTGRESQL, postgresqlDatatypeMap);
+        Map<String,String> mysqlDatatypeMap = new HashMap<String,String>();
+        mysqlDatatypeMap.put("LARGETEXT", "TEXT");
+        // mysqlDatatypeMap.put("DATE", "DATE");
+        DATABASE_DATATYPES.put(DatabaseProductType.MYSQL, mysqlDatatypeMap);
+
         String datatype = "";
-        if (!logicalDatatype.equalsIgnoreCase(LARGE_TEXT_DATATYPE)) {
+        if (!Arrays.asList(DATABASE_PRODUCT_TYPES).contains(databaseProductType)) {
+            throw new Exception("Unrecognized database system " + databaseProductType);
+        }
+        if (!Arrays.asList(DATATYPES).contains(logicalDatatype.toUpperCase())) {
             throw new Exception("Unrecognized logical datatype " + logicalDatatype);
         }
-        if (databaseProductType == DatabaseProductType.MYSQL) {
-            datatype = "TEXT";
-        } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-            datatype = "TEXT";
-        } else {
-            throw new Exception("Unrecognized database system " + databaseProductType);
+        datatype = DATABASE_DATATYPES.get(databaseProductType).get(logicalDatatype.toUpperCase());
+        if (datatype == null) {
+            throw new Exception("Unrecognized logical datatype " + logicalDatatype
+                    + " for database system " + databaseProductType);
         }
         return datatype;
     }
@@ -142,21 +159,20 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         Statement stmt = null;
         ResultSet rs = null;
 
-        if (databaseProductType == DatabaseProductType.MYSQL) {
-            sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS "
-                    + "WHERE TABLE_SCHEMA = '" + getDatabaseName(field) + "'"
-                    + " AND TABLE_NAME = '" + getTableName(field) + "'"
-                    + " AND COLUMN_NAME = '" + field.getCol() + "'";
-        } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
-            sql = "SELECT data_type FROM information_schema.columns "
-                    + "WHERE table_catalog = '" + getDatabaseName(field) + "'"
-                    + " AND table_name = '" + getTableName(field) + "'"
-                    + " AND column_name = '" + field.getCol() + "'";
-        }
-
         try {
             conn = JDBCTools.getConnection(dataSource);
             stmt = conn.createStatement();
+            if (databaseProductType == DatabaseProductType.MYSQL) {
+                sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS "
+                    + "WHERE TABLE_SCHEMA = '" + JDBCTools.getDatabaseName(conn) + "'"
+                    + " AND TABLE_NAME = '" + getTableName(field) + "'"
+                    + " AND COLUMN_NAME = '" + field.getCol() + "'";
+            } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
+                sql = "SELECT data_type FROM information_schema.columns "
+                    + "WHERE table_catalog = '" + JDBCTools.getDatabaseName(conn) + "'"
+                    + " AND table_name = '" + getTableName(field) + "'"
+                    + " AND column_name = '" + field.getCol() + "'";
+            }
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 currentDatatype = rs.getString(1);

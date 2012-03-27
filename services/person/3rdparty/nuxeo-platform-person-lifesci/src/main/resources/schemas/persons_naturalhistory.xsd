@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+  Person schema (XSD)
+  
+  Entity  : Person
+  Part    : Domain - Natural History (example)
+  Used for: Nuxeo EP core document type
+  
+  $LastChangedRevision: 4929 $
+  $LastChangedDate: 2011-06-07 13:26:32 -0700 (Tue, 07 Jun 2011) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/person/domain/naturalhistory"
+  xmlns="http://collectionspace.org/services/person/domain/naturalhistory"
+  targetNamespace="http://collectionspace.org/services/person/domain/naturalhistory"
+  version="0.1">
+
+  <!-- used for testing
+  <xs:element name="nh-string" type="xs:string" />
+  <xs:element name="nh-int" type="xs:int"/>
+  <xs:element name="nh-long" type="xs:long"/>
+  <xs:element name="nh-date" type="xs:dateTime"/>
+  <xs:element name="nh-note" type="xs:string"/>
+  -->
+
+ <xs:element name="nameTypes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="nameType" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="affiliatedPersonOrgGroupList" type="affiliatedPersonOrgGroupList"/>
+
+  <xs:complexType name="affiliatedPersonOrgGroupList">
+    <xs:sequence>
+      <xs:element name="affiliatedPersonOrgGroup" type="affiliatedPersonOrgGroup" minOccurs="0"
+        maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="affiliatedPersonOrgGroup">
+    <xs:sequence>
+      <xs:element name="affiliatedPersonOrg" type="xs:string"/>
+      <xs:element name="affiliatedPersonOrgType" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="nameSource" type="xs:string"/>
+  <xs:element name="entityType" type="xs:string"/>
+  <xs:element name="lifeSpan" type="xs:string"/>
+  <xs:element name="scopeNote" type="xs:string"/>
+  <xs:element name="sourceNote" type="xs:string"/>
+  <xs:element name="orgContactNames">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="orgContactName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nameFunctions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="nameFunction" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
