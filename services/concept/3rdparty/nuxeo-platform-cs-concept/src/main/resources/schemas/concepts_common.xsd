@@ -32,6 +32,8 @@
     <xs:element name="description" type="xs:string"/>
 
 	<!--  Common Concept Information Group -->
+	<!--  Based on UCB Version 2.3: http://wiki.collectionspace.org/display/deploy/Concept+Authority+Schema+and+Mockup+-+UCB+Version -->
+	<!--  This will be refactored for 2.4. -->
 	<xs:element name="conceptType" type="xs:string"/>
 	<xs:element name="sourceTermID" type="xs:string"/>
 	<xs:element name="termLanguage" type="xs:string"/>
