@@ -2591,6 +2591,10 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>termType</service:element>
+              <service:xpath>termType</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
