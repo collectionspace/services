@@ -58,6 +58,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -329,6 +330,8 @@ public class RefNameServiceUtils {
         	logger.error("RefNameServiceUtils.getAuthorityRefDocs: No services bindings found, cannot proceed!");
             return null;
         }
+        // Filter the list for current user rights
+        servicebindings = SecurityUtils.getReadableServiceBindingsForCurrentUser(servicebindings);
         
         // Need to escape the quotes in the refName
         // TODO What if they are already escaped?
@@ -433,6 +436,7 @@ public class RefNameServiceUtils {
             AuthorityRefDocList.AuthorityRefDocItem ilistItem;
 
             String docType = docModel.getDocumentType().getName();
+            docType = ServiceBindingUtils.getUnqualifiedTenantDocType(docType);
             ServiceBindingType sb = queriedServiceBindings.get(docType);
             if (sb == null) {
                 throw new RuntimeException(

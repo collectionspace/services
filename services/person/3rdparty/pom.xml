@@ -19,5 +19,6 @@
 
     <modules>
         <module>nuxeo-platform-cs-person</module>
+        <module>nuxeo-platform-person-lifesci</module>
     </modules>
 </project>

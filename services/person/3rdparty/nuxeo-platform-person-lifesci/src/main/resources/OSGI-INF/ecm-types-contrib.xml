@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.person.lifesci.ecm.types">
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="PersonTenant2" coretype="PersonTenant2">
+      <label>org.collectionspace.person</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>collectionspace_core</layout>
+        <layout>person</layout>
+        <layout>person_naturalhistory</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>PersonTenant2</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>PersonTenant2</type>
+      </subtypes>
+    </type>
+
+  </extension>
+</component>

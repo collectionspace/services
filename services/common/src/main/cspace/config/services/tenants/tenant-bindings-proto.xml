@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
+<!-- 
+    Copyright: Regents of the University of California 2012
     Document   : tenants-bindings.xml
     Description: Prototype tenant bindings, specifying the default services
                  layer configuration for a generic, out-of-the-box tenant.
@@ -63,6 +64,16 @@
     </tenant:serviceBindings>	
     <!-- end id service meta-data -->
         
+    <!-- begin servicegroup service meta-data -->
+		<!-- Servicegroup is a task service that has no representation in the repo, 
+				 but provides tools like keyword search across many types of services. 
+		  -->
+    <tenant:serviceBindings id="servicegroups" name="servicegroups" type="utility" version="0.1">
+      <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
+      <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler</service:documentHandler>
+    </tenant:serviceBindings>
+    <!-- end servicegroup service meta-data -->
+
     <!-- begin collectionobject service meta-data -->
     <tenant:serviceBindings id="CollectionObjects" name="CollectionObjects" type="object" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/collectionobjects/*/workflow/</service:uriPath>
@@ -573,7 +584,7 @@
     
     <!-- begin blob service meta-data -->
 		<!-- This should likely be type="object" -->
-    <tenant:serviceBindings id="Blobs" name="Blobs" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Blobs" name="Blobs" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/blobs/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:documentHandler>
@@ -1093,7 +1104,7 @@
     <!-- end objectexit service meta-data -->
     
     <!-- begin batch service meta-data -->
-    <tenant:serviceBindings id="Batch" name="Batch" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Batch" name="Batch" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/batch/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler</service:documentHandler>
@@ -1141,6 +1152,10 @@
               <service:element>title</service:element>
               <service:xpath>title</service:xpath>
             </service:ListResultField>
+            <service:ListResultField>
+              <service:element>owner</service:element>
+              <service:xpath>owner</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -1148,8 +1163,12 @@
       <service:properties xmlns:service="http://collectionspace.org/services/common/service">
         <types:item xmlns:types="http://collectionspace.org/services/common/types">
           <types:key>objectNameProperty</types:key>
-          <types:value>title</types:value>
+          <types:value>groups_common:owner</types:value>
         </types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/common/types">
+						<types:key>objectNumberProperty</types:key>
+						<types:value>groups_common:title</types:value>
+				</types:item>
       </service:properties>
       <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Group" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="group-system" updated="" order="0">
@@ -1184,7 +1203,7 @@
     <!-- end group service meta-data -->
     
     <!-- begin imports service meta-data -->
-    <tenant:serviceBindings id="Imports" name="Imports" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Imports" name="Imports" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/imports/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.imports.nuxeo.ImportsDocumentModelHandler</service:documentHandler>
@@ -1372,17 +1391,26 @@
         </service:params>
       </service:DocHandlerParams>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.movement.nuxeo.MovementValidatorHandler</service:validatorHandler>
-            <service:properties xmlns:service="http://collectionspace.org/services/common/service">
-                <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                    <types:key>objectNameProperty</types:key>
-                    <types:value>currentLocation</types:value>
-                </types:item>
-                <types:item xmlns:types="http://collectionspace.org/services/common/types">
-                    <types:key>objectNumberProperty</types:key>
-                    <types:value>movementReferenceNumber</types:value>
-                </types:item>
-            </service:properties>
-      <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Movement" version="0.1">
+      <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+            <types:key>objectNameProperty</types:key>
+            <types:value>currentLocation</types:value>
+        </types:item>
+        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+            <types:key>objectNumberProperty</types:key>
+            <types:value>movementReferenceNumber</types:value>
+        </types:item>
+    </service:properties>
+    <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
+        <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+        <service:params>
+            <service:field>
+                <service:table>movements_common</service:table>
+                <service:col>locationdate</service:col>
+            </service:field>
+        </service:params>
+    </service:initHandler>
+    <service:object xmlns:service="http://collectionspace.org/services/common/service" name="Movement" version="0.1">
         <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="movements-system" updated="" order="0">
           <service:content contentType="application/xml">
             <service:xmlContent namespaceURI="http://collectionspace.org/services/common/system" schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd" />
@@ -1406,6 +1434,11 @@
               <types:key>authRef</types:key>
               <types:value>movementContact</types:value>
             </types:item>
+                         <!-- Inventory Control Information group -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>authRef</types:key>
+              <types:value>inventoryContactList|inventoryContact</types:value>
+            </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <!-- Object Location Information group -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -1420,6 +1453,15 @@
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
                             <types:value>reasonForMove</types:value>
+            </types:item>
+                        <!-- Inventory Control Information group -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>inventoryActionRequired</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+              <types:value>frequencyForInventory</types:value>
             </types:item>
           </service:properties>
           <service:content contentType="application/xml">
@@ -1436,7 +1478,7 @@
     <!-- end movement service meta-data -->
     
     <!-- begin Workflow service meta-data -->
-    <tenant:serviceBindings id="Workflow" name="Workflow" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Workflow" name="Workflow" type="utility" version="0.1">
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler</service:documentHandler>
       <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.workflow.nuxeo.WorkflowValidatorHandler</service:validatorHandler>
@@ -1456,7 +1498,7 @@
     <!-- end Workflow service meta-data -->
         
     <!-- begin report service meta-data -->
-    <tenant:serviceBindings id="Reports" name="Reports" type="procedure" version="0.1">
+    <tenant:serviceBindings id="Reports" name="Reports" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/reports/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
@@ -1888,6 +1930,14 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>foreName</service:element>
+              <service:xpath>foreName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>surName</service:element>
+              <service:xpath>surName</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2062,6 +2112,10 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>name</service:element>
+              <service:xpath>name</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2123,7 +2177,186 @@
       </service:object>
     </tenant:serviceBindings>
     <!-- end location service meta-data -->
-    
+        <!-- begin placeauthority service meta-data -->
+        <tenant:serviceBindings id="Placeauthorities" name="Placeauthorities" version="0.1">
+            <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/placeauthorities/*/workflow/</service:uriPath>
+            <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/placeauthorities/*/items/*/workflow/</service:uriPath>
+            <!-- other URI paths using which this service could be accessed -->
+            <!-- 
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /placeauthorities/*/items/
+            </service:uriPath>-->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.place.nuxeo.PlaceAuthorityDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>displayName</service:element>
+                            <service:xpath>displayName</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>refName</service:element>
+                            <service:xpath>refName</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>shortIdentifier</service:element>
+                            <service:xpath>shortIdentifier</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>vocabType</service:element>
+                            <service:xpath>vocabType</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>placeauthorities_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>placeauthorities_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/common/service" id="1" name="Placeauthority" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="placeauthorities-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/common/system" schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd"/>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="placeauthorities_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/place" schemaLocation="http://collectionspace.org/services/place http://services.collectionspace.org/place/placeauthorities_common.xsd"/>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd"/>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end placeauthority service meta-data -->
+        <!-- begin place service meta-data.
+             Note there is no Place service, but there is a
+             Repository workspace so we have to configure that.
+        -->
+        <tenant:serviceBindings id="Places" name="Places" version="0.1">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.place.nuxeo.PlaceDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.place.nuxeo.PlaceValidatorHandler</service:validatorHandler>
+            <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>places_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>places_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>places_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>displayName</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>shortIdentifier</types:value>
+                </types:item>
+            </service:properties>
+            <service:object xmlns:service="http://collectionspace.org/services/common/service" id="1" name="Placeitem" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="places-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/common/system" schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd"/>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="places_common" updated="" order="1">
+                    <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>authRef</types:key>
+                            <types:value>placeOwnerGroupList/*/owner</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>termStatus</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>placeType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>placeNameGroupList/*/nameLanguage</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>placeNameGroupList/*/nameType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>placeNameGroupList/*/nameStatus</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>placeNameGroupList/*/nameAdminStatus</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>vCoordSys</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>vSpatialReferenceSystem</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>vUnitofMeasure</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>placeGeoRefGroupList/*/geodeticDatum</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>placeGeoRefGroupList/*/geoRefProtocol</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/common/types">
+                            <types:key>termRef</types:key>
+                            <types:value>placeGeoRefGroupList/*/geoRefVerificationStatus</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/place" schemaLocation="http://collectionspace.org/services/place http://services.collectionspace.org/place/places_common.xsd"/>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd"/>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end place service meta-data -->
     <!-- begin taxonomyauthority service meta-data -->
     <tenant:serviceBindings id="Taxonomyauthority" name="Taxonomyauthority" type="utility" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/taxonomyauthority/*/workflow/</service:uriPath>
@@ -2202,6 +2435,10 @@
         <service:params>
           <service:ListResultsFields>
 					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>taxonFullName</service:element>
+              <service:xpath>taxonFullName</service:xpath>
+            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>

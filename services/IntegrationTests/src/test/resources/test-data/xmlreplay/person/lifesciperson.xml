@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+  <!-- Authenticate into the lifesci tenant for extension testing -->
+  <auths default="admin@lifesci.collectionspace.org">
+    <auth ID="admin@lifesci.collectionspace.org"
+      >YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+  </auths>
+
+  <!-- 
+    testGroup ID="person" is not live.  It works, but may not clean up correctly. 
+    For now, use ID="updatePerson"
+  -->
+  <testGroup ID="person" autoDeletePOSTS="true">
+    <test ID="PersonAuth1" auth="admin@lifesci.collectionspace.org">
+      <method>POST</method>
+      <uri>/cspace-services/personauthorities/</uri>
+      <filename>person/personauthorities_common.xml</filename>
+      <vars>
+        <var ID="authShortIdentifier">TestPersonAuthority</var>
+      </vars>
+    </test>
+    <test ID="Person1">
+      <method>POST</method>
+      <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+      <filename>person/persons_common_and_lifesci.xml</filename>
+      <vars>
+        <var ID="shortIdentifier">johnWayneActor1</var>
+        <var ID="foreName">John</var>
+        <var ID="surName">Wayne</var>
+        <var ID="entityType">Actor</var>
+        <var ID="lifeSpan">Way Long Time</var>
+      </vars>
+    </test>
+    <test ID="Person2">
+      <method>POST</method>
+      <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+      <filename>person/persons_common_and_lifesci.xml</filename>
+      <vars>
+        <var ID="shortIdentifier">billyBob1</var>
+        <var ID="foreName">Billy-Bob</var>
+        <var ID="surName">Homeboy</var>
+        <var ID="entityType">Goof</var>
+        <var ID="lifeSpan">Too Long</var>
+      </vars>
+    </test>
+    <test ID="getAuthorityList">
+      <method>GET</method>
+      <uri>/cspace-services/personauthorities/</uri>
+    </test>
+    <test ID="getAuthorityByName">
+      <method>GET</method>
+      <uri>/cspace-services/personauthorities/urn:cspace:name(TestPersonAuthority)</uri>
+    </test>
+    <test ID="getAuthorityByCSID">
+      <method>GET</method>
+      <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}</uri>
+    </test>
+    <test ID="getPersonList">
+      <method>GET</method>
+      <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/</uri>
+    </test>
+    <test ID="getPerson1">
+      <method>GET</method>
+      <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}</uri>
+    </test>
+
+    <test ID="UpdatePerson2WithRelations">
+      <method>PUT</method>
+      <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}</uri>
+      <filename>person/persons_common_and_lifesci_set_broader.xml</filename>
+      <vars>
+        <var ID="shortIdentifier">billyBob1</var>
+        <var ID="foreName">Billy-Bob</var>
+        <var ID="surName">Homeboy</var>
+        <var ID="entityType">Goof</var>
+        <var ID="lifeSpan">Too Long</var>
+        <var ID="childCSID">${Person2.CSID}</var>
+        <var ID="parentCSID">${Person1.CSID}</var>
+        <var ID="parentName">John Wayne</var>
+      </vars>
+    </test>
+
+    <test ID="getPerson1WithRelations">
+      <method>GET</method>
+      <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}?showAllRelations=true</uri>
+      <response>
+        <expected level="ADDOK"/>
+        <filename>person/res/lifesciPersonWithRelns.res.xml</filename>
+        <!-- NOTE: vars are referenced in lifesciPersonWithRelns.res.xml
+          from tests in this test group, e.g. 
+          PersonParent.CSID :: ${PersonParent.CSID} 
+          These vars are all in the expression context while this group is active,
+          because we hang onto all ServiceResult objects for the duration of the group,
+          and ServiceObjects keep their vars.
+        -->
+        <startElement>/document/*[local-name()='relations-common-list']</startElement>
+      </response>
+    </test>
+		
+		<test ID="getPerson2WithRelations">
+      <method>GET</method>
+      <uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person2.CSID}?showAllRelations=true</uri>
+      <response>
+        <expected level="ADDOK"/>
+        <filename>person/res/lifesciPersonWithRelns.res.xml</filename>
+        <!-- NOTE: vars are referenced in lifesciPersonWithRelns.res.xml
+          from tests in this test group, e.g. 
+          PersonParent.CSID :: ${PersonParent.CSID} 
+          These vars are all in the expression context while this group is active,
+          because we hang onto all ServiceResult objects for the duration of the group,
+          and ServiceObjects keep their vars.
+        -->
+        <startElement>/document/*[local-name()='relations-common-list']</startElement>
+      </response>
+		</test>
+
+		<test ID="createLoanin1" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/loansin/</uri>
+			<filename>authrefs/loanin.xml</filename>
+			<vars>
+				<var ID="loannum">42</var>
+				<var ID="person">${getPerson1.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="getPerson1RefObjs">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}/refObjs</uri>
+			<response>
+				<expected level="ADDOK"/>
+				<filename>person/res/refObjs.res.xml</filename>
+				<vars>
+					<var ID="numFound">1</var>
+				</vars>
+			</response>
+		</test>
+
+		<test ID="createAcquisition1" auth="test">
+			<method>POST</method>
+			<uri>/cspace-services/acquisitions/</uri>
+			<filename>person/acquisition.xml</filename>
+			<vars>
+				<var ID="acqNum">42</var>
+				<var ID="owner">${getPerson1.got("//refName")}</var>
+			</vars>
+		</test>
+
+		<test ID="getPerson1RefObjs">
+			<method>GET</method>
+			<uri>/cspace-services/personauthorities/${PersonAuth1.CSID}/items/${Person1.CSID}/refObjs</uri>
+			<response>
+				<expected level="ADDOK"/>
+				<filename>person/res/refObjs.res.xml</filename>
+				<vars>
+					<var ID="numFound">2</var>
+				</vars>
+			</response>
+		</test>
+
+  </testGroup>
+
+</xmlReplay>
+

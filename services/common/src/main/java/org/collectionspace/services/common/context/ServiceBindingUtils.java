@@ -3,6 +3,9 @@ package org.collectionspace.services.common.context;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.collectionspace.services.common.config.PropertyItemUtils;
 import org.collectionspace.services.common.service.ObjectPartType;
@@ -11,8 +14,13 @@ import org.collectionspace.services.common.service.ServiceObjectType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.types.PropertyItemType;
 import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import java.lang.IndexOutOfBoundsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class ServiceBindingUtils {
 	public static final boolean QUALIFIED_PROP_NAMES = true;
@@ -28,9 +36,30 @@ public class ServiceBindingUtils {
 	public static final String SERVICE_TYPE_UTILITY = "utility";
 	public static final String SERVICE_TYPE_SECURITY = "security";
 	
+	private static final String TENANT_EXTENSION_PATTERN = "(.*)"+ServiceContext.TENANT_SUFFIX+"[\\d]+$";
+	private static final String TENANT_REPLACEMENT_PATTERN = "$1";
+	private static Pattern tenantSuffixPattern = null;
+
+	private static final Logger logger = LoggerFactory.getLogger(ServiceBindingUtils.class);
+	
     public static String getTenantQualifiedDocType(String tenantId, String docType) {
     	String result = docType + ServiceContext.TENANT_SUFFIX + tenantId;
     	return result;
+    }
+    	
+    public static String getUnqualifiedTenantDocType(String docType) {
+        try {
+            if(tenantSuffixPattern == null ) {
+            	tenantSuffixPattern = Pattern.compile(TENANT_EXTENSION_PATTERN);
+            }
+            Matcher tenantSuffixMatcher = tenantSuffixPattern.matcher(docType);
+            return tenantSuffixMatcher.replaceFirst(TENANT_REPLACEMENT_PATTERN);
+        } catch (PatternSyntaxException pe) {
+            logger.warn("TENANT_EXTENSION_PATTERN regex pattern '" + TENANT_EXTENSION_PATTERN
+                    + "' could not be compiled: " + pe.getMessage());
+            // If reached, method will return a value of false.
+        }
+    	return docType;
     }
     	
 	// TODO consider building up a hashTable of the properties for each
@@ -152,10 +181,32 @@ public class ServiceBindingUtils {
     		return null;
     	try {
     		return (String)docModel.getPropertyValue(propName);
+    	} catch(IndexOutOfBoundsException ioobe) {
+				// Should not happen, but may with certain array forms
+				if(logger.isTraceEnabled()) {
+					logger.trace("SBUtils.getMappedField caught OOB exc, for Prop: "+propName
+						+ " in: " + docModel.getDocumentType().getName()
+						+ " csid: " + NuxeoUtils.getCsid(docModel));
+				}
+				return null;
     	} catch(ClientException ce) {
     		throw new RuntimeException(
     				"getMappedFieldInDoc: Problem fetching: "+propName+" logicalfieldName: "+logicalFieldName+" docModel: "+docModel, ce);
     	}
     } 
+    
+    private static ArrayList<String> commonServiceTypes = null;
+    
+    public static ArrayList<String> getCommonServiceTypes() {
+    	if(commonServiceTypes == null) {
+    		commonServiceTypes = new ArrayList<String>();
+				// Problematic at this point:	commonServiceTypes.add(SERVICE_TYPE_AUTHORITY);
+    		commonServiceTypes.add(SERVICE_TYPE_OBJECT);
+    		commonServiceTypes.add(SERVICE_TYPE_PROCEDURE);
+    	}
+    	return commonServiceTypes;
+    }
+    
+
 
 }

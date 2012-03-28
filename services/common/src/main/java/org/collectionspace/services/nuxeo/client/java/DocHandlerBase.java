@@ -69,6 +69,9 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     private AbstractCommonList commonList;
     
     protected static final int NUM_STANDARD_LIST_RESULT_FIELDS = 3;
+    protected static final String STANDARD_LIST_CSID_FIELD = "csid";
+    protected static final String STANDARD_LIST_URI_FIELD = "uri";
+    protected static final String STANDARD_LIST_UPDATED_AT_FIELD = "updatedAt";
 
     @Override
     public AbstractCommonList getCommonPartList() {
@@ -184,9 +187,9 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         List<ListResultField> resultsFields = getListItemsArray();
         int nFields = resultsFields.size()+NUM_STANDARD_LIST_RESULT_FIELDS;
         String fields[] = new String[nFields];
-        fields[0] = "csid";
-        fields[1] = "uri";
-        fields[2] = "updatedAt";
+        fields[0] = STANDARD_LIST_CSID_FIELD;
+        fields[1] = STANDARD_LIST_URI_FIELD;
+        fields[2] = STANDARD_LIST_UPDATED_AT_FIELD;
         for(int i=NUM_STANDARD_LIST_RESULT_FIELDS;i<nFields;i++) {
         	ListResultField field = resultsFields.get(i-NUM_STANDARD_LIST_RESULT_FIELDS); 
         	fields[i]=field.getElement();
@@ -197,10 +200,10 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             String id = NuxeoUtils.getCsid(docModel);
-            item.put(fields[0], id);
+            item.put(STANDARD_LIST_CSID_FIELD, id);
             String uri = getUri(docModel);
-            item.put(fields[1], uri);
-            item.put(fields[2], getUpdatedAtAsString(docModel));
+            item.put(STANDARD_LIST_URI_FIELD, uri);
+            item.put(STANDARD_LIST_UPDATED_AT_FIELD, getUpdatedAtAsString(docModel));
 
             for (ListResultField field : resultsFields ){
             	String schema = field.getSchema();

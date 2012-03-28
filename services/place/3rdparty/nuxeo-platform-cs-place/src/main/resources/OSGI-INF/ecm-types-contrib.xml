@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.place.ecm.types">
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Placeauthority" coretype="Placeauthority">
+      <label>org.collectionspace.placeauthority</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>csplaceauthority</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Placeauthority</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Placeauthority</type>
+      </subtypes>
+    </type>
+
+  </extension>
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Placeitem" coretype="Placeitem">
+      <label>org.collectionspace.place</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>place</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Place</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Place</type>
+      </subtypes>
+    </type>
+
+  </extension>
+</component>

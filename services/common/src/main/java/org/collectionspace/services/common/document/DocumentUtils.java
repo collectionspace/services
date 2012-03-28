@@ -588,7 +588,23 @@ public class DocumentUtils {
 		parent.appendChild(element);
 		// extract the element content
 		if (type.isSimpleType()) {
-                        element.setTextContent(type.encode(value));
+            String encodedVal = type.encode(value);
+            /*
+             * We need a way to produce just a Date when the specified data
+             * type is an xs:date vs. xs:datetime. Nuxeo maps both to a Calendar. Sigh.
+			if(logger.isTraceEnabled() && isDateType(type)) {
+				String dateValType = "unknown";
+				if (value instanceof java.util.Date) {
+					dateValType = "java.util.Date";
+		        } else if (value instanceof java.util.Calendar) {
+					dateValType = "java.util.Calendar";
+		        }
+				logger.trace("building XML for date type: "+type.getName()
+						+" value type: "+dateValType
+						+" encoded: "+encodedVal);
+			}
+			*/
+            element.setTextContent(encodedVal);
 		} else if (type.isComplexType()) {
 			ComplexType ctype = (ComplexType) type;
 			if (ctype.getName().equals(TypeConstants.CONTENT)) {

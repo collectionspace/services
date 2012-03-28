@@ -177,6 +177,14 @@ public class TenantBindingConfigReaderImpl
         tenantBindingTypeList = readTenantConfigs(protoBindingsFile, tenantDirs);
         
         for (TenantBindingType tenantBinding : tenantBindingTypeList) {
+        	if(tenantBindings.get(tenantBinding.getId()) != null) {
+        		TenantBindingType tenantBindingOld = tenantBindings.get(tenantBinding.getId());
+                logger.error("Ignoring duplicate binding definition for tenant id=" 
+                		+ tenantBinding.getId()
+                        + " existing name=" + tenantBindingOld.getName()
+                        + " conflicting (ignored) name=" + tenantBinding.getName());
+                continue;
+        	}
             tenantBindings.put(tenantBinding.getId(), tenantBinding);
             readDomains(tenantBinding);
             readServiceBindings(tenantBinding);
@@ -386,6 +394,18 @@ public class TenantBindingConfigReaderImpl
         return docTypes.get(key);
     }
 
+    /**
+     * getServiceBinding gets service binding for given tenant for a given service
+     * @param tenantId
+     * @param serviceName
+     * @return
+     */
+    public List<ServiceBindingType> getServiceBindingsByType(
+            String tenantId, String serviceType) {
+    	List<String> serviceTypes = new ArrayList<String>(1);
+    	serviceTypes.add(serviceType);
+    	return getServiceBindingsByType(tenantId, serviceTypes);
+    }
     /**
      * getServiceBinding gets service binding for given tenant for a given service
      * @param tenantId

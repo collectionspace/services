@@ -50,6 +50,7 @@
         <module>person</module>
         <module>id</module>
         <module>collectionobject</module>
+        <module>servicegroup</module>
         <module>group</module>
         <module>intake</module>
         <module>loanin</module>
@@ -58,6 +59,7 @@
         <module>batch</module>
         <module>imports</module>
         <module>location</module>
+        <module>place</module>
         <module>taxonomy</module>
         <module>movement</module>
         <module>report</module>

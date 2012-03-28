@@ -53,6 +53,7 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
+import org.collectionspace.services.client.PlaceAuthorityClient;
 
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -260,6 +261,7 @@ public class RelationDocumentModelHandler
         DocumentModel itemDocModel = NuxeoUtils.getDocFromCsid(ctx, this.getRepositorySession(), itemCsid);    //null if not found.
         if (itemDocModel != null) {
             String itemDocType = itemDocModel.getDocumentType().getName();
+            itemDocType = ServiceBindingUtils.getUnqualifiedTenantDocType(itemDocType);
             if (Tools.isBlank(documentType)) {
                 item.setDocumentType(itemDocType);
             }
@@ -359,7 +361,8 @@ public class RelationDocumentModelHandler
     	
         HashMap<String,Object> properties = new HashMap<String,Object>();
         try {
-	        String doctype = (String) subjectOrObjectDocModel.getType();
+	        String doctype = subjectOrObjectDocModel.getDocumentType().getName();
+            doctype = ServiceBindingUtils.getUnqualifiedTenantDocType(doctype);
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_DOCTYPE:RelationJAXBSchema.OBJECT_DOCTYPE),
 	        					doctype);
 	
@@ -397,15 +400,20 @@ public class RelationDocumentModelHandler
     
     private String getCommonSchemaNameForDocType(String docType) {
     	String common_schema = null;
-    	if("Person".equals(docType))
-    		common_schema = PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-    	else if("Organization".equals(docType))
-    		common_schema = OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-    	else if("Locationitem".equals(docType))
-    		common_schema = LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-    	else if("Taxon".equals(docType))
-    		common_schema = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-    	//else leave it null.
+    	if(docType!=null) {
+    		// HACK - Use startsWith to allow for extension of schemas.
+	    	if(docType.startsWith("Person"))
+	    		common_schema = PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+	    	else if(docType.startsWith("Organization"))
+	    		common_schema = OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+	    	else if(docType.startsWith("Locationitem"))
+	    		common_schema = LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+	    	else if(docType.startsWith("Taxon"))
+	    		common_schema = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+    		else if(docType.startsWith("Placeitem"))
+    			common_schema = PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+	    	//else leave it null.
+    	}
     	return common_schema;
     }
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="persons">  
+  <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <totalItems>1</totalItems>
+    <!-- 
+    This file represents the expected response from test case
+    	lifesciperson.xml :: 
+    These are the vars that are available from the time Person1 is created.
+    Person1.CSID       ${Person1.CSID}
+    Person2.CSID     ${Person2.CSID}
+	-->
+
+
+    <relation-list-item>
+      <subjectCsid>${Person2.CSID}</subjectCsid>
+      <objectCsid>${Person1.CSID}</objectCsid>
+      <predicate>hasBroader</predicate>
+      <subject>
+        <csid>${Person2.CSID}</csid>
+      </subject>
+      <object>
+        <csid>${Person1.CSID}</csid>
+      </object>
+    </relation-list-item>
+  </ns2:relations-common-list>
+</document>

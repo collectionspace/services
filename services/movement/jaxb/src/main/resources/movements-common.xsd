@@ -44,6 +44,13 @@
                 <xs:element name="plannedRemovalDate" type="xs:string"/>
                 <xs:element name="removalDate" type="xs:string"/>
                 <xs:element name="reasonForMove" type="xs:string"/>
+                <!-- Inventory Information Group -->
+                <xs:element name="inventoryDate" type="xs:date"/>
+                <xs:element name="inventoryContactList" type="inventoryContactList"/>
+                <xs:element name="inventoryActionRequired" type="xs:string"/>
+                <xs:element name="inventoryNote" type="xs:string"/>
+                <xs:element name="frequencyForInventory" type="xs:string"/>
+                <xs:element name="nextInventoryDate" type="xs:date"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -51,6 +58,12 @@
     <xs:complexType name="movementMethodsList">
         <xs:sequence>
             <xs:element name="movementMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="inventoryContactList">
+        <xs:sequence>
+            <xs:element name="inventoryContact" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
  
