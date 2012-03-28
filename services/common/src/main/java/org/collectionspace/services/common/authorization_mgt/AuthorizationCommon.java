@@ -21,11 +21,16 @@ import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.tenant.TenantBindingType;
+import org.collectionspace.services.lifecycle.Lifecycle;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.acls.model.AlreadyExistsException;
@@ -86,8 +91,22 @@ public class AuthorizationCommon {
         return JDBCTools.getConnection(JDBCTools.CSPACE_REPOSITORY_NAME);
     }
     
-    public static void createDefaultPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader)
+    public static void createDefaultPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader) throws Exception
     {
+        Hashtable<String, TenantBindingType> tenantBindings =
+            	tenantBindingConfigReader.getTenantBindings();
+        for (String tenantId : tenantBindings.keySet()) {
+	        TenantBindingType tenantBinding = tenantBindings.get(tenantId);
+	        for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
+	        	try {
+		        	DocumentHandler docHandler = ServiceConfigUtils.createDocumentHandlerInstance(
+		        			tenantBinding, serviceBinding);
+		        	Lifecycle lifecycle = docHandler.getLifecycle();
+	        	} catch (IllegalStateException e) {
+	        		Log.debug(e.getLocalizedMessage(), e); //We end up here if there is no document handler for the service -this is ok for some of the services.
+	        	}
+	        }
+        }
     	// For each service binding in each tenancy, get the Nuxeo document type and retrieve it's life cycle type.  For
     	// that life cycle type, ask Nuxeo for all the configured transitions.  For each of those transitions,
     	// create:
@@ -99,6 +118,7 @@ public class AuthorizationCommon {
     	//		
     	//		* add a new Permission/PermissionRole tuple to the Spring AuthZ tables
     	//		* persist the new Permission, and PermissionRole to the cspace database
+    	
     }
     
     /*

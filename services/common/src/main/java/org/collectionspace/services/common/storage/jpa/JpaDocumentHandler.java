@@ -6,6 +6,7 @@ import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.lifecycle.Lifecycle;
 
 public abstract class JpaDocumentHandler<T, TL, WT, WLT>
 	extends AbstractDocumentHandlerImpl<T, TL, WT, WLT>{
@@ -34,5 +35,9 @@ public abstract class JpaDocumentHandler<T, TL, WT, WLT>
         commonList.setTotalItems(docList.size());
 
         return (TL) commonList;
-    }	
+    }
+    
+    public Lifecycle getLifecycle() {
+    	return null; // NOTE: As of 3/2012, none of the JPA-based services support a life cycle type.
+    }
 }

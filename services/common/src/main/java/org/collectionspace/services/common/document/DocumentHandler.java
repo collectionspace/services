@@ -19,6 +19,7 @@ package org.collectionspace.services.common.document;
 
 import java.util.Map;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.lifecycle.Lifecycle;
 
 /**
  *
@@ -41,9 +42,10 @@ import org.collectionspace.services.common.context.ServiceContext;
 public interface DocumentHandler<T, TL, WT, WTL> {
 
     public enum Action {
-
         CREATE, GET, GET_ALL, UPDATE, DELETE
     }
+    
+    public Lifecycle getLifecycle();
 
     /**
      * getServiceContext returns service context

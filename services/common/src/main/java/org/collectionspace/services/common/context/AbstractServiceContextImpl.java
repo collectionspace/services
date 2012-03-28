@@ -35,6 +35,7 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.PropertyItemUtils;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -482,14 +483,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      * @throws Exception the exception
      */
     private DocumentHandler createDocumentHandlerInstance() throws Exception {
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        Class<?> c = tccl.loadClass(getDocumentHandlerClass());
-        if (DocumentHandler.class.isAssignableFrom(c)) {
-            docHandler = (DocumentHandler) c.newInstance();
-        } else {
-            throw new IllegalArgumentException("Not of type "
-                    + DocumentHandler.class.getCanonicalName());
-        }
+        docHandler = ServiceConfigUtils.createDocumentHandlerInstance(tenantBinding, serviceBinding);
         //
         // Create a default document filter
         //
@@ -536,23 +530,6 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         DocumentFilter documentFilter = result.getDocumentFilter(); //to see results in debugger variables view
         documentFilter.setPagination(queryParams);
         return result;
-    }
-
-    /**
-     * Gets the document handler class.
-     * 
-     * @return the document handler class
-     */
-    private String getDocumentHandlerClass() {
-        if (serviceBinding.getDocumentHandler() == null
-                || serviceBinding.getDocumentHandler().isEmpty()) {
-            String msg = "Missing documentHandler in service binding for "
-                    + getServiceName() + " for tenant id=" + getTenantId()
-                    + " name=" + getTenantName();
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        return serviceBinding.getDocumentHandler().trim();
     }
     
     /*

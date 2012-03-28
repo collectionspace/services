@@ -144,6 +144,7 @@ public class ServiceMain {
         // Create all the default user accounts
         //
         try {
+        	AuthorizationCommon.createDefaultPermissions(tenantBindingConfigReader);
         	AuthorizationCommon.createDefaultAccounts(tenantBindingConfigReader);
         } catch(Exception e) {
         	logger.error("Default accounts setup failed with exception(s): " + e.getLocalizedMessage());

@@ -24,18 +24,17 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.List;
-import java.util.Map;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
-import org.collectionspace.services.nuxeo.client.*;
+import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.repository.RepositoryClient;
@@ -72,6 +71,19 @@ public abstract class DocumentModelHandler<T, TL>
     public final static String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
     public final static String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
 
+    public Lifecycle getLifecycle() {
+    	Lifecycle result = null;
+    	
+    	try {
+			result = (Lifecycle)FileTools.getJaxbObjectFromFile(Lifecycle.class, "default-lifecycle.xml");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return result;
+    }
+    
     /*
      * We're using the "name" field of Nuxeo's DocumentModel to store
      * the CSID.
