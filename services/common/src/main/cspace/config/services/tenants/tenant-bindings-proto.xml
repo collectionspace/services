@@ -168,6 +168,8 @@
                         <!-- Object Identification Information group -->
                         <!-- There are currently no authority term references in this group -->
                         <!-- Object Description Information group -->
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>contentActivities|contentActivity</types:value>
@@ -176,30 +178,46 @@
               <types:key>authRef</types:key>
               <types:value>contentConcepts|contentConcept</types:value>
             </types:item>
+            -->
+            <!-- Uncomment when Subject authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentEventNameGroupList/*/contentEventName</types:value>
             </types:item>
+            -->
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentEventNameGroupList/*/contentEventNameType</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentOrganizations|contentOrganization</types:value>
             </types:item>
+            <!-- Uncomment when Concept OR Subject authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentOtherGroupList/*/contentOther</types:value>
             </types:item>
+            -->
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentOtherGroupList/*/contentOtherType</types:value>
             </types:item>
+            -->
+            <!-- Uncomment when People authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentPeoples|contentPeople</types:value>
-            </types:item>
+            </types:item
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentPersons|contentPerson</types:value>
@@ -216,22 +234,31 @@
               <types:key>authRef</types:key>
                             <types:value>textualInscriptionGroupList/*/inscriptionContentInscriber</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>textualInscriptionGroupList/*/inscriptionContentMethod</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>nonTextualInscriptionGroupList/*/inscriptionDescriptionInscriber</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>nonTextualInscriptionGroupList/*/inscriptionDescriptionMethod</types:value>
             </types:item>
+            -->
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>materialGroupList/*/material</types:value>
             </types:item>
+            -->
                         <!-- The following field may become part of a repeatable sub-group -->
                         <!-- for materialComponent, per CSPACE-4563. -->
                         <!-- Names of ancestor elements below are placeholders and subject to change. -->
@@ -245,6 +272,8 @@
               <types:key>authRef</types:key>
 							<types:value>materialGroupList/*/materialSource</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>styles|style</types:value>
@@ -253,11 +282,14 @@
               <types:key>authRef</types:key>
 							<types:value>objectComponentGroupList/*/objectComponentName</types:value>
             </types:item>
+            -->
+
                         <!-- Object Production Information group -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>objectProductionOrganizationGroupList/*/objectProductionOrganization</types:value>
             </types:item>
+            
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>objectProductionPeopleGroupList/*/objectProductionPeople</types:value>
@@ -304,10 +336,13 @@
               <types:key>authRef</types:key>
 							<types:value>assocOrganizationGroupList/*/assocOrganization</types:value>
             </types:item>
+            <!-- Uncomment when People authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>assocPeopleGroupList/*/assocPeople</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>assocPersonGroupList/*/assocPerson</types:value>
@@ -334,10 +369,13 @@
                         <!-- Object Viewer's Contribution Information group -->
                         <!-- There are currently no authority term references in this group -->
                         <!-- Reference Information group -->
+            <!-- Uncomment when Citation authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>referenceGroupList/*/reference</types:value>
-            </types:item>
+            </types:item
+            -->
                         <!-- Object Collection Information group -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
@@ -351,10 +389,13 @@
               <types:key>authRef</types:key>
                             <types:value>fieldCollectors|fieldCollector</types:value>
             </types:item>
+            <!-- Uncomment when Field Collection Event authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>fieldColEventNames|fieldColEventName</types:value>
             </types:item>
+            -->
                         <!-- ### -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <!-- ### -->
