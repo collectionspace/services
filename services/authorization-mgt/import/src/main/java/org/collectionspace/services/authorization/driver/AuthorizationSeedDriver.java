@@ -123,7 +123,7 @@ public class AuthorizationSeedDriver {
     public void seed() {
         TransactionStatus status = null;
         try {
-        	// Push all the authz info into the cspace DB tables.
+        	// Push all the authz info into the cspace DB tables -this include default roles, permissions, and permroles
             store();
 
             setupSpring();
@@ -167,7 +167,7 @@ public class AuthorizationSeedDriver {
 
     private void login() {
         //GrantedAuthority cspace_admin = new GrantedAuthorityImpl("ROLE_ADMINISTRATOR");
-        GrantedAuthority spring_security_admin = new GrantedAuthorityImpl("ROLE_SPRING_ADMIN");
+        GrantedAuthority spring_security_admin = new GrantedAuthorityImpl("ROLE_SPRING_ADMIN"); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
         HashSet<GrantedAuthority> gauths = new HashSet<GrantedAuthority>();
         //gauths.add(cspace_admin);
         gauths.add(spring_security_admin);
@@ -203,7 +203,7 @@ public class AuthorizationSeedDriver {
         	}
         }
 
-        for (Permission perm : authzGen.getDefaultPermissions()) {
+        for (Permission perm : authzGen.getDefaultPermissions()) { //FIXME: REM - 3/27/2012 - If we change the CSID of permissions to something like a refname, then we need to check for existing perms just like we did above for roles
             authzStore.store(perm);
         }
 

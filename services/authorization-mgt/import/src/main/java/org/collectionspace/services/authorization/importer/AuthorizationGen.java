@@ -155,7 +155,7 @@ public class AuthorizationGen {
     }
 
     private Permission buildAdminPermission(String tenantId, String resourceName) {
-        String id = UUID.randomUUID().toString();
+        String id = UUID.randomUUID().toString(); //FIXME: Could this be something like a refname instead of a UUID?
         Permission perm = new Permission();
         perm.setCsid(id);
         perm.setDescription("generated admin permission");
@@ -310,7 +310,7 @@ public class AuthorizationGen {
 	        allRoleList.addAll(adminRoles);
 	        allRoleList.addAll(readerRoles);
     	}
-        return allRoleList;
+        return allRoleList;  //FIXME: REM - 3/27/2012, The super role "cspaceAdminRole" is not on this list.  Intentional?
     }
 
     public void associateDefaultPermissionsRoles() {

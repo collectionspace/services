@@ -96,7 +96,7 @@ public class AuthorizationStore {
             em.getTransaction().commit();
             String id = null;
             try{
-                id = (String) JaxbUtils.getValue(entity, "getCsid");
+                id = (String) JaxbUtils.getValue(entity, "getCsid"); //NOTE: Not all entities have a CSID attribute
             } catch(NoSuchMethodException nsme) {
                 //do nothing ok, relationship does not have csid
             }
