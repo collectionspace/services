@@ -174,11 +174,11 @@
               <types:key>authRef</types:key>
               <types:value>contentActivities|contentActivity</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>contentConcepts|contentConcept</types:value>
             </types:item>
-            -->
             <!-- Uncomment when Subject authority is implemented in Services -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -551,7 +551,7 @@
                             <types:value>assocActivityGroupList/*/assocActivity</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
-              <types:key>termRef</types:key>
+              <types:key>authRef</types:key>
                             <types:value>assocConceptGroupList/*/assocConcept</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
