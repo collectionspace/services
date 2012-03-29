@@ -289,11 +289,13 @@
               <types:key>authRef</types:key>
 							<types:value>objectProductionOrganizationGroupList/*/objectProductionOrganization</types:value>
             </types:item>
-            
+            <!-- Uncomment when People authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>objectProductionPeopleGroupList/*/objectProductionPeople</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>objectProductionPersonGroupList/*/objectProductionPerson</types:value>
@@ -389,7 +391,7 @@
               <types:key>authRef</types:key>
                             <types:value>fieldCollectors|fieldCollector</types:value>
             </types:item>
-            <!-- Uncomment when Field Collection Event authority is implemented in Services -->
+            <!-- Uncomment when Collecting Event authority is implemented in Services -->
             <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
@@ -762,10 +764,13 @@
               <types:key>authRef</types:key>
               <types:value>fieldCollectors|fieldCollector</types:value>
             </types:item>
+            <!-- Uncomment when Collecting Event authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-                            <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
-                        </types:item>
+              <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
+            </types:item>
+            -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
               <types:value>valuer</types:value>
@@ -1358,11 +1363,13 @@
               <types:key>authRef</types:key>
               <types:value>rightsHolder</types:value>
             </types:item>
-            <!-- Subject Authority field -->
+            <!-- Uncomment when Subject authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>subjectList|subject</types:value>
-            </types:item>
+            </types:item
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measuredBy</types:value>
@@ -1854,6 +1861,8 @@
               <types:key>authRef</types:key>
               <types:value>foundingPlace</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>groups|group</types:value>
@@ -1862,6 +1871,7 @@
               <types:key>authRef</types:key>
               <types:value>functions|function</types:value>
             </types:item>
+            -->
                         <!-- Organization's subBody field was removed here from the authRef list -->
                         <!-- per anticipated work on CSPACE-4685.-->
                         <!-- Fields containing term list / controlled vocabulary references -->
@@ -2031,6 +2041,8 @@
               <types:key>authRef</types:key>
               <types:value>deathPlace</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>groups|group</types:value>
@@ -2047,6 +2059,7 @@
               <types:key>authRef</types:key>
               <types:value>schoolsOrStyles|schoolOrStyle</types:value>
             </types:item>
+            -->
                         <!-- Fields containing term list / controlled vocabulary references -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
@@ -2628,10 +2641,13 @@
               <types:key>authRef</types:key>
               <types:value>acquisitionSources|acquisitionSource</types:value>
             </types:item>
+            <!-- Uncomment when Collecting Event authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
             </types:item>
+            -->
                         <!-- Fields containing term list / controlled vocabulary references -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
