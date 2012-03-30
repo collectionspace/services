@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
@@ -14,13 +15,23 @@ import javax.naming.NamingException;
 
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
+import org.collectionspace.services.authorization.PermissionActionUtil;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.authorization.PermissionValue;
+import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
+import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
+
+import org.collectionspace.services.client.RoleClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+
+import org.collectionspace.services.common.authorization_mgt.AuthorizationStore;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -29,16 +40,64 @@ import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.tenant.TenantBindingType;
+
 import org.collectionspace.services.lifecycle.Lifecycle;
-import org.mortbay.log.Log;
+import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.lifecycle.TransitionDefList;
+
+//import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.security.acls.model.AlreadyExistsException;
 
 
 public class AuthorizationCommon {
+	
+    //
+    // ActionGroup labels/constants
+    //
+	
+	// for READ-WRITE
+    final public static String ACTIONGROUP_CRUDL_NAME = "CRUDL";
+    final public static ActionType[] ACTIONSET_CRUDL = {ActionType.CREATE, ActionType.READ, ActionType.UPDATE, ActionType.DELETE, ActionType.SEARCH};
+    // for READ-ONLY
+    final public static String ACTIONGROUP_RL_NAME = "RL";
+    final public static ActionType[] ACTIONSET_RL = {ActionType.READ, ActionType.SEARCH};
+    
+	/*
+	 * Inner class to deal with predefined ADMIN and READER action groupds
+	 */
+	public class ActionGroup {
+		String name;
+		ActionType[] actions;
+	}
+	
+	static ActionGroup ACTIONGROUP_CRUDL;
+	static ActionGroup ACTIONGROUP_RL;
+	
+	// A static block to initialize the predefined action groups
+	static {
+		AuthorizationCommon ac = new AuthorizationCommon();
+		// For admin
+		ACTIONGROUP_CRUDL = ac.new ActionGroup();
+		ACTIONGROUP_CRUDL.name = ACTIONGROUP_CRUDL_NAME;
+		ACTIONGROUP_CRUDL.actions = ACTIONSET_CRUDL;
+		// For reader
+		ACTIONGROUP_RL = ac.new ActionGroup();
+		ACTIONGROUP_RL.name = ACTIONGROUP_RL_NAME;
+		ACTIONGROUP_RL.actions = ACTIONSET_RL;
+
+	}
+	
     final static Logger logger = LoggerFactory.getLogger(AuthorizationCommon.class);
 
+    final public static String ROLE_ADMINISTRATOR = "ADMINISTRATOR";
+    final public static String ROLE_TENANT_ADMINISTRATOR = "TENANT_ADMINISTRATOR";
+    final public static String ROLE_TENANT_READER = "TENANT_READER";
+    final public static String ROLE_ADMINISTRATOR_ID = "0";
+    final public static String ADMINISTRATOR_TENANT_ID = "0";
+	
     public static final String TENANT_ADMIN_ACCT_PREFIX = "admin@"; 
     public static final String TENANT_READER_ACCT_PREFIX = "reader@"; 
     public static final String ROLE_PREFIX = "ROLE_"; 
@@ -51,20 +110,56 @@ public class AuthorizationCommon {
     public static String ROLE_SPRING_ADMIN_ID = "-1";
     public static String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";
 
+    public static Role getRole(String tenantId, String displayName) {
+    	Role role = null;
+    	
+    	String roleName = AuthorizationCommon.getQualifiedRoleName(tenantId, displayName);
+    	role = AuthorizationStore.getRoleByName(roleName, tenantId);
+        
+        return role;
+    }
+    
+    public static Role createRole(String tenantId, String name, String description) {
+    	return createRole(tenantId, name, description, false /* mutable by default */);
+    }
+    
+    public static Role createRole(String tenantId, String name, String description, boolean immutable) {
+    	Role role = new Role();
+    	
+        role.setCreatedAtItem(new Date());
+        role.setDisplayName(name);
+    	String roleName = AuthorizationCommon.getQualifiedRoleName(tenantId, name);    	
+        role.setRoleName(roleName);
+        String id = UUID.randomUUID().toString(); //FIXME: The qualified role name should be unique enough to use as an ID/key
+        role.setCsid(id);
+		role.setDescription(description);
+        role.setTenantId(tenantId);
+        if (immutable == true) {
+	        role.setMetadataProtection(RoleClient.IMMUTABLE);
+	        role.setPermsProtection(RoleClient.IMMUTABLE);
+        }
+    	
+    	return role;
+    }
+    
     /**
-     * addPermissionsForUri add permissions from given permission configuration
+     * Add permission to the Spring Security tables
      * with assumption that resource is of type URI
      * @param permission configuration
      */
     public static void addPermissionsForUri(Permission perm,
             PermissionRole permRole) throws PermissionException {
-        List<String> principals = new ArrayList<String>();
+    	//
+    	// First check the integrity of the incoming arguments.
+    	//
         if (!perm.getCsid().equals(permRole.getPermission().get(0).getPermissionId())) {
             throw new IllegalArgumentException("permission ids do not"
                     + " match for role=" + permRole.getRole().get(0).getRoleName()
                     + " with permissionId=" + permRole.getPermission().get(0).getPermissionId()
                     + " for permission with csid=" + perm.getCsid());
         }
+        
+        List<String> principals = new ArrayList<String>();        
         for (RoleValue roleValue : permRole.getRole()) {
             principals.add(roleValue.getRoleName());
         }
@@ -91,8 +186,128 @@ public class AuthorizationCommon {
         return JDBCTools.getConnection(JDBCTools.CSPACE_REPOSITORY_NAME);
     }
     
+    /*
+     * Spring security seems to require that all of our role names start
+     * with the ROLE_PREFIX string.
+     */
+    public static String getQualifiedRoleName(String tenantId, String name) {
+    	String result = name;
+    	
+    	String qualifiedName = ROLE_PREFIX + tenantId.toUpperCase() + "_" + name.toUpperCase();    	
+    	if (name.equals(qualifiedName) == false) {
+    		result = qualifiedName;
+    	}
+    	
+    	return result;
+    }
+        
+    private static ActionGroup getActionGroup(String actionGroupStr) {
+    	ActionGroup result = null;
+    	
+    	if (actionGroupStr.equalsIgnoreCase(ACTIONGROUP_CRUDL_NAME)) {
+    		result = ACTIONGROUP_CRUDL;
+    	} else if (actionGroupStr.equalsIgnoreCase(ACTIONGROUP_RL_NAME)) {
+    		result = ACTIONGROUP_RL;
+    	}
+    	
+    	return result;
+    }
+    
+    public static Permission createPermission(String tenantId,
+    		String resourceName,
+    		String description,
+    		String actionGroupStr) {
+    	Permission result = null;
+    	
+    	ActionGroup actionGroup = getActionGroup(actionGroupStr);
+    	result = createPermission(tenantId, resourceName, description, actionGroup);
+    	
+    	return result;
+    }
+    
+    private static Permission createPermission(String tenantId,
+    		String resourceName,
+    		String description,
+    		ActionGroup actionGroup) {
+        String id = UUID.randomUUID().toString(); //FIXME: Could this be something like a refname instead of a UUID?
+        Permission perm = new Permission();
+        perm.setCsid(id);
+        perm.setDescription(description);
+        perm.setCreatedAtItem(new Date());
+        perm.setResourceName(resourceName.toLowerCase().trim());
+        perm.setEffect(EffectType.PERMIT);
+        perm.setTenantId(tenantId);
+        
+        perm.setActionGroup(actionGroup.name);
+        ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
+        perm.setAction(pas);
+        for (ActionType actionType : actionGroup.actions) {
+        	PermissionAction permAction = createPermissionAction(perm, actionType);
+        	pas.add(permAction);
+        }
+        
+        return perm;
+    }
+    
+    private static Permission createWorkflowPermission(TenantBindingType tenantBinding,
+    		ServiceBindingType serviceBinding,
+    		TransitionDef transitionDef,
+    		ActionGroup actionGroup)
+    {
+    	Permission result = null;
+    	
+    	String tenantId = tenantBinding.getId();
+    	String resourceName = serviceBinding.getName().toLowerCase().trim()
+    			+ WorkflowClient.SERVICE_AUTHZ_SUFFIX
+    			+ transitionDef.getName();
+    	String description = "A generate workflow permission for actiongroup " + actionGroup.name;
+    	result = createPermission(tenantId, resourceName, description, actionGroup);
+    	
+    	return result;
+    }
+    
+    private static PermissionRole createPermissionRole(Permission permission,
+    		Role role,
+    		boolean enforceTenancy) throws Exception
+    {
+    	PermissionRole permRole = new PermissionRole();
+    	
+		if (enforceTenancy && role.getTenantId().equalsIgnoreCase(permission.getTenantId())) {
+	    	permRole.setSubject(SubjectType.ROLE);
+	    	//
+	    	// Set of the permission value list of the permrole
+	    	//
+	        List<PermissionValue> permValues = new ArrayList<PermissionValue>();
+	        PermissionValue permValue = new PermissionValue();
+	        permValue.setPermissionId(permission.getCsid());
+	        permValue.setResourceName(permission.getResourceName().toLowerCase());
+	        permValue.setActionGroup(permission.getActionGroup());
+	        permValues.add(permValue);
+	        permRole.setPermission(permValues);
+	        //
+	        // Set of the role value list of the permrole
+	        //
+	        List<RoleValue> roleValues = new ArrayList<RoleValue>();
+	        RoleValue rv = new RoleValue();
+            // This needs to use the qualified name, not the display name
+            rv.setRoleName(role.getRoleName());
+            rv.setRoleId(role.getCsid());
+            roleValues.add(rv);
+            permRole.setRole(roleValues);
+		} else {
+    		String errMsg = "The tenant ID of the role: " + role.getTenantId()
+    				+ " did not match the tenant ID of the permission: " + permission.getTenantId();
+    		throw new Exception(errMsg);
+		}
+    	
+    	return permRole;
+    }
+    
     public static void createDefaultPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader) throws Exception
     {
+        PermissionAction pa = new PermissionAction();
+        pa.getHjid();
+
         Hashtable<String, TenantBindingType> tenantBindings =
             	tenantBindingConfigReader.getTenantBindings();
         for (String tenantId : tenantBindings.keySet()) {
@@ -102,23 +317,33 @@ public class AuthorizationCommon {
 		        	DocumentHandler docHandler = ServiceConfigUtils.createDocumentHandlerInstance(
 		        			tenantBinding, serviceBinding);
 		        	Lifecycle lifecycle = docHandler.getLifecycle();
+		        	TransitionDefList transitionDefList = lifecycle.getTransitionDefList();
+		        	for (TransitionDef transitionDef : transitionDefList.getTransitionDef()) {
+		        		//
+		        		// Create the permission for the admin role
+		        		//
+		        		Permission adminPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionDef, AuthorizationCommon.ACTIONGROUP_CRUDL);
+		        		Role adminRole = AuthorizationCommon.getRole(tenantBinding.getId(), AuthorizationCommon.ROLE_TENANT_ADMINISTRATOR);
+		        		PermissionRole adminPermRole = createPermissionRole(adminPerm, adminRole, true);
+		        		addPermissionsForUri(adminPerm, adminPermRole);
+		        		//
+		        		// Create the permission for the read-only role
+		        		Permission readonlyPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionDef, AuthorizationCommon.ACTIONGROUP_RL);
+		        		Role readonlyRole = AuthorizationCommon.getRole(tenantBinding.getId(), AuthorizationCommon.ROLE_TENANT_READER);
+		        		PermissionRole readonlyPermRole = createPermissionRole(readonlyPerm, readonlyRole, true);
+		        		addPermissionsForUri(readonlyPerm, readonlyPermRole);
+		        		//
+		        		// Create the permission for the super-admin role.  Note we use the same "adminPerm" instance we used for the "adminPermRole" instance
+		        		//
+		        		Role superRole = AuthorizationCommon.getRole(tenantBinding.getId(), AuthorizationCommon.ROLE_TENANT_READER);
+		        		PermissionRole superPermRole = createPermissionRole(adminPerm, superRole, false);
+		        		addPermissionsForUri(adminPerm, superPermRole);
+		        	}
 	        	} catch (IllegalStateException e) {
-	        		Log.debug(e.getLocalizedMessage(), e); //We end up here if there is no document handler for the service -this is ok for some of the services.
+	        		logger.debug(e.getLocalizedMessage(), e); //We end up here if there is no document handler for the service -this is ok for some of the services.
 	        	}
 	        }
         }
-    	// For each service binding in each tenancy, get the Nuxeo document type and retrieve it's life cycle type.  For
-    	// that life cycle type, ask Nuxeo for all the configured transitions.  For each of those transitions,
-    	// create:
-    	// 		* a URI of the form - /<service>/*/workflow/<transition>
-    	//		* a CRUDL Permission for the URI
-    	//		* a RL Permission for the URI
-    	//		* a PermissionRole for admin role
-    	//		* a PermissionRole for the reader role
-    	//		
-    	//		* add a new Permission/PermissionRole tuple to the Spring AuthZ tables
-    	//		* persist the new Permission, and PermissionRole to the cspace database
-    	
     }
     
     /*
@@ -512,4 +737,33 @@ public class AuthorizationCommon {
     private static String getDefaultReaderUserID(String tenantName) {
     	return TENANT_READER_ACCT_PREFIX+tenantName;
     }
+    
+	static public PermissionAction createPermissionAction(Permission perm,
+			ActionType actionType) {
+        PermissionAction pa = new PermissionAction();
+
+	    CSpaceAction action = URIResourceImpl.getAction(actionType);
+	    URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
+	            perm.getResourceName(), action);
+	    pa.setName(actionType);
+	    pa.setObjectIdentity(uriRes.getHashedId().toString());
+	    pa.setObjectIdentityResource(uriRes.getId());
+	    
+	    return pa;
+	}
+
+	static public PermissionAction update(Permission perm, PermissionAction permAction) {
+        PermissionAction pa = new PermissionAction();
+
+	    CSpaceAction action = URIResourceImpl.getAction(permAction.getName());
+	    URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
+	            perm.getResourceName(), action);
+	    pa.setObjectIdentity(uriRes.getHashedId().toString());
+	    pa.setObjectIdentityResource(uriRes.getId());
+	    
+	    return pa;
+	}
+	
+	
+
 }

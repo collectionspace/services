@@ -68,7 +68,6 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.service</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
             <exclusions>
             	<exclusion>
             		<artifactId>jboss-logging-log4j</artifactId>

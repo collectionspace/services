@@ -25,7 +25,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.collectionspace.services.authorization.importer;
+package org.collectionspace.services.common.authorization_mgt;
 
 import java.util.Date;
 import javax.persistence.EntityManager;
@@ -33,7 +33,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.perms.Permission;
-import org.collectionspace.services.authorization.storage.RoleStorageConstants;
+import org.collectionspace.services.common.authorization_mgt.RoleStorageConstants;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;

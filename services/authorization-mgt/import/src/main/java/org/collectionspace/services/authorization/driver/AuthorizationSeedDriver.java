@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -35,11 +36,14 @@ import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.importer.AuthorizationGen;
 import org.collectionspace.services.authorization.importer.AuthorizationSeed;
-import org.collectionspace.services.authorization.importer.AuthorizationStore;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationStore;
 import org.collectionspace.services.authorization.storage.PermissionRoleUtil;
+
 import org.hibernate.exception.ConstraintViolationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
