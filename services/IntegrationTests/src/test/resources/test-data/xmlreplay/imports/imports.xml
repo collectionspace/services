@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+    </auths>
+    
+   <!-- ================================================================================ -->
+    
+   <testGroup ID="importsTestGroup" autoDeletePOSTS="false">
+
+        <test ID="import-post"  auth="test">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-1objectexit-post.xml</filename>
+        </test>
+        
+        <!-- FIXME: Add check of response payload; 200 status is routinely returned -->
+        
+        <!-- FIXME: Add forms-based import test -->
+        
+    </testGroup>
+</xmlReplay>
+        
+        
