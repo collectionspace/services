@@ -131,12 +131,16 @@
         <ant antfile="account/build.xml" target="gen_ddl" inheritAll="false"/>
     </target>
 
-    <target name="create_db"
+    <target name="create_cspace_db"
             description="create service-specific tables(s), indices, etc.">
-        <ant antfile="authentication/build.xml" target="create_db" inheritAll="false"/>
-        <ant antfile="authorization/build.xml" target="create_db" inheritAll="false"/>
-        <ant antfile="account/build.xml" target="create_db" inheritAll="false"/>
-        <ant antfile="id/build.xml" target="create_db" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="create_cspace_db" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="create_cspace_db" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="create_cspace_db" inheritAll="false"/>
+    </target>
+
+    <target name="create_nuxeo_db"
+            description="create service-specific tables(s), indices, etc.">
+        <ant antfile="id/build.xml" target="create_nuxeo_db" inheritAll="false"/>
     </target>
 
     <target name="import"
