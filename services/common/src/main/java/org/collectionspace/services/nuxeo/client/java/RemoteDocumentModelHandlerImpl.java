@@ -205,9 +205,17 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                 continue; // unknown part, ignore
             }
             Map<String, Object> unQObjectProperties = extractPart(docModel, schema, partMeta);
+            if(COLLECTIONSPACE_CORE_SCHEMA.equals(schema)) {
+            	addExtraCoreValues(docModel, unQObjectProperties);
+            }
             addOutputPart(unQObjectProperties, schema, partMeta);
         }
         addAccountPermissionsPart();
+    }
+    
+    private void addExtraCoreValues(DocumentModel docModel, Map<String, Object> unQObjectProperties)
+    		throws Exception {
+        unQObjectProperties.put(COLLECTIONSPACE_CORE_CURRENTLIFECYCLESTATE, docModel.getCurrentLifeCycleState());
     }
     
     private void addAccountPermissionsPart() throws Exception {
