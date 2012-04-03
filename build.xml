@@ -205,24 +205,42 @@
 		<ant antfile="services/build.xml" target="gen_ddl" inheritAll="false"/>
 	</target>
 
-	<target name="create_db" depends="create_base_db"
+	<target name="create_db" 
             description="create database(s), invoke subtasks for indexes, etc.">
-		<ant antfile="services/build.xml" target="create_db" inheritAll="false"/>
+		<antcall target="create_nuxeo_db"/>
+		<antcall target="create_cspace_db"/>
 	</target>
 
-	<target name="create_base_db" 
-            description="create database(s), grant privileges to test users">
+	<target name="create_nuxeo_db" 
+            description="create nuxeo database">
 		<sql driver="${db.jdbc.driver.class}"
              url="${db.jdbc.baseurl}"
              userid="${db.user}"
              password="${db.user.password}"
 						 autocommit="true"
-             src="${db.script.dir}/init_db.sql"
+             src="${db.script.dir}/init_nuxeo_db.sql"
              >
 			<classpath>
 				<pathelement path="${db.driver.jar}"/>
 			</classpath>
 		</sql>
+		<ant antfile="services/build.xml" target="create_nuxeo_db" inheritAll="false"/>
+	</target>
+
+	<target name="create_cspace_db" 
+		description="create cspace database">
+		<sql driver="${db.jdbc.driver.class}"
+             url="${db.jdbc.baseurl}"
+             userid="${db.user}"
+             password="${db.user.password}"
+						 autocommit="true"
+             src="${db.script.dir}/init_cspace_db.sql"
+             >
+			<classpath>
+				<pathelement path="${db.driver.jar}"/>
+			</classpath>
+		</sql>
+		<ant antfile="services/build.xml" target="create_cspace_db" inheritAll="false"/>
 	</target>
 
 	<target name="import"

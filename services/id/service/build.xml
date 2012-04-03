@@ -107,7 +107,7 @@
         </exec>
     </target>
 
-    <target name="create_db"
+    <target name="create_nuxeo_db"
     description="create tables(s), indices for id service">
 				<sql driver="${db.jdbc.driver.class}"
             url="${db.jdbc.nuxeo.url}"
