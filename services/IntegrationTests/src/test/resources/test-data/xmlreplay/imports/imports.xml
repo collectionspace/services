@@ -2,21 +2,24 @@
 <xmlReplay>
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+       <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
     
    <!-- ================================================================================ -->
     
-   <testGroup ID="importsTestGroup" autoDeletePOSTS="false">
+   <testGroup ID="importsTestGroup" autoDeletePOSTS="true">
 
-        <test ID="import-post"  auth="test">
+        <test ID="import-post">
             <expectedCodes>200</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/imports</uri>
             <filename>imports/import-1objectexit-post.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-1objectexit-post.res.xml</filename>
+             </response>
         </test>
-        
-        <!-- FIXME: Add check of response payload; 200 status is routinely returned -->
-        
+                
         <!-- FIXME: Add forms-based import test -->
         
     </testGroup>
