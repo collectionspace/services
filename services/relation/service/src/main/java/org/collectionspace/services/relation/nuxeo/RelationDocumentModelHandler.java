@@ -261,6 +261,7 @@ public class RelationDocumentModelHandler
         DocumentModel itemDocModel = NuxeoUtils.getDocFromCsid(ctx, this.getRepositorySession(), itemCsid);    //null if not found.
         if (itemDocModel != null) {
             String itemDocType = itemDocModel.getDocumentType().getName();
+            itemDocType = ServiceBindingUtils.getUnqualifiedTenantDocType(itemDocType);
             if (Tools.isBlank(documentType)) {
                 item.setDocumentType(itemDocType);
             }
@@ -360,7 +361,8 @@ public class RelationDocumentModelHandler
     	
         HashMap<String,Object> properties = new HashMap<String,Object>();
         try {
-	        String doctype = (String) subjectOrObjectDocModel.getType();
+	        String doctype = subjectOrObjectDocModel.getDocumentType().getName();
+            doctype = ServiceBindingUtils.getUnqualifiedTenantDocType(doctype);
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_DOCTYPE:RelationJAXBSchema.OBJECT_DOCTYPE),
 	        					doctype);
 	

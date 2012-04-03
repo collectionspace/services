@@ -3,6 +3,9 @@ package org.collectionspace.services.common.context;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.collectionspace.services.common.config.PropertyItemUtils;
 import org.collectionspace.services.common.service.ObjectPartType;
@@ -32,12 +35,31 @@ public class ServiceBindingUtils {
 	public static final String SERVICE_TYPE_AUTHORITY = "authority";
 	public static final String SERVICE_TYPE_UTILITY = "utility";
 	public static final String SERVICE_TYPE_SECURITY = "security";
+	
+	private static final String TENANT_EXTENSION_PATTERN = "(.*)"+ServiceContext.TENANT_SUFFIX+"[\\d]+$";
+	private static final String TENANT_REPLACEMENT_PATTERN = "$1";
+	private static Pattern tenantSuffixPattern = null;
 
 	private static final Logger logger = LoggerFactory.getLogger(ServiceBindingUtils.class);
 	
     public static String getTenantQualifiedDocType(String tenantId, String docType) {
     	String result = docType + ServiceContext.TENANT_SUFFIX + tenantId;
     	return result;
+    }
+    	
+    public static String getUnqualifiedTenantDocType(String docType) {
+        try {
+            if(tenantSuffixPattern == null ) {
+            	tenantSuffixPattern = Pattern.compile(TENANT_EXTENSION_PATTERN);
+            }
+            Matcher tenantSuffixMatcher = tenantSuffixPattern.matcher(docType);
+            return tenantSuffixMatcher.replaceFirst(TENANT_REPLACEMENT_PATTERN);
+        } catch (PatternSyntaxException pe) {
+            logger.warn("TENANT_EXTENSION_PATTERN regex pattern '" + TENANT_EXTENSION_PATTERN
+                    + "' could not be compiled: " + pe.getMessage());
+            // If reached, method will return a value of false.
+        }
+    	return docType;
     }
     	
 	// TODO consider building up a hashTable of the properties for each

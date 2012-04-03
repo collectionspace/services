@@ -18,14 +18,6 @@
   targetNamespace="http://collectionspace.org/services/collectionobject/domain/naturalhistory"
   version="0.1">
 
-  <!-- used for testing
-  <xs:element name="nh-string" type="xs:string" />
-  <xs:element name="nh-int" type="xs:int"/>
-  <xs:element name="nh-long" type="xs:long"/>
-  <xs:element name="nh-date" type="xs:dateTime"/>
-  <xs:element name="nh-note" type="xs:string"/>
-  -->
-
   <!--  These items are being moved to common
   <xs:element name="fieldCollector" type="xs:string"/>
   <xs:element name="fieldCollectionDate" type="xs:string"/>
@@ -42,6 +34,23 @@
     <xs:element name="fieldLocLatDecimal" type="xs:string"/>
     <xs:element name="fieldLocLongDecimal" type="xs:string"/>
     <xs:element name="fieldLocElevation" type="xs:string"/>
+
+
+		<!-- Add in an extension field for the common title group -->
+		<xs:element name="nh_titleGroupList">
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element name="nh_titleGroup">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="titleNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:complexType>
+    </xs:element>
+
 
   <!-- These will become contolled lists -->
     <xs:element name="fieldLocGeodeticDatum" type="xs:string"/>

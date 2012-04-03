@@ -106,9 +106,9 @@
         </exec>
     </target>
 
-    <target name="create_db"
+    <target name="create_nuxeo_db"
     description="create tables(s), indices for id service">
-        <ant antfile="service/build.xml" target="create_db" inheritAll="false"/>
+        <ant antfile="service/build.xml" target="create_nuxeo_db" inheritAll="false"/>
     </target>
 
     <target name="deploy" depends="install"

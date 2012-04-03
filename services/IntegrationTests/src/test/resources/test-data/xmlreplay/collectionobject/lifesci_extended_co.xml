@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="collectionobjects">
+  <ns2:collectionobjects_naturalhistory
+    xmlns:ns2="http://collectionspace.org/services/collectionobject/domain/naturalhistory"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <taxonomicIdentGroupList>
+      <taxonomicIdentGroup>
+        <qualifier>questionable</qualifier>
+        <notes/>
+        <taxon>urn:cspace:lifesci.collectionspace.org:taxonomyauthority:name(taxon):item:name(AcerJaponicus1332900279183)'Acer
+          Japonicus'</taxon>
+        <reference/>
+        <identBy>urn:cspace:lifesci.collectionspace.org:personauthorities:name(person):item:name(PatrickSchmitz1332900293194)'Patrick
+          Schmitz'</identBy>
+        <institution/>
+      </taxonomicIdentGroup>
+    </taxonomicIdentGroupList>
+  </ns2:collectionobjects_naturalhistory>
+  <ns2:collectionobjects_common xmlns:ns2="http://collectionspace.org/services/collectionobject"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<objectNumber>2012.1.3</objectNumber>
+    <titleGroupList>
+      <titleGroup>
+        <title>This is a nice Object</title>
+        <titleType>generic</titleType>
+        <titleTranslationSubGroupList>
+          <titleTranslationSubGroup>
+            <titleTranslationLanguage>urn:cspace:lifesci.collectionspace.org:vocabularies:name(languages):item:name(deu)'German'</titleTranslationLanguage>
+            <titleTranslation>Das ist ein nettes Object</titleTranslation>
+          </titleTranslationSubGroup>
+        </titleTranslationSubGroupList>
+        <titleLanguage>urn:cspace:lifesci.collectionspace.org:vocabularies:name(languages):item:name(eng)'English'</titleLanguage>
+      </titleGroup>
+    </titleGroupList>
+    <responsibleDepartments>
+      <responsibleDepartment>antiquities</responsibleDepartment>
+    </responsibleDepartments>
+    <otherNumberList>
+      <otherNumber>
+        <numberValue>Obj123</numberValue>
+        <numberType>serial</numberType>
+      </otherNumber>
+    </otherNumberList>
+  </ns2:collectionobjects_common>
+</document>
