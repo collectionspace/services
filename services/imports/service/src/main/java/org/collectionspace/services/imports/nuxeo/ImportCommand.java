@@ -44,7 +44,8 @@ public class ImportCommand {
         DocumentReader reader = null;
         DocumentWriter writer = null;
         DocumentModel docModel = null;
-        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+        DocumentRef keyDocRef, valueDocRef;
+        String docType;
         StringBuffer dump = new StringBuffer("NO RESULTS");
         try {
             System.out.println("importTree reading file: "+file+(file!=null ? " exists? "+file.exists() : " file param is null"));
@@ -54,12 +55,17 @@ public class ImportCommand {
             // pipe.addTransformer(transformer);
             pipe.setReader(reader);
             pipe.setWriter(writer);
+            // FIXME: pipe.run() appears to return at least one type
+            // of Exception that is logged but not thrown; this is a
+            // potential workaround
             DocumentTranslationMap dtm = pipe.run();
-            DocumentRef keyDocRef, valueDocRef;
-            String docType;
             Map<DocumentRef,DocumentRef> documentRefs = dtm.getDocRefMap();
             if (documentRefs.size() > 0) {
                 dump.setLength(0);
+                // Assumes that every import request must necessarily
+                // be attempting to import at least one record.
+            } else {
+                throw new Exception("No records were successfully imported");
             }
             dump.append("<importedRecords>");
             for (Map.Entry entry: documentRefs.entrySet()) {
@@ -89,7 +95,7 @@ public class ImportCommand {
             throw e;
         } finally {
             if (reader != null) {
-                dump.append("<fullReport>"+(((LoggedXMLDirectoryReader)reader).report())+"</fullReport>");
+                dump.append("<report>"+(((LoggedXMLDirectoryReader)reader).report())+"</report>");
                 reader.close();
             }
             if (writer != null) {
