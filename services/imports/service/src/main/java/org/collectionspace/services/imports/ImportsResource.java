@@ -66,7 +66,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import org.collectionspace.services.common.ResourceBase;
 
 // The modified Nuxeo ImportCommand from nuxeo's shell:
 
