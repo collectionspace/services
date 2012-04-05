@@ -25,16 +25,31 @@
   <xs:element name="catalogDate" type="xs:string"/>
   -->
 
+    <xs:element name="typeSpecimenKind" type="xs:string"/>
+    <xs:element name="typeSpecimenReference" type="xs:string"/>
+    <xs:element name="typeSpecimenRefPage" type="xs:string"/>
+    <xs:element name="typeSpecimenNotes" type="xs:string"/>
+
     <xs:element name="labelHeader" type="xs:string"/>
     <xs:element name="labelFooter" type="xs:string"/>
+
+    <xs:element name="elevationMin" type="xs:decimal"/>
+    <xs:element name="elevationMax" type="xs:decimal"/>
+    <xs:element name="elevationUnit" type="xs:string"/>
+    <xs:element name="elevationQualifier" type="xs:string"/>
+    <xs:element name="elevationNote" type="xs:string"/>
+
+    <xs:element name="depthMin" type="xs:decimal"/>
+    <xs:element name="depthMax" type="xs:decimal"/>
+    <xs:element name="depthUnit" type="xs:string"/>
+    <xs:element name="depthQualifier" type="xs:string"/>
+    <xs:element name="depthNote" type="xs:string"/>
 
     <xs:element name="fieldLocVerbatim" type="xs:string"/>
     <xs:element name="fieldCollectionDateEarliest" type="xs:string"/>
     <xs:element name="fieldCollectionDateLatest" type="xs:string"/>
     <xs:element name="fieldLocLatDecimal" type="xs:string"/>
     <xs:element name="fieldLocLongDecimal" type="xs:string"/>
-    <xs:element name="fieldLocElevation" type="xs:string"/>
-
 
 		<!-- Add in an extension field for the common title group -->
 		<xs:element name="nh_titleGroupList">
@@ -51,8 +66,7 @@
 			</xs:complexType>
     </xs:element>
 
-
-  <!-- These will become contolled lists -->
+    <!-- These will become contolled lists -->
     <xs:element name="fieldLocGeodeticDatum" type="xs:string"/>
     <xs:element name="fieldLocCoordinateSystem" type="xs:string"/>
     <xs:element name="fieldLocCounty" type="xs:string"/>
@@ -61,10 +75,8 @@
     <xs:element name="fieldLocHigherGeography" type="xs:string"/>
 
     <xs:element name="taxonomicIdentGroupList" type="taxonomicIdentGroupList"/>
-    <xs:element name="typeSpecimenGroupList" type="typeSpecimenGroupList"/>
-    <xs:element name="fieldCollElevationGroupList" type="fieldCollElevationGroupList"/>
-    <xs:element name="fieldCollDepthGroupList" type="fieldCollDepthGroupList"/>
     <xs:element name="associatedTaxaGroupList" type="associatedTaxaGroupList"/>
+    <xs:element name="annotationGroupList" type="annotationGroupList"/>
 
     <xs:complexType name="taxonomicIdentGroupList">
         <xs:sequence>
@@ -86,55 +98,6 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="typeSpecimenGroupList">
-        <xs:sequence>
-            <xs:element name="typeSpecimenGroup" type="typeSpecimenGroup" minOccurs="0"
-							maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="typeSpecimenGroup">
-        <xs:sequence>
-            <xs:element name="kindOfType" type="xs:string"/>
-            <xs:element name="reference" type="xs:string"/>
-            <xs:element name="refPage" type="xs:string"/>
-            <xs:element name="institution" type="xs:string"/>
-            <xs:element name="institutionType" type="xs:string"/>
-            <xs:element name="notes" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="fieldCollElevationGroupList">
-        <xs:sequence>
-            <xs:element name="fieldCollElevationGroup" type="fieldCollElevationGroup" minOccurs="0"
-							maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="fieldCollElevationGroup">
-        <xs:sequence>
-            <xs:element name="minElevation" type="xs:integer"/>
-            <xs:element name="maxElevation" type="xs:integer"/>
-            <xs:element name="units" type="xs:string"/>
-            <xs:element name="qualifier" type="xs:string"/>
-            <xs:element name="notes" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="fieldCollDepthGroupList">
-        <xs:sequence>
-            <xs:element name="fieldCollDepthGroup" type="fieldCollDepthGroup" minOccurs="0"
-							maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="fieldCollDepthGroup">
-        <xs:sequence>
-            <xs:element name="minDepth" type="xs:integer"/>
-            <xs:element name="maxDepth" type="xs:integer"/>
-            <xs:element name="units" type="xs:string"/>
-            <xs:element name="qualifier" type="xs:string"/>
-            <xs:element name="notes" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-
     <xs:complexType name="associatedTaxaGroupList">
         <xs:sequence>
             <xs:element name="associatedTaxaGroup" type="associatedTaxaGroup" minOccurs="0"
@@ -144,9 +107,23 @@
     <xs:complexType name="associatedTaxaGroup">
         <xs:sequence>
             <xs:element name="taxon" type="xs:string"/>
-            <xs:element name="commonName" type="xs:integer"/>
-            <xs:element name="interaction" type="xs:integer"/>
+            <xs:element name="commonName" type="xs:string"/>
+            <xs:element name="interaction" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="annotationGroupList">
+        <xs:sequence>
+            <xs:element name="annotationGroup" type="annotationGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="annotationGroup">
+        <xs:sequence>
+            <xs:element name="annotationType" type="xs:string"/>
+            <xs:element name="annotationNote" type="xs:string"/>
+            <xs:element name="annotationDate" type="xs:string"/>
+            <xs:element name="annotationAuthor" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
