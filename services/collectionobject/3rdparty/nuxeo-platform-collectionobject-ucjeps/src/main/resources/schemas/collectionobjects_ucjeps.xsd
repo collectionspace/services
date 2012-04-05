@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+	CollectionObject schema (XSD)
+
+	Entity  : CollectionObject
+	Part    : Local - UCJEPS (Extends Natural History)
+	Used for: Nuxeo EP core document type
+
+	$LastChangedRevision: 4929 $
+	$LastChangedDate: 2011-06-07 13:26:32 -0700 (Tue, 07 Jun 2011) $
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://collectionspace.org/services/collectionobject/local/ucjeps" xmlns="http://collectionspace.org/services/collectionobject/local/ucjeps" targetNamespace="http://collectionspace.org/services/collectionobject/local/ucjeps" version="0.1">
+
+	<xs:element name="handwritten" type="xs:string"/>
+	<xs:element name="postToPublic" type="xs:string"/>
+
+</xs:schema>

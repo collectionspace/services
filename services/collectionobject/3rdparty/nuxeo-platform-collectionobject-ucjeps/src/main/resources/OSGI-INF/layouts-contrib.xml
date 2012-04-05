@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.${CustomSchemaName}.layouts.webapp">
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="${CustomSchemaName}">
+	<!-- Insert layout settings for the custom schema here. -->
+	<!--
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>exampleField</widget></row>
+      </rows>
+
+      <widget name="exampleField" type="text">
+        <labels>
+          <label mode="any">exampleField</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="${CustomSchemaName}">exampleField</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      -->
+    </layout>
+    <layout name="collectionobjects_naturalhistory">
+    </layout>
+  </extension>
+</component>
