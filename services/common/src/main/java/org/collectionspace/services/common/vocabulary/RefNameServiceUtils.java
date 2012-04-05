@@ -458,9 +458,10 @@ public class RefNameServiceUtils {
                 ilistItem.setDocId(csid);
                 ilistItem.setUri(serviceContextPath + csid);
                 try {
+                    ilistItem.setWorkflowState(docModel.getCurrentLifeCycleState());
                 	ilistItem.setUpdatedAt(DocHandlerBase.getUpdatedAtAsString(docModel));
                 } catch(Exception e) {
-                	logger.error("Error getting udpatedAt value for doc ["+csid+"]: "+e.getLocalizedMessage());
+                	logger.error("Error getting core values for doc ["+csid+"]: "+e.getLocalizedMessage());
                 }
                 // The id and URI are the same on all doctypes
                 ilistItem.setDocType(docType);

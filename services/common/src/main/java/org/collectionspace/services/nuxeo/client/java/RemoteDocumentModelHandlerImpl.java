@@ -215,7 +215,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     
     private void addExtraCoreValues(DocumentModel docModel, Map<String, Object> unQObjectProperties)
     		throws Exception {
-        unQObjectProperties.put(COLLECTIONSPACE_CORE_CURRENTLIFECYCLESTATE, docModel.getCurrentLifeCycleState());
+        unQObjectProperties.put(COLLECTIONSPACE_CORE_WORKFLOWSTATE, docModel.getCurrentLifeCycleState());
     }
     
     private void addAccountPermissionsPart() throws Exception {
