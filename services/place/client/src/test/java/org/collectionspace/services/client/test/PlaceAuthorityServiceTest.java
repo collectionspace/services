@@ -132,7 +132,7 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         // TODO Make place type and status be controlled vocabs.
         sanjoseMap.put(PlaceJAXBSchema.DISPLAY_NAME, TEST_DNAME);
         sanjoseMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
-        sanjoseMap.put(PlaceJAXBSchema.NAME, TEST_NAME);
+        sanjoseMap.put(PlaceJAXBSchema.PLACE_NAME, TEST_NAME);
         sanjoseMap.put(PlaceJAXBSchema.NOTE, TEST_NOTE);
         sanjoseMap.put(PlaceJAXBSchema.SOURCE, TEST_SOURCE);
         sanjoseMap.put(PlaceJAXBSchema.SOURCE_PAGE, TEST_SOURCE_PAGE);
@@ -207,12 +207,12 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
         Assert.assertNotNull(placeNameGroups);
         Assert.assertTrue(placeNameGroups.size() > 0);
-        String name = placeNameGroups.get(0).getName();
-        Assert.assertNotNull(name);
+        String placeName = placeNameGroups.get(0).getPlaceName();
+        Assert.assertNotNull(placeName);
 
         // Update the contents of this resource.
         final String PLACE_NAME_ADDITION = "verify-item-place-name-updated";
-        placeNameGroups.get(0).setName(PLACE_NAME_ADDITION + TEST_NAME);
+        placeNameGroups.get(0).setPlaceName(PLACE_NAME_ADDITION + TEST_NAME);
         place.setPlaceNameGroupList(placeNameGroupList);
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated Place");
@@ -579,20 +579,20 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 	@Override
 	protected PlacesCommon updateItemInstance(PlacesCommon placesCommon) {
 		
-                // Get the Name field from the resource passed in      
+                // Get the placeName field from the resource passed in      
                 PlaceNameGroupList placeNameGroupList = placesCommon.getPlaceNameGroupList();
                 Assert.assertNotNull(placeNameGroupList);
                 List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
                 Assert.assertNotNull(placeNameGroups);
                 Assert.assertTrue(placeNameGroups.size() > 0);
-                String originalName = placeNameGroups.get(0).getName();
-                Assert.assertNotNull(originalName);
+                String originalPlaceName = placeNameGroups.get(0).getPlaceName();
+                Assert.assertNotNull(originalPlaceName);
                 
                 // Update the contents of the new resource based on original value
                 PlaceNameGroupList updatedPlaceNameGroupList = new PlaceNameGroupList();
                 List<PlaceNameGroup> updatedPlaceNameGroups = updatedPlaceNameGroupList.getPlaceNameGroup();
                 PlaceNameGroup updatedPlaceNameGroup = new PlaceNameGroup();
-                updatedPlaceNameGroup.setName("updated-" + originalName);
+                updatedPlaceNameGroup.setPlaceName("updated-" + originalPlaceName);
                 updatedPlaceNameGroups.add(updatedPlaceNameGroup);
                 PlacesCommon result = new PlacesCommon();
                 result.setPlaceNameGroupList(updatedPlaceNameGroupList);
@@ -606,27 +606,27 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 	protected void compareUpdatedItemInstances(PlacesCommon original,
 			PlacesCommon updated) throws Exception {
         
-                // Get the Name fields each resource passed in      
+                // Get the placeName fields each resource passed in      
                 PlaceNameGroupList placeNameGroupList = original.getPlaceNameGroupList();
                 Assert.assertNotNull(placeNameGroupList);
                 List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
                 Assert.assertNotNull(placeNameGroups);
                 Assert.assertTrue(placeNameGroups.size() > 0);
-                String originalName = placeNameGroups.get(0).getName();
-                Assert.assertNotNull(originalName);
+                String originalPlaceName = placeNameGroups.get(0).getPlaceName();
+                Assert.assertNotNull(originalPlaceName);
             
                 PlaceNameGroupList updatedPlaceNameGroupList = updated.getPlaceNameGroupList();
                 Assert.assertNotNull(updatedPlaceNameGroupList);
                 List<PlaceNameGroup> updatedPlaceNameGroups = updatedPlaceNameGroupList.getPlaceNameGroup();
                 Assert.assertNotNull(updatedPlaceNameGroups);
                 Assert.assertTrue(updatedPlaceNameGroups.size() > 0);
-                String updatedName = updatedPlaceNameGroups.get(0).getName();
-                Assert.assertNotNull(updatedName);
+                String updatedPlaceName = updatedPlaceNameGroups.get(0).getPlaceName();
+                Assert.assertNotNull(updatedPlaceName);
             
             
             
             
-                Assert.assertEquals(updatedName, originalName,
+                Assert.assertEquals(updatedPlaceName, originalPlaceName,
                     "Data in updated Place did not match submitted data.");
 	}
 
@@ -641,7 +641,7 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 	protected PoxPayloadOut createNonExistenceItemInstance(
 			String commonPartName, String identifier) {
         Map<String, String> nonexMap = new HashMap<String,String>();
-        nonexMap.put(PlaceJAXBSchema.NAME, TEST_NAME);
+        nonexMap.put(PlaceJAXBSchema.PLACE_NAME, TEST_NAME);
         nonexMap.put(PlaceJAXBSchema.SHORT_IDENTIFIER, "nonEx");
         nonexMap.put(PlaceJAXBSchema.PLACE_TYPE, TEST_PLACE_TYPE);
         nonexMap.put(PlaceJAXBSchema.TERM_STATUS, TEST_STATUS);
