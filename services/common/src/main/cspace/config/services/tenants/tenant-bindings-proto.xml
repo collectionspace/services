@@ -107,10 +107,6 @@
               <service:element>responsibleDepartment</service:element>
               <service:xpath>responsibleDepartments/[0]</service:xpath>
             </service:ListResultField>
-            <service:ListResultField>
-              <service:element>fieldCollectionPlace</service:element>
-              <service:xpath>fieldCollectionPlace</service:xpath>
-            </service:ListResultField>
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
