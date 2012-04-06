@@ -80,11 +80,11 @@ public class PlaceAuthorityClientUtils {
 			place.setDisplayNameComputed(displayNameComputed);
         /* TODO - think about how much to support. This approach to the client
 	 * does not scale! We should really favor the document/payload approach. */
-        if((value = (String)placeInfo.get(PlaceJAXBSchema.NAME))!=null) {
+        if((value = (String)placeInfo.get(PlaceJAXBSchema.PLACE_NAME))!=null) {
             PlaceNameGroupList placeNameGroupList = new PlaceNameGroupList();
             List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
             PlaceNameGroup placeNameGroup = new PlaceNameGroup();
-            placeNameGroup.setName(value);
+            placeNameGroup.setPlaceName(value);
             placeNameGroups.add(placeNameGroup);
             place.setPlaceNameGroupList(placeNameGroupList);
         }
@@ -131,7 +131,7 @@ public class PlaceAuthorityClientUtils {
 				/* Could try to pull name out of first placeNameGroup
         	displayName = 
         		prepareDefaultDisplayName(
-    		    	placeMap.get(PlaceJAXBSchema.NAME));
+    		    	placeMap.get(PlaceJAXBSchema.PLACE_NAME));
 							*/
     	}
     	
@@ -295,13 +295,13 @@ public class PlaceAuthorityClientUtils {
      * @see PlaceAuthorityDocumentModelHandler.prepareDefaultDisplayName() which
      * duplicates this logic, until we define a service-general utils package
      * that is neither client nor service specific.
-     * @param name	
+     * @param placeName	
      * @return a display name
      */
     public static String prepareDefaultDisplayName(
-    		String name ) {
+    		String placeName ) {
     	StringBuilder newStr = new StringBuilder();
-			newStr.append(name);
+			newStr.append(placeName);
 		return newStr.toString();
     }
     
