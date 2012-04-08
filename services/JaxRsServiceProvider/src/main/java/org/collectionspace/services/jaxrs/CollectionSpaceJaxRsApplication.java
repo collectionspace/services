@@ -101,6 +101,8 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
         singletons.add(new ServiceGroupResource());
+        singletons.add(new ImportsResource());
+
 
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());
@@ -121,7 +123,6 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new LoanoutResource());
         addResourceToMapAndSingletons(new ObjectExitResource());
         addResourceToMapAndSingletons(new BatchResource());
-        addResourceToMapAndSingletons(new ImportsResource());
         addResourceToMapAndSingletons(new MediaResource());
         addResourceToMapAndSingletons(new BlobResource());
         addResourceToMapAndSingletons(new MovementResource());

@@ -71,7 +71,7 @@
 
     <xs:complexType name="placeNameGroup">
         <xs:sequence>
-            <xs:element name="name" type="xs:string"/>
+            <xs:element name="placeName" type="xs:string"/>
             <xs:element name="nameQualifiedName" type="xs:string"/>
             <xs:element name="nameLanguage" type="xs:string"/>
             <xs:element name="nameAbbrev" type="xs:string"/>
