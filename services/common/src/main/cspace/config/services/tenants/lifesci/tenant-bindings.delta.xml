@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tenant:TenantBindingConfig
 	xmlns:merge='http://xmlmerge.el4j.elca.ch'
-	xmlns:tenant='http://collectionspace.org/services/common/tenant'>
+	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
 	    	 
   <tenant:tenantBinding id="2" name="lifesci.collectionspace.org" displayName="Life Sciences/Natural History Demo Tenant" version="0.1">
 
     <tenant:repositoryDomain name="default-domain" storageName="lifesci-domain" repositoryClient="nuxeo-java" />
 	
 	<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
-    <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+    <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
 			<service:params>
 				<service:ListResultsFields>
 					<service:ListResultField merge:matcher="skip" merge:action="insert" >
@@ -20,27 +20,27 @@
 			</service:params>
     </service:DocHandlerParams>
 
-		<service:object xmlns:service="http://collectionspace.org/services/common/service" >
+		<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 			<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_naturalhistory" updated="" order="3">
 				<!-- Include authRefs for fields in the added schema -->
 				<service:properties>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>authRef</types:key>
 						<types:value>taxonomicIdentGroupList/*/taxon</types:value>
 					</types:item>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>authRef</types:key>
 						<types:value>associatedTaxaGroupList/*/taxon</types:value>
 					</types:item>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>authRef</types:key>
 						<types:value>taxonomicIdentGroupList/*/identBy</types:value>
 					</types:item>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>authRef</types:key>
 						<types:value>taxonomicIdentGroupList/*/institution</types:value>
 					</types:item>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>authRef</types:key>
 						<types:value>annotationGroupList/*/annotationAuthor</types:value>
 					</types:item>
@@ -54,7 +54,7 @@
 	</tenant:serviceBindings>
 
 	<tenant:serviceBindings merge:matcher="id" id="Persons">
-    <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+    <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
 			<service:params>
 				<service:ListResultsFields>
 					<service:ListResultField merge:matcher="skip" merge:action="insert" >
@@ -66,7 +66,7 @@
 			</service:params>
     </service:DocHandlerParams>
 
-		<service:object xmlns:service="http://collectionspace.org/services/common/service">
+		<service:object xmlns:service="http://collectionspace.org/services/config/service">
 			<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed"
 				versionable="true" auditable="false" label="persons_naturalhistory" updated="" order="3">
 				<service:content contentType="application/xml">
@@ -76,27 +76,27 @@
 				</service:content>
 				<service:properties>
 					<!-- See CSPACE-3938 for potential additional authRef and termRef entries -->
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>authRef</types:key>
 						<types:value>affiliatedPersonOrgGroupList/*/affiliatedPersonOrg</types:value>
 					</types:item>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>authRef</types:key>
 						<types:value>orgContactNames|orgContactName</types:value>
 					</types:item>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>termRef</types:key>
 						<types:value>affiliatedPersonOrgGroupList/*/affiliatedPersonOrgType</types:value>
 					</types:item>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>termRef</types:key>
 						<types:value>nameTypes|nameType</types:value>
 					</types:item>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>termRef</types:key>
 						<types:value>nameSource</types:value>
 					</types:item>
-					<types:item xmlns:types="http://collectionspace.org/services/common/types">
+					<types:item xmlns:types="http://collectionspace.org/services/config/types">
 						<types:key>termRef</types:key>
 						<types:value>entityType</types:value>
 					</types:item>

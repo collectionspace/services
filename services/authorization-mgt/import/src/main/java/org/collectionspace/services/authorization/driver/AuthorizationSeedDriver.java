@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -37,7 +40,8 @@ import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.importer.AuthorizationGen;
 import org.collectionspace.services.authorization.importer.AuthorizationSeed;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationStore;
-import org.collectionspace.services.authorization.storage.PermissionRoleUtil;
+import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
 import org.hibernate.exception.ConstraintViolationException;
 
@@ -190,37 +194,59 @@ public class AuthorizationSeedDriver {
     }
 
     private void store() throws Exception {
-        AuthorizationStore authzStore = new AuthorizationStore();
-        for (Role role : authzGen.getDefaultRoles()) {
-        	try {
-        		authzStore.store(role);
-        	} catch (Exception e) {
-        		//
-        		// If the role already exists, read it in and replace the instance
-        		// we're trying to import with the exist one.  This will ensure that the rest
-        		// of import uses the correct CSID.
-        		if (e.getCause() instanceof ConstraintViolationException) {
-        			Role existingRole = authzStore.getRoleByName(role.getRoleName(), role.getTenantId());
-        			//
-        			role = existingRole;
-        		}
-        	}
-        }
+        EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_AUTHZ_PERSISTENCE_UNIT);
+        EntityManager em = null;
 
-        for (Permission perm : authzGen.getDefaultPermissions()) { //FIXME: REM - 3/27/2012 - If we change the CSID of permissions to something like a refname, then we need to check for existing perms just like we did above for roles
-            authzStore.store(perm);
-        }
-
-        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
-        for (PermissionRole pr : authzGen.getDefaultPermissionRoles()) {
-            PermissionRoleUtil.buildPermissionRoleRel(pr, SubjectType.ROLE, permRoleRels, false /*not for delete*/);
-        }
-        for (PermissionRoleRel permRoleRel : permRoleRels) {
-            authzStore.store(permRoleRel);
-        }
-
-        if (logger.isInfoEnabled()) {
-            logger.info("Authroization metata persisted.");
+        try {
+            em = emf.createEntityManager();
+            em.getTransaction().begin();
+            
+	        AuthorizationStore authzStore = new AuthorizationStore();
+	        for (Role role : authzGen.getDefaultRoles()) {
+	        	try {
+	        		authzStore.store(em, role);
+	        	} catch (Exception e) {
+	        		//
+	        		// If the role already exists, read it in and replace the instance
+	        		// we're trying to import with the exist one.  This will ensure that the rest
+	        		// of import uses the correct CSID.
+	        		if (e.getCause() instanceof ConstraintViolationException) {
+	        			Role existingRole = authzStore.getRoleByName(role.getRoleName(), role.getTenantId());
+	        			//
+	        			role = existingRole;
+	        		}
+	        	}
+	        }
+	
+	        for (Permission perm : authzGen.getDefaultPermissions()) { //FIXME: REM - 3/27/2012 - If we change the CSID of permissions to something like a refname, then we need to check for existing perms just like we did above for roles
+	            authzStore.store(em, perm);
+	        }
+	
+	        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
+	        for (PermissionRole pr : authzGen.getDefaultPermissionRoles()) {
+	            PermissionRoleUtil.buildPermissionRoleRel(em, pr, SubjectType.ROLE, permRoleRels, false /*not for delete*/);
+	        }
+	        for (PermissionRoleRel permRoleRel : permRoleRels) {
+	            authzStore.store(em, permRoleRel);
+	        }
+	
+	        em.getTransaction().commit();
+	        em.close();
+	        if (logger.isInfoEnabled()) {
+	            logger.info("Authroization metata persisted.");
+	        }
+        } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception and rolling back permission creation: ", e);
+            }
+            throw e;
+        } finally {
+            if (em != null) {
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
+            }
         }
     }
 

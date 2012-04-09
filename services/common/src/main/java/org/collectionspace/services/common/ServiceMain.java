@@ -18,19 +18,24 @@ import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.collectionspace.authentication.AuthN;
+
+import org.collectionspace.services.config.service.InitHandler;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.security.SecurityUtils;
-import org.collectionspace.services.common.service.*;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.storage.DatabaseProductType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
-import org.collectionspace.services.common.types.PropertyItemType;
-import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.config.ClientType;
+import org.collectionspace.services.config.ServiceConfig;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.config.types.PropertyItemType;
+import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,7 +207,6 @@ public class ServiceMain {
             }
         }
     }
-    
 
     public void firePostInitHandlers() throws Exception {
     	DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
@@ -215,15 +219,15 @@ public class ServiceMain {
             List<ServiceBindingType> sbtList = tbt.getServiceBindings();
             for (ServiceBindingType sbt: sbtList){
                 //Get the list of InitHandler elements, extract the first one (only one supported right now) and fire it using reflection.
-                List<org.collectionspace.services.common.service.InitHandler> list = sbt.getInitHandler();
+                List<org.collectionspace.services.config.service.InitHandler> list = sbt.getInitHandler();
                 if (list!=null && list.size()>0){
-                    org.collectionspace.services.common.service.InitHandler handlerType = list.get(0);
+                	org.collectionspace.services.config.service.InitHandler handlerType = list.get(0);
                     String initHandlerClassname = handlerType.getClassname();
 
-                    List<org.collectionspace.services.common.service.InitHandler.Params.Field>
+                    List<org.collectionspace.services.config.service.InitHandler.Params.Field>
                             fields = handlerType.getParams().getField();
 
-                    List<org.collectionspace.services.common.service.InitHandler.Params.Property>
+                    List<org.collectionspace.services.config.service.InitHandler.Params.Property>
                             props = handlerType.getParams().getProperty();
 
                     //org.collectionspace.services.common.service.InitHandler.Fields ft = handlerType.getFields();

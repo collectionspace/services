@@ -49,9 +49,9 @@ import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 
 /**
  * AuthorizationGen generates authorizations (permissions and roles)
@@ -184,7 +184,7 @@ public class AuthorizationGen {
 
     private Permission buildReaderPermission(String tenantId, String resourceName) {
     	String description = "Generated read-only permission.";
-    	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_CRUDL_NAME);    	
+    	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_RL_NAME);    	
     }
 
     public List<Permission> getDefaultPermissions() {
@@ -251,8 +251,10 @@ public class AuthorizationGen {
 	        allRoleList = new ArrayList<Role>();
 	        allRoleList.addAll(adminRoles);
 	        allRoleList.addAll(readerRoles);
+	        // Finally, add the "super" role to the list
+	        allRoleList.add(cspaceAdminRole);
     	}
-        return allRoleList;  //FIXME: REM - 3/27/2012, The super role "cspaceAdminRole" is not on this list.  Intentional?
+        return allRoleList;
     }
 
     public void associateDefaultPermissionsRoles() {
@@ -356,10 +358,14 @@ public class AuthorizationGen {
 
     private Role buildCSpaceAdminRole() {
         Role role = new Role();
+        
+        role.setDescription("A generated super role that has permissions across tenancies.");
         role.setDisplayName(AuthorizationCommon.ROLE_ADMINISTRATOR);
-        role.setRoleName(AuthorizationCommon.ROLE_PREFIX + role.getDisplayName());
+        role.setRoleName(AuthorizationCommon.getQualifiedRoleName(
+        		AuthorizationCommon.ADMINISTRATOR_TENANT_ID, role.getDisplayName()));
         role.setCsid(AuthorizationCommon.ROLE_ADMINISTRATOR_ID);
         role.setTenantId(AuthorizationCommon.ADMINISTRATOR_TENANT_ID);
+        
         return role;
     }
 

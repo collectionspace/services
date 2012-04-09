@@ -33,17 +33,19 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.context.ServiceBindingUtils;
+
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
-import org.collectionspace.services.common.service.ServiceBindingType;
+
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
@@ -52,14 +54,16 @@ import org.collectionspace.services.relation.RelationsCommonList.RelationListIte
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClient;
-import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.PlaceAuthorityClient;
+import org.collectionspace.services.client.TaxonomyAuthorityClient;
 
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.relation.RelationsDocListItem;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;

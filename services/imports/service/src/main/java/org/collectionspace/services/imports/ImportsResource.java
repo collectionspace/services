@@ -32,8 +32,8 @@ import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.api.ZipTools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.tenant.RepositoryDomainType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.authentication.AuthN;
 
 import org.collectionspace.services.imports.nuxeo.ImportCommand;

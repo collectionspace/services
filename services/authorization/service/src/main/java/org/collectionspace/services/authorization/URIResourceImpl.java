@@ -41,12 +41,14 @@ public class URIResourceImpl extends CSpaceResourceImpl {
      * @param uri
      * @param method an http method
      */
+    /*
     public URIResourceImpl(String uri, String method) {
         super(buildId(uri, getAction(method)),
                 getAction(method), TYPE.URI);
         this.uri = uri;
         this.method = method;
     }
+    */
 
     /**
      * constructor that is usually called from service runtime
@@ -67,11 +69,13 @@ public class URIResourceImpl extends CSpaceResourceImpl {
      * @param resourceName no leading / and no trailing / needed
      * @param actionType
      */
+    /*
     public URIResourceImpl(String resourceName, CSpaceAction action) {
         //FIXME more validation might be needed
         super(buildId(resourceName, action),
                 action, TYPE.URI);
     }
+    */
 
     /**
      * constructor that is usually called from administrative interface

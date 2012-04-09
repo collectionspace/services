@@ -124,7 +124,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 		//
 		if (resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS) != true) { //see comment immediately above
 			AuthZ authZ = AuthZ.get();
-			CSpaceResource res = new URIResourceImpl(resName, httpMethod);
+			CSpaceResource res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), resName, httpMethod);
 			if (authZ.isAccessAllowed(res) == false) {
 					logger.error("Access to " + res.getId() + " is NOT allowed to "
 							+ " user=" + AuthN.get().getUserId());
@@ -138,7 +138,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 				//
 				if (uriPath.endsWith(WorkflowClient.SERVICE_PATH_COMPONENT) == true) {
 					String workflowSubResName = SecurityUtils.getResourceName(request.getUri());
-					res = new URIResourceImpl(workflowSubResName, httpMethod);
+					res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), workflowSubResName, httpMethod);
 					if (authZ.isAccessAllowed(res) == false) {
 						logger.error("Access to " + resName + ":" + res.getId() + " is NOT allowed to "
 								+ " user=" + AuthN.get().getUserId());

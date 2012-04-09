@@ -5,12 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.collectionspace.services.common.config.PropertyItemUtils;
-import org.collectionspace.services.common.service.ObjectPartType;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.service.ServiceObjectType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
-import org.collectionspace.services.common.types.PropertyItemType;
-import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.service.ServiceObjectType;
+import org.collectionspace.services.config.types.PropertyItemType;
+import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;

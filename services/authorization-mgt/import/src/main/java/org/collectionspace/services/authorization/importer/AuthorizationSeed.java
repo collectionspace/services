@@ -26,7 +26,6 @@ package org.collectionspace.services.authorization.importer;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -35,17 +34,10 @@ import javax.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.collectionspace.services.authorization.AuthZ;
-import org.collectionspace.services.authorization.CSpaceAction;
-import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
-import org.collectionspace.services.authorization.perms.PermissionAction;
-import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
-import org.collectionspace.services.authorization.RoleValue;
-import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 
 /**

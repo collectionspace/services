@@ -32,7 +32,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.PropertyItemUtils;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
@@ -43,12 +42,13 @@ import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.security.SecurityContext;
 import org.collectionspace.services.common.security.SecurityContextImpl;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.service.ObjectPartType;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.tenant.RepositoryDomainType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
-import org.collectionspace.services.common.types.PropertyItemType;
-import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.config.ClientType;
+import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.config.types.PropertyItemType;
+import org.collectionspace.services.config.types.PropertyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

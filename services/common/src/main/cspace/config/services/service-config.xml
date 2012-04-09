@@ -10,9 +10,9 @@
 -->
 
 <svc:service-config  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-                     xmlns:svc='http://collectionspace.org/services/common'
-                     xmlns:types='http://collectionspace.org/services/common/types'
-                     xsi:schemaLocation='http://collectionspace.org/services/common ../resources/common.xsd'>
+                     xmlns:svc='http://collectionspace.org/services/config'
+                     xmlns:types='http://collectionspace.org/services/config/types'
+                     xsi:schemaLocation='http://collectionspace.org/services/config ../resources/common.xsd'>
 
     <!-- name of the repository client is referred in each service binding -->
     <repository-client name="nuxeo-java" default="true">

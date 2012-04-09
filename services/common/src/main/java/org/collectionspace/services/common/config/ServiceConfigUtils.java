@@ -26,13 +26,13 @@ package org.collectionspace.services.common.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.collectionspace.services.common.RepositoryClientConfigType;
-import org.collectionspace.services.common.ServiceConfig;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
-import org.collectionspace.services.common.types.PropertyItemType;
-import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.config.RepositoryClientConfigType;
+import org.collectionspace.services.config.ServiceConfig;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.config.types.PropertyItemType;
+import org.collectionspace.services.config.types.PropertyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +59,9 @@ public class ServiceConfigUtils {
         Class<?> c = tccl.loadClass(getDocumentHandlerClass(tenantBinding, serviceBinding));
         if (DocumentHandler.class.isAssignableFrom(c)) {
             docHandler = (DocumentHandler) c.newInstance();
+            if (logger.isDebugEnabled()) {
+            	logger.debug("Created an instance of the DocumentHandler for: " + getDocumentHandlerClass(tenantBinding, serviceBinding));
+            }
         } else {
             throw new IllegalArgumentException("Not of type "
                     + DocumentHandler.class.getCanonicalName());
@@ -76,10 +79,10 @@ public class ServiceConfigUtils {
     		ServiceBindingType serviceBinding) {
         if (serviceBinding.getDocumentHandler() == null
                 || serviceBinding.getDocumentHandler().isEmpty()) {
-            String msg = "Missing documentHandler in service binding for "
-                    + serviceBinding.getName() + " for tenant id=" + tenantBinding.getId()
+            String msg = "Missing documentHandler in service binding for service name \""
+                    + serviceBinding.getName() + "\" for tenant id=" + tenantBinding.getId()
                     + " name=" + tenantBinding.getName();
-            logger.error(msg);
+            logger.warn(msg);
             throw new IllegalStateException(msg);
         }
         return serviceBinding.getDocumentHandler().trim();
