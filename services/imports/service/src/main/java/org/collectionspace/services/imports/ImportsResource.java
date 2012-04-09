@@ -157,7 +157,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl {
             String inputFilename = payloadToFilename(xmlPayload);
             result = createFromFilename(inputFilename);
             rb = javax.ws.rs.core.Response.ok();
-	    } catch (Exception e) {
+	} catch (Exception e) {
             result = Tools.errorToString(e, true);
             rb = javax.ws.rs.core.Response.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -181,7 +181,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl {
         try {
             String report = "NORESULTS";
             report = importCommand.run(outputDir, destWorkspaces);
-            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg><report>"+report+"</report></import>";
+            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg>"+report+"</import>";
         } catch (Exception e){
             result =  "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"+Tools.errorToString(e, true)+"</report></import>";
         }
@@ -204,7 +204,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl {
          try {
             String report = "NORESULTS";
             report = importCommand.run(outputDir, destWorkspaces);
-            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg><report>"+report+"</report></import>";
+            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg>"+report+"</import>";
          } catch (Exception e){
             result = "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"+Tools.errorToString(e, true)+"</report></import>";
          }
@@ -344,7 +344,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl {
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
     	}
-		return response;
+	return response;
     }
 
     String page = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
