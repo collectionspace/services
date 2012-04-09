@@ -101,6 +101,23 @@ public class ServiceMain {
                     try {
                     	//assume the worse
                     	initFailed = true;
+                    	
+                    	{
+                    		System.out.print("About to init ServiceMain - Pausing 3:5 seconds for you to attached the debugger");
+                    		long startTime, currentTime;
+                    		currentTime = startTime = System.currentTimeMillis();
+                    		long stopTime = startTime + 5 * 1000; //5 seconds
+                    		do {
+                    			if (currentTime % 1000 == 0) {
+                    				System.out.print(".");
+                    			}
+                    			currentTime = System.currentTimeMillis();
+                    		} while (currentTime < stopTime);
+                    			
+                    		System.out.println();
+                    		System.out.println("Resuming cspace services initialization.");
+                    	}
+                    	
                         temp.initialize();
                     	//celebrate success
                         initFailed = false;
@@ -125,8 +142,41 @@ public class ServiceMain {
     }
 
     private void initialize() throws Exception {
-    	if (logger.isTraceEnabled() == true) {
-    		System.out.print("Pausing 5 seconds for you to attached the debugger");
+    	
+    	setDataSources();
+    	setServerRootDir();
+        readConfig();
+        propagateConfiguredProperties();
+        //
+        // Create all the default user accounts
+        //
+        try {
+        	AuthorizationCommon.createDefaultPermissions(tenantBindingConfigReader);
+        
+        	if (logger.isDebugEnabled() == true) {
+        		System.out.print("Pausing 1:5 seconds for you to attached the debugger");
+        		long startTime, currentTime;
+        		currentTime = startTime = System.currentTimeMillis();
+        		long stopTime = startTime + 5 * 1000; //5 seconds
+        		do {
+        			if (currentTime % 1000 == 0) {
+        				System.out.print(".");
+        			}
+        			currentTime = System.currentTimeMillis();
+        		} while (currentTime < stopTime);
+        			
+        		System.out.println();
+        		System.out.println("Resuming cspace services initialization.");
+        	}
+
+        	AuthorizationCommon.createDefaultAccounts(tenantBindingConfigReader);
+        
+        } catch(Exception e) {
+        	logger.error("Default accounts setup failed with exception(s): " + e.getLocalizedMessage());
+        }
+        
+    	if (logger.isDebugEnabled() == true) {
+    		System.out.print("Pausing 2:5 seconds for you to attached the debugger");
     		long startTime, currentTime;
     		currentTime = startTime = System.currentTimeMillis();
     		long stopTime = startTime + 5 * 1000; //5 seconds
@@ -140,20 +190,7 @@ public class ServiceMain {
     		System.out.println();
     		System.out.println("Resuming cspace services initialization.");
     	}
-    	
-    	setDataSources();
-    	setServerRootDir();
-        readConfig();
-        propagateConfiguredProperties();
-        //
-        // Create all the default user accounts
-        //
-        try {
-        	AuthorizationCommon.createDefaultPermissions(tenantBindingConfigReader);
-        	AuthorizationCommon.createDefaultAccounts(tenantBindingConfigReader);
-        } catch(Exception e) {
-        	logger.error("Default accounts setup failed with exception(s): " + e.getLocalizedMessage());
-        }
+        
         //
         // Start up and initialize our embedded Nuxeo server instance
         //

@@ -821,7 +821,7 @@ public class AuthorizationCommon {
 			        		Profiler profiler = new Profiler(AuthorizationCommon.class, 1);
 			        		profiler.start("createDefaultPermissions started:" + readonlyPerm.getCsid());
 			        		persist(em, readonlyPerm, readonlyRole, true);
-			        		profiler.stop("createDefaultPermissions finished:" + readonlyPerm.getCsid());
+			        		profiler.stop();
 			        		logger.debug("Finished full perm generation for "
 			        				+ ":" + tenantBinding.getId()
 			        				+ ":" + serviceBinding.getName()
