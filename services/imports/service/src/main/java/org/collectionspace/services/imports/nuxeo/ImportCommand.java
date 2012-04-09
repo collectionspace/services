@@ -1,7 +1,9 @@
 package org.collectionspace.services.imports.nuxeo;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -46,7 +48,10 @@ public class ImportCommand {
         DocumentModel docModel = null;
         DocumentRef keyDocRef, valueDocRef;
         String docType;
-        StringBuffer dump = new StringBuffer("NO RESULTS");
+        StringBuffer dump = new StringBuffer();
+        Map<String,Integer> recordsImportedForDocType = new HashMap<String,Integer>();
+        Integer numRecordsImportedForDocType = new Integer(0);
+        int totalRecordsImported = 0;
         try {
             System.out.println("importTree reading file: "+file+(file!=null ? " exists? "+file.exists() : " file param is null"));
             reader = new LoggedXMLDirectoryReader(file);  //our overload of XMLDirectoryReader.
@@ -60,13 +65,6 @@ public class ImportCommand {
             // potential workaround
             DocumentTranslationMap dtm = pipe.run();
             Map<DocumentRef,DocumentRef> documentRefs = dtm.getDocRefMap();
-            if (documentRefs.size() > 0) {
-                dump.setLength(0);
-                // Assumes that every import request must necessarily
-                // be attempting to import at least one record.
-            } else {
-                throw new Exception("No records were successfully imported");
-            }
             dump.append("<importedRecords>");
             for (Map.Entry entry: documentRefs.entrySet()) {
                 keyDocRef = (DocumentRef) entry.getKey();
@@ -76,7 +74,7 @@ public class ImportCommand {
                 }
                 // System.out.println("value="+entry.getValue());
                 // System.out.println("key="+entry.getKey());
-                
+
                 docModel = repoSession.getDocument((DocumentRef) entry.getValue());
                 // System.out.println("value doctype="+docModel.getDocumentType().toString());
 
@@ -85,15 +83,30 @@ public class ImportCommand {
                 docType = docModel.getDocumentType().getName();
                 // System.out.println(docType);
                 dump.append("<doctype>"+docType+"</doctype>");
-                dump.append("<csid>"+keyDocRef.toString()+"</id>");
+                dump.append("<csid>"+keyDocRef.toString()+"</csid>");
                 dump.append("</importedRecord>");
                 // System.out.println(dump.toString());
-
+                if (recordsImportedForDocType.containsKey(docType)) {
+                    numRecordsImportedForDocType = (Integer) recordsImportedForDocType.get(docType);
+                    numRecordsImportedForDocType = Integer.valueOf(numRecordsImportedForDocType.intValue() + 1);
+                    recordsImportedForDocType.put(docType, numRecordsImportedForDocType);
+                } else {
+                    recordsImportedForDocType.put(docType, 1);
+                }
+                totalRecordsImported++;
             }
             dump.append("</importedRecords>");
         } catch (Exception e) {
             throw e;
         } finally {
+            dump.append("<totalRecordsImported>"+totalRecordsImported+"</totalRecordsImported>");
+            dump.append("<numRecordsImportedByDocType>");
+            TreeSet<String> keys = new TreeSet<String>(recordsImportedForDocType.keySet());
+            for (String key : keys) {
+                dump.append("<docType>"+key+"</docType>");
+                dump.append("<numRecords>"+recordsImportedForDocType.get(key).intValue()+"</numRecords>");
+            }
+            dump.append("</numRecordsImportedByDocType>");
             if (reader != null) {
                 dump.append("<report>"+(((LoggedXMLDirectoryReader)reader).report())+"</report>");
                 reader.close();

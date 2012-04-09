@@ -181,7 +181,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl {
         try {
             String report = "NORESULTS";
             report = importCommand.run(outputDir, destWorkspaces);
-            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg><report>"+report+"</report></import>";
+            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg>"+report+"</import>";
         } catch (Exception e){
             result =  "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"+Tools.errorToString(e, true)+"</report></import>";
         }
@@ -204,7 +204,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl {
          try {
             String report = "NORESULTS";
             report = importCommand.run(outputDir, destWorkspaces);
-            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg><report>"+report+"</report></import>";
+            result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg>"+report+"</import>";
          } catch (Exception e){
             result = "<?xml version=\"1.0\"?><import><msg>ERROR</msg><report>"+Tools.errorToString(e, true)+"</report></import>";
          }
