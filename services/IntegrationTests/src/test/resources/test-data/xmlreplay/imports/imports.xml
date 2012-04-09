@@ -15,12 +15,13 @@
             <uri>/cspace-services/imports</uri>
             <filename>imports/import-1objectexit-post.xml</filename>
             <response>
-                <expected level="TREE" />
+                <expected level="TEXT" />
                 <filename>imports/res/import-1objectexit-post.res.xml</filename>
              </response>
         </test>
         
         <!-- FIXME: Add forms-based import test -->
+        <!--
         <test ID="import-post-form">
             <expectedCodes>200</expectedCodes>
             <method>POST</method>
@@ -31,6 +32,7 @@
                 <filename>imports/res/import-1objectexit-post.res.xml</filename>
              </response>
         </test>
+        -->
         
         <!-- FIXME: Add tests with non-UTF-8 chars in request payloads -->
         <!-- (CSPACE-3923 and see also CSPACE-4866), via each imports path -->
