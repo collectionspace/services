@@ -71,7 +71,7 @@ public abstract class DocumentModelHandler<T, TL>
     public final static String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
     public final static String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
     public final static String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
-    public final static String COLLECTIONSPACE_CORE_CURRENTLIFECYCLESTATE = "currentLifeCycleState";
+    public final static String COLLECTIONSPACE_CORE_WORKFLOWSTATE = "workflowState";
 
     /*
      * We're using the "name" field of Nuxeo's DocumentModel to store

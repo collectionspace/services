@@ -23,21 +23,26 @@
  */
 package org.collectionspace.services.imports;
 
+import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ConfigurationException;
 import org.collectionspace.services.common.FileUtils;
-import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.api.ZipTools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.tenant.RepositoryDomainType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
-import org.collectionspace.authentication.AuthN;
-
+import org.collectionspace.services.imports.ImportsCommon;
 import org.collectionspace.services.imports.nuxeo.ImportCommand;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.xml.sax.InputSource;
@@ -50,6 +55,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -60,7 +66,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.MediaType;
 
 // The modified Nuxeo ImportCommand from nuxeo's shell:
 
@@ -70,10 +75,10 @@ import javax.ws.rs.core.MediaType;
 @Path(ImportsResource.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public class ImportsResource extends ResourceBase {
+public class ImportsResource extends AbstractCollectionSpaceResourceImpl {
     
-    public static final String SERVICE_PATH = "imports";
     public static final String SERVICE_NAME = "imports";
+    public static final String SERVICE_PATH = "/" + SERVICE_NAME;
     
     /*
      * ASSUMPTION: All Nuxeo services of a given tenancy store their stuff in the same repository domain under
@@ -111,7 +116,12 @@ public class ImportsResource extends ResourceBase {
 
     @Override
     public Class<?> getCommonPartClass() {
-		return ImportsCommon.class;
+	return ImportsCommon.class;
+    }
+    
+    @Override
+    public ServiceContextFactory<PoxPayloadIn, PoxPayloadOut> getServiceContextFactory() {
+        return MultipartServiceContextFactory.get();
     }
 
     private static String _templateDir = null;

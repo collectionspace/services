@@ -68,10 +68,11 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 
     private AbstractCommonList commonList;
     
-    protected static final int NUM_STANDARD_LIST_RESULT_FIELDS = 3;
+    protected static final int NUM_STANDARD_LIST_RESULT_FIELDS = 4;
     protected static final String STANDARD_LIST_CSID_FIELD = "csid";
-    protected static final String STANDARD_LIST_URI_FIELD = "uri";
-    protected static final String STANDARD_LIST_UPDATED_AT_FIELD = "updatedAt";
+    protected static final String STANDARD_LIST_URI_FIELD = COLLECTIONSPACE_CORE_URI;
+    protected static final String STANDARD_LIST_UPDATED_AT_FIELD = COLLECTIONSPACE_CORE_UPDATED_AT;
+    protected static final String STANDARD_LIST_WORKFLOW_FIELD = COLLECTIONSPACE_CORE_WORKFLOWSTATE;
 
     @Override
     public AbstractCommonList getCommonPartList() {
@@ -190,6 +191,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         fields[0] = STANDARD_LIST_CSID_FIELD;
         fields[1] = STANDARD_LIST_URI_FIELD;
         fields[2] = STANDARD_LIST_UPDATED_AT_FIELD;
+        fields[3] = STANDARD_LIST_WORKFLOW_FIELD;
         for(int i=NUM_STANDARD_LIST_RESULT_FIELDS;i<nFields;i++) {
         	ListResultField field = resultsFields.get(i-NUM_STANDARD_LIST_RESULT_FIELDS); 
         	fields[i]=field.getElement();
@@ -204,6 +206,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
             String uri = getUri(docModel);
             item.put(STANDARD_LIST_URI_FIELD, uri);
             item.put(STANDARD_LIST_UPDATED_AT_FIELD, getUpdatedAtAsString(docModel));
+            item.put(STANDARD_LIST_WORKFLOW_FIELD, docModel.getCurrentLifeCycleState());
 
             for (ListResultField field : resultsFields ){
             	String schema = field.getSchema();
