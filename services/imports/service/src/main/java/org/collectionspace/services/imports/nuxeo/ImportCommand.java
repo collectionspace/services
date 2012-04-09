@@ -1,13 +1,23 @@
 package org.collectionspace.services.imports.nuxeo;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
+import org.nuxeo.ecm.core.io.DocumentTranslationMap;
 import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.DocumentModelWriter;
@@ -24,34 +34,87 @@ public class ImportCommand {
         RepositoryInstance  repoSession = client.openRepository();
         try {
             return importTree(repoSession, file, dest);
+        } catch (Exception e) {
+            throw e;
         } finally {
 //            repository.close();
             client.releaseRepository(repoSession);
         }
     }
 
-    String importTree(RepositoryInstance repository, File file, String toPath) throws Exception {
+    String importTree(RepositoryInstance repoSession, File file, String toPath) throws Exception {
         DocumentReader reader = null;
         DocumentWriter writer = null;
-        String dump = "NO RESULTS";
+        DocumentModel docModel = null;
+        DocumentRef keyDocRef, valueDocRef;
+        String docType;
+        StringBuffer dump = new StringBuffer();
+        Map<String,Integer> recordsImportedForDocType = new HashMap<String,Integer>();
+        Integer numRecordsImportedForDocType = new Integer(0);
+        int totalRecordsImported = 0;
         try {
             System.out.println("importTree reading file: "+file+(file!=null ? " exists? "+file.exists() : " file param is null"));
             reader = new LoggedXMLDirectoryReader(file);  //our overload of XMLDirectoryReader.
-            writer = new DocumentModelWriter(repository, toPath, 10);
+            writer = new DocumentModelWriter(repoSession, toPath, 10);
             DocumentPipe pipe = new DocumentPipeImpl(10);
             // pipe.addTransformer(transformer);
             pipe.setReader(reader);
             pipe.setWriter(writer);
-            pipe.run();
+            // FIXME: pipe.run() appears to return at least one type
+            // of Exception that is logged but not thrown; this is a
+            // potential workaround
+            DocumentTranslationMap dtm = pipe.run();
+            Map<DocumentRef,DocumentRef> documentRefs = dtm.getDocRefMap();
+            dump.append("<importedRecords>");
+            for (Map.Entry entry: documentRefs.entrySet()) {
+                keyDocRef = (DocumentRef) entry.getKey();
+                valueDocRef = (DocumentRef) entry.getValue();
+                if (keyDocRef == null || valueDocRef == null) {
+                    continue;
+                }
+                // System.out.println("value="+entry.getValue());
+                // System.out.println("key="+entry.getKey());
+
+                docModel = repoSession.getDocument((DocumentRef) entry.getValue());
+                // System.out.println("value doctype="+docModel.getDocumentType().toString());
+
+                dump.append("<importedRecord>");
+                docModel = repoSession.getDocument(valueDocRef);
+                docType = docModel.getDocumentType().getName();
+                // System.out.println(docType);
+                dump.append("<doctype>"+docType+"</doctype>");
+                dump.append("<csid>"+keyDocRef.toString()+"</csid>");
+                dump.append("</importedRecord>");
+                // System.out.println(dump.toString());
+                if (recordsImportedForDocType.containsKey(docType)) {
+                    numRecordsImportedForDocType = (Integer) recordsImportedForDocType.get(docType);
+                    numRecordsImportedForDocType = Integer.valueOf(numRecordsImportedForDocType.intValue() + 1);
+                    recordsImportedForDocType.put(docType, numRecordsImportedForDocType);
+                } else {
+                    recordsImportedForDocType.put(docType, 1);
+                }
+                totalRecordsImported++;
+            }
+            dump.append("</importedRecords>");
+        } catch (Exception e) {
+            throw e;
         } finally {
+            dump.append("<totalRecordsImported>"+totalRecordsImported+"</totalRecordsImported>");
+            dump.append("<numRecordsImportedByDocType>");
+            TreeSet<String> keys = new TreeSet<String>(recordsImportedForDocType.keySet());
+            for (String key : keys) {
+                dump.append("<docType>"+key+"</docType>");
+                dump.append("<numRecords>"+recordsImportedForDocType.get(key).intValue()+"</numRecords>");
+            }
+            dump.append("</numRecordsImportedByDocType>");
             if (reader != null) {
+                dump.append("<report>"+(((LoggedXMLDirectoryReader)reader).report())+"</report>");
                 reader.close();
-                dump = ((LoggedXMLDirectoryReader)reader).report();
             }
             if (writer != null) {
                 writer.close();
             }
         }
-        return dump;
+        return dump.toString();
     }
 }
