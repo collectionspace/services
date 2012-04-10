@@ -136,7 +136,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 				// They passed the first round of security checks, so now let's check to see if they're trying
 				// to perform a workflow state change and make sure they are allowed to to this.
 				//
-				if (uriPath.endsWith(WorkflowClient.SERVICE_PATH_COMPONENT) == true) {
+				if (uriPath.contains(WorkflowClient.SERVICE_PATH_COMPONENT) == true) {
 					String workflowSubResName = SecurityUtils.getResourceName(request.getUri());
 					res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), workflowSubResName, httpMethod);
 					if (authZ.isAccessAllowed(res) == false) {

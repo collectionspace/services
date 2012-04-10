@@ -27,6 +27,12 @@ public class PoxPayloadIn extends PoxPayload<PayloadInputPart> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    public PoxPayloadIn(String payloadName, Object jaxbObject, String partLabel) {
+    	setPayloadName(payloadName);
+    	PayloadInputPart inputPart = createPart(partLabel, jaxbObject, null);
+    	this.addPart(inputPart);
+    }
+    
 	/*
 	 * Parse the POX 'xmlPayload' into individual parts.  Each part is saved
 	 * as a DOM4j Element and, if possible, a JAXB object instance as well.

@@ -46,6 +46,8 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     }
     
     public Lifecycle getLifecycle();
+    
+    public Lifecycle getLifecycle(String serviceObjectName);
 
     /**
      * getServiceContext returns service context

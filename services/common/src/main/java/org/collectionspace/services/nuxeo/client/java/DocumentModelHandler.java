@@ -23,29 +23,37 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
+import org.collectionspace.services.lifecycle.Lifecycle;
+import org.collectionspace.services.lifecycle.State;
+import org.collectionspace.services.lifecycle.StateList;
+import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.lifecycle.TransitionDefList;
+import org.collectionspace.services.lifecycle.TransitionList;
 
+import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,14 +79,109 @@ public abstract class DocumentModelHandler<T, TL>
     public final static String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
     public final static String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
 
+    /*
+     * Map Nuxeo's life cycle object to our JAX-B based life cycle object
+     */
+    private Lifecycle createCollectionSpaceLifecycle(org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle) {
+    	Lifecycle result = null;
+    	
+    	if (nuxeoLifecyle != null) {
+    		//
+    		// Copy the life cycle's name
+    		result = new Lifecycle();
+    		result.setName(nuxeoLifecyle.getName());
+    		
+    		// We currently support only one initial state, so take the first one from Nuxeo
+    		Collection<String> initialStateNames = nuxeoLifecyle.getInitialStateNames();
+    		result.setDefaultInitial(initialStateNames.iterator().next());
+    		
+    		// Next, we copy the state and corresponding transition lists
+    		StateList stateList = new StateList();
+    		List<State> states = stateList.getState();
+    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleState> nuxeoStates = nuxeoLifecyle.getStates();
+    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleState nuxeoState : nuxeoStates) {
+    			State tempState = new State();
+    			tempState.setDescription(nuxeoState.getDescription());
+    			tempState.setInitial(nuxeoState.isInitial());
+    			tempState.setName(nuxeoState.getName());
+    			// Now get the list of transitions
+    			TransitionList transitionList = new TransitionList();
+    			List<String> transitions = transitionList.getTransition();
+    			Collection<String> nuxeoTransitions = nuxeoState.getAllowedStateTransitions();
+    			for (String nuxeoTransition : nuxeoTransitions) {
+    				transitions.add(nuxeoTransition);
+    			}
+    			tempState.setTransitionList(transitionList);
+    			states.add(tempState);
+    		}
+    		result.setStateList(stateList);
+    		
+    		// Finally, we create the transition definitions
+    		TransitionDefList transitionDefList = new TransitionDefList();
+    		List<TransitionDef> transitionDefs = transitionDefList.getTransitionDef();
+    		Collection<org.nuxeo.ecm.core.lifecycle.LifeCycleTransition> nuxeoTransitionDefs = nuxeoLifecyle.getTransitions();
+    		for (org.nuxeo.ecm.core.lifecycle.LifeCycleTransition nuxeoTransitionDef : nuxeoTransitionDefs) {
+    			TransitionDef tempTransitionDef = new TransitionDef();
+    			tempTransitionDef.setDescription(nuxeoTransitionDef.getDescription());
+    			tempTransitionDef.setDestinationState(nuxeoTransitionDef.getDestinationStateName());
+    			tempTransitionDef.setName(nuxeoTransitionDef.getName());
+    			transitionDefs.add(tempTransitionDef);
+    		}
+    		result.setTransitionDefList(transitionDefList);
+    	}
+    	
+    	return result;
+    }
+    
+    /*
+     * Returns the the life cycle definition of the related Nuxeo document type for this handler.
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#getLifecycle()
+     */
+    @Override
     public Lifecycle getLifecycle() {
     	Lifecycle result = null;
     	
+    	String docTypeName = null;
     	try {
-			result = (Lifecycle)FileTools.getJaxbObjectFromFile(Lifecycle.class, "default-lifecycle.xml");
+	    	docTypeName = this.getServiceContext().getDocumentType();
+	    	result = getLifecycle(docTypeName);
+    	} catch (Exception e) {
+    		if (logger.isTraceEnabled() == true) {
+    			logger.trace("Could not retrieve lifecycle definition for Nuxeo doctype: " + docTypeName);
+    		}
+    	}
+    	
+    	return result;
+    }
+    
+    /*
+     * Returns the the life cycle definition of the related Nuxeo document type for this handler.
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#getLifecycle(java.lang.String)
+     */
+    @Override
+    public Lifecycle getLifecycle(String docTypeName) {
+    	org.nuxeo.ecm.core.lifecycle.LifeCycle nuxeoLifecyle;
+    	Lifecycle result = null;
+    	
+    	try {
+    		LifeCycleService lifeCycleService = null;
+			try {
+				lifeCycleService = NXCore.getLifeCycleService();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+	    	String lifeCycleName; 
+	    	lifeCycleName = lifeCycleService.getLifeCycleNameFor(docTypeName);
+	    	nuxeoLifecyle = lifeCycleService.getLifeCycleByName(lifeCycleName);
+	    	
+	    	result = createCollectionSpaceLifecycle(nuxeoLifecyle);	
+//			result = (Lifecycle)FileTools.getJaxbObjectFromFile(Lifecycle.class, "default-lifecycle.xml");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Could not retreive life cycle information for Nuxeo doctype: " + docTypeName, e);
 		}
     	
     	return result;
@@ -242,5 +345,4 @@ public abstract class DocumentModelHandler<T, TL>
                     COLLECTIONSPACE_CORE_UPDATED_BY, userId);
     	}
     }
-
 }

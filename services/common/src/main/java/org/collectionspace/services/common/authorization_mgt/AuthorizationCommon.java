@@ -275,26 +275,37 @@ public class AuthorizationCommon {
     		ActionGroup actionGroup)
     {
     	Permission result = null;
+    	String workFlowServiceSuffix;
+    	String transitionName;
+    	if (transitionDef != null) {
+    		transitionName = transitionDef.getName();
+    		workFlowServiceSuffix = WorkflowClient.SERVICE_AUTHZ_SUFFIX;
+    	} else {
+    		transitionName = ""; //since the transitionDef was null, we're assuming that this is the base workflow permission to be created    		
+    		workFlowServiceSuffix = WorkflowClient.SERVICE_PATH;
+    	}
     	
     	String tenantId = tenantBinding.getId();
     	String resourceName = "/"
     			+ serviceBinding.getName().toLowerCase().trim()
-    			+ WorkflowClient.SERVICE_AUTHZ_SUFFIX
-    			+ transitionDef.getName();
+    			+ workFlowServiceSuffix
+    			+ transitionName;
     	String description = "A generated workflow permission for actiongroup " + actionGroup.name;
     	result = createPermission(tenantId, resourceName, description, actionGroup);
     	
     	if (logger.isDebugEnabled() == true) {
     		logger.debug("Generated a workflow permission: "
     				+ result.getResourceName()
-    				+ ":" + transitionDef.getName()
-    				+ ":" + "tenant id=" + result.getTenantId());
+    				+ ":" + transitionName
+    				+ ":" + "tenant id=" + result.getTenantId()
+    				+ ":" + actionGroup.name);
     	}
     	
     	return result;
     }
     
-    private static PermissionRole createPermissionRole(Permission permission,
+    private static PermissionRole createPermissionRole(EntityManager em,
+    		Permission permission,
     		Role role,
     		boolean enforceTenancy) throws Exception
     {
@@ -758,9 +769,10 @@ public class AuthorizationCommon {
 	private static TransitionDefList getTransitionDefList(TenantBindingType tenantBinding, ServiceBindingType serviceBinding) {
 		TransitionDefList result = null;
 		try {
+			String serviceObjectName = serviceBinding.getObject().getName();
 	    	DocumentHandler docHandler = ServiceConfigUtils.createDocumentHandlerInstance(
 	    			tenantBinding, serviceBinding);
-	    	Lifecycle lifecycle = docHandler.getLifecycle();
+	    	Lifecycle lifecycle = docHandler.getLifecycle(serviceObjectName);
 	    	if (lifecycle != null) {
 	    		result = lifecycle.getTransitionDefList();
 	    	}
@@ -804,40 +816,46 @@ public class AuthorizationCommon {
 	    		Role readonlyRole = AuthorizationCommon.getRole(em, tenantBinding.getId(), ROLE_TENANT_READER);
 		        for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
 		        	try {
+		        		em.getTransaction().begin();
+		        		//
+		        		// For the default admin role, create the base workflow (aka, "/workflow" permissions for the service.
+		        		Permission baseAdminPerm = createWorkflowPermission(tenantBinding, serviceBinding, null, ACTIONGROUP_CRUDL);
+		        		persist(em, baseAdminPerm, adminRole, true);
+		        		//
+		        		// For the default read-only role, create the base workflow (aka, "/workflow" permissions for the service.
+		        		Permission baseReadonlyPerm = createWorkflowPermission(tenantBinding, serviceBinding, null, ACTIONGROUP_RL);
+		        		persist(em, baseReadonlyPerm, readonlyRole, true);		        		
+		        		//
+		        		// Next, create a permission for each workflow transition supported by the service's document type.
+		        		//
 			        	TransitionDefList transitionDefList = getTransitionDefList(tenantBinding, serviceBinding);
 			        	for (TransitionDef transitionDef : transitionDefList.getTransitionDef()) {
-			        		em.getTransaction().begin();
-			        		/*
 			        		//
 			        		// Create the permission for the admin role
-			        		//
 			        		Permission adminPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionDef, ACTIONGROUP_CRUDL);
 			        		persist(em, adminPerm, adminRole, true);
-			        		*/
 			        		//
 			        		// Create the permission for the read-only role
 			        		Permission readonlyPerm = createWorkflowPermission(tenantBinding, serviceBinding, transitionDef, ACTIONGROUP_RL);
 			        		
 			        		Profiler profiler = new Profiler(AuthorizationCommon.class, 1);
 			        		profiler.start("createDefaultPermissions started:" + readonlyPerm.getCsid());
-			        		persist(em, readonlyPerm, readonlyRole, true);
+			        		persist(em, readonlyPerm, readonlyRole, true); // Persist/store the permission and permrole records and related Spring Security info
 			        		profiler.stop();
 			        		logger.debug("Finished full perm generation for "
 			        				+ ":" + tenantBinding.getId()
 			        				+ ":" + serviceBinding.getName()
 			        				+ ":" + transitionDef.getName()
 			        				+ ":" + ACTIONGROUP_RL
-			        				+ ":" + profiler.getCumulativeTime());
-			        		
+			        				+ ":" + profiler.getCumulativeTime());			        		
 			        		/*
 			        		//
 			        		// Create the permission for the super-admin role.  Note we use the same "adminPerm" instance we used for the "adminPermRole" instance
 			        		//
 			        		persist(em, adminPerm, superRole, false);
-			        		
 			        		*/
-			        		em.getTransaction().commit();
 			        	}
+			        	em.getTransaction().commit();
 		        	} catch (IllegalStateException e) {
 		        		logger.debug(e.getLocalizedMessage(), e); //We end up here if there is no document handler for the service -this is ok for some of the services.
 		        	}
@@ -889,7 +907,7 @@ public class AuthorizationCommon {
 		// Create a PermissionRoleRel (the database relation table for the permission and role)
 		PermissionRoleRel permRoleRel = findPermRoleRel(em, permission.getCsid(), role.getCsid());
 		if (permRoleRel == null) {
-			PermissionRole permRole = createPermissionRole(permission, role, enforceTenancy);
+			PermissionRole permRole = createPermissionRole(em, permission, role, enforceTenancy);
 	        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
 	        PermissionRoleUtil.buildPermissionRoleRel(em, permRole, SubjectType.ROLE, permRoleRels, false /*not for delete*/);
 	        for (PermissionRoleRel prr : permRoleRels) {

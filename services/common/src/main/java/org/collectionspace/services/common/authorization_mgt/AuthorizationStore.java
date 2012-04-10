@@ -162,7 +162,7 @@ public class AuthorizationStore {
         }
         
         if (entityExists == true) {
-        	em.merge(entity);
+        	//em.merge(entity); FIXME: Leave commented out until we address CSPACE-5031
         } else {
         	em.persist(entity);
         }

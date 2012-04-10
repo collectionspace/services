@@ -41,7 +41,11 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	//
 	public static final String WORKFLOWSTATE_DELETED = "deleted";
 	public static final String WORKFLOWSTATE_PROJECT = "project";
-	public static final String WORKFLOWSTATE_APPROVED = "approved";	
+	public static final String WORKFLOWSTATE_APPROVED = "approved";
+	//
+	// DocumentHandler passed properties
+	//
+	public static final String TRANSITION_ID = "transition_id";
 	//
 	// Service Query Params
 	//

@@ -37,7 +37,14 @@ public abstract class JpaDocumentHandler<T, TL, WT, WLT>
         return (TL) commonList;
     }
     
+    public Lifecycle getLifecycle(String docTypeName) {
+    	Lifecycle result = new Lifecycle();
+    	result.setName("Life cycles are not supported by the JPA-based services.");
+    	return result; // NOTE: As of 3/2012, none of the JPA-based services support a life cycle type.
+    }
+    
+    @Override
     public Lifecycle getLifecycle() {
-    	return null; // NOTE: As of 3/2012, none of the JPA-based services support a life cycle type.
+    	return getLifecycle(null); // NOTE: As of 3/2012, none of the JPA-based services support a life cycle type.
     }
 }
