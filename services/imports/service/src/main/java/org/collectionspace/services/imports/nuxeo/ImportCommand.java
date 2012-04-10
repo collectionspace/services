@@ -60,9 +60,6 @@ public class ImportCommand {
             // pipe.addTransformer(transformer);
             pipe.setReader(reader);
             pipe.setWriter(writer);
-            // FIXME: pipe.run() appears to return at least one type
-            // of Exception that is logged but not thrown; this is a
-            // potential workaround
             DocumentTranslationMap dtm = pipe.run();
             Map<DocumentRef,DocumentRef> documentRefs = dtm.getDocRefMap();
             dump.append("<importedRecords>");
@@ -72,20 +69,12 @@ public class ImportCommand {
                 if (keyDocRef == null || valueDocRef == null) {
                     continue;
                 }
-                // System.out.println("value="+entry.getValue());
-                // System.out.println("key="+entry.getKey());
-
-                docModel = repoSession.getDocument((DocumentRef) entry.getValue());
-                // System.out.println("value doctype="+docModel.getDocumentType().toString());
-
                 dump.append("<importedRecord>");
                 docModel = repoSession.getDocument(valueDocRef);
                 docType = docModel.getDocumentType().getName();
-                // System.out.println(docType);
                 dump.append("<doctype>"+docType+"</doctype>");
                 dump.append("<csid>"+keyDocRef.toString()+"</csid>");
                 dump.append("</importedRecord>");
-                // System.out.println(dump.toString());
                 if (recordsImportedForDocType.containsKey(docType)) {
                     numRecordsImportedForDocType = (Integer) recordsImportedForDocType.get(docType);
                     numRecordsImportedForDocType = Integer.valueOf(numRecordsImportedForDocType.intValue() + 1);
@@ -103,8 +92,10 @@ public class ImportCommand {
             dump.append("<numRecordsImportedByDocType>");
             TreeSet<String> keys = new TreeSet<String>(recordsImportedForDocType.keySet());
             for (String key : keys) {
+                dump.append("<numRecordsImported>");
                 dump.append("<docType>"+key+"</docType>");
                 dump.append("<numRecords>"+recordsImportedForDocType.get(key).intValue()+"</numRecords>");
+                dump.append("</numRecordsImported>");
             }
             dump.append("</numRecordsImportedByDocType>");
             if (reader != null) {
