@@ -54,6 +54,7 @@ import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.PlaceAuthorityClient;
+import org.collectionspace.services.client.ConceptAuthorityClient;
 
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -412,6 +413,8 @@ public class RelationDocumentModelHandler
 	    		common_schema = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
     		else if(docType.startsWith("Placeitem"))
     			common_schema = PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+	    	else if(docType.startsWith("Conceptitem"))
+	    		common_schema = ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
 	    	//else leave it null.
     	}
     	return common_schema;

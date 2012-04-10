@@ -76,10 +76,10 @@ public class PlaceDocumentModelHandler
     		shortDisplayNameComputed = true;
     	if (displayNameComputed || shortDisplayNameComputed) {
                 // Obtain the primary place name from the list of place names, for computing the display name.
-    		String xpathToName = PlaceJAXBSchema.PLACE_NAME_GROUP_LIST 
-                        + "/[0]/" + PlaceJAXBSchema.NAME;
-    		String name = getXPathStringValue(docModel, COMMON_PART_LABEL, xpathToName);
-    		String displayName = prepareDefaultDisplayName(name);
+    		String xpathToPlaceName = PlaceJAXBSchema.PLACE_NAME_GROUP_LIST 
+                        + "/[0]/" + PlaceJAXBSchema.PLACE_NAME;
+    		String placeName = getXPathStringValue(docModel, COMMON_PART_LABEL, xpathToPlaceName);
+    		String displayName = prepareDefaultDisplayName(placeName);
     		if (displayNameComputed) {
     			docModel.setProperty(commonPartLabel, PlaceJAXBSchema.DISPLAY_NAME,
     					displayName);
@@ -96,14 +96,14 @@ public class PlaceDocumentModelHandler
      * @see PlaceAuthorityClientUtils.prepareDefaultDisplayName() which
      * duplicates this logic, until we define a service-general utils package
      * that is neither client nor service specific.
-     * @param name
+     * @param placeName
      * @return the default display name
      * @throws Exception
      */
     private static String prepareDefaultDisplayName(
-    		String name ) throws Exception {
+    		String placeName ) throws Exception {
     	StringBuilder newStr = new StringBuilder();
-			newStr.append(name);
+			newStr.append(placeName);
 			return newStr.toString();
     }
     
