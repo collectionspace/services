@@ -83,7 +83,7 @@
         <row><widget>refName</widget></row>
         <row><widget>displayName</widget></row>
         <row><widget>displayNameComputed</widget></row>
-        <row><widget>conceptType</widget></row>
+        <row><widget>recordType</widget></row>
         <row><widget>status</widget></row>
       </rows>
 
@@ -153,13 +153,13 @@
         </properties>
       </widget>
       
-      <widget name="conceptType" type="text">
+      <widget name="recordType" type="text">
         <labels>
-          <label mode="any">conceptType</label>
+          <label mode="any">recordType</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="concepts_common">conceptType</field>
+          <field schema="concepts_common">recordType</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

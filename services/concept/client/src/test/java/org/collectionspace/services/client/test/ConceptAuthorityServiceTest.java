@@ -89,7 +89,7 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
     // TODO Make status type be a controlled vocab term.
     final String TEST_STATUS = "Approved";
     
-    private String knownConceptTypeRefName = null;
+    private String knownRecordTypeRefName = null;
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()

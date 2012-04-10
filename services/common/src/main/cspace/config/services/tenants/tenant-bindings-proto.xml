@@ -2700,7 +2700,7 @@
                         <!-- Fields containing term list / controlled vocabulary references -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
-                            <types:value>conceptType</types:value>
+                            <types:value>recordType</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>termRef</types:key>
