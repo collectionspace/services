@@ -34,14 +34,14 @@
 	<!--  Common Concept Information Group -->
 	<!--  Based on UCB Version 2.3: http://wiki.collectionspace.org/display/deploy/Concept+Authority+Schema+and+Mockup+-+UCB+Version -->
 	<!--  This will be refactored for 2.4. -->
-	<xs:element name="conceptType" type="xs:string"/>
-	<xs:element name="sourceTermID" type="xs:string"/>
+	<xs:element name="termType" type="xs:string"/>
+	<xs:element name="qualifier" type="xs:string"/>
 	<xs:element name="termLanguage" type="xs:string"/>
 	<xs:element name="preferred" type="xs:boolean"/>
 	<xs:element name="preferredForLang" type="xs:string"/>
 	<xs:element name="historicFlag" type="xs:string"/>
-	<xs:element name="termType" type="xs:string"/>
-	<xs:element name="qualifier" type="xs:string"/>
+	<xs:element name="sourceTermID" type="xs:string"/>
+	<xs:element name="recordType" type="xs:string"/>
 	<xs:element name="scopeNote" type="xs:string"/>
 	<xs:element name="scopeNoteSource" type="xs:string"/>
 	<xs:element name="scopeNoteSourceDetail" type="xs:string"/>
