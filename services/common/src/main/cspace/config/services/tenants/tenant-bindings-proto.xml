@@ -168,38 +168,56 @@
                         <!-- Object Identification Information group -->
                         <!-- There are currently no authority term references in this group -->
                         <!-- Object Description Information group -->
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>contentActivities|contentActivity</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>contentConcepts|contentConcept</types:value>
             </types:item>
+            <!-- Uncomment when Subject authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentEventNameGroupList/*/contentEventName</types:value>
             </types:item>
+            -->
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentEventNameGroupList/*/contentEventNameType</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentOrganizations|contentOrganization</types:value>
             </types:item>
+            <!-- Uncomment when Concept OR Subject authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentOtherGroupList/*/contentOther</types:value>
             </types:item>
+            -->
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentOtherGroupList/*/contentOtherType</types:value>
             </types:item>
+            -->
+            <!-- Uncomment when People authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentPeoples|contentPeople</types:value>
-            </types:item>
+            </types:item
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>contentPersons|contentPerson</types:value>
@@ -216,22 +234,31 @@
               <types:key>authRef</types:key>
                             <types:value>textualInscriptionGroupList/*/inscriptionContentInscriber</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>textualInscriptionGroupList/*/inscriptionContentMethod</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>nonTextualInscriptionGroupList/*/inscriptionDescriptionInscriber</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>nonTextualInscriptionGroupList/*/inscriptionDescriptionMethod</types:value>
             </types:item>
+            -->
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>materialGroupList/*/material</types:value>
             </types:item>
+            -->
                         <!-- The following field may become part of a repeatable sub-group -->
                         <!-- for materialComponent, per CSPACE-4563. -->
                         <!-- Names of ancestor elements below are placeholders and subject to change. -->
@@ -245,6 +272,8 @@
               <types:key>authRef</types:key>
 							<types:value>materialGroupList/*/materialSource</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>styles|style</types:value>
@@ -253,15 +282,20 @@
               <types:key>authRef</types:key>
 							<types:value>objectComponentGroupList/*/objectComponentName</types:value>
             </types:item>
+            -->
+
                         <!-- Object Production Information group -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>objectProductionOrganizationGroupList/*/objectProductionOrganization</types:value>
             </types:item>
+            <!-- Uncomment when People authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>objectProductionPeopleGroupList/*/objectProductionPeople</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>objectProductionPersonGroupList/*/objectProductionPerson</types:value>
@@ -304,10 +338,13 @@
               <types:key>authRef</types:key>
 							<types:value>assocOrganizationGroupList/*/assocOrganization</types:value>
             </types:item>
+            <!-- Uncomment when People authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>assocPeopleGroupList/*/assocPeople</types:value>
             </types:item>
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>assocPersonGroupList/*/assocPerson</types:value>
@@ -334,10 +371,13 @@
                         <!-- Object Viewer's Contribution Information group -->
                         <!-- There are currently no authority term references in this group -->
                         <!-- Reference Information group -->
+            <!-- Uncomment when Citation authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>referenceGroupList/*/reference</types:value>
-            </types:item>
+            </types:item
+            -->
                         <!-- Object Collection Information group -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
@@ -351,10 +391,13 @@
               <types:key>authRef</types:key>
                             <types:value>fieldCollectors|fieldCollector</types:value>
             </types:item>
+            <!-- Uncomment when Collecting Event authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
                             <types:value>fieldColEventNames|fieldColEventName</types:value>
             </types:item>
+            -->
                         <!-- ### -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <!-- ### -->
@@ -508,7 +551,7 @@
                             <types:value>assocActivityGroupList/*/assocActivity</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
-              <types:key>termRef</types:key>
+              <types:key>authRef</types:key>
                             <types:value>assocConceptGroupList/*/assocConcept</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
@@ -721,10 +764,13 @@
               <types:key>authRef</types:key>
               <types:value>fieldCollectors|fieldCollector</types:value>
             </types:item>
+            <!-- Uncomment when Collecting Event authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
-                            <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
-                        </types:item>
+              <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
+            </types:item>
+            -->
                         <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>authRef</types:key>
               <types:value>valuer</types:value>
@@ -1317,11 +1363,13 @@
               <types:key>authRef</types:key>
               <types:value>rightsHolder</types:value>
             </types:item>
-            <!-- Subject Authority field -->
+            <!-- Uncomment when Subject authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
 							<types:value>subjectList|subject</types:value>
-            </types:item>
+            </types:item
+            -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>measuredPartGroupList/*/dimensionSubGroupList/*/measuredBy</types:value>
@@ -1813,6 +1861,8 @@
               <types:key>authRef</types:key>
               <types:value>foundingPlace</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>groups|group</types:value>
@@ -1821,6 +1871,7 @@
               <types:key>authRef</types:key>
               <types:value>functions|function</types:value>
             </types:item>
+            -->
                         <!-- Organization's subBody field was removed here from the authRef list -->
                         <!-- per anticipated work on CSPACE-4685.-->
                         <!-- Fields containing term list / controlled vocabulary references -->
@@ -1990,6 +2041,8 @@
               <types:key>authRef</types:key>
               <types:value>deathPlace</types:value>
             </types:item>
+            <!-- Uncomment when Concept authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>groups|group</types:value>
@@ -2006,6 +2059,7 @@
               <types:key>authRef</types:key>
               <types:value>schoolsOrStyles|schoolOrStyle</types:value>
             </types:item>
+            -->
                         <!-- Fields containing term list / controlled vocabulary references -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
@@ -2522,6 +2576,150 @@
     </tenant:serviceBindings>
     <!-- end taxon service meta-data -->
     
+    <!-- begin conceptauthority service meta-data -->
+    <tenant:serviceBindings id="Conceptauthorities" name="Conceptauthorities" type="utility" version="0.1">
+      <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/conceptauthorities/*/workflow/</service:uriPath>
+      <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/conceptauthorities/*/items/*/workflow/</service:uriPath>
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /conceptauthorities/*/items/
+            </service:uriPath>
+            -->
+      <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
+      <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.concept.nuxeo.ConceptAuthorityDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+            <service:ListResultField>
+              <service:element>displayName</service:element>
+              <service:xpath>displayName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>refName</service:element>
+              <service:xpath>refName</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>shortIdentifier</service:element>
+              <service:xpath>shortIdentifier</service:xpath>
+            </service:ListResultField>
+            <service:ListResultField>
+              <service:element>vocabType</service:element>
+              <service:xpath>vocabType</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
+      <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
+        <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+        <service:params>
+          <service:field>
+            <service:table>conceptauthorities_common</service:table>
+            <service:col>displayname</service:col>
+          </service:field>
+          <service:field>
+            <service:table>conceptauthorities_common</service:table>
+            <service:col>shortidentifier</service:col>
+          </service:field>
+        </service:params>
+      </service:initHandler>
+      <service:object xmlns:service="http://collectionspace.org/services/common/service" id="1" name="Conceptauthority" version="0.1">
+        <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="conceptauthorities-system" updated="" order="0">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/services/common/system" schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd" />
+          </service:content>
+        </service:part>
+        <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="conceptauthorities_common" updated="" order="1">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/services/concept" schemaLocation="http://collectionspace.org/services/concept http://services.collectionspace.org/concept/conceptauthorities_common.xsd" />
+          </service:content>
+        </service:part>
+        <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+          </service:content>
+        </service:part>
+      </service:object>
+    </tenant:serviceBindings>
+    <!-- end conceptauthority service meta-data -->
+        
+    <!-- begin concept service meta-data.
+             Note there is no Concept service, but there is a
+             Repository workspace so we have to configure that.
+        -->
+    <tenant:serviceBindings id="Concepts" name="Concepts" type="authority" version="0.1">
+      <service:repositoryDomain xmlns:service="http://collectionspace.org/services/common/service">default-domain</service:repositoryDomain>
+      <service:documentHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.concept.nuxeo.ConceptDocumentModelHandler</service:documentHandler>
+      <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/common/service">
+        <service:params>
+          <service:ListResultsFields>
+					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+            <service:ListResultField>
+              <service:element>termType</service:element>
+              <service:xpath>termType</service:xpath>
+            </service:ListResultField>
+          </service:ListResultsFields>
+        </service:params>
+      </service:DocHandlerParams>
+      <service:validatorHandler xmlns:service="http://collectionspace.org/services/common/service">org.collectionspace.services.concept.nuxeo.ConceptValidatorHandler</service:validatorHandler>
+      <service:initHandler xmlns:service="http://collectionspace.org/services/common/service">
+        <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+        <service:params>
+          <service:field>
+            <service:table>concepts_common</service:table>
+            <service:col>inauthority</service:col>
+          </service:field>
+          <service:field>
+            <service:table>concepts_common</service:table>
+            <service:col>displayname</service:col>
+          </service:field>
+          <service:field>
+            <service:table>concepts_common</service:table>
+            <service:col>shortidentifier</service:col>
+          </service:field>
+        </service:params>
+      </service:initHandler>
+      <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+		<types:item xmlns:types="http://collectionspace.org/services/common/types">
+			<types:key>objectNameProperty</types:key>
+			<types:value>displayName</types:value>
+		</types:item>
+		<types:item xmlns:types="http://collectionspace.org/services/common/types">
+			<types:key>objectNumberProperty</types:key>
+			<types:value>shortIdentifier</types:value>
+		</types:item>
+      </service:properties>
+      <service:object xmlns:service="http://collectionspace.org/services/common/service" id="1" name="Conceptitem" version="0.1">
+        <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="concepts-system" updated="" order="0">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/services/common/system" schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd" />
+          </service:content>
+        </service:part>
+        <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="concepts_common" updated="" order="1">
+          <service:properties xmlns:service="http://collectionspace.org/services/common/service">
+                        <!-- Fields containing term list / controlled vocabulary references -->
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+                            <types:value>recordType</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/common/types">
+              <types:key>termRef</types:key>
+                            <types:value>termStatus</types:value>
+            </types:item>
+                    </service:properties>
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/services/concept" schemaLocation="http://collectionspace.org/services/concept http://services.collectionspace.org/concept/concepts_common.xsd" />
+          </service:content>
+        </service:part>
+        <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+          <service:content contentType="application/xml">
+            <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+          </service:content>
+        </service:part>
+      </service:object>
+    </tenant:serviceBindings>
+    <!-- end concept service meta-data -->
+
     <!-- begin acquisition service meta-data -->
     <tenant:serviceBindings id="Acquisitions" name="Acquisitions" type="procedure" version="0.1">
       <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/acquisitions/*/workflow/</service:uriPath>
@@ -2587,10 +2785,13 @@
               <types:key>authRef</types:key>
               <types:value>acquisitionSources|acquisitionSource</types:value>
             </types:item>
+            <!-- Uncomment when Collecting Event authority is implemented in Services -->
+            <!--
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
               <types:key>authRef</types:key>
               <types:value>fieldCollectionEventNames|fieldCollectionEventName</types:value>
             </types:item>
+            -->
                         <!-- Fields containing term list / controlled vocabulary references -->
             <types:item xmlns:types="http://collectionspace.org/services/common/types">
                             <types:key>termRef</types:key>
