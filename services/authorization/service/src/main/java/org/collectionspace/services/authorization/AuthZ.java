@@ -24,12 +24,17 @@
  */
 package org.collectionspace.services.authorization;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.authorization.spi.CSpaceAuthorizationProvider;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * AuthZ is the authorization service singleton used by the services runtime
@@ -42,7 +47,7 @@ public class AuthZ {
      */
     private static volatile AuthZ self = new AuthZ();
     private CSpaceAuthorizationProvider provider;
-    final Log log = LogFactory.getLog(AuthZ.class);
+    final Log logger = LogFactory.getLog(AuthZ.class);
 
     private AuthZ() {
         setupProvider();
@@ -63,14 +68,14 @@ public class AuthZ {
         if (beanConfigProp != null && !beanConfigProp.isEmpty()) {
             beanConfig = beanConfigProp;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("reading beanConfig=" + beanConfig);
+        if (logger.isDebugEnabled()) {
+            logger.debug("reading beanConfig=" + beanConfig);
         }
         ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(
                 new String[]{beanConfig});
         provider = (CSpaceAuthorizationProvider) appContext.getBean("cspaceAuthorizationProvider");
-        if (log.isDebugEnabled()) {
-            log.debug("initialized the authz provider");
+        if (logger.isDebugEnabled()) {
+            logger.debug("initialized the authz provider");
         }
     }
 
@@ -178,4 +183,18 @@ public class AuthZ {
     public boolean isAccessAllowed(CSpaceResource res, CSpaceAction action) {
         return provider.getPermissionEvaluator().hasPermission(res, action);
     }
+    
+    public void login() {
+    	String user = "SPRING_ADMIN";
+    	String password = "SPRING_ADMIN";
+        GrantedAuthority spring_security_admin = new GrantedAuthorityImpl("ROLE_SPRING_ADMIN"); //NOTE: Must match with value in applicationContext-authorization-test.xml (aka SPRING_SECURITY_METADATA)
+        HashSet<GrantedAuthority> gauths = new HashSet<GrantedAuthority>();
+        gauths.add(spring_security_admin);
+        Authentication authRequest = new UsernamePasswordAuthenticationToken(user, password, gauths);
+        SecurityContextHolder.getContext().setAuthentication(authRequest);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Spring Security login successful for user=" + user);
+        }
+    }
+
 }

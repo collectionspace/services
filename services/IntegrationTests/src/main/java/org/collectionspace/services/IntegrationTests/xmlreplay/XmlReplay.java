@@ -4,9 +4,7 @@ import org.apache.commons.cli.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.jexl2.JexlEngine;
-import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.service.ServiceBindingType;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 

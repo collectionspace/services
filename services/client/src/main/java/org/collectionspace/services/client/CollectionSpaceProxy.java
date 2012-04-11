@@ -67,8 +67,8 @@ public interface CollectionSpaceProxy<CLT> {
     @PUT
     @Produces({"application/xml"})
     @Consumes({"application/xml"})    
-    @Path("{csid}" + WorkflowClient.SERVICE_PATH)
-    ClientResponse<String> updateWorkflow(@PathParam("csid") String csid, byte[] xmlPayload);
+    @Path("{csid}" + WorkflowClient.SERVICE_PATH + "/" + "{transition}")
+    ClientResponse<String> updateWorkflowWithTransition(@PathParam("csid") String csid, @PathParam("transition") String transition);
     
     /*
      * (R)read List operations

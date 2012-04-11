@@ -24,6 +24,8 @@
 -->
 		<cspace.services.version>2.2-SNAPSHOT</cspace.services.version>
 		<cspace.services.client.version>2.2-SNAPSHOT</cspace.services.client.version>
+		<spring.version>3.0.0.RELEASE</spring.version>
+        <spring.security.version>3.0.2.RELEASE</spring.security.version>
 	</properties>
 
 	<distributionManagement>
@@ -382,7 +384,9 @@
 				<groupId>javax.transaction</groupId>
 				<artifactId>jta</artifactId>
 				<version>1.1</version>
+				<!--
 				<scope>provided</scope>
+				-->
 			</dependency>
 
 			<dependency>

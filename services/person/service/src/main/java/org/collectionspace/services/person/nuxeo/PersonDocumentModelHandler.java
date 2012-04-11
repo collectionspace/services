@@ -25,13 +25,10 @@ package org.collectionspace.services.person.nuxeo;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.PersonJAXBSchema;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.person.PersonsCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 

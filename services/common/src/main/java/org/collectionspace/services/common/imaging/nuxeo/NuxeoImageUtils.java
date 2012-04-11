@@ -90,7 +90,6 @@ import org.slf4j.LoggerFactory;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
-import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.DimensionSubGroup;
 import org.collectionspace.services.blob.DimensionSubGroupList;
@@ -101,6 +100,8 @@ import org.collectionspace.services.blob.MeasuredPartGroupList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.common.blob.BlobOutput;
+
+import org.collectionspace.services.config.service.ListResultField;
 
 //import org.collectionspace.ecm.platform.quote.api.QuoteManager;
 

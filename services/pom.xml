@@ -7,7 +7,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.main</artifactId>
     <name>services.main</name>
     <packaging>pom</packaging>
@@ -29,8 +28,10 @@
     be built after the security module and common modules are built
     -->
     <modules>
+        <module>config</module>
         <module>common-api</module>
         <module>authentication</module>
+		<module>authorization-common</module>
         <module>authorization</module>
         <module>blob</module>
         <module>client</module>

@@ -32,8 +32,7 @@ import java.util.StringTokenizer;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.service.ServiceObjectType;
+import org.collectionspace.services.config.service.ServiceBindingType;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
@@ -202,7 +201,7 @@ public class SecurityUtils {
 		AuthZ authZ = AuthZ.get();
     	for(ServiceBindingType binding:serviceBindings) {
     		String resourceName = binding.getName().toLowerCase();
-    		CSpaceResource res = new URIResourceImpl(resourceName, "GET");
+    		CSpaceResource res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), resourceName, "GET");
     		if (authZ.isAccessAllowed(res) == true) {
     			readableList.add(binding);
     		}

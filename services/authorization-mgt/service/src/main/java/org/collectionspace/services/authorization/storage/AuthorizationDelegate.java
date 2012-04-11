@@ -25,6 +25,8 @@ package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
@@ -39,6 +41,7 @@ import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
@@ -228,7 +231,7 @@ public class AuthorizationDelegate {
         for (PermissionAction pa : p.getAction()) {
             CSpaceResource res = null;
             if (p.getTenantId() == null) {
-                res = new URIResourceImpl(p.getResourceName(),
+                res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), p.getResourceName(),
                         getAction(pa.getName()));
             } else {
                 res = new URIResourceImpl(p.getTenantId(), p.getResourceName(),
