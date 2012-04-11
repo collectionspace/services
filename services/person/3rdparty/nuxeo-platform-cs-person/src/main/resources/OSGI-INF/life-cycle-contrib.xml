@@ -4,8 +4,8 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Personauthority">default</type>
-      <type name="Person">default</type>
+      <type name="Personauthority">cs_default</type>
+      <type name="Person">cs_default</type>
     </types>
   </extension>
 

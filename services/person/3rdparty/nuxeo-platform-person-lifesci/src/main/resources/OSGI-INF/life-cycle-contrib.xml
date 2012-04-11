@@ -4,7 +4,7 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="PersonTenant2">default</type>
+      <type name="PersonTenant2">cs_default</type>
     </types>
   </extension>
 

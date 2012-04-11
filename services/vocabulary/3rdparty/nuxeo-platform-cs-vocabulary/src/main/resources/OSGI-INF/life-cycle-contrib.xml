@@ -4,8 +4,8 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Vocabulary">default</type>
-      <type name="Vocabularyitem">default</type>
+      <type name="Vocabulary">cs_default</type>
+      <type name="Vocabularyitem">cs_default</type>
     </types>
   </extension>
 

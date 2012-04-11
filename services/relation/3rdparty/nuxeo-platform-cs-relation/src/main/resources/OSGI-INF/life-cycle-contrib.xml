@@ -4,7 +4,7 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Relation">default</type>
+      <type name="Relation">cs_default</type>
     </types>
   </extension>
 

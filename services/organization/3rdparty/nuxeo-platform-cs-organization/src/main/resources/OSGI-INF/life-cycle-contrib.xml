@@ -4,8 +4,8 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Orgauthority">default</type>
-      <type name="Organization">default</type>
+      <type name="Orgauthority">cs_default</type>
+      <type name="Organization">cs_default</type>
     </types>
   </extension>
 
