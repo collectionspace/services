@@ -206,7 +206,7 @@ public class ServiceBindingUtils {
     	return commonServiceTypes;
     }
     
-    // Temporary workaround for CSPACE-4963, to help reduce the
+    // Temporary workaround for CSPACE-4983, to help reduce the
     // number of service types searched for authority references
     // in AuthorityResource.getReferencingObjects(), to in turn
     // help reduce database query complexity.

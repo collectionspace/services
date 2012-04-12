@@ -745,7 +745,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
             List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
             if(serviceTypes == null || serviceTypes.isEmpty()) {
-                // Temporary workaround for CSPACE-4963
+                // Temporary workaround for CSPACE-4983
             	// serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
                 serviceTypes = ServiceBindingUtils.getCommonProcedureServiceTypes();
             }
