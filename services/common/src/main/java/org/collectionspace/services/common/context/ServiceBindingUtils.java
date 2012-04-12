@@ -206,6 +206,22 @@ public class ServiceBindingUtils {
     	return commonServiceTypes;
     }
     
+    // Temporary workaround for CSPACE-4983, to help reduce the
+    // number of service types searched for authority references
+    // in AuthorityResource.getReferencingObjects(), to in turn
+    // help reduce database query complexity.
+    //
+    // FIXME; this method is intended to be temporary.  It was added in part to
+    // make the effect of the workaround more explicit, and in part to avoid
+    // breaking the use of the getCommonServiceTypes method in ServiceGroups.
+    public static ArrayList<String> getCommonProcedureServiceTypes() {
+        if(commonServiceTypes == null) {
+    		commonServiceTypes = new ArrayList<String>();
+    		commonServiceTypes.add(SERVICE_TYPE_PROCEDURE);
+    	}
+    	return commonServiceTypes;
+    }
+    
 
 
 }
