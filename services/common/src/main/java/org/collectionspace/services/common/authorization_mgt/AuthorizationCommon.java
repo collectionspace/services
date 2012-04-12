@@ -864,7 +864,8 @@ public class AuthorizationCommon {
 			        		logger.debug(e.getLocalizedMessage(), e); //We end up here if there is no document handler for the service -this is ok for some of the services.
 			        	}
 		        	} else {
-		        		logger.warn("AuthZ refresh service binding property is set to FALSE so default roles and permissions will NOT be refreshed.");
+		        		logger.warn("AuthZ refresh service binding property is set to FALSE so default permissions will NOT be refreshed for: "
+		        				+ serviceBinding.getName());
 		        	}
 		        }
 	        }

@@ -4,7 +4,7 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Blob">cs_locking</type>
+      <type name="Blob">${Lifecycle}</type>
     </types>
   </extension>
 

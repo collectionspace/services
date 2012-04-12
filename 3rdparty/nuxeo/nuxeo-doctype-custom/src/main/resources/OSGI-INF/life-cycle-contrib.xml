@@ -3,7 +3,7 @@
 
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService" point="types">
     <types>
-      <type name="${NuxeoDocTypeName}${TenantPrefix}${TenantId}">cs_default</type>
+      <type name="${NuxeoDocTypeName}${TenantPrefix}${TenantId}">${Lifecycle}</type>
     </types>
   </extension>
 

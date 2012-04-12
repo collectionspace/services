@@ -4,7 +4,7 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Batch">cs_default</type>
+      <type name="Batch">${Lifecycle}</type>
     </types>
   </extension>
 

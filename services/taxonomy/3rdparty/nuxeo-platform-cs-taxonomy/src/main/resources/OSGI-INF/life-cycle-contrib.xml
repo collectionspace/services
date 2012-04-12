@@ -4,8 +4,8 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Taxonomyauthority">cs_default</type>
-      <type name="Taxon">cs_default</type>
+      <type name="Taxonomyauthority">${Lifecycle}</type>
+      <type name="Taxon">${Lifecycle}</type>
     </types>
   </extension>
 

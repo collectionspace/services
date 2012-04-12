@@ -22,6 +22,7 @@
         <ServiceName>intake</ServiceName>
         <NuxeoDocTypeName>Intake</NuxeoDocTypeName>
         <CommonSchemaName>intakes_common</CommonSchemaName>
+		<Lifecycle>cs_default</Lifecycle>
     </properties>
     
     <build>

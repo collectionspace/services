@@ -4,7 +4,7 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="ObjectExit">cs_default</type>
+      <type name="ObjectExit">${Lifecycle}</type>
     </types>
   </extension>
 
