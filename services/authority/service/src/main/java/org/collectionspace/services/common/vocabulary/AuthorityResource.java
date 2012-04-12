@@ -745,7 +745,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
             List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
             if(serviceTypes == null || serviceTypes.isEmpty()) {
-            	serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
+                // Temporary workaround for CSPACE-4963
+            	// serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
+                serviceTypes = ServiceBindingUtils.getCommonProcedureServiceTypes();
             }
             
             // Note that we have to create the service context for the Items, not the main service
