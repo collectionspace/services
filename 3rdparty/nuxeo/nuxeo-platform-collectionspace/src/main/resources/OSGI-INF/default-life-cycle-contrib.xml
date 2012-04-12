@@ -12,17 +12,17 @@
 
     <documentation>CollectionSpace core default life cycle definition.</documentation>
 
-    <lifecycle name="cs_default" defaultInitial="active">
+    <lifecycle name="cs_default" defaultInitial="project">
       <transitions>
         <transition name="delete" destinationState="deleted">
           <description>Move document to trash (temporary delete)</description>
         </transition>
-        <transition name="undelete" destinationState="active">
+        <transition name="undelete" destinationState="project">
           <description>Recover the document from trash</description>
         </transition>
       </transitions>
       <states>
-        <state name="active" description="Default state" initial="true">
+        <state name="project" description="Default state" initial="true">
           <transitions>
             <transition>delete</transition>
           </transitions>
@@ -40,23 +40,23 @@
   
     <documentation>CollectionSpace "locking" life cycle definition.</documentation>
 
-    <lifecycle name="cs_locking" defaultInitial="active">
+    <lifecycle name="cs_locking" defaultInitial="project">
       <transitions>
         <transition name="lock" destinationState="locked">
           <description>Lock document</description>
         </transition>
-        <transition name="unlock" destinationState="active">
+        <transition name="unlock" destinationState="project">
           <description>Unlock the document</description>
         </transition>
         <transition name="delete" destinationState="deleted">
           <description>Move document to trash (temporary delete)</description>
         </transition>
-        <transition name="undelete" destinationState="active">
+        <transition name="undelete" destinationState="project">
           <description>Recover the document from trash</description>
         </transition>
       </transitions>	  
       <states>
-        <state name="active" description="Default state" initial="true">
+        <state name="project" description="Default state" initial="true">
           <transitions>
             <transition>delete</transition>
             <transition>lock</transition>

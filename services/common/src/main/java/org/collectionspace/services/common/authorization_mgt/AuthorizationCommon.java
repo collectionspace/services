@@ -248,9 +248,8 @@ public class AuthorizationCommon {
     		String resourceName,
     		String description,
     		ActionGroup actionGroup) {
-//        String id = UUID.randomUUID().toString(); //FIXME: Could this be something like a refname instead of a UUID?
         String id = tenantId
-        		+ "-" + resourceName
+        		+ "-" + resourceName.replace('/', '_') // Remove the slashes so the ID can be used in a URI/URL
         		+ "-" + actionGroup.name;
         Permission perm = new Permission();
         perm.setCsid(id);
