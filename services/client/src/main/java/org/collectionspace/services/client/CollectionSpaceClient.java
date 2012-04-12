@@ -193,7 +193,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      */
     public ClientResponse<String> getWorkflow(String csid);
     
-	public ClientResponse<String> updateWorkflow(String csid, PoxPayloadOut xmlPayload);
+	public ClientResponse<String> updateWorkflowWithTransition(String csid, String workflowTransition);
     
     /**
      * Gets the authority refs.

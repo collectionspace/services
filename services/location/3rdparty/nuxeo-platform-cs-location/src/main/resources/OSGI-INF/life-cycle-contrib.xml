@@ -4,8 +4,8 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Locationauthority">default</type>
-      <type name="Locationitem">default</type>
+      <type name="Locationauthority">${Lifecycle}</type>
+      <type name="Locationitem">${Lifecycle}</type>
     </types>
   </extension>
 

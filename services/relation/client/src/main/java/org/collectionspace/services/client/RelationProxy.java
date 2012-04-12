@@ -28,14 +28,14 @@ public interface RelationProxy extends CollectionSpacePoxProxy<RelationsCommonLi
 	@GET
     @Produces({"application/xml"})
     ClientResponse<RelationsCommonList> readIncludeDeleted(
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);        
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);        
     
     @Override
     @GET
     @Produces({"application/xml"})
     ClientResponse<RelationsCommonList> keywordSearchIncludeDeleted(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     @GET
     @Produces({"application/xml"})

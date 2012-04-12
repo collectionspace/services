@@ -21,10 +21,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.authorization.storage;
+package org.collectionspace.services.common.authorization_mgt;
 
 import java.util.HashMap;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -51,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PermissionRoleUtil {
 
-    final Logger logger = LoggerFactory.getLogger(PermissionRoleUtil.class);
+    static final Logger logger = LoggerFactory.getLogger(PermissionRoleUtil.class);
 
     /**
      * Gets the relation subject.
@@ -59,7 +62,7 @@ public class PermissionRoleUtil {
      * @param ctx the ctx
      * @return the relation subject
      */
-    static SubjectType getRelationSubject(ServiceContext ctx) {
+    static public SubjectType getRelationSubject(ServiceContext ctx) {
         Object o = ctx.getProperty(ServiceContextProperties.SUBJECT);
         if (o == null) {
             throw new IllegalArgumentException(ServiceContextProperties.SUBJECT
@@ -76,7 +79,7 @@ public class PermissionRoleUtil {
      * @param pr the pr
      * @return the relation subject
      */
-    static SubjectType getRelationSubject(ServiceContext ctx, PermissionRole pr) {
+    static public SubjectType getRelationSubject(ServiceContext ctx, PermissionRole pr) {
         SubjectType subject = pr.getSubject();
         if (subject == null) {
             //it is not required to give subject as URI determines the subject
@@ -94,17 +97,17 @@ public class PermissionRoleUtil {
      * @param prrl persistent entities built are inserted into this list
      * @param toDelete the to delete
      */
-    static public void buildPermissionRoleRel(PermissionRole pr,
+    static public void buildPermissionRoleRel(EntityManager em, 
+    		PermissionRole pr,
     		SubjectType subject,
     		List<PermissionRoleRel> prrl,
-    		boolean handleDelete)
-    			throws DocumentNotFoundException {
+    		boolean handleDelete) throws Exception {
         if (subject.equals(SubjectType.ROLE)) {
         	List<PermissionValue> permissionValues = pr.getPermission();
         	if (permissionValues != null && permissionValues.size() > 0) {
 	            PermissionValue pv = permissionValues.get(0);
 	            for (RoleValue rv : pr.getRole()) {
-	                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
+	                PermissionRoleRel prr = buildPermissonRoleRel(em, pv, rv, subject, handleDelete);
 	                prrl.add(prr);
 	            }
         	}
@@ -113,12 +116,43 @@ public class PermissionRoleUtil {
         	if (roleValues != null && roleValues.size() > 0) {
 	            RoleValue rv = roleValues.get(0);
 	            for (PermissionValue pv : pr.getPermission()) {
-	                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
+	                PermissionRoleRel prr = buildPermissonRoleRel(em, pv, rv, subject, handleDelete);
 	                prrl.add(prr);
 	            }
         	}
         }
     }
+    
+    static public void buildPermissionRoleRel( 
+    		PermissionRole pr,
+    		SubjectType subject,
+    		List<PermissionRoleRel> prrl,
+    		boolean handleDelete) throws Exception {
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        try {
+            emf = JpaStorageUtils.getEntityManagerFactory(JpaStorageUtils.CS_PERSISTENCE_UNIT);
+            em = emf.createEntityManager();
+            em.getTransaction().begin();
+            
+            buildPermissionRoleRel(em, pr, subject, prrl, handleDelete);
+            
+            em.getTransaction().commit();
+        	em.close();            
+        } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw e;
+        } finally {
+            if (em != null) {
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
+            }
+        }
+    }    
 
     /**
      * Builds a permisson role relationship for either 'create' or 'delete'
@@ -128,7 +162,7 @@ public class PermissionRoleUtil {
      * @param handleDelete the handle delete
      * @return the permission role rel
      */
-    static private PermissionRoleRel buildPermissonRoleRel(PermissionValue permissionValue,
+    static private PermissionRoleRel buildPermissonRoleRel(EntityManager em, PermissionValue permissionValue,
     		RoleValue roleValue,
     		SubjectType subject,
     		boolean handleDelete)
@@ -142,8 +176,13 @@ public class PermissionRoleUtil {
     	// correctly.  The import utility should create and store the permissions and roles BEFORE creating the relationships
     	//
     	PermissionValue pv = permissionValue;
+    	
+    	//
+    	// This lookup is slow, do we really need it?
+    	//
+    	/*
     	try {
-	    	Permission permission = (Permission)JpaStorageUtils.getEntity(pv.getPermissionId(),
+	    	Permission permission = (Permission)JpaStorageUtils.getEntity(em, pv.getPermissionId(), //FIXME: REM 4/5/2012 - To improve performance, we should use a passed in Permission instance
 	    			Permission.class);
 	    	if (permission != null) {
 	    		// If the permission already exists, then use it to fill our the relation record
@@ -152,14 +191,19 @@ public class PermissionRoleUtil {
     	} catch (DocumentNotFoundException e) {
     		// ignore this exception, pv is set to permissionValue;
     	}
+    	*/
+    	
     	//
     	// Ensure we can find both the Permission and Role to relate.
     	// FIXME: REM - This is a workaround until the Import utility creates Perm/Role relationships
     	// correctly.  The import utility should create and store the permissions and roles BEFORE creating the relationships
     	//
     	RoleValue rv = roleValue;
+    	
+    	/*
+    	 * This lookup is slow, can we avoid it?
     	try {
-	    	Role role = (Role)JpaStorageUtils.getEntity(rv.getRoleId(),
+	    	Role role = (Role)JpaStorageUtils.getEntity(em, rv.getRoleId(),
 	    			Role.class);
 	    	if (role != null) {
 	    		// If the role already exists, then use it to fill out the relation record
@@ -168,6 +212,7 @@ public class PermissionRoleUtil {
     	} catch (DocumentNotFoundException e) {
     		// ignore this exception, rv is set to roleValue
     	}
+    	 */
     	
         result = new PermissionRoleRel();
         result.setPermissionId(pv.getPermissionId());

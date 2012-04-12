@@ -32,12 +32,12 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.service.ServiceObjectType;
-import org.collectionspace.services.common.tenant.RepositoryDomainType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
-import org.collectionspace.services.common.tenant.TenantBindingConfig;
-import org.collectionspace.services.common.types.PropertyItemType;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.service.ServiceObjectType;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
+import org.collectionspace.services.config.tenant.TenantBindingConfig;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.config.types.PropertyItemType;
 
 import ch.elca.el4j.services.xmlmerge.Configurer;
 import ch.elca.el4j.services.xmlmerge.config.AttributeMergeConfigurer;

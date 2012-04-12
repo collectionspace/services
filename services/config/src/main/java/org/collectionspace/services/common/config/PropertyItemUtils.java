@@ -3,8 +3,8 @@ package org.collectionspace.services.common.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.collectionspace.services.common.types.PropertyItemType;
-import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.config.types.PropertyItemType;
+import org.collectionspace.services.config.types.PropertyType;
 
 public class PropertyItemUtils {
 

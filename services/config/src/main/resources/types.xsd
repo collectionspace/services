@@ -15,8 +15,8 @@
         
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns="http://collectionspace.org/services/common/types"
-    targetNamespace="http://collectionspace.org/services/common/types"
+    xmlns="http://collectionspace.org/services/config/types"
+    targetNamespace="http://collectionspace.org/services/config/types"
     elementFormDefault="qualified"
 >
     <!--

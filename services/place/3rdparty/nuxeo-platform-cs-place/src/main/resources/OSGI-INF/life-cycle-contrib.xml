@@ -4,8 +4,8 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Placeauthority">default</type>
-      <type name="Placeitem">default</type>
+      <type name="Placeauthority">${Lifecycle}</type>
+      <type name="Placeitem">${Lifecycle}</type>
     </types>
   </extension>
 

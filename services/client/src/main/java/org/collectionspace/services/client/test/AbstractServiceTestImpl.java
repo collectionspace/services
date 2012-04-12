@@ -530,7 +530,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             int existingTestCreated = allResourceIdsCreated.size(); // assumption is that no other test created records were soft deleted
             String csid = allResourceIdsCreated.get(existingTestCreated - 1); //0-based index to get the last one added
             this.setupUpdate();
-            this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
+            this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWTRANSITION_DELETE, WorkflowClient.WORKFLOWSTATE_DELETED);
             //
             // Read the list of existing non-deleted records
             //
@@ -597,7 +597,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
             int existingTestCreated = allResourceIdsCreated.size(); // assumption is that no other test created records were soft deleted
             String csid = allResourceIdsCreated.get(existingTestCreated - 1); //0-based index to get the last one added
             this.setupUpdate();
-            this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
+            this.updateLifeCycleState(testName, csid, WorkflowClient.WORKFLOWTRANSITION_DELETE, WorkflowClient.WORKFLOWSTATE_DELETED);
 
             //
             // Search for the newly-created records, excluding the soft deleted record.
@@ -806,7 +806,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
     
 
     @SuppressWarnings("rawtypes")
-    protected void updateLifeCycleState(String testName, String resourceId, String lifeCycleState) throws Exception {
+    protected void updateLifeCycleState(String testName, String resourceId, String workflowTransition, String lifeCycleState) throws Exception {
         //
         // Read the existing object
         //
@@ -835,7 +835,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         // Perform the update
         //
         WorkflowCommon updatedWorkflowCommons = null;
-        res = client.updateWorkflow(resourceId, output);
+        res = client.updateWorkflowWithTransition(resourceId, workflowTransition);
         try {
 	        assertStatusCode(res, testName);
 	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());

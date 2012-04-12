@@ -24,7 +24,9 @@
 package org.collectionspace.services.common.config;
 
 import java.io.File;
-import org.collectionspace.services.common.*;
+
+import org.collectionspace.services.config.ClientType;
+import org.collectionspace.services.config.ServiceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

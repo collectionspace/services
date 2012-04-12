@@ -22,6 +22,7 @@
         <ServiceName>media</ServiceName>
         <NuxeoDocTypeName>Media</NuxeoDocTypeName>
         <CommonSchemaName>media_common</CommonSchemaName>
+		<Lifecycle>cs_default</Lifecycle>
     </properties>
     
     <build>

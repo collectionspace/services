@@ -7,7 +7,6 @@
         <version>2.2-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authorization-mgt</artifactId>
     <name>services.authorization-mgt</name>
     <packaging>pom</packaging>

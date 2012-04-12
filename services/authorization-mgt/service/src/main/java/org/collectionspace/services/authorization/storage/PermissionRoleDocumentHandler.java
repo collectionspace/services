@@ -34,6 +34,8 @@ import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
+import org.collectionspace.services.common.authorization_mgt.PermissionRoleUtil;
+
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;

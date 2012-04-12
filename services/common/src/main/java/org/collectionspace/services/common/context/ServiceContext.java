@@ -29,15 +29,13 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
-import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.security.SecurityContext;
-import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.service.ObjectPartType;
-import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.config.ClientType;
+import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.config.service.ServiceBindingType;
 
 /**
  *

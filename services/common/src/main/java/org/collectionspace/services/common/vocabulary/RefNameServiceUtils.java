@@ -59,7 +59,7 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
-import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 

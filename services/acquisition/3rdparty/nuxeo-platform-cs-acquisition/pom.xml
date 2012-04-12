@@ -18,6 +18,7 @@
         <ServiceName>acquisition</ServiceName>
         <NuxeoDocTypeName>Acquisition</NuxeoDocTypeName>
         <CommonSchemaName>acquisitions_common</CommonSchemaName>
+		<Lifecycle>cs_default</Lifecycle>
     </properties>
 
     <build>

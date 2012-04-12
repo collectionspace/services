@@ -28,7 +28,6 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
@@ -55,6 +54,7 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
+import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
@@ -114,7 +114,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     protected Class<?> resourceClass;
     protected String authorityCommonSchemaName;
     protected String authorityItemCommonSchemaName;
-    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
+    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType(); //FIXME: REM - 3 Why is this field needed?  I see no references to it.
     final static String URN_PREFIX = "urn:cspace:";
     final static int URN_PREFIX_LEN = URN_PREFIX.length();
     final static String URN_PREFIX_NAME = "name(";
@@ -745,7 +745,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
             List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
             if(serviceTypes == null || serviceTypes.isEmpty()) {
-            	serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
+                // Temporary workaround for CSPACE-4983
+            	// serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
+                serviceTypes = ServiceBindingUtils.getCommonProcedureServiceTypes();
             }
             
             // Note that we have to create the service context for the Items, not the main service

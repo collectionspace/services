@@ -39,13 +39,23 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	//
 	// Workflow states
 	//
+	public static final String WORKFLOWTRANSITION_UNDELETE = "undelete";
+	public static final String WORKFLOWTRANSITION_DELETE = "delete";
 	public static final String WORKFLOWSTATE_DELETED = "deleted";
-	public static final String WORKFLOWSTATE_PROJECT = "project";
-	public static final String WORKFLOWSTATE_APPROVED = "approved";	
+	
+	public static final String WORKFLOWSTATE_ACTIVE = "active";
+	
+	public static final String WORKFLOWTRANSITION_LOCK = "lock";
+	public static final String WORKFLOWSTATE_LOCKED = "locked";
+	//
+	// DocumentHandler passed properties
+	//
+	public static final String TRANSITION_ID = "transition_id";
 	//
 	// Service Query Params
 	//
-	public static final String WORKFLOW_QUERY_NONDELETED = "wf_deleted";	
+	public static final String WORKFLOW_QUERY_NONDELETED = "wf_deleted";
+	public static final String WORKFLOWSTATE_QUERY = "wf_deleted";
 
 	
 	@Override
