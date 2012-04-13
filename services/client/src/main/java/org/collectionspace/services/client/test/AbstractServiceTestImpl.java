@@ -1041,7 +1041,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
 
                 this.setupUpdate();
 
-                this.updateItemLifeCycleState(testName, parentCsid, csid, WorkflowClient.WORKFLOWSTATE_DELETED);
+                this.updateItemLifeCycleState(testName, parentCsid, csid, WorkflowClient.WORKFLOWTRANSITION_DELETE, WorkflowClient.WORKFLOWSTATE_DELETED);
                 //
                 // Read the list of existing non-deleted records
                 //
@@ -1065,7 +1065,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         }
     }
 
-    protected void updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String lifeCycleState) throws Exception {
+    protected void updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String workflowTransition, String lifeCycleState) throws Exception {
         //
         // Read the existing object
         //
@@ -1093,7 +1093,7 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         //
         // Perform the state change update
         //
-        res = client.updateItemWorkflow(parentCsid, itemCsid, output);
+        res = client.updateItemWorkflowWithTransition(parentCsid, itemCsid, workflowTransition);
         WorkflowCommon updatedWorkflowCommons = null;
         try {
 	        assertStatusCode(res, testName);

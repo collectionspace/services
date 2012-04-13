@@ -45,9 +45,6 @@
         <transition name="lock" destinationState="locked">
           <description>Lock document</description>
         </transition>
-        <transition name="unlock" destinationState="project">
-          <description>Unlock the document</description>
-        </transition>
         <transition name="delete" destinationState="deleted">
           <description>Move document to trash (temporary delete)</description>
         </transition>
@@ -63,9 +60,7 @@
           </transitions>
         </state>
         <state name="locked" description="Locked state">
-          <transitions>
-            <transition>unlock</transition>
-          </transitions>
+        	<!-- No transitions allowed from locked state. -->
         </state>
         <state name="deleted" description="Document is deleted">
           <transitions>

@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.config.service.ServiceBindingType;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -42,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jboss.crypto.digest.DigestCallback;
+import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.security.Base64Encoder;
 import org.jboss.security.Base64Utils;
 
@@ -98,6 +100,25 @@ public class SecurityUtils {
         }
     }
 
+    public static String getWorkflowResourceName(HttpRequest request) {
+    	String result = null;
+    			
+    	UriInfo uriInfo = request.getUri();
+    	String workflowSubResName = SecurityUtils.getResourceName(uriInfo);
+    	String resEntity = SecurityUtils.getResourceEntity(workflowSubResName);
+    	
+		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
+		String workflowTransition = pathParams.getFirst(WorkflowClient.TRANSITION_PARAM_JAXRS);
+		if (workflowTransition != null) {
+	    	result = resEntity + "/*/" + WorkflowClient.SERVICE_NAME + "/" + workflowTransition;
+		} else {
+			// e.g., intakes/workflow or intakes/*/workflow
+			result = resEntity;
+		}
+    	
+    	return result;
+    }
+    
 	/**
 	 * Gets the resource name.
 	 *

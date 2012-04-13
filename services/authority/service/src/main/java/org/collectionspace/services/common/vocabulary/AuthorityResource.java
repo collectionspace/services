@@ -56,12 +56,14 @@ import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumen
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
+import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -550,18 +552,22 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     @PUT
-    @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH)
-    public byte[] updateWorkflow(
+    @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
+    public byte[] updateItemWorkflowWithTransition(
             @PathParam("csid") String csid,
             @PathParam("itemcsid") String itemcsid,
-            String xmlPayload) {
+            @PathParam("transition") String transition) {
         PoxPayloadOut result = null;
         try {
+        	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
+        			WorkflowClient.SERVICE_COMMONPART_NAME);
+
             ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
             String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
 
-            PoxPayloadIn workflowUpdate = new PoxPayloadIn(xmlPayload);
-            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, workflowUpdate);
+            TransitionDef transitionDef = getTransitionDef(parentCtx, transition);
+            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input);
+            ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
             WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
             ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
             getRepositoryClient(ctx).update(ctx, itemcsid, handler);

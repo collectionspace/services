@@ -148,9 +148,10 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
             
     //(U)pdate Item workflow
     @PUT
-    @Path("/{vcsid}/items/{csid}" + WorkflowClient.SERVICE_PATH)
-    ClientResponse<String> updateItemWorkflow(@PathParam("vcsid") String vcsid,
+    @Path("/{vcsid}/items/{csid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
+    ClientResponse<String> updateItemWorkflowWithTransition(
+    		@PathParam("vcsid") String vcsid,
     		@PathParam("csid") String csid,
-    		byte[] xmlPayload);
+    		@PathParam("transition") String transition);
     
 }
