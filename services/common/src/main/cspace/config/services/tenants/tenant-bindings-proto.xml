@@ -76,7 +76,6 @@
 
     <!-- begin collectionobject service meta-data -->
     <tenant:serviceBindings id="CollectionObjects" name="CollectionObjects" type="object" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/collectionobjects/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -628,7 +627,6 @@
     <!-- begin blob service meta-data -->
 		<!-- This should likely be type="object" -->
     <tenant:serviceBindings id="Blobs" name="Blobs" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/blobs/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
@@ -690,7 +688,6 @@
     
     <!-- begin intake service meta-data -->
     <tenant:serviceBindings id="Intakes" name="Intakes" type="procedure" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/intakes/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -834,7 +831,6 @@
         
     <!-- begin loanin service meta-data -->
     <tenant:serviceBindings id="Loansin" name="Loansin" type="procedure" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/loansin/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -990,7 +986,6 @@
     
     <!-- begin loanout service meta-data -->
     <tenant:serviceBindings id="Loansout" name="Loansout" type="procedure" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/loansout/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -1078,7 +1073,6 @@
     
     <!-- begin objectexit service meta-data -->
     <tenant:serviceBindings id="ObjectExit" name="ObjectExit" type="procedure" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/objectexit/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
@@ -1151,7 +1145,6 @@
     
     <!-- begin batch service meta-data -->
     <tenant:serviceBindings id="Batch" name="Batch" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/batch/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
@@ -1188,7 +1181,6 @@
     
     <!-- begin group service meta-data -->
     <tenant:serviceBindings id="Groups" name="Groups" type="procedure" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/groups/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.group.nuxeo.GroupDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
@@ -1250,7 +1242,6 @@
     
     <!-- begin imports service meta-data -->
     <tenant:serviceBindings id="Imports" name="Imports" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/imports/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.imports.nuxeo.ImportsDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
@@ -1294,7 +1285,6 @@
     <!-- begin media service meta-data -->
 		<!-- This should likely be type="object" -->
      <tenant:serviceBindings id="Media" name="Media" type="procedure" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/media/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler</service:documentHandler>
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
@@ -1411,7 +1401,6 @@
         
     <!-- begin movement service meta-data -->
     <tenant:serviceBindings id="Movements" name="Movements" type="procedure" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/movements/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -1547,7 +1536,6 @@
         
     <!-- begin report service meta-data -->
     <tenant:serviceBindings id="Reports" name="Reports" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/reports/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -1597,8 +1585,6 @@
     
     <!-- begin vocabulary service meta-data -->
     <tenant:serviceBindings id="Vocabularies" name="Vocabularies" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/vocabularies/*/workflow/</service:uriPath>
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/vocabularies/*/items/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.vocabulary.nuxeo.VocabularyDocumentModelHandler</service:documentHandler>
@@ -1663,7 +1649,6 @@
             Repository workspace so we have to configure that.
         -->
     <tenant:serviceBindings id="Vocabularyitems" name="Vocabularyitems" type="authority" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/vocabularyitems/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
       <!--
                         <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -1726,8 +1711,6 @@
     
     <!-- begin orgauthority service meta-data -->
     <tenant:serviceBindings id="Orgauthorities" name="Orgauthorities" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/orgauthorities/*/workflow/</service:uriPath>
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/orgauthorities/*/items/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -1895,8 +1878,6 @@
         
     <!-- begin personauthority service meta-data -->
     <tenant:serviceBindings id="Personauthorities" name="Personauthorities" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/personauthorities/*/workflow/</service:uriPath>
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/personauthorities/*/items/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -2090,8 +2071,6 @@
         
     <!-- begin locationauthority service meta-data -->
     <tenant:serviceBindings id="Locationauthorities" name="Locationauthorities" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/locationauthorities/*/workflow/</service:uriPath>
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/locationauthorities/*/items/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -2233,8 +2212,6 @@
     <!-- end location service meta-data -->
         <!-- begin placeauthority service meta-data -->
         <tenant:serviceBindings id="Placeauthorities" name="Placeauthorities" version="0.1">
-            <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/placeauthorities/*/workflow/</service:uriPath>
-            <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/placeauthorities/*/items/*/workflow/</service:uriPath>
             <!-- other URI paths using which this service could be accessed -->
             <!-- 
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -2413,8 +2390,6 @@
         <!-- end place service meta-data -->
     <!-- begin taxonomyauthority service meta-data -->
     <tenant:serviceBindings id="Taxonomyauthority" name="Taxonomyauthority" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/taxonomyauthority/*/workflow/</service:uriPath>
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/taxonomyauthority/*/items/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -2578,8 +2553,6 @@
     
     <!-- begin conceptauthority service meta-data -->
     <tenant:serviceBindings id="Conceptauthorities" name="Conceptauthorities" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/conceptauthorities/*/workflow/</service:uriPath>
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/conceptauthorities/*/items/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -2722,7 +2695,6 @@
 
     <!-- begin acquisition service meta-data -->
     <tenant:serviceBindings id="Acquisitions" name="Acquisitions" type="procedure" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/acquisitions/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -2837,7 +2809,6 @@
     
     <!-- begin relation service meta-data -->
     <tenant:serviceBindings id="Relations" name="Relations" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/relations/*/workflow/</service:uriPath>
             <!-- other URI paths through which this service could be accessed -->
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.relation.nuxeo.RelationDocumentModelHandler</service:documentHandler>
@@ -2986,7 +2957,7 @@
     <!-- begin dimension service meta-data -->
     <tenant:serviceBindings id="Dimensions" name="Dimensions" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/dimensions/*/workflow/</service:uriPath>
+      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/dimensions/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.dimension.nuxeo.DimensionDocumentModelHandler</service:documentHandler>
       <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Dimension" version="0.1">
@@ -3090,7 +3061,6 @@
     
     <!-- begin note service meta-data -->
     <tenant:serviceBindings id="Notes" name="Notes" type="utility" version="0.1">
-      <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/notes/*/workflow/</service:uriPath>
       <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
       <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.note.nuxeo.NoteDocumentModelHandler</service:documentHandler>
       <service:object xmlns:service="http://collectionspace.org/services/config/service" name="CSNote" version="0.1">

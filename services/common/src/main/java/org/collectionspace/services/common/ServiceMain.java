@@ -164,7 +164,7 @@ public class ServiceMain {
         // Create all the default user accounts and permissions
         //
         try {
-        	AuthorizationCommon.createDefaultPermissions(tenantBindingConfigReader);        	
+        	AuthorizationCommon.createDefaultWorkflowPermissions(tenantBindingConfigReader);        	
         	AuthorizationCommon.createDefaultAccounts(tenantBindingConfigReader);     
         } catch(Throwable e) {        	
         	logger.error("Default accounts and permissions setup failed with exception(s): " + e.getLocalizedMessage(), e);

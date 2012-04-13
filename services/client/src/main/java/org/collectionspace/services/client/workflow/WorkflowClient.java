@@ -51,6 +51,7 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	// DocumentHandler passed properties
 	//
 	public static final String TRANSITION_ID = "transition_id";
+	public static final String TRANSITION_PARAM_JAXRS = "transition";
 	//
 	// Service Query Params
 	//

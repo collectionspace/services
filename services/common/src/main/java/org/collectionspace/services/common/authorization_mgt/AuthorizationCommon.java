@@ -248,9 +248,8 @@ public class AuthorizationCommon {
     		String resourceName,
     		String description,
     		ActionGroup actionGroup) {
-//        String id = UUID.randomUUID().toString(); //FIXME: Could this be something like a refname instead of a UUID?
         String id = tenantId
-        		+ "-" + resourceName
+        		+ "-" + resourceName.replace('/', '_') // Remove the slashes so the ID can be used in a URI/URL
         		+ "-" + actionGroup.name;
         Permission perm = new Permission();
         perm.setCsid(id);
@@ -799,7 +798,7 @@ public class AuthorizationCommon {
 		return result;
 	}
 	
-    public static void createDefaultPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader) throws Exception //FIXME: REM - 4/11/2012 - Rename to createWorkflowPermissions
+    public static void createDefaultWorkflowPermissions(TenantBindingConfigReaderImpl tenantBindingConfigReader) throws Exception //FIXME: REM - 4/11/2012 - Rename to createWorkflowPermissions
     {
     	AuthZ.get().login(); //login to Spring Security manager
     	
@@ -821,17 +820,6 @@ public class AuthorizationCommon {
 		        	if (prop == null ? true : Boolean.parseBoolean(prop)) {
 			        		try {
 			        		em.getTransaction().begin();
-			        		//
-			        		// For the default admin role, create the base workflow (aka, "/workflow" permissions for the service.
-			        		Permission baseAdminPerm = createWorkflowPermission(tenantBinding, serviceBinding, null, ACTIONGROUP_CRUDL);
-			        		persist(em, baseAdminPerm, adminRole, true);
-			        		//
-			        		// For the default read-only role, create the base workflow (aka, "/workflow" permissions for the service.
-			        		Permission baseReadonlyPerm = createWorkflowPermission(tenantBinding, serviceBinding, null, ACTIONGROUP_RL);
-			        		persist(em, baseReadonlyPerm, readonlyRole, true);		        		
-			        		//
-			        		// Next, create a permission for each workflow transition supported by the service's document type.
-			        		//
 				        	TransitionDefList transitionDefList = getTransitionDefList(tenantBinding, serviceBinding);
 				        	for (TransitionDef transitionDef : transitionDefList.getTransitionDef()) {
 				        		//

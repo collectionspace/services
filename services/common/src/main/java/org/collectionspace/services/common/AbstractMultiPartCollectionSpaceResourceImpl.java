@@ -193,7 +193,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
         return result.getBytes();
     }
     
-    private TransitionDef getTransitionDef(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String transition) {
+    protected TransitionDef getTransitionDef(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String transition) {
     	TransitionDef result = null;
     	
     	try {
