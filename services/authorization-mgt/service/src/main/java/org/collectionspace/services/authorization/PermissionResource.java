@@ -102,8 +102,10 @@ public class PermissionResource extends SecurityResourceBase {
     @Produces("application/xml")
     public PermissionsList getPermissionList(@Context UriInfo ui) {
     	PermissionsList result = (PermissionsList)getList(ui, Permission.class);
-    	PayloadOutputPart ppo = new PayloadOutputPart(PermissionsList.class.getName(), result);
-    	System.out.println(ppo.asXML());
+    	if(logger.isTraceEnabled()) {
+        	PayloadOutputPart ppo = new PayloadOutputPart(PermissionsList.class.getName(), result);
+    		System.out.println(ppo.asXML());
+    	}
     	
     	return result;
     }
