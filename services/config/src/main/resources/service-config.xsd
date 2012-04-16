@@ -12,13 +12,13 @@
 
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns="http://collectionspace.org/services/common"
-  xmlns:types="http://collectionspace.org/services/common/types"
-  targetNamespace="http://collectionspace.org/services/common"
+  xmlns="http://collectionspace.org/services/config"
+  xmlns:types="http://collectionspace.org/services/config/types"
+  targetNamespace="http://collectionspace.org/services/config"
   version="0.1"
 >
 
-    <xs:import namespace="http://collectionspace.org/services/common/types" schemaLocation="types.xsd" />
+    <xs:import namespace="http://collectionspace.org/services/config/types" schemaLocation="types.xsd" />
 
     <xs:element name="service-config">
         <xs:complexType>

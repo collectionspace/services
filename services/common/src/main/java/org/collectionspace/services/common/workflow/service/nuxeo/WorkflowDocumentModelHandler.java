@@ -23,12 +23,11 @@
  */
 package org.collectionspace.services.common.workflow.service.nuxeo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -36,17 +35,13 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
-import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.workflow.jaxb.WorkflowJAXBSchema;
+import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.workflow.WorkflowCommon;
-import org.dom4j.Element;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -118,6 +113,7 @@ public class WorkflowDocumentModelHandler
      * @return an identifier for the transition required to
      * place the document in that workflow state.
      */
+    @Deprecated 
     private String getTransitionFromState(String state) {
         String result = TRANSITION_UNKNOWN;
 
@@ -126,11 +122,11 @@ public class WorkflowDocumentModelHandler
         // destination workflow state and the set of allowable state transitions.
 
         if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_DELETED)) {
-            result = TRANSITION_DELETE;
-        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_APPROVED)) {
-            result = TRANSITION_APPROVE;
-        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_PROJECT)) {
-            result = TRANSITION_UNDELETE;
+            result = WorkflowClient.WORKFLOWTRANSITION_DELETE;
+        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_ACTIVE)) {
+            result = WorkflowClient.WORKFLOWTRANSITION_UNDELETE; //FIXME, could also be transition WORKFLOWTRANSITION_UNLOCK
+        } else if (state.equalsIgnoreCase(WorkflowClient.WORKFLOWSTATE_LOCKED)) {
+            result = WorkflowClient.WORKFLOWTRANSITION_LOCK;
         } else {
         	logger.warn("An attempt was made to transition a document to an unknown workflow state = "
         			+ state);
@@ -144,26 +140,23 @@ public class WorkflowDocumentModelHandler
      */
 
     @Override
-    protected void fillPart(PayloadInputPart part, DocumentModel docModel,
-            ObjectPartType partMeta, Action action,
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
-            throws Exception {
-    	String toState = null;
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
+    	String transitionToFollow = null;
+    	
+        DocumentModel docModel = wrapDoc.getWrappedObject();
+        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
     	
     	try {
-	        WorkflowCommon workflowsCommon = (WorkflowCommon) part.getBody();
-	        toState = getTransitionFromState(workflowsCommon.getCurrentLifeCycleState());
-	        docModel.followTransition(toState);
+    		TransitionDef transitionDef = (TransitionDef)this.getServiceContext().getProperty(WorkflowClient.TRANSITION_ID);
+    		transitionToFollow = transitionDef.getName();
+	        docModel.followTransition(transitionToFollow);
     	} catch (Exception e) {
     		String msg = "Unable to follow workflow transition to state = "
-    				+ toState;
-    		if (logger.isDebugEnabled() == true) {
-    			logger.debug(msg, e);
-    		}
-    		ClientException ce = new ClientException("Unable to follow workflow transition to state = "
-    				+ toState);
+    				+ transitionToFollow;
+    		logger.error(msg, e);
+    		ClientException ce = new ClientException("Unable to follow workflow transition: " + transitionToFollow);
     		throw ce;
     	}
-    }
+    }    
 }
 

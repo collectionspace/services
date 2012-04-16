@@ -34,7 +34,7 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.tenant.TenantBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

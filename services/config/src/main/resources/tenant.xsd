@@ -15,15 +15,15 @@
 
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="http://collectionspace.org/services/common/tenant"
-           xmlns:types="http://collectionspace.org/services/common/types"
-           xmlns:service="http://collectionspace.org/services/common/service"
-           targetNamespace="http://collectionspace.org/services/common/tenant"
+           xmlns="http://collectionspace.org/services/config/tenant"
+           xmlns:types="http://collectionspace.org/services/config/types"
+           xmlns:service="http://collectionspace.org/services/config/service"
+           targetNamespace="http://collectionspace.org/services/config/tenant"
            version="0.1"
            elementFormDefault="qualified">
 
-    <xs:import namespace="http://collectionspace.org/services/common/types" schemaLocation="types.xsd" />
-    <xs:import namespace="http://collectionspace.org/services/common/service" schemaLocation="service.xsd" />
+    <xs:import namespace="http://collectionspace.org/services/config/types" schemaLocation="types.xsd" />
+    <xs:import namespace="http://collectionspace.org/services/config/service" schemaLocation="service.xsd" />
 
     <xs:element name="TenantBindingConfig">
         <xs:annotation>

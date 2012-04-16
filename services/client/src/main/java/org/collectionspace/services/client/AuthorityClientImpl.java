@@ -198,8 +198,8 @@ public abstract class AuthorityClientImpl<AUTHORITY_ITEM_TYPE, P extends Authori
     }
     
 	@Override
-    public ClientResponse<String> updateItemWorkflow(String vcsid, String csid, PoxPayloadOut xmlPayload) {
-    	return getProxy().updateItemWorkflow(vcsid, csid, xmlPayload.getBytes());
+    public ClientResponse<String> updateItemWorkflowWithTransition(String vcsid, String csid, String workflowTransition) {
+    	return getProxy().updateItemWorkflowWithTransition(vcsid, csid, workflowTransition);
     }
 	
 }

@@ -28,7 +28,6 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
@@ -55,13 +54,16 @@ import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
+import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
+import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -114,7 +116,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     protected Class<?> resourceClass;
     protected String authorityCommonSchemaName;
     protected String authorityItemCommonSchemaName;
-    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
+    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType(); //FIXME: REM - 3 Why is this field needed?  I see no references to it.
     final static String URN_PREFIX = "urn:cspace:";
     final static int URN_PREFIX_LEN = URN_PREFIX.length();
     final static String URN_PREFIX_NAME = "name(";
@@ -550,18 +552,22 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     @PUT
-    @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH)
-    public byte[] updateWorkflow(
+    @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
+    public byte[] updateItemWorkflowWithTransition(
             @PathParam("csid") String csid,
             @PathParam("itemcsid") String itemcsid,
-            String xmlPayload) {
+            @PathParam("transition") String transition) {
         PoxPayloadOut result = null;
         try {
+        	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
+        			WorkflowClient.SERVICE_COMMONPART_NAME);
+
             ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
             String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
 
-            PoxPayloadIn workflowUpdate = new PoxPayloadIn(xmlPayload);
-            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, workflowUpdate);
+            TransitionDef transitionDef = getTransitionDef(parentCtx, transition);
+            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input);
+            ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
             WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
             ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
             getRepositoryClient(ctx).update(ctx, itemcsid, handler);
@@ -745,7 +751,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
             List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
             if(serviceTypes == null || serviceTypes.isEmpty()) {
-            	serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
+                // Temporary workaround for CSPACE-4983
+            	// serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
+                serviceTypes = ServiceBindingUtils.getCommonProcedureServiceTypes();
             }
             
             // Note that we have to create the service context for the Items, not the main service

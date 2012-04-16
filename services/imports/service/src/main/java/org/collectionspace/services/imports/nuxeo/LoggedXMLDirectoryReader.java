@@ -19,7 +19,6 @@ import org.nuxeo.ecm.core.io.ExportConstants;
 import org.nuxeo.ecm.core.io.ExportedDocument;
 import org.nuxeo.ecm.core.io.impl.AbstractDocumentReader;
 import org.nuxeo.ecm.core.io.impl.ExportedDocumentImpl;
-import org.nuxeo.ecm.core.io.impl.plugins.XMLDirectoryReader;
 import org.nuxeo.runtime.services.streaming.FileSource;
 
 public class LoggedXMLDirectoryReader extends AbstractDocumentReader {

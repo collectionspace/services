@@ -23,8 +23,6 @@
  */
 package org.collectionspace.services.common.document;
 
-import java.util.Calendar;
-
 import java.lang.reflect.Array;
 
 import java.io.File;
@@ -56,9 +54,9 @@ import javax.xml.transform.TransformerException;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
-import org.collectionspace.services.common.service.ObjectPartContentType;
-import org.collectionspace.services.common.service.ObjectPartType;
-import org.collectionspace.services.common.service.XmlContentType;
+import org.collectionspace.services.config.service.ObjectPartContentType;
+import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.config.service.XmlContentType;
 import org.dom4j.io.DOMReader;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;

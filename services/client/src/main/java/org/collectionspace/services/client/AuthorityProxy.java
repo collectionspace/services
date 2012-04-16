@@ -37,7 +37,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @Path("/{vcsid}/items/{csid}")
     ClientResponse<String> readItem(@PathParam("vcsid") String vcsid,
     		@PathParam("csid") String csid,
-    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
     
     //(U)pdate Item
     @PUT
@@ -64,7 +64,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     ClientResponse<AuthorityRefDocList> getReferencingObjects(
             @PathParam("csid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
     
     // List Item Authority References
     @GET
@@ -82,7 +82,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @GET
     @Path("/urn:cspace:name({name})")
     ClientResponse<String> readByName(@PathParam("name") String name,
-    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
     
     /*
      * Item subresource methods
@@ -93,21 +93,21 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     @Path("/{vcsid}/items/urn:cspace:name({specifier})")
     ClientResponse<String> readNamedItem(@PathParam("vcsid") String vcsid,
     		@PathParam("specifier") String specifier,
-    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     //(R)ead Item In Named Authority
     @GET
     @Path("/urn:cspace:name({specifier})/items/{csid}")
     ClientResponse<String> readItemInNamedAuthority(@PathParam("specifier") String specifier,
     		@PathParam("csid") String csid,
-    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     //(R)ead Named Item In Named Authority
     @GET
     @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
     ClientResponse<String> readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, 
     		@PathParam("itemspecifier") String itemspecifier,
-    		@QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+    		@QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
     
     /*
      * Item subresource List methods
@@ -121,7 +121,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     		@PathParam("csid") String vcsid,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
     
     // List Items for a named authority matching a partial term or keywords.
     @GET
@@ -131,7 +131,7 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
     		@PathParam("specifier") String specifier,
             @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     /*
      * Workflow related methods
@@ -148,9 +148,10 @@ public interface AuthorityProxy extends CollectionSpaceCommonListPoxProxy {
             
     //(U)pdate Item workflow
     @PUT
-    @Path("/{vcsid}/items/{csid}" + WorkflowClient.SERVICE_PATH)
-    ClientResponse<String> updateItemWorkflow(@PathParam("vcsid") String vcsid,
+    @Path("/{vcsid}/items/{csid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
+    ClientResponse<String> updateItemWorkflowWithTransition(
+    		@PathParam("vcsid") String vcsid,
     		@PathParam("csid") String csid,
-    		byte[] xmlPayload);
+    		@PathParam("transition") String transition);
     
 }

@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.collectionspace.services.common.context.ServiceBindingUtils;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
-import org.collectionspace.services.common.types.PropertyItemType;
-import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.config.types.PropertyItemType;
+import org.collectionspace.services.config.types.PropertyType;
+
 
 public class TenantBindingUtils {
 

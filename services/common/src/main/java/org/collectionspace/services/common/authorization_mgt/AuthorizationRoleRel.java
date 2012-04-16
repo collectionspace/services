@@ -5,7 +5,6 @@ import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.RoleValue;
-import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 
 public class AuthorizationRoleRel {
 

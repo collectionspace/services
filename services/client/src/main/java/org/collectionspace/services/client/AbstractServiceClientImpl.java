@@ -430,8 +430,8 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     }
     
     @Override
-	public ClientResponse<String> updateWorkflow(String csid, PoxPayloadOut xmlPayload) {
-    	return getProxy().updateWorkflow(csid, xmlPayload.getBytes());
+	public ClientResponse<String> updateWorkflowWithTransition(String csid, String workflowTransition) {
+    	return getProxy().updateWorkflowWithTransition(csid, workflowTransition);
     }        
     
     /*

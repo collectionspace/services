@@ -27,10 +27,10 @@ import java.util.Map;
 
 import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.contact.ContactsCommon;
 
 import org.nuxeo.ecm.core.api.DocumentModel;

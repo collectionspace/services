@@ -22,6 +22,7 @@
         <ServiceName>loanin</ServiceName>
         <NuxeoDocTypeName>Loanin</NuxeoDocTypeName>
         <CommonSchemaName>loansin_common</CommonSchemaName>
+		<Lifecycle>cs_default</Lifecycle>
     </properties>
 
     <build>

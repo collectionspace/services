@@ -24,7 +24,6 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -44,26 +43,22 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.security.SecurityUtils;
-import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
+import org.collectionspace.services.config.service.ObjectPartType;
 import org.dom4j.Element;
 
 import org.nuxeo.ecm.core.api.DocumentModel;

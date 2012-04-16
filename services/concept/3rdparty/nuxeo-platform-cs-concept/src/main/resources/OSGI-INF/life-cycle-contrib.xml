@@ -4,8 +4,8 @@
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
              point="types">
     <types>
-      <type name="Conceptauthority">default</type>
-      <type name="Conceptitem">default</type>
+      <type name="Conceptauthority">${Lifecycle}</type>
+      <type name="Conceptitem">${Lifecycle}</type>
     </types>
   </extension>
 

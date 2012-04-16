@@ -25,7 +25,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.collectionspace.services.authorization.importer;
+package org.collectionspace.services.common.authorization_mgt;
 
 import java.util.Date;
 import javax.persistence.EntityManager;
@@ -33,7 +33,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.perms.Permission;
-import org.collectionspace.services.authorization.storage.RoleStorageConstants;
+import org.collectionspace.services.common.authorization_mgt.RoleStorageConstants;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class AuthorizationStore {
     	try {
     		theRole = (Role)JpaStorageUtils.getEnityByKey(Role.class.getName(),
     				RoleStorageConstants.ROLE_NAME, roleName, tenantId);
-    	} catch (Exception e) {
+    	} catch (Throwable e) {
     		if (logger.isTraceEnabled() == true) {
     			logger.trace("Could not retrieve role with name =" + roleName, e);
     		}
@@ -62,6 +62,22 @@ public class AuthorizationStore {
     	
     	return theRole;
     }
+    
+    static public Role getRoleByName(EntityManager em, String roleName, String tenantId) {
+    	Role theRole = null;
+    	
+    	try {
+    		theRole = (Role)JpaStorageUtils.getEnityByKey(em, Role.class.getName(),
+    				RoleStorageConstants.ROLE_NAME, roleName, tenantId);
+    	} catch (Throwable e) {
+    		if (logger.isTraceEnabled() == true) {
+    			logger.trace("Could not retrieve role with name =" + roleName, e);
+    		}
+    	}
+    	
+    	return theRole;
+    }
+    
     
     static public Permission getPermission(Permission permission) {
     	Permission result = null;
@@ -96,7 +112,7 @@ public class AuthorizationStore {
             em.getTransaction().commit();
             String id = null;
             try{
-                id = (String) JaxbUtils.getValue(entity, "getCsid");
+                id = (String) JaxbUtils.getValue(entity, "getCsid"); //NOTE: Not all entities have a CSID attribute
             } catch(NoSuchMethodException nsme) {
                 //do nothing ok, relationship does not have csid
             }
@@ -111,8 +127,53 @@ public class AuthorizationStore {
             throw e;
         } finally {
             if (em != null) {
+            	em.clear();
+            	em.close();
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
+    }
+    
+    private boolean exists(EntityManager em, Object entity) {
+    	boolean result = false;
+    	
+    	try {
+    		String csid = (String)JaxbUtils.getValue(entity, "getCsid");
+    		Object existingEntity = em.find(entity.getClass(), csid);
+    		if (existingEntity != null) {
+    			result = true;
+    		}
+    	} catch (Exception e) {
+    		//NOTE: Not all entities have a CSID attribute
+    	}
+    	
+    	return result;
+    }
+    /*
+     * Use this method if you've already started a transaction with an EntityManager
+     */
+    public String store(EntityManager em, Object entity) throws Exception {
+    	boolean entityExists = exists(em, entity);
+    	if (entityExists == true) {
+    		logger.debug("Entity to persist already exists.");
+    	}
+        if (JaxbUtils.getValue(entity, "getCreatedAt") == null) {
+            JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
+        }
+        
+        if (entityExists == true) {
+        	//em.merge(entity); FIXME: Leave commented out until we address CSPACE-5031
+        } else {
+        	em.persist(entity);
+        }
+        
+        // look for a CSID
+        String id = null;
+        try{
+            id = (String) JaxbUtils.getValue(entity, "getCsid"); //NOTE: Not all entities have a CSID attribute
+        } catch(NoSuchMethodException nsme) {
+            //do nothing ok, relationship does not have csid
+        }
+        return id;
     }
 }
