@@ -48,23 +48,10 @@
     <xs:element name="fieldLocVerbatim" type="xs:string"/>
     <xs:element name="fieldCollectionDateEarliest" type="xs:string"/>
     <xs:element name="fieldCollectionDateLatest" type="xs:string"/>
-    <xs:element name="fieldLocLatDecimal" type="xs:string"/>
-    <xs:element name="fieldLocLongDecimal" type="xs:string"/>
-
-		<!-- Add in an extension field for the common title group -->
-		<xs:element name="nh_titleGroupList">
-			<xs:complexType>
-				<xs:sequence>
-					<xs:element name="nh_titleGroup">
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="titleNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-				</xs:sequence>
-			</xs:complexType>
-    </xs:element>
+    <xs:element name="fieldLocLat" type="xs:string"/>
+    <xs:element name="fieldLocLong" type="xs:string"/>
+    <xs:element name="fieldLocLatDecimal" type="xs:decimal"/>
+    <xs:element name="fieldLocLongDecimal" type="xs:decimal"/>
 
     <!-- These will become contolled lists -->
     <xs:element name="fieldLocGeodeticDatum" type="xs:string"/>
