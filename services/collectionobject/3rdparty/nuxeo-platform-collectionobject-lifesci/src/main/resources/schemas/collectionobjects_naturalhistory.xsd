@@ -25,11 +25,6 @@
   <xs:element name="catalogDate" type="xs:string"/>
   -->
 
-    <xs:element name="typeSpecimenKind" type="xs:string"/>
-    <xs:element name="typeSpecimenReference" type="xs:string"/>
-    <xs:element name="typeSpecimenRefPage" type="xs:string"/>
-    <xs:element name="typeSpecimenNotes" type="xs:string"/>
-
     <xs:element name="labelHeader" type="xs:string"/>
     <xs:element name="labelFooter" type="xs:string"/>
 
@@ -111,6 +106,23 @@
             <xs:element name="annotationNote" type="xs:string"/>
             <xs:element name="annotationDate" type="xs:string"/>
             <xs:element name="annotationAuthor" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="typeSpecimenGroupList">
+        <xs:sequence>
+            <xs:element name="typeSpecimenGroup" type="typeSpecimenGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="typeSpecimenGroup">
+        <xs:sequence>
+		    <xs:element name="typeSpecimenKind" type="xs:string"/>
+		    <xs:element name="typeSpecimenBasionym" type="xs:string"/>
+		    <xs:element name="typeSpecimenReference" type="xs:string"/>
+		    <xs:element name="typeSpecimenRefPage" type="xs:string"/>
+		    <xs:element name="typeSpecimenAssertionBy" type="xs:string"/>
+		    <xs:element name="typeSpecimenNotes" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>
