@@ -9,16 +9,73 @@
     
    <testGroup ID="importsTestGroup" autoDeletePOSTS="true">
 
-        <test ID="import-post">
+        <!-- Import a single ObjectExit record -->
+        <test ID="import-objectexit">
             <expectedCodes>200</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/imports</uri>
-            <filename>imports/import-1objectexit-post.xml</filename>
+            <filename>imports/import-objectexit.xml</filename>
             <response>
                 <expected level="TEXT" />
-                <filename>imports/res/import-1objectexit-post.res.xml</filename>
+                <filename>imports/res/import-objectexit.res.xml</filename>
              </response>
         </test>
+        
+        <!--
+            Import a single ObjectExit record, at least one of whose fields
+            contains a set of UTF-8 characters outside the USASCII range.
+            (See CSPACE-3923 and CSPACE-4866.)
+        -->
+        <test ID="import-objectexit-utf8">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-utf8.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+             </response>
+        </test>
+        
+        <!--
+            Import a single ObjectExit record, at least one of whose fields
+            contains a set of special characters defined in the
+            "Special Characters and Formatting - QA Test Plan"
+            http://wiki.collectionspace.org/x/A4AjB
+        -->
+        <test ID="import-objectexit-utf8">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-specialchars.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+             </response>
+        </test>
+        
+        <!--
+            Import a mixed set of records, containing of two (2) Object Exit
+            records and one (1) Media record.  (The latter also includes
+            (optional) namespace prefixes on its child elements, as an
+            additional variation.)
+        -->
+        <test ID="import-objectexit-media">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-media.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit-media.res.xml</filename>
+             </response>
+        </test>
+        
+        
+        <!-- FIXME: Add test with special chars in request payloads -->
+        <!-- (CSPACE-3923), via each imports path -->
+
+        <!-- FIXME: Add tests with invalid payloads, via each imports path -->
         
         <!-- FIXME: Add forms-based import test -->
         <!--
@@ -33,14 +90,6 @@
              </response>
         </test>
         -->
-        
-        <!-- FIXME: Add tests with non-UTF-8 chars in request payloads -->
-        <!-- (CSPACE-3923 and see also CSPACE-4866), via each imports path -->
-
-        <!-- FIXME: Add test with special chars in request payloads -->
-        <!-- (CSPACE-3923), via each imports path -->
-
-        <!-- FIXME: Add tests with invalid payloads, via each imports path -->
         
     </testGroup>
 </xmlReplay>
