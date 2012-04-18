@@ -28,6 +28,10 @@
     <xs:element name="labelHeader" type="xs:string"/>
     <xs:element name="labelFooter" type="xs:string"/>
 
+    <!-- This is intended to complement numberOfObjects from the common schema. -->
+    <!-- It indicates that this is object {objectCountNumber} out of a total {numberOfObjects}. -->
+    <xs:element name="objectCountNumber" type="xs:integer"/>
+
     <xs:element name="elevationMin" type="xs:decimal"/>
     <xs:element name="elevationMax" type="xs:decimal"/>
     <xs:element name="elevationUnit" type="xs:string"/>
