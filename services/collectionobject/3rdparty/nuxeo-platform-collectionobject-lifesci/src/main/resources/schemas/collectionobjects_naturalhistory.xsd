@@ -56,6 +56,10 @@
     <xs:element name="fieldLocCountry" type="xs:string"/>
     <xs:element name="fieldLocHigherGeography" type="xs:string"/>
 
+    <xs:element name="donor" type="xs:string"/>
+    <xs:element name="donorDateGroup" type="structuredDateGroup"/>
+    <xs:element name="donorNote" type="xs:string"/>
+
     <xs:element name="taxonomicIdentGroupList" type="taxonomicIdentGroupList"/>
     <xs:element name="associatedTaxaGroupList" type="associatedTaxaGroupList"/>
     <xs:element name="annotationGroupList" type="annotationGroupList"/>
