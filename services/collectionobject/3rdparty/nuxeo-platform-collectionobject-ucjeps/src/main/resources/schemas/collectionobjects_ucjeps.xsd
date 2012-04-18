@@ -12,7 +12,6 @@
 -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://collectionspace.org/services/collectionobject/local/ucjeps" xmlns="http://collectionspace.org/services/collectionobject/local/ucjeps" targetNamespace="http://collectionspace.org/services/collectionobject/local/ucjeps" version="0.1">
-	<xs:element name="sheetNumber" type="xs:integer"/>
 	<xs:element name="handwritten" type="xs:string"/>
 	<xs:element name="postToPublic" type="xs:string"/>
 </xs:schema>
