@@ -66,6 +66,7 @@
     <xs:element name="donorNote" type="xs:string"/>
 
     <xs:element name="taxonomicIdentGroupList" type="taxonomicIdentGroupList"/>
+    <xs:element name="typeSpecimenGroupList" type="typeSpecimenGroupList"/>
     <xs:element name="associatedTaxaGroupList" type="associatedTaxaGroupList"/>
     <xs:element name="annotationGroupList" type="annotationGroupList"/>
 
