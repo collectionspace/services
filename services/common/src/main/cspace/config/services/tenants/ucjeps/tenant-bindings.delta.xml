@@ -18,7 +18,7 @@
 						<service:ListResultField merge:matcher="skip" merge:action="insert">
 							<service:element>typeSpecimenKind</service:element>
 							<service:schema>collectionobjects_naturalhistory</service:schema>
-							<service:xpath>typeSpecimenKind</service:xpath>
+							<service:xpath>typeSpecimenGroupList/[0]/typeSpecimenKind</service:xpath>
 						</service:ListResultField>
 					</service:ListResultsFields>
 				</service:params>
