@@ -48,7 +48,7 @@
     <xs:element name="fieldLocLatDecimal" type="xs:decimal"/>
     <xs:element name="fieldLocLongDecimal" type="xs:decimal"/>
 
-    <!-- These will become contolled lists -->
+    <!-- These will become controlled lists -->
     <xs:element name="fieldLocGeodeticDatum" type="xs:string"/>
     <xs:element name="fieldLocCoordinateSystem" type="xs:string"/>
     <xs:element name="fieldLocCounty" type="xs:string"/>
