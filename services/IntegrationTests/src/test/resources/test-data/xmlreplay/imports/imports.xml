@@ -2,15 +2,15 @@
 <xmlReplay>
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
-       <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
     
    <!-- ================================================================================ -->
     
-   <testGroup ID="importsTestGroup" autoDeletePOSTS="true">
+    <testGroup ID="importsTestGroup" autoDeletePOSTS="true">
 
         <!-- Import a single ObjectExit record -->
-        <test ID="import-objectexit">
+        <test ID="importObjectExit">
             <expectedCodes>200</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/imports</uri>
@@ -18,7 +18,12 @@
             <response>
                 <expected level="TEXT" />
                 <filename>imports/res/import-objectexit.res.xml</filename>
-             </response>
+            </response>
+        </test>
+        <test ID="deleteObjectExit">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExit.got("//csid")}</uri>
         </test>
         
         <!--
@@ -26,7 +31,7 @@
             contains a set of UTF-8 characters outside the USASCII range.
             (See CSPACE-3923 and CSPACE-4866.)
         -->
-        <test ID="import-objectexit-utf8">
+        <test ID="importObjectExitUTF8">
             <expectedCodes>200</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/imports</uri>
@@ -34,16 +39,34 @@
             <response>
                 <expected level="TEXT" />
                 <filename>imports/res/import-objectexit.res.xml</filename>
-             </response>
+            </response>
+        </test>
+        <test ID="deleteObjectExitUTF8">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
         </test>
         
+        <!--
+        <test ID="verifyObjectExitUTF8">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>imports/res/import-objectexit-utf8.res.xml</filename>
+                <label>objectexit_common</label>
+            </response>
+        </test>
+        -->
+                
         <!--
             Import a single ObjectExit record, at least one of whose fields
             contains a set of special characters defined in the
             "Special Characters and Formatting - QA Test Plan"
             http://wiki.collectionspace.org/x/A4AjB
         -->
-        <test ID="import-objectexit-utf8">
+        <test ID="importObjectExitSpecialChars">
             <expectedCodes>200</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/imports</uri>
@@ -51,7 +74,12 @@
             <response>
                 <expected level="TEXT" />
                 <filename>imports/res/import-objectexit.res.xml</filename>
-             </response>
+            </response>
+        </test>
+        <test ID="deleteObjectExitSpecialChars">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitSpecialChars.got("//csid")}</uri>
         </test>
         
         <!--
@@ -60,7 +88,7 @@
             (optional) namespace prefixes on its child elements, as an
             additional variation.)
         -->
-        <test ID="import-objectexit-media">
+        <test ID="importObjectExitMedia">
             <expectedCodes>200</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/imports</uri>
@@ -68,9 +96,25 @@
             <response>
                 <expected level="TEXT" />
                 <filename>imports/res/import-objectexit-media.res.xml</filename>
-             </response>
+            </response>
         </test>
-        
+        <!--
+        <test ID="deleteObjectExitSpecialCharsObjExit1">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitMedia.got("//importedRecords/importedRecord[0]/csid[0]")}</uri>
+        </test>
+        <test ID="deleteObjectExitSpecialCharsObjExit2">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitMedia.got("//importedRecords/importedRecord[1]/csid[0]")}</uri>
+        </test>
+        <test ID="deleteObjectExitSpecialCharsMedia">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/media/${importObjectExitMedia.got("//importedRecords/importedRecord[2]/csid[0]")}</uri>
+        </test>
+        -->
         
         <!-- FIXME: Add test with special chars in request payloads -->
         <!-- (CSPACE-3923), via each imports path -->

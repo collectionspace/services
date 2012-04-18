@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <imports>
-    <import service="ObjectExit" type="ObjectExit">
+    <import service="ObjectExit" type="ObjectExit" CSID="920c578f-e5d6-45da-adab-6f26f6a491ff">
         <schema xmlns:objectexit_common="http://collectionspace.org/services/objectexit" 
             name="objectexit_common">
             <exitNote>This is an exit note.</exitNote>
