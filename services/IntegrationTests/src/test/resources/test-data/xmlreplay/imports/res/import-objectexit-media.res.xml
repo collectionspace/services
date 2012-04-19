@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <import>
-    <totalRecordsImported>3</totalRecordsImported>
+    <totalRecordsImported>2</totalRecordsImported>
     <numRecordsImported>
         <docType>ObjectExit</docType>
-        <numRecords>2</numRecords>
+        <numRecords>1</numRecords>
     </numRecordsImported>
     <numRecordsImported>
         <docType>Media</docType>

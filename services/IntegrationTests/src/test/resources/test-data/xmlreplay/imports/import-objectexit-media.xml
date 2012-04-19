@@ -7,13 +7,6 @@
             <exitNumber>OE-IMPORT-TEST-1999.3</exitNumber>
         </schema>
     </import>
-    <import service="ObjectExit" type="ObjectExit">
-        <schema xmlns:objectexit_common="http://collectionspace.org/services/objectexit" 
-                name="objectexit_common">
-            <exitNote>This is another exit note.</exitNote>
-            <exitNumber>OE-IMPORT-TEST-1999.4</exitNumber>
-        </schema>
-    </import>
     <import service="Media" type="Media">
         <schema xmlns:media_common="http://collectionspace.org/services/media/" name="media_common">
             <media_common:dateGroupList>

@@ -7,7 +7,7 @@
     
    <!-- ================================================================================ -->
     
-    <testGroup ID="importsTestGroup" autoDeletePOSTS="true">
+    <testGroup ID="importsTestGroup" autoDeletePOSTS="false">
 
         <!-- Import a single ObjectExit record -->
         <test ID="importObjectExit">
@@ -41,12 +41,7 @@
                 <filename>imports/res/import-objectexit.res.xml</filename>
             </response>
         </test>
-        <test ID="deleteObjectExitUTF8">
-            <expectedCodes>200</expectedCodes>
-            <method>DELETE</method>
-            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
-        </test>
-        
+        <!-- This test is not currently working, and thus is commented out. -->
         <!--
         <test ID="verifyObjectExitUTF8">
             <expectedCodes>200</expectedCodes>
@@ -59,6 +54,11 @@
             </response>
         </test>
         -->
+        <test ID="deleteObjectExitUTF8">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
+        </test>
                 
         <!--
             Import a single ObjectExit record, at least one of whose fields
@@ -83,8 +83,8 @@
         </test>
         
         <!--
-            Import a mixed set of records, containing of two (2) Object Exit
-            records and one (1) Media record.  (The latter also includes
+            Import a mixed set of records, containing of one Object Exit
+            records and one Media record.  (The latter also includes
             (optional) namespace prefixes on its child elements, as an
             additional variation.)
         -->
@@ -98,29 +98,17 @@
                 <filename>imports/res/import-objectexit-media.res.xml</filename>
             </response>
         </test>
-        <!--
-        <test ID="deleteObjectExitSpecialCharsObjExit1">
+        <test ID="deleteMediaFromObjectExitMedia">
             <expectedCodes>200</expectedCodes>
             <method>DELETE</method>
-            <uri>/cspace-services/objectexit/${importObjectExitMedia.got("//importedRecords/importedRecord[0]/csid[0]")}</uri>
+            <uri>/cspace-services/media/${importObjectExitMedia.got("//csid[preceding-sibling::doctype[1][text()='Media']]")}</uri>
         </test>
-        <test ID="deleteObjectExitSpecialCharsObjExit2">
+        <test ID="deleteObjectExitFromObjectExitMedia">
             <expectedCodes>200</expectedCodes>
             <method>DELETE</method>
-            <uri>/cspace-services/objectexit/${importObjectExitMedia.got("//importedRecords/importedRecord[1]/csid[0]")}</uri>
+            <uri>/cspace-services/objectexit/${importObjectExitMedia.got("//csid[preceding-sibling::doctype[1][text()='ObjectExit']]")}</uri>
         </test>
-        <test ID="deleteObjectExitSpecialCharsMedia">
-            <expectedCodes>200</expectedCodes>
-            <method>DELETE</method>
-            <uri>/cspace-services/media/${importObjectExitMedia.got("//importedRecords/importedRecord[2]/csid[0]")}</uri>
-        </test>
-        -->
-        
-        <!-- FIXME: Add test with special chars in request payloads -->
-        <!-- (CSPACE-3923), via each imports path -->
-
-        <!-- FIXME: Add tests with invalid payloads, via each imports path -->
-        
+                
         <!-- FIXME: Add forms-based import test -->
         <!--
         <test ID="import-post-form">
@@ -135,7 +123,22 @@
         </test>
         -->
         
+        <!-- FIXME: Add tests with invalid payloads, via each imports path -->
+
     </testGroup>
+    
+    <!--
+      Temporary test group for testing changes or additions to this control file.
+      To use:
+      * Clone dev-master-example.xml to dev-master.xml
+      * Add this line to dev-master.xml:
+        <run controlFile="imports/imports.xml" testGroup="importsTemporaryTestGroup" />
+      * Run XmlReplay tests listed in dev-master.xml via 'mvn test -Dtest=XmlReplayDevTest'
+    -->
+    <testGroup ID="importsTemporaryTestGroup" autoDeletePOSTS="false">
+        <!-- Add new or changed tests here -->
+    </testGroup>
+
 </xmlReplay>
         
         
