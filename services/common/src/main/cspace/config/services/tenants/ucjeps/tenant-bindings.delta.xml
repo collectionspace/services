@@ -47,6 +47,14 @@
 							<types:key>authRef</types:key>
 							<types:value>annotationGroupList/*/annotationAuthor</types:value>
 						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>typeSpecimenGroupList/*/typeSpecimenAssertionBy</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>typeSpecimenGroupList/*/typeSpecimenBasionym</types:value>
+						</types:item>
 					</service:properties>
 					<service:content contentType="application/xml">
 						<service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd" />
