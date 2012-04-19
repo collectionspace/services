@@ -25,40 +25,6 @@
             <method>DELETE</method>
             <uri>/cspace-services/objectexit/${importObjectExit.got("//csid")}</uri>
         </test>
-        
-        <!--
-            Import a single ObjectExit record, at least one of whose fields
-            contains a set of UTF-8 characters outside the USASCII range.
-            (See CSPACE-3923 and CSPACE-4866.)
-        -->
-        <test ID="importObjectExitUTF8">
-            <expectedCodes>200</expectedCodes>
-            <method>POST</method>
-            <uri>/cspace-services/imports</uri>
-            <filename>imports/import-objectexit-utf8.xml</filename>
-            <response>
-                <expected level="TEXT" />
-                <filename>imports/res/import-objectexit.res.xml</filename>
-            </response>
-        </test>
-        <!-- This test is not currently working, and thus is commented out. -->
-        <!--
-        <test ID="verifyObjectExitUTF8">
-            <expectedCodes>200</expectedCodes>
-            <method>GET</method>
-            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
-            <response>
-                <expected level="ADDOK" />
-                <filename>imports/res/import-objectexit-utf8.res.xml</filename>
-                <label>objectexit_common</label>
-            </response>
-        </test>
-        -->
-        <test ID="deleteObjectExitUTF8">
-            <expectedCodes>200</expectedCodes>
-            <method>DELETE</method>
-            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
-        </test>
                 
         <!--
             Import a single ObjectExit record, at least one of whose fields
@@ -108,7 +74,57 @@
             <method>DELETE</method>
             <uri>/cspace-services/objectexit/${importObjectExitMedia.got("//csid[preceding-sibling::doctype[1][text()='ObjectExit']]")}</uri>
         </test>
-                
+
+    </testGroup>
+    
+    <!--
+      Temporary test group for testing changes or additions to this control file.
+      To use:
+      * Clone dev-master-example.xml to dev-master.xml
+      * Add this line to dev-master.xml:
+        <run controlFile="imports/imports.xml" testGroup="importsTemporaryTestGroup" />
+      * Run XmlReplay tests listed in dev-master.xml via 'mvn test -Dtest=XmlReplayDevTest'
+    -->
+    <testGroup ID="importsTemporaryTestGroup" autoDeletePOSTS="false">
+        
+        <!-- The following tests are not currently working, and thus are commented out. -->
+        <!--
+            Import a single ObjectExit record, at least one of whose fields
+            contains a set of UTF-8 characters outside the USASCII range.
+            (See CSPACE-3923 and CSPACE-4866.)
+        -->
+        <!--
+        <test ID="importObjectExitUTF8">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-utf8.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+            </response>
+        </test>
+        -->
+        <!--
+        <test ID="verifyObjectExitUTF8">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>imports/res/import-objectexit-utf8.res.xml</filename>
+                <label>objectexit_common</label>
+            </response>
+        </test>
+        -->
+        <!--
+        <test ID="deleteObjectExitUTF8">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
+        </test>
+        -->
+        
         <!-- FIXME: Add forms-based import test -->
         <!--
         <test ID="import-post-form">
@@ -124,19 +140,9 @@
         -->
         
         <!-- FIXME: Add tests with invalid payloads, via each imports path -->
-
-    </testGroup>
-    
-    <!--
-      Temporary test group for testing changes or additions to this control file.
-      To use:
-      * Clone dev-master-example.xml to dev-master.xml
-      * Add this line to dev-master.xml:
-        <run controlFile="imports/imports.xml" testGroup="importsTemporaryTestGroup" />
-      * Run XmlReplay tests listed in dev-master.xml via 'mvn test -Dtest=XmlReplayDevTest'
-    -->
-    <testGroup ID="importsTemporaryTestGroup" autoDeletePOSTS="false">
+        
         <!-- Add new or changed tests here -->
+        
     </testGroup>
 
 </xmlReplay>
