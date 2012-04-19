@@ -2211,7 +2211,7 @@
     </tenant:serviceBindings>
     <!-- end location service meta-data -->
         <!-- begin placeauthority service meta-data -->
-        <tenant:serviceBindings id="Placeauthorities" name="Placeauthorities" version="0.1">
+        <tenant:serviceBindings id="Placeauthorities" name="Placeauthorities" type="utility" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
             <!-- 
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -2277,7 +2277,7 @@
              Note there is no Place service, but there is a
              Repository workspace so we have to configure that.
         -->
-        <tenant:serviceBindings id="Places" name="Places" version="0.1">
+        <tenant:serviceBindings id="Places" name="Places" type="authority" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.place.nuxeo.PlaceDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
