@@ -215,7 +215,7 @@
         
         <!-- Verify that tests work in an authority other than Person Authority -->
         
-        <test ID="getPersonItems">
+        <test ID="getLocationItems">
             <expectedCodes>200</expectedCodes>
             <method>GET</method>
             <uri>/cspace-services/locationauthorities/_ALL_/items?pgSz=1&amp;pgNum=0</uri>
