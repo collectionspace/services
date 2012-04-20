@@ -169,7 +169,6 @@
         </xs:sequence>
     </xs:complexType>
 
-
     <xs:complexType name="structuredDateGroup">
         <xs:sequence>
             <xs:element name="dateDisplayDate" type="xs:string"/>
@@ -198,7 +197,7 @@
         </xs:sequence>
     </xs:complexType>
 
-    <!-- The following fields are going away! --->
+    <!-- The following fields are going away! -->
     <xs:element name="fieldCollectionDateEarliest" type="xs:string"/>
     <xs:element name="fieldCollectionDateLatest" type="xs:string"/>
     <xs:element name="fieldLocGeodeticDatum" type="xs:string"/>
@@ -206,18 +205,16 @@
    
     <xs:element name="elevationMin" type="xs:decimal"/>
     <xs:element name="elevationMax" type="xs:decimal"/>
-    <xs:element name="elevationUnit" type="xs:string"/>
     <xs:element name="elevationQualifier" type="xs:string"/>
     <xs:element name="elevationNote" type="xs:string"/>
 
     <xs:element name="depthMin" type="xs:decimal"/>
     <xs:element name="depthMax" type="xs:decimal"/>
-    <xs:element name="depthUnit" type="xs:string"/>
     <xs:element name="depthQualifier" type="xs:string"/>
     <xs:element name="depthNote" type="xs:string"/>
 
-	<xs:element name="fieldLocLatDecimal" type="xs:string"/>
-	<xs:element name="fieldLocLongDecimal" type="xs:string"/>
+    <xs:element name="fieldLocLatDecimal" type="xs:string"/>
+    <xs:element name="fieldLocLongDecimal" type="xs:string"/>
 </xs:schema>
 
 
