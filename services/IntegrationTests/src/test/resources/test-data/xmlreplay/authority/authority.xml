@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    
+    <auths>
+	<!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+    </auths>
+        
+    <testGroup ID="TestAuthoritiesMultiVocabSearch" autoDeletePOSTS="true">
+        
+        <!--
+            Create three new vocabularies: two in the Person Authority,
+            and one in the Storage Location Authority.
+        -->
+        <test ID="createPersonAuthority1">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities</uri>
+            <filename>authority/personauthority.xml</filename>
+            <vars>
+                <var ID="identifier1">jlmbsoq</var>
+                <var ID="identifier2">tqbfjotld</var>
+                <var ID="authDisplayName">${identifier1}</var>
+                <var ID="authShortIdentifier">${identifier1}</var>
+           </vars>
+        </test>
+
+        <test ID="createPersonAuthority2">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities</uri>
+            <filename>authority/personauthority.xml</filename>
+            <vars>
+                <var ID="authDisplayName">${createPersonAuthority1.identifier2}</var>
+                <var ID="authShortIdentifier">${createPersonAuthority1.identifier2}</var>
+            </vars>
+        </test>
+                
+        <test ID="createLocationAuthority">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities</uri>
+            <filename>authority/locationauthority.xml</filename>
+            <vars>
+                <var ID="authDisplayName">${createPersonAuthority1.identifier1}</var>
+                <var ID="authShortIdentifier">${createPersonAuthority1.identifier1}</var>
+            </vars>
+        </test>
+        
+        <!-- Create at least one item in each of those vocabularies. -->
+        
+        <!-- Create two items in the first Person Authority -->
+        
+        <test ID="createPersonItem1" auth="test">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${createPersonAuthority1.CSID}/items</uri>
+            <filename>authority/personitem.xml</filename>
+            <vars>
+                <var ID="itemDisplayName">${createPersonAuthority1.identifier1} ${createPersonAuthority1.identifier2}</var>
+                <var ID="itemShortIdentifier">${createPersonAuthority1.identifier1}1</var>
+            </vars>
+        </test>
+        <test ID="createPersonItem2" auth="test">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${createPersonAuthority1.CSID}/items</uri>
+            <filename>authority/personitem.xml</filename>
+            <vars>
+                <var ID="itemDisplayName">${createPersonAuthority1.identifier1}</var>
+                <var ID="itemShortIdentifier">${createPersonAuthority1.identifier1}2</var>
+            </vars>
+        </test>
+        
+        <!-- Create one item in the second Person Authority -->
+        <test ID="createPersonItem3" auth="test">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/${createPersonAuthority2.CSID}/items</uri>
+            <filename>authority/personitem.xml</filename>
+            <vars>
+                <var ID="itemDisplayName">${createPersonAuthority1.identifier1}</var>
+                <var ID="itemShortIdentifier">${createPersonAuthority1.identifier1}3</var>
+            </vars>
+        </test>
+                
+        <!-- Create one item in the Location Authority -->
+        <test ID="createLocationItem" auth="test">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities/${createLocationAuthority.CSID}/items</uri>
+            <filename>authority/locationitem.xml</filename>
+            <vars>
+                <var ID="itemDisplayName">${createPersonAuthority1.identifier1} ${createPersonAuthority1.identifier2}</var>
+                <var ID="itemShortIdentifier">${createPersonAuthority1.identifier1}</var>
+            </vars>
+        </test>
+        
+        <!--
+            Perform 'all vocabularies' searches and verify that the
+            expected items were returned by each search.
+        -->
+        
+        <!-- Keyword search -->
+        <!--
+        <test ID="keywordSearchAuthorityItems">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/authorities/_ALL_/items?kw=${createPersonAuthority1.name1}</uri>
+            <response>
+                <expected level="ADDOK"/>
+                <filename>authority/res/keywordSearchAuthorityItems.res.xml</filename>
+            </response>
+        </test>
+        -->
+        
+        <!-- Partial term search -->
+        <!--
+        <test ID="partialTermSearchAuthorityItems">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/authorities/_ALL_/items?pt=${createPersonAuthority1.name1}</uri>
+            <response>
+                <expected level="ADDOK"/>
+                <filename>authority/res/partialTermSearchAuthorityItems.res.xml</filename>
+            </response>
+        </test>
+        -->
+                
+        <!-- Advanced search -->
+        <!--
+        <test ID="advancedTermSearchAuthorityItems">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/authorities/_ALL_/items?as=persons_common%3AdisplayName%20ILIKE%20%27%25${createPersonAuthority1.name1}%25%27</uri>
+            <response>
+                <expected level="ADDOK"/>
+                <filename>authority/res/advancedSearchAuthorityItems.res.xml</filename>
+            </response>
+        </test>
+        -->
+        
+    </testGroup>
+    
+</xmlReplay>
