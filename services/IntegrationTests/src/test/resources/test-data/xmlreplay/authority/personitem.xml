@@ -4,5 +4,6 @@
         <displayName>${itemDisplayName}</displayName>
         <shortIdentifier>${itemShortIdentifier}</shortIdentifier>
         <bioNote>A bio note for this Person.</bioNote>
+        <foreName>${itemDisplayName}</foreName>
     </ns2:persons_common>
 </document>

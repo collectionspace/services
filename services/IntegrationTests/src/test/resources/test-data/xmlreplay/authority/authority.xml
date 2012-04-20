@@ -79,7 +79,7 @@
             <uri>/cspace-services/personauthorities/${createPersonAuthority2.CSID}/items</uri>
             <filename>authority/personitem.xml</filename>
             <vars>
-                <var ID="itemDisplayName">${createPersonAuthority1.identifier1}</var>
+                <var ID="itemDisplayName">${createPersonAuthority1.identifier1} ${createPersonAuthority1.identifier2}</var>
                 <var ID="itemShortIdentifier">${createPersonAuthority1.identifier1}3</var>
             </vars>
         </test>
@@ -102,17 +102,31 @@
         -->
         
         <!-- Keyword search -->
-        <!--
-        <test ID="keywordSearchAuthorityItems">
+        <test ID="keywordSearchAuthorityItems1">
             <expectedCodes>200</expectedCodes>
             <method>GET</method>
-            <uri>/cspace-services/authorities/_ALL_/items?kw=${createPersonAuthority1.name1}</uri>
+            <uri>/cspace-services/personauthorities/_ALL_/items?kw=${createPersonAuthority1.identifier1}</uri>
+            <vars>
+                <var ID="shortIdentifierBase">${createPersonAuthority1.identifier1}</var>
+            </vars>
             <response>
-                <expected level="ADDOK"/>
-                <filename>authority/res/keywordSearchAuthorityItems.res.xml</filename>
+                <expected level="TEXT"/>
+                <filename>authority/res/keywordSearchAuthorityItems1.res.xml</filename>
             </response>
         </test>
-        -->
+ 
+         <test ID="keywordSearchAuthorityItems2">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?kw=${createPersonAuthority1.identifier2}</uri>
+            <vars>
+                <var ID="shortIdentifierBase">${createPersonAuthority1.identifier1}</var>
+            </vars>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/keywordSearchAuthorityItems2.res.xml</filename>
+            </response>
+        </test>
         
         <!-- Partial term search -->
         <!--
