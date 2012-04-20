@@ -117,6 +117,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     final static String URN_PREFIX_ID = "id(";
     final static int URN_ID_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_ID.length();
     final static String FETCH_SHORT_ID = "_fetch_";
+	final static String PARENT_WILDCARD = "_ALL_";
+	
     final Logger logger = LoggerFactory.getLogger(AuthorityResource.class);
 
     public enum SpecifierForm {
@@ -668,12 +670,15 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 
-            String parentcsid = lookupParentCSID(specifier, "getAuthorityItemList", "LIST", queryParams);
+            String parentcsid = PARENT_WILDCARD.equals(specifier)?null:
+            					lookupParentCSID(specifier, "getAuthorityItemList", "LIST", queryParams);
 
             ctx = createServiceContext(getItemServiceName(), queryParams);
+
+            // For the wildcard case, parentcsid is null, but docHandler will deal with this.
             // We omit the parentShortId, only needed when doing a create...
-            DocumentHandler handler = createItemDocumentHandler(ctx,
-                    parentcsid, null);
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid, null);
+            
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
             // be on the displayName field
@@ -681,11 +686,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             if (sortBy == null || sortBy.isEmpty()) {
                 myFilter.setOrderByClause(qualifiedDisplayNameField);
             }
-            
-            myFilter.appendWhereClause(authorityItemCommonSchemaName + ":"
-                    + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
-                    + "'" + parentcsid + "'",
-                    IQueryManager.SEARCH_QUALIFIER_AND);
+
+            // If we are not wildcarding the parent, add a restriction
+            if(parentcsid!=null) {
+	            myFilter.appendWhereClause(authorityItemCommonSchemaName + ":"
+	                    + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
+	                    + "'" + parentcsid + "'",
+	                    IQueryManager.SEARCH_QUALIFIER_AND);
+            }
 
             if (Tools.notBlank(termStatus)) {
             	// Start with the qualified termStatus field
