@@ -127,6 +127,7 @@
             <xs:element name="fieldLocState" type="xs:string"/>
             <xs:element name="fieldLocCountry" type="xs:string"/>
             <xs:element name="fieldLocHigherGeography" type="xs:string"/>
+            <xs:element name="fieldLocPlace" type="xs:string"/>
 
             <xs:element name="vCoordinates" type="xs:string"/>
             <xs:element name="vLatitude" type="xs:string"/>
