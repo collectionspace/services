@@ -205,10 +205,8 @@
     <xs:element name="depthQualifier" type="xs:string"/>
     <xs:element name="depthNote" type="xs:string"/>
 
-    <xs:element name="fieldLocLat" type="xs:string"/>
-    <xs:element name="fieldLocLong" type="xs:string"/>
-    <xs:element name="fieldLocLatDecimal" type="xs:decimal"/>
-    <xs:element name="fieldLocLongDecimal" type="xs:decimal"/>
+	<xs:element name="fieldLocLatDecimal" type="xs:string"/>
+	<xs:element name="fieldLocLongDecimal" type="xs:string"/>
 </xs:schema>
 
 
