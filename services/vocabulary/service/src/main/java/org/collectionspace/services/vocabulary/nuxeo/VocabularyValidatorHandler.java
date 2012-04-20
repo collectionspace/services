@@ -53,6 +53,12 @@ public class VocabularyValidatorHandler implements ValidatorHandler {
         if (logger.isDebugEnabled()) {
             logger.debug("validate() action=" + action.name());
         }
+        
+        // Bail out if the validation action is for delete.
+        if (action.equals(Action.DELETE)) {
+        	return;
+        }
+        
         try {
             MultipartServiceContext mctx = (MultipartServiceContext) ctx;
             VocabulariesCommon vocab = (VocabulariesCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
