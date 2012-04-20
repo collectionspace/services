@@ -57,6 +57,7 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	//
 	public static final String WORKFLOW_QUERY_NONDELETED = "wf_deleted";
 	public static final String WORKFLOWSTATE_QUERY = "wf_deleted";
+	public static final String PARENT_DOCHANDLER = "wf_dochandler";
 
 	
 	@Override

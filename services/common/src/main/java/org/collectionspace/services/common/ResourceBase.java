@@ -173,7 +173,8 @@ public abstract class ResourceBase
      *  which handles setup of ServiceContext, and does Exception handling.  */
     protected Response delete(String csid, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception {
-        getRepositoryClient(ctx).delete(ctx, csid);
+    	DocumentHandler handler = createDocumentHandler(ctx);
+        getRepositoryClient(ctx).delete(ctx, csid, handler);
         return Response.status(HttpResponseCodes.SC_OK).build();
     }
 
