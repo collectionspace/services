@@ -3,7 +3,7 @@
     <ns2:locations_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
         <displayName>${itemDisplayName}</displayName>
         <shortIdentifier>${itemShortIdentifier}</shortIdentifier>
-        <description>This is a test Location Authority item.</description>
+        <description>This is a test Location Authority item, whose description contains: ${itemDisplayName}</description>
     </ns2:locations_common>
 </document>
 

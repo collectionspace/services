@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <totalItems>3</totalItems>
+    <!--
+      Note that tests verifying this specific response may fail if the order
+      of list items below - which assumes reverse chronological order by
+      update timestamp (collectionspace_core:updatedAt) - changes.
+    -->
+    <list-item>
+        <shortIdentifier>${createPersonAuthority1.word1}item3</shortIdentifier>
+    </list-item>
+    <list-item>
+        <shortIdentifier>${createPersonAuthority1.word1}item2</shortIdentifier>
+    </list-item>
+    <list-item>
+        <shortIdentifier>${createPersonAuthority1.word1}item1</shortIdentifier>
+    </list-item>
+</ns2:abstract-common-list>
+

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <totalItems>1</totalItems>
+    <list-item>
+        <shortIdentifier>${createPersonAuthority1.word1}item1</shortIdentifier>
+    </list-item>
+</ns2:abstract-common-list>
+
