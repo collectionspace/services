@@ -57,13 +57,14 @@
             <xs:element name="taxon" type="xs:string"/>
             <xs:element name="qualifier" type="xs:string"/>
             <xs:element name="identBy" type="xs:string"/>
-            <xs:element name="identDate" type="xs:string"/>
             <xs:element name="identDateGroup" type="structuredDateGroup"/>
             <xs:element name="institution" type="xs:string"/>
             <xs:element name="identKind" type="xs:string"/>
             <xs:element name="reference" type="xs:string"/>
             <xs:element name="refPage" type="xs:string"/>
             <xs:element name="notes" type="xs:string"/>
+            <!-- The following fields are going away! -->
+            <xs:element name="identDate" type="xs:string"/>            
         </xs:sequence>
     </xs:complexType>
 
