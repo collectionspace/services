@@ -20,6 +20,8 @@
             <vars>
                 <var ID="identifier1">jlmbsoq</var>
                 <var ID="identifier2">tqbfjotld</var>
+                <var ID="identifier1PartialTerm">jlmb</var>
+                <var ID="identifier2PartialTerm">tqbf</var>
                 <var ID="authDisplayName">${identifier1}</var>
                 <var ID="authShortIdentifier">${identifier1}</var>
            </vars>
@@ -57,7 +59,7 @@
             <uri>/cspace-services/personauthorities/${createPersonAuthority1.CSID}/items</uri>
             <filename>authority/personitem.xml</filename>
             <vars>
-                <var ID="itemDisplayName">${createPersonAuthority1.identifier1} ${createPersonAuthority1.identifier2}</var>
+                <var ID="itemDisplayName">${createPersonAuthority1.identifier2} ${createPersonAuthority1.identifier1}</var>
                 <var ID="itemShortIdentifier">${createPersonAuthority1.identifier1}1</var>
             </vars>
         </test>
@@ -129,14 +131,13 @@
         </test>
         
         <!-- Partial term search -->
-        <!--
         <test ID="partialTermSearchAuthorityItems">
             <expectedCodes>200</expectedCodes>
             <method>GET</method>
-            <uri>/cspace-services/authorities/_ALL_/items?pt=${createPersonAuthority1.name1}</uri>
+            <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.identifier2PartialTerm}</uri>
             <response>
-                <expected level="ADDOK"/>
-                <filename>authority/res/partialTermSearchAuthorityItems.res.xml</filename>
+                <expected level="TEXT"/>
+                <filename>authority/res/partialTermSearchAuthorityItems1.res.xml</filename>
             </response>
         </test>
         -->
