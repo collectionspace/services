@@ -23,24 +23,20 @@
  */
 package org.collectionspace.services.common.workflow.service.nuxeo;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
-import org.collectionspace.services.client.PayloadInputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.workflow.jaxb.WorkflowJAXBSchema;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -61,11 +57,25 @@ public class WorkflowDocumentModelHandler
      *
      * org.nuxeo.ecm.core.LifecycleCoreExtensions--lifecycle (as opposed to --types)
      */
-    private static final String TRANSITION_DELETE = "delete";
-    private static final String TRANSITION_APPROVE = "approve";
-    private static final String TRANSITION_UNDELETE = "undelete";
     private static final String TRANSITION_UNKNOWN = "unknown";
 
+    
+    @Override
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	//
+    	// First, call the parent document handler to give it a chance to handle the workflow transition -otherwise, call
+    	// the super/parent handleUpdate() method.
+    	//
+    	ServiceContext ctx = this.getServiceContext();
+    	DocumentModelHandler docHandler = (DocumentModelHandler)ctx.getProperty(WorkflowClient.PARENT_DOCHANDLER);
+    	TransitionDef transitionDef =  (TransitionDef)ctx.getProperty(WorkflowClient.TRANSITION_ID);
+    	docHandler.handleWorkflowTransition(wrapDoc, transitionDef);
+    	//
+    	// If no exception occurred, then call the super's method
+    	//
+    	super.handleUpdate(wrapDoc);
+    }
+    
     /*
      * Handle read (GET)
      */

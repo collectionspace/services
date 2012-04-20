@@ -1065,7 +1065,8 @@ public abstract class AbstractServiceTestImpl<CLT, CPT, REQUEST_TYPE, RESPONSE_T
         }
     }
 
-    protected void updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String workflowTransition, String lifeCycleState) throws Exception {
+    @SuppressWarnings("unchecked")
+	protected void updateItemLifeCycleState(String testName, String parentCsid, String itemCsid, String workflowTransition, String lifeCycleState) throws Exception {
         //
         // Read the existing object
         //
