@@ -29,6 +29,10 @@
 					<service:properties>
 						<types:item xmlns:types="http://collectionspace.org/services/config/types">
 							<types:key>authRef</types:key>
+							<types:value>basicStorageLocation</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
 							<types:value>taxonomicIdentGroupList/*/taxon</types:value>
 						</types:item>
 						<types:item xmlns:types="http://collectionspace.org/services/config/types">
