@@ -25,6 +25,7 @@
   <xs:element name="catalogDate" type="xs:string"/>
   -->
 
+    <xs:element name="hybridName" type="xs:string"/>
     <xs:element name="labelHeader" type="xs:string"/>
     <xs:element name="labelFooter" type="xs:string"/>
     <xs:element name="cultivated" type="xs:boolean"/>
@@ -41,6 +42,7 @@
     <xs:element name="donorNote" type="xs:string"/>
 
     <xs:element name="taxonomicIdentGroupList" type="taxonomicIdentGroupList"/>
+    <xs:element name="hybridParentGroupList" type="hybridParentGroupList"/>
     <xs:element name="typeSpecimenGroupList" type="typeSpecimenGroupList"/>
     <xs:element name="associatedTaxaGroupList" type="associatedTaxaGroupList"/>
     <xs:element name="annotationGroupList" type="annotationGroupList"/>
@@ -65,6 +67,19 @@
             <xs:element name="notes" type="xs:string"/>
             <!-- The following fields are going away! -->
             <xs:element name="identDate" type="xs:string"/>            
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="hybridParentGroupList">
+        <xs:sequence>
+            <xs:element name="hybridParentGroup" type="hybridParentGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="hybridParentGroup">
+        <xs:sequence>
+            <xs:element name="hybridParent" type="xs:string"/>
+            <xs:element name="hybridParentQualifier" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
