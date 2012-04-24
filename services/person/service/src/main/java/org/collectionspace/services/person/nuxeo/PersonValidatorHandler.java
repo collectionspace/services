@@ -52,6 +52,12 @@ public class PersonValidatorHandler implements ValidatorHandler {
         if (logger.isDebugEnabled()) {
             logger.debug("validate() action=" + action.name());
         }
+        
+        // Bail out if the validation action is for delete.
+        if (action.equals(Action.DELETE)) {
+        	return;
+        }
+        
         try {
             MultipartServiceContext mctx = (MultipartServiceContext) ctx;
             PersonsCommon person = (PersonsCommon) mctx.getInputPart(mctx.getCommonPartLabel(),

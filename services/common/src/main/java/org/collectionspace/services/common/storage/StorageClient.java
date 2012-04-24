@@ -24,6 +24,7 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.lifecycle.TransitionDef;
 
 /**
  *
@@ -123,6 +124,13 @@ public interface StorageClient {
      * @throws DocumentNotFoundException if entity not found
      * @throws DocumentException
      */
-    void update(ServiceContext ctx, String id, DocumentHandler handler) throws BadRequestException, DocumentNotFoundException, DocumentException;
+    void update(ServiceContext ctx, String id, DocumentHandler handler) 
+    		throws BadRequestException, DocumentNotFoundException, DocumentException;
+
+    /*
+     * Updates the workflow state of a document
+     */
+    void doWorkflowTransition(ServiceContext ctx, String id, DocumentHandler handler, TransitionDef transitionDef) 
+    		throws BadRequestException, DocumentNotFoundException, DocumentException;
 
 }
