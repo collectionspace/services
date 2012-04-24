@@ -136,5 +136,6 @@ public class DimensionDocumentModelHandler
     public String getQProperty(String prop) {
         return DimensionConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+
 }
 

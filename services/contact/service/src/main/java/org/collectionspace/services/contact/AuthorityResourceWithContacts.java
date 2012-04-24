@@ -285,7 +285,8 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
             // Note that we have to create the service context for the Contact service, not the main service.
             ctx = createServiceContext(getContactServiceName());
-            getRepositoryClient(ctx).delete(ctx, csid);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).delete(ctx, csid, handler);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, "DELETE failed, the requested Contact CSID:" + csid

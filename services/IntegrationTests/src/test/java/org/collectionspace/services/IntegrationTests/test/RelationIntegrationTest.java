@@ -22,11 +22,15 @@
  */
 package org.collectionspace.services.IntegrationTests.test;
 
+import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -37,6 +41,8 @@ import org.slf4j.LoggerFactory;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.DimensionClient;
+import org.collectionspace.services.client.DimensionFactory;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -46,6 +52,8 @@ import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.intake.IntakesCommon;
 
 import org.collectionspace.services.client.RelationClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
@@ -65,8 +73,208 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	private CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 	private RelationClient relationClient = new RelationClient();
 	private IntakeClient intakeClient = new IntakeClient();
+	private DimensionClient dimensionClient = new DimensionClient();
 	
 	private static final int OBJECTS_TO_INTAKE = 1;
+	
+	
+    /**
+     * Object as xml string.
+     *
+     * @param o the o
+     * @param clazz the clazz
+     * @return the string
+     */
+    static protected String objectAsXmlString(Object o, Class<?> clazz) {
+        StringWriter sw = new StringWriter();
+        try {
+            JAXBContext jc = JAXBContext.newInstance(clazz);
+            Marshaller m = jc.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+                    Boolean.TRUE);
+            m.marshal(o, sw);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sw.toString();
+    }
+	
+    private PoxPayloadOut createDimensionInstance(String commonPartName, String dimensionType, String dimensionValue, String entryDate) {
+        DimensionsCommon dimensionsCommon = new DimensionsCommon();
+        dimensionsCommon.setDimension(dimensionType);
+        dimensionsCommon.setValue(new BigDecimal(dimensionValue));
+        dimensionsCommon.setValueDate(entryDate);
+        PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(
+                commonPartName, dimensionsCommon);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be created, dimension common");
+            logger.debug(objectAsXmlString(dimensionsCommon,
+                    DimensionsCommon.class));
+        }
+
+        return multipart;
+    }
+	
+    protected PoxPayloadOut createDimensionInstance(String identifier) {
+    	DimensionClient client = new DimensionClient();
+    	return createDimensionInstance(client.getCommonPartName(), identifier);
+    }
+    
+    /**
+     * Creates the dimension instance.
+     *
+     * @param identifier the identifier
+     * @return the multipart output
+     */
+    protected PoxPayloadOut createDimensionInstance(String commonPartName, String identifier) {
+        final String DIMENSION_VALUE = "78.306";
+    	
+        return createDimensionInstance(commonPartName, 
+                "dimensionType-" + identifier,
+                DIMENSION_VALUE,
+                "entryDate-" + identifier);
+    }
+    
+	@Test void deleteCollectionObjectRelationshipToLockedDimension() {
+		//
+		// First create a CollectionObject
+		//
+		CollectionobjectsCommon co = new CollectionobjectsCommon();
+		fillCollectionObject(co, createIdentifier());
+		
+		// Next, create a part object
+		PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+		PayloadOutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
+		commonPart.setLabel(collectionObjectClient.getCommonPartName());
+		
+		// Make the create call and check the response
+		ClientResponse<Response> response = collectionObjectClient.create(multipart);
+		String collectionObjectCsid = null;
+		try {
+			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
+					.getStatusCode());
+			collectionObjectCsid = extractId(response);
+		} finally {
+			response.releaseConnection();
+		}
+		
+		//Next, create a Dimension record to relate the collection object to
+	    multipart = this.createDimensionInstance(createIdentifier());
+	    // Make the call to create and check the response
+	    response = dimensionClient.create(multipart);
+	    String dimensionCsid = null;
+	    try {
+		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+		    dimensionCsid = extractId(response);
+	    } finally {
+	    	response.releaseConnection();
+	    }
+	    
+	    // Relate the two entities, by creating a new relation object
+	    RelationsCommon relation = new RelationsCommon();
+	    fillRelation(relation, collectionObjectCsid, CollectionobjectsCommon.class.getSimpleName(),
+	    		dimensionCsid, DimensionsCommon.class.getSimpleName(),
+	    		"collectionobject-dimension");
+	    // Create the part and fill it with the relation object
+	    multipart = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
+	    commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
+	    commonPart.setLabel(relationClient.getCommonPartName());
+
+	    // Create the relationship
+	    response = relationClient.create(multipart);
+	    @SuppressWarnings("unused")
+		String relationCsid = null;
+	    try {
+		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+		    relationCsid = extractId(response);
+	    } finally {
+	    	response.releaseConnection();
+	    }
+	    
+	    // Now lock the dimension record.
+	    
+		@SuppressWarnings("unused")
+		ClientResponse<String> workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid, WorkflowClient.WORKFLOWTRANSITION_LOCK);
+	    System.out.println("Locked dimension record with CSID=" + dimensionCsid);
+	    
+	    // Finally, try to delete the relationship
+	    
+	    // Try to delete the relationship -should fail because we don't allow delete if one of the sides is locked.
+	    response = relationClient.delete(relationCsid);
+	    try {
+		    Assert.assertEquals(response.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
+	    } finally {
+	    	response.releaseConnection();
+	    }
+	    
+	    // Also, try to soft-delete.  This should also fail.
+		workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid, WorkflowClient.WORKFLOWTRANSITION_DELETE);
+	    System.out.println("Locked dimension record with CSID=" + dimensionCsid);
+	}
+    
+	
+	@Test void releteCollectionObjectToLockedDimension() {
+		//
+		// First create a CollectionObject
+		//
+		CollectionobjectsCommon co = new CollectionobjectsCommon();
+		fillCollectionObject(co, createIdentifier());
+		
+		// Next, create a part object
+		PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+		PayloadOutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
+		commonPart.setLabel(collectionObjectClient.getCommonPartName());
+		
+		// Make the create call and check the response
+		ClientResponse<Response> response = collectionObjectClient.create(multipart);
+		String collectionObjectCsid = null;
+		try {
+			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
+					.getStatusCode());
+			collectionObjectCsid = extractId(response);
+		} finally {
+			response.releaseConnection();
+		}
+		
+		//Next, create a Dimension record to relate the collection object to
+	    multipart = this.createDimensionInstance(createIdentifier());
+	    // Make the call to create and check the response
+	    response = dimensionClient.create(multipart);
+	    String dimensionCsid = null;
+	    try {
+		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+		    dimensionCsid = extractId(response);
+	    } finally {
+	    	response.releaseConnection();
+	    }
+	    
+	    @SuppressWarnings("unused")
+		ClientResponse<String> workflowResponse = dimensionClient.updateWorkflowWithTransition(dimensionCsid, WorkflowClient.WORKFLOWTRANSITION_LOCK);
+	    System.out.println("Locked dimension record with CSID=" + dimensionCsid);
+	    
+	    // Lastly, relate the two entities, by creating a new relation object
+	    RelationsCommon relation = new RelationsCommon();
+	    fillRelation(relation, collectionObjectCsid, CollectionobjectsCommon.class.getSimpleName(),
+	    		dimensionCsid, DimensionsCommon.class.getSimpleName(),
+	    		"collectionobject-dimension");
+	    // Create the part and fill it with the relation object
+	    multipart = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
+	    commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
+	    commonPart.setLabel(relationClient.getCommonPartName());
+
+	    // Make the call to crate
+	    ClientResponse<Response> relationresponse = relationClient.create(multipart);
+	    @SuppressWarnings("unused")
+		String relationCsid = null;
+	    try {
+		    Assert.assertEquals(relationresponse.getStatus(), Response.Status.BAD_REQUEST.getStatusCode());
+		    relationCsid = extractId(response);
+	    } finally {
+	    	relationresponse.releaseConnection();
+	    }
+	    
+	}
 	
 	@Test
 	public void relateCollectionObjectToIntake() {

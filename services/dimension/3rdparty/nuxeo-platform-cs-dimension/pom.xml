@@ -19,7 +19,7 @@
 		<ServiceName>dimension</ServiceName>
 		<NuxeoDocTypeName>Dimension</NuxeoDocTypeName>
 		<CommonSchemaName>dimensions_common</CommonSchemaName>
-		<Lifecycle>cs_default</Lifecycle>
+		<Lifecycle>cs_locking</Lifecycle>
 	</properties>
     
     <build>

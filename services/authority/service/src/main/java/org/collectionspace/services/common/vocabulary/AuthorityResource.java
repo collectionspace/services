@@ -32,14 +32,12 @@ import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -49,7 +47,6 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
@@ -58,11 +55,7 @@ import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
-import org.collectionspace.services.relation.RelationResource;
-import org.collectionspace.services.relation.RelationsCommonList;
-import org.collectionspace.services.relation.RelationshipType;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -494,7 +487,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         try {
             ensureCSID(csid, ServiceMessages.DELETE_FAILED, "Authority.csid");
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            getRepositoryClient(ctx).delete(ctx, csid);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).delete(ctx, csid, handler);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
@@ -551,6 +545,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result.getBytes();
     }
 
+    //FIXME: This method is almost identical to the method org.collectionspace.services.common.updateWorkflowWithTransition() so
+    // they should be consolidated -be DRY (don't repeat yourself).
     @PUT
     @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
     public byte[] updateItemWorkflowWithTransition(
@@ -558,23 +554,34 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             @PathParam("itemcsid") String itemcsid,
             @PathParam("transition") String transition) {
         PoxPayloadOut result = null;
+        
         try {
+        	//
+        	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
         	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
         			WorkflowClient.SERVICE_COMMONPART_NAME);
-
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
-            String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
-
-            TransitionDef transitionDef = getTransitionDef(parentCtx, transition);
             MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input);
-            ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
-            WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
+
+            // Create a service context and document handler for the parent resource.
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
+            DocumentHandler parentDocHandler = this.createDocumentHandler(parentCtx);
+            ctx.setProperty(WorkflowClient.PARENT_DOCHANDLER, parentDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
+
+            // When looking for the document, we need to use the parent's workspace name -not the "workflow" workspace name
+            String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
             ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
+            
+        	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
+            TransitionDef transitionDef = getTransitionDef(parentCtx, transition);
+            ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
+            
+            WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, itemcsid, handler);
             result = ctx.getOutput();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }
+        
         return result.getBytes();
     }
 
@@ -879,7 +886,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // try {
             // Note that we have to create the service context for the Items, not the main service
             ServiceContext ctx = createServiceContext(getItemServiceName());
-            getRepositoryClient(ctx).delete(ctx, itemcsid);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).delete(ctx, itemcsid, handler);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED + "  itemcsid: " + itemcsid + " parentcsid:" + parentcsid);
