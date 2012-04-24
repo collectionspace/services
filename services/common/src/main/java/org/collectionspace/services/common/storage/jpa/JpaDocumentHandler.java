@@ -7,6 +7,8 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.Lifecycle;
+import org.collectionspace.services.lifecycle.TransitionDef;
+import org.nuxeo.ecm.core.api.DocumentModel;
 
 public abstract class JpaDocumentHandler<T, TL, WT, WLT>
 	extends AbstractDocumentHandlerImpl<T, TL, WT, WLT>{
@@ -47,4 +49,12 @@ public abstract class JpaDocumentHandler<T, TL, WT, WLT>
     public Lifecycle getLifecycle() {
     	return getLifecycle(null); // NOTE: As of 3/2012, none of the JPA-based services support a life cycle type.
     }
+    
+	@Override
+	public void handleWorkflowTransition(
+			DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+			throws Exception {
+		// Do nothing.  JPA document handlers do not support workflow transitions yet.
+	}
+    
 }

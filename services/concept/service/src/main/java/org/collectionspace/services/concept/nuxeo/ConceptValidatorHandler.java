@@ -53,6 +53,12 @@ public class ConceptValidatorHandler implements ValidatorHandler {
         if (logger.isDebugEnabled()) {
             logger.debug("validate() action=" + action.name());
         }
+        
+        // Bail out if the validation action is for delete.
+        if (action.equals(Action.DELETE)) {
+        	return;
+        }
+        
         try {
             MultipartServiceContext mctx = (MultipartServiceContext) ctx;
             ConceptsCommon concept = (ConceptsCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
