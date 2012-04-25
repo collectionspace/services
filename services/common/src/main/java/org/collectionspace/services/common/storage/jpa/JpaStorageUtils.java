@@ -63,18 +63,12 @@ public class JpaStorageUtils {
     
     /** The Constant CS_PERSISTENCE_UNIT. */
     public final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
-    private final static String CS_AUTHZ_PERSISTENCE_UNIT = "org.collectionspace.services.authorization";
+    public static String CS_AUTHZ_PERSISTENCE_UNIT = "org.collectionspace.services.authorization";
     public final static String CS_CURRENT_USER = "0";
     
     // This is the column name for ID field of all the JPA objects
     public static final String CSID_LABEL = "csid";
-
-    /**
-     * getEntity for given id and class
-     * @param id
-     * @param entityClazz
-     * @return null if entity is not found
-     */
+    
     public static Object getEntity(String id, Class entityClazz)
     		throws DocumentNotFoundException {
         EntityManagerFactory emf = null;
@@ -92,6 +86,7 @@ public class JpaStorageUtils {
         }
         return entityFound;
     }
+    
 
     public static Object getEntity(long id, Class entityClazz)
     		throws DocumentNotFoundException {
@@ -119,7 +114,7 @@ public class JpaStorageUtils {
      * @param entityClazz
      * @return
      */
-    public static Object getEntity(EntityManager em, String id, Class entityClazz) {
+    public static Object getEntity(EntityManager em, String id, Class entityClazz) throws DocumentNotFoundException {
         if (entityClazz == null) {
             String msg = "Not constructed with JpaStorageClientImpl(entityClazz) ctor";
             logger.error(msg);
@@ -227,7 +222,7 @@ public class JpaStorageUtils {
     	String userId = account.getUserId();
     	String currentUserId = AuthN.get().getUserId(); 
         if (currentUserId.equalsIgnoreCase(userId) == false) {
-			CSpaceResource res = new URIResourceImpl("accounts", "GET");
+			CSpaceResource res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), "accounts", "GET");
 			if (AuthZ.get().isAccessAllowed(res) == false) {
 	        	String msg = "Access to the permissions for the account with csid = " + csid + " is NOT allowed for " +
 					" user=" + currentUserId;
@@ -296,12 +291,10 @@ public class JpaStorageUtils {
         return result;
     }
     
-    public static Object getEnityByKey(String entityName, String key, String value,
+    public static Object getEnityByKey(EntityManager em, String entityName, String key, String value,
             String tenantId) {
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
-        Object o = null;
-        
+    	Object result = null;
+    	
         if (entityName == null) {
             throw new IllegalArgumentException("entityName is required");
         }
@@ -311,24 +304,36 @@ public class JpaStorageUtils {
         if (tenantId == null) {
             throw new IllegalArgumentException("tenantId is required");
         }
+        
+        StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+        queryStrBldr.append(entityName);
+        queryStrBldr.append(" a");
+        queryStrBldr.append(" WHERE " + key + " = :" + key);
+        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+        if (!csAdmin) {
+            queryStrBldr.append(" AND tenantId = :tenantId");
+        }
+        String queryStr = queryStrBldr.toString(); //for debugging
+        Query q = em.createQuery(queryStr);
+        q.setParameter(key, value);
+        if (!csAdmin) {
+            q.setParameter("tenantId", tenantId);
+        }
+        result = q.getSingleResult();
+
+        return result;
+    }
+    
+    public static Object getEnityByKey(String entityName, String key, String value,
+            String tenantId) {
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        Object o = null;
+        
         try {
-            StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
-            queryStrBldr.append(entityName);
-            queryStrBldr.append(" a");
-            queryStrBldr.append(" WHERE " + key + " = :" + key);
-            boolean csAdmin = SecurityUtils.isCSpaceAdmin();
-            if (!csAdmin) {
-                queryStrBldr.append(" AND tenantId = :tenantId");
-            }
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
-            String queryStr = queryStrBldr.toString(); //for debugging
-            Query q = em.createQuery(queryStr);
-            q.setParameter(key, value);
-            if (!csAdmin) {
-                q.setParameter("tenantId", tenantId);
-            }
-            o = q.getSingleResult();
+            o = getEnityByKey(em, entityName, key, value, tenantId);
         } catch (NoResultException nre) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -342,7 +347,7 @@ public class JpaStorageUtils {
                 em.getTransaction().rollback();
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("could not find entity(2) with id=" + key, e);
+                logger.debug("Could not find entity with id=" + key, e);
             }
             //returns null
         } finally {
@@ -423,6 +428,37 @@ public class JpaStorageUtils {
         return o;
     }
 
+    public static Object getEntity(EntityManager em, String entityName,
+            String whereClause, HashMap<String, Object> paramBindings) {
+        Object result = null;
+        
+    	if (entityName == null) {
+            throw new IllegalArgumentException("entityName is required");
+        }
+        if (whereClause == null) {
+            throw new IllegalArgumentException("whereClause is required");
+        }
+
+        StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+        queryStrBldr.append(entityName);
+        queryStrBldr.append(" a");
+        queryStrBldr.append(" " + whereClause);
+
+        String queryStr = queryStrBldr.toString(); //for debugging
+        Query q = em.createQuery(queryStr);
+        for (String paramName : paramBindings.keySet()) {
+            q.setParameter(paramName, paramBindings.get(paramName));
+        }
+        
+        result = q.getSingleResult();
+        
+        if (result == null) {
+        	logger.debug("Call to getEntity() returned empty set.");
+        }
+        
+        return result;
+    }
+    
     /**
      * getEntity using given where clause with given param bindings
      * @param entityName
@@ -432,29 +468,13 @@ public class JpaStorageUtils {
      */
     public static Object getEntity(String entityName,
             String whereClause, HashMap<String, Object> paramBindings) {
-        if (entityName == null) {
-            throw new IllegalArgumentException("entityName is required");
-        }
-        if (whereClause == null) {
-            throw new IllegalArgumentException("whereClause is required");
-        }
-        EntityManagerFactory emf = null;
-        EntityManager em = null;
+    	EntityManagerFactory emf = null;
+    	EntityManager em = null;
         Object o = null;
         try {
-            StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
-            queryStrBldr.append(entityName);
-            queryStrBldr.append(" a");
-            queryStrBldr.append(" " + whereClause);
-            //FIXME it would be nice to insert tenant id in the where clause here
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
-            String queryStr = queryStrBldr.toString(); //for debugging
-            Query q = em.createQuery(queryStr);
-            for (String paramName : paramBindings.keySet()) {
-                q.setParameter(paramName, paramBindings.get(paramName));
-            }
-            o = q.getSingleResult();
+            o = getEntity(em, entityName, whereClause, paramBindings);
         } catch (NoResultException nre) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -523,8 +543,33 @@ public class JpaStorageUtils {
      */
     public static EntityManagerFactory getEntityManagerFactory(
             String persistenceUnit) {
-        return Persistence.createEntityManagerFactory(persistenceUnit);
+    	EntityManagerFactory result = null;
+    	
+    	try {
+    		result = Persistence.createEntityManagerFactory(persistenceUnit);
+    	} catch (javax.persistence.PersistenceException e) {
+    		logger.warn("Could not find a persistence unit for: " + persistenceUnit);
+    	}
+    	
+		//
+		// Try using a backup persistence unit if the specified one is not available and log a warning
+		//
+    	if (result == null && !persistenceUnit.equalsIgnoreCase(CS_PERSISTENCE_UNIT)) try {
+    		result = Persistence.createEntityManagerFactory(CS_PERSISTENCE_UNIT);
+    	} catch (javax.persistence.PersistenceException e) {
+    		logger.warn("Could not find a persistence unit for: " + CS_PERSISTENCE_UNIT);
+    	}
+    	
+    	//
+    	// One more try.
+    	//
+    	if (result == null && !persistenceUnit.equalsIgnoreCase(CS_AUTHZ_PERSISTENCE_UNIT)) try {
+    		result = Persistence.createEntityManagerFactory(CS_AUTHZ_PERSISTENCE_UNIT);
+    	} catch (javax.persistence.PersistenceException e) {
+    		logger.warn("Could not find a persistence unit for: " + CS_AUTHZ_PERSISTENCE_UNIT);
+    	}
 
+        return result;
     }
 
     /**

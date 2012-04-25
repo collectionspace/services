@@ -9,7 +9,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authorization-mgt.import</artifactId>
     <name>services.authorization-mgt.import</name>
     <properties>
@@ -17,6 +16,7 @@
         <spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.2.RELEASE</spring.security.version>
     </properties>
+    
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -28,6 +28,13 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.6.1</version>
+        </dependency>
+        <!-- CollectionSpace dependencies -->
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authentication.service</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -57,6 +64,7 @@
             <artifactId>org.collectionspace.services.authorization-mgt.client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 3rd Pary dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>

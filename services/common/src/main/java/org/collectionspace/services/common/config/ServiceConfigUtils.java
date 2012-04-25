@@ -25,12 +25,16 @@ package org.collectionspace.services.common.config;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.collectionspace.services.common.RepositoryClientConfigType;
-import org.collectionspace.services.common.ServiceConfig;
-import org.collectionspace.services.common.types.PropertyItemType;
-import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.config.RepositoryClientConfigType;
+import org.collectionspace.services.config.ServiceConfig;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.config.types.PropertyItemType;
+import org.collectionspace.services.config.types.PropertyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author pschmitz
@@ -38,6 +42,51 @@ import org.collectionspace.services.common.types.PropertyType;
  */
 public class ServiceConfigUtils {
 
+    final static Logger logger = LoggerFactory.getLogger(ServiceConfigUtils.class);
+
+    /**
+     * Creates the document handler instance.
+     * 
+     * @return the document handler
+     * 
+     * @throws Exception the exception
+     */
+    public static DocumentHandler createDocumentHandlerInstance(TenantBindingType tenantBinding,
+    		ServiceBindingType serviceBinding) throws Exception {
+    	DocumentHandler docHandler = null;
+    	
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        Class<?> c = tccl.loadClass(getDocumentHandlerClass(tenantBinding, serviceBinding));
+        if (DocumentHandler.class.isAssignableFrom(c)) {
+            docHandler = (DocumentHandler) c.newInstance();
+            if (logger.isDebugEnabled()) {
+            	logger.debug("Created an instance of the DocumentHandler for: " + getDocumentHandlerClass(tenantBinding, serviceBinding));
+            }
+        } else {
+            throw new IllegalArgumentException("Not of type "
+                    + DocumentHandler.class.getCanonicalName());
+        }
+
+        return docHandler;
+    }
+
+    /**
+     * Gets the document handler class.
+     * 
+     * @return the document handler class
+     */
+    private static String getDocumentHandlerClass(TenantBindingType tenantBinding,
+    		ServiceBindingType serviceBinding) {
+        if (serviceBinding.getDocumentHandler() == null
+                || serviceBinding.getDocumentHandler().isEmpty()) {
+            String msg = "Missing documentHandler in service binding for service name \""
+                    + serviceBinding.getName() + "\" for tenant id=" + tenantBinding.getId()
+                    + " name=" + tenantBinding.getName();
+            logger.warn(msg);
+            throw new IllegalStateException(msg);
+        }
+        return serviceBinding.getDocumentHandler().trim();
+    }
 
     /**
      * Gets the values of a configured property for a service.

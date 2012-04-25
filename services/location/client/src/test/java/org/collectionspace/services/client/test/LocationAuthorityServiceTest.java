@@ -82,15 +82,6 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     
     // Instance variables specific to this test.
     
-//    /** The SERVICE path component. */
-//    final String SERVICE_PATH_COMPONENT = "locationauthorities";
-//    
-//    /** The ITEM service path component. */
-//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-//    
-//    /** The CONTACT service path component. */
-//    final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
-    
     final String TEST_NAME = "Shelf 1";
     final String TEST_SHORTID = "shelf1";
     final String TEST_CONDITION_NOTE = "Basically clean";
@@ -104,11 +95,7 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     final String TEST_STATUS = "Approved";
     
     /** The known resource id. */
-    private String knownResourceShortIdentifer = null;
-    private String knownResourceRefName = null;
-    
     private String knownLocationTypeRefName = null;
-    private String knownContactResourceId = null;
         
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -596,10 +583,6 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
         nonexMap.put(LocationJAXBSchema.SHORT_IDENTIFIER, "nonEx");
         nonexMap.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
         nonexMap.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
-        // PoxPayloadOut multipart = 
-    	// LocationAuthorityClientUtils.createLocationInstance(
-    	//		LocationAuthorityClientUtils.createLocationRefName(knownResourceRefName, "nonEx", "Non Existent"), 
-    	//		nonexMap, client.getItemCommonPartName() );
         final String EMPTY_REFNAME = "";
         PoxPayloadOut result = 
                 LocationAuthorityClientUtils.createLocationInstance(EMPTY_REFNAME, 

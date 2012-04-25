@@ -111,7 +111,7 @@
             description="generate service-specific tables(s), indices, etc.">
     </target>
 
-    <target name="create_db"
+    <target name="create_cspace_db"
             description="create tables(s), indices for authorization service">
     </target>
 

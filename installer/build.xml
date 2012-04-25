@@ -52,23 +52,44 @@
 				<ant antfile="services/build.xml" target="config" inheritAll="false"/>        
     </target>    
     
-    <target name="predeploy" depends="config">
-        <exec executable="echo">
-        		<arg value="Installer: Creating necessary databases and associated users and privileges." />
-				</exec>
-        <sql driver="${db.jdbc.driver.class}"
-        url="${db.jdbc.baseurl}"
-        userid="${db.user}"
-        password="${db.user.password}"
-        src="${db.script.dir}/init_db.sql">
-            <classpath>
-                <pathelement path="${db.driver.jar}"/>
-            </classpath>
-        </sql>
-				
+    <target name="predeploy" depends="config, create_cspace_db, create_nuxeo_db">
 				<!-- Now, invoke the "predeploy" target on each of the services' install directories -->
         <ant antfile="services/build.xml" target="predeploy" inheritAll="false"/>        	
     </target>
+
+		<target name="create_nuxeo_db" 
+							description="create nuxeo database">
+			<sql driver="${db.jdbc.driver.class}"
+							 url="${db.jdbc.baseurl}"
+							 userid="${db.user}"
+							 password="${db.user.password}"
+							 autocommit="true"
+							 src="${db.script.dir}/init_nuxeo_db.sql"
+							 >
+				<classpath>
+					<pathelement path="${db.driver.jar}"/>
+				</classpath>
+			</sql>
+		<ant antfile="services/build.xml" target="create_nuxeo_db" inheritAll="false"/>
+		</target>
+
+		<target name="create_cspace_db" 
+			description="create cspace database">
+			<sql driver="${db.jdbc.driver.class}"
+							 url="${db.jdbc.baseurl}"
+							 userid="${db.user}"
+							 password="${db.user.password}"
+							 autocommit="true"
+							 src="${db.script.dir}/init_cspace_db.sql"
+							 >
+				<classpath>
+					<pathelement path="${db.driver.jar}"/>
+				</classpath>
+			</sql>
+		<ant antfile="services/build.xml" target="create_cspace_db" inheritAll="false"/>
+		</target>
+
+
     
     <target name="deploy" description="">
 				<!-- Now, invoke the "deploy" target on each of the services' install directories -->

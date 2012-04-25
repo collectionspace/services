@@ -30,8 +30,9 @@ package org.collectionspace.services.common.api;
 
 import java.io.*;
 import java.util.UUID;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 
 /**
  * @author Laramie Crocker
@@ -39,6 +40,34 @@ import java.util.regex.Matcher;
  * $LastChangedDate:  $
  */
 public class FileTools {
+
+	
+    /**
+     * getObjectFromStream get object of given class from given inputstream
+     * @param jaxbClass
+     * @param is stream to read to construct the object
+     * @return
+     * @throws Exception
+     */
+    static protected Object getObjectFromStream(Class<?> jaxbClass, InputStream is) throws Exception {
+        JAXBContext context = JAXBContext.newInstance(jaxbClass);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        //note: setting schema to null will turn validator off
+        unmarshaller.setSchema(null);
+        return jaxbClass.cast(unmarshaller.unmarshal(is));
+    }
+
+    static public Object getJaxbObjectFromFile(Class<?> jaxbClass, String fileName)
+            throws Exception {
+
+        JAXBContext context = JAXBContext.newInstance(jaxbClass);
+        Unmarshaller unmarshaller = context.createUnmarshaller();
+        //note: setting schema to null will turn validator off
+        unmarshaller.setSchema(null);
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        InputStream is = tccl.getResourceAsStream(fileName);
+        return getObjectFromStream(jaxbClass, is);
+    }
 
 	public static String convertStreamToString(InputStream is) {
 		/*

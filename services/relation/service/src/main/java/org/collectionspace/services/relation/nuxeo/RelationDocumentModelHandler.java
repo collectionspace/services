@@ -25,28 +25,29 @@ package org.collectionspace.services.relation.nuxeo;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.net.HttpURLConnection;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ServiceException;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.RepositoryClientFactory;
-import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
+import org.collectionspace.services.relation.RelationsDocListItem;
 
 // HACK HACK HACK
 import org.collectionspace.services.client.PersonAuthorityClient;
@@ -54,14 +55,13 @@ import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.PlaceAuthorityClient;
+import org.collectionspace.services.client.ConceptAuthorityClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
-import org.collectionspace.services.relation.RelationsDocListItem;
 import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -89,6 +89,47 @@ public class RelationDocumentModelHandler
      * for ACTION.GET_ALL
      */
     private RelationsCommonList relationList;
+    
+    private static final String ERROR_TERMS_IN_WORKFLOWSTATE = "Cannot modify a relationship if either end is in the workflow state: ";
+
+    
+    private boolean subjectOrObjectInWorkflowState(DocumentWrapper<DocumentModel> wrapDoc, String workflowState) throws ServiceException {
+    	boolean result = false;
+    	DocumentModel relationDocModel = wrapDoc.getWrappedObject();
+    	String errMsg = ERROR_TERMS_IN_WORKFLOWSTATE + workflowState;
+    			
+        RepositoryInstance repoSession = this.getRepositorySession();
+        try {
+			DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
+			DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
+			if (subjectDocModel.getCurrentLifeCycleState().equalsIgnoreCase(workflowState) ||
+					objectDocModel.getCurrentLifeCycleState().equalsIgnoreCase(workflowState)) {
+				result = true;
+			}
+		} catch (Exception e) {
+			if (logger.isInfoEnabled() == true) {
+				logger.info(errMsg, e);
+			}
+		}
+    	        
+    	return result;
+    }
+    
+	@Override
+	/*
+	 * Until we rework the RepositoryClient to handle the workflow transition (just like it does for 'create', 'get', 'update', and 'delete', this method will only check to see if the transition is allowed.  Until then,
+	 * the WorkflowDocumentModelHandler class does the actual workflow transition.
+	 * 
+	 * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
+	 */
+	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+			throws Exception {
+		String workflowState = transitionDef.getDestinationState();
+		if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
+    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+                    "Cannot change a relationship if either end of it is in the workflow state: " + workflowState);
+		}
+	}
 
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
@@ -97,6 +138,13 @@ public class RelationDocumentModelHandler
 
         // And take care of ensuring all the values for the relation info are correct 
         populateSubjectAndObjectValues(wrapDoc);
+    	
+        // both subject and object cannot be locked
+    	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
+    	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
+    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+                    "Cannot create a relationship if either end is in the workflow state: " + workflowState);
+    	}
     }
 
     @Override
@@ -106,6 +154,18 @@ public class RelationDocumentModelHandler
         
         // And take care of ensuring all the values for the relation info are correct 
         populateSubjectAndObjectValues(wrapDoc);
+    }
+    
+    @Override
+    public void handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
+    	// both subject and object cannot be locked
+    	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == false) {
+    		super.handleDelete(wrapDoc);
+    	} else {
+    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+                    "Cannot delete a relationship if either end is in the workflow state: " + workflowState);
+    	}
     }
     
     private void populateSubjectAndObjectValues(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
@@ -412,6 +472,8 @@ public class RelationDocumentModelHandler
 	    		common_schema = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
     		else if(docType.startsWith("Placeitem"))
     			common_schema = PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+	    	else if(docType.startsWith("Conceptitem"))
+	    		common_schema = ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
 	    	//else leave it null.
     	}
     	return common_schema;

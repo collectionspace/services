@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="personauthorities">
+<ns2:conceptauthorities_common
+xmlns:ns2="http://collectionspace.org/services/concept"
+xmlns:ns3="http://collectionspace.org/services/jaxb">
+	<shortIdentifier>conceptMaterials</shortIdentifier>
+  <displayName>Materials</displayName>
+  <vocabType>ConceptAuthority</vocabType>
+</ns2:conceptauthorities_common>
+</document>
+

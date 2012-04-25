@@ -37,12 +37,12 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
-import org.collectionspace.services.common.service.ListResultField;
-import org.collectionspace.services.common.service.ObjectPartType;
+import org.collectionspace.services.config.service.ListResultField;
+import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;

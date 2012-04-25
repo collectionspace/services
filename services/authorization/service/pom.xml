@@ -8,7 +8,7 @@
         <groupId>org.collectionspace.services</groupId>
         <version>2.2-SNAPSHOT</version>
     </parent>
-    <groupId>org.collectionspace.services</groupId>
+
     <artifactId>org.collectionspace.services.authorization.service</artifactId>
     <packaging>jar</packaging>
     <name>services.authorization.service</name>

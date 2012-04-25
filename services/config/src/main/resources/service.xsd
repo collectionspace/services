@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2009 University of California at Berkeley
+    Licensed under the Educational Community License (ECL), Version 2.0.
+    You may not use this file except in compliance with this License.
+
+    You may obtain a copy of the ECL 2.0 License at
+    https://source.collectionspace.org/collection-space/LICENSE.txt
+
+    Document   : service.xsd
+    Revision   : $LastChangedRevision$
+    Created on : $LastChangedDate$
+    Author     : $LastChangedBy: $
+    Description: ServiceBinding desribes how a possibly tenant-specific service is
+                 bound to corresponding service framework at runtime
+                 ServiceObjectType is used to describe the
+                 structure of a CollectionSpace object - an entity or relation.
+                 This is NOT used to encode or decode the stream in or out the
+                 content over the wire or to the storage.
+                 Derived from Fedora Digtial Object Model and MIME Multipart
+-->
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://collectionspace.org/services/config/service"
+    xmlns:types="http://collectionspace.org/services/config/types"
+    targetNamespace="http://collectionspace.org/services/config/service"
+    version="0.1"
+    elementFormDefault="qualified"
+    >
+
+    <xs:import namespace="http://collectionspace.org/services/config/types" schemaLocation="types.xsd" />
+
+    <xs:complexType name="ServiceBindingType">
+        <xs:sequence>
+            <!-- other URI paths using which this service binding could be accessed -->
+            <xs:element name="uriPath" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- object representation served by the service -->
+            <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="1"/>
+            <!-- document handler to be used to process the content (need to be in classpath) -->
+            <xs:element name="documentHandler" type="xs:string" minOccurs="1" maxOccurs="1"/>
+
+            <xs:element name="DocHandlerParams" type="DocHandlerParams" minOccurs="0" maxOccurs="1"/>
+
+            <!-- validator handler(s) to be used to validate the content (need to be in classpath) -->
+            <!-- validator handler is called for create (POST) and update (PUT) requests only -->
+            <xs:element name="validatorHandler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="disableAsserts" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+            <!-- initHandler is a post-init task after the Nuxeo repository is available. -->
+            <!-- worked: <xs:element name="initHandler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>-->
+            <xs:element name="initHandler" type="initHandler" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- name of the repository domain -->
+            <xs:element name="repositoryDomain" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <!-- repositoryWorkspaceId could be workspace id -->
+            <!-- used only for Nuxeo rest client -->
+            <xs:element name="repositoryWorkspaceId" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <!-- name of the service, this is also the default URI path to access this service binding -->
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="type" type="xs:string" use="optional"/>
+        <xs:attribute name="version" type="types:VersionType" use="required"/>
+    </xs:complexType>
+
+    <!--
+        ServiceObjectType defines the manifest for a collectionspace
+        object.  includes properties of the object as well as manifests
+        for zero or more parts of the object.
+    -->
+    <xs:complexType name="ServiceObjectType">
+        <xs:annotation>
+            <xs:documentation/>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="property" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="part" type="ObjectPartType" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- a handler Java class to process the content of this service -->
+            <xs:element name="serviceHandler" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <!-- the object name could be collectionobject|intake|location, etc. -->
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="version" type="types:VersionType" use="required"/>
+    </xs:complexType>
+
+
+    <!---
+    ObjectPartType describes a part of an object
+    -->
+    <xs:complexType name="ObjectPartType">
+        <xs:annotation>
+            <xs:documentation/>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="content" type="ObjectPartContentType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="required"/>
+        <!-- control group indicates where the content resides -->
+        <xs:attribute name="control_group" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <!-- managed by an external repository such as MediaVault -->
+                    <xs:enumeration value="External"/>
+                    <!-- managed by CollectionSpace -->
+                    <xs:enumeration value="Managed"/>
+                    <!-- inlined from this manifest -->
+                    <xs:enumeration value="Inline"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="versionable" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="auditable" type="xs:boolean" use="optional" default="false"/>
+        <!-- application defined label to identify the part, e.g. collectionobject.ucmp.berkeley -->
+        <xs:attribute name="label" type="xs:string" use="optional"/>
+        <xs:attribute name="updated" type="xs:dateTime" use="optional"/>
+        <!-- order in the sequence of one or more parts -->
+        <xs:attribute name="order" type="xs:int" use="optional"/>
+    </xs:complexType>
+
+    <!--
+        ObjectPartContentType describes the content of a part as well as provides
+        information about how to handle the part
+    -->
+    <xs:complexType name="ObjectPartContentType">
+        <xs:sequence>
+            <xs:element name="contentDigest" type="ContentDigestType" minOccurs="0"/>
+            <xs:choice>
+                <xs:element name="xmlContent" type="XmlContentType"/>
+                <xs:element name="contentLocation" type="ContentLocationType"/>
+                <xs:element name="binaryContent" type="xs:base64Binary"/>
+            </xs:choice>
+            <!-- a handler Java class to process the content of this part -->
+            <xs:element name="partHandler" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <!-- MIME content type -->
+        <xs:attribute name="contentType" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <!--
+    content digest provides information about the digest algorithm used
+    and the digest itself
+    -->
+    <xs:complexType name="ContentDigestType">
+        <xs:attribute name="algorithm" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="MD5"/>
+                    <xs:enumeration value="SHA-1"/>
+                    <xs:enumeration value="SHA-256"/>
+                    <xs:enumeration value="SHA-384"/>
+                    <xs:enumeration value="SHA-512"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="XmlContentType">
+        <xs:sequence>
+            <xs:any namespace="##any" processContents="skip" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <!-- location to retrieve the schema from -->
+        <!-- in fact, schema should be retrievable by the parser, validator -->
+        <xs:attribute name="schemaLocation" type="xs:string" use="optional"/>
+        <xs:attribute name="namespaceURI" type="xs:string" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="ContentLocationType">
+        <xs:attribute name="type" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="internalId"/>
+                    <xs:enumeration value="URL"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="ref" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:anyURI">
+                    <xs:minLength value="1"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="FieldsType">
+        <xs:sequence>
+            <xs:element name="field" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="initHandlerOLD">
+        <xs:sequence>
+            <xs:element name="classname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <!--<xs:element name="fields" type="FieldsType" minOccurs="0" maxOccurs="1"/>-->
+            <xs:element name="fields">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="field" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+           </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="initHandler">
+        <xs:sequence>
+            <xs:element name="classname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="params">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="field" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="table" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                    <xs:element name="col" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                    <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                    <xs:element name="param" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="property" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="key" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                                    <xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+           </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DocHandlerParams">
+        <xs:sequence>
+            <xs:element name="classname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="params">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="SchemaName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="DublinCoreTitle" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="SummaryFields" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="AbstractCommonListClassname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="CommonListItemClassname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="ListResultsItemMethodName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="ListResultsFields" minOccurs="1" maxOccurs="1">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="ListResultField" type="ListResultField" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+           </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ListResultField">
+        <xs:sequence>
+            <xs:element name="setter" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="element" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="schema" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="xpath" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+
+
+
+</xs:schema>

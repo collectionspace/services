@@ -107,9 +107,11 @@ public class AccountResource extends SecurityResourceBase {
     @Produces("application/xml")
     public AccountsCommonList getAccountList(@Context UriInfo ui) {
     	AccountsCommonList result = (AccountsCommonList)getList(ui, AccountsCommon.class);
-    	PayloadOutputPart ppo = new PayloadOutputPart(AccountsCommonList.class.getSimpleName(),
-    			result);
-    	System.out.println(ppo.asXML());
+    	if(logger.isTraceEnabled()) {
+        	PayloadOutputPart ppo = new PayloadOutputPart(AccountsCommonList.class.getSimpleName(),
+        			result);
+    		System.out.println(ppo.asXML());
+    	}
     	return result;
     }
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <totalItems>3</totalItems>
+    <!--
+      Note that tests verifying this specific response may either fail, or
+      return a non-fatal NESTED_ERROR, if the order of the list items below
+      changes. (This response assumes that items are both returned in reverse
+      chronological order by update timestamp (collectionspace_core:updatedAt),
+      and that they are created in timestamp order by the order of tests in
+      the control file.)
+      
+      If the list items order changes, you can: reorder the following
+      list-items appropriately; remove those items entirely, relying solely
+      on the <totalItems> value and not on the actual items returned; or
+      rewrite the test and/or response using more sophisticated techniques.
+    -->
+    <list-item>
+        <shortIdentifier>${createPersonAuthority1.word1}item3</shortIdentifier>
+    </list-item>
+    <list-item>
+        <shortIdentifier>${createPersonAuthority1.word1}item2</shortIdentifier>
+    </list-item>
+    <list-item>
+        <shortIdentifier>${createPersonAuthority1.word1}item1</shortIdentifier>
+    </list-item>
+</ns2:abstract-common-list>
+

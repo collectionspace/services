@@ -23,46 +23,24 @@
  */
 package org.collectionspace.services.report;
 
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler;
-import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
-import org.collectionspace.services.common.invocable.InvocationResults;
-import org.collectionspace.services.common.invocable.Invocable.InvocationError;
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.JDBCTools;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.security.auth.login.LoginException;
-import javax.sql.DataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -70,16 +48,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
 
 @Path(ReportClient.SERVICE_PATH)
 @Consumes("application/xml")

@@ -26,7 +26,6 @@ package org.collectionspace.services.authorization.importer;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -35,18 +34,11 @@ import javax.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.security.acls.model.AlreadyExistsException;
-import org.collectionspace.services.authorization.AuthZ;
-import org.collectionspace.services.authorization.CSpaceAction;
-import org.collectionspace.services.authorization.perms.EffectType;
 import org.collectionspace.services.authorization.perms.Permission;
-import org.collectionspace.services.authorization.perms.PermissionAction;
-import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
-import org.collectionspace.services.authorization.RoleValue;
-import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 
 /**
  * AuthorizationSeed seeds authorizations (permission, role) into authz provider database
@@ -107,48 +99,13 @@ public class AuthorizationSeed {
             }
             for (PermissionRole pr : permRoleList) {
                 if (pr.getPermission().get(0).getPermissionId().equals(p.getCsid())) {
-                    addPermissionsForUri(p, pr);
+                	AuthorizationCommon.addPermissionsForUri(p, pr);
                 }
             }
         }
     }
     
-    /**
-     * addPermissionsForUri add permissions from given permission configuration
-     * with assumption that resource is of type URI
-     * @param permission configuration
-     */
-    private void addPermissionsForUri(Permission perm,
-            PermissionRole permRole) throws PermissionException {
-        List<String> principals = new ArrayList<String>();
-        if (!perm.getCsid().equals(permRole.getPermission().get(0).getPermissionId())) {
-            throw new IllegalArgumentException("permission ids do not"
-                    + " match for role=" + permRole.getRole().get(0).getRoleName()
-                    + " with permissionId=" + permRole.getPermission().get(0).getPermissionId()
-                    + " for permission with csid=" + perm.getCsid());
-        }
-        for (RoleValue roleValue : permRole.getRole()) {
-            principals.add(roleValue.getRoleName());
-        }
-        List<PermissionAction> permActions = perm.getAction();
-        for (PermissionAction permAction : permActions) {
-        	try {
-	            CSpaceAction action = URIResourceImpl.getAction(permAction.getName());
-	            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
-	                    perm.getResourceName(), action);
-	            boolean grant = perm.getEffect().equals(EffectType.PERMIT) ? true : false;
-	            AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]), grant);
-        	} catch (PermissionException e) {
-        		//
-        		// Only throw the exception if it is *not* an already-exists exception
-        		//
-        		if (e.getCause() instanceof AlreadyExistsException == false) {
-        			throw e;
-        		}
-        	}
-        }
-    }
-
+    
     /**
      * getAction is a convenience method to get corresponding action for
      * given ActionType

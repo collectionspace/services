@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="objectexit">
+<ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <exitNote>This is an exit note written by Sebastián (a-acute accent) and Barnes,
+which includes a pleasant façade (c-cedilla) and this cast of additional characters:
+Δ : Greek capital letter Delta (U+0394)
+Ж : Cyrillic capital letter Zhe with breve (U+04C1)
+Ŵ : Latin capital letter W with circumflex (U+0174)
+Ω : Greek capital letter Omega (U+03A9)
+月 : Han (CJK) character 'moon; month' ((U+6708)</exitNote>
+      <exitNumber>OE-IMPORT-TEST-1999.2</exitNumber>
+</ns2:objectexit_common>
+</document>
+

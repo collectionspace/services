@@ -147,5 +147,5 @@ public interface AuthorityClient<AUTHORITY_ITEM_TYPE, P extends AuthorityProxy>
     
     public ClientResponse<String> readItemWorkflow(String vcsid, String csid);
     
-    public ClientResponse<String> updateItemWorkflow(String vcsid, String csid, PoxPayloadOut workflowPayload);
+    public ClientResponse<String> updateItemWorkflowWithTransition(String vcsid, String csid, String workflowTransition);
 }

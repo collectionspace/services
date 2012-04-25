@@ -54,8 +54,8 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.security.SecurityUtils;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.service.ServiceObjectType;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.service.ServiceObjectType;
 import org.collectionspace.services.servicegroup.ServicegroupsCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -200,12 +200,13 @@ public class ServiceGroupDocumentModelHandler
 		CommonList list ) {
         int nFields = NUM_META_FIELDS+NUM_STANDARD_LIST_RESULT_FIELDS;
         String fields[] = new String[nFields];
-        fields[0] = "csid";
-        fields[1] = "uri";
-        fields[2] = "updatedAt";
-        fields[3] = DOC_NAME_FIELD;
-        fields[4] = DOC_NUMBER_FIELD;
-        fields[5] = DOC_TYPE_FIELD;
+        fields[0] = STANDARD_LIST_CSID_FIELD;
+        fields[1] = STANDARD_LIST_URI_FIELD;
+        fields[2] = STANDARD_LIST_UPDATED_AT_FIELD;
+        fields[3] = STANDARD_LIST_WORKFLOW_FIELD;
+        fields[4] = DOC_NAME_FIELD;
+        fields[5] = DOC_NUMBER_FIELD;
+        fields[6] = DOC_TYPE_FIELD;
         list.setFieldsReturned(fields);
         Iterator<DocumentModel> iter = docList.iterator();
 		HashMap<String,String> item = new HashMap<String,String>();
@@ -224,8 +225,9 @@ public class ServiceGroupDocumentModelHandler
             item.put(STANDARD_LIST_URI_FIELD, getUriFromServiceBinding(sb, csid));
             try {
             	item.put(STANDARD_LIST_UPDATED_AT_FIELD, getUpdatedAtAsString(docModel));
+                item.put(STANDARD_LIST_WORKFLOW_FIELD, docModel.getCurrentLifeCycleState());
             } catch(Exception e) {
-            	logger.error("Error getting udpatedAt value for doc ["+csid+"]: "+e.getLocalizedMessage());
+            	logger.error("Error getting core values for doc ["+csid+"]: "+e.getLocalizedMessage());
             }
 
             String value = ServiceBindingUtils.getMappedFieldInDoc(sb, 

@@ -40,6 +40,7 @@ import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
+import org.collectionspace.services.lifecycle.TransitionDef;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -577,4 +578,12 @@ public class JpaStorageClientImpl implements StorageClient {
             throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException();
     }
+
+	@Override
+	public void doWorkflowTransition(ServiceContext ctx, String id,
+			DocumentHandler handler, TransitionDef transitionDef)
+			throws BadRequestException, DocumentNotFoundException,
+			DocumentException {
+		// Do nothing.  JPA services do not support workflow.
+	}
 }

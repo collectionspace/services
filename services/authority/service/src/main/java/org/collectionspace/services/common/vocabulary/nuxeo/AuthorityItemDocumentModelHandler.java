@@ -45,19 +45,20 @@ import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
-import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.config.service.ListResultField;
+import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
-import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
@@ -93,8 +94,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     /**
      * inVocabulary is the parent Authority for this context
      */
-    protected String inAuthority;
-    protected String authorityRefNameBase;
+    protected String inAuthority = null;
+    protected String authorityRefNameBase = null;
     // Used to determine when the displayName changes as part of the update.
     protected String oldDisplayNameOnUpdate = null;
     protected String oldRefNameOnUpdate = null;
@@ -102,10 +103,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
-    }
-
-    public String getInAuthority() {
-        return inAuthority;
     }
 
     public void setInAuthority(String inAuthority) {
@@ -121,10 +118,18 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public String getUri(DocumentModel docModel) {
         // Laramie20110510 CSPACE-3932
         String authorityServicePath = getAuthorityServicePath();
+        if(inAuthority==null) {	// Only happens on queries to wildcarded authorities
+        	try {
+	        	inAuthority = (String) docModel.getProperty(authorityItemCommonSchemaName,
+	                AuthorityItemJAXBSchema.IN_AUTHORITY);
+    		} catch (ClientException pe) {
+    			throw new RuntimeException("Could not get parent specifier for item!");
+    		}
+        }
         return "/" + authorityServicePath + '/' + inAuthority + '/' + AuthorityClient.ITEMS + '/' + getCsid(docModel);
     }
 
-    public String getAuthorityRefNameBase() {
+    protected String getAuthorityRefNameBase() {
         return this.authorityRefNameBase;
     }
 
@@ -346,6 +351,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * @throws Exception the exception
      */
     private void handleInAuthority(DocumentModel docModel) throws Exception {
+        if(inAuthority==null) {	// Only happens on queries to wildcarded authorities
+        	throw new IllegalStateException("Trying to Create an object with no inAuthority value!");
+        }
         docModel.setProperty(authorityItemCommonSchemaName,
                 AuthorityItemJAXBSchema.IN_AUTHORITY, inAuthority);
     }

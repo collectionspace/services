@@ -32,8 +32,8 @@ import java.util.StringTokenizer;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.service.ServiceObjectType;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.config.service.ServiceBindingType;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jboss.crypto.digest.DigestCallback;
+import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.security.Base64Encoder;
 import org.jboss.security.Base64Utils;
 
@@ -99,6 +100,25 @@ public class SecurityUtils {
         }
     }
 
+    public static String getWorkflowResourceName(HttpRequest request) {
+    	String result = null;
+    			
+    	UriInfo uriInfo = request.getUri();
+    	String workflowSubResName = SecurityUtils.getResourceName(uriInfo);
+    	String resEntity = SecurityUtils.getResourceEntity(workflowSubResName);
+    	
+		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
+		String workflowTransition = pathParams.getFirst(WorkflowClient.TRANSITION_PARAM_JAXRS);
+		if (workflowTransition != null) {
+	    	result = resEntity + "/*/" + WorkflowClient.SERVICE_NAME + "/" + workflowTransition;
+		} else {
+			// e.g., intakes/workflow or intakes/*/workflow
+			result = resEntity;
+		}
+    	
+    	return result;
+    }
+    
 	/**
 	 * Gets the resource name.
 	 *
@@ -202,7 +222,7 @@ public class SecurityUtils {
 		AuthZ authZ = AuthZ.get();
     	for(ServiceBindingType binding:serviceBindings) {
     		String resourceName = binding.getName().toLowerCase();
-    		CSpaceResource res = new URIResourceImpl(resourceName, "GET");
+    		CSpaceResource res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), resourceName, "GET");
     		if (authZ.isAccessAllowed(res) == true) {
     			readableList.add(binding);
     		}

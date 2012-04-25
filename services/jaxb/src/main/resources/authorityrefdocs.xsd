@@ -48,6 +48,7 @@
 									<xs:element name="sourceField"     type="xs:string" minOccurs="1" />
 									<xs:element name="uri"             type="xs:anyURI" minOccurs="1" />
 									<xs:element name="updatedAt"       type="xs:string" minOccurs="1" />
+									<xs:element name="workflowState"   type="xs:string" minOccurs="1" />
 								</xs:sequence>
 							</xs:complexType>
 						</xs:element>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<imports>
+    <import service="ObjectExit" type="ObjectExit">
+        <schema xmlns:objectexit_common="http://collectionspace.org/services/objectexit" 
+                name="objectexit_common">
+            <exitNote>This is an exit note.</exitNote>
+            <exitNumber>OE-IMPORT-TEST-1999.3</exitNumber>
+        </schema>
+    </import>
+    <import service="Media" type="Media">
+        <schema xmlns:media_common="http://collectionspace.org/services/media/" name="media_common">
+            <media_common:dateGroupList>
+                <media_common:dateGroup>
+                    <media_common:dateEarliestSingleQualifier/>
+                    <media_common:scalarValuesComputed>true</media_common:scalarValuesComputed>
+                    <media_common:dateLatestYear>1999</media_common:dateLatestYear>
+                    <media_common:dateLatestDay/>
+                    <media_common:dateAssociation/>
+                    <media_common:dateEarliestSingleEra/>
+                    <media_common:dateDisplayDate/>
+                    <media_common:dateEarliestSingleCertainty/>
+                    <media_common:dateLatestEra/>
+                    <media_common:dateEarliestSingleQualifierValue/>
+                    <media_common:dateLatestCertainty/>
+                    <media_common:dateEarliestSingleYear/>
+                    <media_common:dateLatestQualifier/>
+                    <media_common:dateLatestQualifierValue/>
+                    <media_common:dateEarliestSingleQualifierUnit/>
+                    <media_common:datePeriod/>
+                    <media_common:dateEarliestScalarValue/>
+                    <media_common:dateLatestMonth/>
+                    <media_common:dateNote/>
+                    <media_common:dateLatestScalarValue/>
+                    <media_common:dateLatestQualifierUnit/>
+                    <media_common:dateEarliestSingleDay/>
+                    <media_common:dateEarliestSingleMonth/>
+                </media_common:dateGroup>
+            </media_common:dateGroupList>
+            <media_common:languageList>
+                <media_common:language>eng</media_common:language>
+            </media_common:languageList>
+            <media_common:measuredPartGroupList>
+                <media_common:measuredPartGroup>
+                    <media_common:dimensionSummary/>
+                    <media_common:measuredPart/>
+                    <media_common:dimensionSubGroupList>
+                        <media_common:dimensionSubGroup>
+                            <media_common:dimension/>
+                            <media_common:measuredBy/>
+                            <media_common:valueDate/>
+                            <media_common:measurementUnit/>
+                            <media_common:value>42</media_common:value>
+                            <media_common:dimensionNote/>
+                            <media_common:valueQualifier/>
+                            <media_common:measurementMethod/>
+                        </media_common:dimensionSubGroup>
+                    </media_common:dimensionSubGroupList>
+                </media_common:measuredPartGroup>
+            </media_common:measuredPartGroupList>
+            <media_common:identificationNumber>MH-IMPORT-TEST-1999.1</media_common:identificationNumber>
+        </schema>
+    </import>
+</imports>

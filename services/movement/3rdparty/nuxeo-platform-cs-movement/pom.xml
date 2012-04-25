@@ -9,7 +9,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.movement.3rdparty.nuxeo</artifactId>
     <name>services.movement.3rdparty.nuxeo</name>
     <packaging>jar</packaging>
@@ -21,6 +20,7 @@
         <ServiceName>movement</ServiceName>
         <NuxeoDocTypeName>Movement</NuxeoDocTypeName>
         <CommonSchemaName>movements_common</CommonSchemaName>
+		<Lifecycle>cs_locking</Lifecycle>
     </properties>
 
     <build>

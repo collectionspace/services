@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!--
+    Copyright 2009 University of California at Berkeley
+    Licensed under the Educational Community License (ECL), Version 2.0.
+    You may not use this file except in compliance with this License.
+
+    You may obtain a copy of the ECL 2.0 License at
+
+    https://source.collectionspace.org/collection-space/LICENSE.txt
+
+    Document   : tenant-binding.xsd
+    Revision   : $LastChangedRevision$
+    Created on : $LastChangedDate$
+    Description:
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://collectionspace.org/services/config/tenant"
+           xmlns:types="http://collectionspace.org/services/config/types"
+           xmlns:service="http://collectionspace.org/services/config/service"
+           targetNamespace="http://collectionspace.org/services/config/tenant"
+           version="0.1"
+           elementFormDefault="qualified">
+
+    <xs:import namespace="http://collectionspace.org/services/config/types" schemaLocation="types.xsd" />
+    <xs:import namespace="http://collectionspace.org/services/config/service" schemaLocation="service.xsd" />
+
+    <xs:element name="TenantBindingConfig">
+        <xs:annotation>
+            <xs:documentation/>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="tenantBinding" type="TenantBindingType" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--
+        TenantBindingType describes bindings for each tenant in CollectionSpace
+    -->
+    <xs:complexType name="TenantBindingType">
+        <xs:annotation>
+            <xs:documentation>Tenant bindings</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="repositoryDomain" type="RepositoryDomainType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <!-- tenant id, a UUID -->
+        <xs:attribute name="id" type="xs:ID" use="required"/>
+        <!-- domain name including subdomain but not TLD -->
+        <!-- e.g. hearstmuseum.berkeley or movingimage.us -->
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <!-- display name as Museum of Moving Images -->
+        <xs:attribute name="displayName" type="xs:string" use="required"/>
+        <xs:attribute name="version" type="types:VersionType" use="required"/>
+
+    </xs:complexType>
+
+    <xs:complexType name="RepositoryDomainType">
+        <xs:annotation>
+            <xs:documentation>Repository domain configuartion</xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="storageName" type="xs:string" use="required"/>
+        <xs:attribute name="repositoryClient" type="xs:string" use="optional" default="nuxeo-java"/>
+    </xs:complexType>
+
+</xs:schema>

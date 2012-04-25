@@ -28,19 +28,16 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -50,18 +47,16 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
+import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
-import org.collectionspace.services.relation.RelationResource;
-import org.collectionspace.services.relation.RelationsCommonList;
-import org.collectionspace.services.relation.RelationshipType;
+import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -114,7 +109,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     protected Class<?> resourceClass;
     protected String authorityCommonSchemaName;
     protected String authorityItemCommonSchemaName;
-    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
+    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType(); //FIXME: REM - 3 Why is this field needed?  I see no references to it.
     final static String URN_PREFIX = "urn:cspace:";
     final static int URN_PREFIX_LEN = URN_PREFIX.length();
     final static String URN_PREFIX_NAME = "name(";
@@ -122,6 +117,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     final static String URN_PREFIX_ID = "id(";
     final static int URN_ID_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_ID.length();
     final static String FETCH_SHORT_ID = "_fetch_";
+	final static String PARENT_WILDCARD = "_ALL_";
+	
     final Logger logger = LoggerFactory.getLogger(AuthorityResource.class);
 
     public enum SpecifierForm {
@@ -492,7 +489,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         try {
             ensureCSID(csid, ServiceMessages.DELETE_FAILED, "Authority.csid");
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            getRepositoryClient(ctx).delete(ctx, csid);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).delete(ctx, csid, handler);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
@@ -549,26 +547,43 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result.getBytes();
     }
 
+    //FIXME: This method is almost identical to the method org.collectionspace.services.common.updateWorkflowWithTransition() so
+    // they should be consolidated -be DRY (don't repeat yourself).
     @PUT
-    @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH)
-    public byte[] updateWorkflow(
+    @Path("{csid}/items/{itemcsid}" + WorkflowClient.SERVICE_PATH + "/{transition}")
+    public byte[] updateItemWorkflowWithTransition(
             @PathParam("csid") String csid,
             @PathParam("itemcsid") String itemcsid,
-            String xmlPayload) {
+            @PathParam("transition") String transition) {
         PoxPayloadOut result = null;
+        
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
-            String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
+        	//
+        	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
+        	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
+        			WorkflowClient.SERVICE_COMMONPART_NAME);
+            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input);
 
-            PoxPayloadIn workflowUpdate = new PoxPayloadIn(xmlPayload);
-            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, workflowUpdate);
-            WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
+            // Create a service context and document handler for the parent resource.
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(getItemServiceName());
+            DocumentHandler parentDocHandler = this.createDocumentHandler(parentCtx);
+            ctx.setProperty(WorkflowClient.PARENT_DOCHANDLER, parentDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
+
+            // When looking for the document, we need to use the parent's workspace name -not the "workflow" workspace name
+            String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
             ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
+            
+        	// Get the type of transition we're being asked to make and store it as a context parameter -used by the workflow document handler
+            TransitionDef transitionDef = getTransitionDef(parentCtx, transition);
+            ctx.setProperty(WorkflowClient.TRANSITION_ID, transitionDef);
+            
+            WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, itemcsid, handler);
             result = ctx.getOutput();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED + WorkflowClient.SERVICE_PAYLOAD_NAME, csid);
         }
+        
         return result.getBytes();
     }
 
@@ -655,12 +670,15 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 
-            String parentcsid = lookupParentCSID(specifier, "getAuthorityItemList", "LIST", queryParams);
+            String parentcsid = PARENT_WILDCARD.equals(specifier)?null:
+            					lookupParentCSID(specifier, "getAuthorityItemList", "LIST", queryParams);
 
             ctx = createServiceContext(getItemServiceName(), queryParams);
+
+            // For the wildcard case, parentcsid is null, but docHandler will deal with this.
             // We omit the parentShortId, only needed when doing a create...
-            DocumentHandler handler = createItemDocumentHandler(ctx,
-                    parentcsid, null);
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid, null);
+            
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
             // be on the displayName field
@@ -668,11 +686,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             if (sortBy == null || sortBy.isEmpty()) {
                 myFilter.setOrderByClause(qualifiedDisplayNameField);
             }
-            
-            myFilter.appendWhereClause(authorityItemCommonSchemaName + ":"
-                    + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
-                    + "'" + parentcsid + "'",
-                    IQueryManager.SEARCH_QUALIFIER_AND);
+
+            // If we are not wildcarding the parent, add a restriction
+            if(parentcsid!=null) {
+	            myFilter.appendWhereClause(authorityItemCommonSchemaName + ":"
+	                    + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
+	                    + "'" + parentcsid + "'",
+	                    IQueryManager.SEARCH_QUALIFIER_AND);
+            }
 
             if (Tools.notBlank(termStatus)) {
             	// Start with the qualified termStatus field
@@ -745,7 +766,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
             List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
             if(serviceTypes == null || serviceTypes.isEmpty()) {
-            	serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
+                // Temporary workaround for CSPACE-4983
+            	// serviceTypes = ServiceBindingUtils.getCommonServiceTypes();
+                serviceTypes = ServiceBindingUtils.getCommonProcedureServiceTypes();
             }
             
             // Note that we have to create the service context for the Items, not the main service
@@ -871,7 +894,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // try {
             // Note that we have to create the service context for the Items, not the main service
             ServiceContext ctx = createServiceContext(getItemServiceName());
-            getRepositoryClient(ctx).delete(ctx, itemcsid);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).delete(ctx, itemcsid, handler);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED + "  itemcsid: " + itemcsid + " parentcsid:" + parentcsid);

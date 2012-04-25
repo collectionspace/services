@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="locationauthorities">
+    <ns2:locationauthorities_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
+        <displayName>${authDisplayName}</displayName>
+        <shortIdentifier>${authShortIdentifier}</shortIdentifier>
+        <vocabType>LocationAuthority</vocabType>
+        <description>This is a test Location Authority.</description>
+    </ns2:locationauthorities_common>
+</document>
+

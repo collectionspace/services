@@ -29,7 +29,6 @@ import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
@@ -104,7 +103,7 @@ public class MediaResource extends ResourceBase {
 	}	
 	
     //FIXME retrieve client type from configuration
-    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
+//    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
 
     @Override
     protected String getVersionString() {

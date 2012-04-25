@@ -25,12 +25,12 @@ public interface DimensionProxy extends CollectionSpacePoxProxy<DimensionsCommon
 	@GET
     @Produces({"application/xml"})
     ClientResponse<DimensionsCommonList> readIncludeDeleted(
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);    
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);    
 
     @Override
     @GET
     @Produces({"application/xml"})
     ClientResponse<DimensionsCommonList> keywordSearchIncludeDeleted(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 }
