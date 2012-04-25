@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<imports>
+    <import service="ObjectExit" type="ObjectExit" CSID="${recordCSID}">
+        <schema xmlns:objectexit_common="http://collectionspace.org/services/objectexit" 
+                name="objectexit_common">
+            <exitNote>The value of a 'docID' variable in the original import document should be inserted here: ${docID}</exitNote>        
+            <exitNumber>OE-IMPORT-TEST-1999.8</exitNumber>
+        </schema>
+    </import>
+</imports>
