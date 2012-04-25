@@ -74,6 +74,41 @@
             <method>DELETE</method>
             <uri>/cspace-services/objectexit/${importObjectExitMedia.got("//csid[preceding-sibling::doctype[1][text()='ObjectExit']]")}</uri>
         </test>
+        
+        <!--
+            Import a record with a client-provided CSID.
+            Then also insert the value of that CSID into a field via the ${docID} variable. 
+            (See "Variables supported in expansion of request" in
+            http://wiki.collectionspace.org/display/collectionspace/Imports+Service+Home)
+        -->
+        <test ID="importObjectExitWithDocID">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-docid.xml</filename>
+            <vars>
+                <var ID="recordCSID">920c578f-e5d6-45da-adab-6f26f6a491ff</var>
+            </vars>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+            </response>
+        </test>
+        <test ID="verifyObjectExitWithDocID">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${importObjectExitWithDocID.recordCSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>imports/res/import-objectexit-docID.res.xml</filename>
+                <label>objectexit_common</label>
+            </response>
+        </test>
+        <test ID="deleteObjectExitWithDocID">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitWithDocID.recordCSID}</uri>
+        </test>
 
     </testGroup>
     
@@ -121,7 +156,7 @@
         <test ID="deleteObjectExitUTF8">
             <expectedCodes>200</expectedCodes>
             <method>DELETE</method>
-            <uri cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
+            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
         </test>
         -->
         
