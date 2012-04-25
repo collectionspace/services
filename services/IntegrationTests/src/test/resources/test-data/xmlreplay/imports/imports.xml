@@ -109,6 +109,36 @@
             <method>DELETE</method>
             <uri>/cspace-services/objectexit/${importObjectExitWithDocID.recordCSID}</uri>
         </test>
+        
+        <!--
+            Import a record containing dollar sign and backslash character(s).
+            (See CSPACE-3917.) 
+        -->
+        <test ID="importObjectExitWithDollarSign">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-dollarsign.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+            </response>
+        </test>
+        <test ID="verifyObjectExitWithDollarSign">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${importObjectExitWithDollarSign.got("//csid")}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>imports/res/import-objectexit-dollarsign.res.xml</filename>
+                <label>objectexit_common</label>
+            </response>
+        </test>
+        <test ID="deleteObjectExitWithDollarSign">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitWithDollarSign.got("//csid")}</uri>
+        </test>
 
     </testGroup>
     
