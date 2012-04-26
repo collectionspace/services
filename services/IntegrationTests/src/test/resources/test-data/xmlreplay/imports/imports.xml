@@ -105,9 +105,16 @@
             <method>GET</method>
             <uri>/cspace-services/objectexit/${importObjectExitWithVarExpansion.recordCSID}</uri>
             <response>
-                <expected level="ADDOK" />
                 <filename>imports/res/import-objectexit-varexpansion.res.xml</filename>
-                <label>objectexit_common</label>
+                <expected level="ADDOK" />
+                <parts>
+                    <part>
+                        <label>collectionspace_core</label>
+                    </part>
+                    <part>
+                        <label>objectexit_common</label>
+                    </part>
+                </parts>
             </response>
         </test>
         <test ID="deleteObjectExitWithVarExpansion">
