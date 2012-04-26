@@ -195,7 +195,8 @@ public class ServiceBindingUtils {
     } 
     
     private static ArrayList<String> commonServiceTypes = null;
-    
+    private static ArrayList<String> commonProcedureServiceTypes = null;
+   
     public static ArrayList<String> getCommonServiceTypes() {
     	if(commonServiceTypes == null) {
     		commonServiceTypes = new ArrayList<String>();
@@ -215,11 +216,11 @@ public class ServiceBindingUtils {
     // make the effect of the workaround more explicit, and in part to avoid
     // breaking the use of the getCommonServiceTypes method in ServiceGroups.
     public static ArrayList<String> getCommonProcedureServiceTypes() {
-        if(commonServiceTypes == null) {
-    		commonServiceTypes = new ArrayList<String>();
-    		commonServiceTypes.add(SERVICE_TYPE_PROCEDURE);
-    	}
-    	return commonServiceTypes;
+        if(commonProcedureServiceTypes == null) {
+            commonProcedureServiceTypes = new ArrayList<String>();
+            commonProcedureServiceTypes.add(SERVICE_TYPE_PROCEDURE);
+        }
+    	return commonProcedureServiceTypes;
     }
     
 
