@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="objectexit">
+    <ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <exitNote>The value of a 'docID' variable in the original import document should be inserted here: ${importObjectExitWithVarExpansion.recordCSID}</exitNote>
+        <exitNumber>OE-IMPORT-TEST-1999.8</exitNumber>
+    </ns2:objectexit_common>
+    <ns2:collectionspace_core xmlns:ns2="http://collectionspace.org/collectionspace_core/"
+                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <!-- Note: This test may fail if the identifier for the core tenant changes. -->
+        <tenantId>1</tenantId>
+    </ns2:collectionspace_core>
+</document>
+
