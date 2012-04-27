@@ -24,6 +24,17 @@
 				</service:params>
 			</service:DocHandlerParams>
 
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNameProperty</types:key>
+					<types:value>taxonomicIdentGroupList/[0]/taxon</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNumberProperty</types:key>
+					<types:value>objectNumber</types:value>
+				</types:item>
+			</service:properties>
+
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_naturalhistory" updated="" order="3">
 					<service:properties>
@@ -108,6 +119,17 @@
 					</service:ListResultsFields>
 				</service:params>
 			</service:DocHandlerParams>
+
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNameProperty</types:key>
+					<types:value>scientificTaxonomy</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNumberProperty</types:key>
+					<types:value>identificationNumber</types:value>
+				</types:item>
+			</service:properties>
 
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="media_ucjeps" updated="" order="3">
