@@ -17,9 +17,11 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.WebApplicationException;
@@ -48,11 +50,20 @@ import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
+//
+// CSPACE-5036 - How to make CMISQL queries from Nuxeo
+//
+import org.apache.chemistry.opencmis.commons.server.CallContext;
+import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
+import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
+import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -685,7 +696,41 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         return uri;
     }
 
+    /*
+     * See CSPACE-5036 - How to make CMISQL queries from Nuxeo
+     */
+    private void makeCMISQLQuery(RepositoryInstance repoSession) {
+    	// the NuxeoRepository should be constructed only once, then cached
+        // (its construction is expensive)
+        try {
+			NuxeoRepository repo = new NuxeoRepository(repoSession.getRepositoryName(),
+					repoSession.getRootDocument().getId());
+			logger.debug("Repository ID:" + repo.getId() + " Root folder:" + repo.getRootFolderId());
+			
+			CallContextImpl callContext = new CallContextImpl(CallContext.BINDING_LOCAL,
+					repo.getId(), false);
+					callContext.put(CallContext.USERNAME, repoSession.getPrincipal().getName());
+					NuxeoCmisService cmisService = new NuxeoCmisService(repo, callContext, repoSession);
 
+					// do a query
+//					String query = "SELECT cmis:objectId, dc:title FROM cmis:document WHERE dc:title = 'REMBlobs'"; // try eaee111c-a8d8-48c7-95cb
+					String query = "SELECT cmis:objectId, cmis:name, dc:title, nuxeo:lifecycleState FROM Dimension WHERE dc:title = 'REMBlobs'"; // try eaee111c-a8d8-48c7-95cb
+//					String query = "SELECT * from Dimension D JOIN Relation R ON D.cmis:name = R.relations_common:objectcsid";
+//					String query = "SELECT * FROM cmis:document WHERE dc:title = 'REMBlobs'"; // try eaee111c-a8d8-48c7-95cb
+					IterableQueryResult result = repoSession.queryAndFetch(query, "CMISQL", cmisService);
+					for (Map<String, Serializable> row : result) {
+						logger.debug("dc:title is: " + (String)row.get("dc:title")
+								+ " Hierarchy Table ID is:" + row.get("cmis:objectId")
+								+ " cmis:name is: " + row.get("cmis:name")
+								+ " nuxeo:lifecycleState is: " + row.get("nuxeo:lifecycleState")
+								); 
+					}			
+		} catch (ClientException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+     
     /**
      * getFiltered get all documents for an entity service from the Document repository,
      * given filter parameters specified by the handler. 
@@ -709,6 +754,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         try {
             handler.prepare(Action.GET_ALL);
             repoSession = getRepositorySession();
+            //
+            // CSPACE-5036 - How to make CMISQL queries from Nuxeo
+            //
+            makeCMISQLQuery(repoSession);
+            
             DocumentModelList docList = null;
             String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
 

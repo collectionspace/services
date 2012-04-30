@@ -13,7 +13,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
-		<nuxeo.general.release>5.5-RC1</nuxeo.general.release>
+		<nuxeo.general.release>5.5</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>		
