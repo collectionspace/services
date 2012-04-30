@@ -19,7 +19,7 @@
     xmlns="http://collectionspace.org/services/person"
     targetNamespace="http://collectionspace.org/services/person"
     version="0.1"
-    >
+>
     
     <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Person+Service+Home -->    
@@ -33,23 +33,13 @@
                 
                 <!--  Person Information Group -->
                 <xs:element name="inAuthority" type="xs:string" />
-				<xs:element name="shortIdentifier" type="xs:string"/>
+                <xs:element name="shortIdentifier" type="xs:string"/>
                 <xs:element name="refName" type="xs:string" />
-                <xs:element name="termStatus" type="xs:string"/>
-                <xs:element name="displayName" type="xs:string"/>
-                <xs:element name="displayNameComputed" type="xs:boolean"/>
-                <xs:element name="shortDisplayName" type="xs:string"/>
-                <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
-                <xs:element name="source" type="xs:string"/>
-                <xs:element name="sourcePage" type="xs:string"/>
+                
+                <!-- Term Information repeatable group -->
+                <xs:element name="personTermGroupList" type="personTermGroupList"/>
+
                 <xs:element name="description" type="xs:string"/>
-                <xs:element name="foreName" type="xs:string"/>
-                <xs:element name="middleName" type="xs:string"/>
-                <xs:element name="surName" type="xs:string"/>
-                <xs:element name="initials" type="xs:string"/>
-                <xs:element name="salutation" type="xs:string"/>
-                <xs:element name="title" type="xs:string"/>
-                <xs:element name="nameAdditions" type="xs:string"/>
                 <xs:element name="birthDate" type="xs:string"/>
                 <xs:element name="deathDate" type="xs:string"/>
                 <xs:element name="birthPlace" type="xs:string"/>
@@ -64,6 +54,39 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    
+    <xs:complexType name="personTermGroupList">
+        <xs:sequence>
+            <xs:element name="personTermGroup" type="personTermGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Terms marked as "Provisional" below are under active discussion -->
+    <!-- as of 2012-04-30 -->
+    <xs:complexType name="personTermGroup">
+        <xs:sequence>
+            <!-- Common across all authority item terms -->
+            <xs:element name="displayName" type="xs:string"/>
+            <xs:element name="term" type="xs:string"/> <!-- Provisional -->
+            <xs:element name="termType" type="xs:string"/>
+            <xs:element name="termStatus" type="xs:string"/> <!-- Provisional -->
+            <xs:element name="termQualifier" type="xs:string"/>
+            <xs:element name="termLanguage" type="xs:string"/>
+            <xs:element name="termPreferredForLanguage" type="xs:boolean"/>
+            <xs:element name="termSource" type="xs:string"/>
+            <xs:element name="termSourceDetail" type="xs:string"/>
+            <xs:element name="termSourceUniqueID" type="xs:string"/>
+            <!-- Specific to Person terms -->
+            <xs:element name="foreName" type="xs:string"/>
+            <xs:element name="middleName" type="xs:string"/>
+            <xs:element name="surName" type="xs:string"/>
+            <xs:element name="initials" type="xs:string"/>
+            <xs:element name="salutation" type="xs:string"/>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="nameAdditions" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="groupList">
         <xs:sequence>
