@@ -105,7 +105,7 @@ public class WorkflowServiceTest extends AbstractPoxServiceTestImpl<AbstractComm
     @Override
     public void update(String testName) throws Exception {
         setupUpdate();
-        updateLifeCycleState(testName, knownResourceId, WorkflowClient.WORKFLOWSTATE_APPROVED);
+        updateLifeCycleState(testName, knownResourceId, WorkflowClient.WORKFLOWTRANSITION_DELETE, WorkflowClient.WORKFLOWSTATE_DELETED);
     }    
 
     @Override

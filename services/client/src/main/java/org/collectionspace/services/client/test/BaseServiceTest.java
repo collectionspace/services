@@ -67,6 +67,7 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.TestServiceClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.common.api.FileTools;
 
 /**
  * BaseServiceTest.
@@ -533,14 +534,11 @@ public abstract class BaseServiceTest<CLT> {
      */
     static protected Object getObjectFromFile(Class<?> jaxbClass, String fileName)
             throws Exception {
-
-        JAXBContext context = JAXBContext.newInstance(jaxbClass);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        //note: setting schema to null will turn validator off
-        unmarshaller.setSchema(null);
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        InputStream is = tccl.getResourceAsStream(fileName);
-        return getObjectFromStream(jaxbClass, is);
+    	Object result = null;
+    	
+    	result = FileTools.getJaxbObjectFromFile(jaxbClass, fileName);
+    	
+        return result;
     }
 
     /**
@@ -570,21 +568,6 @@ public abstract class BaseServiceTest<CLT> {
     static protected String getXmlDocumentAsString(String fileName) throws Exception {
         String result = FileUtils.readFileToString(new File(fileName), "UTF8");
         return result;
-    }
-
-    /**
-     * getObjectFromStream get object of given class from given inputstream
-     * @param jaxbClass
-     * @param is stream to read to construct the object
-     * @return
-     * @throws Exception
-     */
-    static protected Object getObjectFromStream(Class<?> jaxbClass, InputStream is) throws Exception {
-        JAXBContext context = JAXBContext.newInstance(jaxbClass);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        //note: setting schema to null will turn validator off
-        unmarshaller.setSchema(null);
-        return jaxbClass.cast(unmarshaller.unmarshal(is));
     }
 
     /**

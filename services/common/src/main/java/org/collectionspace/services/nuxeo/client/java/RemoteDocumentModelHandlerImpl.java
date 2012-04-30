@@ -24,7 +24,6 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -39,31 +38,28 @@ import javax.xml.bind.JAXBElement;
 
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.security.SecurityUtils;
-import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
+import org.collectionspace.services.config.service.ObjectPartType;
 import org.dom4j.Element;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -104,6 +100,12 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
     }
 
+	@Override
+	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+			throws Exception {
+		// Do nothing by default, but children can override if they want.  The really workflow transition happens in the WorkflowDocumemtModelHandler class
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#completeUpdate(org.collectionspace.services.common.document.DocumentWrapper)
      */
@@ -205,9 +207,17 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                 continue; // unknown part, ignore
             }
             Map<String, Object> unQObjectProperties = extractPart(docModel, schema, partMeta);
+            if(COLLECTIONSPACE_CORE_SCHEMA.equals(schema)) {
+            	addExtraCoreValues(docModel, unQObjectProperties);
+            }
             addOutputPart(unQObjectProperties, schema, partMeta);
         }
         addAccountPermissionsPart();
+    }
+    
+    private void addExtraCoreValues(DocumentModel docModel, Map<String, Object> unQObjectProperties)
+    		throws Exception {
+        unQObjectProperties.put(COLLECTIONSPACE_CORE_WORKFLOWSTATE, docModel.getCurrentLifeCycleState());
     }
     
     private void addAccountPermissionsPart() throws Exception {

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+    </auths>
+    
+   <!-- ================================================================================ -->
+    
+    <testGroup ID="importsTestGroup" autoDeletePOSTS="false">
+
+        <!-- Import a single ObjectExit record -->
+        <test ID="importObjectExit">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+            </response>
+        </test>
+        <test ID="deleteObjectExit">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExit.got("//csid")}</uri>
+        </test>
+                
+        <!--
+            Import a single ObjectExit record, at least one of whose fields
+            contains a set of special characters defined in the
+            "Special Characters and Formatting - QA Test Plan"
+            http://wiki.collectionspace.org/x/A4AjB
+        -->
+        <test ID="importObjectExitSpecialChars">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-specialchars.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+            </response>
+        </test>
+        <test ID="deleteObjectExitSpecialChars">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitSpecialChars.got("//csid")}</uri>
+        </test>
+        
+        <!--
+            Import a mixed set of records, containing of one Object Exit
+            records and one Media record.  (The latter also includes
+            (optional) namespace prefixes on its child elements, as an
+            additional variation.)
+        -->
+        <test ID="importObjectExitMedia">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-media.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit-media.res.xml</filename>
+            </response>
+        </test>
+        <test ID="deleteMediaFromObjectExitMedia">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/media/${importObjectExitMedia.got("//csid[preceding-sibling::doctype[1][text()='Media']]")}</uri>
+        </test>
+        <test ID="deleteObjectExitFromObjectExitMedia">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitMedia.got("//csid[preceding-sibling::doctype[1][text()='ObjectExit']]")}</uri>
+        </test>
+        
+        <!--
+            Import a record with a client-provided CSID.
+            Then also exercise the Imports services's variable expansion:
+            * Insert the value of that CSID into a field via expansion
+              of the ${docID} variable.
+            * Verify that variable has been expanded in the imported record.
+            * Verify that a server-side variable has also been expanded in the
+              wrapper template for imported records; specifically, that an
+              expected value is is present in the collectionspace_core part.
+            (See "Variables supported in expansion of request" in
+            http://wiki.collectionspace.org/display/collectionspace/Imports+Service+Home)
+        -->
+        <test ID="importObjectExitWithVarExpansion">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-varexpansion.xml</filename>
+            <vars>
+                <var ID="recordCSID">920c578f-e5d6-45da-adab-6f26f6a491ff</var>
+            </vars>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+            </response>
+        </test>
+        <test ID="verifyObjectExitWithVarExpansion">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${importObjectExitWithVarExpansion.recordCSID}</uri>
+            <response>
+                <filename>imports/res/import-objectexit-varexpansion.res.xml</filename>
+                <expected level="ADDOK" />
+                <parts>
+                    <part>
+                        <label>collectionspace_core</label>
+                    </part>
+                    <part>
+                        <label>objectexit_common</label>
+                    </part>
+                </parts>
+            </response>
+        </test>
+        <test ID="deleteObjectExitWithVarExpansion">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitWithVarExpansion.recordCSID}</uri>
+        </test>
+        
+        <!--
+            Import a record containing dollar sign and backslash character(s).
+            (See CSPACE-3917.) 
+        -->
+        <test ID="importObjectExitWithDollarSign">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-dollarsign.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+            </response>
+        </test>
+        <test ID="verifyObjectExitWithDollarSign">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${importObjectExitWithDollarSign.got("//csid")}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>imports/res/import-objectexit-dollarsign.res.xml</filename>
+                <label>objectexit_common</label>
+            </response>
+        </test>
+        <test ID="deleteObjectExitWithDollarSign">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitWithDollarSign.got("//csid")}</uri>
+        </test>
+
+    </testGroup>
+    
+    <!--
+      Temporary test group for testing changes or additions to this control file.
+      To use:
+      * Clone dev-master-example.xml to dev-master.xml
+      * Add this line to dev-master.xml:
+        <run controlFile="imports/imports.xml" testGroup="importsTemporaryTestGroup" />
+      * Run XmlReplay tests listed in dev-master.xml via 'mvn test -Dtest=XmlReplayDevTest'
+    -->
+    <testGroup ID="importsTemporaryTestGroup" autoDeletePOSTS="false">
+        
+        <!-- Add new or changed tests here -->
+        
+    </testGroup>
+    
+    
+    <!--
+      Test group holding notes and markup fragments for possible future
+      standard tests of the Imports service.
+    -->
+    <testGroup ID="importsTestNotesGroup" autoDeletePOSTS="false">
+        
+        <!-- The following tests are not currently working, and thus are commented out. -->
+        <!--
+            Import a single ObjectExit record, at least one of whose fields
+            contains a set of UTF-8 characters outside the USASCII range.
+            (See CSPACE-3923 and CSPACE-4866.)
+        -->
+        <!--
+        <test ID="importObjectExitUTF8">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-objectexit-utf8.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-objectexit.res.xml</filename>
+            </response>
+        </test>
+        -->
+        <!--
+        <test ID="verifyObjectExitUTF8">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>imports/res/import-objectexit-utf8.res.xml</filename>
+                <label>objectexit_common</label>
+            </response>
+        </test>
+        -->
+        <!--
+        <test ID="deleteObjectExitUTF8">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${importObjectExitUTF8.got("//csid")}</uri>
+        </test>
+        -->
+        
+        <!-- FIXME: Add a test of the forms-based import pathway. -->
+        <!-- This may require support for the requisite MIME type in XmlReplay -->
+        <!--
+        <test ID="import-post-form">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports?type=xml</uri>
+            <filename>imports/import-1objectexit-post-form.xml</filename>
+            <response>
+                <expected level="TREE" />
+                <filename>imports/res/import-1objectexit-post.res.xml</filename>
+             </response>
+        </test>
+        -->
+        
+        <!-- FIXME: Add import of records with schema expansion part(s). -->
+        
+        <!-- FIXME: Add tests with invalid payloads, via each imports path, -->
+        <!-- and verify failure results. -->
+                
+    </testGroup>
+
+</xmlReplay>
+        
+        

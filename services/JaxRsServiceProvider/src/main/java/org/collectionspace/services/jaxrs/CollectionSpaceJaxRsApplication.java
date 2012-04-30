@@ -37,6 +37,7 @@ import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.imports.ImportsResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
 import org.collectionspace.services.place.PlaceAuthorityResource;
+import org.collectionspace.services.concept.ConceptAuthorityResource;
 import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
 import org.collectionspace.services.relation.RelationResource;
@@ -100,11 +101,14 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
         singletons.add(new ServiceGroupResource());
+        singletons.add(new ImportsResource());
+
 
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());
         addResourceToMapAndSingletons(new OrgAuthorityResource());
         addResourceToMapAndSingletons(new LocationAuthorityResource());
+        addResourceToMapAndSingletons(new ConceptAuthorityResource());
         addResourceToMapAndSingletons(new TaxonomyAuthorityResource());
         addResourceToMapAndSingletons(new PlaceAuthorityResource());
         addResourceToMapAndSingletons(new AcquisitionResource());
@@ -119,7 +123,6 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new LoanoutResource());
         addResourceToMapAndSingletons(new ObjectExitResource());
         addResourceToMapAndSingletons(new BatchResource());
-        addResourceToMapAndSingletons(new ImportsResource());
         addResourceToMapAndSingletons(new MediaResource());
         addResourceToMapAndSingletons(new BlobResource());
         addResourceToMapAndSingletons(new MovementResource());

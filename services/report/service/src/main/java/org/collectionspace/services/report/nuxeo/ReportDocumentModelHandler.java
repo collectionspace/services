@@ -41,13 +41,10 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import org.collectionspace.services.ReportJAXBSchema;
-import org.collectionspace.services.report.ReportResource;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;

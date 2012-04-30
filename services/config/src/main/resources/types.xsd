@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+    Copyright 2009 University of California at Berkeley
+    Licensed under the Educational Community License (ECL), Version 2.0.
+    You may not use this file except in compliance with this License.
+
+    You may obtain a copy of the ECL 2.0 License at
+    
+    https://source.collectionspace.org/collection-space/LICENSE.txt
+
+    Document   : types.xsd
+    Revision   : $LastChangedRevision$
+    Created on : $LastChangedDate$
+    Description:
+        
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://collectionspace.org/services/config/types"
+    targetNamespace="http://collectionspace.org/services/config/types"
+    elementFormDefault="qualified"
+>
+    <!--
+        PropertyType defines the type for property in the property bag
+    -->
+    <xs:complexType name="PropertyType">
+        <xs:sequence>
+            <xs:element name="item" type="PropertyItemType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="PropertyItemType">
+        <xs:sequence>
+            <xs:element name="key" type="xs:string"/>
+            <xs:element name="value" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="VersionType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="0.1"/>
+            <xs:enumeration value="1.0"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

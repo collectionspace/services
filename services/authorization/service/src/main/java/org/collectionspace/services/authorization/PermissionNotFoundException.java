@@ -30,6 +30,11 @@ package org.collectionspace.services.authorization;
 public class PermissionNotFoundException extends PermissionException {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Creates a new instance of <code>PermissionNotFoundException</code> without detail message.
      */
     public PermissionNotFoundException() {

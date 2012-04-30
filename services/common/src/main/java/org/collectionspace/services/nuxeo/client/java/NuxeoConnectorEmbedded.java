@@ -2,27 +2,17 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
-//import org.collectionspace.services.common.RepositoryClientConfigType;
-import org.collectionspace.services.common.RepositoryClientConfigType;
+import org.collectionspace.services.config.RepositoryClientConfigType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.api.repository.RepositoryManager;
-import org.nuxeo.ecm.core.client.DefaultLoginHandler;
-import org.nuxeo.ecm.core.client.NuxeoApp;
-//import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.osgi.application.FrameworkBootstrap;
-import org.nuxeo.runtime.api.Framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

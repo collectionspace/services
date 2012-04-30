@@ -8,12 +8,11 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.collectionspace.services.common.config.PropertyItemUtils;
-import org.collectionspace.services.common.service.ObjectPartType;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.service.ServiceObjectType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
-import org.collectionspace.services.common.types.PropertyItemType;
-import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.service.ServiceObjectType;
+import org.collectionspace.services.config.types.PropertyItemType;
+import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -196,7 +195,8 @@ public class ServiceBindingUtils {
     } 
     
     private static ArrayList<String> commonServiceTypes = null;
-    
+    private static ArrayList<String> commonProcedureServiceTypes = null;
+   
     public static ArrayList<String> getCommonServiceTypes() {
     	if(commonServiceTypes == null) {
     		commonServiceTypes = new ArrayList<String>();
@@ -205,6 +205,22 @@ public class ServiceBindingUtils {
     		commonServiceTypes.add(SERVICE_TYPE_PROCEDURE);
     	}
     	return commonServiceTypes;
+    }
+    
+    // Temporary workaround for CSPACE-4983, to help reduce the
+    // number of service types searched for authority references
+    // in AuthorityResource.getReferencingObjects(), to in turn
+    // help reduce database query complexity.
+    //
+    // FIXME; this method is intended to be temporary.  It was added in part to
+    // make the effect of the workaround more explicit, and in part to avoid
+    // breaking the use of the getCommonServiceTypes method in ServiceGroups.
+    public static ArrayList<String> getCommonProcedureServiceTypes() {
+        if(commonProcedureServiceTypes == null) {
+            commonProcedureServiceTypes = new ArrayList<String>();
+            commonProcedureServiceTypes.add(SERVICE_TYPE_PROCEDURE);
+        }
+    	return commonProcedureServiceTypes;
     }
     
 

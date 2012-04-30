@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:abstract-common-list xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <pageSize>3</pageSize>
+    <itemsInPage>3</itemsInPage>
+</ns2:abstract-common-list>
+

@@ -151,7 +151,7 @@
         </exec>
     </target>
 
-    <target name="create_db"
+    <target name="create_cspace_db"
             description="create tables(s), indices for authorization service">
 				<sql driver="${db.jdbc.driver.class}"
              url="${db.jdbc.cspace.url}"

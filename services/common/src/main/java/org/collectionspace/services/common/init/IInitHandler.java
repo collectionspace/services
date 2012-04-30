@@ -1,12 +1,12 @@
 package org.collectionspace.services.common.init;
 
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.service.InitHandler.Params.Field;
-import org.collectionspace.services.common.service.InitHandler.Params.Property;
-
 import java.util.List;
 
 import javax.sql.DataSource;
+
+import org.collectionspace.services.config.service.InitHandler.Params.Field;
+import org.collectionspace.services.config.service.InitHandler.Params.Property;
+import org.collectionspace.services.config.service.ServiceBindingType;
 
 /**
  * User: laramie

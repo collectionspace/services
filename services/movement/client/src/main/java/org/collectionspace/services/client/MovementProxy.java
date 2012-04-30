@@ -55,14 +55,14 @@ public interface MovementProxy extends CollectionSpaceCommonListPoxProxy {
 	@GET
     @Produces({"application/xml"})
     ClientResponse<AbstractCommonList> readIncludeDeleted(
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     @Override
     @GET
     @Produces({"application/xml"})
     ClientResponse<AbstractCommonList> keywordSearchIncludeDeleted(
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
-            @QueryParam(WorkflowClient.WORKFLOW_QUERY_NONDELETED) String includeDeleted);
+            @QueryParam(WorkflowClient.WORKFLOWSTATE_QUERY) String workflowState);
 
     @GET
     @Produces({"application/xml"})

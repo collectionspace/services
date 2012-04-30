@@ -23,8 +23,6 @@
  */
 package org.collectionspace.services.authorization;
 
-import org.collectionspace.authentication.AuthN;
-
 /**
  * CSpaceResourceImpl abstract resource implementation
  * @author 
@@ -39,6 +37,7 @@ public abstract class CSpaceResourceImpl implements CSpaceResource {
     private String tenantId;
 
     private CSpaceResourceImpl() {
+    	// Do nothing.
     }
 
     /**
@@ -47,10 +46,12 @@ public abstract class CSpaceResourceImpl implements CSpaceResource {
      * @param action
      * @param type
      */
+    /*
     public CSpaceResourceImpl(String id, CSpaceAction action, TYPE type) {
         setup(id, action, type);
         tenantId = AuthN.get().getCurrentTenantId();
     }
+    */
 
     /**
      * constructor that uses given tenant id to associate the resource with

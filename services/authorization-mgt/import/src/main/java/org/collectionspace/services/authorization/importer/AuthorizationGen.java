@@ -47,10 +47,11 @@ import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.authorization.SubjectType;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.service.ServiceBindingType;
-import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 
 /**
  * AuthorizationGen generates authorizations (permissions and roles)
@@ -59,17 +60,6 @@ import org.collectionspace.services.common.security.SecurityUtils;
  */
 public class AuthorizationGen {
 
-	final public static String ROLE_PREFIX = "ROLE_";
-    final public static String ROLE_ADMINISTRATOR = "ADMINISTRATOR";
-    final public static String ROLE_TENANT_ADMINISTRATOR = "TENANT_ADMINISTRATOR";
-    final public static String ROLE_TENANT_READER = "TENANT_READER";
-    final public static String ROLE_ADMINISTRATOR_ID = "0";
-    final public static String ADMINISTRATOR_TENANT_ID = "0";
-    //
-    // ActionGroup labels/constants
-    //
-    final public static String ACTIONGROUP_CRUDL = "CRUDL";
-    final public static String ACTIONGROUP_RL = "RL";
     //
     // Should the base resource act as a proxy for its sub-resources for AuthZ purposes
     //
@@ -155,35 +145,8 @@ public class AuthorizationGen {
     }
 
     private Permission buildAdminPermission(String tenantId, String resourceName) {
-        String id = UUID.randomUUID().toString();
-        Permission perm = new Permission();
-        perm.setCsid(id);
-        perm.setDescription("generated admin permission");
-        perm.setCreatedAtItem(new Date());
-        perm.setResourceName(resourceName.toLowerCase().trim());
-        perm.setEffect(EffectType.PERMIT);
-        perm.setTenantId(tenantId);
-        
-        perm.setActionGroup(ACTIONGROUP_CRUDL);
-        ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
-        perm.setAction(pas);
-
-        PermissionAction permAction = PermissionActionUtil.create(perm, ActionType.CREATE);
-        pas.add(permAction);
-        
-        permAction = PermissionActionUtil.create(perm, ActionType.READ);
-        pas.add(permAction);
-        
-        permAction = PermissionActionUtil.create(perm, ActionType.UPDATE);
-        pas.add(permAction);
-        
-        permAction = PermissionActionUtil.create(perm, ActionType.DELETE);
-        pas.add(permAction);
-        
-        permAction = PermissionActionUtil.create(perm, ActionType.SEARCH);
-        pas.add(permAction);
-        
-        return perm;
+    	String description = "Generated admin permission.";
+    	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_CRUDL_NAME);
     }
 
     /**
@@ -220,26 +183,8 @@ public class AuthorizationGen {
     }
 
     private Permission buildReaderPermission(String tenantId, String resourceName) {
-        String id = UUID.randomUUID().toString();
-        Permission perm = new Permission();
-        perm.setCsid(id);
-        perm.setCreatedAtItem(new Date());
-        perm.setDescription("generated readonly permission");
-        perm.setResourceName(resourceName.toLowerCase().trim());
-        perm.setEffect(EffectType.PERMIT);
-        perm.setTenantId(tenantId);
-        
-        perm.setActionGroup(ACTIONGROUP_RL);
-        ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
-        perm.setAction(pas);
-
-        PermissionAction permAction = PermissionActionUtil.create(perm, ActionType.READ);
-        pas.add(permAction);
-
-        permAction = PermissionActionUtil.create(perm, ActionType.SEARCH);
-        pas.add(permAction);
-
-        return perm;
+    	String description = "Generated read-only permission.";
+    	return AuthorizationCommon.createPermission(tenantId, resourceName, description, AuthorizationCommon.ACTIONGROUP_RL_NAME);    	
     }
 
     public List<Permission> getDefaultPermissions() {
@@ -275,40 +220,39 @@ public class AuthorizationGen {
     }
 
     private Role buildTenantAdminRole(String tenantId) {
-        return buildTenantRole(tenantId, ROLE_TENANT_ADMINISTRATOR, "admin");
+    	String type = "admin";
+        Role result = AuthorizationCommon.getRole(tenantId, AuthorizationCommon.ROLE_TENANT_ADMINISTRATOR);
+        
+        if (result == null) {
+    		// the role doesn't exist already, so we need to create it
+    		String description = "Generated tenant " + type + " role.";
+	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_ADMINISTRATOR, description);
+        }
+        
+        return result;
     }
 
     private Role buildTenantReaderRole(String tenantId) {
-        return buildTenantRole(tenantId, ROLE_TENANT_READER, "read only");
-    }
-
-    private Role buildTenantRole(String tenantId, String name, String type) {
-    	Role role = null;
-    	
-    	String roleName = ROLE_PREFIX + tenantId + "_" + name;
-    	role = AuthorizationStore.getRoleByName(roleName, tenantId);
-    	if (role == null) {
-    		// the role doesn't exist already, so we need to create it
-	        role = new Role();
-	        role.setCreatedAtItem(new Date());
-	        role.setDisplayName(name);
-	        role.setRoleName(roleName);
-	        String id = UUID.randomUUID().toString();
-	        role.setCsid(id);
-			role.setDescription("generated tenant " + type + " role");
-	        role.setTenantId(tenantId);
-	        role.setMetadataProtection(RoleClient.IMMUTABLE);
-	        role.setPermsProtection(RoleClient.IMMUTABLE);
-    	}
+    	String type = "read only";
+        Role result = AuthorizationCommon.getRole(tenantId, AuthorizationCommon.ROLE_TENANT_READER);
         
-        return role;
+        if (result == null) {
+    		// the role doesn't exist already, so we need to create it
+    		String description = "Generated tenant " + type + " role.";
+	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_READER, description);
+        }
+        
+        return result;
     }
+    
 
     public List<Role> getDefaultRoles() {
     	if (allRoleList == null) {
 	        allRoleList = new ArrayList<Role>();
 	        allRoleList.addAll(adminRoles);
 	        allRoleList.addAll(readerRoles);
+	        // Finally, add the "super" role to the list
+	        allRoleList.add(cspaceAdminRole);
     	}
         return allRoleList;
     }
@@ -414,10 +358,14 @@ public class AuthorizationGen {
 
     private Role buildCSpaceAdminRole() {
         Role role = new Role();
-        role.setDisplayName(ROLE_ADMINISTRATOR);
-        role.setRoleName(ROLE_PREFIX + role.getDisplayName());
-        role.setCsid(ROLE_ADMINISTRATOR_ID);
-        role.setTenantId(ADMINISTRATOR_TENANT_ID);
+        
+        role.setDescription("A generated super role that has permissions across tenancies.");
+        role.setDisplayName(AuthorizationCommon.ROLE_ADMINISTRATOR);
+        role.setRoleName(AuthorizationCommon.getQualifiedRoleName(
+        		AuthorizationCommon.ADMINISTRATOR_TENANT_ID, role.getDisplayName()));
+        role.setCsid(AuthorizationCommon.ROLE_ADMINISTRATOR_ID);
+        role.setTenantId(AuthorizationCommon.ADMINISTRATOR_TENANT_ID);
+        
         return role;
     }
 

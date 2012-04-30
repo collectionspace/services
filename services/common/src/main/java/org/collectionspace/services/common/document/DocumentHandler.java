@@ -19,6 +19,9 @@ package org.collectionspace.services.common.document;
 
 import java.util.Map;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.lifecycle.Lifecycle;
+import org.collectionspace.services.lifecycle.TransitionDef;
+import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
  *
@@ -41,9 +44,12 @@ import org.collectionspace.services.common.context.ServiceContext;
 public interface DocumentHandler<T, TL, WT, WTL> {
 
     public enum Action {
-
-        CREATE, GET, GET_ALL, UPDATE, DELETE
+        CREATE, GET, GET_ALL, UPDATE, DELETE, WORKFLOW
     }
+    
+    public Lifecycle getLifecycle();
+    
+    public Lifecycle getLifecycle(String serviceObjectName);
 
     /**
      * getServiceContext returns service context
@@ -72,6 +78,11 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      */
     public void prepare(Action action) throws Exception;
 
+    /**
+     * updateWorkflowTransition - prepare for a workflow transition
+     */
+    public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef) throws Exception;
+    
     /**
      * prepareCreate processes documents before creating document in repository
 

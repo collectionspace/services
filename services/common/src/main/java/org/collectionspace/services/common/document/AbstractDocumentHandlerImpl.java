@@ -148,6 +148,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 break;
 
             case DELETE:
+                validate(action);
                 prepareDelete();
                 break;
 

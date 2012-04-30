@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import org.collectionspace.services.common.RepositoryClientConfigType;
+import org.collectionspace.services.config.RepositoryClientConfigType;
 import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
