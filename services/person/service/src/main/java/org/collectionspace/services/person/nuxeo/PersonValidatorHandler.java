@@ -66,12 +66,21 @@ public class PersonValidatorHandler implements ValidatorHandler {
             boolean invalid = false;
             
             if(person != null) {	// No guarantee that there is a common part in every post/update.
+                
 	            // Validation occurring on both creates and updates
+                
+                    // FIXME Add validation logic here to ensure that every term info group must contain
+                    // any required data elements.  (Potential example: every term info group must contain
+                    // a non-null, non-whitespace-only value in either of the term or displayName fields.)
+                
+                    /*
 	            String displayName = person.getDisplayName();
 	            if (!person.isDisplayNameComputed() && ((displayName == null) || displayName.trim().isEmpty())) {
 	                invalid = true;
 	                msg += "displayName must be non-null and non-blank if displayNameComputed is false!";
 	            }
+                    * 
+                    */
 	            
 	            // Validation specific to creates or updates
 	            if (action.equals(Action.CREATE)) {

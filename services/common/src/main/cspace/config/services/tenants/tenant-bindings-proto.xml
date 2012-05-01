@@ -1983,7 +1983,7 @@
           </service:field>
           <service:field>
             <service:table>persontermgroup</service:table>
-            <service:col>displayname</service:col>
+            <service:col>termdisplayname</service:col>
           </service:field>
           <service:field>
             <service:table>persons_common</service:table>
