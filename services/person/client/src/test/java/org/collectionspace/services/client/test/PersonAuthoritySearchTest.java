@@ -612,8 +612,8 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
         
         List<PersonTermGroup> partialTerms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
-        term.setDisplayName(TEST_PARTIAL_TERM_DISPLAY_NAME_UNICODE);
-        term.setTerm(TEST_PARTIAL_TERM_DISPLAY_NAME_UNICODE);
+        term.setTermDisplayName(TEST_PARTIAL_TERM_DISPLAY_NAME_UNICODE);
+        term.setTermName(TEST_PARTIAL_TERM_DISPLAY_NAME_UNICODE);
         term.setForeName(TEST_PARTIAL_TERM_FORE_NAME);
         term.setSurName(TEST_PARTIAL_TERM_SUR_NAME_UNICODE);
         partialTerms.add(term);
@@ -631,7 +631,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
         partialTermPersonMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, TEST_SHORT_ID_QUOTE );
         partialTermPersonMap.put(PersonJAXBSchema.BIO_NOTE, TEST_KWD_BIO_NOTE_DBL_QUOTES);
         
-        partialTerms.get(0).setDisplayName(TEST_PARTIAL_TERM_DISPLAY_NAME_QUOTE);
+        partialTerms.get(0).setTermDisplayName(TEST_PARTIAL_TERM_DISPLAY_NAME_QUOTE);
         partialTerms.get(0).setSurName(TEST_PARTIAL_TERM_SUR_NAME_QUOTE);
 
         createItem(testName, authorityCsid, null /*authRefName*/, client, 

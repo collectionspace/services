@@ -207,8 +207,8 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
-        term.setDisplayName(firstName + " " + lastName);
-        term.setTerm(firstName + " " + lastName);
+        term.setTermDisplayName(firstName + " " + lastName);
+        term.setTermName(firstName + " " + lastName);
         term.setForeName(firstName);
         term.setSurName(lastName);
         terms.add(term);

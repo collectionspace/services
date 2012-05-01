@@ -192,8 +192,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
-        term.setDisplayName("John Wayne Temp");
-        term.setTerm("JohnWayneTemp");
+        term.setTermDisplayName("John Wayne Temp");
+        term.setTermName("JohnWayneTemp");
         terms.add(term);
         
         return PersonAuthorityClientUtils.createPersonInstance(parentCsid, identifier, personInfo, terms, headerLabel);
@@ -233,8 +233,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         List<PersonTermGroup> johnWayneTerms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
-        term.setDisplayName("John Wayne DisplayName");
-        term.setTerm("John Wayne");
+        term.setTermDisplayName("John Wayne DisplayName");
+        term.setTermName("John Wayne");
         term.setForeName(TEST_FORE_NAME);
         term.setSurName(TEST_SUR_NAME);
         johnWayneTerms.add(term);
@@ -419,8 +419,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
-        term.setDisplayName(shortId);
-        term.setTerm(shortId);
+        term.setTermDisplayName(shortId);
+        term.setTermName(shortId);
         terms.add(term);
         
         final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
@@ -663,8 +663,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         // Try to Update with no displayName
         List<PersonTermGroup> johnWayneTerms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
-        term.setDisplayName("John Wayne DisplayName");
-        term.setTerm("John Wayne");
+        term.setTermDisplayName("John Wayne DisplayName");
+        term.setTermName("John Wayne");
         term.setForeName(TEST_FORE_NAME);
         term.setSurName(TEST_SUR_NAME);
         johnWayneTerms.add(term);
@@ -673,7 +673,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         Assert.assertNotNull(termList);
         List<PersonTermGroup> terms = termList.getPersonTermGroup();
         Assert.assertNotNull(terms);
-        terms.get(0).setDisplayName(null);
+        terms.get(0).setTermDisplayName(null);
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);

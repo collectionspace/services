@@ -288,7 +288,7 @@ public class PersonAuthorityClientUtils {
         
         String displayName = "";
         if (terms !=null && terms.size() > 0) {
-            displayName = terms.get(0).getDisplayName();
+            displayName = terms.get(0).getTermDisplayName();
         }
     	
     	if(logger.isDebugEnabled()){
