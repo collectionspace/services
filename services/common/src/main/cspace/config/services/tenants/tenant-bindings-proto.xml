@@ -1982,7 +1982,7 @@
             <service:col>inauthority</service:col>
           </service:field>
           <service:field>
-            <service:table>persons_common</service:table>
+            <service:table>persontermgroup</service:table>
             <service:col>displayname</service:col>
           </service:field>
           <service:field>
