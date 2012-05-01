@@ -219,12 +219,9 @@ public class PersonAuthorityClientUtils {
         	person.setNameNote(value);
         
         // Set values in the Term Information Group
-        /*
         PersonTermGroupList termList = new PersonTermGroupList();
         termList.getPersonTermGroup().addAll(terms);
         person.setPersonTermGroupList(termList);
-        * 
-        */
         
         
         if (personRepeatablesInfo != null) {

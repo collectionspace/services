@@ -329,8 +329,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
 
-    @POST
-    public Response createAuthority(String xmlPayload) {
+    @POST													//FIXME: REM - 5/1/2012 - We can probably remove this method.
+    public Response createAuthority(String xmlPayload) { 	//REM - This method is never reached by the JAX-RS client -instead the "create" method in ResourceBase.java is getting called.
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
