@@ -67,6 +67,7 @@ public class PersonDocumentModelHandler
      * @param docModel the doc model
      * @throws Exception the exception
      */
+    /*
     @Override
     protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
     	String commonPartLabel = getServiceContext().getCommonPartLabel("persons");
@@ -103,6 +104,8 @@ public class PersonDocumentModelHandler
     		}
     	}
     }
+    * 
+    */
 	
 	
     /**
@@ -118,6 +121,7 @@ public class PersonDocumentModelHandler
      * @return
      * @throws Exception
      */
+    /*
     private static String prepareDefaultDisplayName(
     		String foreName, String middleName, String surName,
     		String birthDate, String deathDate ) throws Exception {
@@ -159,6 +163,8 @@ public class PersonDocumentModelHandler
 		
 		return newStr.toString();
     }
+    * 
+    */
     
     /**
      * getQProperty converts the given property to qualified schema property

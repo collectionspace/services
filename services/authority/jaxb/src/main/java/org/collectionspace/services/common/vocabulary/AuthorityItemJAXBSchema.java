@@ -28,16 +28,26 @@ package org.collectionspace.services.common.vocabulary;
  *
  */
 public interface AuthorityItemJAXBSchema {
+    	final static String IN_AUTHORITY = "inAuthority";
+	final static String REF_NAME = "refName";
+	final static String ORDER = "order";
+	final static String SHORT_IDENTIFIER = "shortIdentifier";
+	final static String CSID = "csid";
+        final static String TERM_DISPLAY_NAME = "termDisplayName";
+        final static String TERM_NAME = "termName";
+        final static String TERM_STATUS = "termStatus";
+        final static String PREFERRED_TERM_DISPLAY_NAME_XPATH ="termGroupList/0/termDisplayName";
+        final static String PREFERRED_TERM_NAME_XPATH ="termGroupList/0/termName";
+        final static String PREFERRED_TERM_STATUS_XPATH ="termGroupList/0/termStatus";
+        // CSPACE-4813
+        /*
 	final static String DISPLAY_NAME = "displayName";
 	final static String DISPLAY_NAME_COMPUTED = "displayNameComputed";
 	final static String SHORT_DISPLAY_NAME = "shortDisplayName";
 	final static String SHORT_DISPLAY_NAME_COMPUTED = "shortDisplayNameComputed";
-	final static String IN_AUTHORITY = "inAuthority";
-	final static String REF_NAME = "refName";
-	final static String ORDER = "order";
-	final static String SHORT_IDENTIFIER = "shortIdentifier";
-	final static String TERM_STATUS = "termStatus";
-	final static String CSID = "csid";
+ 	final static String TERM_STATUS = "termStatus";
+        *
+        */
 }
 
 

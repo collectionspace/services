@@ -425,8 +425,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // be on the displayName field
             String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
             if (sortBy == null || sortBy.isEmpty()) {
-                String qualifiedDisplayNameField = authorityCommonSchemaName + ":"
-                        + AuthorityItemJAXBSchema.DISPLAY_NAME;
+                // String qualifiedDisplayNameField = authorityCommonSchemaName + ":"
+                //         + AuthorityItemJAXBSchema.DISPLAY_NAME;
+                String qualifiedDisplayNameField = AuthorityItemJAXBSchema.TERM_INFO_GROUP_SCHEMA_NAME + ":"
+                        + AuthorityItemJAXBSchema.TERM_DISPLAY_NAME;
                 myFilter.setOrderByClause(qualifiedDisplayNameField);
             }
             String nameQ = queryParams.getFirst("refName");
