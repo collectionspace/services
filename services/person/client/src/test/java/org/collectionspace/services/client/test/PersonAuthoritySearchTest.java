@@ -36,6 +36,7 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.person.PersonTermGroup;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -602,16 +603,20 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
         PersonAuthorityClient client = new PersonAuthorityClient();
         Map<String, String> partialTermPersonMap = new HashMap<String,String>();
         //
-        // Fill the property map for the UNICODE item
+        // Fill values for the UNICODE item
         //
         partialTermPersonMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, TEST_SHORT_ID_UNICODE );
-        partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
-        partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME, TEST_PARTIAL_TERM_DISPLAY_NAME_UNICODE);
-        partialTermPersonMap.put(PersonJAXBSchema.FORE_NAME, TEST_PARTIAL_TERM_FORE_NAME);
-        partialTermPersonMap.put(PersonJAXBSchema.SUR_NAME, TEST_PARTIAL_TERM_SUR_NAME_UNICODE);
         partialTermPersonMap.put(PersonJAXBSchema.BIRTH_PLACE, TEST_KWD_BIRTH_PLACE);
         partialTermPersonMap.put(PersonJAXBSchema.GENDER, "male");
         partialTermPersonMap.put(PersonJAXBSchema.BIO_NOTE, TEST_KWD_BIO_NOTE_NO_QUOTES);
+        
+        List<PersonTermGroup> partialTerms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        term.setDisplayName(TEST_PARTIAL_TERM_DISPLAY_NAME_UNICODE);
+        term.setTerm(TEST_PARTIAL_TERM_DISPLAY_NAME_UNICODE);
+        term.setForeName(TEST_PARTIAL_TERM_FORE_NAME);
+        term.setSurName(TEST_PARTIAL_TERM_SUR_NAME_UNICODE);
+        partialTerms.add(term);
 
         Map<String, List<String>> partialTermRepeatablesMap = new HashMap<String, List<String>>();
         ArrayList<String> styles = new ArrayList<String>();
@@ -619,17 +624,18 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
         partialTermRepeatablesMap.put(PersonJAXBSchema.SCHOOLS_OR_STYLES, styles);
 
         createItem(testName, authorityCsid, null /*authRefName*/, client, 
-                partialTermPersonMap, partialTermRepeatablesMap);
+                partialTermPersonMap, partialTerms, partialTermRepeatablesMap);
         //
-        // Adjust the property map for the QUOTE item
+        // Adjust values for the QUOTE item
         //
         partialTermPersonMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, TEST_SHORT_ID_QUOTE );
-        partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME, TEST_PARTIAL_TERM_DISPLAY_NAME_QUOTE);
-        partialTermPersonMap.put(PersonJAXBSchema.SUR_NAME, TEST_PARTIAL_TERM_SUR_NAME_QUOTE);
         partialTermPersonMap.put(PersonJAXBSchema.BIO_NOTE, TEST_KWD_BIO_NOTE_DBL_QUOTES);
+        
+        partialTerms.get(0).setDisplayName(TEST_PARTIAL_TERM_DISPLAY_NAME_QUOTE);
+        partialTerms.get(0).setSurName(TEST_PARTIAL_TERM_SUR_NAME_QUOTE);
 
         createItem(testName, authorityCsid, null /*authRefName*/, client, 
-                partialTermPersonMap, partialTermRepeatablesMap);
+                partialTermPersonMap, partialTerms, partialTermRepeatablesMap);
     }
     
     private void createItem(
@@ -638,10 +644,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest<AbstractCommonLis
     		String authRefName,
     		PersonAuthorityClient client,
     		Map<String, String> partialTermPersonMap,
+                List<PersonTermGroup> partialTerms,
     		Map<String, List<String>> partialTermRepeatablesMap) throws Exception {
         PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonInstance(authorityCsid, null, //authRefName, 
-                partialTermPersonMap, partialTermRepeatablesMap, client.getItemCommonPartName() );
+                partialTermPersonMap, partialTerms, partialTermRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
         ClientResponse<Response> res = client.createItem(authorityCsid, multipart);

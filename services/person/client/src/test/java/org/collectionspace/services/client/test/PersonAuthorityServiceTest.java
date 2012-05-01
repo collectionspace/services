@@ -46,6 +46,8 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
+import org.collectionspace.services.person.PersonTermGroup;
+import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -183,15 +185,18 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     @Override
     protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
         String headerLabel = new PersonAuthorityClient().getItemCommonPartName();
+        
         HashMap<String, String> personInfo = new HashMap<String, String>();
         String shortId = "johnWayneTempActor";
-        personInfo.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
-        personInfo.put(PersonJAXBSchema.DISPLAY_NAME, "John Wayne Temp");
-        personInfo.put(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED, "false");
-        personInfo.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, "JohnWayneTemp");
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-
-        return PersonAuthorityClientUtils.createPersonInstance(parentCsid, identifier, personInfo, headerLabel);
+        
+        List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        term.setDisplayName("John Wayne Temp");
+        term.setTerm("JohnWayneTemp");
+        terms.add(term);
+        
+        return PersonAuthorityClientUtils.createPersonInstance(parentCsid, identifier, personInfo, terms, headerLabel);
     }
 
     /**
@@ -214,14 +219,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         // Fill the property map
         //
         String shortId = "johnWayneActor";
-        johnWayneMap.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
-        johnWayneMap.put(PersonJAXBSchema.DISPLAY_NAME, "John Wayne");
-        johnWayneMap.put(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED, "false");
-        johnWayneMap.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, "JohnWayne");
         johnWayneMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-
-        johnWayneMap.put(PersonJAXBSchema.FORE_NAME, TEST_FORE_NAME);
-        johnWayneMap.put(PersonJAXBSchema.SUR_NAME, TEST_SUR_NAME);
         johnWayneMap.put(PersonJAXBSchema.GENDER, "male");
         johnWayneMap.put(PersonJAXBSchema.BIRTH_DATE, TEST_BIRTH_DATE);
         johnWayneMap.put(PersonJAXBSchema.BIRTH_PLACE, "Winterset, Iowa");
@@ -233,13 +231,21 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                 + "He was also known for his conservative political views and his support in "
                 + "the 1950s for anti-communist positions.");
 
+        List<PersonTermGroup> johnWayneTerms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        term.setDisplayName("John Wayne DisplayName");
+        term.setTerm("John Wayne");
+        term.setForeName(TEST_FORE_NAME);
+        term.setSurName(TEST_SUR_NAME);
+        johnWayneTerms.add(term);
+
         Map<String, List<String>> johnWayneRepeatablesMap = new HashMap<String, List<String>>();
         List<String> johnWayneGroups = new ArrayList<String>();
         johnWayneGroups.add("Irish");
         johnWayneGroups.add("Scottish");
         johnWayneRepeatablesMap.put(PersonJAXBSchema.GROUPS, johnWayneGroups);
 
-        return createItemInAuthority(vcsid, null /*authRefName*/, shortId, johnWayneMap, johnWayneRepeatablesMap);
+        return createItemInAuthority(vcsid, null /*authRefName*/, shortId, johnWayneMap, johnWayneTerms, johnWayneRepeatablesMap);
 
     }
 
@@ -253,7 +259,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @return the string
      */
     private String createItemInAuthority(String vcsid, String authRefName, String shortId,
-            Map itemFieldProperties, Map itemRepeatableFieldProperties) {
+            Map itemFieldProperties, List<PersonTermGroup> terms, Map itemRepeatableFieldProperties) {
 
         final String testName = "createItemInAuthority";
         if (logger.isDebugEnabled()) {
@@ -264,7 +270,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         PersonAuthorityClient client = new PersonAuthorityClient();
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(vcsid, null /*authRefName*/, itemFieldProperties,
-                itemRepeatableFieldProperties, client.getItemCommonPartName());
+                terms, itemRepeatableFieldProperties, client.getItemCommonPartName());
         setupCreate();
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         String newID = null;
@@ -409,15 +415,18 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         // Create the payload to be included in the body of the request
         String shortId = "7-Eleven";
         Map<String, String> fieldProperties = new HashMap<String, String>();
-        fieldProperties.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
-        fieldProperties.put(PersonJAXBSchema.DISPLAY_NAME, shortId);
-        fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED, "false");
-        fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, shortId);
         fieldProperties.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        
+        List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        term.setDisplayName(shortId);
+        term.setTerm(shortId);
+        terms.add(term);
+        
         final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
         PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(knownResourceId,
-                null /*knownResourceRefName*/, fieldProperties,
+                null /*knownResourceRefName*/, fieldProperties, terms,
                 NULL_REPEATABLE_FIELD_PROPERTIES, client.getItemCommonPartName());
 
         // Send the request and receive a response
@@ -617,135 +626,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             }
         }
     }
-
-    /**
-     * Verify item display name.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName", groups = {"update"},
-    		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.updateItem"})
-    public void verifyItemDisplayName(String testName) throws Exception {
-        // Perform setup.
-        setupUpdate();
-
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        PoxPayloadIn input = null;
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        try {
-            assertStatusCode(res, testName);
-            // Check whether person has expected displayName.
-            input = new PoxPayloadIn(res.getEntity());
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        PersonsCommon person = (PersonsCommon) extractPart(input,
-                client.getItemCommonPartName(), PersonsCommon.class);
-        Assert.assertNotNull(person);
-        // Check whether person has expected displayName.
-        // Make sure displayName matches computed form
-        String displayName = person.getDisplayName();
-        String expectedDisplayName =
-                PersonAuthorityClientUtils.prepareDefaultDisplayName(
-                TEST_FORE_NAME, null, TEST_SUR_NAME,
-                TEST_BIRTH_DATE, TEST_DEATH_DATE);
-        Assert.assertFalse(displayName.equals(expectedDisplayName));
-
-        // Make sure short displayName matches computed form
-        String shortDisplayName = person.getShortDisplayName();
-        String expectedShortDisplayName =
-                PersonAuthorityClientUtils.prepareDefaultDisplayName(
-                TEST_FORE_NAME, null, TEST_SUR_NAME, null, null);
-        Assert.assertFalse(expectedShortDisplayName.equals(shortDisplayName));
-
-        // Update the forename and verify the computed name is updated.
-        person.setCsid(null);
-        person.setDisplayNameComputed(true);
-        person.setShortDisplayNameComputed(true);
-        person.setForeName("updated-" + TEST_FORE_NAME);
-        expectedDisplayName =
-                PersonAuthorityClientUtils.prepareDefaultDisplayName(
-                "updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME,
-                TEST_BIRTH_DATE, TEST_DEATH_DATE);
-        expectedShortDisplayName =
-                PersonAuthorityClientUtils.prepareDefaultDisplayName(
-                "updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME, null, null);
-
-        // Submit the updated resource to the service and store the response.
-        PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), person);
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        try {
-            assertStatusCode(res, testName);
-            // Retrieve the updated resource and verify that its contents exist.
-            input = new PoxPayloadIn(res.getEntity());
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        PersonsCommon updatedPerson =
-                (PersonsCommon) extractPart(input,
-                client.getItemCommonPartName(), PersonsCommon.class);
-        Assert.assertNotNull(updatedPerson);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedPerson.getForeName(), person.getForeName(),
-                "Updated ForeName in Person did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedPerson.getDisplayName(), expectedDisplayName,
-                "Updated ForeName in Person not reflected in computed DisplayName.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedPerson.getShortDisplayName(), expectedShortDisplayName,
-                "Updated ForeName in Person not reflected in computed ShortDisplayName.");
-
-        // Now Update the displayName, not computed and verify the computed name is overriden.
-        person.setDisplayNameComputed(false);
-        expectedDisplayName = "TestName";
-        person.setDisplayName(expectedDisplayName);
-        person.setShortDisplayNameComputed(false);
-        person.setShortDisplayName(expectedDisplayName);
-
-        // Submit the updated resource to the service and store the response.
-        output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        commonPart = output.addPart(client.getItemCommonPartName(), person);
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        try {
-            assertStatusCode(res, testName);
-            // Retrieve the updated resource and verify that its contents exist.
-            input = new PoxPayloadIn(res.getEntity());
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        updatedPerson =
-                (PersonsCommon) extractPart(input,
-                client.getItemCommonPartName(), PersonsCommon.class);
-        Assert.assertNotNull(updatedPerson);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedPerson.isDisplayNameComputed(), false,
-                "Updated displayNameComputed in Person did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedPerson.getDisplayName(),
-                expectedDisplayName,
-                "Updated DisplayName (not computed) in Person not stored.");
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedPerson.isShortDisplayNameComputed(), false,
-                "Updated shortDisplayNameComputed in Person did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedPerson.getShortDisplayName(),
-                expectedDisplayName,
-                "Updated ShortDisplayName (not computed) in Person not stored.");
-    }
+    
+    // FIXME: This test depends on server-side validation logic to require
+    // a non-null (and potentially, non-empty) displayname for each term,
+    // and will fail if that validation is not present.
 
     /**
      * Verify illegal item display name.
@@ -753,8 +637,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName", groups = {"update"},
-    		dependsOnMethods = {"verifyItemDisplayName"})
+    @Test(dataProvider = "testName", groups = {"update"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
         // Perform setup for read.
         setupRead();
@@ -772,15 +655,25 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             }
         }
         //
-        // Make an invalid UPDATE request -i.e., if we don't want the display name computed, then
-        // we need to supply one.
+        // Make an invalid UPDATE request, without a display name
         //
         PersonsCommon person = (PersonsCommon) extractPart(input,
                 client.getItemCommonPartName(), PersonsCommon.class);
         Assert.assertNotNull(person);
-        // Try to Update with computed false and no displayName
-        person.setDisplayNameComputed(false);
-        person.setDisplayName(null);
+        // Try to Update with no displayName
+        List<PersonTermGroup> johnWayneTerms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        term.setDisplayName("John Wayne DisplayName");
+        term.setTerm("John Wayne");
+        term.setForeName(TEST_FORE_NAME);
+        term.setSurName(TEST_SUR_NAME);
+        johnWayneTerms.add(term);
+        
+        PersonTermGroupList termList = person.getPersonTermGroupList();
+        Assert.assertNotNull(termList);
+        List<PersonTermGroup> terms = termList.getPersonTermGroup();
+        Assert.assertNotNull(terms);
+        terms.get(0).setDisplayName(null);
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
@@ -1105,7 +998,12 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         // Update the contents of this resource.
         person.setCsid(null);
-        person.setForeName("updated-" + person.getForeName());
+        PersonTermGroupList termList = person.getPersonTermGroupList();
+        Assert.assertNotNull(termList);
+        List<PersonTermGroup> terms = termList.getPersonTermGroup();
+        Assert.assertNotNull(terms);
+        String foreName = terms.get(0).getForeName();
+        terms.get(0).setForeName("updated-" + foreName);
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated Person");
             logger.debug(objectAsXmlString(person,
@@ -1138,8 +1036,12 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         }
 
         // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedPerson.getForeName(),
-                person.getForeName(),
+        PersonTermGroupList updatedTermList = person.getPersonTermGroupList();
+        Assert.assertNotNull(updatedTermList);
+        List<PersonTermGroup> updatedTerms = termList.getPersonTermGroup();
+        Assert.assertNotNull(updatedTerms);
+        String updatedForeName = updatedTerms.get(0).getForeName();
+        Assert.assertEquals(updatedForeName, foreName,
                 "Data in updated Person did not match submitted data.");
     }
 
@@ -1518,14 +1420,19 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     protected PoxPayloadOut createNonExistenceItemInstance(String commonPartName, String identifier) {
         Map<String, String> nonexMap = new HashMap<String, String>();
         nonexMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, "nonEX");
-        nonexMap.put(PersonJAXBSchema.FORE_NAME, "John");
-        nonexMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
         nonexMap.put(PersonJAXBSchema.GENDER, "male");
+        
+        List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        term.setForeName("John");
+        term.setSurName("Wayne");
+        terms.add(term);
+        
         Map<String, List<String>> nonexRepeatablesMap = new HashMap<String, List<String>>();
         PoxPayloadOut result =
                 PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID,
                 null, //PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
-                nonexMap, nonexRepeatablesMap, commonPartName);
+                nonexMap, terms, nonexRepeatablesMap, commonPartName);
         return result;
     }
 	
