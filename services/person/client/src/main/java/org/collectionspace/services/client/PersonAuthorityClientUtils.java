@@ -219,9 +219,13 @@ public class PersonAuthorityClientUtils {
         	person.setNameNote(value);
         
         // Set values in the Term Information Group
-        PersonTermGroupList termList = person.getPersonTermGroupList();
-        List<PersonTermGroup> existingTerms = termList.getPersonTermGroup();
-        existingTerms = terms;
+        /*
+        PersonTermGroupList termList = new PersonTermGroupList();
+        termList.getPersonTermGroup().addAll(terms);
+        person.setPersonTermGroupList(termList);
+        * 
+        */
+        
         
         if (personRepeatablesInfo != null) {
             if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.GROUPS))!=null) {
