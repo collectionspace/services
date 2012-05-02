@@ -93,6 +93,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
     private final Logger logger = LoggerFactory.getLogger(AuthorityItemDocumentModelHandler.class);
     private String authorityItemCommonSchemaName;
+    private String authorityItemTermGroupXPathBase;
     /**
      * inVocabulary is the parent Authority for this context
      */
@@ -151,7 +152,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         for (int i = 0; i < nFields; i++) {
             ListResultField field = list.get(i);
             String elName = field.getElement();
-            if (AuthorityItemJAXBSchema.DISPLAY_NAME.equals(elName)) {
+            if (AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName)) {
                 hasDisplayName = true;
             } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
                 hasShortId = true;
@@ -164,7 +165,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         ListResultField field;
         if (!hasDisplayName) {
             field = new ListResultField();
-            field.setElement(AuthorityItemJAXBSchema.DISPLAY_NAME);
+            field.setElement(AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
             field.setXpath(AuthorityItemJAXBSchema.DISPLAY_NAME);
             list.add(field);
         }
@@ -225,16 +226,20 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // First, get a copy of the old displayName
         // oldDisplayNameOnUpdate = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
         //        AuthorityItemJAXBSchema.DISPLAY_NAME);
-        oldDisplayNameOnUpdate = (String) RemoteDocumentModelHandlerImpl.getXPathStringValue(wrapDoc.getWrappedObject(),
-                    authorityItemCommonSchemaName, AuthorityItemJAXBSchema.PREFERRED_TERM_DISPLAY_NAME_XPATH);
+        oldDisplayNameOnUpdate = (String) getStringValueInPrimaryRepeatingComplexProperty(
+                wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
+                this.authorityItemTermGroupXPathBase,
+                AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
         oldRefNameOnUpdate = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
                 AuthorityItemJAXBSchema.REF_NAME);
         super.handleUpdate(wrapDoc);
         // handleComputedDisplayNames(wrapDoc.getWrappedObject());
         // String newDisplayName = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
         //        AuthorityItemJAXBSchema.DISPLAY_NAME);
-        String newDisplayName = (String) RemoteDocumentModelHandlerImpl.getXPathStringValue(wrapDoc.getWrappedObject(),
-            authorityItemCommonSchemaName, AuthorityItemJAXBSchema.PREFERRED_TERM_DISPLAY_NAME_XPATH);
+        String newDisplayName = (String) getStringValueInPrimaryRepeatingComplexProperty(
+                wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
+                this.authorityItemTermGroupXPathBase,
+                AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
         if (newDisplayName != null && !newDisplayName.equals(oldDisplayNameOnUpdate)) {
             // Need to update the refName, and then fix all references.
             newRefNameOnUpdate = handleItemRefNameUpdateForDisplayName(wrapDoc.getWrappedObject(), newDisplayName);
@@ -314,10 +319,15 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         String termDisplayName =
-                (String) RemoteDocumentModelHandlerImpl.getXPathStringValue(docModel,
-                    schemaName, AuthorityItemJAXBSchema.PREFERRED_TERM_DISPLAY_NAME_XPATH);
-        String termName = (String) RemoteDocumentModelHandlerImpl.getXPathStringValue(docModel,
-                    schemaName, AuthorityItemJAXBSchema.PREFERRED_TERM_NAME_XPATH);
+                (String) getStringValueInPrimaryRepeatingComplexProperty(
+                    docModel, authorityItemCommonSchemaName,
+                    this.authorityItemTermGroupXPathBase,
+                    AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+        String termName = 
+                (String) getStringValueInPrimaryRepeatingComplexProperty(
+                    docModel, authorityItemCommonSchemaName,
+                    this.authorityItemTermGroupXPathBase,
+                    AuthorityItemJAXBSchema.TERM_NAME);
         if (Tools.isEmpty(shortIdentifier)) {
             String generatedShortIdentifier =
                     AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(termDisplayName, termName);
@@ -342,8 +352,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         DocumentModel docModel = wrapDoc.getWrappedObject();
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         String displayName =
-                RemoteDocumentModelHandlerImpl.getXPathStringValue(docModel, schemaName,
-                    AuthorityItemJAXBSchema.PREFERRED_TERM_DISPLAY_NAME_XPATH);
+                (String) getStringValueInPrimaryRepeatingComplexProperty(
+                    docModel, authorityItemCommonSchemaName,
+                    this.authorityItemTermGroupXPathBase,
+                    AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
         if (Tools.isEmpty(authorityRefBaseName)) {
             throw new Exception("Could not create the refName for this authority term, because the refName for its authority parent was empty.");
         }
@@ -1088,4 +1100,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return relationsCommonList;
     }
     //============================= END TODO refactor ==========================
+
+    public String getItemTermInfoGroupXPathBase() {
+        return this.authorityItemTermGroupXPathBase;
+    }
+        
+    public void setItemTermInfoGroupXPathBase(String itemTermInfoGroupXPathBase) {
+        this.authorityItemTermGroupXPathBase = itemTermInfoGroupXPathBase;
+    }
 }

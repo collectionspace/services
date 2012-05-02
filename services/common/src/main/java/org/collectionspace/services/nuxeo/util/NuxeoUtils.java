@@ -600,4 +600,8 @@ public class NuxeoUtils {
 		
     	return result;
     }
+    
+    static public String getPrimaryXPathPropertyName(String schema, String complexPropertyName, String fieldName) {
+    	return schema + ":" + complexPropertyName + "/[0]/" + fieldName;
+    }
 }

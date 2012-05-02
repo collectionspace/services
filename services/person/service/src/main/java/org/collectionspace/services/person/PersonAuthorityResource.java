@@ -55,6 +55,11 @@ public class PersonAuthorityResource extends
     public String getItemServiceName() {
         return PersonAuthorityClient.SERVICE_ITEM_NAME;
     }
+    
+    @Override
+    public String getItemTermInfoGroupXPathBase() {
+        return PersonAuthorityClient.TERM_INFO_GROUP_XPATH_BASE;
+    }
 
     @Override
     public Class<PersonauthoritiesCommon> getCommonPartClass() {
