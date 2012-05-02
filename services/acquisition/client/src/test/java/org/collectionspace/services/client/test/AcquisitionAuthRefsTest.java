@@ -203,7 +203,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
 		PoxPayloadOut multipart = 
 			PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
-					authRefName, personInfo, personAuthClient.getItemCommonPartName());
+					authRefName, personInfo, null, personAuthClient.getItemCommonPartName());
 		ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
 		int statusCode = res.getStatus();
 

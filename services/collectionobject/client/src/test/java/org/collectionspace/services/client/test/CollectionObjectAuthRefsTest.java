@@ -249,7 +249,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
-    				personAuthRefName, personInfo, personAuthClient.getItemCommonPartName());
+    				personAuthRefName, personInfo, null, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 

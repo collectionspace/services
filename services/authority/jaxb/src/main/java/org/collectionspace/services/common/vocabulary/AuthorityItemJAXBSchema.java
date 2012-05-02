@@ -39,15 +39,13 @@ public interface AuthorityItemJAXBSchema {
         final static String PREFERRED_TERM_DISPLAY_NAME_XPATH ="termGroupList/0/termDisplayName";
         final static String PREFERRED_TERM_NAME_XPATH ="termGroupList/0/termName";
         final static String PREFERRED_TERM_STATUS_XPATH ="termGroupList/0/termStatus";
-        // CSPACE-4813
-        /*
+        final static String TERM_INFO_GROUP_SCHEMA_NAME = ""; //FIXME: REM - Needs to be defined.
+        // CSPACE-4813 - Remove all the below values and recompile all authorityitem related classes
 	final static String DISPLAY_NAME = "displayName";
 	final static String DISPLAY_NAME_COMPUTED = "displayNameComputed";
 	final static String SHORT_DISPLAY_NAME = "shortDisplayName";
 	final static String SHORT_DISPLAY_NAME_COMPUTED = "shortDisplayNameComputed";
- 	final static String TERM_STATUS = "termStatus";
-        *
-        */
+ 	//final static String TERM_STATUS = "termStatus";
 }
 
 

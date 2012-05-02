@@ -158,7 +158,7 @@ public class MediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(
-        		personAuthCSID, authRefName, personInfo, personAuthClient.getItemCommonPartName());
+        		personAuthCSID, authRefName, personInfo, null, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
 	        assertStatusCode(res, "createPerson (not a surefire test)");

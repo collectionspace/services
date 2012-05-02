@@ -205,7 +205,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
-    				authRefName, personInfo, personAuthClient.getItemCommonPartName());
+    				authRefName, personInfo, null, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 
