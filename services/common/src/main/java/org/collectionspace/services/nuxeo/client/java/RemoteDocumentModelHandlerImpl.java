@@ -60,6 +60,7 @@ import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Element;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -672,7 +673,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      */
     protected String getStringValueInPrimaryRepeatingComplexProperty(
     		DocumentModel docModel, String schema, String complexPropertyName, String fieldName) {
-    	String xpath = "/"+schema+":"+complexPropertyName+"/[0]/"+fieldName;
+    	String xpath = "/" + NuxeoUtils.getPrimaryXPathPropertyName(schema, complexPropertyName, fieldName);
     	try {
 	    	return (String)docModel.getPropertyValue(xpath);
     	} catch(PropertyException pe) {

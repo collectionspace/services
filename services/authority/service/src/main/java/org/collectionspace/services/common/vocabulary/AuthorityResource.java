@@ -82,6 +82,8 @@ import javax.ws.rs.core.UriInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.collectionspace.services.client.*;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 /**
  * The Class AuthorityResource.
@@ -180,6 +182,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     public abstract String getItemServiceName();
+    
+    public abstract String getItemTermInfoGroupXPathBase();
 
     @Override
     protected String getVersionString() {
@@ -223,9 +227,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         docHandler = (AuthorityItemDocumentModelHandler<?>) createDocumentHandler(ctx,
                 ctx.getCommonPartLabel(getItemServiceName()),
                 authCommonClass);
+        // FIXME - Richard and Aron think the following three lines should
+        // be in the constructor for the AuthorityItemDocumentModelHandler
+        // because all three are required fields.
         docHandler.setInAuthority(inAuthority);
         docHandler.setAuthorityRefNameBase(authorityRefNameBase);
-
+        docHandler.setItemTermInfoGroupXPathBase(getItemTermInfoGroupXPathBase());
         return docHandler;
     }
 
@@ -427,8 +434,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             if (sortBy == null || sortBy.isEmpty()) {
                 // String qualifiedDisplayNameField = authorityCommonSchemaName + ":"
                 //         + AuthorityItemJAXBSchema.DISPLAY_NAME;
-                String qualifiedDisplayNameField = AuthorityItemJAXBSchema.TERM_INFO_GROUP_SCHEMA_NAME + ":"
-                        + AuthorityItemJAXBSchema.TERM_DISPLAY_NAME;
+                String qualifiedDisplayNameField = getQualifiedDisplayNameField();
                 myFilter.setOrderByClause(qualifiedDisplayNameField);
             }
             String nameQ = queryParams.getFirst("refName");
@@ -440,6 +446,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
+    }
+    
+    protected String getQualifiedDisplayNameField() {
+        return NuxeoUtils.getPrimaryXPathPropertyName(authorityCommonSchemaName, 
+                getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
     }
 
     /**
@@ -666,8 +677,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
 
-            String qualifiedDisplayNameField = authorityItemCommonSchemaName + ":"
-                    + AuthorityItemJAXBSchema.DISPLAY_NAME;
+            String qualifiedDisplayNameField = getQualifiedDisplayNameField();
 
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;

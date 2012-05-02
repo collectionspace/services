@@ -36,9 +36,6 @@ public interface AuthorityItemJAXBSchema {
         final static String TERM_DISPLAY_NAME = "termDisplayName";
         final static String TERM_NAME = "termName";
         final static String TERM_STATUS = "termStatus";
-        final static String PREFERRED_TERM_DISPLAY_NAME_XPATH ="termGroupList/0/termDisplayName";
-        final static String PREFERRED_TERM_NAME_XPATH ="termGroupList/0/termName";
-        final static String PREFERRED_TERM_STATUS_XPATH ="termGroupList/0/termStatus";
         // CSPACE-4813
         /*
 	final static String DISPLAY_NAME = "displayName";
