@@ -74,5 +74,11 @@ public class VocabularyResource extends
     protected String getRefPropName() {
     	return ServiceBindingUtils.TERM_REF_PROP;
     }
+
+	@Override
+	public String getItemTermInfoGroupXPathBase() {
+		// TODO Auto-generated method stub
+		return VocabularyClient.TERM_INFO_GROUP_XPATH_BASE;
+	}
     
 }

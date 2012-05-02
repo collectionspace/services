@@ -24,6 +24,7 @@
 package org.collectionspace.services.concept;
 
 import org.collectionspace.services.client.ConceptAuthorityClient;
+import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.concept.nuxeo.ConceptDocumentModelHandler;
 import org.slf4j.Logger;
@@ -66,4 +67,9 @@ public class ConceptAuthorityResource
     public Class<ConceptauthoritiesCommon> getCommonPartClass() {
     	return ConceptauthoritiesCommon.class;
     }
+
+	@Override
+	public String getItemTermInfoGroupXPathBase() {
+        return ConceptAuthorityClient.TERM_INFO_GROUP_XPATH_BASE;
+	}
 }

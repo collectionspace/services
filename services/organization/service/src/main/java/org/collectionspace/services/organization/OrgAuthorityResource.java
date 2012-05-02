@@ -24,6 +24,7 @@
 package org.collectionspace.services.organization;
 
 import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.contact.AuthorityResourceWithContacts;
 import org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler;
 import org.slf4j.Logger;
@@ -64,5 +65,11 @@ public class OrgAuthorityResource extends
     @Override
     public Class<OrgauthoritiesCommon> getCommonPartClass() {
     	return OrgauthoritiesCommon.class;
-    }    
+    }
+    
+    @Override
+    public String getItemTermInfoGroupXPathBase() {
+        return OrgAuthorityClient.TERM_INFO_GROUP_XPATH_BASE;
+    }
+    
 }
