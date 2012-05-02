@@ -672,9 +672,11 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
 
-            String qualifiedDisplayNameField = 
-                    authorityItemCommonSchemaName + ":" + getItemTermInfoGroupXPathBase()
-                        + "/0/" + AuthorityItemJAXBSchema.TERM_DISPLAY_NAME;
+            String qualifiedDisplayNameField =
+                    NuxeoUtils.getPrimaryElPathPropertyName(authorityItemCommonSchemaName,
+                        getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+                    // authorityItemCommonSchemaName + ":" + getItemTermInfoGroupXPathBase()
+                    //    + "/0/" + AuthorityItemJAXBSchema.TERM_DISPLAY_NAME;
 
                     // NuxeoUtils.getPrimaryXPathPropertyName(authorityItemCommonSchemaName, 
                     //     getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);

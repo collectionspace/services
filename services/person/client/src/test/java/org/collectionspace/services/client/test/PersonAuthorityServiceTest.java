@@ -45,6 +45,8 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.PersonJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.collectionspace.services.person.PersonTermGroupList;
@@ -71,7 +73,10 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     private final String REFNAME = "refName";
-    private final String DISPLAYNAME = "displayName";
+    private final String TERM_DISPLAY_NAME = "termDisplayName";
+    // private final String TERM_DISPLAY_NAME_ELPATH =
+    //        NuxeoUtils.getPrimaryElPathPropertyName(null,
+    //            new PersonAuthorityClient().getTermInfoGroupXpathBase(), TERM_DISPLAY_NAME);
 
     @Override
     public String getServicePathComponent() {
@@ -822,8 +827,9 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             String value =
                     AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
             Assert.assertTrue((null != value), "Item refName is null!");
+            
             value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
+                    AbstractCommonListUtils.ListItemGetElementValue(item, TERM_DISPLAY_NAME);
             Assert.assertTrue((null != value), "Item displayName is null!");
         }
         if (logger.isTraceEnabled()) {
@@ -1003,7 +1009,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         List<PersonTermGroup> terms = termList.getPersonTermGroup();
         Assert.assertNotNull(terms);
         String foreName = terms.get(0).getForeName();
-        terms.get(0).setForeName("updated-" + foreName);
+        String updatedForeName = "updated-" + foreName;
+        terms.get(0).setForeName(updatedForeName);
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated Person");
             logger.debug(objectAsXmlString(person,
@@ -1040,8 +1047,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         Assert.assertNotNull(updatedTermList);
         List<PersonTermGroup> updatedTerms = termList.getPersonTermGroup();
         Assert.assertNotNull(updatedTerms);
-        String updatedForeName = updatedTerms.get(0).getForeName();
-        Assert.assertEquals(updatedForeName, foreName,
+        Assert.assertEquals(updatedTerms.get(0).getForeName(), updatedForeName,
                 "Data in updated Person did not match submitted data.");
     }
 

@@ -609,4 +609,12 @@ public class NuxeoUtils {
     	    return schema + ":" + complexPropertyName + "/[0]/" + fieldName;
         }
     }
+    
+    static public String getPrimaryElPathPropertyName(String schema, String complexPropertyName, String fieldName) {
+        if (Tools.isBlank(schema)) {
+            return complexPropertyName + "/0/" + fieldName;
+        } else {
+    	    return schema + ":" + complexPropertyName + "/0/" + fieldName;
+        }
+    }
 }
