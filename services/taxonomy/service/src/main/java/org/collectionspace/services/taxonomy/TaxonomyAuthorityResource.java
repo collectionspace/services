@@ -65,4 +65,9 @@ public class TaxonomyAuthorityResource
     public Class<TaxonomyauthorityCommon> getCommonPartClass() {
         return TaxonomyauthorityCommon.class;
     }
+
+	@Override
+	public String getItemTermInfoGroupXPathBase() {
+        return TaxonomyAuthorityClient.TERM_INFO_GROUP_XPATH_BASE;
+	}
 }
