@@ -1,14 +1,6 @@
 /**	
  * PersonAuthorityClient.java
  *
- * {Purpose of This Class}
- *
- * {Other Notes Relating to This Class (Optional)}
- *
- * $LastChangedBy: $
- * $LastChangedRevision: $
- * $LastChangedDate: $
- *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -16,7 +8,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright © 2009 {Contributing Institution}
+ * Copyright © 2009 University of California, Berkeley
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -36,7 +28,7 @@ public class PersonAuthorityClient extends AuthorityWithContactsClientImpl<Perso
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
-    public static final String TERM_INFO_GROUP_XPATH_BASE = "personTermGroup";
+	public static final String TERM_INFO_GROUP_XPATH_BASE = "personTermGroupList";
 	//
 	// Subitem constants
 	//
