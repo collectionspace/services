@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<imports>
+    <import service="ObjectExit" type="ObjectExit">
+        <schema xmlns:objectexit_common="http://collectionspace.org/services/objectexit" 
+                name="objectexit_common">
+            <exitNote>A dollar sign followed by '29.00': $29.00  And a backslash: \</exitNote>        
+            <exitNumber>OE-IMPORT-TEST-1999.10</exitNumber>
+        </schema>
+    </import>
+</imports>

@@ -113,6 +113,13 @@ public class Tools {
         String output = matcher.replaceAll(replace);
         return output;
     }
+    
+    public static String searchAndReplaceWithQuoteReplacement(String source, String find, String replace){
+        Pattern pattern = Pattern.compile(find);
+        Matcher matcher = pattern.matcher(source);
+        String output = matcher.replaceAll(matcher.quoteReplacement(replace));
+        return output;
+    }
 
     static boolean m_fileSystemIsDOS = "\\".equals(File.separator);
     static boolean m_fileSystemIsMac = ":".equals(File.separator);

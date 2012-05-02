@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<imports>
+    <import service="ObjectExit" type="ObjectExit">
+        <schema xmlns:objectexit_common="http://collectionspace.org/services/objectexit" 
+            name="objectexit_common">
+            <exitNote>
+                "This sentence is wrapped in quotation marks (double quotes)."
+                &quot;This sentence is wrapped in quotation marks (double quotes) as XML entities.&quot;
+	        'This sentence is wrapped in apostrophes (single quotes).'
+	        &apos;This sentence is wrapped in apostrophes (single quotes) as XML entities.&apos;
+	        This sentence has a "quoted" segment &amp; an ampersand (as an XML entity).
+	        "This sentence has a "quoted" segment; &amp; an ampersand (as an XML entity), and is wrapped in quotation marks."
+                &lt;There are angle brackets around me, as XML entities.&gt;
+
+                An XML comment follows on the next line:
+                <!-- This is an XML comment -->
+
+                [there are square brackets around me]
+	        {there are curly braces around me}	
+                
+	        The text which follows a backquote: Hawai`i
+	        The text which follows contains a number sign (aka hash mark, pound sign): #20
+	        The text which follows contains reverse solidus (aka backslash) characters and a colon: c:\mydocs\
+                The text which follows contains doubled reverse solidus (backslash) characters: \\mydocs
+	        The text which follows contains a reverse solidus (backslash) followed by a solidus (aka forward slash): \/
+            </exitNote>
+            <exitNumber>OE-IMPORT-TEST-1999.5</exitNumber>
+        </schema>
+    </import>
+</imports>

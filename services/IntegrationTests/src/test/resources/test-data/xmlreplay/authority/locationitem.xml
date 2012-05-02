@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="locations">
+    <ns2:locations_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
+        <displayName>${itemDisplayName}</displayName>
+        <displayNameComputed>false</displayNameComputed>
+        <shortIdentifier>${itemShortIdentifier}</shortIdentifier>
+        <accessNote>This is a test Location Authority item, whose access note contains: ${itemDisplayName}</accessNote>
+    </ns2:locations_common>
+</document>

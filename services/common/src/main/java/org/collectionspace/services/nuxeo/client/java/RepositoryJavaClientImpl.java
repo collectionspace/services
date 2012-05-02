@@ -32,6 +32,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.profile.Profiler;
+import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 import org.collectionspace.services.common.document.BadRequestException;
@@ -889,23 +890,36 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @throws DocumentException
      */
     @Override
-    public void delete(ServiceContext ctx, String id) throws DocumentNotFoundException,
+    public void delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException,
             DocumentException {
-
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "delete(ctx, ix, handler): ctx is missing");
+        }
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "delete(ctx, ix, handler): handler is missing");
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Deleting document with CSID=" + id);
         }
         RepositoryInstance repoSession = null;
         try {
+        	handler.prepare(Action.DELETE);
             repoSession = getRepositorySession();
-            DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
+            DocumentWrapper<DocumentModel> wrapDoc = null;
             try {
+            	DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
+	            wrapDoc = new DocumentWrapperImpl<DocumentModel>(repoSession.getDocument(docRef));
+	            ((DocumentModelHandler) handler).setRepositorySession(repoSession);
+	            handler.handle(Action.DELETE, wrapDoc);
                 repoSession.removeDocument(docRef);
             } catch (ClientException ce) {
             	String msg = logException(ce, "Could not find document to delete with CSID=" + id);
                 throw new DocumentNotFoundException(msg, ce);
             }
             repoSession.save();
+            handler.complete(Action.DELETE, wrapDoc);
         } catch (DocumentException de) {
             throw de;
         } catch (Exception e) {
@@ -924,9 +938,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String, org.collectionspace.services.common.document.DocumentHandler)
      */
     @Override
-    public void delete(ServiceContext ctx, String id, DocumentHandler handler)
+    @Deprecated
+    public void delete(@SuppressWarnings("rawtypes") ServiceContext ctx, String id)
             throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException();
+        // Use the other delete instead
     }
 
     @Override
@@ -1149,5 +1165,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             // no need to throw this service specific exception
         }
     }
+
+	@Override
+	public void doWorkflowTransition(ServiceContext ctx, String id,
+			DocumentHandler handler, TransitionDef transitionDef)
+			throws BadRequestException, DocumentNotFoundException,
+			DocumentException {
+		// This is a placeholder for when we change the StorageClient interface to treat workflow transitions as 1st class operations like 'get', 'create', 'update, 'delete', etc
+	}
 
 }
