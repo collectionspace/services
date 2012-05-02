@@ -66,4 +66,9 @@ public class PlaceAuthorityResource
     public Class<PlaceauthoritiesCommon> getCommonPartClass() {
     	return PlaceauthoritiesCommon.class;
     }
+
+	@Override
+	public String getItemTermInfoGroupXPathBase() {
+        return PlaceAuthorityClient.TERM_INFO_GROUP_XPATH_BASE;
+	}
 }
