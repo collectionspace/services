@@ -432,9 +432,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // be on the displayName field
             String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
             if (sortBy == null || sortBy.isEmpty()) {
-                // String qualifiedDisplayNameField = authorityCommonSchemaName + ":"
-                //         + AuthorityItemJAXBSchema.DISPLAY_NAME;
-                String qualifiedDisplayNameField = getQualifiedDisplayNameField();
+                String qualifiedDisplayNameField = authorityCommonSchemaName + ":"
+                        + AuthorityItemJAXBSchema.DISPLAY_NAME;
                 myFilter.setOrderByClause(qualifiedDisplayNameField);
             }
             String nameQ = queryParams.getFirst("refName");
@@ -448,10 +447,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
     }
     
-    protected String getQualifiedDisplayNameField() {
-        return NuxeoUtils.getPrimaryXPathPropertyName(authorityCommonSchemaName, 
-                getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-    }
 
     /**
      * Update authority.
@@ -677,7 +672,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
 
-            String qualifiedDisplayNameField = getQualifiedDisplayNameField();
+            String qualifiedDisplayNameField = 
+                    authorityItemCommonSchemaName + ":" + getItemTermInfoGroupXPathBase()
+                        + "/0/" + AuthorityItemJAXBSchema.TERM_DISPLAY_NAME;
+
+                    // NuxeoUtils.getPrimaryXPathPropertyName(authorityItemCommonSchemaName, 
+                    //     getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
 
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
@@ -730,7 +730,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             }
             if (logger.isDebugEnabled()) {
                 logger.debug("getAuthorityItemList filtered WHERE clause: "
-                        + myFilter.getWhereClause());
+                        + myFilter.getWhereClause() 
+                        + " and ORDER BY clause: " + myFilter.getOrderByClause());
             }
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             return (AbstractCommonList) handler.getCommonPartList();

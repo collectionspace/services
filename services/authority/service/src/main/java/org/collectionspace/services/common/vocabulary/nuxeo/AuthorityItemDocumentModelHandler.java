@@ -169,7 +169,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             field = new ListResultField();
             field.setElement(AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
             field.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
-                    null, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME));
+                    authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME));
             // field.setXpath(AuthorityItemJAXBSchema.DISPLAY_NAME);
             list.add(field);
         }
@@ -189,7 +189,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             field = new ListResultField();
             field.setElement(AuthorityItemJAXBSchema.TERM_STATUS);
             field.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
-                    null, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_STATUS));
+                    authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_STATUS));
             // field.setXpath(AuthorityItemJAXBSchema.TERM_STATUS);
             list.add(field);
         }
