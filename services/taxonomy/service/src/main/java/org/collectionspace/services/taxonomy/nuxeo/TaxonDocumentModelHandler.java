@@ -62,32 +62,32 @@ public class TaxonDocumentModelHandler
      * @param docModel the doc model
      * @throws Exception the exception
      */
-    @Override
-    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
-        String commonPartLabel = getServiceContext().getCommonPartLabel("taxon");
-        Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-                TaxonJAXBSchema.DISPLAY_NAME_COMPUTED);
-        Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-                TaxonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
-        if (displayNameComputed == null) {
-            displayNameComputed = true;
-        }
-        if (shortDisplayNameComputed == null) {
-            shortDisplayNameComputed = true;
-        }
-        if (displayNameComputed || shortDisplayNameComputed) {
-            String displayName = prepareDefaultDisplayName(
-                    (String) docModel.getProperty(commonPartLabel, TaxonJAXBSchema.NAME));
-            if (displayNameComputed) {
-                docModel.setProperty(commonPartLabel, TaxonJAXBSchema.DISPLAY_NAME,
-                        displayName);
-            }
-            if (shortDisplayNameComputed) {
-                docModel.setProperty(commonPartLabel, TaxonJAXBSchema.SHORT_DISPLAY_NAME,
-                        displayName);
-            }
-        }
-    }
+//    @Override
+//    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
+//        String commonPartLabel = getServiceContext().getCommonPartLabel("taxon");
+//        Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+//                TaxonJAXBSchema.DISPLAY_NAME_COMPUTED);
+//        Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+//                TaxonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+//        if (displayNameComputed == null) {
+//            displayNameComputed = true;
+//        }
+//        if (shortDisplayNameComputed == null) {
+//            shortDisplayNameComputed = true;
+//        }
+//        if (displayNameComputed || shortDisplayNameComputed) {
+//            String displayName = prepareDefaultDisplayName(
+//                    (String) docModel.getProperty(commonPartLabel, TaxonJAXBSchema.NAME));
+//            if (displayNameComputed) {
+//                docModel.setProperty(commonPartLabel, TaxonJAXBSchema.DISPLAY_NAME,
+//                        displayName);
+//            }
+//            if (shortDisplayNameComputed) {
+//                docModel.setProperty(commonPartLabel, TaxonJAXBSchema.SHORT_DISPLAY_NAME,
+//                        displayName);
+//            }
+//        }
+//    }
 
     /**
      * Produces a default displayName from the basic name and dates fields.
