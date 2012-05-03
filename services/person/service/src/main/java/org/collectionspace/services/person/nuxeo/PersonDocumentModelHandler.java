@@ -84,20 +84,14 @@ public class PersonDocumentModelHandler
     		String lastname = 
 				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.SUR_NAME);
     		if(shortDisplayNameComputed) {
-	    		String displayName = prepareDefaultDisplayName(forename, null, lastname,
-	    				null, null);
+	    		String displayName = prepareDefaultDisplayName(forename, null, lastname);
 	    		docModel.setProperty(commonPartLabel, PersonJAXBSchema.SHORT_DISPLAY_NAME,
 	    				displayName);
     		}
     		if(displayNameComputed) {
 	    		String midname = 
 					(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.MIDDLE_NAME);    			
-	    		String birthdate = 
-					(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.BIRTH_DATE);
-	    		String deathdate = 
-					(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.DEATH_DATE);
-	    		String displayName = prepareDefaultDisplayName(forename, midname, lastname,
-	    				birthdate, deathdate);
+	    		String displayName = prepareDefaultDisplayName(forename, midname, lastname); 
 	    		docModel.setProperty(commonPartLabel, PersonJAXBSchema.DISPLAY_NAME,
 	    				displayName);
     		}
@@ -113,14 +107,11 @@ public class PersonDocumentModelHandler
      * @param foreName	
      * @param middleName
      * @param surName
-     * @param birthDate
-     * @param deathDate
      * @return
      * @throws Exception
      */
     private static String prepareDefaultDisplayName(
-    		String foreName, String middleName, String surName,
-    		String birthDate, String deathDate ) throws Exception {
+    		String foreName, String middleName, String surName) throws Exception {
 		final String SEP = " ";
 		final String DATE_SEP = "-";
 
@@ -137,25 +128,6 @@ public class PersonDocumentModelHandler
 				firstAdded = true;
 			}
     	}
-    	// Now we add the dates. In theory could have dates with no name, but that is their problem.
-    	boolean foundBirth = false;
-		if (birthDate != null) {
-			if (firstAdded) {
-				newStr.append(SEP);
-			}
-			newStr.append(birthDate);
-	    	newStr.append(DATE_SEP);		// Put this in whether there is a death date or not
-			foundBirth = true;
-		}
-		if (deathDate != null) {
-			if (!foundBirth) {
-				if (firstAdded == true) {
-					newStr.append(SEP);
-				}
-		    	newStr.append(DATE_SEP);
-			}
-			newStr.append(deathDate);
-		}
 		
 		return newStr.toString();
     }

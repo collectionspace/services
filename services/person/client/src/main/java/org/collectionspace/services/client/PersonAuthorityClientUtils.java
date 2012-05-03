@@ -245,10 +245,6 @@ public class PersonAuthorityClientUtils {
         	person.setTitle(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.NAME_ADDITIONS))!=null)
         	person.setNameAdditions(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_DATE))!=null)
-        	person.setBirthDate(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_DATE))!=null)
-        	person.setDeathDate(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_PLACE))!=null)
         	person.setBirthPlace(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_PLACE))!=null)
@@ -330,9 +326,7 @@ public class PersonAuthorityClientUtils {
         		prepareDefaultDisplayName(
     		    	personMap.get(PersonJAXBSchema.FORE_NAME),
     		    	personMap.get(PersonJAXBSchema.MIDDLE_NAME),
-    		    	personMap.get(PersonJAXBSchema.SUR_NAME),
-    		    	personMap.get(PersonJAXBSchema.BIRTH_DATE),
-    		    	personMap.get(PersonJAXBSchema.DEATH_DATE));
+    		    	personMap.get(PersonJAXBSchema.SUR_NAME));
         	personMap.put(PersonJAXBSchema.DISPLAY_NAME, displayName);
     	}
     	String shortDisplayName = personMap.get(PersonJAXBSchema.SHORT_DISPLAY_NAME);
@@ -346,7 +340,7 @@ public class PersonAuthorityClientUtils {
     		shortDisplayName = 
         		prepareDefaultDisplayName(
     		    	personMap.get(PersonJAXBSchema.FORE_NAME), null,
-    		    	personMap.get(PersonJAXBSchema.SUR_NAME),null,null);
+    		    	personMap.get(PersonJAXBSchema.SUR_NAME));
         	personMap.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, shortDisplayName);
     	}
     	
@@ -464,13 +458,10 @@ public class PersonAuthorityClientUtils {
      * @param foreName	
      * @param middleName
      * @param surName
-     * @param birthDate
-     * @param deathDate
      * @return display name
      */
     public static String prepareDefaultDisplayName(
-    		String foreName, String middleName, String surName,
-    		String birthDate, String deathDate ) {
+    		String foreName, String middleName, String surName) {
     	StringBuilder newStr = new StringBuilder();
 		final String sep = " ";
 		final String dateSep = "-";
@@ -486,25 +477,7 @@ public class PersonAuthorityClientUtils {
 				firstAdded = true;
 			}
     	}
-    	// Now we add the dates. In theory could have dates with no name, but that is their problem.
-    	boolean foundBirth = false;
-		if(null != birthDate) {
-			if(firstAdded) {
-				newStr.append(sep);
-			}
-			newStr.append(birthDate);
-	    	newStr.append(dateSep);		// Put this in whether there is a death date or not
-			foundBirth = true;
-		}
-		if(null != deathDate) {
-			if(!foundBirth) {
-				if(firstAdded) {
-					newStr.append(sep);
-				}
-		    	newStr.append(dateSep);
-			}
-			newStr.append(deathDate);
-		}
+
 		return newStr.toString();
     }
     

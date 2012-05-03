@@ -8,7 +8,7 @@ package org.collectionspace.services;
  *
  */
 public interface AcquisitionJAXBSchema {
-	final static String ACCESSIONDATE = "accessionDate";
+    // final static String ACCESSIONDATE = "accessionDate";
 }
 
 

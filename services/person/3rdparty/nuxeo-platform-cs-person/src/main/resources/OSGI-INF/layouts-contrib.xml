@@ -89,8 +89,6 @@
         <row><widget>salutation</widget></row>
         <row><widget>title</widget></row>
         <row><widget>nameAdditions</widget></row>
-        <row><widget>birthDate</widget></row>
-        <row><widget>deathDate</widget></row>
         <row><widget>birthPlace</widget></row>
         <row><widget>deathPlace</widget></row>
         <!-- Repeatable fields are commented out for now until we -->
@@ -242,32 +240,6 @@
         <translated>true</translated>
         <fields>
           <field schema="persons_common">nameAdditions</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-      
-      <widget name="birthDate" type="text">
-        <labels>
-          <label mode="any">birthDate</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="persons_common">birthDate</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-      
-      <widget name="deathDate" type="text">
-        <labels>
-          <label mode="any">deathDate</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="persons_common">deathDate</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

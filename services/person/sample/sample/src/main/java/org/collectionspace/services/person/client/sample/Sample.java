@@ -123,8 +123,6 @@ public class Sample {
     	String foreName = personMap.get(PersonJAXBSchema.FORE_NAME);
     	String middleName = personMap.get(PersonJAXBSchema.MIDDLE_NAME);
     	String surName = personMap.get(PersonJAXBSchema.SUR_NAME);
-    	String birthDate = personMap.get(PersonJAXBSchema.BIRTH_DATE);
-    	String deathDate = personMap.get(PersonJAXBSchema.DEATH_DATE);
     	StringBuilder builtName = new StringBuilder();
     	if(foreName!=null)
     		builtName.append(foreName);
@@ -132,11 +130,6 @@ public class Sample {
     		builtName.append(middleName);
     	if(surName!=null)
     		builtName.append(surName);
-    	if(birthDate!=null)
-    		builtName.append(birthDate);
-		builtName.append("-");
-    	if(deathDate!=null)
-    		builtName.append(deathDate);
 
         String displaySuffix = "displayName-" + System.currentTimeMillis(); //TODO: Laramie20100728 temp fix, made-up displaySuffix.
 
@@ -372,10 +365,6 @@ public class Sample {
             	person.setTitle(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.NAME_ADDITIONS))!=null)
             	person.setNameAdditions(value);
-            if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_DATE))!=null)
-            	person.setBirthDate(value);
-            if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_DATE))!=null)
-            	person.setDeathDate(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_PLACE))!=null)
             	person.setBirthPlace(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_PLACE))!=null)

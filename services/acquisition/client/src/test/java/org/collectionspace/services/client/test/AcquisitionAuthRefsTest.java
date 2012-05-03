@@ -112,11 +112,11 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		createPersonRefs();
 
 		PoxPayloadOut multipart = createAcquisitionInstance(
-				"April 1, 2010",
 				acquisitionAuthorizerRefName,
 				acquisitionFundingSourcesRefNames,
 				ownersRefNames,
 				acquisitionSourcesRefNames);
+                                // "April 1, 2010",
 
 		AcquisitionClient acquisitionClient = new AcquisitionClient();
 		ClientResponse<Response> res = acquisitionClient.create(multipart);
@@ -367,14 +367,14 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 	}
 
 	private PoxPayloadOut createAcquisitionInstance(
-			String accessionDate,
 			String acquisitionAuthorizer,
 			List<String> acquisitionFundingSources,
 			List<String> acqOwners,
 			List<String> acquisitionSources) {
+                            // String accessionDate,
 
 		AcquisitionsCommon acquisition = new AcquisitionsCommon();
-		acquisition.setAccessionDate(accessionDate);
+        // acquisition.setAccessionDate(accessionDate);
 		acquisition.setAcquisitionAuthorizer(acquisitionAuthorizer);
 
 		// AcquisitionFunding-related authrefs fields are *not* currently

@@ -66,7 +66,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
     private String depositorRefName = null;
-    private String exitDate = null;
+    // private String exitDate = null;
     private String exitNumber = null;
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.currentDateUTC();
@@ -91,14 +91,15 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    private PoxPayloadOut createObjectExitInstance(String depositorRefName, String exitNumber, String exitDate) {
-        this.exitDate = exitDate;
+    private PoxPayloadOut createObjectExitInstance(String depositorRefName, String exitNumber) {
+        // , String exitDate
+        // this.exitDate = exitDate;
         this.exitNumber = exitNumber;
         this.depositorRefName = depositorRefName;
         ObjectexitCommon objectexit = new ObjectexitCommon();
         objectexit.setDepositor(depositorRefName);
         objectexit.setExitNumber(exitNumber);
-        objectexit.setExitDate(exitDate);
+        // objectexit.setExitDate(exitDate);
 
         PoxPayloadOut multipart = new PoxPayloadOut(ObjectExitClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(new ObjectExitClient().getCommonPartName(),
@@ -116,7 +117,8 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         //    references, and will refer to Person resources by their refNames.
         ObjectExitClient objectexitClient = new ObjectExitClient();
         PoxPayloadOut multipart = createObjectExitInstance(depositorRefName,
-                "exitNumber-" + identifier, CURRENT_DATE_UTC);
+                "exitNumber-" + identifier);
+                // , CURRENT_DATE_UTC
         ClientResponse<Response> res = objectexitClient.create(multipart);
         try {
 	        assertStatusCode(res, testName);

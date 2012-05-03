@@ -17,8 +17,6 @@ public interface PersonJAXBSchema extends AuthorityItemJAXBSchema {
 	final static String SALUTATIONS = "salutations";
 	final static String TITLE = "title";
 	final static String NAME_ADDITIONS = "nameAdditions";
-	final static String BIRTH_DATE = "birthDate";
-	final static String DEATH_DATE = "deathDate";
 	final static String BIRTH_PLACE = "birthPlace";
 	final static String DEATH_PLACE = "deathPlace";
 	final static String GROUPS = "groups";

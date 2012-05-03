@@ -126,7 +126,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, TEST_ORG_SHORTNAME);
         testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
-        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
+        // testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
 
         return OrgAuthorityClientUtils.createOrganizationInstance(identifier, testOrgMap, headerLabel);
@@ -153,7 +153,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, TEST_ORG_SHORTNAME);
         testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
-        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
+        // testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
 
         Map<String, List<String>> testOrgRepeatablesMap = new HashMap<String, List<String>>();

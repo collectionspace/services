@@ -311,10 +311,10 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         Assert.assertTrue(acqSources.size() > 0);
         Assert.assertNotNull(acqSources.get(0));
 
-        List<String> acqDates =
-                acquisitionObject.getAcquisitionDates().getAcquisitionDate();
-        Assert.assertTrue(acqDates.size() > 0);
-        Assert.assertNotNull(acqDates.get(0));
+        // List<String> acqDates =
+        //         acquisitionObject.getAcquisitionDates().getAcquisitionDate();
+        // Assert.assertTrue(acqDates.size() > 0);
+        // Assert.assertNotNull(acqDates.get(0));
 
         List<String> owners =
                 acquisitionObject.getOwners().getOwner();
@@ -703,11 +703,11 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         acqSources.add("Museum Acquisition Source-" + identifier);
         acquisition.setAcquisitionSources(acqSourcesList);
 
-        AcquisitionDateList acqDatesList = new AcquisitionDateList();
-        List<String> acqDates = acqDatesList.getAcquisitionDate();
-        acqDates.add(CURRENT_DATE_UTC);
-        acqDates.add(CURRENT_DATE_UTC);
-        acquisition.setAcquisitionDates(acqDatesList);
+        // AcquisitionDateList acqDatesList = new AcquisitionDateList();
+        // List<String> acqDates = acqDatesList.getAcquisitionDate();
+        // acqDates.add(CURRENT_DATE_UTC);
+        // acqDates.add(CURRENT_DATE_UTC);
+        // acquisition.setAcquisitionDates(acqDatesList);
 
         OwnerList ownersList = new OwnerList();
         List<String> owners = ownersList.getOwner();

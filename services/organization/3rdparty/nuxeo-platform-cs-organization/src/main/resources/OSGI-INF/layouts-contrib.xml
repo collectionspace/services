@@ -89,8 +89,8 @@
         <!-- Repeatable fields are commented out for now until we -->
         <!-- identify how to represent these complex types in layouts. -->
 <!--        <row><widget>contactName</widget></row>-->
-        <row><widget>foundingDate</widget></row>
-        <row><widget>dissolutionDate</widget></row>
+        <!-- <row><widget>foundingDate</widget></row>
+        <row><widget>dissolutionDate</widget></row> -->
         <row><widget>foundingPlace</widget></row>
 <!--        <row><widget>group</widget></row> -->
 <!--        <row><widget>function</widget></row> -->
@@ -217,7 +217,6 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
--->
       
       <widget name="foundingDate" type="text">
         <labels>
@@ -244,7 +243,7 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
+-->      
       <widget name="foundingPlace" type="text">
         <labels>
           <label mode="any">foundingPlace</label>

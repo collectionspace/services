@@ -90,10 +90,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     final String TEST_MIDDLE_NAME = null;
     /** The test surname. */
     final String TEST_SUR_NAME = "Wayne";
-    /** The test birthdate. */
-    final String TEST_BIRTH_DATE = "May 26, 1907";
-    /** The test death date. */
-    final String TEST_DEATH_DATE = "June 11, 1979";
     //private String knownResourceRefName = null;
     private String knownItemResourceShortIdentifer = null;
     // The resource ID of an item resource used for partial term matching tests.
@@ -223,9 +219,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         johnWayneMap.put(PersonJAXBSchema.FORE_NAME, TEST_FORE_NAME);
         johnWayneMap.put(PersonJAXBSchema.SUR_NAME, TEST_SUR_NAME);
         johnWayneMap.put(PersonJAXBSchema.GENDER, "male");
-        johnWayneMap.put(PersonJAXBSchema.BIRTH_DATE, TEST_BIRTH_DATE);
         johnWayneMap.put(PersonJAXBSchema.BIRTH_PLACE, "Winterset, Iowa");
-        johnWayneMap.put(PersonJAXBSchema.DEATH_DATE, TEST_DEATH_DATE);
         johnWayneMap.put(PersonJAXBSchema.BIO_NOTE, "born Marion Robert Morrison and better"
                 + "known by his stage name John Wayne, was an American film actor, director "
                 + "and producer. He epitomized rugged masculinity and has become an enduring "
@@ -652,15 +646,15 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         String displayName = person.getDisplayName();
         String expectedDisplayName =
                 PersonAuthorityClientUtils.prepareDefaultDisplayName(
-                TEST_FORE_NAME, null, TEST_SUR_NAME,
-                TEST_BIRTH_DATE, TEST_DEATH_DATE);
+                TEST_FORE_NAME, null, TEST_SUR_NAME);
         Assert.assertFalse(displayName.equals(expectedDisplayName));
 
         // Make sure short displayName matches computed form
         String shortDisplayName = person.getShortDisplayName();
         String expectedShortDisplayName =
                 PersonAuthorityClientUtils.prepareDefaultDisplayName(
-                TEST_FORE_NAME, null, TEST_SUR_NAME, null, null);
+                TEST_FORE_NAME, null, TEST_SUR_NAME);
+                // , null
         Assert.assertFalse(expectedShortDisplayName.equals(shortDisplayName));
 
         // Update the forename and verify the computed name is updated.
@@ -670,11 +664,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         person.setForeName("updated-" + TEST_FORE_NAME);
         expectedDisplayName =
                 PersonAuthorityClientUtils.prepareDefaultDisplayName(
-                "updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME,
-                TEST_BIRTH_DATE, TEST_DEATH_DATE);
+                "updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME);
         expectedShortDisplayName =
                 PersonAuthorityClientUtils.prepareDefaultDisplayName(
-                "updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME, null, null);
+                "updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME);
+                // , null
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
