@@ -154,7 +154,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         for (int i = 0; i < nFields; i++) {
             ListResultField field = list.get(i);
             String elName = field.getElement();
-            if (AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName)) {
+            if (AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName)) { //FIXME: Add a special if-case for Vocabulary item's displayName
                 hasDisplayName = true;
             } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
                 hasShortId = true;
@@ -167,7 +167,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         ListResultField field;
         if (!hasDisplayName) {
             field = new ListResultField();
-            // Per CSPACE-5132, the name of this element remains 'displayName'
+            // Per CSPACE-5132, the name of this element remains 'displayName' //FIXME: Add a special case again for Vocab item's displayName
             // for backwards compatibility, although its value is obtained
             // from the termDisplayName field.
             //
@@ -238,7 +238,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // First, get a copy of the old displayName
         // oldDisplayNameOnUpdate = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
         //        AuthorityItemJAXBSchema.DISPLAY_NAME);
-        oldDisplayNameOnUpdate = (String) getStringValueInPrimaryRepeatingComplexProperty(
+        oldDisplayNameOnUpdate = (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
                 wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
                 getItemTermInfoGroupXPathBase(),
                 AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
@@ -248,7 +248,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // handleComputedDisplayNames(wrapDoc.getWrappedObject());
         // String newDisplayName = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
         //        AuthorityItemJAXBSchema.DISPLAY_NAME);
-        String newDisplayName = (String) getStringValueInPrimaryRepeatingComplexProperty(
+        String newDisplayName = (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
                 wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
                 this.authorityItemTermGroupXPathBase,
                 AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
@@ -268,9 +268,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * @param docModel the doc model
      * @throws Exception the exception
      */
-    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
-        // Do nothing by default.
-    }
+//    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
+//        // Do nothing by default.
+//    }
 
     /**
      * Handle refName updates for changes to display name.
@@ -331,12 +331,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         String termDisplayName =
-                (String) getStringValueInPrimaryRepeatingComplexProperty(
+                (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
                     docModel, authorityItemCommonSchemaName,
                     getItemTermInfoGroupXPathBase(),
                     AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
         String termName = 
-                (String) getStringValueInPrimaryRepeatingComplexProperty(
+                (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
                     docModel, authorityItemCommonSchemaName,
                     getItemTermInfoGroupXPathBase(),
                     AuthorityItemJAXBSchema.TERM_NAME);
@@ -364,7 +364,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         DocumentModel docModel = wrapDoc.getWrappedObject();
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         String displayName =
-                (String) getStringValueInPrimaryRepeatingComplexProperty(
+                (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
                     docModel, authorityItemCommonSchemaName,
                     getItemTermInfoGroupXPathBase(),
                     AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);

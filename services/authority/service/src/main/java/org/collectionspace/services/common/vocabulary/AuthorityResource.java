@@ -649,6 +649,20 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result.getBytes();
     }
 
+    /*
+     * Most of the authority child classes will use this method.  However, the Vocabulary service's item schema is
+     * different enough that it will have to override this method in it's resource class.
+     */
+	protected String getQualifiedDisplayNameField() {
+		String result = null;
+
+		result = NuxeoUtils.getPrimaryElPathPropertyName(
+				authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(),
+				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+
+		return result;
+	}
+    
     /**
      * Gets the authorityItem list for the specified authority
      * If partialPerm is specified, keywords will be ignored.
@@ -672,9 +686,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
 
-            String qualifiedDisplayNameField =
-                    NuxeoUtils.getPrimaryElPathPropertyName(authorityItemCommonSchemaName,
-                        getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+            String qualifiedDisplayNameField = getQualifiedDisplayNameField();
 
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;

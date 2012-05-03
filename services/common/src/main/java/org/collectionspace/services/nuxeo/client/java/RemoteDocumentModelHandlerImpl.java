@@ -671,7 +671,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param listName The name of the scalar list property
      * @return first value in list, as a String, or empty string if the list is empty
      */
-    protected String getStringValueInPrimaryRepeatingComplexProperty(
+    protected String getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
     		DocumentModel docModel, String schema, String complexPropertyName, String fieldName) {
     	String xpath = "/" + NuxeoUtils.getPrimaryXPathPropertyName(schema, complexPropertyName, fieldName);
     	try {
