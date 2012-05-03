@@ -167,7 +167,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         ListResultField field;
         if (!hasDisplayName) {
             field = new ListResultField();
-            field.setElement(AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+            // Per CSPACE-5132, the name of this element remains 'displayName'
+            // for backwards compatibility, although its value is obtained
+            // from the termDisplayName field.
+            //
+            // In CSPACE-5134, these list results will change substantially
+            // to return display names for both the preferred term and for
+            // each non-preferred term (if any).
+            field.setElement(AuthorityItemJAXBSchema.DISPLAY_NAME);
             field.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
                     authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME));
             list.add(field);

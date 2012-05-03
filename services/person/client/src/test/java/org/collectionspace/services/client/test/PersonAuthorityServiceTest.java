@@ -824,8 +824,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                     AbstractCommonListUtils.ListItemGetElementValue(item, AuthorityItemJAXBSchema.REF_NAME);
             Assert.assertTrue((null != value), "Item refName is null!");
             
+            // Per CSPACE-5132, lists items still return a field named displayName,
+            // not termDisplayName, for backward compatibility.
+            // (The format of list items will change significantly in CSPACE-5134.)
             value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+                    AbstractCommonListUtils.ListItemGetElementValue(item, AuthorityItemJAXBSchema.DISPLAY_NAME);
             Assert.assertTrue((null != value), "Item displayName is null!");
         }
         if (logger.isTraceEnabled()) {
