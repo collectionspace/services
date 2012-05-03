@@ -72,11 +72,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
     /** The logger. */
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    private final String REFNAME = "refName";
-    private final String TERM_DISPLAY_NAME = "termDisplayName";
-    // private final String TERM_DISPLAY_NAME_ELPATH =
-    //        NuxeoUtils.getPrimaryElPathPropertyName(null,
-    //            new PersonAuthorityClient().getTermInfoGroupXpathBase(), TERM_DISPLAY_NAME);
 
     @Override
     public String getServicePathComponent() {
@@ -679,6 +674,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         List<PersonTermGroup> terms = termList.getPersonTermGroup();
         Assert.assertNotNull(terms);
         terms.get(0).setTermDisplayName(null);
+        terms.get(0).setTermName(null);
 
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
@@ -825,11 +821,11 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 
         for (AbstractCommonList.ListItem item : items) {
             String value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
+                    AbstractCommonListUtils.ListItemGetElementValue(item, AuthorityItemJAXBSchema.REF_NAME);
             Assert.assertTrue((null != value), "Item refName is null!");
             
             value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, TERM_DISPLAY_NAME);
+                    AbstractCommonListUtils.ListItemGetElementValue(item, AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
             Assert.assertTrue((null != value), "Item displayName is null!");
         }
         if (logger.isTraceEnabled()) {
@@ -1430,6 +1426,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
+        term.setTermDisplayName("John Wayne");
+        term.setTermName("John Wayne");
         term.setForeName("John");
         term.setSurName("Wayne");
         terms.add(term);

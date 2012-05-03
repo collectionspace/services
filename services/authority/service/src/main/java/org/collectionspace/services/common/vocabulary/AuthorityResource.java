@@ -675,11 +675,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String qualifiedDisplayNameField =
                     NuxeoUtils.getPrimaryElPathPropertyName(authorityItemCommonSchemaName,
                         getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-                    // authorityItemCommonSchemaName + ":" + getItemTermInfoGroupXPathBase()
-                    //    + "/0/" + AuthorityItemJAXBSchema.TERM_DISPLAY_NAME;
-
-                    // NuxeoUtils.getPrimaryXPathPropertyName(authorityItemCommonSchemaName, 
-                    //     getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
 
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;

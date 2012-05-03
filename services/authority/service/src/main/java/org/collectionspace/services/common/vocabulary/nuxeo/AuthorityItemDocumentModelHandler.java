@@ -170,7 +170,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             field.setElement(AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
             field.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
                     authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME));
-            // field.setXpath(AuthorityItemJAXBSchema.DISPLAY_NAME);
             list.add(field);
         }
         if (!hasShortId) {
@@ -190,7 +189,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             field.setElement(AuthorityItemJAXBSchema.TERM_STATUS);
             field.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
                     authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_STATUS));
-            // field.setXpath(AuthorityItemJAXBSchema.TERM_STATUS);
             list.add(field);
         }
         return list;
@@ -217,7 +215,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             logger.warn("Creating Authority Item with no displayName!");
         }
         *
-        */
+        */        
+        
         // CSPACE-3178:
         // handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
         // refName includes displayName, so we force a correct value here.
