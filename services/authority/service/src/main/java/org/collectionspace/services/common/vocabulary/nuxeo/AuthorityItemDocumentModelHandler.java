@@ -140,6 +140,25 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         this.authorityRefNameBase = value;
     }
 
+    /*
+     * Note that the Vocabulary service's item-documentmodel-handler will override this method.
+     */
+    protected ListResultField getListResultField() {
+    	ListResultField result = new ListResultField();
+    	// Per CSPACE-5132, the name of this element remains 'displayName'
+        // for backwards compatibility, although its value is obtained
+        // from the termDisplayName field.
+        //
+        // In CSPACE-5134, these list results will change substantially
+        // to return display names for both the preferred term and for
+        // each non-preferred term (if any).
+    	result.setElement(AuthorityItemJAXBSchema.DISPLAY_NAME);
+    	result.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
+                authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME));
+    	
+    	return result;
+    }
+    
     @Override
     public List<ListResultField> getListItemsArray() throws DocumentException {
         List<ListResultField> list = super.getListItemsArray();
@@ -154,7 +173,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         for (int i = 0; i < nFields; i++) {
             ListResultField field = list.get(i);
             String elName = field.getElement();
-            if (AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName)) { //FIXME: Add a special if-case for Vocabulary item's displayName
+            if (AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName) || AuthorityItemJAXBSchema.DISPLAY_NAME.equals(elName)) {
                 hasDisplayName = true;
             } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
                 hasShortId = true;
@@ -166,17 +185,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
         ListResultField field;
         if (!hasDisplayName) {
-            field = new ListResultField();
-            // Per CSPACE-5132, the name of this element remains 'displayName' //FIXME: Add a special case again for Vocab item's displayName
-            // for backwards compatibility, although its value is obtained
-            // from the termDisplayName field.
-            //
-            // In CSPACE-5134, these list results will change substantially
-            // to return display names for both the preferred term and for
-            // each non-preferred term (if any).
-            field.setElement(AuthorityItemJAXBSchema.DISPLAY_NAME);
-            field.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
-                    authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME));
+        	field = getListResultField();
             list.add(field);
         }
         if (!hasShortId) {
@@ -198,8 +207,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                     authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_STATUS));
             list.add(field);
         }
+        
         return list;
-
     }
 
 
@@ -212,17 +221,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         super.handleCreate(wrapDoc);
         // Ensure we have required fields set properly
         handleInAuthority(wrapDoc.getWrappedObject());
-
-        // CSPACE-4813
-        /*
-        handleComputedDisplayNames(wrapDoc.getWrappedObject());
-        String displayName = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
-                AuthorityItemJAXBSchema.DISPLAY_NAME);
-        if (Tools.isEmpty(displayName)) {
-            logger.warn("Creating Authority Item with no displayName!");
-        }
-        *
-        */        
         
         // CSPACE-3178:
         // handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
@@ -230,6 +228,18 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         updateRefnameForAuthorityItem(wrapDoc, authorityItemCommonSchemaName, getAuthorityRefNameBase());
     }
 
+    /*
+     * Note that the Vocabulary service's document-model for items overrides this method.
+     */
+	protected String getPrimaryDisplayName(DocumentModel docModel, String schema,
+			String complexPropertyName, String fieldName) {
+		String result = null;
+
+		result = getStringValueInPrimaryRepeatingComplexProperty(docModel, schema, complexPropertyName, fieldName);
+		
+		return result;
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
      */
@@ -238,18 +248,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // First, get a copy of the old displayName
         // oldDisplayNameOnUpdate = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
         //        AuthorityItemJAXBSchema.DISPLAY_NAME);
-        oldDisplayNameOnUpdate = (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
-                wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
-                getItemTermInfoGroupXPathBase(),
-                AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+        oldDisplayNameOnUpdate = getPrimaryDisplayName(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
+                getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
         oldRefNameOnUpdate = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
                 AuthorityItemJAXBSchema.REF_NAME);
         super.handleUpdate(wrapDoc);
-        // handleComputedDisplayNames(wrapDoc.getWrappedObject());
-        // String newDisplayName = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
-        //        AuthorityItemJAXBSchema.DISPLAY_NAME);
-        String newDisplayName = (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
-                wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
+
+        // Now, check the new display and handle the refname update.
+        String newDisplayName = (String) getPrimaryDisplayName(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
                 this.authorityItemTermGroupXPathBase,
                 AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
         if (newDisplayName != null && !newDisplayName.equals(oldDisplayNameOnUpdate)) {
@@ -328,24 +334,28 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * If no short identifier was provided in the input payload, generate a
      * short identifier from the preferred term display name or term name.
      */
-    private void handleDisplayNameAsShortIdentifier(DocumentModel docModel, String schemaName) throws Exception {
-        String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-        String termDisplayName =
-                (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
-                    docModel, authorityItemCommonSchemaName,
-                    getItemTermInfoGroupXPathBase(),
-                    AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-        String termName = 
-                (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
-                    docModel, authorityItemCommonSchemaName,
-                    getItemTermInfoGroupXPathBase(),
-                    AuthorityItemJAXBSchema.TERM_NAME);
-        if (Tools.isEmpty(shortIdentifier)) {
-            String generatedShortIdentifier =
-                    AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(termDisplayName, termName);
-            docModel.setProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER, generatedShortIdentifier);
-        }
-    }
+	private void handleDisplayNameAsShortIdentifier(DocumentModel docModel,
+			String schemaName) throws Exception {
+		String shortIdentifier = (String) docModel.getProperty(schemaName,
+				AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+
+		String termDisplayName = getPrimaryDisplayName(
+				docModel, authorityItemCommonSchemaName,
+				getItemTermInfoGroupXPathBase(),
+				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+
+		String termName = getPrimaryDisplayName(
+				docModel, authorityItemCommonSchemaName,
+				getItemTermInfoGroupXPathBase(),
+				AuthorityItemJAXBSchema.TERM_NAME);
+
+		if (Tools.isEmpty(shortIdentifier)) {
+			String generatedShortIdentifier = AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(termDisplayName,
+							termName);
+			docModel.setProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER,
+					generatedShortIdentifier);
+		}
+	}
 
     /**
      * Generate a refName for the authority item from the short identifier
@@ -363,14 +373,13 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             String authorityRefBaseName) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
         String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-        String displayName =
-                (String) getStringValueInPrimaryRepeatingComplexProperty( //FIXME - This won't work for vocabulary items
-                    docModel, authorityItemCommonSchemaName,
-                    getItemTermInfoGroupXPathBase(),
-                    AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+        String displayName = getPrimaryDisplayName(docModel, authorityItemCommonSchemaName,
+                    getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+        
         if (Tools.isEmpty(authorityRefBaseName)) {
             throw new Exception("Could not create the refName for this authority term, because the refName for its authority parent was empty.");
         }
+        
         RefName.Authority authority = RefName.Authority.parse(authorityRefBaseName);
         String refName = RefName.buildAuthorityItem(authority, shortIdentifier, displayName).toString();
         docModel.setProperty(schemaName, AuthorityItemJAXBSchema.REF_NAME, refName);
@@ -1119,5 +1128,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         
     public void setItemTermInfoGroupXPathBase(String itemTermInfoGroupXPathBase) {
         this.authorityItemTermGroupXPathBase = itemTermInfoGroupXPathBase;
+    }
+    
+    protected String getAuthorityItemCommonSchemaName() {
+    	return authorityItemCommonSchemaName;
     }
 }
