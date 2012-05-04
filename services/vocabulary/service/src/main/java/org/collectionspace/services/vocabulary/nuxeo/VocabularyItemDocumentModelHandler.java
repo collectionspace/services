@@ -28,9 +28,8 @@ import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.config.service.ListResultField;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
@@ -79,7 +78,7 @@ public class VocabularyItemDocumentModelHandler
 		String result = null;
 
 		try {
-			result = (String) docModel.getProperty(schema, AuthorityItemJAXBSchema.DISPLAY_NAME);
+			result = (String) docModel.getProperty(schema, VocabularyItemJAXBSchema.DISPLAY_NAME);
 		} catch (Exception e) {
 			throw new RuntimeException("Unknown problem retrieving property {"
 					+ schema + ":" + fieldName + "}." + e.getLocalizedMessage());
@@ -92,16 +91,23 @@ public class VocabularyItemDocumentModelHandler
      * Because the Vocabulary service's item schema is not standard, we need to override this method.
      */
     @Override
-	protected ListResultField getListResultField() {
+	protected ListResultField getListResultsDisplayNameField() {
 		ListResultField result = new ListResultField();
 
 		result.setElement(AuthorityItemJAXBSchema.DISPLAY_NAME);
-		result.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(this.getAuthorityItemCommonSchemaName(),
-				getItemTermInfoGroupXPathBase(),
-				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME));
+		result.setXpath(AuthorityItemJAXBSchema.DISPLAY_NAME);
 
 		return result;
 	}
+    
+    protected ListResultField getListResultsTermStatusField() {
+		ListResultField result = new ListResultField();
+
+		result.setElement(VocabularyItemJAXBSchema.DISPLAY_NAME);
+		result.setXpath(VocabularyItemJAXBSchema.TERM_STATUS);
+
+		return result;
+    }    
     
 }
 

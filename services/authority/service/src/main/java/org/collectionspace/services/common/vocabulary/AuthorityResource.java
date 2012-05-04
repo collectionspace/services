@@ -422,7 +422,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      */
     @GET
     @Produces("application/xml")
-    public AbstractCommonList getAuthorityList(@Context UriInfo ui) {
+    public AbstractCommonList getAuthorityList(@Context UriInfo ui) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);

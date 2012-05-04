@@ -74,7 +74,7 @@ public class VocabularyClientUtils {
 
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+itemMap.get(AuthorityItemJAXBSchema.SHORT_IDENTIFIER)
-    				+"\" in personAuthority: \"" + vcsid +"\"");
+    				+"\" in vocabularyAuthority: \"" + vcsid +"\"");
     	}
     	PoxPayloadOut multipart = createVocabularyItemInstance(null, //vocabularyRefName,
     				itemMap, client.getItemCommonPartName());
@@ -89,7 +89,7 @@ public class VocabularyClientUtils {
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating Item: \""+itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-    				+ "\" in personAuthority: \"" + vcsid /*vocabularyRefName*/ + "\", Status:" + statusCode);
+    				+ "\" in vocabularyAuthority: \"" + vcsid /*vocabularyRefName*/ + "\", Status:" + statusCode);
     	}
 
     	return extractId(res);

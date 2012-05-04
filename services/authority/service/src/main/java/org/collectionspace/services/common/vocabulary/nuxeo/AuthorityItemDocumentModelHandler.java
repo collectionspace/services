@@ -141,9 +141,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
 
     /*
-     * Note that the Vocabulary service's item-documentmodel-handler will override this method.
+     * Note: the Vocabulary service's VocabularyItemDocumentModelHandler class overrides this method.
      */
-    protected ListResultField getListResultField() {
+    protected ListResultField getListResultsDisplayNameField() {
     	ListResultField result = new ListResultField();
     	// Per CSPACE-5132, the name of this element remains 'displayName'
         // for backwards compatibility, although its value is obtained
@@ -158,6 +158,19 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	
     	return result;
     }
+    
+    /*
+     * Note: the Vocabulary service's VocabularyItemDocumentModelHandler class overrides this method.
+     */    
+    protected ListResultField getListResultsTermStatusField() {
+    	ListResultField result = new ListResultField();
+        
+    	result.setElement(AuthorityItemJAXBSchema.TERM_STATUS);
+    	result.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
+                authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_STATUS));
+
+        return result;
+    }    
     
     @Override
     public List<ListResultField> getListItemsArray() throws DocumentException {
@@ -185,7 +198,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
         ListResultField field;
         if (!hasDisplayName) {
-        	field = getListResultField();
+        	field = getListResultsDisplayNameField();
             list.add(field);
         }
         if (!hasShortId) {
@@ -201,10 +214,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             list.add(field);
         }
         if (!hasTermStatus) {
-            field = new ListResultField();
-            field.setElement(AuthorityItemJAXBSchema.TERM_STATUS);
-            field.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
-                    authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_STATUS));
+            field = getListResultsTermStatusField();
             list.add(field);
         }
         
@@ -256,7 +266,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
         // Now, check the new display and handle the refname update.
         String newDisplayName = (String) getPrimaryDisplayName(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
-                this.authorityItemTermGroupXPathBase,
+                authorityItemTermGroupXPathBase,
                 AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
         if (newDisplayName != null && !newDisplayName.equals(oldDisplayNameOnUpdate)) {
             // Need to update the refName, and then fix all references.
@@ -1123,11 +1133,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     //============================= END TODO refactor ==========================
 
     public String getItemTermInfoGroupXPathBase() {
-        return this.authorityItemTermGroupXPathBase;
+        return authorityItemTermGroupXPathBase;
     }
         
     public void setItemTermInfoGroupXPathBase(String itemTermInfoGroupXPathBase) {
-        this.authorityItemTermGroupXPathBase = itemTermInfoGroupXPathBase;
+        authorityItemTermGroupXPathBase = itemTermInfoGroupXPathBase;
     }
     
     protected String getAuthorityItemCommonSchemaName() {

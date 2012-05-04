@@ -91,6 +91,6 @@ public class VocabularyResource extends
 	 */
 	@Override
 	public String getItemTermInfoGroupXPathBase() {
-		throw new UnsupportedOperationException("operation not relevant for AccountDocumentHandler");
+		return null;
 	}
 }
