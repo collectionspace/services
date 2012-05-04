@@ -44,9 +44,7 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="foundingDate" type="structuredDateGroup"/>
-    <!-- <xs:element name="foundingDate" type="xs:string"/> -->
     <xs:element name="dissolutionDate" type="structuredDateGroup"/>
-    <!-- <xs:element name="dissolutionDate" type="xs:string"/> -->
     <xs:element name="foundingPlace" type="xs:string"/>
     <xs:element name="groups">
         <xs:complexType>

@@ -10,10 +10,8 @@
         <template mode="any">/layouts/layout_default_template.xhtml</template>
       </templates>
       <rows>
-        <!-- <row><widget>accessionDate</widget></row> -->
         <row><widget>acquisitionAuthorizer</widget></row>
         <row><widget>acquisitionAuthorizerDate</widget></row>
-        <row><widget>acquisitionDate</widget></row>
         <row><widget>acquisitionFundingCurrency</widget></row>
         <row><widget>acquisitionFundingValue</widget></row>
         <row><widget>acquisitionFundingSource</widget></row>
@@ -38,19 +36,6 @@
         <row><widget>transferOfTitleNumber</widget></row>
         <row><widget>fieldCollectionEventName</widget></row>
       </rows>
-
-      <!-- <widget name="accessionDate" type="text">
-        <labels>
-          <label mode="any">accessionDate</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field>acquisitions_common:accessionDate</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget> -->
       
       <widget name="acquisitionAuthorizer" type="text">
         <labels>
@@ -77,20 +62,7 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
-      <widget name="acquisitionDate" type="text">
-        <labels>
-          <label mode="any">acquisitionDate</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field>acquisitions_common:acquisitionDate</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-      
+            
       <widget name="acquisitionFundingCurrency" type="text">
         <labels>
           <label mode="any">acquisitionFundingCurrency</label>

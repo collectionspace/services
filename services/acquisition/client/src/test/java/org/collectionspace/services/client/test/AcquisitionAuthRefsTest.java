@@ -371,10 +371,8 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 			List<String> acquisitionFundingSources,
 			List<String> acqOwners,
 			List<String> acquisitionSources) {
-                            // String accessionDate,
 
 		AcquisitionsCommon acquisition = new AcquisitionsCommon();
-        // acquisition.setAccessionDate(accessionDate);
 		acquisition.setAcquisitionAuthorizer(acquisitionAuthorizer);
 
 		// AcquisitionFunding-related authrefs fields are *not* currently

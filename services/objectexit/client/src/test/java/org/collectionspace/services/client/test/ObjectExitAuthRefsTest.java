@@ -66,7 +66,6 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
     private String depositorRefName = null;
-    // private String exitDate = null;
     private String exitNumber = null;
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.currentDateUTC();
@@ -92,14 +91,11 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
     }
 
     private PoxPayloadOut createObjectExitInstance(String depositorRefName, String exitNumber) {
-        // , String exitDate
-        // this.exitDate = exitDate;
         this.exitNumber = exitNumber;
         this.depositorRefName = depositorRefName;
         ObjectexitCommon objectexit = new ObjectexitCommon();
         objectexit.setDepositor(depositorRefName);
         objectexit.setExitNumber(exitNumber);
-        // objectexit.setExitDate(exitDate);
 
         PoxPayloadOut multipart = new PoxPayloadOut(ObjectExitClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(new ObjectExitClient().getCommonPartName(),

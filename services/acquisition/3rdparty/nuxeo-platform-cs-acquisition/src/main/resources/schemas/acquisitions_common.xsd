@@ -32,15 +32,6 @@
         </xs:complexType>
     </xs:element>
     
-    <!-- <xs:element name="acquisitionDateGroupList" type="acquisitionDateGroupList"/>
-    
-    <xs:complexType name="acquisitionDateGroupList">
-        <xs:sequence>
-            <xs:element name="acquisitionDateGroup" type="structuredDateGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType> -->
-    
     <xs:element name="acquisitionFundingList" type="acquisitionFundingList"/>
     <xs:element name="acquisitionMethod" type="xs:string"/>
     <xs:element name="acquisitionNote" type="xs:string"/>

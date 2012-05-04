@@ -88,9 +88,7 @@
         <row><widget>nameAdditions</widget></row>
         <!-- Repeatable fields are commented out for now until we -->
         <!-- identify how to represent these complex types in layouts. -->
-<!--        <row><widget>contactName</widget></row>-->
-        <!-- <row><widget>foundingDate</widget></row>
-        <row><widget>dissolutionDate</widget></row> -->
+<!--        <row><widget>contactName</widget></row> -->
         <row><widget>foundingPlace</widget></row>
 <!--        <row><widget>group</widget></row> -->
 <!--        <row><widget>function</widget></row> -->
@@ -212,32 +210,6 @@
         <translated>true</translated>
         <fields>
           <field schema="organizations_common">contactName</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-      
-      <widget name="foundingDate" type="text">
-        <labels>
-          <label mode="any">foundingDate</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="organizations_common">foundingDate</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-      
-      <widget name="dissolutionDate" type="text">
-        <labels>
-          <label mode="any">dissolutionDate</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="organizations_common">dissolutionDate</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
