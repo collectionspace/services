@@ -1041,6 +1041,10 @@
               <types:value>borrowersContact</types:value>
             </types:item>
             <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                <types:key>authRef</types:key>
+                <types:value>borrowersAuthorizer</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/config/types">
               <types:key>authRef</types:key>
               <types:value>lendersAuthorizer</types:value>
             </types:item>
@@ -2326,6 +2330,10 @@
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>placeOwnerGroupList/*/owner</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>placeGeoRefGroupList/*/geoReferencedBy</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>

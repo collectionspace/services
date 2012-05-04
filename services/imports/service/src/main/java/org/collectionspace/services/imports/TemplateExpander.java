@@ -59,7 +59,7 @@ public class TemplateExpander {
      * @return the expanded template.
      */
     public static String searchAndReplaceVar(String source, String theVar, String replace){
-        return Tools.searchAndReplace(source, var(theVar), replace);
+        return Tools.searchAndReplaceWithQuoteReplacement(source, var(theVar), replace);
     }
 
     public static String doOneService(String tenantId, String outDir, String partTmpl, String wrapperTmpl,
@@ -70,17 +70,17 @@ public class TemplateExpander {
         } else {
             docID = UUID.randomUUID().toString();
         }
-        String part = Tools.searchAndReplace(partTmpl, var("docID"), docID);
+        String part = searchAndReplaceVar(partTmpl, "docID", docID);
 
-        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("Schema"), part);
-        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("docID"), docID);
-        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("tenantID"), tenantId);
-        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("ServiceType"), SERVICE_TYPE);
-        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("ServiceName"), SERVICE_NAME);
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "Schema", part);
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "docID", docID);
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "tenantID", tenantId);
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "ServiceType", SERVICE_TYPE);
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "ServiceName", SERVICE_NAME);
         //TODO: set timestamp via creating a ${created} variable.
         String nowTime = GregorianCalendarDateTimeUtils.timestampUTC();
-        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("createdDate"), nowTime);
-        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("updatedDate"), nowTime);
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "createdDate", nowTime);
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedDate", nowTime);
 
         String serviceDir = outDir+'/'+docID;
         FileTools.saveFile(serviceDir, "document.xml", wrapperTmpl, true/*true=create parent dirs*/);
