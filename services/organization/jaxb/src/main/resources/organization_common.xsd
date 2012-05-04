@@ -29,7 +29,6 @@
                 
                 <xs:element name="mainBodyGroupList" type="mainBodyGroupList"/>
                 
-                <xs:element name="description" type="xs:string"/>
                 <xs:element name="foundingDate" type="xs:string"/>
                 <xs:element name="dissolutionDate" type="xs:string"/>
                 <xs:element name="foundingPlace" type="xs:string"/>
@@ -95,10 +94,10 @@
             <xs:element name="termStatus" type="xs:string"/>
             <xs:element name="termQualifier" type="xs:string"/>
             <xs:element name="termLanguage" type="xs:string"/>
-            <xs:element name="termPreferredForLanguage" type="xs:boolean"/>
+            <xs:element name="termPrefForLang" type="xs:boolean"/>
             <xs:element name="termSource" type="xs:string"/>
             <xs:element name="termSourceDetail" type="xs:string"/>
-            <xs:element name="termSourceUniqueID" type="xs:string"/>
+            <xs:element name="termSourceID" type="xs:string"/>
             <!-- Specific to Organization terms -->
         </xs:sequence>
     </xs:complexType>
