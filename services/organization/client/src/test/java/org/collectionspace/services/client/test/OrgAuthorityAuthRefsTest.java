@@ -40,9 +40,8 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.organization.MainBodyGroup;
-import org.collectionspace.services.organization.MainBodyGroupList;
 import org.collectionspace.services.organization.OrganizationsCommon;
+import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -194,22 +193,14 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         testOrgContactNames.add(organizationContactPersonRefName1);
         testOrgContactNames.add(organizationContactPersonRefName2);
         testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContactNames);
-        List<String> testOrgSubBodies = new ArrayList<String>();
-        testOrgSubBodies.add(subBodyRefName);
-        testOrgRepeatablesMap.put(OrganizationJAXBSchema.SUB_BODIES, testOrgSubBodies);
-
-        MainBodyGroupList mainBodyList = new MainBodyGroupList();
-        List<MainBodyGroup> mainBodyGroups = mainBodyList.getMainBodyGroup();
-        MainBodyGroup mainBodyGroup = new MainBodyGroup();
-        mainBodyGroup.setShortName("Test Organization-" + shortId);
-        mainBodyGroup.setLongName("Test Organization Name");
-        mainBodyGroups.add(mainBodyGroup);
+        
+        List<OrgTermGroup> terms = OrgAuthorityClientUtils.getTermGroupInstance("Org name");
 
         // Finishing creating the new Organization item, then
         // submit the request to the service and store the response.
         knownItemResourceId = OrgAuthorityClientUtils.createItemInAuthority(
         		knownResourceId, knownResourceRefName, testOrgMap,
-                        testOrgRepeatablesMap, mainBodyList, orgAuthClient);
+                        terms, testOrgRepeatablesMap, orgAuthClient);
 
         // Store the IDs from every item created by tests,
         // so they can be deleted after tests have been run.
@@ -241,13 +232,13 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-       	String csid = createPerson("Charlie", "Orgcontact", "charlieOrgcontact", null ); // authRefName);
+       	String csid = createPerson(personAuthCSID, "Charlie", "Orgcontact", "charlieOrgcontact", null ); // authRefName);
         personIdsCreated.add(csid);
         organizationContactPersonRefName1 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-       	csid = createPerson("Chelsie", "Contact", "chelsieContact", null ); // authRefName);
+       	csid = createPerson(personAuthCSID, "Chelsie", "Contact", "chelsieContact", null ); // authRefName);
         personIdsCreated.add(csid);
         organizationContactPersonRefName2 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
@@ -261,21 +252,21 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
      * @param authRefName
      * @return the string
      */
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+    protected String createPerson(String personAuthCSID, String firstName, String surName, String shortId, String authRefName ) {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
-        personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
-        personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
         String termName = firstName + " " + surName;
         term.setTermDisplayName(termName);
         term.setTermName(termName);
+        term.setForeName(firstName);
+        term.setSurName(surName);
         personTerms.add(term);
     	PoxPayloadOut multipart = 
     	    PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
-    	    		authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
+    	    		null, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         
     	String result = null;
     	ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);

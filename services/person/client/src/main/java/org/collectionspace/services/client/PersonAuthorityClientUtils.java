@@ -26,11 +26,7 @@
  */
 package org.collectionspace.services.client;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -173,6 +169,9 @@ public class PersonAuthorityClientUtils {
     		String headerLabel){
         final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO =
                 new HashMap<String, List<String>>();
+        if (terms == null || terms.size() == 0) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
+        }
         return createPersonInstance(inAuthority, null /*personAuthRefName*/,
                 personInfo, terms, EMPTY_PERSON_REPEATABLES_INFO, headerLabel);
     }
@@ -446,6 +445,17 @@ public class PersonAuthorityClientUtils {
 		return newStr.toString();
     }
     
-
+    public static List<PersonTermGroup> getTermGroupInstance(String identifier) {
+        List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        term.setTermDisplayName(identifier);
+        term.setTermName(identifier);
+        terms.add(term);
+        return terms;
+    }
+    
+    private static String getGeneratedIdentifier() {
+        return "id" + new Date().getTime(); 
+   }
 
 }

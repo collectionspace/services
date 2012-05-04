@@ -46,7 +46,6 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.collectionspace.services.person.PersonTermGroupList;
@@ -627,7 +626,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         }
     }
     
-    // FIXME: This test depends on server-side validation logic to require
+    // Note: This test depends on server-side validation logic to require
     // a non-null (and potentially, non-empty) displayname for each term,
     // and will fail if that validation is not present.
 
@@ -673,6 +672,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         Assert.assertNotNull(termList);
         List<PersonTermGroup> terms = termList.getPersonTermGroup();
         Assert.assertNotNull(terms);
+        Assert.assertTrue(terms.size() > 0);
         terms.get(0).setTermDisplayName(null);
         terms.get(0).setTermName(null);
 
@@ -1007,6 +1007,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         Assert.assertNotNull(termList);
         List<PersonTermGroup> terms = termList.getPersonTermGroup();
         Assert.assertNotNull(terms);
+        Assert.assertTrue(terms.size() > 0);
         String foreName = terms.get(0).getForeName();
         String updatedForeName = "updated-" + foreName;
         terms.get(0).setForeName(updatedForeName);

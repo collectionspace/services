@@ -1,14 +1,4 @@
 /**	
- * OrgAuthorityClientUtils.java
- *
- * {Purpose of This Class}
- *
- * {Other Notes Relating to This Class (Optional)}
- *
- * $LastChangedBy: $
- * $LastChangedRevision$
- * $LastChangedDate$
- *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -16,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright © 2009 {Contributing Institution}
+ * Copyright © 2009 University of California, Berkeley
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -36,7 +26,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.OrganizationJAXBSchema;
-import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.organization.ContactNameList;
 import org.collectionspace.services.organization.FunctionList;
@@ -46,15 +35,12 @@ import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.organization.OrgTermGroupList;
-import org.collectionspace.services.person.PersonauthoritiesCommon;
-import org.collectionspace.services.person.PersonsCommon;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class OrgAuthorityClientUtils.
+ * OrgAuthorityClientUtils.
  */
 public class OrgAuthorityClientUtils {
     
@@ -168,13 +154,17 @@ public class OrgAuthorityClientUtils {
      * @return the string
      */
     public static String createItemInAuthority( String inAuthority,
-    		String orgAuthorityRefName, List<OrgTermGroup> terms, Map<String, String> orgInfo,
+    		String orgAuthorityRefName, Map<String, String> orgInfo, List<OrgTermGroup> terms,
                 Map<String, List<String>> orgRepeatablesInfo, OrgAuthorityClient client) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-        String displayName = createDisplayName(orgInfo);
+
+        String displayName = "";
+        if (terms !=null && terms.size() > 0) {
+            displayName = terms.get(0).getTermDisplayName();
+        }
 
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+displayName
@@ -247,9 +237,11 @@ public class OrgAuthorityClientUtils {
        	String value = null;
         List<String> values = null;
         
+        // Set values in the Term Information Group
+        OrgTermGroupList termList = new OrgTermGroupList();
+        termList.getOrgTermGroup().addAll(terms);
+        organization.setOrgTermGroupList(termList);
         
-       	// Handle terms here
-
         if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.CONTACT_NAMES))!=null) {
                 ContactNameList contactsList = new ContactNameList();
                 List<String> contactNames = contactsList.getContactName();
@@ -394,20 +386,13 @@ public class OrgAuthorityClientUtils {
 		return newStr.toString();
     }
 
-    public static String createDisplayName(Map<String, String> orgInfo) {
-        String displayName = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME);
-    	String displayNameComputedStr = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (displayNameComputedStr==null) || displayNameComputedStr.equalsIgnoreCase("true");
-    	if( displayName == null ) {
-            if(!displayNameComputed) {
-                throw new RuntimeException(
-                "CreateItem: Must supply a displayName if displayNameComputed is set to false.");
-            }
-            displayName = prepareDefaultDisplayName(
-                orgInfo.get(OrganizationJAXBSchema.SHORT_NAME ),
-                orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE ));
-    	}
-        return displayName;
+    public static List<OrgTermGroup> getTermGroupInstance(String identifier) {
+        List<OrgTermGroup> terms = new ArrayList<OrgTermGroup>();
+        OrgTermGroup term = new OrgTermGroup();
+        term.setTermDisplayName(identifier);
+        term.setTermName(identifier);
+        terms.add(term);
+        return terms;
     }
     
 }

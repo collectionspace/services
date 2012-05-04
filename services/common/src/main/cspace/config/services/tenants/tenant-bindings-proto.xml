@@ -1807,8 +1807,8 @@
             <service:col>inauthority</service:col>
           </service:field>
           <service:field>
-            <service:table>organizations_common</service:table>
-            <service:col>displayname</service:col>
+            <service:table>orgtermgroup</service:table>
+            <service:col>termdisplayname</service:col>
           </service:field>
           <service:field>
             <service:table>organizations_common</service:table>
