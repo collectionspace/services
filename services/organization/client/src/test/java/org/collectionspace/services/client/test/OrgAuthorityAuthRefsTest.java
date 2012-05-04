@@ -43,6 +43,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.MainBodyGroup;
 import org.collectionspace.services.organization.MainBodyGroupList;
 import org.collectionspace.services.organization.OrganizationsCommon;
+import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -178,9 +179,6 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         // Create all the person refs and entities
         createPersonRefs();
 
-        // Create all the organization sub-body refs and entities
-        createSubBodyOrgRefs();
-
         // Initialize values for a new Organization item, to be created within
         // the newly-created Organization Authority resource.
         //
@@ -269,9 +267,15 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        String termName = firstName + " " + surName;
+        term.setTermDisplayName(termName);
+        term.setTermName(termName);
+        personTerms.add(term);
     	PoxPayloadOut multipart = 
     	    PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
-    	    		authRefName, personInfo, null, personAuthClient.getItemCommonPartName());
+    	    		authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         
     	String result = null;
     	ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
@@ -286,46 +290,6 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
     		res.releaseConnection();
     	}
     	
-    	return result;
-    }
-
-    private void createSubBodyOrgRefs() {
-        // Create a temporary sub-body Organization resource, and its corresponding refName
-        // by which it can be identified.
-        //
-        // This sub-body Organization resource will be created in the same
-        // Organization authority as its parent Organization resource.
-
-        String subBodyResourceId = createSubBodyOrganization("Test SubBody Organization");
-        allResourceItemIdsCreated.put(subBodyResourceId, knownResourceId);
-        subBodyRefName = OrgAuthorityClientUtils.getOrgRefName(knownResourceId, subBodyResourceId, null);
-    }
-
-    protected String createSubBodyOrganization(String subBodyName) {
-        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-        Map<String, String> subBodyOrgMap = new HashMap<String,String>();
-        String shortId = createIdentifier();
-        subBodyOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId );
-        subBodyOrgMap.put(OrganizationJAXBSchema.SHORT_NAME,
-            subBodyName + "-" + shortId);
-        subBodyOrgMap.put(OrganizationJAXBSchema.LONG_NAME, subBodyName + " Long Name");
-        subBodyOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, subBodyName + " Founding Place");
-    	PoxPayloadOut multipart =
-    	    OrgAuthorityClientUtils.createOrganizationInstance(
-    		knownResourceRefName, subBodyOrgMap, orgAuthClient.getItemCommonPartName());
-
-    	String result = null;
-    	ClientResponse<Response> res = orgAuthClient.createItem(knownResourceId, multipart);
-    	try {
-            int statusCode = res.getStatus();
-            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(testRequestType, statusCode));
-            Assert.assertEquals(statusCode, STATUS_CREATED);
-            result = extractId(res);
-    	} finally {
-    	    res.releaseConnection();
-    	}
-
     	return result;
     }
 
@@ -365,8 +329,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest<AbstractCommonList
                 organizationContactPersonRefName1);
         Assert.assertEquals(organization.getContactNames().getContactName().get(1),
                 organizationContactPersonRefName2);
-        Assert.assertEquals(organization.getSubBodies().getSubBody().get(0),
-                subBodyRefName);
+
 
         // Get the auth refs and check them
         // FIXME - need to create this method in the client

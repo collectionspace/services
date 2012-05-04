@@ -71,10 +71,11 @@
             <xs:element name="termStatus" type="xs:string"/>
             <xs:element name="termQualifier" type="xs:string"/>
             <xs:element name="termLanguage" type="xs:string"/>
-            <xs:element name="termPreferredForLanguage" type="xs:boolean"/>
+            <xs:element name="termPrefForLang" type="xs:boolean"/>
             <xs:element name="termSource" type="xs:string"/>
             <xs:element name="termSourceDetail" type="xs:string"/>
-            <xs:element name="termSourceUniqueID" type="xs:string"/>
+            <xs:element name="termSourceID" type="xs:string"/>
+            <xs:element name="termSourceNote" type="xs:string"/>
             <!-- Specific to Person terms -->
             <xs:element name="foreName" type="xs:string"/>
             <xs:element name="middleName" type="xs:string"/>
