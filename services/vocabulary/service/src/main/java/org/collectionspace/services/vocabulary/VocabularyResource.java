@@ -25,9 +25,9 @@ package org.collectionspace.services.vocabulary;
 
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
-import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+//import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+//import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

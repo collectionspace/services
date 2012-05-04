@@ -94,8 +94,8 @@ public class VocabularyItemDocumentModelHandler
 	protected ListResultField getListResultsDisplayNameField() {
 		ListResultField result = new ListResultField();
 
-		result.setElement(AuthorityItemJAXBSchema.DISPLAY_NAME);
-		result.setXpath(AuthorityItemJAXBSchema.DISPLAY_NAME);
+		result.setElement(VocabularyItemJAXBSchema.DISPLAY_NAME);
+		result.setXpath(VocabularyItemJAXBSchema.DISPLAY_NAME);
 
 		return result;
 	}
@@ -103,8 +103,8 @@ public class VocabularyItemDocumentModelHandler
     protected ListResultField getListResultsTermStatusField() {
 		ListResultField result = new ListResultField();
 
-		result.setElement(VocabularyItemJAXBSchema.DISPLAY_NAME);
-		result.setXpath(VocabularyItemJAXBSchema.TERM_STATUS);
+		result.setElement(AuthorityItemJAXBSchema.TERM_STATUS);
+		result.setXpath(AuthorityItemJAXBSchema.TERM_STATUS);
 
 		return result;
     }    

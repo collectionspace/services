@@ -59,6 +59,7 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
+import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -186,7 +187,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         for (int i = 0; i < nFields; i++) {
             ListResultField field = list.get(i);
             String elName = field.getElement();
-            if (AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName) || AuthorityItemJAXBSchema.DISPLAY_NAME.equals(elName)) {
+            if (AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName) || VocabularyItemJAXBSchema.DISPLAY_NAME.equals(elName)) {
                 hasDisplayName = true;
             } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
                 hasShortId = true;
@@ -199,7 +200,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         ListResultField field;
         if (!hasDisplayName) {
         	field = getListResultsDisplayNameField();
-            list.add(field);
+            list.add(field);  //Note: We're updating the "global" service and tenant bindings instance here -the list instance here is a reference to the tenant bindings instance in the singleton ServiceMain.
         }
         if (!hasShortId) {
             field = new ListResultField();
@@ -310,6 +311,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return updatedRefName;
     }
     
+    /*
+     * Note: The Vocabulary document handler overrides this method.
+     */
     protected String getRefPropName() {
     	return ServiceBindingUtils.AUTH_REF_PROP;
     }

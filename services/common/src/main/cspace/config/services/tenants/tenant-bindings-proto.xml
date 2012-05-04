@@ -2042,22 +2042,22 @@
             </types:item>
             -->
                         <!-- Fields containing term list / controlled vocabulary references -->
-            <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-              <types:value>salutation</types:value>
-            </types:item>
-            <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-              <types:value>title</types:value>
-            </types:item>
-            <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-              <types:value>gender</types:value>
-            </types:item>
-            <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>termStatus</types:value>
-            </types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>termRef</types:key>
+					<types:value>personTermGroupList/[0]/salutation</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>termRef</types:key>
+					<types:value>personTermGroupList/[0]/title</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>termRef</types:key>
+					<types:value>gender</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>termRef</types:key>
+					<types:value>personTermGroupList/[0]/termStatus</types:value>
+				</types:item>
           </service:properties>
         </service:part>
         <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
