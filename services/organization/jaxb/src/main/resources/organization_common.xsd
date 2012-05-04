@@ -26,9 +26,7 @@
                 
                 <!-- Term Information repeatable group -->
                 <xs:element name="orgTermGroupList" type="orgTermGroupList"/>
-                
-                <xs:element name="mainBodyGroupList" type="mainBodyGroupList"/>
-                
+                                
                 <xs:element name="foundingDate" type="xs:string"/>
                 <xs:element name="dissolutionDate" type="xs:string"/>
                 <xs:element name="foundingPlace" type="xs:string"/>
@@ -40,20 +38,6 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
-    <xs:complexType name="mainBodyGroupList">
-        <xs:sequence>
-            <xs:element name="mainBodyGroup" type="mainBodyGroup" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="mainBodyGroup">
-        <xs:sequence>
-            <xs:element name="longName" type="xs:string"/>
-            <xs:element name="shortName" type="xs:string"/>
-            <xs:element name="nameAdditions" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
     
     <xs:complexType name="contactNameList">
         <xs:sequence>
@@ -98,7 +82,10 @@
             <xs:element name="termSource" type="xs:string"/>
             <xs:element name="termSourceDetail" type="xs:string"/>
             <xs:element name="termSourceID" type="xs:string"/>
+            <xs:element name="termSourceNote" type="xs:string"/>
             <!-- Specific to Organization terms -->
+            <xs:element name="mainBodyName" type="xs:string"/>
+            <xs:element name="additionsToName" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
