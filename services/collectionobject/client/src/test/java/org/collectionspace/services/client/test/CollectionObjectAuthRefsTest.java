@@ -53,6 +53,7 @@ import org.collectionspace.services.collectionobject.FieldCollectorList;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -246,10 +247,16 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+        List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        String termName = firstName + " " + surName;
+        term.setTermDisplayName(termName);
+        term.setTermName(termName);
+        personTerms.add(term);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
-    				personAuthRefName, personInfo, null, personAuthClient.getItemCommonPartName());
+    				personAuthRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 

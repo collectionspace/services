@@ -43,6 +43,7 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
+import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -179,9 +180,15 @@ public class MovementAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        String termName = firstName + " " + surName;
+        term.setTermDisplayName(termName);
+        term.setTermName(termName);
+        personTerms.add(term);
     	PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
-    				authRefName, personInfo, null, personAuthClient.getItemCommonPartName());
+    				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 
