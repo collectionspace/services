@@ -4,7 +4,7 @@
   CollectionObject schema (XSD)
   
   Entity  : CollectionObject
-  Part    : Domain - Natural History (example)
+  Part    : UC Berkeley Natural History
   Used for: Nuxeo EP core document type
   
   $LastChangedRevision: 4929 $
@@ -65,8 +65,6 @@
             <xs:element name="reference" type="xs:string"/>
             <xs:element name="refPage" type="xs:string"/>
             <xs:element name="notes" type="xs:string"/>
-            <!-- The following fields are going away! -->
-            <xs:element name="identDate" type="xs:string"/>            
         </xs:sequence>
     </xs:complexType>
 
@@ -213,25 +211,6 @@
             <xs:element name="scalarValuesComputed" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
-
-    <!-- The following fields are going away! -->
-    <xs:element name="fieldCollectionDateEarliest" type="xs:string"/>
-    <xs:element name="fieldCollectionDateLatest" type="xs:string"/>
-    <xs:element name="fieldLocGeodeticDatum" type="xs:string"/>
-    <xs:element name="fieldLocCoordinateSystem" type="xs:string"/>
-   
-    <xs:element name="elevationMin" type="xs:decimal"/>
-    <xs:element name="elevationMax" type="xs:decimal"/>
-    <xs:element name="elevationQualifier" type="xs:string"/>
-    <xs:element name="elevationNote" type="xs:string"/>
-
-    <xs:element name="depthMin" type="xs:decimal"/>
-    <xs:element name="depthMax" type="xs:decimal"/>
-    <xs:element name="depthQualifier" type="xs:string"/>
-    <xs:element name="depthNote" type="xs:string"/>
-
-    <xs:element name="fieldLocLatDecimal" type="xs:string"/>
-    <xs:element name="fieldLocLongDecimal" type="xs:string"/>
 </xs:schema>
 
 
