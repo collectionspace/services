@@ -42,10 +42,10 @@ import org.collectionspace.services.organization.ContactNameList;
 import org.collectionspace.services.organization.FunctionList;
 import org.collectionspace.services.organization.GroupList;
 import org.collectionspace.services.organization.HistoryNoteList;
-import org.collectionspace.services.organization.MainBodyGroupList;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
-import org.collectionspace.services.organization.SubBodyList;
+import org.collectionspace.services.organization.OrgTermGroup;
+import org.collectionspace.services.organization.OrgTermGroupList;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonsCommon;
 import org.jboss.resteasy.client.ClientResponse;
@@ -168,8 +168,8 @@ public class OrgAuthorityClientUtils {
      * @return the string
      */
     public static String createItemInAuthority( String inAuthority,
-    		String orgAuthorityRefName, Map<String, String> orgInfo,
-                Map<String, List<String>> orgRepeatablesInfo, MainBodyGroupList mainBodyList, OrgAuthorityClient client) {
+    		String orgAuthorityRefName, List<OrgTermGroup> terms, Map<String, String> orgInfo,
+                Map<String, List<String>> orgRepeatablesInfo, OrgAuthorityClient client) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
@@ -182,7 +182,7 @@ public class OrgAuthorityClientUtils {
     	}
     	PoxPayloadOut multipart =
     		createOrganizationInstance(orgAuthorityRefName, 
-    				orgInfo, orgRepeatablesInfo, mainBodyList, client.getItemCommonPartName());
+    				orgInfo, terms, orgRepeatablesInfo, client.getItemCommonPartName());
 
     	ClientResponse<Response> res = client.createItem(inAuthority, multipart);
     	String result;
@@ -216,12 +216,12 @@ public class OrgAuthorityClientUtils {
      * @return the multipart output
      */
     public static PoxPayloadOut createOrganizationInstance(
-    		String orgAuthRefName, Map<String, String> orgInfo, String headerLabel){
+    		String orgAuthRefName, Map<String, String> orgInfo,
+                List<OrgTermGroup> terms, String headerLabel){
             final Map<String, List<String>> EMPTY_ORG_REPEATABLES_INFO =
                 new HashMap<String, List<String>>();
-            final MainBodyGroupList EMPTY_MAIN_BODY_LIST = new MainBodyGroupList();
             return createOrganizationInstance(orgAuthRefName,
-                    orgInfo, EMPTY_ORG_REPEATABLES_INFO, EMPTY_MAIN_BODY_LIST, headerLabel);
+                    orgInfo, terms, EMPTY_ORG_REPEATABLES_INFO, headerLabel);
     }
 
 
@@ -236,8 +236,8 @@ public class OrgAuthorityClientUtils {
      * @return the multipart output
      */
     public static PoxPayloadOut createOrganizationInstance( 
-    		String orgAuthRefName, Map<String, String> orgInfo,
-                Map<String, List<String>> orgRepeatablesInfo, MainBodyGroupList mainBodyList, String headerLabel){
+    		String orgAuthRefName, Map<String, String> orgInfo, List<OrgTermGroup> terms,
+                Map<String, List<String>> orgRepeatablesInfo, String headerLabel){
         OrganizationsCommon organization = new OrganizationsCommon();
     	String shortId = orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER);
     	if (shortId == null || shortId.isEmpty()) {
@@ -246,24 +246,9 @@ public class OrgAuthorityClientUtils {
     	organization.setShortIdentifier(shortId);
        	String value = null;
         List<String> values = null;
-    	value = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
-   		organization.setDisplayNameComputed(displayNameComputed);
-       	if((value = (String)orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME))!=null)
-        	organization.setDisplayName(value);
-   		
-    	value = orgInfo.get(OrganizationJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
-    	boolean shortDisplayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
-   		organization.setShortDisplayNameComputed(shortDisplayNameComputed);
-       	if((value = (String)orgInfo.get(OrganizationJAXBSchema.SHORT_DISPLAY_NAME))!=null)
-        	organization.setShortDisplayName(value);
-   		
-    	//String refName = createOrganizationRefName(orgAuthRefName, shortId, value);
-    	//organization.setRefName(refName);
-
-        if (mainBodyList != null) {
-            organization.setMainBodyGroupList(mainBodyList);
-        }
+        
+        
+       	// Handle terms here
 
         if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.CONTACT_NAMES))!=null) {
                 ContactNameList contactsList = new ContactNameList();
@@ -289,20 +274,13 @@ public class OrgAuthorityClientUtils {
         	functions.addAll(values);
                 organization.setFunctions(functionsList);
         }
-        if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.SUB_BODIES))!=null) {
-                SubBodyList subBodiesList = new SubBodyList();
-                List<String> subbodies = subBodiesList.getSubBody();
-        	subbodies.addAll(values);
-                organization.setSubBodies(subBodiesList);
-        }
         if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.HISTORY_NOTES))!=null) {
                 HistoryNoteList historyNotesList = new HistoryNoteList();
                 List<String> historyNotes = historyNotesList.getHistoryNote();
         	historyNotes.addAll(values);
                 organization.setHistoryNotes(historyNotesList);
         }
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.TERM_STATUS))!=null)
-        	organization.setTermStatus(value);
+
         PoxPayloadOut multipart = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(organization,
             MediaType.APPLICATION_XML_TYPE);
