@@ -2044,11 +2044,11 @@
                         <!-- Fields containing term list / controlled vocabulary references -->
 				<types:item xmlns:types="http://collectionspace.org/services/config/types">
 					<types:key>termRef</types:key>
-					<types:value>personTermGroupList/[0]/salutation</types:value>
+					<types:value>personTermGroupList/*/salutation</types:value>
 				</types:item>
 				<types:item xmlns:types="http://collectionspace.org/services/config/types">
 					<types:key>termRef</types:key>
-					<types:value>personTermGroupList/[0]/title</types:value>
+					<types:value>personTermGroupList/*/title</types:value>
 				</types:item>
 				<types:item xmlns:types="http://collectionspace.org/services/config/types">
 					<types:key>termRef</types:key>
@@ -2056,7 +2056,7 @@
 				</types:item>
 				<types:item xmlns:types="http://collectionspace.org/services/config/types">
 					<types:key>termRef</types:key>
-					<types:value>personTermGroupList/[0]/termStatus</types:value>
+					<types:value>personTermGroupList/*/termStatus</types:value>
 				</types:item>
           </service:properties>
         </service:part>
