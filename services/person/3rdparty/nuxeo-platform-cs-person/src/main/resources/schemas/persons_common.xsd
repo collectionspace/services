@@ -93,7 +93,7 @@
             <xs:element name="initials" type="xs:string"/>
             <xs:element name="salutation" type="xs:string"/>
             <xs:element name="title" type="xs:string"/>
-            <xs:element name="nameAdditions" type="xs:string"/>F
+            <xs:element name="nameAdditions" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

@@ -17,7 +17,7 @@
     xmlns="http://collectionspace.org/services/organization"
     targetNamespace="http://collectionspace.org/services/organization"
     version="0.1"
-    >
+>
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Name+Authority+Schema -->
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->    
 
@@ -26,68 +26,86 @@
     <xs:element name="inAuthority" type="xs:string" />
     <xs:element name="shortIdentifier" type="xs:string"/>
     <xs:element name="refName" type="xs:string"/>
-    <xs:element name="termStatus" type="xs:string"/>
-    <xs:element name="displayName" type="xs:string"/>
-    <xs:element name="displayNameComputed" type="xs:boolean"/>
-    <xs:element name="shortDisplayName" type="xs:string"/>
-    <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
-    <xs:element name="mainBodyGroupList" type="mainBodyGroupList"/>
-    <xs:element name="source" type="xs:string"/>
-    <xs:element name="sourcePage" type="xs:string"/>
-    <xs:element name="description" type="xs:string"/>
+    
+    <!-- Term Information repeatable group -->
+    <xs:element name="orgTermGroupList" type="orgTermGroupList"/>
 
-    <xs:element name="contactNames">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="contactName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="mainBodyGroupList" type="mainBodyGroupList"/>
+    
+    <xs:element name="description" type="xs:string"/>
     <xs:element name="foundingDate" type="xs:string"/>
     <xs:element name="dissolutionDate" type="xs:string"/>
     <xs:element name="foundingPlace" type="xs:string"/>
-    <xs:element name="groups">
-        <xs:complexType>
+    <xs:annotation>
+    
+        <xs:element name="groups">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+    
+        <xs:element name="functions">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="function" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+            
+        <xs:element name="contactNames">
+            <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="contactName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:element>
+
+        <xs:element name="historyNotes" type="historyNotes"/>
+
+        <xs:complexType name="mainBodyGroupList">
             <xs:sequence>
-                <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="mainBodyGroup" type="mainBodyGroup" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
-    </xs:element>
-    <xs:element name="functions">
-        <xs:complexType>
+
+        <xs:complexType name="mainBodyGroup">
             <xs:sequence>
-                <xs:element name="function" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="longName" type="xs:string"/>
+                <xs:element name="shortName" type="xs:string"/>
+                <xs:element name="nameAdditions" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
-    </xs:element>
-    <xs:element name="subBodies">
-        <xs:complexType>
+
+        <xs:complexType name="historyNotes">
             <xs:sequence>
-                <xs:element name="subBody" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="historyNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
-    </xs:element>
-    <xs:element name="historyNotes" type="historyNotes"/>
+    
+        <xs:complexType name="orgTermGroupList">
+            <xs:sequence>
+                <xs:element name="orgTermGroup" type="orgTermGroup" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
 
-    <xs:complexType name="mainBodyGroupList">
-        <xs:sequence>
-            <xs:element name="mainBodyGroup" type="mainBodyGroup" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="mainBodyGroup">
-        <xs:sequence>
-            <xs:element name="longName" type="xs:string"/>
-            <xs:element name="shortName" type="xs:string"/>
-            <xs:element name="nameAdditions" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="historyNotes">
-        <xs:sequence>
-            <xs:element name="historyNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-</xs:schema>
+        <xs:complexType name="orgTermGroup">
+            <xs:sequence>
+                <!-- Common across all authority item terms -->
+                <xs:element name="termDisplayName" type="xs:string"/>
+                <xs:element name="termName" type="xs:string"/>
+                <xs:element name="termType" type="xs:string"/>
+                <xs:element name="termStatus" type="xs:string"/>
+                <xs:element name="termQualifier" type="xs:string"/>
+                <xs:element name="termLanguage" type="xs:string"/>
+                <xs:element name="termPreferredForLanguage" type="xs:boolean"/>
+                <xs:element name="termSource" type="xs:string"/>
+                <xs:element name="termSourceDetail" type="xs:string"/>
+                <xs:element name="termSourceUniqueID" type="xs:string"/>
+                <!-- Specific to Organization terms -->
+            </xs:sequence>
+        </xs:complexType>
+    
+    </xs:schema>
 
