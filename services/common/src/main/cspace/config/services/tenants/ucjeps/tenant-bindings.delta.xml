@@ -106,6 +106,16 @@
 				</service:part>
 			</service:object>
 		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Loansin">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansin_naturalhistory" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/loanin/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/loanin/domain/naturalhistory http://collectionspace.org/services/loanin/domain/loansin_naturalhistory.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
 		
 		<tenant:serviceBindings merge:matcher="id" id="Loansout">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service">
