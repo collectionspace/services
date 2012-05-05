@@ -18,5 +18,77 @@
 	targetNamespace="http://collectionspace.org/loanin/domain/naturalhistory"
 	version="0.1">
 
+	<xs:element name="lenderLoanNumber" type="xs:string"/>
+	
+	<xs:element name="geographyList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="geography" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="taxonomyList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="taxonomy" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="objKindList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="objKind" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>		
+	</xs:element>
+	
+	<xs:element name="loanInShipDate" type="xs:date"/>
+	<xs:element name="loanInDueDate" type="xs:date"/>
 
+	<xs:element name="transferInDate" type="xs:date"/>
+	<xs:element name="transferInOrg" type="xs:string"/>
+	<xs:element name="transferInPrevBorrower" type="xs:string"/>
+
+	<xs:element name="numReceived" type="xs:integer"/>
+	<xs:element name="numReturned" type="xs:integer"/>
+	<xs:element name="numTransferredOut" type="xs:integer"/>
+	<xs:element name="balance" type="xs:integer"/>
+	<xs:element name="discrepancy" type="xs:integer"/>
+
+	<xs:element name="returnGroupList" type="returnGroupList"/>
+	<xs:element name="transferOutGroupList" type="transferOutGroupList"/>
+
+	<xs:complexType name="returnGroupList">
+		<xs:sequence>
+			<xs:element name="returnGroup" type="returnGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="returnGroup">
+		<xs:sequence>
+			<xs:element name="returnDate" type="xs:date"/>
+			<xs:element name="returnQuantity" type="xs:integer"/>
+			<xs:element name="returnNotes" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="transferOutGroupList">
+		<xs:sequence>
+			<xs:element name="transferOutGroup" type="transferOutGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="transferOutGroup">
+		<xs:sequence>	
+			<xs:element name="transferOutDate" type="xs:date"/>
+			<xs:element name="transferOutQuantity" type="xs:integer"/>
+			<xs:element name="transferOutOrg" type="xs:string"/>
+			<xs:element name="transferOutPerson" type="xs:string"/>
+			<xs:element name="transferOutDirector" type="xs:string"/>
+			<xs:element name="transferOutNotes" type="xs:string"/>
+			<xs:element name="transferOutReturnDate" type="xs:date"/>
+			<xs:element name="transferOutReturnQuantity" type="xs:integer"/>
+			<xs:element name="transferOutReturnNotes" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
 </xs:schema>
