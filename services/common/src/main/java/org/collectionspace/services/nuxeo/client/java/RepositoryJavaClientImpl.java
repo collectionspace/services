@@ -699,33 +699,39 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     /*
      * See CSPACE-5036 - How to make CMISQL queries from Nuxeo
      */
-    private void makeCMISQLQuery(RepositoryInstance repoSession, String query) {
-    	// the NuxeoRepository should be constructed only once, then cached
-        // (its construction is expensive)
-        try {
-			NuxeoRepository repo = new NuxeoRepository(repoSession.getRepositoryName(),
-					repoSession.getRootDocument().getId());
-			logger.debug("Repository ID:" + repo.getId() + " Root folder:" + repo.getRootFolderId());
-			
-			CallContextImpl callContext = new CallContextImpl(CallContext.BINDING_LOCAL,
-					repo.getId(), false);
-					callContext.put(CallContext.USERNAME, repoSession.getPrincipal().getName());
-					NuxeoCmisService cmisService = new NuxeoCmisService(repo, callContext, repoSession);
+	private void makeCMISQLQuery(RepositoryInstance repoSession, String query) {
+		// the NuxeoRepository should be constructed only once, then cached
+		// (its construction is expensive)
+		try {
+			NuxeoRepository repo = new NuxeoRepository(
+					repoSession.getRepositoryName(), repoSession
+							.getRootDocument().getId());
+			logger.debug("Repository ID:" + repo.getId() + " Root folder:"
+					+ repo.getRootFolderId());
 
-					IterableQueryResult result = repoSession.queryAndFetch(query, "CMISQL", cmisService);
-					for (Map<String, Serializable> row : result) {
-						logger.debug(
-//								"dc:title is: " + (String)row.get("dc:title")
-								"" + " Hierarchy Table ID is:" + row.get("cmis:objectId")
-								+ " cmis:name is: " + row.get("cmis:name")
-//								+ " nuxeo:lifecycleState is: " + row.get("nuxeo:lifecycleState")
-								); 
-					}			
+			CallContextImpl callContext = new CallContextImpl(
+					CallContext.BINDING_LOCAL, repo.getId(), false);
+			callContext.put(CallContext.USERNAME, repoSession.getPrincipal()
+					.getName());
+			NuxeoCmisService cmisService = new NuxeoCmisService(repo,
+					callContext, repoSession);
+
+			IterableQueryResult result = repoSession.queryAndFetch(query,
+					"CMISQL", cmisService);
+			for (Map<String, Serializable> row : result) {
+				logger.debug(
+				// "dc:title is: " + (String)row.get("dc:title")
+				"" + " Hierarchy Table ID is:" + row.get("cmis:objectId")
+						+ " cmis:name is: " + row.get("cmis:name")
+				// + " nuxeo:lifecycleState is: " +
+				// row.get("nuxeo:lifecycleState")
+				);
+			}
 		} catch (ClientException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    }
+	}
      
     /**
      * getFiltered get all documents for an entity service from the Document repository,
@@ -754,7 +760,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             // CSPACE-5036 - How to make CMISQL queries from Nuxeo
             //
             
-			// do a query
+            /*
+             * Find all the Dimension records related to record X with csid = aa93c38d-43a1-42cc-ad2a where X is the subject of the relationship and
+             * the dimension records are the 'object' of the relationship
+             */            
+            String targetCsid = "0b5fd53a-41ff-478f-9ed8";
+            String query0 = "SELECT D.cmis:name, D.dc:title, R.dc:title, R.relations_common:subjectCsid FROM Dimension D JOIN Relation R ON R.relations_common:objectCsid = D.cmis:name WHERE R.relations_common:subjectCsid = '0b5fd53a-41ff-478f-9ed8'";
+            makeCMISQLQuery(repoSession, query0); //SHOULD return two dimension records
+            
 			String query1 = "SELECT A.intakes_common:entryReason FROM Intake A"; // try eaee111c-a8d8-48c7-95cb
             makeCMISQLQuery(repoSession, query1);
 
