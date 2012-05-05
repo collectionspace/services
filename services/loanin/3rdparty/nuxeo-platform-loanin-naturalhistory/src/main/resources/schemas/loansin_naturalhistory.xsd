@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+	Loan In schema (XSD)
+	
+	Entity	: Loanin
+	Part	: naturalhistory
+	Used for: Nuxeo EP core document type
+
+	$LastChangedRevision$
+	$LastChangedDate$
+-->
+
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ns="http://collectionspace.org/loanin/domain/naturalhistory"
+	xmlns="http://collectionspace.org/loanin/domain/naturalhistory"
+	targetNamespace="http://collectionspace.org/loanin/domain/naturalhistory"
+	version="0.1">
+
+
+</xs:schema>
