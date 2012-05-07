@@ -23,7 +23,7 @@
     <!--  ObjectExit Information Group -->
     <xs:element name="currentOwner" type="xs:string"/>
     <xs:element name="depositor" type="xs:string"/>
-    <xs:element name="exitDate" type="structuredDateGroup"/>
+    <xs:element name="exitDateGroup" type="structuredDateGroup"/>
     <xs:element name="exitMethods">
         <xs:complexType>
             <xs:sequence>
