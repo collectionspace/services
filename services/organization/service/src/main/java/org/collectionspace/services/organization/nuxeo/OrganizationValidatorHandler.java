@@ -37,7 +37,9 @@ import org.slf4j.LoggerFactory;
 /**
  * OrganizationValidatorHandler
  * 
- * Validates data supplied when attempting to create and/or update Organization records.
+ * Performs validation when making requests related to Organization records.
+ * As an example, you can modify this class to customize validation of
+ * payloads supplied in requests to create and/or update records.
  */
 public class OrganizationValidatorHandler extends ValidatorHandlerImpl {
 

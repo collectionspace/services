@@ -6,7 +6,7 @@
  *  http://www.collectionspace.org
  *  http://wiki.collectionspace.org
 
- *  Copyright 2009 University of California at Berkeley
+ *  Copyright 2009 University of California, Berkeley
 
  *  Licensed under the Educational Community License (ECL), Version 2.0.
  *  You may not use this file except in compliance with this License.
@@ -37,7 +37,9 @@ import org.slf4j.LoggerFactory;
 /**
  * LocationValidatorHandler
  * 
- * Validates data supplied when attempting to create and/or update Location records.
+ * Performs validation when making requests related to Location records.
+ * As an example, you can modify this class to customize validation of
+ * payloads supplied in requests to create and/or update records.
  */
 public class LocationValidatorHandler extends ValidatorHandlerImpl {
 

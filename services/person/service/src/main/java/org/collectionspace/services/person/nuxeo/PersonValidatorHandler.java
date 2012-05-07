@@ -36,10 +36,9 @@ import org.slf4j.LoggerFactory;
 /**
  * PersonValidatorHandler
  *
- * Validates data supplied when attempting to create and/or update Person
- * records.
- *
- * $LastChangedRevision: $ $LastChangedDate: $
+ * Performs validation when making requests related to Person records.
+ * As an example, you can modify this class to customize validation of
+ * payloads supplied in requests to create and/or update records.
  */
 public class PersonValidatorHandler extends ValidatorHandlerImpl {
 
