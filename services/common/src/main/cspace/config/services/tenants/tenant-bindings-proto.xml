@@ -1860,7 +1860,11 @@
                         <!-- Fields containing term list / controlled vocabulary references -->
             <types:item xmlns:types="http://collectionspace.org/services/config/types">
               <types:key>termRef</types:key>
-              <types:value>termStatus</types:value>
+              <types:value>orgTermGroupList/*termStatus</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>termRef</types:key>
+                    <types:value>orgTermGroupList/*/termType</types:value>
             </types:item>
           </service:properties>
           <service:content contentType="application/xml">
@@ -2058,6 +2062,10 @@
 					<types:key>termRef</types:key>
 					<types:value>personTermGroupList/*/termStatus</types:value>
 				</types:item>
+                                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>termRef</types:key>
+					<types:value>personTermGroupList/*/termType</types:value>
+				</types:item>
           </service:properties>
         </service:part>
         <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
@@ -2189,9 +2197,13 @@
               <types:key>termRef</types:key>
                             <types:value>locationType</types:value>
             </types:item>
-            <types:item xmlns:types="http://collectionspace.org/services/config/types">
+           <types:item xmlns:types="http://collectionspace.org/services/config/types">
               <types:key>termRef</types:key>
-                            <types:value>termStatus</types:value>
+              <types:value>orgTermGroupList/*termStatus</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>termRef</types:key>
+                    <types:value>orgTermGroupList/*/termType</types:value>
             </types:item>
                     </service:properties>
           <service:content contentType="application/xml">
