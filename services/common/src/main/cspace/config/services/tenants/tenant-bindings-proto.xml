@@ -1794,7 +1794,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
         <service:params>
           <service:ListResultsFields>
-					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+		<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2144,11 +2144,7 @@
       <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
         <service:params>
           <service:ListResultsFields>
-					<!-- Omit the standard AuthorityItem items (they are handled by the code) -->
-            <service:ListResultField>
-              <service:element>name</service:element>
-              <service:xpath>name</service:xpath>
-            </service:ListResultField>
+	      <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
           </service:ListResultsFields>
         </service:params>
       </service:DocHandlerParams>
@@ -2161,8 +2157,8 @@
             <service:col>inauthority</service:col>
           </service:field>
           <service:field>
-            <service:table>locations_common</service:table>
-            <service:col>displayname</service:col>
+            <service:table>loctermgroup</service:table>
+            <service:col>termdisplayname</service:col>
           </service:field>
           <service:field>
             <service:table>locations_common</service:table>
