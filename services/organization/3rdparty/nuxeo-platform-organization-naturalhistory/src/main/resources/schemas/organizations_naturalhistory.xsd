@@ -13,9 +13,9 @@
 
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:ns="http://collectionspace.org/services/organization"
-    xmlns="http://collectionspace.org/services/organization"
-    targetNamespace="http://collectionspace.org/services/organization"
+    xmlns:ns="http://collectionspace.org/services/organization/domain/naturalhistory"
+    xmlns="http://collectionspace.org/services/organization/domain/naturalhistory"
+    targetNamespace="http://collectionspace.org/services/organization/domain/naturalhistory"
     version="0.1"
     >
 
