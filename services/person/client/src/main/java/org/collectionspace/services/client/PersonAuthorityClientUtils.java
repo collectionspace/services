@@ -167,11 +167,11 @@ public class PersonAuthorityClientUtils {
     		Map<String, String> personInfo,
                 List<PersonTermGroup> terms,
     		String headerLabel){
-        final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO =
-                new HashMap<String, List<String>>();
-        if (terms == null || terms.size() == 0) {
+        if (terms == null || terms.isEmpty()) {
             terms = getTermGroupInstance(getGeneratedIdentifier());
         }
+        final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO =
+                new HashMap<String, List<String>>();
         return createPersonInstance(inAuthority, null /*personAuthRefName*/,
                 personInfo, terms, EMPTY_PERSON_REPEATABLES_INFO, headerLabel);
     }
@@ -219,9 +219,11 @@ public class PersonAuthorityClientUtils {
         
         // Set values in the Term Information Group
         PersonTermGroupList termList = new PersonTermGroupList();
-        termList.getPersonTermGroup().addAll(terms);
+        if (terms == null || terms.isEmpty()) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
+        }
+        termList.getPersonTermGroup().addAll(terms); 
         person.setPersonTermGroupList(termList);
-        
         
         if (personRepeatablesInfo != null) {
             if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.GROUPS))!=null) {

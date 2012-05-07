@@ -55,8 +55,6 @@ public class PersonValidatorHandler extends ValidatorHandlerImpl {
             "Each term group in an authority item must contain "
             + "a non-empty term name or "
             + "a non-empty term display name.";
-    boolean invalid = false;
-    String msg = "";
 
     @Override
     protected Class getCommonPartClass() {
@@ -130,7 +128,7 @@ public class PersonValidatorHandler extends ValidatorHandlerImpl {
             return false;
         }
         List<PersonTermGroup> termGroups = termGroupList.getPersonTermGroup();
-        if ((termGroups == null) || (termGroups.size() == 0)) {
+        if ((termGroups == null) || (termGroups.isEmpty())) {
             return false;
         }
         return true;

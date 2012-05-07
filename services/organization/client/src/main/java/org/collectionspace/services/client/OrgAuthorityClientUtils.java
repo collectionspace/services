@@ -17,14 +17,13 @@
 package org.collectionspace.services.client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.organization.ContactNameList;
@@ -239,7 +238,10 @@ public class OrgAuthorityClientUtils {
         
         // Set values in the Term Information Group
         OrgTermGroupList termList = new OrgTermGroupList();
-        termList.getOrgTermGroup().addAll(terms);
+        if (terms == null || terms.isEmpty()) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
+        }
+        termList.getOrgTermGroup().addAll(terms); 
         organization.setOrgTermGroupList(termList);
         
         if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.CONTACT_NAMES))!=null) {
@@ -394,5 +396,9 @@ public class OrgAuthorityClientUtils {
         terms.add(term);
         return terms;
     }
+    
+    private static String getGeneratedIdentifier() {
+        return "id" + new Date().getTime(); 
+   }
     
 }

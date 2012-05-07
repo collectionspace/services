@@ -53,8 +53,6 @@ public class OrganizationValidatorHandler extends ValidatorHandlerImpl {
             "Each term group in an authority item must contain "
             + "a non-empty term name or "
             + "a non-empty term display name.";
-    boolean invalid = false;
-    String msg = "";
 
     @Override
     protected Class getCommonPartClass() {
@@ -63,16 +61,16 @@ public class OrganizationValidatorHandler extends ValidatorHandlerImpl {
 
     @Override
     protected void handleCreate() throws InvalidDocumentException {
-        OrganizationsCommon person = (OrganizationsCommon) getCommonPart();
+        OrganizationsCommon organization = (OrganizationsCommon) getCommonPart();
         // No guarantee that there is a common part in every post/update.
-        if (person != null) {
+        if (organization != null) {
             try {
-                String shortId = person.getShortIdentifier();
+                String shortId = organization.getShortIdentifier();
                 if (shortId != null) {
                     CS_ASSERT(shortIdentifierContainsOnlyValidChars(shortId), SHORT_ID_BAD_CHARS_ERROR);
                 }
-                CS_ASSERT(containsAtLeastOneTerm(person), HAS_NO_TERMS_ERROR);
-                CS_ASSERT(allTermsContainNameOrDisplayName(person), HAS_AN_EMPTY_TERM_ERROR);
+                CS_ASSERT(containsAtLeastOneTerm(organization), HAS_NO_TERMS_ERROR);
+                CS_ASSERT(allTermsContainNameOrDisplayName(organization), HAS_AN_EMPTY_TERM_ERROR);
             } catch (AssertionError e) {
                 if (logger.isErrorEnabled()) {
                     logger.error(e.getMessage(), e);
@@ -92,15 +90,15 @@ public class OrganizationValidatorHandler extends ValidatorHandlerImpl {
 
     @Override
     protected void handleUpdate() throws InvalidDocumentException {
-        OrganizationsCommon person = (OrganizationsCommon) getCommonPart();
+        OrganizationsCommon organization = (OrganizationsCommon) getCommonPart();
         // No guarantee that there is a common part in every post/update.
-        if (person != null) {
+        if (organization != null) {
             try {
                 // shortIdentifier is among a set of fields that are
                 // prevented from being changed on an update, and thus
                 // we don't need to check its value here.
-                CS_ASSERT(containsAtLeastOneTerm(person), HAS_NO_TERMS_ERROR);
-                CS_ASSERT(allTermsContainNameOrDisplayName(person), HAS_AN_EMPTY_TERM_ERROR);
+                CS_ASSERT(containsAtLeastOneTerm(organization), HAS_NO_TERMS_ERROR);
+                CS_ASSERT(allTermsContainNameOrDisplayName(organization), HAS_AN_EMPTY_TERM_ERROR);
             } catch (AssertionError e) {
                 if (logger.isErrorEnabled()) {
                     logger.error(e.getMessage(), e);
@@ -122,20 +120,20 @@ public class OrganizationValidatorHandler extends ValidatorHandlerImpl {
         return true;
     }
 
-    private boolean containsAtLeastOneTerm(OrganizationsCommon person) {
-        OrgTermGroupList termGroupList = person.getOrgTermGroupList();
+    private boolean containsAtLeastOneTerm(OrganizationsCommon organization) {
+        OrgTermGroupList termGroupList = organization.getOrgTermGroupList();
         if (termGroupList == null) {
             return false;
         }
         List<OrgTermGroup> termGroups = termGroupList.getOrgTermGroup();
-        if ((termGroups == null) || (termGroups.size() == 0)) {
+        if ((termGroups == null) || (termGroups.isEmpty())){ 
             return false;
         }
         return true;
     }
 
-    private boolean allTermsContainNameOrDisplayName(OrganizationsCommon person) {
-        OrgTermGroupList termGroupList = person.getOrgTermGroupList();
+    private boolean allTermsContainNameOrDisplayName(OrganizationsCommon organization) {
+        OrgTermGroupList termGroupList = organization.getOrgTermGroupList();
         List<OrgTermGroup> termGroups = termGroupList.getOrgTermGroup();
         for (OrgTermGroup termGroup : termGroups) {
             if (Tools.isBlank(termGroup.getTermName()) || Tools.isBlank(termGroup.getTermDisplayName())) {
