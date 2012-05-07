@@ -44,12 +44,12 @@
 		</xs:complexType>		
 	</xs:element>
 	
-	<xs:element name="loanInShipDate" type="xs:date"/>
-	<xs:element name="loanInDueDate" type="xs:date"/>
+	<xs:element name="shipDate" type="xs:date"/>
+	<xs:element name="dueDate" type="xs:date"/>
 
 	<xs:element name="transferInDate" type="xs:date"/>
 	<xs:element name="transferInOrg" type="xs:string"/>
-	<xs:element name="transferInPrevBorrower" type="xs:string"/>
+	<xs:element name="transferInPerson" type="xs:string"/>
 
 	<xs:element name="numReceived" type="xs:integer"/>
 	<xs:element name="numReturned" type="xs:integer"/>
