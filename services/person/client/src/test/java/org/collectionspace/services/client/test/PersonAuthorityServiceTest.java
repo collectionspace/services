@@ -660,14 +660,6 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                 client.getItemCommonPartName(), PersonsCommon.class);
         Assert.assertNotNull(person);
         // Try to Update with no displayName
-        List<PersonTermGroup> johnWayneTerms = new ArrayList<PersonTermGroup>();
-        PersonTermGroup term = new PersonTermGroup();
-        term.setTermDisplayName("John Wayne DisplayName");
-        term.setTermName("John Wayne");
-        term.setForeName(TEST_FORE_NAME);
-        term.setSurName(TEST_SUR_NAME);
-        johnWayneTerms.add(term);
-        
         PersonTermGroupList termList = person.getPersonTermGroupList();
         Assert.assertNotNull(termList);
         List<PersonTermGroup> terms = termList.getPersonTermGroup();
@@ -1389,18 +1381,42 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	protected PersonsCommon updateItemInstance(PersonsCommon authorityItem) {
-		// TODO Auto-generated method stub
-		return null;
+   
+        @Override
+	protected PersonsCommon updateItemInstance(PersonsCommon personsCommon) {
+            
+	    PersonsCommon result = personsCommon;
+                
+            PersonTermGroupList termList = result.getPersonTermGroupList();
+            Assert.assertNotNull(termList);
+            List<PersonTermGroup> terms = termList.getPersonTermGroup();
+            Assert.assertNotNull(terms);
+            Assert.assertTrue(terms.size() > 0);
+            terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
+            terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
+	
+            return result;
 	}
 
 	@Override
 	protected void compareUpdatedItemInstances(PersonsCommon original,
 			PersonsCommon updated) throws Exception {
-		// TODO Auto-generated method stub
-		
+            
+            PersonTermGroupList originalTermList = original.getPersonTermGroupList();
+            Assert.assertNotNull(originalTermList);
+            List<PersonTermGroup> originalTerms = originalTermList.getPersonTermGroup();
+            Assert.assertNotNull(originalTerms);
+            Assert.assertTrue(originalTerms.size() > 0);
+            
+            PersonTermGroupList updatedTermList = updated.getPersonTermGroupList();
+            Assert.assertNotNull(updatedTermList);
+            List<PersonTermGroup> updatedTerms = updatedTermList.getPersonTermGroup();
+            Assert.assertNotNull(updatedTerms);
+            Assert.assertTrue(updatedTerms.size() > 0);
+            
+            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
+                originalTerms.get(0).getTermDisplayName(),
+                "Value in updated record did not match submitted data.");
 	}
 
 	@Override
@@ -1443,23 +1459,30 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
                 nonexMap, terms, nonexRepeatablesMap, commonPartName);
         return result;
     }
-	
-
-	@Override
-	protected PersonauthoritiesCommon updateInstance(
-			PersonauthoritiesCommon commonPartObject) {
-		// TODO Auto-generated method stub
-		return null;
+	        
+        @Override
+	protected PersonauthoritiesCommon updateInstance(PersonauthoritiesCommon personauthoritiesCommon) {
+		PersonauthoritiesCommon result = new PersonauthoritiesCommon();
+		
+        result.setDisplayName("updated-" + personauthoritiesCommon.getDisplayName());
+        result.setVocabType("updated-" + personauthoritiesCommon.getVocabType());
+        
+		return result;
 	}
 
 	@Override
 	protected void compareUpdatedInstances(PersonauthoritiesCommon original,
 			PersonauthoritiesCommon updated) throws Exception {
-		// TODO Auto-generated method stub
+        // Verify that the updated resource received the correct data.
+        Assert.assertEquals(updated.getDisplayName(),
+        		original.getDisplayName(),
+                "Display name in updated object did not match submitted data.");
 	}
 
 	@Override
 	protected void verifyReadItemInstance(PersonsCommon item) throws Exception {
 		// Do nothing for now.  Add more 'read' validation checks here if applicable.
 	}
+        
+        
 }
