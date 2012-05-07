@@ -69,8 +69,6 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     /** The logger. */
     private final String CLASS_NAME = OrgAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    private final String REFNAME = "refName";
-    private final String DISPLAYNAME = "displayName";
 
     @Override
     public String getServicePathComponent() {
@@ -641,10 +639,10 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         for (AbstractCommonList.ListItem item : items) {
             String value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
+                    AbstractCommonListUtils.ListItemGetElementValue(item, OrganizationJAXBSchema.REF_NAME);
             Assert.assertTrue((null != value), "Item refName is null!");
             value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
+                    AbstractCommonListUtils.ListItemGetElementValue(item, OrganizationJAXBSchema.DISPLAY_NAME);
             Assert.assertTrue((null != value), "Item displayName is null!");
         }
         if (logger.isTraceEnabled()) {
