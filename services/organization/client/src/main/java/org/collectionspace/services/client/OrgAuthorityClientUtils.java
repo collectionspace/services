@@ -26,6 +26,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.organization.ContactNameList;
 import org.collectionspace.services.organization.FunctionList;
 import org.collectionspace.services.organization.GroupList;
@@ -389,6 +390,9 @@ public class OrgAuthorityClientUtils {
     }
 
     public static List<OrgTermGroup> getTermGroupInstance(String identifier) {
+        if (Tools.isBlank(identifier)) {
+            identifier = getGeneratedIdentifier();
+        }
         List<OrgTermGroup> terms = new ArrayList<OrgTermGroup>();
         OrgTermGroup term = new OrgTermGroup();
         term.setTermDisplayName(identifier);

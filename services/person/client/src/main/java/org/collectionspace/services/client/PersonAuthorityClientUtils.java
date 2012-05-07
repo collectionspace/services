@@ -34,6 +34,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.person.GroupList;
 import org.collectionspace.services.person.NationalityList;
 import org.collectionspace.services.person.OccupationList;
@@ -448,6 +449,9 @@ public class PersonAuthorityClientUtils {
     }
     
     public static List<PersonTermGroup> getTermGroupInstance(String identifier) {
+        if (Tools.isBlank(identifier)) {
+            identifier = getGeneratedIdentifier();
+        }
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
         term.setTermDisplayName(identifier);

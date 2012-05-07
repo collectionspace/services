@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.LocationJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.location.*;
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
@@ -300,6 +301,9 @@ public class LocationAuthorityClientUtils {
     }
     
     public static List<LocTermGroup> getTermGroupInstance(String identifier) {
+        if (Tools.isBlank(identifier)) {
+            identifier = getGeneratedIdentifier();
+        }
         List<LocTermGroup> terms = new ArrayList<LocTermGroup>();
         LocTermGroup term = new LocTermGroup();
         term.setTermDisplayName(identifier);
