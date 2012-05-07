@@ -1072,9 +1072,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
 	@Override
 	protected OrganizationsCommon updateItemInstance(OrganizationsCommon organizationsCommon) {
-            
-	    OrganizationsCommon result = organizationsCommon;
-                
+                            
             OrgTermGroupList termList = result.getOrgTermGroupList();
             Assert.assertNotNull(termList);
             List<OrgTermGroup> terms = termList.getOrgTermGroup();
@@ -1084,7 +1082,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
             terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
 	    organizationsCommon.setOrgTermGroupList(termList);
 
-            return result;
+            return organizationsCommon;
 	}
 
 	@Override

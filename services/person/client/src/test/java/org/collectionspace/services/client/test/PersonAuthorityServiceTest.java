@@ -1384,10 +1384,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
    
         @Override
 	protected PersonsCommon updateItemInstance(PersonsCommon personsCommon) {
-            
-	    PersonsCommon result = personsCommon;
-                
-            PersonTermGroupList termList = result.getPersonTermGroupList();
+                            
+            PersonTermGroupList termList = personsCommon.getPersonTermGroupList();
             Assert.assertNotNull(termList);
             List<PersonTermGroup> terms = termList.getPersonTermGroup();
             Assert.assertNotNull(terms);
@@ -1396,7 +1394,7 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
 	    personsCommon.setPersonTermGroupList(termList);
 
-            return result;
+            return personsCommon;
 	}
 
 	@Override
