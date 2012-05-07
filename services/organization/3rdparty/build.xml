@@ -111,21 +111,29 @@
     <target name="deploy" depends="install"
     description="deploy organization in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-organization/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-naturalhistory/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-ucjeps/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy organization from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-organization/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-naturalhistory/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-ucjeps/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for organization" depends="package">
         <ant antfile="nuxeo-platform-cs-organization/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-naturalhistory/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-ucjeps/build.xml" target="dist" inheritall="false"/>
     </target>
     
     <target name="dist_installer"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="nuxeo-platform-cs-organization/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-naturalhistory/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-ucjeps/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 
 </project>
