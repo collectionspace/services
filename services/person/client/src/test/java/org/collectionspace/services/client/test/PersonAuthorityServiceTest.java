@@ -1394,7 +1394,8 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
             Assert.assertTrue(terms.size() > 0);
             terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
             terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
-	
+	    personsCommon.setPersonTermGroupList(termList);
+
             return result;
 	}
 
