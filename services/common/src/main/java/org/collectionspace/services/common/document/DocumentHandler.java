@@ -328,4 +328,10 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @return unqualified property
      */
     public String getUnQProperty(String qProp);
+    
+    /**
+     * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
+     * information in the current service context -which includes things like the query parameters, etc.
+     */
+    public String getCMISQuery();
 }

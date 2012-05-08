@@ -372,6 +372,17 @@ public class NuxeoUtils {
         return query.toString();
     }
     
+    static public final String buildCMISQuery(ServiceContext ctx, QueryContext queryContext) throws Exception {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+
+        /*
+         * This is a place holder for CMIS query creation -see buildNXQLQuery as a reference
+         */
+
+        return query.toString();
+    }
+    
+    
     /**
      * Builds an NXQL SELECT query across multiple document types.
      *

@@ -699,7 +699,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     /*
      * See CSPACE-5036 - How to make CMISQL queries from Nuxeo
      */
-	private void makeCMISQLQuery(RepositoryInstance repoSession, String query) {
+	private IterableQueryResult makeCMISQLQuery(RepositoryInstance repoSession, String query) {
 		// the NuxeoRepository should be constructed only once, then cached
 		// (its construction is expensive)
 		try {
@@ -756,42 +756,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         try {
             handler.prepare(Action.GET_ALL);
             repoSession = getRepositorySession();
-            //
-            // CSPACE-5036 - How to make CMISQL queries from Nuxeo
-            //
-            
-            /*
-             * Find all the Dimension records related to record X with csid = aa93c38d-43a1-42cc-ad2a where X is the subject of the relationship and
-             * the dimension records are the 'object' of the relationship
-             */            
-            String targetCsid = "0b5fd53a-41ff-478f-9ed8";
-            String query0 = "SELECT D.cmis:name, D.dc:title, R.dc:title, R.relations_common:subjectCsid FROM Dimension D JOIN Relation R ON R.relations_common:objectCsid = D.cmis:name WHERE R.relations_common:subjectCsid = '0b5fd53a-41ff-478f-9ed8'";
-            makeCMISQLQuery(repoSession, query0); //SHOULD return two dimension records
-            
-			String query1 = "SELECT A.intakes_common:entryReason FROM Intake A"; // try eaee111c-a8d8-48c7-95cb
-            makeCMISQLQuery(repoSession, query1);
-
-			String query2 = "SELECT * FROM Intake A where A.intakes_common:entryReason <> 'foo'"; // try eaee111c-a8d8-48c7-95cb
-            makeCMISQLQuery(repoSession, query2);
-
-            String query3 = "SELECT A.cmis:objectId, A.dc:title FROM Intake A where A.intakes_common:entryReason <> 'foo'"; // try eaee111c-a8d8-48c7-95cb
-            makeCMISQLQuery(repoSession, query3);
-
-            String query4 = "SELECT A.cmis:objectId, A.dc:title FROM Intake A where A.intakes_common:entryReason = '38ed4b32-e38f-4f82-adaa'";
-            makeCMISQLQuery(repoSession, query4);
-
-			String query5 = "SELECT A.cmis:name, A.dc:title, B.intakes_common:entryReason FROM Dimension A JOIN Intake B ON A.cmis:name = B.intakes_common:entryReason"; // try eaee111c-a8d8-48c7-95cb
-            makeCMISQLQuery(repoSession, query5);
-            
-			String query6 = "SELECT A.cmis:name, A.dc:title, B.intakes_common:entryReason FROM Dimension A JOIN Intake B ON A.dc:title = B.intakes_common:entryReason"; // try eaee111c-a8d8-48c7-95cb
-            makeCMISQLQuery(repoSession, query6);
-            
-            query6 = "SELECT A.cmis:name, A.dc:title, B.intakes_common:entryReason FROM Dimension A JOIN Intake B ON B.intakes_common:entryReason = A.dc:title"; // try eaee111c-a8d8-48c7-95cb
-            makeCMISQLQuery(repoSession, query6);
-            
-            String query7 = "SELECT B.intakes_common:entryReason FROM Intake B"; // try eaee111c-a8d8-48c7-95cb
-            makeCMISQLQuery(repoSession, query7);
-            
             
             DocumentModelList docList = null;
             String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
@@ -805,7 +769,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         	Profiler profiler = new Profiler(this, 2);
         	profiler.log("Executing NXQL query: " + query.toString());
         	profiler.start();
-            if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
+        	if (handler.getCMISQuery() != null) {
+        		docList = getFilteredCMIS(ctx, handler, queryContext);
+        	} else if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
                 docList = repoSession.query(query, null,
                         queryContext.getDocFilter().getPageSize(), queryContext.getDocFilter().getOffset(), true);
             } else {
@@ -832,6 +798,53 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         }
     }
 
+    private DocumentModelList getFilteredCMIS(RepositoryInstance repoSession, ServiceContext ctx, DocumentHandler handler, QueryContext queryContext)
+            throws DocumentNotFoundException, DocumentException {
+
+    	DocumentModelList result = new DocumentModelListImpl();
+        try {
+            String query = handler.getCMISQuery();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing CMIS query: " + query.toString());
+            }
+
+            // If we have limit and/or offset, then pass true to get totalSize
+            // in returned DocumentModelList.
+        	Profiler profiler = new Profiler(this, 2);
+        	profiler.log("Executing CMIS query: " + query.toString());
+        	profiler.start();
+        	//
+        	IterableQueryResult queryResult = makeCMISQLQuery(repoSession, query);
+			for (Map<String, Serializable> row : queryResult) {
+				logger.debug(
+				// "dc:title is: " + (String)row.get("dc:title")
+				"" + " Hierarchy Table ID is:" + row.get("cmis:objectId")
+						+ " cmis:name is: " + row.get("cmis:name")
+				// + " nuxeo:lifecycleState is: " +
+				// row.get("nuxeo:lifecycleState")
+				);
+				String nuxeoId = (String) row.get("cmis:objectId");
+				DocumentModel docModel = NuxeoUtils.getDocumentModel(repoSession, nuxeoId);
+				result.add(docModel);
+			}        	
+        	//
+            profiler.stop();
+
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(repoSession);
+            }
+        }
+        
+        return result;
+    }
+    
     private String logException(Exception e, String msg) {
     	String result = null;
     	

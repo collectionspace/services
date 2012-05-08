@@ -42,6 +42,11 @@ public interface IQueryManager {
     final static String SEARCH_TYPE_INVOCATION = "inv";
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
+	//
+	// Query params for CMIS queries on the relationship (Relation) table.
+	//
+	final static String SEARCH_RELATED_TO_CSID_SUBJECT = "rt_sbj";
+	final static String SEARCH_RELATED_TO_CSID_OBJECT = "rd_obj";
 
 	public void execQuery(String queryString);
 	
