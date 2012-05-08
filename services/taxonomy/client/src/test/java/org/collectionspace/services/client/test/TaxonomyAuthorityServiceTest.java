@@ -44,6 +44,7 @@ import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 import org.collectionspace.services.taxonomy.TaxonCommon;
 
 import javax.ws.rs.core.Response;
+import org.collectionspace.services.taxonomy.*;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.slf4j.Logger;
@@ -65,24 +66,23 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
     /** The logger. */
     private final String CLASS_NAME = TaxonomyAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(TaxonomyAuthorityServiceTest.class);
-    private final String REFNAME = "refName";
-    private final String DISPLAYNAME = "displayName";
 
-    final String TEST_SHORTID = "CentauruspleurexanthemusGreen1832";
-    final String TEST_TERM_STATUS = "accepted";
-    final String TEST_TAXON_FULL_NAME = "Centaurus pleurexanthemus Green 1832";
+    private final String TEST_SHORTID = "CentauruspleurexanthemusGreen1832";
+    private final String TEST_TERM_STATUS = "accepted";
+    private final String TEST_TAXON_FULL_NAME = "Centaurus pleurexanthemus Green 1832";
     // TODO Re-implement the Taxon Rank field so as to provide an orderable
     // ranking value, as well as a display name.
-    final String TEST_TAXON_RANK = "species";
-    final String TEST_TAXON_AUTHOR = "J. Green";
-    final String TEST_TAXON_AUTHOR_TYPE = "ascribed";
-    final String TEST_TAXON_CITATION = "A Monograph of the Trilobites of North America";
-    final String TEST_TAXON_CURRENCY = "current";
-    final String TEST_TAXON_YEAR = "1832";
-    final String TEST_TAXONOMIC_STATUS = "valid";
-    final String TEST_TAXON_IS_NAMED_HYBRID = "false";
-    final TaxonAuthorGroupList NULL_TAXON_AUTHOR_GROUP_LIST = null;
-    final TaxonCitationList NULL_TAXON_CITATION_LIST = null;
+    private final String TEST_TAXON_RANK = "species";
+    private final String TEST_TAXON_AUTHOR = "J. Green";
+    private final String TEST_TAXON_AUTHOR_TYPE = "ascribed";
+    private final String TEST_TAXON_CITATION = "A Monograph of the Trilobites of North America";
+    private final String TEST_TAXON_CURRENCY = "current";
+    private final String TEST_TAXON_YEAR = "1832";
+    private final String TEST_TAXONOMIC_STATUS = "valid";
+    private final String TEST_TAXON_IS_NAMED_HYBRID = "false";
+    private final List<TaxonTermGroup> NULL_TAXON_TERMS_LIST = null;
+    private final TaxonAuthorGroupList NULL_TAXON_AUTHOR_GROUP_LIST = null;
+    private final TaxonCitationList NULL_TAXON_CITATION_LIST = null;
     
     private String knownResourceShortIdentifer = null;
     private String knownTaxonomyTypeRefName = null;
@@ -157,7 +157,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         // * an authref field (when implemented)
 
         String newID = TaxonomyAuthorityClientUtils.createItemInAuthority(vcsid,
-                authRefName, taxonMap, taxonAuthorGroupList, taxonCitationList, client);
+                authRefName, taxonMap, NULL_TAXON_TERMS_LIST, taxonAuthorGroupList, taxonCitationList, client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -177,116 +177,12 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
     }
 
     /**
-     * Verify item display name.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"readItem", "updateItem"})
-    public void verifyItemDisplayName(String testName) throws Exception {
-        //
-    	// First read in our known resource
-    	//
-    	setupRead();
-        TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        TaxonCommon taxon = null;
-        try {
-        	assertStatusCode(res, testName);
-            // Check whether taxon has expected displayName.
-            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-            taxon = (TaxonCommon) extractPart(input,
-                    client.getItemCommonPartName(), TaxonCommon.class);
-            Assert.assertNotNull(taxon);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-        //
-        // Now setup for an update
-        //
-        String displayName = taxon.getDisplayName();
-        // Make sure displayName matches computed form
-        String expectedDisplayName =
-                TaxonomyAuthorityClientUtils.prepareDefaultDisplayName(TEST_TAXON_FULL_NAME);
-        Assert.assertNotNull(displayName, "Display name was null.  Expected it to be: " + expectedDisplayName);
-        // Update the shortName and verify the computed name is updated.
-        taxon.setCsid(null);
-        taxon.setDisplayNameComputed(true);
-        taxon.setTaxonFullName("updated-" + TEST_TAXON_FULL_NAME);
-        expectedDisplayName =
-                TaxonomyAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_TAXON_FULL_NAME);
-
-        // Create the update payload.
-        PoxPayloadOut output = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), taxon);
-
-        setupUpdate();
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        TaxonCommon updatedTaxon = null;
-        try {
-        	assertStatusCode(res, testName);
-            // Retrieve the updated resource and verify that its contents exist.
-        	PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-            updatedTaxon =
-                    (TaxonCommon) extractPart(input,
-                    client.getItemCommonPartName(), TaxonCommon.class);
-            Assert.assertNotNull(updatedTaxon);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedTaxon.getTaxonFullName(), taxon.getTaxonFullName(),
-                "Updated ForeName in Taxonomy did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedTaxon.getDisplayName(), expectedDisplayName,
-                "Updated ForeName in Taxonomy not reflected in computed DisplayName.");
-        //
-        // Now Update the displayName, not computed and verify the computed name is overriden.
-        //
-        taxon.setDisplayNameComputed(false);
-        expectedDisplayName = "TestName";
-        taxon.setDisplayName(expectedDisplayName);
-
-        // Submit the updated resource to the service and store the response.
-        output = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        commonPart = output.addPart(client.getItemCommonPartName(), taxon);
-        setupUpdate(); // setup expected status code for result
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        try {
-        	assertStatusCode(res, testName);
-            // Retrieve the updated resource and verify that its contents exist.
-        	PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-            updatedTaxon =
-                    (TaxonCommon) extractPart(input,
-                    client.getItemCommonPartName(), TaxonCommon.class);
-            Assert.assertNotNull(updatedTaxon);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedTaxon.isDisplayNameComputed(), false,
-                "Updated displayNameComputed in Taxonomy did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedTaxon.getDisplayName(),
-                expectedDisplayName,
-                "Updated DisplayName (not computed) in Taxonomy not stored.");
-    }
-
-    /**
      * Verify illegal item display name.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"verifyItemDisplayName"})
+    @Test(dataProvider = "testName")
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
         //
     	// First read in our known resource.
@@ -308,10 +204,15 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
             }
         }
         //
-        // Try to Update with computed false and no displayName
+        // Make an invalid UPDATE request, without a display name
         //
-        taxon.setDisplayNameComputed(false);
-        taxon.setDisplayName(null);
+        TaxonTermGroupList termList = taxon.getTaxonTermGroupList();
+        Assert.assertNotNull(termList);
+        List<TaxonTermGroup> terms = termList.getTaxonTermGroup();
+        Assert.assertNotNull(terms);
+        Assert.assertTrue(terms.size() > 0);
+        terms.get(0).setTermDisplayName(null);
+        terms.get(0).setTermName(null);
         
         PoxPayloadOut output = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), taxon);
@@ -393,10 +294,10 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
 
             for (AbstractCommonList.ListItem item : items) {
             	String value = 
-            		AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
+            		AbstractCommonListUtils.ListItemGetElementValue(item, TaxonJAXBSchema.REF_NAME);
                 Assert.assertTrue((null != value), "Item refName is null!");
             	value = 
-            		AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
+            		AbstractCommonListUtils.ListItemGetElementValue(item, TaxonJAXBSchema.DISPLAY_NAME);
                 Assert.assertTrue((null != value), "Item displayName is null!");
             }
             if(logger.isTraceEnabled()){
@@ -574,20 +475,38 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
 	}
 	
 	@Override
-	protected TaxonCommon updateItemInstance(TaxonCommon authorityItem) {
-		TaxonCommon result = new TaxonCommon();
-		
-        result.setDisplayName("updated-" + authorityItem.getTaxonFullName());
-        result.setTaxonFullName("updated-" + authorityItem.getTaxonFullName());
-		
-		return result;
+	protected TaxonCommon updateItemInstance(TaxonCommon taxonCommon) {
+            TaxonCommon result = taxonCommon;
+            TaxonTermGroupList termList = taxonCommon.getTaxonTermGroupList();
+            Assert.assertNotNull(termList);
+            List<TaxonTermGroup> terms = termList.getTaxonTermGroup();
+            Assert.assertNotNull(terms);
+            Assert.assertTrue(terms.size() > 0);
+            terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
+            terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
+	    result.setTaxonTermGroupList(termList);
+            return result;
 	}
 
 	@Override
 	protected void compareUpdatedItemInstances(TaxonCommon original,
 			TaxonCommon updated) throws Exception {
-        Assert.assertEquals(updated.getTaxonFullName(), original.getTaxonFullName(),
-                "Taxon full name in updated Taxon did not match submitted data.");
+
+            TaxonTermGroupList originalTermList = original.getTaxonTermGroupList();
+            Assert.assertNotNull(originalTermList);
+            List<TaxonTermGroup> originalTerms = originalTermList.getTaxonTermGroup();
+            Assert.assertNotNull(originalTerms);
+            Assert.assertTrue(originalTerms.size() > 0);
+            
+            TaxonTermGroupList updatedTermList = updated.getTaxonTermGroupList();
+            Assert.assertNotNull(updatedTermList);
+            List<TaxonTermGroup> updatedTerms = updatedTermList.getTaxonTermGroup();
+            Assert.assertNotNull(updatedTerms);
+            Assert.assertTrue(updatedTerms.size() > 0);
+            
+            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
+                originalTerms.get(0).getTermDisplayName(),
+                "Value in updated record did not match submitted data.");
 	}
 
 	@Override
@@ -605,15 +524,10 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         nonexMap.put(TaxonJAXBSchema.NAME, TEST_TAXON_FULL_NAME);
         nonexMap.put(TaxonJAXBSchema.SHORT_IDENTIFIER, "nonEx");
         nonexMap.put(TaxonJAXBSchema.TERM_STATUS, TEST_TERM_STATUS);
-        // PoxPayloadOut multipart =
-        //        TaxonomyAuthorityClientUtils.createTaxonInstance(
-        //        TaxonomyAuthorityClientUtils.createTaxonomyRefName(knownResourceRefName, "nonEx", "Non Existent"),
-        //        nonexMap, NULL_TAXON_AUTHOR_GROUP_LIST, NULL_TAXON_CITATION_LIST,
-        //        client.getItemCommonPartName());
         final String EMPTY_REFNAME = "";
         PoxPayloadOut result =
                 TaxonomyAuthorityClientUtils.createTaxonInstance(EMPTY_REFNAME,
-                nonexMap, NULL_TAXON_AUTHOR_GROUP_LIST, NULL_TAXON_CITATION_LIST,
+                nonexMap, NULL_TAXON_TERMS_LIST, NULL_TAXON_AUTHOR_GROUP_LIST, NULL_TAXON_CITATION_LIST,
                 commonPartName);
 		return result;
 	}

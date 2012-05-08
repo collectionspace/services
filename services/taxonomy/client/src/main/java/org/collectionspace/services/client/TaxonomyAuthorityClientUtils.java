@@ -2,6 +2,8 @@ package org.collectionspace.services.client;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -11,10 +13,8 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.TaxonJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.taxonomy.TaxonAuthorGroupList;
-import org.collectionspace.services.taxonomy.TaxonCitationList;
-import org.collectionspace.services.taxonomy.TaxonCommon;
-import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.taxonomy.*;
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
@@ -61,23 +61,28 @@ public class TaxonomyAuthorityClientUtils {
      * @return	The PoxPayloadOut payload for the create call
      */
     public static PoxPayloadOut createTaxonInstance(
-            String taxonomyAuthRefName, Map<String, String> taxonInfo,
+            String taxonomyAuthRefName, Map<String, String> taxonInfo, List<TaxonTermGroup> terms,
             TaxonAuthorGroupList taxonAuthorGroupList, TaxonCitationList taxonCitationList,
             String headerLabel) {
         TaxonCommon taxon = new TaxonCommon();
         String shortId = taxonInfo.get(TaxonJAXBSchema.SHORT_IDENTIFIER);
-        String displayName = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME);
         taxon.setShortIdentifier(shortId);
-        // String taxonomyRefName = createTaxonomyRefName(taxonomyAuthRefName, shortId, displayName);
-        // taxon.setRefName(taxonomyRefName);
-        String value = null;
-        value = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME_COMPUTED);
-        boolean displayNameComputed = (value == null) || value.equalsIgnoreCase("true");
-        taxon.setDisplayNameComputed(displayNameComputed);
-        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TERM_STATUS)) != null) {
-            taxon.setTermStatus(value);
-        }
 
+        // Set values in the Term Information Group
+        String displayName = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME);
+        TaxonTermGroupList termList = new TaxonTermGroupList();
+        if (terms == null || terms.isEmpty()) {
+            if (Tools.notBlank(displayName)) {
+                terms = getTermGroupInstance(displayName);
+            } else {
+                terms = getTermGroupInstance(getGeneratedIdentifier());
+            }
+        }
+        terms.get(0).setTermStatus(taxonInfo.get(TaxonJAXBSchema.TERM_STATUS));
+        termList.getTaxonTermGroup().addAll(terms); 
+        taxon.setTaxonTermGroupList(termList);        
+        
+        String value = null;
         // Fields specific to this authority record type.
         if ((value = (String) taxonInfo.get(TaxonJAXBSchema.NAME)) != null) {
             taxon.setTaxonFullName(value);
@@ -128,7 +133,7 @@ public class TaxonomyAuthorityClientUtils {
      */
     public static String createItemInAuthority(String vcsid,
             String TaxonomyauthorityRefName, Map<String, String> taxonMap,
-            TaxonAuthorGroupList taxonAuthorGroupList,
+            List<TaxonTermGroup> terms, TaxonAuthorGroupList taxonAuthorGroupList,
             TaxonCitationList taxonCitationList, TaxonomyAuthorityClient client) {
         // Expected status code: 201 Created
         int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
@@ -154,7 +159,7 @@ public class TaxonomyAuthorityClientUtils {
         }
         PoxPayloadOut multipart =
                 createTaxonInstance(TaxonomyauthorityRefName,
-                taxonMap, taxonAuthorGroupList, taxonCitationList, client.getItemCommonPartName());
+                taxonMap, terms, taxonAuthorGroupList, taxonCitationList, client.getItemCommonPartName());
         String newID = null;
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         try {
@@ -317,4 +322,20 @@ public class TaxonomyAuthorityClientUtils {
         newStr.append(name);
         return newStr.toString();
     }
+    
+    public static List<TaxonTermGroup> getTermGroupInstance(String identifier) {
+        if (Tools.isBlank(identifier)) {
+            identifier = getGeneratedIdentifier();
+        }
+        List<TaxonTermGroup> terms = new ArrayList<TaxonTermGroup>();
+        TaxonTermGroup term = new TaxonTermGroup();
+        term.setTermDisplayName(identifier);
+        term.setTermName(identifier);
+        terms.add(term);
+        return terms;
+    }
+    
+    private static String getGeneratedIdentifier() {
+        return "id" + new Date().getTime(); 
+   }
 }
