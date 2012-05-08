@@ -179,8 +179,8 @@
             <xs:element name="termSourceID" type="xs:string"/>
             <xs:element name="termSourceNote" type="xs:string"/>
             <!-- Specific to Place terms -->
+            <xs:element name="historicalStatus" type="xs:string"/>
             <xs:element name="nameAbbrev" type="xs:string"/>
-            <xs:element name="nameType" type="xs:string"/>
             <xs:element name="nameNote" type="xs:string"/>
             <xs:element name="nameDateGroup" type="structuredDateGroup"/>
         </xs:sequence>
