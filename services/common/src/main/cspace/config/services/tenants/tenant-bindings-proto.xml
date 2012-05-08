@@ -2600,8 +2600,8 @@
                         <service:col>inauthority</service:col>
                     </service:field>
                     <service:field>
-                        <service:table>concepts_common</service:table>
-                        <service:col>displayname</service:col>
+                        <service:table>concepttermgroup</service:table>
+                        <service:col>termdisplayname</service:col>
                     </service:field>
                     <service:field>
                         <service:table>concepts_common</service:table>
@@ -2632,9 +2632,17 @@
                             <types:key>termRef</types:key>
                             <types:value>recordType</types:value>
                         </types:item>
+                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conceptTermGroupList/*/termType</types:value>
+                        </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>termStatus</types:value>
+                            <types:value>conceptTermGroupList/*termLanguage</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conceptTermGroupList/*termStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
