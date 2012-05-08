@@ -1804,7 +1804,7 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>orgTermGroupList/*termStatus</types:value>
+                            <types:value>orgTermGroupList/*/termStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
@@ -2139,15 +2139,15 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>orgTermGroupList/*/termType</types:value>
+                            <types:value>locTermGroupList/*/termType</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>orgTermGroupList/*termLanguage</types:value>
+                            <types:value>locTermGroupList/*/termLanguage</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>orgTermGroupList/*termStatus</types:value>
+                            <types:value>locTermGroupList/*/termStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
@@ -2293,11 +2293,11 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>placeTermGroupList/*/termLanguage</types:value>
+                            <types:value>placeTermGroupList/*/termType</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>placeTermGroupList/*/termType</types:value>
+                            <types:value>placeTermGroupList/*/termLanguage</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -2583,11 +2583,7 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
-                    <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
-                        <service:ListResultField>
-                            <service:element>termType</service:element>
-                            <service:xpath>termType</service:xpath>
-                        </service:ListResultField>
+                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -2638,11 +2634,11 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>conceptTermGroupList/*termLanguage</types:value>
+                            <types:value>conceptTermGroupList/*/termLanguage</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>conceptTermGroupList/*termStatus</types:value>
+                            <types:value>conceptTermGroupList/*/termStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
