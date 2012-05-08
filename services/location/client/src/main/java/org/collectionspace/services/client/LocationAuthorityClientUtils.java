@@ -125,7 +125,7 @@ public class LocationAuthorityClientUtils {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
         
         String displayName = "";
-        if (terms !=null && terms.size() > 0) {
+        if ((terms !=null) && (! terms.isEmpty())) {
             displayName = terms.get(0).getTermDisplayName();
         }
     	

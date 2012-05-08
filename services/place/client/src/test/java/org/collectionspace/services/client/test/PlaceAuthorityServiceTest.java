@@ -25,7 +25,6 @@ package org.collectionspace.services.client.test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.collectionspace.services.PlaceJAXBSchema;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
@@ -38,14 +37,9 @@ import org.collectionspace.services.client.PlaceAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.place.PlaceauthoritiesCommon;
 import org.collectionspace.services.place.PlacesCommon;
-import org.collectionspace.services.place.PlaceNameGroup;
-import org.collectionspace.services.place.PlaceNameGroupList;
-
 import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -140,7 +134,7 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
         sanjoseMap.put(PlaceJAXBSchema.TERM_STATUS, TEST_STATUS);
         
         String newID = PlaceAuthorityClientUtils.createItemInAuthority(vcsid,
-        		authRefName, sanjoseMap, client );    
+        		authRefName, sanjoseMap, terms client );    
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -160,133 +154,12 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
     }
 
     /**
-     * Verify item display name.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider="testName", 
-        dependsOnMethods = {"readItem", "updateItem"})
-    public void verifyItemDisplayName(String testName) throws Exception {
-        // Perform setup.
-        setupRead();
-        //
-        // First, read our known item resource
-        //
-        PlaceAuthorityClient client = new PlaceAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        PlacesCommon place = null;
-        try {
-            assertStatusCode(res, testName);
-	        // Check whether place has expected displayName.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        place = (PlacesCommon) extractPart(input,
-	                client.getItemCommonPartName(), PlacesCommon.class);
-	        Assert.assertNotNull(place);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-        //
-        // Now prepare an updated payload.
-        //
-        String displayName = place.getDisplayName();
-        // Make sure displayName matches computed form
-        String expectedDisplayName = 
-            PlaceAuthorityClientUtils.prepareDefaultDisplayName(TEST_NAME);
-        Assert.assertNotNull(displayName, expectedDisplayName);
-        
-        // Update the shortName and verify the computed name is updated.
-        place.setCsid(null);
-        place.setDisplayNameComputed(true);
-        
-         // Verify the contents of this resource
-        PlaceNameGroupList placeNameGroupList = place.getPlaceNameGroupList();
-        Assert.assertNotNull(placeNameGroupList);
-        List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
-        Assert.assertNotNull(placeNameGroups);
-        Assert.assertTrue(placeNameGroups.size() > 0);
-        String placeName = placeNameGroups.get(0).getPlaceName();
-        Assert.assertNotNull(placeName);
-
-        // Update the contents of this resource.
-        final String PLACE_NAME_ADDITION = "verify-item-place-name-updated";
-        placeNameGroups.get(0).setPlaceName(PLACE_NAME_ADDITION + TEST_NAME);
-        place.setPlaceNameGroupList(placeNameGroupList);
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be updated Place");
-            logger.debug(objectAsXmlString(place,
-                    PlacesCommon.class));
-        }
-        expectedDisplayName = 
-            PlaceAuthorityClientUtils.prepareDefaultDisplayName(PLACE_NAME_ADDITION + TEST_NAME);
-
-        // Submit the updated resource to the service and store the response.
-        PoxPayloadOut output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), place);
-
-        setupUpdate();        
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        PlacesCommon updatedPlace = null;
-        try {
-        	assertStatusCode(res, testName);
-	        // Retrieve the updated resource and verify that its contents exist.
-        	PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        updatedPlace = (PlacesCommon) extractPart(input,
-	                        client.getItemCommonPartName(), PlacesCommon.class);
-	        Assert.assertNotNull(updatedPlace);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedPlace.getDisplayName(), expectedDisplayName,
-            "Updated DisplayName in Place not reflected in computed DisplayName.");
-        //
-        // Now Update the displayName, not computed and verify the computed name is overriden.
-        //
-        place.setDisplayNameComputed(false);
-        expectedDisplayName = "TestName";
-        place.setDisplayName(expectedDisplayName);
-
-        // Submit the updated resource to the service and store the response.
-        output = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        commonPart = output.addPart(client.getItemCommonPartName(), place);
-        setupUpdate();        
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        try {
-	        assertStatusCode(res, testName);
-	        // Retrieve the updated resource and verify that its contents exist.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        updatedPlace = (PlacesCommon) extractPart(input,
-	        		client.getItemCommonPartName(), PlacesCommon.class);
-	        Assert.assertNotNull(updatedPlace);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedPlace.isDisplayNameComputed(), false,
-                "Updated displayNameComputed in Place did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedPlace.getDisplayName(),
-        		expectedDisplayName,
-                "Updated DisplayName (not computed) in Place not stored.");
-    }
-
-    /**
      * Verify illegal item display name.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider="testName",
-            dependsOnMethods = {"verifyItemDisplayName"})
+    @Test(dataProvider="testName")
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
         // Perform setup for read.
         setupRead();

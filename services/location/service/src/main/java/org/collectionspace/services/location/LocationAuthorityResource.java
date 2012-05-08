@@ -22,45 +22,42 @@
  */
 package org.collectionspace.services.location;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.location.nuxeo.LocationDocumentModelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-
+/**
+ * LocationAuthorityResource
+ *
+ * Handles, dispatches, and returns responses to RESTful requests related to
+ * Location authority-related resources.
+ */
 @Path(LocationAuthorityClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class LocationAuthorityResource
         extends AuthorityResource<LocationauthoritiesCommon, LocationDocumentModelHandler> {
 
-    private final static String locationAuthorityServiceName = "locationauthorities";
-    private final static String LOCATIONAUTHORITIES_COMMON = "locationauthorities_common";
-    private final static String locationServiceName = "locations";
-    private final static String LOCATIONS_COMMON = "locations_common";
     final Logger logger = LoggerFactory.getLogger(LocationAuthorityResource.class);
 
     public LocationAuthorityResource() {
         super(LocationauthoritiesCommon.class, LocationAuthorityResource.class,
-                LOCATIONAUTHORITIES_COMMON, LOCATIONS_COMMON);
+                LocationAuthorityClient.SERVICE_COMMON_PART_NAME, LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override
     public String getServiceName() {
-        return locationAuthorityServiceName;
-    }
-
-    public String getItemServiceName() {
-        return locationServiceName;
+        return LocationAuthorityClient.SERVICE_NAME;
     }
 
     @Override
-    public Class<LocationauthoritiesCommon> getCommonPartClass() {
-        return LocationauthoritiesCommon.class;
+    public String getItemServiceName() {
+        return LocationAuthorityClient.SERVICE_ITEM_NAME;
     }
 
     @Override

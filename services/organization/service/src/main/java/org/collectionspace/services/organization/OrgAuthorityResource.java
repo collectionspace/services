@@ -23,50 +23,45 @@
  */
 package org.collectionspace.services.organization;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import org.collectionspace.services.client.OrgAuthorityClient;
-import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.contact.AuthorityResourceWithContacts;
 import org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+/**
+ * OrgAuthorityResource
+ * 
+ * Handles, dispatches, and returns responses to RESTful requests
+ * related to Organization authority-related resources.
+ */
 
-@Path("/" + OrgAuthorityClient.SERVICE_PATH_COMPONENT)
+@Path(OrgAuthorityClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class OrgAuthorityResource extends
-	AuthorityResourceWithContacts<OrgauthoritiesCommon, OrganizationDocumentModelHandler> {
+    AuthorityResourceWithContacts<OrgauthoritiesCommon, OrganizationDocumentModelHandler> {
 
-    private final static String orgAuthorityServiceName = OrgAuthorityClient.SERVICE_NAME;
-	private final static String ORGAUTHORITIES_COMMON = "orgauthorities_common";
-    
-    private final static String organizationServiceName = "organizations";
-	private final static String ORGANIZATIONS_COMMON = "organizations_common";
-    
     final Logger logger = LoggerFactory.getLogger(OrgAuthorityResource.class);
     
     public OrgAuthorityResource() {
-		super(OrgauthoritiesCommon.class, OrgAuthorityResource.class,
-				ORGAUTHORITIES_COMMON, ORGANIZATIONS_COMMON);
+        super(OrgauthoritiesCommon.class, OrgAuthorityResource.class,
+                OrgAuthorityClient.SERVICE_COMMON_PART_NAME, OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     @Override
     public String getServiceName() {
-        return orgAuthorityServiceName;
-    }
-    
-    public String getItemServiceName() {
-        return organizationServiceName;
+        return OrgAuthorityClient.SERVICE_NAME;
     }
 
     @Override
-    public Class<OrgauthoritiesCommon> getCommonPartClass() {
-    	return OrgauthoritiesCommon.class;
+    public String getItemServiceName() {
+        return OrgAuthorityClient.SERVICE_ITEM_NAME;
     }
-    
+
     @Override
     public String getItemTermInfoGroupXPathBase() {
         return OrgAuthorityClient.TERM_INFO_GROUP_XPATH_BASE;
