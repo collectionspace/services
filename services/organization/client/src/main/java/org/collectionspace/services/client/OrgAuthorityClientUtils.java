@@ -205,15 +205,15 @@ public class OrgAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static PoxPayloadOut createOrganizationInstance(
-    		String orgAuthRefName, Map<String, String> orgInfo,
-                List<OrgTermGroup> terms, String headerLabel){
-            final Map<String, List<String>> EMPTY_ORG_REPEATABLES_INFO =
-                new HashMap<String, List<String>>();
-            return createOrganizationInstance(orgAuthRefName,
-                    orgInfo, terms, EMPTY_ORG_REPEATABLES_INFO, headerLabel);
-    }
-
+	public static PoxPayloadOut createOrganizationInstance(
+			String orgAuthRefName,
+			Map<String,	String> orgInfo,
+			List<OrgTermGroup> terms,
+			String headerLabel) {
+		final Map<String, List<String>> EMPTY_ORG_REPEATABLES_INFO = new HashMap<String, List<String>>();
+		return createOrganizationInstance(orgAuthRefName, orgInfo, terms,
+				EMPTY_ORG_REPEATABLES_INFO, headerLabel);
+	}
 
     /**
      * Creates the organization instance.

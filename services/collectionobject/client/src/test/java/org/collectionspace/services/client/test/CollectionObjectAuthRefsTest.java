@@ -53,6 +53,7 @@ import org.collectionspace.services.collectionobject.FieldCollectorList;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -344,13 +345,18 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      */
     protected String createOrganization(String shortName, String foundingPlace, String shortIdentifier ) {
         Map<String, String> orgInfo = new HashMap<String,String>();
-        orgInfo.put(OrganizationJAXBSchema.SHORT_NAME, shortName);
         orgInfo.put(OrganizationJAXBSchema.FOUNDING_PLACE, foundingPlace);
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+        
+        List<OrgTermGroup> orgTerms = new ArrayList<OrgTermGroup>();
+        OrgTermGroup term = new OrgTermGroup();
+        term.setTermDisplayName(shortName);
+        term.setTermName(shortName);
+        orgTerms.add(term);
+        
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
     	PoxPayloadOut multipart =
-    		OrgAuthorityClientUtils.createOrganizationInstance(
-    				orgAuthRefName, orgInfo, orgAuthClient.getItemCommonPartName());
+    		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthRefName, orgInfo, orgTerms, orgAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
         int statusCode = res.getStatus();
 
