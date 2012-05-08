@@ -953,7 +953,6 @@
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="loansout_common" updated="" order="1">
                     <service:properties>
                         <!-- Fields containing authority term references -->
-<<<<<<< HEAD
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>borrower</types:value>
@@ -2968,9 +2967,7 @@
                         <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-<<<<<<< HEAD
                             <types:value>addressGroupList/*/addressMunicipality</types:value>
-                            =======
                             <types:value>placeOwnerGroupList/*/owner</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
@@ -2996,7 +2993,6 @@
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>placeNameGroupList/*/nameStatus</types:value>
-                            >>>>>>> upstream/master
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
