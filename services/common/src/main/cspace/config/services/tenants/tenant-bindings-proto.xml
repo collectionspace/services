@@ -2282,6 +2282,10 @@
                             <types:key>authRef</types:key>
                             <types:value>placeOwnerGroupList/*/owner</types:value>
                         </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>placeGeoRefGroupList/*/geoReferencedBy</types:value>
+                        </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -2968,31 +2972,6 @@
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>addressGroupList/*/addressMunicipality</types:value>
-                            <types:value>placeOwnerGroupList/*/owner</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>placeGeoRefGroupList/*/geoReferencedBy</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>termStatus</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>placeType</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>placeNameGroupList/*/nameLanguage</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>placeNameGroupList/*/nameType</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>placeNameGroupList/*/nameStatus</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
