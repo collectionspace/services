@@ -233,6 +233,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // Ensure we have required fields set properly
         handleInAuthority(wrapDoc.getWrappedObject());
         
+        // FIXME: This call to synthesize a shortIdentifier from the termDisplayName
+        // of the preferred term may have been commented out, in the course of
+        // adding support for preferred / non-preferred terms, in CSPACE-4813
+        // and linked issues. Revisit this to determine whether we want to
+        // re-enable it.
+        //
         // CSPACE-3178:
         // handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
         // refName includes displayName, so we force a correct value here.
