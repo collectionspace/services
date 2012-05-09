@@ -41,6 +41,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.objectexit.StructuredDateGroup;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -66,7 +67,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
     private String depositorRefName = null;
-    private String exitDate = null;
+    private StructuredDateGroup exitDateGroup = new StructuredDateGroup();
     private String exitNumber = null;
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.currentDateUTC();
@@ -91,20 +92,18 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    private PoxPayloadOut createObjectExitInstance(String depositorRefName, String exitNumber, String exitDateDisplayDate) {        
-        ExitDateGroup exitDateGroup = this.getExitDateGroup();
-        exitDateGroup.setDateDisplayDate(exitDateDisplayDate);
-
+    private PoxPayloadOut createObjectExitInstance(String depositorRefName, String exitNumber, String exitDateDisplayDate) {
         this.exitNumber = exitNumber;
         this.depositorRefName = depositorRefName;
-        this.setExitDateGroup(exitDateGroup);
+        this.exitDateGroup.setDateDisplayDate(exitDateDisplayDate);
+        this.exitDateGroup.setDateDisplayDate(exitDateDisplayDate);
         
         ObjectexitCommon objectexit = new ObjectexitCommon();
-        oeExitDateGroup = objectexit.getExitDateGroup();
-        oeExitDateGroup.setDisplayDate(exitDateDisplayDate);
+        StructuredDateGroup oeExitDateGroup = new StructuredDateGroup();
 
         objectexit.setDepositor(depositorRefName);
         objectexit.setExitNumber(exitNumber);
+        oeExitDateGroup.setDateDisplayDate(exitDateDisplayDate);
         objectexit.setExitDateGroup(oeExitDateGroup);
 
         PoxPayloadOut multipart = new PoxPayloadOut(ObjectExitClient.SERVICE_PAYLOAD_NAME);
