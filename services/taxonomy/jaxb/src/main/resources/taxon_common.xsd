@@ -28,21 +28,15 @@
                 <!-- Term Information repeatable group -->
                 <xs:element name="taxonTermGroupList" type="taxonTermGroupList"/>
     
-                <!-- FIXME: See comments on CSPACE-5122 for any additional changes -->
-                <!-- to the set of fields below -->
                 <xs:element name="description" type="xs:string"/>
-                <xs:element name="taxonFullName" type="xs:string"/>
                 <xs:element name="taxonRank" type="xs:string"/>
                 <xs:element name="taxonCurrency" type="xs:string"/>
                 <xs:element name="taxonAuthorGroupList" type="taxonAuthorGroupList"/>
                 <xs:element name="taxonYear" type="xs:string"/>
                 <xs:element name="taxonCitationList" type="taxonCitationList"/>
-                <xs:element name="taxonomicStatus" type="xs:string"/>
-                <xs:element name="taxonNameSource" type="xs:string"/>
-                <xs:element name="taxonNameSourceCode" type="xs:string"/>
-                <xs:element name="taxonGUID" type="xs:string"/>
                 <xs:element name="taxonNote" type="xs:string"/>
-                <xs:element name="taxonIsNamedHybrid" type="xs:string"/>
+                <xs:element name="taxonIsNamedHybrid" type="xs:boolean"/>
+                <xs:element name="commonNameGroupList" type="commonNameGroupList"/>
 
             </xs:sequence>
         </xs:complexType>
@@ -67,6 +61,20 @@
         </xs:sequence>
     </xs:complexType>
     
+    <xs:complexType name="commonNameGroupList">
+        <xs:sequence>
+            <xs:element name="commonNameGroup" type="commonNameGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="commonNameGroup">
+        <xs:sequence>
+            <xs:element name="commonName" type="xs:string"/>
+            <xs:element name="commonNameLanguage" type="xs:string"/>
+            <xs:element name="commonNameSource" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
     <xs:complexType name="taxonTermGroupList">
         <xs:sequence>
             <xs:element name="taxonTermGroup" type="taxonTermGroup" minOccurs="0" maxOccurs="unbounded"/>
@@ -88,7 +96,7 @@
             <xs:element name="termSourceID" type="xs:string"/>
             <xs:element name="termSourceNote" type="xs:string"/>
             <!-- Specific to Taxon terms -->
-            <!-- FIXME: See comments on CSPACE-5122 for any additions here -->
+            <xs:element name="taxonomicStatus" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

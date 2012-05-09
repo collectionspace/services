@@ -1,24 +1,23 @@
 /**
- * This document is a part of the source code and related artifacts
- * for CollectionSpace, an open source collections management system
- * for museums and related institutions:
+ * This document is a part of the source code and related artifacts for
+ * CollectionSpace, an open source collections management system for museums and
+ * related institutions:
  *
- * http://www.collectionspace.org
- * http://wiki.collectionspace.org
+ * http://www.collectionspace.org http://wiki.collectionspace.org
  *
  * Copyright (c)) 2009 Regents of the University of California
  *
- * Licensed under the Educational Community License (ECL), Version 2.0.
- * You may not use this file except in compliance with this License.
+ * Licensed under the Educational Community License (ECL), Version 2.0. You may
+ * not use this file except in compliance with this License.
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.collectionspace.services.client.test;
 
@@ -37,6 +36,7 @@ import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClientUtils;
 import org.collectionspace.services.client.TaxonomyAuthorityProxy;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.taxonomy.CommonNameGroupList;
 import org.collectionspace.services.taxonomy.TaxonAuthorGroup;
 import org.collectionspace.services.taxonomy.TaxonAuthorGroupList;
 import org.collectionspace.services.taxonomy.TaxonCitationList;
@@ -55,18 +55,18 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 /**
- * TaxonomyAuthorityServiceTest, carries out tests against a
- * deployed and running TaxonomyAuthority Service.
+ * TaxonomyAuthorityServiceTest, carries out tests against a deployed and
+ * running TaxonomyAuthority Service.
  *
- * $LastChangedRevision$
- * $LastChangedDate$
+ * $LastChangedRevision$ $LastChangedDate$
  */
 public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<TaxonomyauthorityCommon, TaxonCommon> {
 
-    /** The logger. */
+    /**
+     * The logger.
+     */
     private final String CLASS_NAME = TaxonomyAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(TaxonomyAuthorityServiceTest.class);
-
     private final String TEST_SHORTID = "CentauruspleurexanthemusGreen1832";
     private final String TEST_TERM_STATUS = "accepted";
     private final String TEST_TAXON_FULL_NAME = "Centaurus pleurexanthemus Green 1832";
@@ -83,7 +83,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
     private final List<TaxonTermGroup> NULL_TAXON_TERMS_LIST = null;
     private final TaxonAuthorGroupList NULL_TAXON_AUTHOR_GROUP_LIST = null;
     private final TaxonCitationList NULL_TAXON_CITATION_LIST = null;
-    
+    private final CommonNameGroupList NULL_COMMON_NAME_GROUP_LIST = null;
+
     private String knownResourceShortIdentifer = null;
     private String knownTaxonomyTypeRefName = null;
 
@@ -100,9 +101,10 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
     public String getItemServicePathComponent() {
         return AuthorityClient.ITEMS;
     }
-        
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+
+    /*
+     * (non-Javadoc) @see
+     * org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
     protected CollectionSpaceClient<AbstractCommonList, PoxPayloadOut, String, TaxonomyAuthorityProxy> getClientInstance() {
@@ -150,6 +152,12 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         taxonAuthorGroup.setTaxonAuthor(TEST_TAXON_AUTHOR);
         taxonAuthorGroup.setTaxonAuthorType(TEST_TAXON_AUTHOR_TYPE);
         taxonAuthorGroups.add(taxonAuthorGroup);
+                
+        CommonNameGroupList commonNameGroupList = new CommonNameGroupList();
+        List<CommonNameGroup> commonNameGroups = commonNameGroupList.getCommonNameGroup();
+        CommonNameGroup commonNameGroup = new CommonNameGroup();
+        commonNameGroup.setCommonName(TEST_TAXON_FULL_NAME);
+        commonNameGroups.add(commonNameGroup);
 
         // FIXME: Add additional fields in the Taxon record here,
         // including at least one each of:
@@ -157,7 +165,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         // * an authref field (when implemented)
 
         String newID = TaxonomyAuthorityClientUtils.createItemInAuthority(vcsid,
-                authRefName, taxonMap, NULL_TAXON_TERMS_LIST, taxonAuthorGroupList, taxonCitationList, client);
+                authRefName, taxonMap, NULL_TAXON_TERMS_LIST, taxonAuthorGroupList,
+                taxonCitationList, commonNameGroupList, client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -185,8 +194,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
     @Test(dataProvider = "testName")
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
         //
-    	// First read in our known resource.
-    	//
+        // First read in our known resource.
+        //
         setupRead();
         TaxonomyAuthorityClient client = new TaxonomyAuthorityClient();
         ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
@@ -199,7 +208,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
                     client.getItemCommonPartName(), TaxonCommon.class);
             Assert.assertNotNull(taxon);
         } finally {
-        	if (res != null) {
+            if (res != null) {
                 res.releaseConnection();
             }
         }
@@ -213,13 +222,13 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         Assert.assertTrue(terms.size() > 0);
         terms.get(0).setTermDisplayName(null);
         terms.get(0).setTermName(null);
-        
+
         PoxPayloadOut output = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), taxon);
         setupUpdateWithInvalidBody(); // we expect a failure here
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
-        	assertStatusCode(res, testName);
+            assertStatusCode(res, testName);
         } finally {
             res.releaseConnection();
         }
@@ -229,7 +238,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
      * Read item list.
      */
     @Test(dataProvider = "testName", groups = {"readList"},
-    		dependsOnMethods = {"readList"})
+    dependsOnMethods = {"readList"})
     public void readItemList(String testName) {
         readItemList(knownAuthorityWithItems, null);
     }
@@ -238,7 +247,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
      * Read item list by authority name.
      */
     @Test(dataProvider = "testName", groups = {"readList"},
-    		dependsOnMethods = {"readItemList"})
+    dependsOnMethods = {"readItemList"})
     public void readItemListByAuthorityName(String testName) {
         readItemList(null, READITEMS_SHORT_IDENTIFIER);
     }
@@ -267,7 +276,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         }
         try {
             assertStatusCode(res, testName);
-        	AbstractCommonList list = res.getEntity();
+            AbstractCommonList list = res.getEntity();
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -293,15 +302,15 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
             Assert.assertEquals(nItemsReturned, nExpectedItems);
 
             for (AbstractCommonList.ListItem item : items) {
-            	String value = 
-            		AbstractCommonListUtils.ListItemGetElementValue(item, TaxonJAXBSchema.REF_NAME);
+                String value =
+                        AbstractCommonListUtils.ListItemGetElementValue(item, TaxonJAXBSchema.REF_NAME);
                 Assert.assertTrue((null != value), "Item refName is null!");
-            	value = 
-            		AbstractCommonListUtils.ListItemGetElementValue(item, TaxonJAXBSchema.DISPLAY_NAME);
+                value =
+                        AbstractCommonListUtils.ListItemGetElementValue(item, TaxonJAXBSchema.DISPLAY_NAME);
                 Assert.assertTrue((null != value), "Item displayName is null!");
             }
-            if(logger.isTraceEnabled()){
-            	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
+            if (logger.isTraceEnabled()) {
+                AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
             }
         } finally {
             res.releaseConnection();
@@ -310,26 +319,26 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
 
     @Override
     public void delete(String testName) throws Exception {
-    	// Do nothing.  See localDelete().  This ensure proper test order.
+        // Do nothing.  See localDelete().  This ensure proper test order.
     }
-    
-    @Test(dataProvider = "testName", dependsOnMethods = {"localDeleteItem"})    
+
+    @Test(dataProvider = "testName", dependsOnMethods = {"localDeleteItem"})
     public void localDelete(String testName) throws Exception {
-    	super.delete(testName);
+        super.delete(testName);
     }
 
     @Override
     public void deleteItem(String testName) throws Exception {
-    	// Do nothing.  We need to wait until after the test "localDelete" gets run.  When it does,
-    	// its dependencies will get run first and then we can call the base class' delete method.
+        // Do nothing.  We need to wait until after the test "localDelete" gets run.  When it does,
+        // its dependencies will get run first and then we can call the base class' delete method.
     }
-    
+
     @Test(dataProvider = "testName", groups = {"delete"},
-    	dependsOnMethods = {"verifyIllegalItemDisplayName"})
+    dependsOnMethods = {"verifyIllegalItemDisplayName"})
     public void localDeleteItem(String testName) throws Exception {
-    	super.deleteItem(testName);
+        super.deleteItem(testName);
     }
-    
+
     // ---------------------------------------------------------------
     // Cleanup of resources created during testing
     // ---------------------------------------------------------------
@@ -337,9 +346,9 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
      * Deletes all resources created by tests, after all tests have been run.
      *
      * This cleanup method will always be run, even if one or more tests fail.
-     * For this reason, it attempts to remove all resources created
-     * at any point during testing, even if some of those resources
-     * may be expected to be deleted by certain tests.
+     * For this reason, it attempts to remove all resources created at any point
+     * during testing, even if some of those resources may be expected to be
+     * deleted by certain tests.
      */
     @AfterClass(alwaysRun = true)
     public void cleanUp() {
@@ -380,17 +389,18 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+    /*
+     * (non-Javadoc) @see
+     * org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     /**
      * Returns the root URL for the item service.
      *
-     * This URL consists of a base URL for all services, followed by
-     * a path component for the owning parent, followed by the
-     * path component for the items.
+     * This URL consists of a base URL for all services, followed by a path
+     * component for the owning parent, followed by the path component for the
+     * items.
      *
-     * @param  parentResourceIdentifier  An identifier (such as a UUID) for the
+     * @param parentResourceIdentifier An identifier (such as a UUID) for the
      * parent authority resource of the relevant item resource.
      *
      * @return The root URL for the item service.
@@ -403,11 +413,11 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
      * Returns the URL of a specific item resource managed by a service, and
      * designated by an identifier (such as a universally unique ID, or UUID).
      *
-     * @param  parentResourceIdentifier  An identifier (such as a UUID) for the
+     * @param parentResourceIdentifier An identifier (such as a UUID) for the
      * parent authority resource of the relevant item resource.
      *
-     * @param  itemResourceIdentifier  An identifier (such as a UUID) for an
-     * item resource.
+     * @param itemResourceIdentifier An identifier (such as a UUID) for an item
+     * resource.
      *
      * @return The URL of a specific item resource managed by a service.
      */
@@ -415,18 +425,17 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         return getItemServiceRootURL(parentResourceIdentifier) + "/" + itemResourceIdentifier;
     }
 
-	@Override
-	public void authorityTests(String testName) {
-		// TODO Auto-generated method stub
-	}
+    @Override
+    public void authorityTests(String testName) {
+        // TODO Auto-generated method stub
+    }
 
-	//
-	// Taxonomy authority specific instances
-	//
-	
-	@Override
-	protected PoxPayloadOut createInstance(String commonPartName,
-			String identifier) {
+    //
+    // Taxonomy authority specific instances
+    //
+    @Override
+    protected PoxPayloadOut createInstance(String commonPartName,
+            String identifier) {
         String shortId = identifier;
         String displayName = "displayName-" + shortId;
         String baseRefName =
@@ -435,91 +444,100 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
                 TaxonomyAuthorityClientUtils.createTaxonomyAuthorityInstance(
                 displayName, shortId, commonPartName);
         return multipart;
-	}
-	
-	@Override
+    }
+
+    @Override
     protected PoxPayloadOut createNonExistenceInstance(String commonPartName, String identifier) {
         String displayName = "displayName-NON_EXISTENT_ID";
-    	PoxPayloadOut result = TaxonomyAuthorityClientUtils.createTaxonomyAuthorityInstance(
-    				displayName, "nonEx", commonPartName);
-    	return result;
-    }		
+        PoxPayloadOut result = TaxonomyAuthorityClientUtils.createTaxonomyAuthorityInstance(
+                displayName, "nonEx", commonPartName);
+        return result;
+    }
 
-	@Override
-	protected TaxonomyauthorityCommon updateInstance(
-			TaxonomyauthorityCommon taxonomyAuthority) {
-		TaxonomyauthorityCommon result = new TaxonomyauthorityCommon();
-		
-		result.setDisplayName("updated-" + taxonomyAuthority.getDisplayName());
-		result.setVocabType("updated-" + taxonomyAuthority.getVocabType());
-		
-		return result;
-	}
+    @Override
+    protected TaxonomyauthorityCommon updateInstance(
+            TaxonomyauthorityCommon taxonomyAuthority) {
+        TaxonomyauthorityCommon result = new TaxonomyauthorityCommon();
 
-	@Override
-	protected void compareUpdatedInstances(TaxonomyauthorityCommon original,
-			TaxonomyauthorityCommon updated) throws Exception {
+        result.setDisplayName("updated-" + taxonomyAuthority.getDisplayName());
+        result.setVocabType("updated-" + taxonomyAuthority.getVocabType());
+
+        return result;
+    }
+
+    @Override
+    protected void compareUpdatedInstances(TaxonomyauthorityCommon original,
+            TaxonomyauthorityCommon updated) throws Exception {
         // Verify that the updated resource received the correct data.
         Assert.assertEquals(updated.getDisplayName(),
-        		original.getDisplayName(),
+                original.getDisplayName(),
                 "Display name in updated object did not match submitted data.");
-	}
-	
-	//
-	// Authority item specific overrides
-	//
+    }
 
-	@Override
-	protected String createItemInAuthority(String authorityId) {
-		return createItemInAuthority(authorityId, null /*refname*/);
-	}
-	
-	@Override
-	protected TaxonCommon updateItemInstance(TaxonCommon taxonCommon) {
-            TaxonCommon result = taxonCommon;
-            TaxonTermGroupList termList = taxonCommon.getTaxonTermGroupList();
-            Assert.assertNotNull(termList);
-            List<TaxonTermGroup> terms = termList.getTaxonTermGroup();
-            Assert.assertNotNull(terms);
-            Assert.assertTrue(terms.size() > 0);
-            terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
-            terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
-	    result.setTaxonTermGroupList(termList);
-            return result;
-	}
+    //
+    // Authority item specific overrides
+    //
+    @Override
+    protected String createItemInAuthority(String authorityId) {
+        return createItemInAuthority(authorityId, null /*
+                 * refname
+                 */);
+    }
 
-	@Override
-	protected void compareUpdatedItemInstances(TaxonCommon original,
-			TaxonCommon updated) throws Exception {
+    @Override
+    protected TaxonCommon updateItemInstance(TaxonCommon taxonCommon) {
+        TaxonCommon result = taxonCommon;
+        TaxonTermGroupList termList = taxonCommon.getTaxonTermGroupList();
+        Assert.assertNotNull(termList);
+        List<TaxonTermGroup> terms = termList.getTaxonTermGroup();
+        Assert.assertNotNull(terms);
+        Assert.assertTrue(terms.size() > 0);
+        terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
+        terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
+        result.setTaxonTermGroupList(termList);
+        return result;
+    }
 
-            TaxonTermGroupList originalTermList = original.getTaxonTermGroupList();
-            Assert.assertNotNull(originalTermList);
-            List<TaxonTermGroup> originalTerms = originalTermList.getTaxonTermGroup();
-            Assert.assertNotNull(originalTerms);
-            Assert.assertTrue(originalTerms.size() > 0);
-            
-            TaxonTermGroupList updatedTermList = updated.getTaxonTermGroupList();
-            Assert.assertNotNull(updatedTermList);
-            List<TaxonTermGroup> updatedTerms = updatedTermList.getTaxonTermGroup();
-            Assert.assertNotNull(updatedTerms);
-            Assert.assertTrue(updatedTerms.size() > 0);
-            
-            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
+    @Override
+    protected void compareUpdatedItemInstances(TaxonCommon original,
+            TaxonCommon updated) throws Exception {
+
+        TaxonTermGroupList originalTermList = original.getTaxonTermGroupList();
+        Assert.assertNotNull(originalTermList);
+        List<TaxonTermGroup> originalTerms = originalTermList.getTaxonTermGroup();
+        Assert.assertNotNull(originalTerms);
+        Assert.assertTrue(originalTerms.size() > 0);
+
+        TaxonTermGroupList updatedTermList = updated.getTaxonTermGroupList();
+        Assert.assertNotNull(updatedTermList);
+        List<TaxonTermGroup> updatedTerms = updatedTermList.getTaxonTermGroup();
+        Assert.assertNotNull(updatedTerms);
+        Assert.assertTrue(updatedTerms.size() > 0);
+
+        Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
                 originalTerms.get(0).getTermDisplayName(),
                 "Value in updated record did not match submitted data.");
-	}
+    }
 
-	@Override
-	protected void verifyReadItemInstance(TaxonCommon item) throws Exception {
-        Assert.assertNotNull(item.getTaxonFullName(), "Field value is unexpectedly null.");
-        Assert.assertEquals(item.getTaxonFullName(), TEST_TAXON_FULL_NAME,
-                "Field value " + item.getTaxonFullName()
+    @Override
+    protected void verifyReadItemInstance(TaxonCommon item) throws Exception {
+        
+        TaxonTermGroupList termList = item.getTaxonTermGroupList();
+        Assert.assertNotNull(termList);
+        List<TaxonTermGroup> terms = termList.getTaxonTermGroup();
+        Assert.assertNotNull(terms);
+        Assert.assertTrue(terms.size() > 0);
+        
+        String preferredTermName = terms.get(0).getTermName();
+        Assert.assertNotNull(preferredTermName, "Field value is unexpectedly null.");
+        Assert.assertEquals(preferredTermName, TEST_TAXON_FULL_NAME,
+                "Field value " + preferredTermName
                 + "does not match expected value " + TEST_TAXON_FULL_NAME);
-	}
+    }
 
-	@Override
-	protected PoxPayloadOut createNonExistenceItemInstance(
-			String commonPartName, String identifier) {
+    @Override
+    protected PoxPayloadOut createNonExistenceItemInstance(
+            String commonPartName, String identifier) {
         Map<String, String> nonexMap = new HashMap<String, String>();
         nonexMap.put(TaxonJAXBSchema.NAME, TEST_TAXON_FULL_NAME);
         nonexMap.put(TaxonJAXBSchema.SHORT_IDENTIFIER, "nonEx");
@@ -528,7 +546,7 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
         PoxPayloadOut result =
                 TaxonomyAuthorityClientUtils.createTaxonInstance(EMPTY_REFNAME,
                 nonexMap, NULL_TAXON_TERMS_LIST, NULL_TAXON_AUTHOR_GROUP_LIST, NULL_TAXON_CITATION_LIST,
-                commonPartName);
-		return result;
-	}
+                NULL_COMMON_NAME_GROUP_LIST, commonPartName);
+        return result;
+    }
 }

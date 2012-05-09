@@ -2404,10 +2404,14 @@
                 <service:params>
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Uncomment when bug in returning list result values from complex types,
+                             currently in the CSPACE-4813 branch (P/NP term work in services), is fixed -->
+                        <!--
                         <service:ListResultField>
                             <service:element>taxonFullName</service:element>
-                            <service:xpath>taxonFullName</service:xpath>
+                            <service:xpath>taxonTermGroup/[0]/termName</service:xpath>
                         </service:ListResultField>
+                        -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -2452,6 +2456,13 @@
                             <types:key>authRef</types:key>
                             <types:value>taxonAuthorGroupList/*/taxonAuthor</types:value>
                         </types:item>
+                        <!-- Uncomment when Citation Authority is implemented -->
+                        <!--
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>commonNameGroupList/*/commonNameSource</types:value>
+                        </types:item>
+                        -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -2464,6 +2475,10 @@
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>taxonAuthorGroupList/*/taxonAuthorType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>commonNameGroupList/*/commonNameLanguage</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
