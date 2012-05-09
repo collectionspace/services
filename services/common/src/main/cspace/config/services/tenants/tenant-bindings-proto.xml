@@ -86,7 +86,6 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:classname>
                 <service:params>
                     <service:DublinCoreTitle>collectionobjects</service:DublinCoreTitle>
                     <service:ListResultsItemMethodName>getCollectionObjectListItem</service:ListResultsItemMethodName>
@@ -953,22 +952,6 @@
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="loansout_common" updated="" order="1">
                     <service:properties>
                         <!-- Fields containing authority term references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>borrower</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>borrowersContact</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>lendersAuthorizer</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>lendersContact</types:value>
-                        </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>borrower</types:value>
