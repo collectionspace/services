@@ -6,9 +6,6 @@
     Entity  : Concept
     Part    : Common
     Used for: Nuxeo EP core document type
-    
-    $LastChangedRevision: 860 $
-    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
 -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -76,7 +73,8 @@
         <xs:sequence>
             <xs:element name="additionalSource" type="xs:string"/>
             <xs:element name="additionalSourceDetail" type="xs:string"/>
-            <xs:element name="additionalSourceUID" type="xs:string"/>
+            <xs:element name="additionalSourceID" type="xs:string"/>
+            <xs:element name="additionalSourceNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

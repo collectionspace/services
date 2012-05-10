@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Concept schema (XSD)
+
+    Entity  : Concept
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
@@ -81,7 +90,8 @@
         <xs:sequence>
             <xs:element name="additionalSource" type="xs:string"/>
             <xs:element name="additionalSourceDetail" type="xs:string"/>
-            <xs:element name="additionalSourceUID" type="xs:string"/>
+            <xs:element name="additionalSourceID" type="xs:string"/>
+            <xs:element name="additionalSourceNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
