@@ -116,7 +116,7 @@ public class XmlReplayEval {
             start = cursor;
 
             Expression expr = jexl.createExpression(var);
-            Object resultObj = expr.evaluate(jc);
+            Object resultObj = expr.evaluate(jc); //REM - 5/9/2011 - Usually calls back to fields and methods in ServiceResult class to do the evaluation -e.g., the "got" method.
             String resultStr;
             if (null == resultObj){
                 //debug: System.out.println("null found while evaluationg variable: '"+var+"' Jexl context: "+dumpContext(jc));

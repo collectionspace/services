@@ -37,27 +37,35 @@
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
     <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
     <run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
+
+<!--
     <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchCommonSchema" />
     <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchExtensionSchema" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
     <run controlFile="relation/relation.xml" testGroup="makeRelations" />
-		<!-- No - this test is broken
-		<run controlFile="relation/relation.xml" testGroup="r2only" />
-		-->
+-->
+
+<!-- No - this test is broken
+	<run controlFile="relation/relation.xml" testGroup="r2only" />
+-->
+
     <run controlFile="person/person.xml" testGroup="postPerson" />
     <run controlFile="person/person.xml" testGroup="updatePerson" />
     <run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
+
     <run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
+
+<!-- 		
     <run controlFile="organization/organization-hierarchy.xml" testGroup="HierarchicOrganization" />
     <run controlFile="batch/batch.xml" />
     <run controlFile="report/report.xml" />
     <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
-		<run controlFile="authrefs/authrefs.xml" testGroup="AuthRefs" />
-		<run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
-		<run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
+	<run controlFile="authrefs/authrefs.xml" testGroup="AuthRefs" />
+	<run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
+	<run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
     <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
-
+-->
     
 </xmlReplayMaster>
 

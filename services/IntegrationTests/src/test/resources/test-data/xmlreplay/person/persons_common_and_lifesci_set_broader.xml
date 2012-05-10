@@ -2,12 +2,17 @@
 <document name="persons">
   <pers:persons_common xmlns:pers="http://collectionspace.org/services/person">
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
-    <displayName>${foreName} ${surName}</displayName>
-    <displayNameComputed>false</displayNameComputed>
-    <shortDisplayName>>${foreName} ${surName}</shortDisplayName>
-    <shortDisplayNameComputed>false</shortDisplayNameComputed>
-		<foreName>${foreName}</foreName>
-		<surName>${surName}</surName>
+    
+	<personTermGroupList>
+		<personTermGroup>
+			<termName>${foreName} ${surName}</termName>
+			<termPrefForLang>false</termPrefForLang>
+			<termDisplayName>${foreName} ${surName}</termDisplayName>
+		    <foreName>${foreName}</foreName>
+		    <surName>${surName}</surName>
+		</personTermGroup>
+	</personTermGroupList>  
+    
 	</pers:persons_common>
 	<pnh:persons_naturalhistory xmlns:pnh="http://collectionspace.org/services/person/domain/naturalhistory">
 		<entityType>${entityType}</entityType>

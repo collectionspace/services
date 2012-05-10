@@ -2,11 +2,16 @@
 <document name="persons">
   <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
 	<shortIdentifier>pmadry</shortIdentifier>
-	<displayNameComputed>false</displayNameComputed>
-	<shortDisplayNameComputed>false</shortDisplayNameComputed>
-	<shortDisplayName>Penelope Madry</shortDisplayName>
-	<displayName>Penelope Madry, New York</displayName>
-	<termStatus>${termStatus}</termStatus>
+	
+	<personTermGroupList>
+		<personTermGroup>
+			<termName>Penelope Madry, New York</termName>
+			<termPrefForLang>false</termPrefForLang>
+			<termDisplayName>Penelope Madry, New York</termDisplayName>
+			<termStatus>${termStatus}</termStatus>
+		</personTermGroup>
+	</personTermGroupList>  
+	
 	<bioNote>Project Manager for CollectionSpace</bioNote>
   </ns2:persons_common>
 </document>

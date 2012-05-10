@@ -4,12 +4,17 @@
     <inAuthority>${inAuthority}</inAuthority>
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
     <refName>urn:cspace:org.collectionspace.demo:personauthority:name(${authShortIdentifier}):person:name(${shortIdentifier})'John Wayne'</refName>
-    <displayName>John Wayne</displayName>
-    <displayNameComputed>false</displayNameComputed>
-    <shortDisplayName>JohnWayne</shortDisplayName>
-    <shortDisplayNameComputed>false</shortDisplayNameComputed>
-    <foreName>John</foreName>
-    <surName>Wayne</surName>
+
+	<personTermGroupList>
+		<personTermGroup>
+			<termName>John Wayne</termName>
+			<termPrefForLang>false</termPrefForLang>
+			<termDisplayName>John Wayne</termDisplayName>
+		    <foreName>John</foreName>
+		    <surName>Wayne</surName>
+		</personTermGroup>
+	</personTermGroupList>  
+    
     <birthDate>May 26, 1907</birthDate>
     <deathDate>June 11, 1979</deathDate>
     <birthPlace>Winterset, Iowa</birthPlace>
