@@ -745,11 +745,13 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 					// Some other variant on a missing sub-field; quietly
 					// absorb.
 					result = "";
-				} // Otherwise, e.g., for true OOB indices, propagate the
-					// exception.
+				}
 			}
-			throw new RuntimeException("Problem retrieving property {" + xpath
-					+ "}:" + ioobe.getLocalizedMessage());
+			// Otherwise, e.g., for true OOB indices, propagate the exception.
+			if (result == null) {
+				throw new RuntimeException("Problem retrieving property {" + xpath
+						+ "}:" + ioobe.getLocalizedMessage());
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Unknown problem retrieving property {"
 					+ xpath + "}." + e.getLocalizedMessage());

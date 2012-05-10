@@ -4,9 +4,25 @@
     <inAuthority>${inAuthority}</inAuthority>
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
     <refName>urn:cspace:org.collectionspace.demo:organizationauthority:name(${authShortIdentifier}):organization:name(${shortIdentifier})'${name}'</refName>
-    <displayName>${name}</displayName>
-    <displayNameComputed>false</displayNameComputed>
-    <shortDisplayNameComputed>true</shortDisplayNameComputed>
+
+	<orgTermGroupList>
+		<orgTermGroup>
+			<additionsToName/>
+			<termName>${name}</termName>
+			<termSource/>
+			<termSourceID/>
+			<termSourceNote/>
+			<termLanguage/>
+			<termPrefForLang>false</termPrefForLang>
+			<termDisplayName>${name}</termDisplayName>
+			<termType/>
+			<mainBodyName>The real test official test organization</mainBodyName>
+			<termStatus/>
+			<termQualifier/>
+			<termSourceDetail/>
+		</orgTermGroup>
+	</orgTermGroupList>
+
   </ns2:organizations_common>
   <!-- 
        WARNING: ${itemCSID} does NOT get expanded by XmlReplay. 
