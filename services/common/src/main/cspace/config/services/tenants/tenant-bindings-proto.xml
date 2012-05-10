@@ -86,7 +86,6 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:classname>
                 <service:params>
                     <service:DublinCoreTitle>collectionobjects</service:DublinCoreTitle>
                     <service:ListResultsItemMethodName>getCollectionObjectListItem</service:ListResultsItemMethodName>
@@ -963,22 +962,6 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>lendersAuthorizer</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>lendersContact</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>borrower</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>borrowersContact</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
                             <types:value>borrowersAuthorizer</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
@@ -1804,7 +1787,7 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>orgTermGroupList/*termStatus</types:value>
+                            <types:value>orgTermGroupList/*/termStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
@@ -2139,15 +2122,15 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>orgTermGroupList/*/termType</types:value>
+                            <types:value>locTermGroupList/*/termType</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>orgTermGroupList/*termLanguage</types:value>
+                            <types:value>locTermGroupList/*/termLanguage</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>orgTermGroupList/*termStatus</types:value>
+                            <types:value>locTermGroupList/*/termStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
@@ -2293,11 +2276,11 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>placeTermGroupList/*/termLanguage</types:value>
+                            <types:value>placeTermGroupList/*/termType</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>placeTermGroupList/*/termType</types:value>
+                            <types:value>placeTermGroupList/*/termLanguage</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -2421,10 +2404,14 @@
                 <service:params>
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Uncomment when bug in returning list result values from complex types,
+                             currently in the CSPACE-4813 branch (P/NP term work in services), is fixed -->
+                        <!--
                         <service:ListResultField>
                             <service:element>taxonFullName</service:element>
-                            <service:xpath>taxonFullName</service:xpath>
+                            <service:xpath>taxonTermGroup/[0]/termName</service:xpath>
                         </service:ListResultField>
+                        -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -2437,8 +2424,8 @@
                         <service:col>inauthority</service:col>
                     </service:field>
                     <service:field>
-                        <service:table>taxon_common</service:table>
-                        <service:col>displayname</service:col>
+                        <service:table>taxontermgroup</service:table>
+                        <service:col>termdisplayname</service:col>
                     </service:field>
                     <service:field>
                         <service:table>taxon_common</service:table>
@@ -2469,6 +2456,13 @@
                             <types:key>authRef</types:key>
                             <types:value>taxonAuthorGroupList/*/taxonAuthor</types:value>
                         </types:item>
+                        <!-- Uncomment when Citation Authority is implemented -->
+                        <!--
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>commonNameGroupList/*/commonNameSource</types:value>
+                        </types:item>
+                        -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -2484,6 +2478,10 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
+                            <types:value>commonNameGroupList/*/commonNameLanguage</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
                             <types:value>taxonomicStatus</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
@@ -2492,7 +2490,15 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>termStatus</types:value>
+                            <types:value>taxonTermGroupList/*/termType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>taxonTermGroupList/*/termLanguage</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>taxonTermGroupList/*/termStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
@@ -2583,11 +2589,7 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
-                    <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
-                        <service:ListResultField>
-                            <service:element>termType</service:element>
-                            <service:xpath>termType</service:xpath>
-                        </service:ListResultField>
+                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -2600,8 +2602,8 @@
                         <service:col>inauthority</service:col>
                     </service:field>
                     <service:field>
-                        <service:table>concepts_common</service:table>
-                        <service:col>displayname</service:col>
+                        <service:table>concepttermgroup</service:table>
+                        <service:col>termdisplayname</service:col>
                     </service:field>
                     <service:field>
                         <service:table>concepts_common</service:table>
@@ -2634,7 +2636,15 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>termStatus</types:value>
+                            <types:value>conceptTermGroupList/*/termType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conceptTermGroupList/*/termLanguage</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conceptTermGroupList/*/termStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
