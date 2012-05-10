@@ -2482,11 +2482,11 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>taxonomicStatus</types:value>
+                            <types:value>taxonTermGroupList/*/taxonomicStatus</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>taxonNameSource</types:value>
+                            <types:value>taxonTermGroupList/*/termSource</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>

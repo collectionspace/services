@@ -699,7 +699,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         //Updates relations part
         RelationsCommonList relationsCommonList = updateRelations(itemCsid, input, wrapDoc, fUpdate);
 
-        PayloadOutputPart payloadOutputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, relationsCommonList);
+        PayloadOutputPart payloadOutputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, relationsCommonList);  //FIXME: REM - We should check for a null relationsCommonList and not create the new common list payload
         ctx.setProperty(RelationClient.SERVICE_COMMON_LIST_NAME, payloadOutputPart);
 
         //now we add part for relations list

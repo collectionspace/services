@@ -65,8 +65,9 @@
     <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
 	<run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
 	<run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
+<!--
+	REM - 5/10/2012: This needs to be re-enabled before we code freeze the v2.4 release. 		
     <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
-<!-- 		
 -->
     
 </xmlReplayMaster>
