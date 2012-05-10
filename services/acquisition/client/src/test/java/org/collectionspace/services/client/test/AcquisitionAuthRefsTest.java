@@ -44,6 +44,8 @@ import org.collectionspace.services.acquisition.AcquisitionFunding;
 import org.collectionspace.services.acquisition.AcquisitionFundingList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
+import org.collectionspace.services.acquisition.StructuredDateGroup;
+
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -112,11 +114,11 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		createPersonRefs();
 
 		PoxPayloadOut multipart = createAcquisitionInstance(
+                "April 1, 2010",
 				acquisitionAuthorizerRefName,
 				acquisitionFundingSourcesRefNames,
 				ownersRefNames,
 				acquisitionSourcesRefNames);
-                                // "April 1, 2010",
 
 		AcquisitionClient acquisitionClient = new AcquisitionClient();
 		ClientResponse<Response> res = acquisitionClient.create(multipart);
@@ -367,12 +369,16 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 	}
 
 	private PoxPayloadOut createAcquisitionInstance(
+            String accessionDateDisplayDate,
 			String acquisitionAuthorizer,
 			List<String> acquisitionFundingSources,
 			List<String> acqOwners,
 			List<String> acquisitionSources) {
 
 		AcquisitionsCommon acquisition = new AcquisitionsCommon();
+		StructuredDateGroup accessionDateGroup = new StructuredDateGroup(); 
+		accessionDateGroup.setDateDisplayDate(accessionDateDisplayDate);
+        acquisition.setAccessionDateGroup(accessionDateGroup);
 		acquisition.setAcquisitionAuthorizer(acquisitionAuthorizer);
 
 		// AcquisitionFunding-related authrefs fields are *not* currently
