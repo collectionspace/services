@@ -1743,7 +1743,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>termDisplayName</types:value>
+                    <types:value>orgTermGroupList/[0]/termDisplayName</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
@@ -1921,7 +1921,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>termDisplayName</types:value>
+                    <types:value>personTermGroupList/[0]/termDisplayName</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
@@ -2100,7 +2100,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>termDisplayName</types:value>
+                    <types:value>locTermGroupList/[0]/termDisplayName</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
@@ -2245,7 +2245,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>termDisplayName</types:value>
+                    <types:value>placeTermGroupList/[0]/termDisplayName</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
@@ -2436,7 +2436,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>termDisplayName</types:value>
+                    <types:value>taxonTermGroupList/[0]/termDisplayName</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
@@ -2614,7 +2614,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>termDisplayName</types:value>
+                    <types:value>conceptTermGroupList/[0]/termDisplayName</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
