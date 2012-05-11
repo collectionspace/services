@@ -138,7 +138,7 @@ public class LocationValidatorHandler extends ValidatorHandlerImpl {
         LocTermGroupList termGroupList = person.getLocTermGroupList();
         List<LocTermGroup> termGroups = termGroupList.getLocTermGroup();
         for (LocTermGroup termGroup : termGroups) {
-            if (Tools.isBlank(termGroup.getTermName()) || Tools.isBlank(termGroup.getTermDisplayName())) {
+            if (Tools.isBlank(termGroup.getTermName()) && Tools.isBlank(termGroup.getTermDisplayName())) {
                 return false;
             }
         }

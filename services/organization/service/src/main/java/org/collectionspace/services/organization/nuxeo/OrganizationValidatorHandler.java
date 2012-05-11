@@ -138,7 +138,7 @@ public class OrganizationValidatorHandler extends ValidatorHandlerImpl {
         OrgTermGroupList termGroupList = organization.getOrgTermGroupList();
         List<OrgTermGroup> termGroups = termGroupList.getOrgTermGroup();
         for (OrgTermGroup termGroup : termGroups) {
-            if (Tools.isBlank(termGroup.getTermName()) || Tools.isBlank(termGroup.getTermDisplayName())) {
+            if (Tools.isBlank(termGroup.getTermName()) && Tools.isBlank(termGroup.getTermDisplayName())) {
                 return false;
             }
         }

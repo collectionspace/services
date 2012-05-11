@@ -138,7 +138,7 @@ public class ConceptValidatorHandler extends ValidatorHandlerImpl {
         ConceptTermGroupList termGroupList = concept.getConceptTermGroupList();
         List<ConceptTermGroup> termGroups = termGroupList.getConceptTermGroup();
         for (ConceptTermGroup termGroup : termGroups) {
-            if (Tools.isBlank(termGroup.getTermName()) || Tools.isBlank(termGroup.getTermDisplayName())) {
+            if (Tools.isBlank(termGroup.getTermName()) && Tools.isBlank(termGroup.getTermDisplayName())) {
                 return false;
             }
         }

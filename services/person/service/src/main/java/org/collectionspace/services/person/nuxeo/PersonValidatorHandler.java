@@ -137,7 +137,7 @@ public class PersonValidatorHandler extends ValidatorHandlerImpl {
         PersonTermGroupList termGroupList = person.getPersonTermGroupList();
         List<PersonTermGroup> termGroups = termGroupList.getPersonTermGroup();
         for (PersonTermGroup termGroup : termGroups) {
-            if (Tools.isBlank(termGroup.getTermName()) || Tools.isBlank(termGroup.getTermDisplayName())) {
+            if (Tools.isBlank(termGroup.getTermName()) && Tools.isBlank(termGroup.getTermDisplayName())) {
                 return false;
             }
         }

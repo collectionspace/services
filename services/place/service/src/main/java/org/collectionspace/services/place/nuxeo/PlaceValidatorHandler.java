@@ -139,7 +139,7 @@ public class PlaceValidatorHandler extends ValidatorHandlerImpl {
         PlaceTermGroupList termGroupList = place.getPlaceTermGroupList();
         List<PlaceTermGroup> termGroups = termGroupList.getPlaceTermGroup();
         for (PlaceTermGroup termGroup : termGroups) {
-            if (Tools.isBlank(termGroup.getTermName()) || Tools.isBlank(termGroup.getTermDisplayName())) {
+            if (Tools.isBlank(termGroup.getTermName()) && Tools.isBlank(termGroup.getTermDisplayName())) {
                 return false;
             }
         }

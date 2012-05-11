@@ -138,7 +138,7 @@ public class TaxonValidatorHandler extends ValidatorHandlerImpl {
         TaxonTermGroupList termGroupList = organization.getTaxonTermGroupList();
         List<TaxonTermGroup> termGroups = termGroupList.getTaxonTermGroup();
         for (TaxonTermGroup termGroup : termGroups) {
-            if (Tools.isBlank(termGroup.getTermName()) || Tools.isBlank(termGroup.getTermDisplayName())) {
+            if (Tools.isBlank(termGroup.getTermName()) && Tools.isBlank(termGroup.getTermDisplayName())) {
                 return false;
             }
         }
