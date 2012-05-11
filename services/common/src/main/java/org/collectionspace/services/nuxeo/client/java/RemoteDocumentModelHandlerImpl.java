@@ -60,6 +60,7 @@ import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Element;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -671,16 +672,18 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @return first value in list, as a String, or empty string if the list is empty
      */
     protected String getStringValueInPrimaryRepeatingComplexProperty(
-    		DocumentModel docModel, String schema, String complexPropertyName, String fieldName) {
-    	String xpath = "/"+schema+":"+complexPropertyName+"/[0]/"+fieldName;
+    		DocumentModel docModel, String schema, String complexPropertyName, String fieldName) {    	
+    	String result = null;
+    	
+    	String xpath = "/" + NuxeoUtils.getPrimaryXPathPropertyName(schema, complexPropertyName, fieldName);
     	try {
-	    	return (String)docModel.getPropertyValue(xpath);
+	    	result = (String)docModel.getPropertyValue(xpath);
     	} catch(PropertyException pe) {
     		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Bad propertyNames?"
     				+pe.getLocalizedMessage());
     	} catch(IndexOutOfBoundsException ioobe) {
     		// Nuxeo sometimes handles missing sub, and sometimes does not. Odd.
-    		return "";	// gracefully handle missing elements
+    		result = "";	// gracefully handle missing elements
     	} catch(ClassCastException cce) {
     		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a String property?"
     				+cce.getLocalizedMessage());
@@ -688,6 +691,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
     				+e.getLocalizedMessage());
     	}
+    	
+    	return result;
     }
    
     /**
@@ -706,43 +711,53 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param xpath The XPath expression (without schema prefix)
      * @return value the indicated property value as a String
      */
-    protected static String getXPathStringValue(DocumentModel docModel, String schema, String xpath) {
-    	xpath = schema+":"+xpath;
-    	try {
-    		Object value = docModel.getPropertyValue(xpath);
-    		String returnVal = null;
-    		if(value==null) {
-    			// Nothing to do - leave returnVal null
-    		} else if(value instanceof GregorianCalendar) {
-    			returnVal = DateTimeFormatUtils.formatAsISO8601Timestamp((GregorianCalendar)value);
-    		} else {
-    			returnVal = value.toString();
-    		}
-    		return returnVal;
-    	} catch(PropertyException pe) {
-    		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Bad XPath spec?"
-    				+pe.getLocalizedMessage());
-    	} catch(ClassCastException cce) {
-    		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a String property?"
-    				+cce.getLocalizedMessage());
-    	} catch(IndexOutOfBoundsException ioobe) {
-    		// Nuxeo seems to handle foo/[0]/bar when it is missing,
-    		// but not foo/bar[0] (for repeating scalars).
-    		if(xpath.endsWith("[0]")) { 		// gracefully handle missing elements
-    			return "";
-    		} else {
-    			String msg = ioobe.getMessage();
-    			if(msg!=null && msg.equals("Index: 0, Size: 0")) {
-    				// Some other variant on a missing sub-field; quietly absorb.
-    				return "";
-    			} // Otherwise, e.g., for true OOB indices, propagate the exception.
-    		}
-    		throw new RuntimeException("Problem retrieving property {"+xpath+"}:"
-    				+ioobe.getLocalizedMessage());
-    	} catch(Exception e) {
-    		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
-    				+e.getLocalizedMessage());
-    	}
-    }
+	protected static String getXPathStringValue(DocumentModel docModel,
+			String schema, String xpath) {
+		String result = null;
+
+		xpath = schema + ":" + xpath;
+		try {
+			Object value = docModel.getPropertyValue(xpath);
+			String returnVal = null;
+			if (value == null) {
+				// Nothing to do - leave returnVal null
+			} else if (value instanceof GregorianCalendar) {
+				returnVal = DateTimeFormatUtils.formatAsISO8601Timestamp((GregorianCalendar) value);
+			} else {
+				returnVal = value.toString();
+			}
+			result = returnVal;
+		} catch (PropertyException pe) {
+			throw new RuntimeException("Problem retrieving property {" + xpath
+					+ "}. Bad XPath spec?" + pe.getLocalizedMessage());
+		} catch (ClassCastException cce) {
+			throw new RuntimeException("Problem retrieving property {" + xpath
+					+ "} as String. Not a String property?"
+					+ cce.getLocalizedMessage());
+		} catch (IndexOutOfBoundsException ioobe) {
+			// Nuxeo seems to handle foo/[0]/bar when it is missing,
+			// but not foo/bar[0] (for repeating scalars).
+			if (xpath.endsWith("[0]")) { // gracefully handle missing elements
+				result = "";
+			} else {
+				String msg = ioobe.getMessage();
+				if (msg != null && msg.equals("Index: 0, Size: 0")) {
+					// Some other variant on a missing sub-field; quietly
+					// absorb.
+					result = "";
+				}
+			}
+			// Otherwise, e.g., for true OOB indices, propagate the exception.
+			if (result == null) {
+				throw new RuntimeException("Problem retrieving property {" + xpath
+						+ "}:" + ioobe.getLocalizedMessage());
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Unknown problem retrieving property {"
+					+ xpath + "}." + e.getLocalizedMessage());
+		}
+
+		return result;
+	}
    
 }

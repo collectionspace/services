@@ -340,7 +340,6 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
         } else {
             Assert.fail("Internal Error: readItemList both vcsid and shortId are null!");
         }
-        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -352,6 +351,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
                 invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, testExpectedStatusCode);
 
+        AbstractCommonList list = res.getEntity();
         List<AbstractCommonList.ListItem> items = list.getListItem();
         int nItemsReturned = items.size();
         long nItemsTotal = list.getTotalItems();

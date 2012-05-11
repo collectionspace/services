@@ -2,20 +2,19 @@ package org.collectionspace.services.client;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.PlaceJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.place.PlaceTermGroup;
+import org.collectionspace.services.place.PlaceTermGroupList;
 import org.collectionspace.services.place.PlaceauthoritiesCommon;
-import org.collectionspace.services.place.PlaceNameGroup;
-import org.collectionspace.services.place.PlaceNameGroupList;
 import org.collectionspace.services.place.PlacesCommon;
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
@@ -62,37 +61,19 @@ public class PlaceAuthorityClientUtils {
      */
     public static PoxPayloadOut createPlaceInstance( 
     		String placeAuthRefName, Map<String, String> placeInfo, 
-				String headerLabel){
+		List<PlaceTermGroup> terms, String headerLabel){
         PlacesCommon place = new PlacesCommon();
     	String shortId = placeInfo.get(PlaceJAXBSchema.SHORT_IDENTIFIER);
-    	String displayName = placeInfo.get(PlaceJAXBSchema.DISPLAY_NAME);
     	place.setShortIdentifier(shortId);
-    	String placeRefName = createPlaceRefName(placeAuthRefName, shortId, displayName);
-       	place.setRefName(placeRefName);
-       	String value = null;
-    	value = placeInfo.get(PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
-    	place.setDisplayNameComputed(displayNameComputed);
-			if((value = (String)placeInfo.get(PlaceJAXBSchema.DISPLAY_NAME))!=null)
-				place.setDisplayName(value);
-    	value = placeInfo.get(PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
-			place.setDisplayNameComputed(displayNameComputed);
-        /* TODO - think about how much to support. This approach to the client
-	 * does not scale! We should really favor the document/payload approach. */
-        if((value = (String)placeInfo.get(PlaceJAXBSchema.PLACE_NAME))!=null) {
-            PlaceNameGroupList placeNameGroupList = new PlaceNameGroupList();
-            List<PlaceNameGroup> placeNameGroups = placeNameGroupList.getPlaceNameGroup();
-            PlaceNameGroup placeNameGroup = new PlaceNameGroup();
-            placeNameGroup.setPlaceName(value);
-            placeNameGroups.add(placeNameGroup);
-            place.setPlaceNameGroupList(placeNameGroupList);
-        }
-        
-					
-        if((value = (String)placeInfo.get(PlaceJAXBSchema.TERM_STATUS))!=null)
-        	place.setTermStatus(value);
 
+        // Set values in the Term Information Group
+        PlaceTermGroupList termList = new PlaceTermGroupList();
+        if (terms == null || terms.isEmpty()) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
+        }
+        termList.getPlaceTermGroup().addAll(terms); 
+        place.setPlaceTermGroupList(termList);
+        
         PoxPayloadOut multipart = new PoxPayloadOut(PlaceAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(place,
             MediaType.APPLICATION_XML_TYPE);
@@ -106,7 +87,7 @@ public class PlaceAuthorityClientUtils {
     }
     
     /**
-     * @param vcsid CSID of the authority to create a new placplace
+     * @param vcsid CSID of the authority to create a new place
      * @param placeAuthorityRefName The refName for the authority
      * @param placeMap the properties for the new Place
      * @param client the service client
@@ -114,34 +95,23 @@ public class PlaceAuthorityClientUtils {
      */
     public static String createItemInAuthority(String vcsid, 
     		String placeAuthorityRefName, Map<String,String> placeMap,
-    		PlaceAuthorityClient client ) {
+    		List<PlaceTermGroup> terms, PlaceAuthorityClient client ) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
     	
-    	String displayName = placeMap.get(PlaceJAXBSchema.DISPLAY_NAME);
-    	String displayNameComputedStr = placeMap.get(PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (displayNameComputedStr==null) || displayNameComputedStr.equalsIgnoreCase("true");
-    	if( displayName == null ) {
-    		if(!displayNameComputed) {
-	    		throw new RuntimeException(
-	    		"CreateItem: Must supply a displayName if displayNameComputed is set to false.");
-    		}
-				/* Could try to pull name out of first placeNameGroup
-        	displayName = 
-        		prepareDefaultDisplayName(
-    		    	placeMap.get(PlaceJAXBSchema.PLACE_NAME));
-							*/
-    	}
-    	
+    	String displayName = "";
+        if ((terms !=null) && (! terms.isEmpty())) {
+            displayName = terms.get(0).getTermDisplayName();
+        }
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create Item: \""+displayName
-    				+"\" in placeAuthority: \"" + placeAuthorityRefName +"\"");
+    		logger.debug("Creating item with display name: \"" + displayName
+    				+"\" in locationAuthority: \"" + vcsid +"\"");
     	}
     	PoxPayloadOut multipart = 
     		createPlaceInstance( placeAuthorityRefName,
-    			placeMap, client.getItemCommonPartName() );
+    			placeMap, terms, client.getItemCommonPartName() );
     	String newID = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
         try {
@@ -305,6 +275,20 @@ public class PlaceAuthorityClientUtils {
 		return newStr.toString();
     }
     
-
-
+    public static List<PlaceTermGroup> getTermGroupInstance(String identifier) {
+        if (Tools.isBlank(identifier)) {
+            identifier = getGeneratedIdentifier();
+        }
+        List<PlaceTermGroup> terms = new ArrayList<PlaceTermGroup>();
+        PlaceTermGroup term = new PlaceTermGroup();
+        term.setTermDisplayName(identifier);
+        term.setTermName(identifier);
+        terms.add(term);
+        return terms;
+    }
+    
+    private static String getGeneratedIdentifier() {
+        return "id" + new Date().getTime(); 
+   }
+    
 }

@@ -25,19 +25,24 @@ package org.collectionspace.services.common.vocabulary;
 
 /**
  * @author pschmitz
- *
+ * 
  */
 public interface AuthorityItemJAXBSchema {
-	final static String DISPLAY_NAME = "displayName";
-	final static String DISPLAY_NAME_COMPUTED = "displayNameComputed";
-	final static String SHORT_DISPLAY_NAME = "shortDisplayName";
-	final static String SHORT_DISPLAY_NAME_COMPUTED = "shortDisplayNameComputed";
 	final static String IN_AUTHORITY = "inAuthority";
 	final static String REF_NAME = "refName";
 	final static String ORDER = "order";
 	final static String SHORT_IDENTIFIER = "shortIdentifier";
-	final static String TERM_STATUS = "termStatus";
 	final static String CSID = "csid";
+    final static String DISPLAY_NAME = "displayName"; // This is the display name element for the Vocabulary service's item	
+	final static String TERM_DISPLAY_NAME = "termDisplayName";
+	final static String TERM_NAME = "termName";
+	final static String TERM_STATUS = "termStatus";
+	final static String TERM_INFO_GROUP_SCHEMA_NAME = ""; // FIXME: REM - Needs
+															// to be defined.
+	// CSPACE-4813 - Remove all the below values and recompile all authorityitem
+	// related classes
+	final static String DISPLAY_NAME_COMPUTED = "displayNameComputed";
+	final static String SHORT_DISPLAY_NAME = "shortDisplayName";
+	final static String SHORT_DISPLAY_NAME_COMPUTED = "shortDisplayNameComputed";
+	// final static String TERM_STATUS = "termStatus";
 }
-
-

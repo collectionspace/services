@@ -4,9 +4,16 @@
     <inAuthority>${inAuthority}</inAuthority>
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
     <refName>urn:cspace:org.collectionspace.demo:locationauthority:name(${authShortIdentifier}):location:name(${shortIdentifier})'${name}'</refName>
-    <displayName>${name}</displayName>
-    <displayNameComputed>false</displayNameComputed>
-    <shortDisplayNameComputed>true</shortDisplayNameComputed>
+
+	<locTermGroupList>
+	    <locTermGroup>
+	        <termPrefForLang>false</termPrefForLang>
+	        <termName>${name}</termName>
+	        <termDisplayName>${name}</termDisplayName>
+	        <termStatus>Approved</termStatus>
+	    </locTermGroup>
+	</locTermGroupList>
+	    
   </ns2:locations_common>
   <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
     <relation-list-item>

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <document name="persons">
-<ns2:persons_common
-xmlns:ns2="http://collectionspace.org/services/person"
-xmlns:ns3="http://collectionspace.org/services/jaxb">
-  <!--<shortIdentifier>thePersonShortIdentifier</shortIdentifier>-->
-  <displayName>${displayName}</displayName>
-  <displayNameComputed>false</displayNameComputed>
-</ns2:persons_common>
+	<ns2:persons_common
+	xmlns:ns2="http://collectionspace.org/services/person"
+	xmlns:ns3="http://collectionspace.org/services/jaxb">
+		<shortIdentifier>${shortIdentifier}</shortIdentifier>
+		<personTermGroupList>
+			<personTermGroup>
+				<termName>${displayName}</termName>
+				<termPrefForLang>false</termPrefForLang>
+				<termDisplayName>${displayName}</termDisplayName>
+			</personTermGroup>
+		</personTermGroupList>  
+	</ns2:persons_common>
 </document>
-

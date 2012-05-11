@@ -1,9 +1,21 @@
+<!--
+	THIS SEEMS TO BE UNUSED.  PLEASE VERIFY AND REMOVE THIS FILE FROM OUR SOURCE CONTROL REPOSITORY. 
+ -->
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
-<inAuthority>4a6dc8f3-3329-4c5d-a1a8</inAuthority>
-<shortIdentifier>connieContactPerson</shortIdentifier>
-<refName>urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth)'TestPersonAuth':person:name(connieContactPerson)</refName>
-<displayNameComputed>true</displayNameComputed>
-<foreName>Connie</foreName>
-<surName>ContactPerson</surName>
+	<inAuthority>4a6dc8f3-3329-4c5d-a1a8</inAuthority>
+	<shortIdentifier>connieContactPerson</shortIdentifier>
+	<refName>urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth)'TestPersonAuth':person:name(connieContactPerson)</refName>
+	
+	<personTermGroupList>
+		<personTermGroup>
+			<termName>Connie ContactPerson</termName>
+			<termPrefForLang>false</termPrefForLang>
+			<termDisplayName>Connie ContactPerson</termDisplayName>
+			<termStatus>${termStatus}</termStatus>
+			<foreName>Connie</foreName>
+			<surName>ContactPerson</surName>
+		</personTermGroup>
+	</personTermGroupList>
+	
 </ns2:persons_common>

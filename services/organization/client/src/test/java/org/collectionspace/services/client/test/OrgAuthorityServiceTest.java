@@ -44,10 +44,10 @@ import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.organization.MainBodyGroup;
-import org.collectionspace.services.organization.MainBodyGroupList;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrganizationsCommon;
+import org.collectionspace.services.organization.OrgTermGroup;
+import org.collectionspace.services.organization.OrgTermGroupList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -69,8 +69,6 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     /** The logger. */
     private final String CLASS_NAME = OrgAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    private final String REFNAME = "refName";
-    private final String DISPLAYNAME = "displayName";
 
     @Override
     public String getServicePathComponent() {
@@ -81,11 +79,12 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     protected String getServiceName() {
         return OrgAuthorityClient.SERVICE_NAME;
     }
-    /** The test organization shortname. */
-    private final String TEST_ORG_SHORTNAME = "Test Org";
-    
-    /** The test organization founding place. */
+    private final String TEST_SHORT_ID = "TestOrg";
+    private final String TEST_ORG_NAME = "Test Org";
+    private final String TEST_ORG_MAIN_BODY_NAME = "The real official test organization";
     private final String TEST_ORG_FOUNDING_PLACE = "Anytown, USA";
+    // FIXME: Change this to a structured date once this field changes in the schema.
+    private final String TEST_ORG_FOUNDING_DATE = "May 26, 1907";
     
     private String knownItemResourceShortIdentifer = null;
     
@@ -121,15 +120,21 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     @Override
     protected PoxPayloadOut createItemInstance(String parentCsid, String identifier) {
         String headerLabel = new OrgAuthorityClient().getItemCommonPartName();
-        String shortId = "testOrg";
+        
+        String shortId = TEST_SHORT_ID;
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
-        testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, TEST_ORG_SHORTNAME);
-        testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
-        // testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
+        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
+        
+        List<OrgTermGroup> terms = new ArrayList<OrgTermGroup>();
+        OrgTermGroup term = new OrgTermGroup();
+        term.setTermDisplayName(TEST_ORG_NAME);
+        term.setTermName(TEST_ORG_NAME);
+        term.setMainBodyName(TEST_ORG_MAIN_BODY_NAME);
+        terms.add(term);
 
-        return OrgAuthorityClientUtils.createOrganizationInstance(identifier, testOrgMap, headerLabel);
+        return OrgAuthorityClientUtils.createOrganizationInstance(identifier, testOrgMap, terms, headerLabel);
     }
 
     /**
@@ -148,29 +153,28 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        String shortId = "testOrg";
+        
+        String shortId = TEST_SHORT_ID;
         Map<String, String> testOrgMap = new HashMap<String, String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
-        testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, TEST_ORG_SHORTNAME);
-        testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
-        // testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
+        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, TEST_ORG_FOUNDING_DATE);
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
-
+        
+        List<OrgTermGroup> terms = new ArrayList<OrgTermGroup>();
+        OrgTermGroup term = new OrgTermGroup();
+        term.setTermDisplayName(TEST_ORG_NAME);
+        term.setTermName(TEST_ORG_NAME);
+        term.setMainBodyName(TEST_ORG_MAIN_BODY_NAME);
+        terms.add(term);
+        
         Map<String, List<String>> testOrgRepeatablesMap = new HashMap<String, List<String>>();
         List<String> testOrgContactNames = new ArrayList<String>();
         testOrgContactNames.add("joe@example.org");
         testOrgContactNames.add("sally@example.org");
         testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContactNames);
 
-        MainBodyGroupList mainBodyList = new MainBodyGroupList();
-        List<MainBodyGroup> mainBodyGroups = mainBodyList.getMainBodyGroup();
-        MainBodyGroup mainBodyGroup = new MainBodyGroup();
-        mainBodyGroup.setShortName(TEST_ORG_SHORTNAME);
-        mainBodyGroup.setLongName("The real official test organization");
-        mainBodyGroups.add(mainBodyGroup);
-
         String newID = OrgAuthorityClientUtils.createItemInAuthority(
-                vcsid, authRefName, testOrgMap, testOrgRepeatablesMap, mainBodyList, client);
+                vcsid, authRefName, testOrgMap, terms, testOrgRepeatablesMap, client);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -442,139 +446,14 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         Assert.assertTrue(contactNames.size() > 0);
         Assert.assertNotNull(contactNames.get(0));
     }
-
-    /**
-     * Verify item display name.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"org.collectionspace.services.client.test.AbstractAuthorityServiceTest.updateItem"})
-    public void verifyItemDisplayName(String testName) throws Exception {
-        // Perform setup.
-        setupRead();
-        //
-        // First, read our known resource.
-        //
-        OrgAuthorityClient client = new OrgAuthorityClient();
-        PoxPayloadIn input = null;
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        try {
-            assertStatusCode(res, testName);
-            // Check whether organization has expected displayName.
-            input = new PoxPayloadIn(res.getEntity());
-            Assert.assertNotNull(input);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        // Check whether organization has expected displayName.
-        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
-                client.getItemCommonPartName(), OrganizationsCommon.class);
-        Assert.assertNotNull(organization);
-        String displayName = organization.getDisplayName();
-        // Make sure displayName matches computed form
-        String expectedDisplayName =
-                OrgAuthorityClientUtils.prepareDefaultDisplayName(
-                TEST_ORG_SHORTNAME, TEST_ORG_FOUNDING_PLACE);
-        Assert.assertNotNull(displayName, expectedDisplayName);
-
-        // Update the shortName and verify the computed name is updated.
-        organization.setCsid(null);
-        organization.setDisplayNameComputed(true);
-
-        MainBodyGroupList mainBodyList = organization.getMainBodyGroupList();
-        List<MainBodyGroup> mainBodyGroups = mainBodyList.getMainBodyGroup();
-        MainBodyGroup mainBodyGroup = new MainBodyGroup();
-        String updatedShortName = "updated-" + TEST_ORG_SHORTNAME;
-        mainBodyGroup.setShortName(updatedShortName);
-        mainBodyGroups.clear(); //clear all the elements and do a sparse update
-        mainBodyGroups.add(mainBodyGroup);
-        organization.setMainBodyGroupList(mainBodyList);
-
-        expectedDisplayName =
-                OrgAuthorityClientUtils.prepareDefaultDisplayName(
-                updatedShortName, TEST_ORG_FOUNDING_PLACE);
-        //
-        // Next, submit the updated resource to the service and store the response.
-        //
-        setupUpdate();
-        PoxPayloadOut output = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), organization);
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        try {
-            assertStatusCode(res, testName);
-            // Retrieve the updated resource and verify that its contents exist.
-            input = new PoxPayloadIn(res.getEntity());
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-        //
-        // Now verify the update was correct.
-        //
-        OrganizationsCommon updatedOrganization =
-                (OrganizationsCommon) extractPart(input,
-                client.getItemCommonPartName(), OrganizationsCommon.class);
-        Assert.assertNotNull(updatedOrganization);
-
-        // Verify that the updated resource received the correct data.
-        mainBodyList = organization.getMainBodyGroupList();
-        Assert.assertNotNull(mainBodyList);
-        Assert.assertTrue(mainBodyList.getMainBodyGroup().size() > 0);
-        Assert.assertEquals(updatedOrganization.getMainBodyGroupList().getMainBodyGroup().get(0).getShortName(),
-                updatedShortName, "Updated ShortName in Organization did not match submitted data.");
-
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedOrganization.getDisplayName(), expectedDisplayName,
-                "Updated ShortName in Organization not reflected in computed DisplayName.");
-        //
-        // Now Update the displayName, not computed and verify the computed name is overriden.
-        //
-        organization.setDisplayNameComputed(false);
-        expectedDisplayName = "TestName";
-        organization.setDisplayName(expectedDisplayName);
-
-        // Submit the updated resource to the service and store the response.
-        output = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        commonPart = output.addPart(client.getItemCommonPartName(), organization);
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        input = null;
-        try {
-            assertStatusCode(res, testName);
-            // Retrieve the updated resource and verify that its contents exist.
-            input = new PoxPayloadIn(res.getEntity());
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-        updatedOrganization =
-                (OrganizationsCommon) extractPart(input,
-                client.getItemCommonPartName(), OrganizationsCommon.class);
-        Assert.assertNotNull(updatedOrganization);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedOrganization.isDisplayNameComputed(), false,
-                "Updated displayNameComputed in Organization did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedOrganization.getDisplayName(),
-                expectedDisplayName,
-                "Updated DisplayName (not computed) in Organization not stored.");
-    }
-
+    
     /**
      * Verify illegal item display name.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider = "testName",
-    		dependsOnMethods = {"verifyItemDisplayName"})
+    @Test(dataProvider = "testName")
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
         // Perform setup for read.
         setupRead();
@@ -596,11 +475,17 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
                 res.releaseConnection();
             }
         }
+        
         //
-        // Try to Update with 'displayNameComputed' flag set to false and no displayName
+        // Make an invalid UPDATE request, without a display name
         //
-        organization.setDisplayNameComputed(false);
-        organization.setDisplayName(null);
+        OrgTermGroupList termList = organization.getOrgTermGroupList();
+        Assert.assertNotNull(termList);
+        List<OrgTermGroup> terms = termList.getOrgTermGroup();
+        Assert.assertNotNull(terms);
+        Assert.assertTrue(terms.size() > 0);
+        terms.get(0).setTermDisplayName(null);
+        terms.get(0).setTermName(null);
         
         setupUpdateWithInvalidBody(); // we expect a failure
         // Submit the updated resource to the service and store the response.
@@ -754,10 +639,10 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
         for (AbstractCommonList.ListItem item : items) {
             String value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
+                    AbstractCommonListUtils.ListItemGetElementValue(item, OrganizationJAXBSchema.REF_NAME);
             Assert.assertTrue((null != value), "Item refName is null!");
             value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
+                    AbstractCommonListUtils.ListItemGetElementValue(item, OrganizationJAXBSchema.DISPLAY_NAME);
             Assert.assertTrue((null != value), "Item displayName is null!");
         }
         if (logger.isTraceEnabled()) {
@@ -1185,27 +1070,38 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
 
 	@Override
 	protected OrganizationsCommon updateItemInstance(OrganizationsCommon organizationsCommon) {
-		OrganizationsCommon result = organizationsCommon; //new OrganizationsCommon();
-		
-        MainBodyGroupList mainBodyList = organizationsCommon.getMainBodyGroupList();
-        Assert.assertNotNull(mainBodyList);
-        List<MainBodyGroup> mainBodyGroups = mainBodyList.getMainBodyGroup();
-        Assert.assertTrue(mainBodyList.getMainBodyGroup().size() > 0);
-        String updatedShortName = "updated-" + mainBodyGroups.get(0).getShortName();
-        mainBodyGroups.get(0).setShortName(updatedShortName);
-        
-        return result;
+                            
+            OrgTermGroupList termList = organizationsCommon.getOrgTermGroupList();
+            Assert.assertNotNull(termList);
+            List<OrgTermGroup> terms = termList.getOrgTermGroup();
+            Assert.assertNotNull(terms);
+            Assert.assertTrue(terms.size() > 0);
+            terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
+            terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
+	    organizationsCommon.setOrgTermGroupList(termList);
+
+            return organizationsCommon;
 	}
 
 	@Override
 	protected void compareUpdatedItemInstances(OrganizationsCommon original,
 			OrganizationsCommon updated) throws Exception {
-		MainBodyGroupList mainBodyList = original.getMainBodyGroupList();
-        Assert.assertNotNull(mainBodyList);
-        Assert.assertTrue(mainBodyList.getMainBodyGroup().size() > 0);
-        Assert.assertEquals(updated.getMainBodyGroupList().getMainBodyGroup().get(0).getShortName(),
-                original.getMainBodyGroupList().getMainBodyGroup().get(0).getShortName(),
-                "Short name in updated Organization did not match submitted data.");
+            
+            OrgTermGroupList originalTermList = original.getOrgTermGroupList();
+            Assert.assertNotNull(originalTermList);
+            List<OrgTermGroup> originalTerms = originalTermList.getOrgTermGroup();
+            Assert.assertNotNull(originalTerms);
+            Assert.assertTrue(originalTerms.size() > 0);
+            
+            OrgTermGroupList updatedTermList = updated.getOrgTermGroupList();
+            Assert.assertNotNull(updatedTermList);
+            List<OrgTermGroup> updatedTerms = updatedTermList.getOrgTermGroup();
+            Assert.assertNotNull(updatedTerms);
+            Assert.assertTrue(updatedTerms.size() > 0);
+            
+            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
+                originalTerms.get(0).getTermDisplayName(),
+                "Value in updated record did not match submitted data.");
 	}
 
 	@Override
@@ -1234,11 +1130,10 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
     		String identifier) {
         Map<String, String> nonexOrgMap = new HashMap<String, String>();
         nonexOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, "nonExistent");
-        nonexOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Non-existent");
         PoxPayloadOut result =
                 OrgAuthorityClientUtils.createOrganizationInstance(
                 knownResourceRefName,
-                nonexOrgMap, commonPartName);
+                nonexOrgMap, OrgAuthorityClientUtils.getTermGroupInstance(TEST_ORG_NAME), commonPartName);
         return result;
     }
 
@@ -1260,4 +1155,5 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         		original.getDisplayName(),
                 "Display name in updated object did not match submitted data.");
 	}
+
 }

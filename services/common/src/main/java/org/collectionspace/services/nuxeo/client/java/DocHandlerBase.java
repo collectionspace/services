@@ -183,15 +183,15 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     	CommonList commonList = new CommonList();
         extractPagingInfo(commonList, wrapDoc);
         List<ListResultField> resultsFields = getListItemsArray();
-        int nFields = resultsFields.size()+NUM_STANDARD_LIST_RESULT_FIELDS;
+        int nFields = resultsFields.size() + NUM_STANDARD_LIST_RESULT_FIELDS;
         String fields[] = new String[nFields];
         fields[0] = STANDARD_LIST_CSID_FIELD;
         fields[1] = STANDARD_LIST_URI_FIELD;
         fields[2] = STANDARD_LIST_UPDATED_AT_FIELD;
         fields[3] = STANDARD_LIST_WORKFLOW_FIELD;
-        for(int i=NUM_STANDARD_LIST_RESULT_FIELDS;i<nFields;i++) {
-        	ListResultField field = resultsFields.get(i-NUM_STANDARD_LIST_RESULT_FIELDS); 
-        	fields[i]=field.getElement();
+        for(int i = NUM_STANDARD_LIST_RESULT_FIELDS; i < nFields; i++) {
+        	ListResultField field = resultsFields.get(i - NUM_STANDARD_LIST_RESULT_FIELDS); 
+        	fields[i] = field.getElement();
         }
         commonList.setFieldsReturned(fields);
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();

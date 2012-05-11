@@ -3,8 +3,25 @@
   <ns3:organizations_common xmlns:ns3="http://collectionspace.org/services/organization" xmlns:ns2="http://collectionspace.org/services/jaxb">
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
     <refName>urn:cspace:org.collectionspace.demo:orgauthority:name(${authShortIdentifier}):organization:name(${shortIdentifier})</refName>
-    <displayNameComputed>true</displayNameComputed>
-    <shortDisplayNameComputed>true</shortDisplayNameComputed>
+
+	<orgTermGroupList>
+		<orgTermGroup>
+			<additionsToName/>
+			<termName>2-item-termName</termName>
+			<termSource/>
+			<termSourceID/>
+			<termSourceNote/>
+			<termLanguage/>
+			<termPrefForLang>false</termPrefForLang>
+			<termDisplayName>2-item-termDisplayName</termDisplayName>
+			<termType/>
+			<mainBodyName>The real test official test organization</mainBodyName>
+			<termStatus/>
+			<termQualifier/>
+			<termSourceDetail/>
+		</orgTermGroup>
+	</orgTermGroupList>
+
     <mainBodyGroupList>
       <mainBodyGroup>
         <longName>Test Organization Name</longName>

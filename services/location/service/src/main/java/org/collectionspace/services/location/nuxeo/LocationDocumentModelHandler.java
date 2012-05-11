@@ -63,30 +63,30 @@ public class LocationDocumentModelHandler
      * @param docModel the doc model
      * @throws Exception the exception
      */
-    @Override
-    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
-    	String commonPartLabel = getServiceContext().getCommonPartLabel("locations");
-    	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-    			LocationJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-    			LocationJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
-    	if(displayNameComputed==null)
-    		displayNameComputed = true;
-    	if(shortDisplayNameComputed==null)
-    		shortDisplayNameComputed = true;
-    	if (displayNameComputed || shortDisplayNameComputed) {
-    		String displayName = prepareDefaultDisplayName(
-			(String)docModel.getProperty(commonPartLabel, LocationJAXBSchema.NAME ));
-    		if (displayNameComputed) {
-    			docModel.setProperty(commonPartLabel, LocationJAXBSchema.DISPLAY_NAME,
-    					displayName);
-    		}
-    		if (shortDisplayNameComputed) {
-    			docModel.setProperty(commonPartLabel, LocationJAXBSchema.SHORT_DISPLAY_NAME,
-    					displayName);
-    		}
-    	}
-    }
+//    @Override
+//    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
+//    	String commonPartLabel = getServiceContext().getCommonPartLabel("locations");
+//    	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+//    			LocationJAXBSchema.DISPLAY_NAME_COMPUTED);
+//    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+//    			LocationJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+//    	if(displayNameComputed==null)
+//    		displayNameComputed = true;
+//    	if(shortDisplayNameComputed==null)
+//    		shortDisplayNameComputed = true;
+//    	if (displayNameComputed || shortDisplayNameComputed) {
+//    		String displayName = prepareDefaultDisplayName(
+//			(String)docModel.getProperty(commonPartLabel, LocationJAXBSchema.NAME ));
+//    		if (displayNameComputed) {
+//    			docModel.setProperty(commonPartLabel, LocationJAXBSchema.DISPLAY_NAME,
+//    					displayName);
+//    		}
+//    		if (shortDisplayNameComputed) {
+//    			docModel.setProperty(commonPartLabel, LocationJAXBSchema.SHORT_DISPLAY_NAME,
+//    					displayName);
+//    		}
+//    	}
+//    }
 	
     /**
      * Produces a default displayName from the basic name and dates fields.

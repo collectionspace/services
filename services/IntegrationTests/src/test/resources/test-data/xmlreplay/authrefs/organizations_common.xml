@@ -3,10 +3,24 @@
 	<ns2:organizations_common xmlns:ns2="http://collectionspace.org/services/organization"
 		xmlns:ns3="http://collectionspace.org/services/jaxb">
 		<shortIdentifier>1288047801161</shortIdentifier>
-		<displayNameComputed>true</displayNameComputed>
-		<shortDisplayNameComputed>true</shortDisplayNameComputed>
-		<shortName>Test Organization-1288047801161</shortName>
-		<longName>Test Organization Name</longName>
+
+		<orgTermGroupList>
+			<orgTermGroup>
+				<additionsToName/>
+				<termName>Test Organization-1288047801161</termName>
+				<termSource/>
+				<termSourceID/>
+				<termSourceNote/>
+				<termLanguage/>
+				<termPrefForLang>false</termPrefForLang>
+				<termDisplayName>Test Organization Name</termDisplayName>
+				<termType/>
+				<termStatus/>
+				<termQualifier/>
+				<termSourceDetail/>
+			</orgTermGroup>
+		</orgTermGroupList>
+
 		<contactNames>
 			<contactName>${person1}</contactName>
 			<contactName>${person2}</contactName>
