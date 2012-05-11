@@ -306,8 +306,8 @@ public class TaxonomyAuthorityServiceTest extends AbstractAuthorityServiceTest<T
                         AbstractCommonListUtils.ListItemGetElementValue(item, TaxonJAXBSchema.REF_NAME);
                 Assert.assertTrue((null != value), "Item refName is null!");
                 value =
-                        AbstractCommonListUtils.ListItemGetElementValue(item, TaxonJAXBSchema.DISPLAY_NAME);
-                Assert.assertTrue((null != value), "Item displayName is null!");
+                        AbstractCommonListUtils.ListItemGetElementValue(item, TaxonJAXBSchema.TERM_DISPLAY_NAME);
+                Assert.assertTrue((null != value), "Item termDisplayName is null!");
             }
             if (logger.isTraceEnabled()) {
                 AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);

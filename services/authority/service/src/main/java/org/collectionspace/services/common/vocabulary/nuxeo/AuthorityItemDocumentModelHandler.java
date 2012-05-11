@@ -150,10 +150,19 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // for backwards compatibility, although its value is obtained
         // from the termDisplayName field.
         //
+        // Update: this name is now being changed to 'termDisplayName', both
+        // because this is the actual field name and because the app layer
+        // work to convert over to this field is underway. Per Patrick, the
+        // app layer treats lists, in at least some context(s), as sparse record
+        // payloads, and thus fields in list results must all be present in
+        // (i.e. represent a strict subset of the fields in) record schemas.
+        // - ADR 2012-05-11
+        // 
+        //
         // In CSPACE-5134, these list results will change substantially
         // to return display names for both the preferred term and for
         // each non-preferred term (if any).
-    	result.setElement(AuthorityItemJAXBSchema.DISPLAY_NAME);
+    	result.setElement(AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
     	result.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
                 authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME));
     	

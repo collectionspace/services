@@ -642,8 +642,8 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
                     AbstractCommonListUtils.ListItemGetElementValue(item, OrganizationJAXBSchema.REF_NAME);
             Assert.assertTrue((null != value), "Item refName is null!");
             value =
-                    AbstractCommonListUtils.ListItemGetElementValue(item, OrganizationJAXBSchema.DISPLAY_NAME);
-            Assert.assertTrue((null != value), "Item displayName is null!");
+                    AbstractCommonListUtils.ListItemGetElementValue(item, OrganizationJAXBSchema.TERM_DISPLAY_NAME);
+            Assert.assertTrue((null != value), "Item termDisplayName is null!");
         }
         if (logger.isTraceEnabled()) {
             AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);

@@ -281,8 +281,8 @@ public class PlaceAuthorityServiceTest extends AbstractAuthorityServiceTest<Plac
 					item, PlaceJAXBSchema.REF_NAME);
 			Assert.assertTrue((null != value), "Item refName is null!");
 			value = AbstractCommonListUtils.ListItemGetElementValue(item,
-					PlaceJAXBSchema.DISPLAY_NAME);
-			Assert.assertTrue((null != value), "Item displayName is null!");
+					PlaceJAXBSchema.TERM_DISPLAY_NAME);
+			Assert.assertTrue((null != value), "Item termDisplayName is null!");
 		}
 		if (logger.isTraceEnabled()) {
 			AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger,

@@ -24,6 +24,7 @@ package org.collectionspace.services.client.test;
 
 import java.util.List;
 import java.util.Map;
+import org.collectionspace.services.ConceptJAXBSchema;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -31,6 +32,7 @@ import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.client.ConceptAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.concept.ConceptTermGroup;
 import org.collectionspace.services.concept.ConceptTermGroupList;
 import org.collectionspace.services.concept.ConceptauthoritiesCommon;
@@ -56,8 +58,6 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 	/** The logger. */
     private final String CLASS_NAME = ConceptAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(ConceptAuthorityServiceTest.class);
-    private final String REFNAME = "refName";
-    private final String DISPLAYNAME = "displayName";
     private final static String CURRENT_DATE_UTC =
         GregorianCalendarDateTimeUtils.currentDateUTC();
 
@@ -203,11 +203,11 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 
         for (AbstractCommonList.ListItem item : items) {
         	String value = 
-        		AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
+        		AbstractCommonListUtils.ListItemGetElementValue(item, ConceptJAXBSchema.REF_NAME);
             Assert.assertTrue((null != value), "Item refName is null!");
         	value = 
-        		AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
-            Assert.assertTrue((null != value), "Item displayName is null!");
+        		AbstractCommonListUtils.ListItemGetElementValue(item, ConceptJAXBSchema.TERM_DISPLAY_NAME);
+            Assert.assertTrue((null != value), "Item termDisplayName is null!");
         }
         if(logger.isTraceEnabled()){
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
