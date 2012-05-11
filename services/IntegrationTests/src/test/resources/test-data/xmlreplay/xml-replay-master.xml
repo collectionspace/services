@@ -6,7 +6,7 @@
     <dump payloads="false" dumpServiceResult="auto" />
     
     <auths default="admin@core.collectionspace.org">
-       <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
 
     <!--
@@ -61,14 +61,11 @@
  
     <run controlFile="batch/batch.xml" />
     <run controlFile="report/report.xml" />
-	<run controlFile="authrefs/authrefs.xml" testGroup="AuthRefs" />
+    <run controlFile="authrefs/authrefs.xml" testGroup="AuthRefs" />
     <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
-	<run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
-	<run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
-<!--
-	REM - 5/10/2012: This needs to be re-enabled before we code freeze the v2.4 release. 		
+    <run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
+    <run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
     <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
--->
     
 </xmlReplayMaster>
 
