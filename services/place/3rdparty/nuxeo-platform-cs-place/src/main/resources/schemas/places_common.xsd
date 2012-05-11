@@ -28,18 +28,12 @@
     <!-- Term Information repeatable group -->
     <xs:element name="placeTermGroupList" type="placeTermGroupList"/>
         
-    <!-- Does this pertain to the item or to individual terms? -->
+    <xs:element name="placeID" type="xs:string" />
     <xs:element name="placeType" type="xs:string" />
-    
-    <xs:element name="placeRecordAdminStatus" type="xs:string" />
-    
-    <!-- Should this have been placeID? -->
-    <xs:element name="placeIdentifier" type="xs:string" />
-    
-    <!-- xs:element name="placeNameGroupList" type="placeNameGroupList"/ -->
-    
+    <xs:element name="placeSource" type="xs:string" />
+    <xs:element name="placeNote" type="xs:string" />
+
     <xs:element name="placeOwnerGroupList" type="placeOwnerGroupList"/>
-    <xs:element name="note" type="xs:string"/>
 
     <!-- Locality Information  -->
     <xs:element name="vCoordinates" type="xs:string"/>
@@ -62,30 +56,6 @@
 
     <xs:element name="placeGeoRefGroupList" type="placeGeoRefGroupList"/>
 
-    <!--
-    <xs:complexType name="placeNameGroupList">
-        <xs:sequence>
-            <xs:element name="placeNameGroup" type="placeNameGroup" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="placeNameGroup">
-        <xs:sequence>
-            <xs:element name="placeName" type="xs:string"/>
-            <xs:element name="nameQualifiedName" type="xs:string"/>
-            <xs:element name="nameLanguage" type="xs:string"/>
-            <xs:element name="nameAbbrev" type="xs:string"/>
-            <xs:element name="nameType" type="xs:string"/>
-            <xs:element name="nameStatus" type="xs:string"/>
-            <xs:element name="nameSource" type="xs:string"/>
-            <xs:element name="nameSourceDetail" type="xs:string"/>
-            <xs:element name="nameSourceRefId" type="xs:string"/>
-            <xs:element name="nameNote" type="xs:string"/>
-            <xs:element name="nameDateGroup" type="structuredDateGroup"/>
-            <xs:element name="nameAdminStatus" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-    -->
     
     <xs:complexType name="placeOwnerGroupList">
         <xs:sequence>
