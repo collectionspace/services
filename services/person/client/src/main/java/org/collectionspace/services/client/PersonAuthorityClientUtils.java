@@ -47,6 +47,7 @@ import org.jboss.resteasy.client.ClientResponse;
 //import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.collectionspace.services.person.StructuredDateGroup;
 
 /**
  * The Class PersonAuthorityClientUtils.
@@ -203,10 +204,16 @@ public class PersonAuthorityClientUtils {
     	String value;
         List<String> values = null;
 
-        if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_DATE))!=null)
-        	person.setBirthDate(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_DATE))!=null)
-        	person.setDeathDate(value);
+        if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_DATE))!=null) {
+            StructuredDateGroup birthDate = new StructuredDateGroup();
+            birthDate.setDateDisplayDate(value);
+            person.setBirthDate(birthDate);
+        }
+        if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_DATE))!=null) {
+            StructuredDateGroup deathDate = new StructuredDateGroup();
+            deathDate.setDateDisplayDate(value);
+            person.setDeathDate(deathDate);
+        }
         if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_PLACE))!=null)
         	person.setBirthPlace(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_PLACE))!=null)
@@ -409,8 +416,8 @@ public class PersonAuthorityClientUtils {
      * @return display name
      */
     public static String prepareDefaultDisplayName(
-    		String foreName, String middleName, String surName,
-    		String birthDate, String deathDate ) {
+    		String foreName, String middleName, String surName, 
+            String birthDate, String deathDate) {
     	StringBuilder newStr = new StringBuilder();
 		final String sep = " ";
 		final String dateSep = "-";
@@ -428,23 +435,23 @@ public class PersonAuthorityClientUtils {
     	}
     	// Now we add the dates. In theory could have dates with no name, but that is their problem.
     	boolean foundBirth = false;
-		if(null != birthDate) {
-			if(firstAdded) {
-				newStr.append(sep);
-			}
-			newStr.append(birthDate);
-	    	newStr.append(dateSep);		// Put this in whether there is a death date or not
-			foundBirth = true;
-		}
-		if(null != deathDate) {
-			if(!foundBirth) {
-				if(firstAdded) {
-					newStr.append(sep);
-				}
-		    	newStr.append(dateSep);
-			}
-			newStr.append(deathDate);
-		}
+        if(null != birthDate) {
+         if(firstAdded) {
+             newStr.append(sep);
+         }
+         newStr.append(birthDate);
+                 newStr.append(dateSep);     // Put this in whether there is a death date or not
+         foundBirth = true;
+        }
+        if(null != deathDate) {
+         if(!foundBirth) {
+             if(firstAdded) {
+                 newStr.append(sep);
+             }
+             newStr.append(dateSep);
+         }
+         newStr.append(deathDate);
+        }
 		return newStr.toString();
     }
     
