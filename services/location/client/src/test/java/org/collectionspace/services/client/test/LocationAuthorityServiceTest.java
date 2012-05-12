@@ -280,8 +280,8 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 					item, LocationJAXBSchema.REF_NAME);
 			Assert.assertTrue((null != value), "Item refName is null!");
 			value = AbstractCommonListUtils.ListItemGetElementValue(item,
-					LocationJAXBSchema.DISPLAY_NAME);
-			Assert.assertTrue((null != value), "Item displayName is null!");
+					LocationJAXBSchema.TERM_DISPLAY_NAME);
+			Assert.assertTrue((null != value), "Item termDisplayName is null!");
 		}
 		if (logger.isTraceEnabled()) {
 			AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger,
