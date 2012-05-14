@@ -617,4 +617,13 @@ public class NuxeoUtils {
     	    return schema + ":" + complexPropertyName + "/0/" + fieldName;
         }
     }
+    
+    static public String getMultiElPathPropertyName(String schema, String complexPropertyName, String fieldName) {
+        if (Tools.isBlank(schema)) {
+            return complexPropertyName + "/*/" + fieldName;
+        } else {
+    	    return schema + ":" + complexPropertyName + "/*/" + fieldName;
+        }
+    }
+    
 }
