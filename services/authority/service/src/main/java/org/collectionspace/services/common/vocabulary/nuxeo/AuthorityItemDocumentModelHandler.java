@@ -666,27 +666,22 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         ctx.addOutputPart(relationsPart);
     }
 
+    @Override
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
+    	//
+    	// We currently don't override this method with any AuthorityItemDocumentModelHandler specific functionality, so
+    	// we could remove this method.
+    	//
         super.fillAllParts(wrapDoc, action);
-        /*
-        ServiceContext ctx = getServiceContext();
-        PoxPayloadIn input = (PoxPayloadIn) ctx.getInput();
-        DocumentModel documentModel = (wrapDoc.getWrappedObject());
-        String itemCsid = documentModel.getName();
-        
-        //UPDATE and CREATE will call.   Updates relations part
-        RelationsCommonList relationsCommonList = updateRelations(itemCsid, input, wrapDoc);
-        
-        PayloadOutputPart payloadOutputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, relationsCommonList);
-        ctx.setProperty(RelationClient.SERVICE_COMMON_LIST_NAME, payloadOutputPart);
-         */
     }
 
+    @Override
     public void completeCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         super.completeCreate(wrapDoc);
         handleRelationsPayload(wrapDoc, false);
     }
 
+    @Override
     public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         super.completeUpdate(wrapDoc);
         handleRelationsPayload(wrapDoc, true);
