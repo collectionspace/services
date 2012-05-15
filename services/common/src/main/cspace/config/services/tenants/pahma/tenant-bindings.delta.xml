@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tenant:TenantBindingConfig
+	xmlns:merge='http://xmlmerge.el4j.elca.ch'
+	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
+	
+	<tenant:tenantBinding id="15" name="pahma.cspace.berkeley.edu" displayName="CollectionSpace PAHMA Tenant" version="0.1">
+		
+		<tenant:repositoryDomain name="default-domain" storageName="pahma-domain" repositoryClient="nuxeo-java" />
+		
+		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_naturalhistory" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory" 
+							schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd" />
+					</service:content>
+				</service:part>
+				
+				<service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_anthropology" updated="" order="4">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/collectionobject/domain/anthropology http://collectionspace.org/services/collectionobject/domain/collectionobjects_anthropology.xsd" />
+					</service:content>
+				</service:part>
+				
+				<service:part id="5" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_pahma" updated="" order="5">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/local/pahma" 
+							schemaLocation="http://collectionspace.org/services/collectionobject/local/pahma http://collectionspace.org/services/collectionobject/local/collectionobjects_pahma.xsd" />
+					</service:content>
+				</service:part>
+				
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Media">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="media_pahma" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/media/local/pahma" schemaLocation="http://collectionspace.org/services/media/local/pahma http://collectionspace.org/services/media/local/media_pahma.xsd" />
+					</service:content>
+				</service:part>
+			 </service:object>
+		</tenant:serviceBindings>
+		
+		<tenant:serviceBindings merge:matcher="id" id="Movements">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="movements_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/movement/domain/anthropology" schemaLocation="http://collectionspace.org/services/movement/domain/anthropology http://collectionspace.org/services/movement/domain/movements_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Claims">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >		
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="claims_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/claim/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/claim/domain/anthropology http://collectionspace.org/services/claim/domain/claims_anthropology.xsd" />
+					</service:content>
+				</service:part>
+				
+				<service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="claims_pahma" updated="" order="4">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/claim/local/pahma" 
+							schemaLocation="http://collectionspace.org/services/claim/local/pahma http://collectionspace.org/services/claim/local/claims_pahma.xsd" />
+						</service:content>
+					</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Organizations">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="organizations_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/organization/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/organization/domain/anthropology http://collectionspace.org/services/organization/domain/organizations_anthropology.xsd" />
+					</service:content>
+				</service:part>
+				
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Persons">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="persons_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/person/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/person/domain/anthropology http://collectionspace.org/services/person/domain/persons_anthropology.xsd" />
+					</service:content>
+				</service:part>
+				
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Locations">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="locations_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/location/domain/anthropology" schemaLocation="http://collectionspace.org/services/location/domain/anthropology http://collectionspace.org/services/location/domain/locations_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Contacts">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="contacts_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/contact/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/contact/domain/anthropology http://collectionspace.org/services/contact/domain/contacts_anthropology.xsd" />
+					</service:content>
+				</service:part>
+				
+			</service:object>
+		</tenant:serviceBindings>		
+	</tenant:tenantBinding>
+</tenant:TenantBindingConfig>
