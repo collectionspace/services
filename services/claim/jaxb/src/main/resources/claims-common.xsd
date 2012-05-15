@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Claim schema (XSD)
+    
+    Entity  : Claim
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision: 5284 $
+    $LastChangedDate: 2011-07-22 12:44:36 -0700 (Fri, 22 Jul 2011) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/claim"
+  xmlns="http://collectionspace.org/services/claim"
+  targetNamespace="http://collectionspace.org/services/claim"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+
+    <xs:element name="claims_common">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="claimNumber" type="xs:string"/>
+				<xs:element name="responsibleDepartments" type="responsibleDepartmentsList"/>
+				<xs:element name="claimClaimantGroupList" type="claimClaimantGroupList"/>
+				<xs:element name="claimReceivedGroupList" type="claimReceivedGroupList"/>
+			</xs:sequence>
+		</xs:complexType>
+    </xs:element>
+    
+	<xs:complexType name="responsibleDepartmentsList">
+		<xs:sequence>
+			<xs:element name="responsibleDepartment" type="xs:string"
+				minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="claimClaimantGroupList">
+		<xs:sequence>
+			<xs:element name="claimClaimantGroup" type="claimClaimantGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="claimClaimantGroup">
+		<xs:sequence>
+			<xs:element name="filedBy" type="xs:string"/>
+			<xs:element name="filedOnBehalfOf" type="xs:string"/>
+			<xs:element name="claimantNote" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="claimReceivedGroupList">
+		<xs:sequence>
+			<xs:element name="claimReceivedGroup" type="claimReceivedGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="claimReceivedGroup">
+		<xs:sequence>
+			<xs:element name="claimReceivedDate" type="xs:string"/>
+			<xs:element name="claimReceivedNote" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType> 
+</xs:schema>
+

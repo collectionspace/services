@@ -183,6 +183,7 @@
         <ant antfile="acquisition/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="dimension/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="contact/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="claim/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false"/>
     </target>
 
@@ -223,6 +224,7 @@
         <ant antfile="authority/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authorization/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="claim/build.xml" target="undeploy" inheritAll="false"/>
     </target>
 
     <target name="hotdeploy" depends="install"
@@ -261,6 +263,7 @@
         <ant antfile="organization/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="person/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="claim/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritAll="false"/>
         <copy file="${basedir}/target/${javadoc.jar}"
               todir="${services.trunk}/${dist.server.cspace}/cspace/services/docs"/>
