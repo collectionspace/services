@@ -209,7 +209,7 @@ public class ServiceGroupDocumentModelHandler
         fields[6] = DOC_TYPE_FIELD;
         list.setFieldsReturned(fields);
         Iterator<DocumentModel> iter = docList.iterator();
-		HashMap<String, Object> item = new HashMap<String,String>();
+		HashMap<String, Object> item = new HashMap<String, Object>();
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             String docType = docModel.getDocumentType().getName();
