@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+ 
+<!--
+    Organization schema (XSD)
+     
+    Entity  : Organization
+    Part    : Domain extension schema for anthropology
+    Used for: Nuxeo EP core document type
+ 
+-->
+ 
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/location/domain/anthropology"
+  xmlns="http://collectionspace.org/services/location/domain/anthropology"
+  targetNamespace="http://collectionspace.org/services/location/domain/anthropology"
+  version="0.1"
+>
+ 
+    <xs:element name="locNote" type="xs:string" />
+	<xs:element name="moveableContainer" type="xs:boolean" />
+ 
+</xs:schema>
