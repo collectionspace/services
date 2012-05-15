@@ -24,13 +24,13 @@
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
@@ -41,17 +41,16 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.CommonList; //FIXME: REM - 5/15/2012 - CommonList should be moved out of this package and into a more "common" package
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationResource;
@@ -60,27 +59,25 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.runtime.transaction.TransactionHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 
 //import org.collectionspace.services.common.authority.AuthorityItemRelations;
 /**
@@ -182,6 +179,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return result;
     }    
     
+    private boolean isTermDisplayName(String elName) {
+    	return AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName) || VocabularyItemJAXBSchema.DISPLAY_NAME.equals(elName);
+    }
+    
     @Override
     public List<ListResultField> getListItemsArray() throws DocumentException {
         List<ListResultField> list = super.getListItemsArray();
@@ -196,7 +197,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         for (int i = 0; i < nFields; i++) {
             ListResultField field = list.get(i);
             String elName = field.getElement();
-            if (AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName) || VocabularyItemJAXBSchema.DISPLAY_NAME.equals(elName)) {
+            if (isTermDisplayName(elName) == true) {
                 hasDisplayName = true;
             } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
                 hasShortId = true;
@@ -227,11 +228,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             field = getListResultsTermStatusField();
             list.add(field);
         }
-        
+                
         return list;
     }
-
-
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
      */
@@ -483,8 +483,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
 
 
-
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
      */
@@ -524,6 +522,29 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
     }
 
+    @Override
+	protected Object getXPathValue(DocumentModel docModel, // REM - CSPACE-5133
+			String schema, ListResultField field) {
+		Object result = null;
+
+		result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
+		String elName = field.getElement();
+		if (isTermDisplayName(elName) == true) {
+			MultivaluedMap<String, String> queryParams = this.getServiceContext().getQueryParams();
+	        String partialTerm = queryParams != null ? queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM) : null;
+	        if (partialTerm != null && partialTerm.trim().isEmpty() == false) {
+	        	List<String> strList = new ArrayList<String>();
+	        	strList.add((String)result);
+	        	strList.add("Tiny");
+	        	strList.add("Tucker");
+	        	strList.add("Tim");
+	        	result = strList;
+	        }
+		}
+		
+		return result;
+	}
+    
     @Override
     public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
