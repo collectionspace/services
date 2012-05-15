@@ -17,7 +17,16 @@
         3rd party build for contact service
     </description>
 
+    <properties>
+        <ServiceName>contact</ServiceName>
+        <NuxeoDocTypeName>Contact</NuxeoDocTypeName>    
+        <CommonSchemaName>contacts_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+    </properties>
+
     <modules>
         <module>nuxeo-platform-cs-contact</module>
+        <module>nuxeo-platform-contact-anthropology</module>
+        <module>nuxeo-platform-contact-pahma</module>
     </modules>
 </project>
