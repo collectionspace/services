@@ -1,15 +1,19 @@
 
-<project name="movement.3rdparty" default="package" basedir=".">
+<project name="nuxeo-platform-movement-pahma" default="package" basedir=".">
     <description>
-        movement service 3rdparty
+        movement nuxeo document type for pahma tenant
     </description>
-  <!-- set global properties for this build -->
-    <property name="services.trunk" value="../../.."/>
+    <!-- set global properties for this build -->
+    <property name="services.trunk" value="../../../.."/>
     <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
+    <property name="nuxeo.movement.jar"
+        value="org.collectionspace.services.movement.3rdparty.pahma.nuxeo-${cspace.release}.jar"/>
+    <property name="nuxeo.movement.jars.all"
+        value="org.collectionspace.services.movement.3rdparty.*.nuxeo-*.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -19,12 +23,12 @@
     </condition>
 
     <target name="init" >
-    <!-- Create the time stamp -->
+        <!-- Create the time stamp -->
         <tstamp/>
     </target>
 
     <target name="package" depends="package-unix,package-windows"
-  description="Package CollectionSpace Services" />
+        description="Package CollectionSpace Services" />
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="package" />
@@ -49,7 +53,7 @@
     </target>
 
     <target name="install" depends="install-unix,install-windows"
-  description="Install" />
+        description="Install" />
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="install" />
@@ -72,9 +76,9 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-    
+
     <target name="clean" depends="clean-unix,clean-windows"
-  description="Delete target directories" >
+        description="Delete target directories" >
         <delete dir="${build}"/>
     </target>
     <target name="clean-unix" if="osfamily-unix">
@@ -109,25 +113,26 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy movement in ${jee.server.nuxeo}">
-        <ant antfile="nuxeo-platform-cs-movement/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="nuxeo-platform-movement-anthropology/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="nuxeo-platform-movement-pahma/build.xml" target="deploy" inheritall="false"/>
+        description="deploy movement doctype in ${jee.server.nuxeo}">
+        <copy file="${basedir}/target/${nuxeo.movement.jar}"
+        todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy movement from ${jee.server.nuxeo}">
-        <ant antfile="nuxeo-platform-cs-movement/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="nuxeo-platform-movement-anthropology/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="nuxeo-platform-movement-pahma/build.xml" target="undeploy" inheritall="false"/>
+        description="undeploy movement doctype from ${jee.server.nuxeo}">
+        <delete>
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.movement.jars.all}"/>
+            </fileset>
+        </delete>
     </target>
 
     <target name="dist"
-    description="generate distribution for movement" depends="package">
-        <ant antfile="nuxeo-platform-cs-movement/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="nuxeo-platform-movement-anthropology/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="nuxeo-platform-movement-pahma/build.xml" target="dist" inheritall="false"/>
+        description="generate distribution for movement doctype" depends="package">
+        <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
+            <fileset file="${basedir}/target/${nuxeo.movement.jar}"/>
+        </copy>
     </target>
 
-
 </project>
+
