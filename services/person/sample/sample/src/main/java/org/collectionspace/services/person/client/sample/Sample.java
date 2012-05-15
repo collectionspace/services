@@ -375,12 +375,12 @@ public class Sample {
             if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_DATE))!=null) {
                 StructuredDateGroup birthDate = new StructuredDateGroup();
                 birthDate.setDateDisplayDate(value);
-                person.setBirthDate(birthDate);
+                person.setBirthDateGroup(birthDate);
             }
             if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_DATE))!=null) {
                 StructuredDateGroup deathDate = new StructuredDateGroup();
                 deathDate.setDateDisplayDate(value);
-                person.setDeathDate(deathDate);
+                person.setDeathDateGroup(deathDate);
             }
             if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_PLACE))!=null)
             	person.setBirthPlace(value);

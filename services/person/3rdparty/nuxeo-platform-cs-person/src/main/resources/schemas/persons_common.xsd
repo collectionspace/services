@@ -30,8 +30,8 @@
     <xs:element name="personTermGroupList" type="personTermGroupList"/>
     
     <xs:element name="description" type="xs:string"/>
-    <xs:element name="birthDate" type="structuredDateGroup"/>
-    <xs:element name="deathDate" type="structuredDateGroup"/>
+    <xs:element name="birthDateGroup" type="structuredDateGroup"/>
+    <xs:element name="deathDateGroup" type="structuredDateGroup"/>
     <xs:element name="birthPlace" type="xs:string"/>
     <xs:element name="deathPlace" type="xs:string"/>
     <xs:element name="groups">
