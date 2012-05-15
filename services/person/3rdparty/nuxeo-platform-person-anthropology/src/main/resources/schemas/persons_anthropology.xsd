@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Person schema (XSD)
+    
+    Entity  : Person
+    Part    : Domain extension schema for anthropology
+    Used for: Nuxeo EP core document type
+    
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/person/domain/anthropology"
+  xmlns="http://collectionspace.org/services/person/domain/anthropology"
+  targetNamespace="http://collectionspace.org/services/person/domain/anthropology"
+  version="0.1"
+>
+
+	<xs:element name="altNameNotes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="altNameNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
