@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Taxon schema (XSD)
+    
+    Entity  : Taxon (item child of a TaxonomyAuthority) 
+    Part    : naturalhistory
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision: 4622 $
+    $LastChangedDate: 2011-05-05 16:51:51 -0700 (Thu, 05 May 2011) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/taxonomy/domain/naturalhistory"
+  xmlns="http://collectionspace.org/services/taxonomy/domain/naturalhistory"
+  targetNamespace="http://collectionspace.org/services/taxonomy/domain/naturalhistory"
+  version="0.1"
+>
+	<xs:element name="taxonBasionym" type="xs:string"/>
+	<xs:element name="commonNameGroupList" type="commonNameGroupList"/>
+	<xs:element name="relatedTermGroupList" type="relatedTermGroupList"/>
+	
+	<xs:complexType name="commonNameGroupList">
+		<xs:sequence>
+			<xs:element name="commonNameGroup" type="commonNameGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="commonNameGroup">
+		<xs:sequence>
+			<xs:element name="commonName" type="xs:string"/>
+			<xs:element name="commonNameLanguage" type="xs:string"/>
+			<xs:element name="commonNameSource" type="xs:string"/>
+			<xs:element name="commonNameSourceDetail" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="relatedTermGroupList">
+		<xs:sequence>
+			<xs:element name="relatedTermGroup" type="relatedTermGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="relatedTermGroup">
+		<xs:sequence>
+			<xs:element name="relatedTerm" type="xs:string"/>
+			<xs:element name="relatedTermType" type="xs:string"/>
+			<xs:element name="relatedTermSource" type="xs:string"/>
+			<xs:element name="relatedTermSourceDetail" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
+
