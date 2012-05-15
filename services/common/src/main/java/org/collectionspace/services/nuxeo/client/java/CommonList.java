@@ -34,6 +34,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jvnet.jaxb2_commons.lang.ToString;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -45,8 +48,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class allows us to generically represent and marshall a set of list
@@ -66,7 +68,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 public class CommonList extends AbstractCommonList {
 	
 	/** The logger. */
-	//private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = LoggerFactory.getLogger(CommonList.class);
 	@XmlTransient
 	private DocumentBuilderFactory factory;
 	@XmlTransient
@@ -129,6 +131,27 @@ public class CommonList extends AbstractCommonList {
 		}
 		return implodedString;
 	}
+		
+	private void addItem(List<Element> anyList, String key, Object value) {
+		if (value != null ) {
+			Element el = doc.createElement(key);
+			if (value instanceof String) {
+				el.setTextContent((String)value);
+				anyList.add(el);
+			} else if (value instanceof List<?>) {
+				List<String> valueList = (List<String>)value;
+				for (String val : valueList) {
+					addItem(anyList, key, val);
+				}
+			} else {
+				logger.error("Unknown value type found while processing common list results: "
+						+ value.getClass().getCanonicalName());
+			}
+		} else {
+			logger.trace("Null value encountered while processing common list results for key: "
+					+ key);
+		}
+	}
 	
 	/**
 	 * Adds an item to the results list. Each item should have fields
@@ -138,18 +161,19 @@ public class CommonList extends AbstractCommonList {
 	 * @param itemInfo
 	 * @throws RuntimeException if this is called before fieldKeys has been set.
 	 */
-	public void addItem(HashMap<String,String> itemInfo) {
-		if(fieldKeys==null) {
-			throw new RuntimeException("CommonList.addItem: Cannot add items before fieldKeys are set.");
+	public void addItem(HashMap<String, Object> itemInfo) {
+		if (fieldKeys == null) {
+			throw new RuntimeException(
+					"CommonList.addItem: Cannot add items before fieldKeys are set.");
 		}
 		List<AbstractCommonList.ListItem> itemsList = getListItem();
 		AbstractCommonList.ListItem listItem = new AbstractCommonList.ListItem();
 		itemsList.add(listItem);
+		
 		List<Element> anyList = listItem.getAny();
-		for(String key:fieldKeys) {
-			Element el = doc.createElement(key);
-			el.setTextContent(itemInfo.get(key));
-			anyList.add(el);
+		for (String key : fieldKeys) {
+			Object value = itemInfo.get(key);
+			addItem(anyList, key, value);
 		}
 	}
 
