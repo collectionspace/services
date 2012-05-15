@@ -153,7 +153,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // In CSPACE-5134, these list results will change substantially
         // to return display names for both the preferred term and for
         // each non-preferred term (if any).
-    	result.setElement(AuthorityItemJAXBSchema.DISPLAY_NAME);
+    	result.setElement(AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
     	result.setXpath(NuxeoUtils.getPrimaryXPathPropertyName(
                 authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME));
     	
@@ -240,7 +240,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // re-enable it.
         //
         // CSPACE-3178:
-        // handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
+        handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
         // refName includes displayName, so we force a correct value here.
         updateRefnameForAuthorityItem(wrapDoc, authorityItemCommonSchemaName, getAuthorityRefNameBase());
     }
@@ -359,17 +359,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 		String shortIdentifier = (String) docModel.getProperty(schemaName,
 				AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
 
-		String termDisplayName = getPrimaryDisplayName(
-				docModel, authorityItemCommonSchemaName,
-				getItemTermInfoGroupXPathBase(),
-				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-
-		String termName = getPrimaryDisplayName(
-				docModel, authorityItemCommonSchemaName,
-				getItemTermInfoGroupXPathBase(),
-				AuthorityItemJAXBSchema.TERM_NAME);
-
 		if (Tools.isEmpty(shortIdentifier)) {
+			String termDisplayName = getPrimaryDisplayName(
+					docModel, authorityItemCommonSchemaName,
+					getItemTermInfoGroupXPathBase(),
+					AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+
+			String termName = getPrimaryDisplayName(
+					docModel, authorityItemCommonSchemaName,
+					getItemTermInfoGroupXPathBase(),
+					AuthorityItemJAXBSchema.TERM_NAME);
+
 			String generatedShortIdentifier = AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(termDisplayName,
 							termName);
 			docModel.setProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER,
