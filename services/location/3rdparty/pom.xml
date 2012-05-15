@@ -17,7 +17,16 @@
         3rd party build for location service
     </description>
 
+    <properties>
+        <ServiceName>location</ServiceName>
+        <NuxeoDocTypeName>Locationitem</NuxeoDocTypeName>
+        <CommonSchemaName>locations_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+    </properties>
+
     <modules>
         <module>nuxeo-platform-cs-location</module>
+        <module>nuxeo-platform-location-anthropology</module>
+        <module>nuxeo-platform-location-pahma</module>
     </modules>
 </project>
