@@ -2,18 +2,22 @@ package org.collectionspace.services.client;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.TaxonJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.taxonomy.CommonNameGroupList;
 import org.collectionspace.services.taxonomy.TaxonAuthorGroupList;
 import org.collectionspace.services.taxonomy.TaxonCitationList;
 import org.collectionspace.services.taxonomy.TaxonCommon;
+import org.collectionspace.services.taxonomy.TaxonTermGroup;
+import org.collectionspace.services.taxonomy.TaxonTermGroupList;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
@@ -27,8 +31,9 @@ public class TaxonomyAuthorityClientUtils {
 
     /**
      * Creates a new Taxonomy Authority
+     *
      * @param displayName	The displayName used in UI, etc.
-     * @param refName		The proper refName for this authority
+     * @param refName	The proper refName for this authority
      * @param headerLabel	The common part label
      * @return	The PoxPayloadOut payload for the create call
      */
@@ -53,35 +58,43 @@ public class TaxonomyAuthorityClientUtils {
     }
 
     /**
-     * @param taxonomyAuthRefName  The proper refName for this authority.
-     * @param taxonInfo the properties for the new instance of a term in this authority.
-     * @param taxonAuthorGroupList an author group list (values of a repeatable group in the term record).
-     * @param taxonCitationList a citation list (values of a repeatable scalar in the term record).
+     * @param taxonomyAuthRefName The proper refName for this authority.
+     * @param taxonInfo the properties for the new instance of a term in this
+     * authority.
+     * @param taxonAuthorGroupList an author group list (values of a repeatable
+     * group in the term record).
+     * @param taxonCitationList a citation list (values of a repeatable scalar
+     * in the term record).
      * @param headerLabel	The common part label
      * @return	The PoxPayloadOut payload for the create call
      */
     public static PoxPayloadOut createTaxonInstance(
             String taxonomyAuthRefName, Map<String, String> taxonInfo,
-            TaxonAuthorGroupList taxonAuthorGroupList, TaxonCitationList taxonCitationList,
-            String headerLabel) {
+            List<TaxonTermGroup> terms, TaxonAuthorGroupList taxonAuthorGroupList,
+            TaxonCitationList taxonCitationList, CommonNameGroupList commonNameGroupList, String headerLabel) {
         TaxonCommon taxon = new TaxonCommon();
         String shortId = taxonInfo.get(TaxonJAXBSchema.SHORT_IDENTIFIER);
-        String displayName = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME);
         taxon.setShortIdentifier(shortId);
-        // String taxonomyRefName = createTaxonomyRefName(taxonomyAuthRefName, shortId, displayName);
-        // taxon.setRefName(taxonomyRefName);
-        String value = null;
-        value = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME_COMPUTED);
-        boolean displayNameComputed = (value == null) || value.equalsIgnoreCase("true");
-        taxon.setDisplayNameComputed(displayNameComputed);
-        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TERM_STATUS)) != null) {
-            taxon.setTermStatus(value);
-        }
 
-        // Fields specific to this authority record type.
-        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.NAME)) != null) {
-            taxon.setTaxonFullName(value);
+        // Set values in the Term Information Group
+        String displayName = taxonInfo.get(TaxonJAXBSchema.DISPLAY_NAME);
+        TaxonTermGroupList termList = new TaxonTermGroupList();
+        if (terms == null || terms.isEmpty()) {
+            if (Tools.notBlank(displayName)) {
+                terms = getTermGroupInstance(displayName);
+            } else {
+                terms = getTermGroupInstance(getGeneratedIdentifier());
+            }
         }
+        terms.get(0).setTermDisplayName(taxonInfo.get(TaxonJAXBSchema.NAME));
+        terms.get(0).setTermName(taxonInfo.get(TaxonJAXBSchema.NAME));
+        terms.get(0).setTermStatus(taxonInfo.get(TaxonJAXBSchema.TERM_STATUS));
+        terms.get(0).setTaxonomicStatus(taxonInfo.get(TaxonJAXBSchema.TAXONOMIC_STATUS));
+        termList.getTaxonTermGroup().addAll(terms);
+        taxon.setTaxonTermGroupList(termList);
+
+        String value = null;
+        // Fields specific to this authority record type.
         if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXON_RANK)) != null) {
             taxon.setTaxonRank(value);
         }
@@ -91,21 +104,18 @@ public class TaxonomyAuthorityClientUtils {
         if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXON_YEAR)) != null) {
             taxon.setTaxonYear(value);
         }
-        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXONOMIC_STATUS)) != null) {
-            taxon.setTaxonomicStatus(value);
-        }
-        if ((value = (String) taxonInfo.get(TaxonJAXBSchema.TAXON_IS_NAMED_HYBRID)) != null) {
-            taxon.setTaxonIsNamedHybrid(value);
-        }
         if (taxonCitationList != null) {
             taxon.setTaxonCitationList(taxonCitationList);
         }
-
         if (taxonAuthorGroupList != null) {
             taxon.setTaxonAuthorGroupList(taxonAuthorGroupList);
         }
+        if (commonNameGroupList != null) {
+            taxon.setCommonNameGroupList(commonNameGroupList);
+        }
 
-        // FIXME: When the field isNamedHybrid becomes Boolean, add it as such to sample instances.
+        taxon.setTaxonIsNamedHybrid(Boolean.parseBoolean(
+                taxonInfo.get(TaxonJAXBSchema.TAXON_IS_NAMED_HYBRID)));
 
         PoxPayloadOut multipart = new PoxPayloadOut(TaxonomyAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(taxon,
@@ -128,8 +138,9 @@ public class TaxonomyAuthorityClientUtils {
      */
     public static String createItemInAuthority(String vcsid,
             String TaxonomyauthorityRefName, Map<String, String> taxonMap,
-            TaxonAuthorGroupList taxonAuthorGroupList,
-            TaxonCitationList taxonCitationList, TaxonomyAuthorityClient client) {
+            List<TaxonTermGroup> terms, TaxonAuthorGroupList taxonAuthorGroupList,
+            TaxonCitationList taxonCitationList, CommonNameGroupList commonNameGroupList,
+            TaxonomyAuthorityClient client) {
         // Expected status code: 201 Created
         int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
         // Type of service request being tested
@@ -154,7 +165,7 @@ public class TaxonomyAuthorityClientUtils {
         }
         PoxPayloadOut multipart =
                 createTaxonInstance(TaxonomyauthorityRefName,
-                taxonMap, taxonAuthorGroupList, taxonCitationList, client.getItemCommonPartName());
+                taxonMap, terms, taxonAuthorGroupList, taxonCitationList, commonNameGroupList, client.getItemCommonPartName());
         String newID = null;
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         try {
@@ -291,10 +302,11 @@ public class TaxonomyAuthorityClientUtils {
      * specific call to a service does not fall within a set of valid status
      * codes for that service.
      *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
+     * @param serviceRequestType A type of service request (e.g. CREATE,
+     * DELETE).
      *
-     * @param statusCode  The invalid status code that was returned in the response,
-     *                    from submitting that type of request to the service.
+     * @param statusCode The invalid status code that was returned in the
+     * response, from submitting that type of request to the service.
      *
      * @return An error message.
      */
@@ -305,10 +317,11 @@ public class TaxonomyAuthorityClientUtils {
 
     /**
      * Produces a default displayName from the basic name and dates fields.
+     *
      * @see TaxonomyDocumentModelHandler.prepareDefaultDisplayName() which
      * duplicates this logic, until we define a service-general utils package
      * that is neither client nor service specific.
-     * @param name	
+     * @param name
      * @return
      */
     public static String prepareDefaultDisplayName(
@@ -316,5 +329,21 @@ public class TaxonomyAuthorityClientUtils {
         StringBuilder newStr = new StringBuilder();
         newStr.append(name);
         return newStr.toString();
+    }
+
+    public static List<TaxonTermGroup> getTermGroupInstance(String identifier) {
+        if (Tools.isBlank(identifier)) {
+            identifier = getGeneratedIdentifier();
+        }
+        List<TaxonTermGroup> terms = new ArrayList<TaxonTermGroup>();
+        TaxonTermGroup term = new TaxonTermGroup();
+        term.setTermDisplayName(identifier);
+        term.setTermName(identifier);
+        terms.add(term);
+        return terms;
+    }
+
+    private static String getGeneratedIdentifier() {
+        return "id" + new Date().getTime();
     }
 }

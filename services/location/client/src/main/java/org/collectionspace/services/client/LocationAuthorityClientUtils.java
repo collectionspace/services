@@ -2,20 +2,17 @@ package org.collectionspace.services.client;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.LocationJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.location.LocationsCommon;
-import org.collectionspace.services.location.ConditionGroupList;
-import org.collectionspace.services.location.ConditionGroup;
-import org.collectionspace.services.location.LocationauthoritiesCommon;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.location.*;
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
@@ -62,7 +59,7 @@ public class LocationAuthorityClientUtils {
      */
     public static PoxPayloadOut createLocationInstance( 
     		String locationAuthRefName, Map<String, String> locationInfo, 
-				String headerLabel){
+				List<LocTermGroup> terms, String headerLabel){
         LocationsCommon location = new LocationsCommon();
     	String shortId = locationInfo.get(LocationJAXBSchema.SHORT_IDENTIFIER);
     	String displayName = locationInfo.get(LocationJAXBSchema.DISPLAY_NAME);
@@ -71,10 +68,16 @@ public class LocationAuthorityClientUtils {
        	// location.setRefName(locationRefName);
        	String value = null;
     	value = locationInfo.get(LocationJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
-    	location.setDisplayNameComputed(displayNameComputed);
-        if((value = (String)locationInfo.get(LocationJAXBSchema.NAME))!=null)
-        	location.setName(value);
+    	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true");
+        
+        // Set values in the Term Information Group
+        LocTermGroupList termList = new LocTermGroupList();
+        if (terms == null || terms.isEmpty()) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
+        }
+        termList.getLocTermGroup().addAll(terms); 
+        location.setLocTermGroupList(termList);
+        
         if((value = (String)locationInfo.get(LocationJAXBSchema.CONDITION_NOTE))!=null) {
             ConditionGroupList conditionGroupList = new ConditionGroupList();
             List<ConditionGroup> conditionGroups = conditionGroupList.getConditionGroup();
@@ -93,8 +96,6 @@ public class LocationAuthorityClientUtils {
         	location.setLocationType(value);
         if((value = (String)locationInfo.get(LocationJAXBSchema.ADDRESS))!=null)
         	location.setAddress(value);
-        if((value = (String)locationInfo.get(LocationJAXBSchema.TERM_STATUS))!=null)
-        	location.setTermStatus(value);
 
         PoxPayloadOut multipart = new PoxPayloadOut(LocationAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(location,
@@ -117,32 +118,25 @@ public class LocationAuthorityClientUtils {
      */
     public static String createItemInAuthority(String vcsid, 
     		String locationAuthorityRefName, Map<String,String> locationMap,
-    		LocationAuthorityClient client ) {
+    		List<LocTermGroup> terms, LocationAuthorityClient client ) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-    	
-    	String displayName = locationMap.get(LocationJAXBSchema.DISPLAY_NAME);
-    	String displayNameComputedStr = locationMap.get(LocationJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (displayNameComputedStr==null) || displayNameComputedStr.equalsIgnoreCase("true");
-    	if( displayName == null ) {
-    		if(!displayNameComputed) {
-	    		throw new RuntimeException(
-	    		"CreateItem: Must supply a displayName if displayNameComputed is set to false.");
-    		}
-        	displayName = 
-        		prepareDefaultDisplayName(
-    		    	locationMap.get(LocationJAXBSchema.NAME));
-    	}
+        
+        String displayName = "";
+        if ((terms !=null) && (! terms.isEmpty())) {
+            displayName = terms.get(0).getTermDisplayName();
+        }
     	
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create Item: \""+displayName
-    				+"\" in locationAuthority: \"" + locationAuthorityRefName +"\"");
+    		logger.debug("Creating item with display name: \"" + displayName
+    				+"\" in locationAuthority: \"" + vcsid +"\"");
     	}
+        
     	PoxPayloadOut multipart = 
     		createLocationInstance( locationAuthorityRefName,
-    			locationMap, client.getItemCommonPartName() );
+    			locationMap, terms, client.getItemCommonPartName() );
     	String newID = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
         try {
@@ -306,6 +300,20 @@ public class LocationAuthorityClientUtils {
 		return newStr.toString();
     }
     
-
+    public static List<LocTermGroup> getTermGroupInstance(String identifier) {
+        if (Tools.isBlank(identifier)) {
+            identifier = getGeneratedIdentifier();
+        }
+        List<LocTermGroup> terms = new ArrayList<LocTermGroup>();
+        LocTermGroup term = new LocTermGroup();
+        term.setTermDisplayName(identifier);
+        term.setTermName(identifier);
+        terms.add(term);
+        return terms;
+    }
+    
+    private static String getGeneratedIdentifier() {
+        return "id" + new Date().getTime(); 
+   }
 
 }

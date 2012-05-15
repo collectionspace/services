@@ -7,7 +7,7 @@
     xmlns="http://collectionspace.org/services/taxonomy"
     targetNamespace="http://collectionspace.org/services/taxonomy"
     version="0.1"
-    >
+>
     
     <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Taxonomy+Service+Home -->    
@@ -24,26 +24,19 @@
                 <xs:element name="inAuthority" type="xs:string" />
                 <xs:element name="shortIdentifier" type="xs:string"/>
                 <xs:element name="refName" type="xs:string"/>
-                <xs:element name="termStatus" type="xs:string"/>
-                <xs:element name="displayName" type="xs:string"/>
-                <xs:element name="displayNameComputed" type="xs:boolean"/>
-                <xs:element name="shortDisplayName" type="xs:string"/>
-                <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
-                <xs:element name="source" type="xs:string"/>
-                <xs:element name="sourcePage" type="xs:string"/>
+                
+                <!-- Term Information repeatable group -->
+                <xs:element name="taxonTermGroupList" type="taxonTermGroupList"/>
+    
                 <xs:element name="description" type="xs:string"/>
-                <xs:element name="taxonFullName" type="xs:string"/>
                 <xs:element name="taxonRank" type="xs:string"/>
                 <xs:element name="taxonCurrency" type="xs:string"/>
                 <xs:element name="taxonAuthorGroupList" type="taxonAuthorGroupList"/>
                 <xs:element name="taxonYear" type="xs:string"/>
                 <xs:element name="taxonCitationList" type="taxonCitationList"/>
-                <xs:element name="taxonomicStatus" type="xs:string"/>
-                <xs:element name="taxonNameSource" type="xs:string"/>
-                <xs:element name="taxonNameSourceCode" type="xs:string"/>
-                <xs:element name="taxonGUID" type="xs:string"/>
                 <xs:element name="taxonNote" type="xs:string"/>
-                <xs:element name="taxonIsNamedHybrid" type="xs:string"/>
+                <xs:element name="taxonIsNamedHybrid" type="xs:boolean"/>
+                <xs:element name="commonNameGroupList" type="commonNameGroupList"/>
 
             </xs:sequence>
         </xs:complexType>
@@ -65,6 +58,45 @@
     <xs:complexType name="taxonCitationList">
         <xs:sequence>
             <xs:element name="taxonCitation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="commonNameGroupList">
+        <xs:sequence>
+            <xs:element name="commonNameGroup" type="commonNameGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="commonNameGroup">
+        <xs:sequence>
+            <xs:element name="commonName" type="xs:string"/>
+            <xs:element name="commonNameLanguage" type="xs:string"/>
+            <xs:element name="commonNameSource" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="taxonTermGroupList">
+        <xs:sequence>
+            <xs:element name="taxonTermGroup" type="taxonTermGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="taxonTermGroup">
+        <xs:sequence>
+            <!-- Common across all authority item terms -->
+            <xs:element name="termDisplayName" type="xs:string"/>
+            <xs:element name="termName" type="xs:string"/>
+            <xs:element name="termType" type="xs:string"/>
+            <xs:element name="termStatus" type="xs:string"/>
+            <xs:element name="termQualifier" type="xs:string"/>
+            <xs:element name="termLanguage" type="xs:string"/>
+            <xs:element name="termPrefForLang" type="xs:boolean"/>
+            <xs:element name="termSource" type="xs:string"/>
+            <xs:element name="termSourceDetail" type="xs:string"/>
+            <xs:element name="termSourceID" type="xs:string"/>
+            <xs:element name="termSourceNote" type="xs:string"/>
+            <!-- Specific to Taxon terms -->
+            <xs:element name="taxonomicStatus" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

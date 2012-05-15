@@ -26,11 +26,7 @@
  */
 package org.collectionspace.services.client;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -38,9 +34,12 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.person.GroupList;
 import org.collectionspace.services.person.NationalityList;
 import org.collectionspace.services.person.OccupationList;
+import org.collectionspace.services.person.PersonTermGroup;
+import org.collectionspace.services.person.PersonTermGroupList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.SchoolOrStyleList;
@@ -167,11 +166,15 @@ public class PersonAuthorityClientUtils {
     public static PoxPayloadOut createPersonInstance(String inAuthority,
     		String personAuthRefName,
     		Map<String, String> personInfo,
+                List<PersonTermGroup> terms,
     		String headerLabel){
+        if (terms == null || terms.isEmpty()) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
+        }
         final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO =
                 new HashMap<String, List<String>>();
-        return createPersonInstance(inAuthority, null /*personAuthRefName*/, personInfo,
-                EMPTY_PERSON_REPEATABLES_INFO, headerLabel);
+        return createPersonInstance(inAuthority, null /*personAuthRefName*/,
+                personInfo, terms, EMPTY_PERSON_REPEATABLES_INFO, headerLabel);
     }
 
     /**
@@ -180,12 +183,14 @@ public class PersonAuthorityClientUtils {
      * @param inAuthority the owning authority
      * @param personAuthRefName the owning Authority ref name
      * @param personInfo the person info
+     * @param terms a list of Person terms
      * @param personRepeatablesInfo names and values of repeatable scalar fields in the Person record
      * @param headerLabel the header label
      * @return the multipart output
      */
     public static PoxPayloadOut createPersonInstance(String inAuthority, 
     		String personAuthRefName, Map<String, String> personInfo,
+                List<PersonTermGroup> terms,
                 Map<String, List<String>> personRepeatablesInfo, String headerLabel){
         PersonsCommon person = new PersonsCommon();
         person.setInAuthority(inAuthority);
@@ -194,57 +199,10 @@ public class PersonAuthorityClientUtils {
     		throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
     	}      	
     	person.setShortIdentifier(shortId);
-       	
-       	//
-       	// If the 'DISPLAY_NAME_COMPUTED' property is null or empty then
-       	// we'll assume that the service consumer wants us to compute the
-       	// display name.  Otherwise, we'll parse the value with the Boolean class.
-       	//
-    	String booleanStr = personInfo.get(PersonJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = true;
-    	if (booleanStr != null && booleanStr.length() > 0) {
-    		displayNameComputed = Boolean.parseBoolean(booleanStr);
-    	}
-    	person.setDisplayNameComputed(displayNameComputed);
-
-       	String displayName = personInfo.get(PersonJAXBSchema.DISPLAY_NAME);
-       	person.setDisplayName(displayName);
-    	if (displayNameComputed == false && displayName == null) {
-    		throw new IllegalArgumentException("displayName cannot be null when displayComputed is 'false'");
-    	}      	
-
-    	booleanStr = personInfo.get(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
-    	boolean shortDisplayNameComputed = true;
-    	if (booleanStr != null && booleanStr.length() > 0) {
-    		shortDisplayNameComputed = Boolean.parseBoolean(booleanStr);
-    	}
-    	person.setShortDisplayNameComputed(shortDisplayNameComputed);
-
-       	String shortDisplayName = personInfo.get(PersonJAXBSchema.SHORT_DISPLAY_NAME);
-       	person.setShortDisplayName(shortDisplayName);
-    	if (shortDisplayNameComputed == false && shortDisplayName == null) {
-    		throw new IllegalArgumentException("shortDisplayName cannot be null when shortDisplayComputed is 'false'");
-    	}      	
-
-    	//String refName = createPersonRefName(personAuthRefName, shortId, displayName);
-       	//person.setRefName(refName);
     	
     	String value;
         List<String> values = null;
-        if((value = (String)personInfo.get(PersonJAXBSchema.FORE_NAME))!=null) //FIXME: REM - I don't think we need to check for null -null is a valid value and won't cause any problems. 
-        	person.setForeName(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.MIDDLE_NAME))!=null)
-        	person.setMiddleName(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.SUR_NAME))!=null)
-        	person.setSurName(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.INITIALS))!=null)
-        	person.setInitials(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.SALUTATIONS))!=null)
-        	person.setSalutation(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.TITLE))!=null)
-        	person.setTitle(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.NAME_ADDITIONS))!=null)
-        	person.setNameAdditions(value);
+
         if((value = (String)personInfo.get(PersonJAXBSchema.BIRTH_DATE))!=null)
         	person.setBirthDate(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_DATE))!=null)
@@ -259,6 +217,14 @@ public class PersonAuthorityClientUtils {
         	person.setBioNote(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.NAME_NOTE))!=null)
         	person.setNameNote(value);
+        
+        // Set values in the Term Information Group
+        PersonTermGroupList termList = new PersonTermGroupList();
+        if (terms == null || terms.isEmpty()) {
+            terms = getTermGroupInstance(getGeneratedIdentifier());
+        }
+        termList.getPersonTermGroup().addAll(terms); 
+        person.setPersonTermGroupList(termList);
         
         if (personRepeatablesInfo != null) {
             if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.GROUPS))!=null) {
@@ -285,7 +251,7 @@ public class PersonAuthorityClientUtils {
                     List<String> schoolsOrStyles = schoolOrStyleList.getSchoolOrStyle();
                     schoolsOrStyles.addAll(values);
                     person.setSchoolsOrStyles(schoolOrStyleList);
-            }
+            }        
         }
 
         
@@ -312,51 +278,25 @@ public class PersonAuthorityClientUtils {
      */
     public static String createItemInAuthority(String vcsid, 
     		String personAuthorityRefName, Map<String,String> personMap,
-    		Map<String, List<String>> personRepeatablesMap, PersonAuthorityClient client ) {
+                List<PersonTermGroup> terms, Map<String, List<String>> personRepeatablesMap,
+                PersonAuthorityClient client ) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-    	
-    	String displayName = personMap.get(PersonJAXBSchema.DISPLAY_NAME);
-    	String displayNameComputedStr = personMap.get(PersonJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (displayNameComputedStr==null) || displayNameComputedStr.equalsIgnoreCase("true");
-    	if( displayName == null ) {
-    		if(!displayNameComputed) {
-	    		throw new RuntimeException(
-	    		"CreateItem: Must supply a displayName if displayNameComputed is set to false.");
-    		}
-        	displayName = 
-        		prepareDefaultDisplayName(
-    		    	personMap.get(PersonJAXBSchema.FORE_NAME),
-    		    	personMap.get(PersonJAXBSchema.MIDDLE_NAME),
-    		    	personMap.get(PersonJAXBSchema.SUR_NAME),
-    		    	personMap.get(PersonJAXBSchema.BIRTH_DATE),
-    		    	personMap.get(PersonJAXBSchema.DEATH_DATE));
-        	personMap.put(PersonJAXBSchema.DISPLAY_NAME, displayName);
-    	}
-    	String shortDisplayName = personMap.get(PersonJAXBSchema.SHORT_DISPLAY_NAME);
-    	String shortDisplayNameComputedStr = personMap.get(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
-    	boolean shortDisplayNameComputed = (shortDisplayNameComputedStr==null) || shortDisplayNameComputedStr.equalsIgnoreCase("true");
-    	if( shortDisplayName == null ) {
-    		if(!shortDisplayNameComputed) {
-	    		throw new RuntimeException(
-	    		"CreateItem: Must supply a shortDisplayName if shortDisplayNameComputed is set to false.");
-    		}
-    		shortDisplayName = 
-        		prepareDefaultDisplayName(
-    		    	personMap.get(PersonJAXBSchema.FORE_NAME), null,
-    		    	personMap.get(PersonJAXBSchema.SUR_NAME),null,null);
-        	personMap.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, shortDisplayName);
-    	}
+        
+        String displayName = "";
+        if (terms !=null && terms.size() > 0) {
+            displayName = terms.get(0).getTermDisplayName();
+        }
     	
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create Item: \"" + displayName
-    				+"\" in personAuthorityulary: \"" + vcsid +"\"");
+    		logger.debug("Creating item with display name: \"" + displayName
+    				+"\" in personAuthority: \"" + vcsid +"\"");
     	}
     	PoxPayloadOut multipart = 
     		createPersonInstance(vcsid, null /*personAuthorityRefName*/,
-    			personMap, personRepeatablesMap, client.getItemCommonPartName());
+    			personMap, terms, personRepeatablesMap, client.getItemCommonPartName());
     	
     	String result = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
@@ -508,6 +448,20 @@ public class PersonAuthorityClientUtils {
 		return newStr.toString();
     }
     
-
+    public static List<PersonTermGroup> getTermGroupInstance(String identifier) {
+        if (Tools.isBlank(identifier)) {
+            identifier = getGeneratedIdentifier();
+        }
+        List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        term.setTermDisplayName(identifier);
+        term.setTermName(identifier);
+        terms.add(term);
+        return terms;
+    }
+    
+    private static String getGeneratedIdentifier() {
+        return "id" + new Date().getTime(); 
+   }
 
 }

@@ -63,33 +63,33 @@ public class PlaceDocumentModelHandler
      * @param docModel the doc model
      * @throws Exception the exception
      */
-    @Override
-    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
-        String commonPartLabel = getServiceContext().getCommonPartLabel("places");
-    	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-    			PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-    			PlaceJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
-    	if(displayNameComputed==null)
-    		displayNameComputed = true;
-    	if(shortDisplayNameComputed==null)
-    		shortDisplayNameComputed = true;
-    	if (displayNameComputed || shortDisplayNameComputed) {
-                // Obtain the primary place name from the list of place names, for computing the display name.
-    		String xpathToPlaceName = PlaceJAXBSchema.PLACE_NAME_GROUP_LIST 
-                        + "/[0]/" + PlaceJAXBSchema.PLACE_NAME;
-    		String placeName = getXPathStringValue(docModel, COMMON_PART_LABEL, xpathToPlaceName);
-    		String displayName = prepareDefaultDisplayName(placeName);
-    		if (displayNameComputed) {
-    			docModel.setProperty(commonPartLabel, PlaceJAXBSchema.DISPLAY_NAME,
-    					displayName);
-    		}
-    		if (shortDisplayNameComputed) {
-    			docModel.setProperty(commonPartLabel, PlaceJAXBSchema.SHORT_DISPLAY_NAME,
-    					displayName);
-    		}
-    	}
-    }
+//    @Override
+//    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
+//        String commonPartLabel = getServiceContext().getCommonPartLabel("places");
+//    	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+//    			PlaceJAXBSchema.DISPLAY_NAME_COMPUTED);
+//    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+//    			PlaceJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+//    	if(displayNameComputed==null)
+//    		displayNameComputed = true;
+//    	if(shortDisplayNameComputed==null)
+//    		shortDisplayNameComputed = true;
+//    	if (displayNameComputed || shortDisplayNameComputed) {
+//                // Obtain the primary place name from the list of place names, for computing the display name.
+//    		String xpathToPlaceName = PlaceJAXBSchema.PLACE_NAME_GROUP_LIST 
+//                        + "/[0]/" + PlaceJAXBSchema.PLACE_NAME;
+//    		String placeName = getXPathStringValue(docModel, COMMON_PART_LABEL, xpathToPlaceName);
+//    		String displayName = prepareDefaultDisplayName(placeName);
+//    		if (displayNameComputed) {
+//    			docModel.setProperty(commonPartLabel, PlaceJAXBSchema.DISPLAY_NAME,
+//    					displayName);
+//    		}
+//    		if (shortDisplayNameComputed) {
+//    			docModel.setProperty(commonPartLabel, PlaceJAXBSchema.SHORT_DISPLAY_NAME,
+//    					displayName);
+//    		}
+//    	}
+//    }
 	
     /**
      * Produces a default displayName from one or more supplied fields.

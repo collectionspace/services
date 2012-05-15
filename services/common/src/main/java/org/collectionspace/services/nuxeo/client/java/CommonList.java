@@ -107,20 +107,20 @@ public class CommonList extends AbstractCommonList {
 	 */
 	public void setFieldsReturned(String[] fieldKeys) {
 		this.fieldKeys = fieldKeys;
-		String fieldsImploded = implode(fieldKeys, "|");
+		String fieldsImploded = implode(fieldKeys, "|");  
 		setFieldsReturned(fieldsImploded);
 	}
 
 	// TODO This should be in common, but then we have mutual dependencies. Sigh.
 	private String implode(String strings[], String sep) {
 		String implodedString;
-		if (strings.length==0) {
+		if (strings.length == 0) {
 			implodedString = "";
 		} else {
 			StringBuffer sb = new StringBuffer();
 			sb.append(strings[0]);
-			for (int i=1;i<strings.length;i++) {
-				if(strings[i]!=null&& !strings[i].trim().isEmpty()) {
+			for (int i = 1; i < strings.length; i++) {
+				if (strings[i] != null && !strings[i].trim().isEmpty()) {
 					sb.append(sep);
 					sb.append(strings[i]);
 				}

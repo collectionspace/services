@@ -44,6 +44,7 @@ import org.collectionspace.services.acquisition.AcquisitionFunding;
 import org.collectionspace.services.acquisition.AcquisitionFundingList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
+import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -200,10 +201,16 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
 		personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
 		personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+                List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
+                PersonTermGroup term = new PersonTermGroup();
+                String termName = firstName + " " + surName;
+                term.setTermDisplayName(termName);
+                term.setTermName(termName);
+                personTerms.add(term);
 		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
 		PoxPayloadOut multipart = 
 			PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
-					authRefName, personInfo, personAuthClient.getItemCommonPartName());
+					authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
 		ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
 		int statusCode = res.getStatus();
 

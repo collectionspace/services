@@ -34,6 +34,7 @@ import java.util.regex.PatternSyntaxException;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -599,5 +600,21 @@ public class NuxeoUtils {
 		}
 		
     	return result;
+    }
+    
+    static public String getPrimaryXPathPropertyName(String schema, String complexPropertyName, String fieldName) {
+        if (Tools.isBlank(schema)) {
+            return complexPropertyName + "/[0]/" + fieldName;
+        } else {
+    	    return schema + ":" + complexPropertyName + "/[0]/" + fieldName;
+        }
+    }
+    
+    static public String getPrimaryElPathPropertyName(String schema, String complexPropertyName, String fieldName) {
+        if (Tools.isBlank(schema)) {
+            return complexPropertyName + "/0/" + fieldName;
+        } else {
+    	    return schema + ":" + complexPropertyName + "/0/" + fieldName;
+        }
     }
 }

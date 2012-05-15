@@ -23,78 +23,125 @@
  */
 package org.collectionspace.services.concept.nuxeo;
 
+import java.util.List;
 import java.util.regex.Pattern;
-
-import org.collectionspace.services.concept.ConceptsCommon;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.ValidatorHandler;
+import org.collectionspace.services.common.document.ValidatorHandlerImpl;
+import org.collectionspace.services.concept.ConceptTermGroup;
+import org.collectionspace.services.concept.ConceptTermGroupList;
+import org.collectionspace.services.concept.ConceptsCommon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * ConceptValidatorHandler
  * 
- * Validates data supplied when attempting to create and/or update Concept records.
- * 
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * Performs validation when making requests related to Concept records.
+ * As an example, you can modify this class to customize validation of
+ * payloads supplied in requests to create and/or update records.
  */
-public class ConceptValidatorHandler implements ValidatorHandler {
+public class ConceptValidatorHandler extends ValidatorHandlerImpl {
 
     final Logger logger = LoggerFactory.getLogger(ConceptValidatorHandler.class);
-    private static final Pattern shortIdBadPattern = Pattern.compile("[\\W]"); //.matcher(input).matches()
+    // 'Bad pattern' for shortIdentifiers matches any non-word characters
+    private static final Pattern SHORT_ID_BAD_PATTERN = Pattern.compile("[\\W]"); //.matcher(input).matches()
+    private static final String VALIDATION_ERROR = "The record payload was invalid. See log file for more details.";
+    private static final String SHORT_ID_BAD_CHARS_ERROR =
+            "shortIdentifier must only contain standard word characters";
+    private static final String HAS_NO_TERMS_ERROR =
+            "Authority items must contain at least one term.";
+    private static final String HAS_AN_EMPTY_TERM_ERROR =
+            "Each term group in an authority item must contain "
+            + "a non-empty term name or "
+            + "a non-empty term display name.";
 
     @Override
-    public void validate(Action action, ServiceContext ctx)
-            throws InvalidDocumentException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("validate() action=" + action.name());
-        }
-        
-        // Bail out if the validation action is for delete.
-        if (action.equals(Action.DELETE)) {
-        	return;
-        }
-        
-        try {
-            MultipartServiceContext mctx = (MultipartServiceContext) ctx;
-            ConceptsCommon concept = (ConceptsCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
-                    ConceptsCommon.class);
-            String msg = "";
-            boolean invalid = false;
+    protected Class getCommonPartClass() {
+        return ConceptsCommon.class;
+    }
 
-            // Validation occurring on both creates and updates
-            String displayName = concept.getDisplayName();
-            if (!concept.isDisplayNameComputed() && ((displayName == null) || displayName.trim().isEmpty())) {
-                invalid = true;
-                msg += "displayName must be non-null and non-blank if displayNameComputed is false";
-            }
-
-            // Validation specific to creates or updates
-            if (action.equals(Action.CREATE)) {
+    @Override
+    protected void handleCreate() throws InvalidDocumentException {
+        ConceptsCommon concept = (ConceptsCommon) getCommonPart();
+        // No guarantee that there is a common part in every post/update.
+        if (concept != null) {
+            try {
                 String shortId = concept.getShortIdentifier();
-                // Per CSPACE-2215, shortIdentifier values that are null (missing)
-                // oe the empty string are now legally accepted in create payloads.
-                // In either of those cases, a short identifier will be synthesized from
-                // a display name or supplied in another manner.
-                if ((shortId != null) && (shortIdBadPattern.matcher(shortId).find())) {
-                    invalid = true;
-                    msg += "shortIdentifier must only contain standard word characters";
+                if (shortId != null) {
+                    CS_ASSERT(shortIdentifierContainsOnlyValidChars(shortId), SHORT_ID_BAD_CHARS_ERROR);
                 }
-            } else if (action.equals(Action.UPDATE)) {
+                CS_ASSERT(containsAtLeastOneTerm(concept), HAS_NO_TERMS_ERROR);
+                CS_ASSERT(allTermsContainNameOrDisplayName(concept), HAS_AN_EMPTY_TERM_ERROR);
+            } catch (AssertionError e) {
+                if (logger.isErrorEnabled()) {
+                    logger.error(e.getMessage(), e);
+                }
+                throw new InvalidDocumentException(VALIDATION_ERROR, e);
             }
-
-            if (invalid) {
-                logger.error(msg);
-                throw new InvalidDocumentException(msg);
-            }
-        } catch (InvalidDocumentException ide) {
-            throw ide;
-        } catch (Exception e) {
-            throw new InvalidDocumentException(e);
         }
+    }
+
+    @Override
+    protected void handleGet() throws InvalidDocumentException {
+    }
+
+    @Override
+    protected void handleGetAll() throws InvalidDocumentException {
+    }
+
+    @Override
+    protected void handleUpdate() throws InvalidDocumentException {
+        ConceptsCommon concept = (ConceptsCommon) getCommonPart();
+        // No guarantee that there is a common part in every post/update.
+        if (concept != null) {
+            try {
+                // shortIdentifier is among a set of fields that are
+                // prevented from being changed on an update, and thus
+                // we don't need to check its value here.
+                CS_ASSERT(containsAtLeastOneTerm(concept), HAS_NO_TERMS_ERROR);
+                CS_ASSERT(allTermsContainNameOrDisplayName(concept), HAS_AN_EMPTY_TERM_ERROR);
+            } catch (AssertionError e) {
+                if (logger.isErrorEnabled()) {
+                    logger.error(e.getMessage(), e);
+                }
+                throw new InvalidDocumentException(VALIDATION_ERROR, e);
+            }
+        }
+    }
+
+    @Override
+    protected void handleDelete() throws InvalidDocumentException {
+    }
+
+    private boolean shortIdentifierContainsOnlyValidChars(String shortId) {
+        // Check whether any characters match the 'bad' pattern
+        if (SHORT_ID_BAD_PATTERN.matcher(shortId).find()) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean containsAtLeastOneTerm(ConceptsCommon concept) {
+        ConceptTermGroupList termGroupList = concept.getConceptTermGroupList();
+        if (termGroupList == null) {
+            return false;
+        }
+        List<ConceptTermGroup> termGroups = termGroupList.getConceptTermGroup();
+        if ((termGroups == null) || (termGroups.isEmpty())){ 
+            return false;
+        }
+        return true;
+    }
+
+    private boolean allTermsContainNameOrDisplayName(ConceptsCommon concept) {
+        ConceptTermGroupList termGroupList = concept.getConceptTermGroupList();
+        List<ConceptTermGroup> termGroups = termGroupList.getConceptTermGroup();
+        for (ConceptTermGroup termGroup : termGroups) {
+            if (Tools.isBlank(termGroup.getTermName()) && Tools.isBlank(termGroup.getTermDisplayName())) {
+                return false;
+            }
+        }
+        return true;
     }
 }

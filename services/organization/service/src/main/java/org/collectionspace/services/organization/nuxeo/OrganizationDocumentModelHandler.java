@@ -64,36 +64,36 @@ public class OrganizationDocumentModelHandler
      * 
      * @throws Exception the exception
      */
-    @Override
-    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
-    	String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");
-    	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-    			OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
-    			OrganizationJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
-    	if(displayNameComputed==null)
-    		displayNameComputed = Boolean.TRUE;
-    	if(shortDisplayNameComputed==null)
-    		shortDisplayNameComputed = Boolean.TRUE;
-    	if (displayNameComputed.booleanValue() || shortDisplayNameComputed.booleanValue()) {
-        	String shortName = getStringValueInPrimaryRepeatingComplexProperty(
-        			docModel, commonPartLabel, OrganizationJAXBSchema.MAIN_BODY_GROUP_LIST, 
-        			OrganizationJAXBSchema.SHORT_NAME);
-            // FIXME: Determine how to handle cases where primary short name is null or empty.
-    		if(shortDisplayNameComputed.booleanValue()) {
-	    		String displayName = prepareDefaultDisplayName(shortName, null);
-	    		docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.SHORT_DISPLAY_NAME,
-	    				displayName);
-    		}
-    		if(displayNameComputed.booleanValue()) {
-            	String foundingPlace = (String) docModel.getProperty(commonPartLabel,
-						OrganizationJAXBSchema.FOUNDING_PLACE);
-	       		String displayName = prepareDefaultDisplayName(shortName, foundingPlace);
-				docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.DISPLAY_NAME,
-							displayName);
-    		}
-    	}
-    }
+//    @Override
+//    protected void handleComputedDisplayNames(DocumentModel docModel) throws Exception {
+//    	String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");
+//    	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+//    			OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
+//    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+//    			OrganizationJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+//    	if(displayNameComputed==null)
+//    		displayNameComputed = Boolean.TRUE;
+//    	if(shortDisplayNameComputed==null)
+//    		shortDisplayNameComputed = Boolean.TRUE;
+//    	if (displayNameComputed.booleanValue() || shortDisplayNameComputed.booleanValue()) {
+//        	String shortName = getStringValueInPrimaryRepeatingComplexProperty(
+//        			docModel, commonPartLabel, OrganizationJAXBSchema.MAIN_BODY_GROUP_LIST, 
+//        			OrganizationJAXBSchema.SHORT_NAME);
+//            // FIXME: Determine how to handle cases where primary short name is null or empty.
+//    		if(shortDisplayNameComputed.booleanValue()) {
+//	    		String displayName = prepareDefaultDisplayName(shortName, null);
+//	    		docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.SHORT_DISPLAY_NAME,
+//	    				displayName);
+//    		}
+//    		if(displayNameComputed.booleanValue()) {
+//            	String foundingPlace = (String) docModel.getProperty(commonPartLabel,
+//						OrganizationJAXBSchema.FOUNDING_PLACE);
+//	       		String displayName = prepareDefaultDisplayName(shortName, foundingPlace);
+//				docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.DISPLAY_NAME,
+//							displayName);
+//    		}
+//    	}
+//    }
 
     /**
      * Produces a default displayName from the basic name and foundingPlace fields.

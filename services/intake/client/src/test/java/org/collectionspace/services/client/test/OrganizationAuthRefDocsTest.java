@@ -43,6 +43,7 @@ import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.organization.OrgTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -214,11 +215,17 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         Map<String, String> orgInfo = new HashMap<String,String>();
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
-        orgInfo.put(OrganizationJAXBSchema.SHORT_NAME, shortName);
-        orgInfo.put(OrganizationJAXBSchema.LONG_NAME, longName);
-        PoxPayloadOut multipart = 
-    		OrgAuthorityClientUtils.createOrganizationInstance(null, //orgAuthRefName,
-    				orgInfo, orgAuthClient.getItemCommonPartName());
+        
+        List<OrgTermGroup> orgTerms = new ArrayList<OrgTermGroup>();
+        OrgTermGroup term = new OrgTermGroup();
+        term.setTermDisplayName(shortName);
+        term.setTermName(shortName);
+        term.setMainBodyName(longName);
+        orgTerms.add(term);
+        PoxPayloadOut multipart =
+                OrgAuthorityClientUtils.createOrganizationInstance(null, //orgAuthRefName
+                orgInfo, orgTerms, orgAuthClient.getItemCommonPartName());
+
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
         int statusCode = res.getStatus();
 

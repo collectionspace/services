@@ -25,6 +25,7 @@
              <filename>objectexit/oePersonDisplayOnly.xml</filename>
              <vars>
                 <var ID="displayName">Finbar the DisplayName</var>
+                <var ID="shortIdentifier">Finbar_the_shortIdentifier</var>
              </vars>
         </test>
         <test ID="oePersonGET">
@@ -38,8 +39,10 @@
                     <!-- TODO: .got is not namespace aware yet, so you must make the xpath work around it for now.-->
                     <var ID="csidGot">${oePersonGET.got("//csid")}</var>                      
                     <var ID="inAuthority">${oePersonauthority.CSID}</var>
+                    <var ID="inAuthorityShortIdentifier">${oePersonauthority.sent("//shortIdentifier")}</var>
                 	<var ID="displayName">${oePerson.sent("//displayName")}</var>
-                    <var ID="refName">urn:cspace:collectionspace.org:Personauthorities(${oePersonauthority.sent("//shortIdentifier")}):items(foobar)'${oePerson.sent("//displayName")}'</var>
+                	<var ID="shortIdentifier">${oePerson.sent("//shortIdentifier")}</var>
+                    <var ID="refName">urn:cspace:core.collectionspace.org:personauthorities:name(${inAuthorityShortIdentifier}):item:name(${shortIdentifier})'${displayName}'</var>
                 </vars>
              </response>
         </test>
