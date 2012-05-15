@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+	CollectionObject schema (XSD)
+	
+	Entity  : CollectionObject
+	Part    : Domain - Anthropology
+	Used for: Nuxeo EP core document type
+	
+	$LastChangedRevision: 4929 $
+	$LastChangedDate: 2011-06-07 13:26:32 -0700 (Tue, 07 Jun 2011) $
+-->
+
+<xs:schema 	
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ns="http://collectionspace.org/services/collectionobject/domain/anthropology"
+	xmlns="http://collectionspace.org/services/collectionobject/domain/anthropology"
+	targetNamespace="http://collectionspace.org/services/collectionobject/domain/anthropology"
+	version="0.1">
+	
+	<xs:element name="nagpraInventoryName" type="xs:string"/>
+	<xs:element name="nagpraApplicability" type="xs:string"/>
+	<xs:element name="nagpraCulturalDetermination" type="xs:string"/>
+	<xs:element name="culturalCareNote" type="xs:string"/>
+	
+	<xs:element name="nagpraClaimGroupList" type="nagpraClaimGroupList"/>
+	<xs:element name="accessRestrictionGroupList" type="accessRestrictionGroupList"/>
+	<xs:element name="repatriationClaimGroupList" type="repatriationClaimGroupList"/>
+	
+	<xs:complexType name="nagpraClaimGroupList">
+		<xs:sequence>
+			<xs:element name="nagpraClaimGroup" type="nagpraClaimGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="nagpraClaimGroup">
+		<xs:sequence>
+			<xs:element name="nagpraClaimName" type="xs:string"/>
+			<xs:element name="nagpraClaimStatus" type="xs:string"/>
+			<xs:element name="nagpraClaimNote" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="accessRestrictionGroupList">
+		<xs:sequence>
+			<xs:element name="accessRestrictionGroup" type="accessRestrictionGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="accessRestrictionGroup">
+		<xs:sequence>
+			<xs:element name="accessRestrictionType" type="xs:string"/>
+			<xs:element name="accessRestrictionLevel" type="xs:string"/>
+			<xs:element name="accessRestrictionDetails" type="xs:string"/>
+			<xs:element name="accessRestrictionRequestor" type="xs:string"/>
+			<xs:element name="accessRestrictionOnBehalfOf" type="xs:string"/>
+			<xs:element name="accessRestrictionDate" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="repatriationClaimGroupList">
+		<xs:sequence>
+			<xs:element name="repatriationClaimGroup" type="repatriationClaimGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="repatriationClaimGroup">
+		<xs:sequence>
+			<xs:element name="repatriationClaimName" type="xs:string"/>
+			<xs:element name="repatriationClaimStatus" type="xs:string"/>
+			<xs:element name="repatriationClaimClaimant" type="xs:string"/>
+			<xs:element name="repatriationClaimNote" type="xs:string"/>
+			<xs:element name="repatriationClaimDate" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="nagpraInventoryNameList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="nagpraInventoryName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="nagpraApplicabilityList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="nagpraApplicability" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="nagpraCulturalDeterminationList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="nagpraCulturalDetermination" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="culturalCareNoteList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="culturalCareNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="repatriationNoteList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="repatriationNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
