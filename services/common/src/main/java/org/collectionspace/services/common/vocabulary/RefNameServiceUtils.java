@@ -235,6 +235,20 @@ public class RefNameServiceUtils {
 	        commonList.setItemsInPage(docList.size());
 	        // set the total result size
 	        commonList.setTotalItems(docList.totalSize());
+	        // set the fieldsReturned list. Even though this is a fixed schema, app layer treats
+	        // this like other abstract common lists
+	        /*
+			<xs:element name="docType"         type="xs:string" minOccurs="1" />
+			<xs:element name="docId"           type="xs:string" minOccurs="1" />
+			<xs:element name="docNumber"       type="xs:string" minOccurs="0" />
+			<xs:element name="docName"         type="xs:string" minOccurs="0" />
+			<xs:element name="sourceField"     type="xs:string" minOccurs="1" />
+			<xs:element name="uri"             type="xs:anyURI" minOccurs="1" />
+			<xs:element name="updatedAt"       type="xs:string" minOccurs="1" />
+			<xs:element name="workflowState"   type="xs:string" minOccurs="1" />
+			*/
+	        String fieldList = "docType|docId|docNumber|docName|sourceField|uri|updatedAt|workflowState";
+	        commonList.setFieldsReturned(fieldList);
 	        
 	        int nRefsFound = processRefObjsDocList(docList, refName, queriedServiceBindings, authRefFieldsByService,
 					       			list, null);
