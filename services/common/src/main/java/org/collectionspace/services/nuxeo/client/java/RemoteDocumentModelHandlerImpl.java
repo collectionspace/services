@@ -713,7 +713,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @param xpath The XPath expression (without schema prefix)
      * @return value the indicated property value as a String
      */
-	protected Object getXPathValue(DocumentModel docModel, // REM - CSPACE-5133
+	protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
 			String schema, ListResultField field) {
 		Object result = null;
 

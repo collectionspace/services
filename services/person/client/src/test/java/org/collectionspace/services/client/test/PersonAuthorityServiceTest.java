@@ -186,14 +186,29 @@ public class PersonAuthorityServiceTest extends AbstractAuthorityServiceTest<Per
         String headerLabel = new PersonAuthorityClient().getItemCommonPartName();
         
         HashMap<String, String> personInfo = new HashMap<String, String>();
-        String shortId = "johnWayneTempActor";
+        String shortId = "MarkTwainAuthor";
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         
         List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
         PersonTermGroup term = new PersonTermGroup();
-        term.setTermDisplayName("John Wayne Temp");
-        term.setTermName("JohnWayneTemp");
+        term.setTermDisplayName("Mark Twain Primary");
+        term.setTermName("MarkTwainPrimary");
         terms.add(term);
+        
+        term = new PersonTermGroup();
+        term.setTermDisplayName("Samuel Langhorne Clemens");
+        term.setTermName("SamuelLanghorneClemens");
+        terms.add(term);        
+        
+        term = new PersonTermGroup();
+        term.setTermDisplayName("Sam Clemens");
+        term.setTermName("SamClemens");
+        terms.add(term);   
+        
+        term = new PersonTermGroup();
+        term.setTermDisplayName("Huck Fin");
+        term.setTermName("Huck Fin");
+        terms.add(term);           
         
         return PersonAuthorityClientUtils.createPersonInstance(parentCsid, identifier, personInfo, terms, headerLabel);
     }

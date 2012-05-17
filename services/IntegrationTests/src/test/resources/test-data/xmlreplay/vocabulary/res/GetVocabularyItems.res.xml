@@ -8,12 +8,11 @@
     <totalItems>3</totalItems>
     <fieldsReturned>csid|uri|updatedAt|workflowState|order|displayName|shortIdentifier|refName|termStatus</fieldsReturned>
     <list-item>
-        <displayName>${Item3DupeOrder.displayName}</displayName>
-        <shortIdentifier>${Item3DupeOrder.itemID}</shortIdentifier>
-        <order>${Item3DupeOrder.order}</order>
-        <uri>/vocabularies/${Vocabulary1.CSID}/items/${Item3DupeOrder.CSID}</uri>
-				<csid>${Item3DupeOrder.CSID}</csid>
-				<termStatus/>
+        <displayName>${Item1.displayName}</displayName>
+        <shortIdentifier>${Item1.itemID}</shortIdentifier>
+        <order>${Item1.order}</order>
+        <uri>/vocabularies/${Vocabulary1.CSID}/items/${Item1.CSID}</uri>
+				<csid>${Item1.CSID}</csid>
     </list-item>
     <list-item>
         <displayName>${Item2.displayName}</displayName>
@@ -21,14 +20,12 @@
         <order>${Item2.order}</order>
         <uri>/vocabularies/${Vocabulary1.CSID}/items/${Item2.CSID}</uri>
 				<csid>${Item2.CSID}</csid>
-				<termStatus/>
     </list-item>
     <list-item>
-        <displayName>${Item1.displayName}</displayName>
-        <shortIdentifier>${Item1.itemID}</shortIdentifier>
-        <order>${Item1.order}</order>
-        <uri>/vocabularies/${Vocabulary1.CSID}/items/${Item1.CSID}</uri>
-				<csid>${Item1.CSID}</csid>
-				<termStatus/>
+        <displayName>${Item3DupeOrder.displayName}</displayName>
+        <shortIdentifier>${Item3DupeOrder.itemID}</shortIdentifier>
+        <order>${Item3DupeOrder.order}</order>
+        <uri>/vocabularies/${Vocabulary1.CSID}/items/${Item3DupeOrder.CSID}</uri>
+				<csid>${Item3DupeOrder.CSID}</csid>
     </list-item>
 </ns3:abstract-common-list>

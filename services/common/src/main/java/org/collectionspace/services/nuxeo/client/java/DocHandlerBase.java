@@ -212,7 +212,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 				if (schema == null || schema.trim().isEmpty()) {
 					schema = commonSchema;
 				}
-				Object value = getXPathValue(docModel, schema, field);
+				Object value = getListResultValue(docModel, schema, field);
 				if (value != null && value instanceof String) {
 					String strValue = (String) value;
 					if (strValue.trim().isEmpty() == true) {
