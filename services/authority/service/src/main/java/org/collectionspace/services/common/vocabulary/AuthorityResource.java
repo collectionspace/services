@@ -650,13 +650,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     /*
-     * Most of the authority child classes will use this method.  However, the Vocabulary service's item schema is
+     * Most of the authority child classes will/should use this implementation.  However, the Vocabulary service's item schema is
      * different enough that it will have to override this method in it's resource class.
      */
-	protected String getQualifiedDisplayNameField() {
+	protected String getOrderByField() {
 		String result = null;
 
 		result = NuxeoUtils.getPrimaryElPathPropertyName(
+				authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(),
+				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+
+		return result;
+	}
+	
+	protected String getPartialTermMatchField() {
+		String result = null;
+		
+		result = NuxeoUtils.getMultiElPathPropertyName(
 				authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(),
 				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
 
@@ -686,8 +696,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
 
-            String qualifiedDisplayNameField = getQualifiedDisplayNameField();
-
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 
@@ -705,7 +713,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // be on the displayName field
             String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
             if (sortBy == null || sortBy.isEmpty()) {
-                myFilter.setOrderByClause(qualifiedDisplayNameField);
+                String orderByField = getOrderByField();
+                myFilter.setOrderByClause(orderByField);
             }
 
             // If we are not wildcarding the parent, add a restriction
@@ -729,8 +738,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // NOTE: Partial terms searches are mutually exclusive to keyword and advanced-search, but
             // the PT query param trumps the KW and AS query params.
             if (partialTerm != null && !partialTerm.isEmpty()) {
+            	String partialTermMatchField = getPartialTermMatchField();
                 String ptClause = QueryManager.createWhereClauseForPartialMatch(
-                        qualifiedDisplayNameField, partialTerm);
+                		partialTermMatchField, partialTerm);
                 myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             } else if (keywords != null || advancedSearch != null) {
 //				String kwdClause = QueryManager.createWhereClauseFromKeywords(keywords);

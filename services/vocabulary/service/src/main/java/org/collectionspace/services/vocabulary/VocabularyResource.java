@@ -77,13 +77,19 @@ public class VocabularyResource extends
     	return ServiceBindingUtils.TERM_REF_PROP;
     }
 	
-	protected String getQualifiedDisplayNameField() {
+	@Override
+	protected String getOrderByField() {
 		String result = null;
 
 		result = authorityItemCommonSchemaName + ":" + VocabularyItemJAXBSchema.DISPLAY_NAME;
 
 		return result;
-	}	
+	}
+	
+	@Override
+	protected String getPartialTermMatchField() {
+		return getOrderByField();
+	}
 
 	/*
 	 * The item schema for the Vocabulary service does not support a multi-valued term list.  Only authorities that support

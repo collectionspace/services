@@ -24,13 +24,13 @@
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
@@ -41,17 +41,16 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.CommonList; //FIXME: REM - 5/15/2012 - CommonList should be moved out of this package and into a more "common" package
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationResource;
@@ -60,27 +59,26 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
+
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.runtime.transaction.TransactionHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 
 //import org.collectionspace.services.common.authority.AuthorityItemRelations;
 /**
@@ -182,6 +180,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return result;
     }    
     
+    private boolean isTermDisplayName(String elName) {
+    	return AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName) || VocabularyItemJAXBSchema.DISPLAY_NAME.equals(elName);
+    }
+    
     @Override
     public List<ListResultField> getListItemsArray() throws DocumentException {
         List<ListResultField> list = super.getListItemsArray();
@@ -196,7 +198,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         for (int i = 0; i < nFields; i++) {
             ListResultField field = list.get(i);
             String elName = field.getElement();
-            if (AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName) || VocabularyItemJAXBSchema.DISPLAY_NAME.equals(elName)) {
+            if (isTermDisplayName(elName) == true) {
                 hasDisplayName = true;
             } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
                 hasShortId = true;
@@ -227,11 +229,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             field = getListResultsTermStatusField();
             list.add(field);
         }
-        
+                
         return list;
     }
-
-
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
      */
@@ -249,7 +250,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // re-enable it.
         //
         // CSPACE-3178:
-        // handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
+        handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
         // refName includes displayName, so we force a correct value here.
         updateRefnameForAuthorityItem(wrapDoc, authorityItemCommonSchemaName, getAuthorityRefNameBase());
     }
@@ -368,17 +369,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 		String shortIdentifier = (String) docModel.getProperty(schemaName,
 				AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
 
-		String termDisplayName = getPrimaryDisplayName(
-				docModel, authorityItemCommonSchemaName,
-				getItemTermInfoGroupXPathBase(),
-				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-
-		String termName = getPrimaryDisplayName(
-				docModel, authorityItemCommonSchemaName,
-				getItemTermInfoGroupXPathBase(),
-				AuthorityItemJAXBSchema.TERM_NAME);
-
 		if (Tools.isEmpty(shortIdentifier)) {
+			String termDisplayName = getPrimaryDisplayName(
+					docModel, authorityItemCommonSchemaName,
+					getItemTermInfoGroupXPathBase(),
+					AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+
+			String termName = getPrimaryDisplayName(
+					docModel, authorityItemCommonSchemaName,
+					getItemTermInfoGroupXPathBase(),
+					AuthorityItemJAXBSchema.TERM_NAME);
+
 			String generatedShortIdentifier = AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(termDisplayName,
 							termName);
 			docModel.setProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER,
@@ -483,8 +484,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
 
 
-
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
      */
@@ -523,7 +522,80 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             objectProps.remove(AuthorityItemJAXBSchema.REF_NAME);
         }
     }
+    
+    protected List<String> getPartialTermDisplayNameMatches(List<String> termDisplayNameList, String partialTerm) {
+    	List<String> result = new ArrayList<String>();
+    	
+    	for (String termDisplayName : termDisplayNameList) {
+    		if (termDisplayName.contains(partialTerm) == true) {
+    			result.add(termDisplayName);
+    		}
+    	}
+    	
+    	return result;
+    }
+    
+    @SuppressWarnings("unchecked")
+	private List<String> getPartialTermDisplayNameMatches(DocumentModel docModel, // REM - CSPACE-5133
+			String schema, ListResultField field, String partialTerm) {
+    	List<String> result = null;
+    	  
+    	String xpath = field.getXpath(); // results in something like "persons_common:personTermGroupList/[0]/termDisplayName"
+    	int endOfTermGroup = xpath.lastIndexOf("/[0]/");
+    	String propertyName = endOfTermGroup != -1 ? xpath.substring(0, endOfTermGroup) : xpath; // it may not be multivalued so the xpath passed in would be the property name
+    	Object value = null;
+    	
+		try {
+			value = docModel.getProperty(schema, propertyName);
+		} catch (Exception e) {
+			logger.error("Could not extract term display name with property = "
+					+ propertyName, e);
+		}
+		
+		if (value != null && value instanceof ArrayList) {
+			ArrayList<HashMap<String, Object>> termGroupList = (ArrayList<HashMap<String, Object>>)value;
+			int arrayListSize = termGroupList.size();
+			if (arrayListSize > 1) { // if there's only 1 element in the list then we've already matched the primary term's display name
+				List<String> displayNameList = new ArrayList<String>();
+				for (int i = 1; i < arrayListSize; i++) { // start at 1, skip the primary term's displayName since we will always return it
+					HashMap<String, Object> map = (HashMap<String, Object>)termGroupList.get(i);
+					String termDisplayName = (String) map.get(AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+					displayNameList.add(i - 1, termDisplayName);
+				}
+				
+				result = getPartialTermDisplayNameMatches(displayNameList, partialTerm);
+			}
+		}
 
+    	return result;
+    }
+
+    @Override
+	protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
+			String schema, ListResultField field) {
+		Object result = null;		
+
+		result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
+		String elName = field.getElement();
+		//
+		// If the list result value is the termDisplayName element, we need to check to see if a partial term query was made.
+		//
+		if (isTermDisplayName(elName) == true) {
+			MultivaluedMap<String, String> queryParams = this.getServiceContext().getQueryParams();
+	        String partialTerm = queryParams != null ? queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM) : null;
+	        if (partialTerm != null && partialTerm.trim().isEmpty() == false) {
+				String primaryTermDisplayName = (String)result;
+	        	List<String> matches = getPartialTermDisplayNameMatches(docModel, schema, field, partialTerm);
+	        	if (matches != null && matches.isEmpty() == false) {
+		        	matches.add(0, primaryTermDisplayName); // insert the primary term's display name at the beginning of the list
+		        	result = matches; // set the result to a list of matching term display names with the primary term's display name at the beginning
+	        	}
+	        }
+		}
+		
+		return result;
+	}
+    
     @Override
     public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
@@ -666,27 +738,22 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         ctx.addOutputPart(relationsPart);
     }
 
+    @Override
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
+    	//
+    	// We currently don't override this method with any AuthorityItemDocumentModelHandler specific functionality, so
+    	// we could remove this method.
+    	//
         super.fillAllParts(wrapDoc, action);
-        /*
-        ServiceContext ctx = getServiceContext();
-        PoxPayloadIn input = (PoxPayloadIn) ctx.getInput();
-        DocumentModel documentModel = (wrapDoc.getWrappedObject());
-        String itemCsid = documentModel.getName();
-        
-        //UPDATE and CREATE will call.   Updates relations part
-        RelationsCommonList relationsCommonList = updateRelations(itemCsid, input, wrapDoc);
-        
-        PayloadOutputPart payloadOutputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, relationsCommonList);
-        ctx.setProperty(RelationClient.SERVICE_COMMON_LIST_NAME, payloadOutputPart);
-         */
     }
 
+    @Override
     public void completeCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         super.completeCreate(wrapDoc);
         handleRelationsPayload(wrapDoc, false);
     }
 
+    @Override
     public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         super.completeUpdate(wrapDoc);
         handleRelationsPayload(wrapDoc, true);
