@@ -30,8 +30,8 @@
     <xs:element name="personTermGroupList" type="personTermGroupList"/>
     
     <xs:element name="description" type="xs:string"/>
-    <xs:element name="birthDate" type="xs:string"/>
-    <xs:element name="deathDate" type="xs:string"/>
+    <xs:element name="birthDateGroup" type="structuredDateGroup"/>
+    <xs:element name="deathDateGroup" type="structuredDateGroup"/>
     <xs:element name="birthPlace" type="xs:string"/>
     <xs:element name="deathPlace" type="xs:string"/>
     <xs:element name="groups">
@@ -95,6 +95,37 @@
             <xs:element name="salutation" type="xs:string"/>
             <xs:element name="title" type="xs:string"/>
             <xs:element name="nameAdditions" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- Before (re)using this generic complex type in any record type -->
+    <!-- other than CollectionObject, be sure to verify that Nuxeo handles -->
+    <!-- that correctly in its table creation/row linking. -->
+    <xs:complexType name="structuredDateGroup">
+        <xs:sequence>
+            <xs:element name="dateDisplayDate" type="xs:string"/>
+            <xs:element name="dateAssociation" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+            <xs:element name="dateLatestYear" type="xs:integer"/>
+            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="dateLatestDay" type="xs:integer"/>
+            <xs:element name="dateLatestEra" type="xs:string"/>
+            <xs:element name="dateLatestCertainty" type="xs:string"/>
+            <xs:element name="dateLatestQualifier" type="xs:string"/>
+            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+            <xs:element name="datePeriod" type="xs:string"/>
+            <xs:element name="dateNote" type="xs:string"/>
+            <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+            <xs:element name="dateLatestScalarValue" type="xs:date"/>
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 
