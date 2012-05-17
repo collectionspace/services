@@ -39,6 +39,8 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.collectionspace.services.organization.StructuredDateGroup;
+
 /**
  * OrgAuthorityClientUtils.
  */
@@ -251,10 +253,16 @@ public class OrgAuthorityClientUtils {
         	contactNames.addAll(values);
                 organization.setContactNames(contactsList);
         }
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_DATE))!=null)
-        	organization.setFoundingDate(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.DISSOLUTION_DATE))!=null)
-        	organization.setDissolutionDate(value);
+        if((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_DATE))!=null) {
+            StructuredDateGroup foundingDate = new StructuredDateGroup();
+            foundingDate.setDateDisplayDate(value);
+            organization.setFoundingDateGroup(foundingDate);
+        }
+        if((value = (String)orgInfo.get(OrganizationJAXBSchema.DISSOLUTION_DATE))!=null) {
+            StructuredDateGroup dissolutionDate = new StructuredDateGroup();
+            dissolutionDate.setDateDisplayDate(value);
+            organization.setDissolutionDateGroup(dissolutionDate);
+        }
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE))!=null)
         	organization.setFoundingPlace(value);
         if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.GROUPS))!=null) {
