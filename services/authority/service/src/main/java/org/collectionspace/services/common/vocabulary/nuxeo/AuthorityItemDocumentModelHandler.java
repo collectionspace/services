@@ -1212,7 +1212,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, subjectCSID);
         queryParams.putSingle(IRelationsManager.OBJECT_QP, objectCSID);
 
-        RelationResource relationResource = new RelationResource();
+        RelationResource relationResource = new RelationResource(); //is this still acting like a singleton as it should be?
         RelationsCommonList relationsCommonList = relationResource.getList(ctx.getUriInfo());
         return relationsCommonList;
     }

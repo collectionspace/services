@@ -83,8 +83,7 @@ public class RelationResource extends ResourceBase {
 		return this.getRelationList(queryParams, subjectCsid, subjectType, predicate, objectCsid, objectType);
 	}
 
-    //this is called by collectionobjectresource...so it is still public.
-    public RelationsCommonList getRelationList(MultivaluedMap<String, String> queryParams, String subjectCsid, String subjectType,
+    private RelationsCommonList getRelationList(MultivaluedMap<String, String> queryParams, String subjectCsid, String subjectType,
                                                                          String predicate, String objectCsid, String objectType) throws WebApplicationException {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
