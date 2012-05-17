@@ -63,6 +63,7 @@ import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
@@ -521,24 +522,74 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             objectProps.remove(AuthorityItemJAXBSchema.REF_NAME);
         }
     }
+    
+    protected List<String> getPartialTermDisplayNameMatches(List<String> termDisplayNameList, String partialTerm) {
+    	List<String> result = new ArrayList<String>();
+    	
+    	for (String termDisplayName : termDisplayNameList) {
+    		if (termDisplayName.contains(partialTerm) == true) {
+    			result.add(termDisplayName);
+    		}
+    	}
+    	
+    	return result;
+    }
+    
+    @SuppressWarnings("unchecked")
+	private List<String> getPartialTermDisplayNameMatches(DocumentModel docModel, // REM - CSPACE-5133
+			String schema, ListResultField field, String partialTerm) {
+    	List<String> result = null;
+    	  
+    	String xpath = field.getXpath(); // results in something like "persons_common:personTermGroupList/[0]/termDisplayName"
+    	int endOfTermGroup = xpath.lastIndexOf("/[0]/");
+    	String propertyName = endOfTermGroup != -1 ? xpath.substring(0, endOfTermGroup) : xpath; // it may not be multivalued so the xpath passed in would be the property name
+    	Object value = null;
+    	
+		try {
+			value = docModel.getProperty(schema, propertyName);
+		} catch (Exception e) {
+			logger.error("Could not extract term display name with property = "
+					+ propertyName, e);
+		}
+		
+		if (value != null && value instanceof ArrayList) {
+			ArrayList<HashMap<String, Object>> termGroupList = (ArrayList<HashMap<String, Object>>)value;
+			int arrayListSize = termGroupList.size();
+			if (arrayListSize > 1) { // if there's only 1 element in the list then we've already matched the primary term's display name
+				List<String> displayNameList = new ArrayList<String>();
+				for (int i = 1; i < arrayListSize; i++) { // start at 1, skip the primary term's displayName since we will always return it
+					HashMap<String, Object> map = (HashMap<String, Object>)termGroupList.get(i);
+					String termDisplayName = (String) map.get(AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+					displayNameList.add(i - 1, termDisplayName);
+				}
+				
+				result = getPartialTermDisplayNameMatches(displayNameList, partialTerm);
+			}
+		}
+
+    	return result;
+    }
 
     @Override
-	protected Object getXPathValue(DocumentModel docModel, // REM - CSPACE-5133
+	protected Object getListResultValue(DocumentModel docModel, // REM - CSPACE-5133
 			String schema, ListResultField field) {
-		Object result = null;
+		Object result = null;		
 
 		result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
 		String elName = field.getElement();
+		//
+		// If the list result value is the termDisplayName element, we need to check to see if a partial term query was made.
+		//
 		if (isTermDisplayName(elName) == true) {
 			MultivaluedMap<String, String> queryParams = this.getServiceContext().getQueryParams();
 	        String partialTerm = queryParams != null ? queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM) : null;
 	        if (partialTerm != null && partialTerm.trim().isEmpty() == false) {
-	        	List<String> strList = new ArrayList<String>();
-	        	strList.add((String)result);
-	        	strList.add("Tiny");
-	        	strList.add("Tucker");
-	        	strList.add("Tim");
-	        	result = strList;
+				String primaryTermDisplayName = (String)result;
+	        	List<String> matches = getPartialTermDisplayNameMatches(docModel, schema, field, partialTerm);
+	        	if (matches != null && matches.isEmpty() == false) {
+		        	matches.add(0, primaryTermDisplayName); // insert the primary term's display name at the beginning of the list
+		        	result = matches; // set the result to a list of matching term display names with the primary term's display name at the beginning
+	        	}
 	        }
 		}
 		
