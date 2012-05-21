@@ -69,6 +69,7 @@
             <xs:element name="commonName" type="xs:string"/>
             <xs:element name="commonNameLanguage" type="xs:string"/>
             <xs:element name="commonNameSource" type="xs:string"/>
+            <xs:element name="commonNameSourceDetail" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
     
