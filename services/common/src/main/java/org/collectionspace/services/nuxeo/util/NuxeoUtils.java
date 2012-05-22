@@ -22,9 +22,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.File;
 
-import java.io.Serializable;
+import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -37,11 +36,10 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.query.QueryContext;
+import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 
 import org.dom4j.Document;
@@ -55,12 +53,10 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
-import org.nuxeo.ecm.core.api.IterableQueryResult;
-import org.nuxeo.ecm.core.api.model.DocumentPart;
+import org.nuxeo.ecm.core.api.model.PropertyException;
 
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
-import org.nuxeo.ecm.core.io.impl.plugins.DocumentTreeReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
@@ -68,8 +64,6 @@ import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
 
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.search.api.client.querymodel.descriptor.QueryModelDescriptor;
-import org.nuxeo.ecm.core.storage.sql.jdbc.ResultSetQueryResult;
-import org.nuxeo.ecm.core.query.sql.NXQL;
 import org.nuxeo.runtime.api.Framework;
 
 
@@ -602,6 +596,71 @@ public class NuxeoUtils {
     	return result;
     }
     
+    /**
+     * Gets XPath value from schema. Note that only "/" and "[n]" are
+     * supported for xpath. Can omit grouping elements for repeating complex types, 
+     * e.g., "fieldList/[0]" can be used as shorthand for "fieldList/field[0]" and
+     * "fieldGroupList/[0]/field" can be used as shorthand for "fieldGroupList/fieldGroup[0]/field".
+     * If there are no entries for a list of scalars or for a list of complex types, 
+     * a 0 index expression (e.g., "fieldGroupList/[0]/field") will safely return an empty
+     * string. A non-zero index will throw an IndexOutOfBoundsException if there are not
+     * that many elements in the list. 
+     * N.B.: This does not follow the XPath spec - indices are 0-based, not 1-based.
+     *
+     * @param docModel The document model to get info from
+     * @param schema The name of the schema (part)
+     * @param xpath The XPath expression (without schema prefix)
+     * @return value the indicated property value as a String
+     */
+	public static Object getXPathValue(DocumentModel docModel,
+			String schema, String xpath) {
+		Object result = null;
+
+		xpath = schema + ":" + xpath;
+		try {
+			Object value = docModel.getPropertyValue(xpath);
+			String returnVal = null;
+			if (value == null) {
+				// Nothing to do - leave returnVal null
+			} else if (value instanceof GregorianCalendar) {
+				returnVal = DateTimeFormatUtils.formatAsISO8601Timestamp((GregorianCalendar) value);
+			} else {
+				returnVal = value.toString();
+			}
+			result = returnVal;
+		} catch (PropertyException pe) {
+			throw new RuntimeException("Problem retrieving property {" + xpath
+					+ "}. Bad XPath spec?" + pe.getLocalizedMessage());
+		} catch (ClassCastException cce) {
+			throw new RuntimeException("Problem retrieving property {" + xpath
+					+ "} as String. Not a String property?"
+					+ cce.getLocalizedMessage());
+		} catch (IndexOutOfBoundsException ioobe) {
+			// Nuxeo seems to handle foo/[0]/bar when it is missing,
+			// but not foo/bar[0] (for repeating scalars).
+			if (xpath.endsWith("[0]")) { // gracefully handle missing elements
+				result = "";
+			} else {
+				String msg = ioobe.getMessage();
+				if (msg != null && msg.equals("Index: 0, Size: 0")) {
+					// Some other variant on a missing sub-field; quietly
+					// absorb.
+					result = "";
+				}
+			}
+			// Otherwise, e.g., for true OOB indices, propagate the exception.
+			if (result == null) {
+				throw new RuntimeException("Problem retrieving property {" + xpath
+						+ "}:" + ioobe.getLocalizedMessage());
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Unknown problem retrieving property {"
+					+ xpath + "}." + e.getLocalizedMessage());
+		}
+
+		return result;
+	}
+    
     static public String getPrimaryXPathPropertyName(String schema, String complexPropertyName, String fieldName) {
         if (Tools.isBlank(schema)) {
             return complexPropertyName + "/[0]/" + fieldName;
@@ -617,4 +676,13 @@ public class NuxeoUtils {
     	    return schema + ":" + complexPropertyName + "/0/" + fieldName;
         }
     }
+    
+    static public String getMultiElPathPropertyName(String schema, String complexPropertyName, String fieldName) {
+        if (Tools.isBlank(schema)) {
+            return complexPropertyName + "/*/" + fieldName;
+        } else {
+    	    return schema + ":" + complexPropertyName + "/*/" + fieldName;
+        }
+    }
+    
 }

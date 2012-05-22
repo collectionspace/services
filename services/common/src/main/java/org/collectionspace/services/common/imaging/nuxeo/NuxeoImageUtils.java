@@ -200,9 +200,9 @@ public class NuxeoImageUtils {
 		return uri + result + "/" + BlobInput.URI_CONTENT_PATH;
 	}
 
-	static private HashMap<String, String> createBlobListItem(Blob blob,
+	static private HashMap<String, Object> createBlobListItem(Blob blob,
 			String uri) {
-		HashMap<String, String> item = new HashMap<String, String>();
+		HashMap<String, Object> item = new HashMap<String, Object>();
 
 		String value = blob.getEncoding();
 		if (value != null && !value.trim().isEmpty()) {
@@ -248,7 +248,7 @@ public class NuxeoImageUtils {
 				.getAdapter(BlobHolder.class);
 		List<Blob> docBlobs = docBlobHolder.getBlobs();
 		// List<BlobListItem> blobListItems = result.getBlobListItem();
-		HashMap<String, String> item = null;
+		HashMap<String, Object> item = null;
 		for (Blob blob : docBlobs) {
 			item = createBlobListItem(blob, uri);
 			commonList.addItem(item);
