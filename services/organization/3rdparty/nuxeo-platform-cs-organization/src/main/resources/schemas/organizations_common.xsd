@@ -91,7 +91,10 @@
             <xs:element name="additionsToName" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-
+    
+    <!-- Before (re)using this generic complex type in any record type -->
+    <!-- other than CollectionObject, be sure to verify that Nuxeo handles -->
+    <!-- that correctly in its table creation/row linking. -->
     <xs:complexType name="structuredDateGroup">
         <xs:sequence>
             <xs:element name="dateDisplayDate" type="xs:string"/>
@@ -119,5 +122,6 @@
             <xs:element name="scalarValuesComputed" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
+    
 </xs:schema>
 
