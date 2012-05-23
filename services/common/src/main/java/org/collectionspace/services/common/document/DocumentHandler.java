@@ -233,6 +233,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      */
     public TL extractCommonPartList(DocumentWrapper<WTL> docWrap) throws Exception;
     
+
     /**
      * Extract paging info.
      *

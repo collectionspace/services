@@ -2,11 +2,24 @@
 <document name="locations">
   <ns2:locations_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
-		<!-- <refName>urn:cspace:org.collectionspace.demo:locationauthority:name(${authShortIdentifier}):location:name(${shortIdentifier})</refName> -->
-    <termStatus>Approved</termStatus>
-    <displayNameComputed>true</displayNameComputed>
-    <shortDisplayNameComputed>false</shortDisplayNameComputed>
-    <name>${name}</name>
+	<refName>urn:cspace:core.collectionspace.org:locationauthorities:name(${authShortIdentifier}):item:name(${shortIdentifier})'${name}'</refName>    
+
+	<locTermGroupList>
+	    <locTermGroup>
+	        <termPrefForLang>false</termPrefForLang>
+	        <termName>${name}</termName>
+	        <termDisplayName>${name}</termDisplayName>
+	        <termType/>
+	        <termSource/>
+	        <termStatus>Approved</termStatus>
+	        <termQualifier/>
+	        <termSourceID/>
+	        <termSourceDetail/>
+	        <termSourceNote/>
+	        <termLanguage/>
+	    </locTermGroup>
+	</locTermGroupList>
+	    
     <conditionGroupList>
       <conditionGroup>
         <conditionNote>Basically clean</conditionNote>

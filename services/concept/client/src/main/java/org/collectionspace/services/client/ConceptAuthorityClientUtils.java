@@ -2,6 +2,8 @@ package org.collectionspace.services.client;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -9,6 +11,8 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.concept.ConceptTermGroup;
 import org.collectionspace.services.concept.ConceptauthoritiesCommon;
 import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
@@ -145,5 +149,21 @@ public class ConceptAuthorityClientUtils {
         return "Status code '" + statusCode + "' in response is NOT within the expected set: " +
                 requestType.validStatusCodesAsString();
     }
+    
+     public static List<ConceptTermGroup> getTermGroupInstance(String identifier) {
+        if (Tools.isBlank(identifier)) {
+            identifier = getGeneratedIdentifier();
+        }
+        List<ConceptTermGroup> terms = new ArrayList<ConceptTermGroup>();
+        ConceptTermGroup term = new ConceptTermGroup();
+        term.setTermDisplayName(identifier);
+        term.setTermName(identifier);
+        terms.add(term);
+        return terms;
+    }
+    
+    private static String getGeneratedIdentifier() {
+        return "id" + new Date().getTime(); 
+   }
 
 }

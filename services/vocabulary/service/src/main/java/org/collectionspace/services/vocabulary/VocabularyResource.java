@@ -25,7 +25,9 @@ package org.collectionspace.services.vocabulary;
 
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
+//import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
+//import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,5 +76,27 @@ public class VocabularyResource extends
     protected String getRefPropName() {
     	return ServiceBindingUtils.TERM_REF_PROP;
     }
-    
+	
+	@Override
+	protected String getOrderByField() {
+		String result = null;
+
+		result = authorityItemCommonSchemaName + ":" + VocabularyItemJAXBSchema.DISPLAY_NAME;
+
+		return result;
+	}
+	
+	@Override
+	protected String getPartialTermMatchField() {
+		return getOrderByField();
+	}
+
+	/*
+	 * The item schema for the Vocabulary service does not support a multi-valued term list.  Only authorities that support
+	 * term lists need to implement this method.
+	 */
+	@Override
+	public String getItemTermInfoGroupXPathBase() {
+		return null;
+	}
 }

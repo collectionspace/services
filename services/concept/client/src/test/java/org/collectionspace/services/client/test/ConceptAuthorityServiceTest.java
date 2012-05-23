@@ -22,30 +22,26 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.collectionspace.services.ConceptJAXBSchema;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.client.ConceptAuthorityClientUtils;
-import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.concept.ConceptTermGroup;
+import org.collectionspace.services.concept.ConceptTermGroupList;
 import org.collectionspace.services.concept.ConceptauthoritiesCommon;
 import org.collectionspace.services.concept.ConceptsCommon;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.DocumentException;
-
 import org.jboss.resteasy.client.ClientResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -62,8 +58,6 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 	/** The logger. */
     private final String CLASS_NAME = ConceptAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(ConceptAuthorityServiceTest.class);
-    private final String REFNAME = "refName";
-    private final String DISPLAYNAME = "displayName";
     private final static String CURRENT_DATE_UTC =
         GregorianCalendarDateTimeUtils.currentDateUTC();
 
@@ -123,8 +117,8 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
         try {
         	newID = ConceptAuthorityClientUtils.createItemInAuthority(authorityId,
         		commonPartXML, client );
-        } catch( DocumentException de ) {
-            logger.error("Problem creating item from XML: "+de.getLocalizedMessage());
+        } catch( Exception e ) {
+            logger.error("Problem creating item from XML: "+e.getLocalizedMessage());
             logger.debug("commonPartXML: "+commonPartXML);
             return null;
         }
@@ -209,11 +203,11 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 
         for (AbstractCommonList.ListItem item : items) {
         	String value = 
-        		AbstractCommonListUtils.ListItemGetElementValue(item, REFNAME);
+        		AbstractCommonListUtils.ListItemGetElementValue(item, ConceptJAXBSchema.REF_NAME);
             Assert.assertTrue((null != value), "Item refName is null!");
         	value = 
-        		AbstractCommonListUtils.ListItemGetElementValue(item, DISPLAYNAME);
-            Assert.assertTrue((null != value), "Item displayName is null!");
+        		AbstractCommonListUtils.ListItemGetElementValue(item, ConceptJAXBSchema.TERM_DISPLAY_NAME);
+            Assert.assertTrue((null != value), "Item termDisplayName is null!");
         }
         if(logger.isTraceEnabled()){
         	AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
@@ -355,23 +349,18 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 
     private String createCommonPartXMLForItem(String shortId, String name ) {
     	
-        String commonPartXML = 
-        		"<ns2:concepts_common xmlns:ns2=\"http://collectionspace.org/services/concept\">" + 
-            	" <shortIdentifier>"+shortId+"</shortIdentifier>"+
-            	" <displayName>"+name+"</displayName>"+
-            	" <displayNameComputed>false</displayNameComputed>"+
-            	" <termStatus>Imagined</termStatus>"+
-            	/*
-            	" <conceptTermGroupList>"+
-            	"  <conceptTermGroup>"+
-            	"   <term>Another term</term>"+
-            	"   <termType>alternate</termType>"+
-            	"   <source>My Imagination</source>"+
-            	"  </conceptTermGroup>"+
-            	" </conceptTermGroupList>"+
-            	*/
-            	"</ns2:concepts_common>";
-        return commonPartXML;
+        StringBuilder commonPartXML = new StringBuilder("");
+        commonPartXML.append("<ns2:concepts_common xmlns:ns2=\"http://collectionspace.org/services/concept\">");
+        commonPartXML.append("    <shortIdentifier>"+shortId+"</shortIdentifier>");
+        commonPartXML.append("    <conceptTermGroupList>");
+        commonPartXML.append("        <conceptTermGroup>");
+        commonPartXML.append("            <termDisplayName>"+name+"</termDisplayName>");
+        commonPartXML.append("            <termName>"+name+"</termName>");
+        commonPartXML.append("            <termStatus>"+name+"</termStatus>");
+        commonPartXML.append("        </conceptTermGroup>");
+        commonPartXML.append("    </conceptTermGroupList>");
+        commonPartXML.append("</ns2:concepts_common>");
+        return commonPartXML.toString();
     }
 
 	@Override
@@ -400,6 +389,7 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
                 "Display name in updated object did not match submitted data.");
 	}
 
+        @Override
 	protected void compareReadInstances(ConceptauthoritiesCommon original,
 			ConceptauthoritiesCommon fromRead) throws Exception {
         Assert.assertNotNull(fromRead.getDisplayName());
@@ -409,21 +399,40 @@ public class ConceptAuthorityServiceTest extends AbstractAuthorityServiceTest<Co
 	
 	@Override
 	protected ConceptsCommon updateItemInstance(ConceptsCommon conceptsCommon) {
-		ConceptsCommon result = new ConceptsCommon();
-		
-        result.setTermStatus("updated-" + conceptsCommon.getTermStatus());
-		result.setDisplayName("updated-" + conceptsCommon.getDisplayName());
-		
-		return result;
+	    ConceptsCommon result = conceptsCommon;
+            ConceptTermGroupList termList = conceptsCommon.getConceptTermGroupList();
+            Assert.assertNotNull(termList);
+            List<ConceptTermGroup> terms = termList.getConceptTermGroup();
+            Assert.assertNotNull(terms);
+            Assert.assertTrue(terms.size() > 0);
+            terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
+            terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
+            terms.get(0).setTermStatus("updated-" + terms.get(0).getTermStatus());
+	    result.setConceptTermGroupList(termList);
+            return result;
 	}
 
 	@Override
 	protected void compareUpdatedItemInstances(ConceptsCommon original,
 			ConceptsCommon updated) throws Exception {
-        Assert.assertEquals(updated.getTermStatus(), original.getTermStatus(),
-                "Data in updated Concept did not match submitted data.");
-        Assert.assertEquals(updated.getDisplayName(), original.getDisplayName(),
-                "Data in updated Concept did not match submitted data.");
+            ConceptTermGroupList originalTermList = original.getConceptTermGroupList();
+            Assert.assertNotNull(originalTermList);
+            List<ConceptTermGroup> originalTerms = originalTermList.getConceptTermGroup();
+            Assert.assertNotNull(originalTerms);
+            Assert.assertTrue(originalTerms.size() > 0);
+            
+            ConceptTermGroupList updatedTermList = updated.getConceptTermGroupList();
+            Assert.assertNotNull(updatedTermList);
+            List<ConceptTermGroup> updatedTerms = updatedTermList.getConceptTermGroup();
+            Assert.assertNotNull(updatedTerms);
+            Assert.assertTrue(updatedTerms.size() > 0);
+            
+            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
+                originalTerms.get(0).getTermDisplayName(),
+                "Value in updated record did not match submitted data.");
+            Assert.assertEquals(updatedTerms.get(0).getTermStatus(),
+                originalTerms.get(0).getTermDisplayName(),
+                "Value in updated record did not match submitted data.");
 	}
 
 	@Override

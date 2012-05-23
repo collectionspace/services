@@ -2,9 +2,27 @@
 <document name="orgauthorities">
   <ns3:orgauthorities_common xmlns:ns3="http://collectionspace.org/services/organization" xmlns:ns2="http://collectionspace.org/services/jaxb">
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
-    <displayName>${displayName}</displayName>
     <refName>urn:cspace:org.collectionspace.demo:orgauthority:name(${shortIdentifier})'${displayName}'</refName>
     <vocabType>OrgAuthority</vocabType>
+    
+	<orgTermGroupList>
+		<orgTermGroup>
+			<additionsToName/>
+			<termName>${displayName}</termName>
+			<termSource/>
+			<termSourceID/>
+			<termSourceNote/>
+			<termLanguage/>
+			<termPrefForLang>false</termPrefForLang>
+			<termDisplayName>${displayName}</termDisplayName>
+			<termType/>
+			<mainBodyName>The real official test organization</mainBodyName>
+			<termStatus/>
+			<termQualifier/>
+			<termSourceDetail/>
+		</orgTermGroup>
+	</orgTermGroupList>
+        
   </ns3:orgauthorities_common>
 </document>
 

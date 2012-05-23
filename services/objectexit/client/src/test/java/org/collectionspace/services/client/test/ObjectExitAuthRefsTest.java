@@ -41,7 +41,9 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.objectexit.StructuredDateGroup;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
+import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -66,7 +68,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
     private String depositorRefName = null;
-    private String exitDate = null;
+    private StructuredDateGroup exitDateGroup = new StructuredDateGroup();
     private String exitNumber = null;
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.currentDateUTC();
@@ -91,14 +93,19 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    private PoxPayloadOut createObjectExitInstance(String depositorRefName, String exitNumber, String exitDate) {
-        this.exitDate = exitDate;
+    private PoxPayloadOut createObjectExitInstance(String depositorRefName, String exitNumber, String exitDateDisplayDate) {
         this.exitNumber = exitNumber;
         this.depositorRefName = depositorRefName;
+        this.exitDateGroup.setDateDisplayDate(exitDateDisplayDate);
+        this.exitDateGroup.setDateDisplayDate(exitDateDisplayDate);
+        
         ObjectexitCommon objectexit = new ObjectexitCommon();
+        StructuredDateGroup oeExitDateGroup = new StructuredDateGroup();
+
         objectexit.setDepositor(depositorRefName);
         objectexit.setExitNumber(exitNumber);
-        objectexit.setExitDate(exitDate);
+        oeExitDateGroup.setDateDisplayDate(exitDateDisplayDate);
+        objectexit.setExitDateGroup(oeExitDateGroup);
 
         PoxPayloadOut multipart = new PoxPayloadOut(ObjectExitClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(new ObjectExitClient().getCommonPartName(),
@@ -165,7 +172,15 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, authRefName, personInfo, personAuthClient.getItemCommonPartName());
+        List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        String termName = firstName + " " + surName;
+        term.setTermDisplayName(termName);
+        term.setTermName(termName);
+        personTerms.add(term);
+        PoxPayloadOut multipart =
+                PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
+                    authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
 	        assertStatusCode(res, "createPerson (not a surefire test)");

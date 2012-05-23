@@ -183,41 +183,49 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     	CommonList commonList = new CommonList();
         extractPagingInfo(commonList, wrapDoc);
         List<ListResultField> resultsFields = getListItemsArray();
-        int nFields = resultsFields.size()+NUM_STANDARD_LIST_RESULT_FIELDS;
+        int nFields = resultsFields.size() + NUM_STANDARD_LIST_RESULT_FIELDS;
         String fields[] = new String[nFields];
         fields[0] = STANDARD_LIST_CSID_FIELD;
         fields[1] = STANDARD_LIST_URI_FIELD;
         fields[2] = STANDARD_LIST_UPDATED_AT_FIELD;
         fields[3] = STANDARD_LIST_WORKFLOW_FIELD;
-        for(int i=NUM_STANDARD_LIST_RESULT_FIELDS;i<nFields;i++) {
-        	ListResultField field = resultsFields.get(i-NUM_STANDARD_LIST_RESULT_FIELDS); 
-        	fields[i]=field.getElement();
+        for(int i = NUM_STANDARD_LIST_RESULT_FIELDS; i < nFields; i++) {
+        	ListResultField field = resultsFields.get(i - NUM_STANDARD_LIST_RESULT_FIELDS); 
+        	fields[i] = field.getElement();
         }
-        commonList.setFieldsReturned(fields);
-        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-		HashMap<String,String> item = new HashMap<String,String>();
-        while(iter.hasNext()){
-            DocumentModel docModel = iter.next();
-            String id = NuxeoUtils.getCsid(docModel);
-            item.put(STANDARD_LIST_CSID_FIELD, id);
-            String uri = getUri(docModel);
-            item.put(STANDARD_LIST_URI_FIELD, uri);
-            item.put(STANDARD_LIST_UPDATED_AT_FIELD, getUpdatedAtAsString(docModel));
-            item.put(STANDARD_LIST_WORKFLOW_FIELD, docModel.getCurrentLifeCycleState());
+		commonList.setFieldsReturned(fields);
+		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+		HashMap<String, Object> item = new HashMap<String, Object>();
+		while (iter.hasNext()) {
+			DocumentModel docModel = iter.next();
+			String id = NuxeoUtils.getCsid(docModel);
+			item.put(STANDARD_LIST_CSID_FIELD, id);
+			String uri = getUri(docModel);
+			item.put(STANDARD_LIST_URI_FIELD, uri);
+			item.put(STANDARD_LIST_UPDATED_AT_FIELD,
+					getUpdatedAtAsString(docModel));
+			item.put(STANDARD_LIST_WORKFLOW_FIELD,
+					docModel.getCurrentLifeCycleState());
 
-            for (ListResultField field : resultsFields ){
-            	String schema = field.getSchema();
-            	if(schema==null || schema.trim().isEmpty())
-            		schema = commonSchema;
-                String value = 
-                	getXPathStringValue(docModel, schema, field.getXpath());
-                if(value!=null && !value.trim().isEmpty()) {
-                	item.put(field.getElement(), value);
-                }
-            }
-            commonList.addItem(item);
-            item.clear();
-        }
+			for (ListResultField field : resultsFields) {
+				String schema = field.getSchema();
+				if (schema == null || schema.trim().isEmpty()) {
+					schema = commonSchema;
+				}
+				Object value = getListResultValue(docModel, schema, field);
+				if (value != null && value instanceof String) {
+					String strValue = (String) value;
+					if (strValue.trim().isEmpty() == true) {
+						value = null;
+					}
+				}
+				if (value != null) {
+					item.put(field.getElement(), value);
+				}
+			}
+			commonList.addItem(item);
+			item.clear();
+		}
 
         return commonList;
     }
@@ -271,7 +279,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
                            String xpath)
                            throws Exception {
         //Object prop = docModel.getProperty(label, elementName);
-        String value = getXPathStringValue(docModel, schema, xpath);
+        String value = (String)NuxeoUtils.getXPathValue(docModel, schema, xpath);
         return ReflectionMapper.callSetter(listItem, setterName, value);
     }
 

@@ -82,6 +82,8 @@ import javax.ws.rs.core.UriInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.collectionspace.services.client.*;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 /**
  * The Class AuthorityResource.
@@ -180,6 +182,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
     public abstract String getItemServiceName();
+    
+    public abstract String getItemTermInfoGroupXPathBase();
 
     @Override
     protected String getVersionString() {
@@ -223,9 +227,12 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         docHandler = (AuthorityItemDocumentModelHandler<?>) createDocumentHandler(ctx,
                 ctx.getCommonPartLabel(getItemServiceName()),
                 authCommonClass);
+        // FIXME - Richard and Aron think the following three lines should
+        // be in the constructor for the AuthorityItemDocumentModelHandler
+        // because all three are required fields.
         docHandler.setInAuthority(inAuthority);
         docHandler.setAuthorityRefNameBase(authorityRefNameBase);
-
+        docHandler.setItemTermInfoGroupXPathBase(getItemTermInfoGroupXPathBase());
         return docHandler;
     }
 
@@ -329,8 +336,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
 
 
-    @POST
-    public Response createAuthority(String xmlPayload) {
+    @POST													//FIXME: REM - 5/1/2012 - We can probably remove this method.
+    public Response createAuthority(String xmlPayload) { 	//REM - This method is never reached by the JAX-RS client -instead the "create" method in ResourceBase.java is getting called.
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
@@ -415,7 +422,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      */
     @GET
     @Produces("application/xml")
-    public AbstractCommonList getAuthorityList(@Context UriInfo ui) {
+    public AbstractCommonList getAuthorityList(@Context UriInfo ui) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
@@ -439,6 +446,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
     }
+    
 
     /**
      * Update authority.
@@ -641,6 +649,30 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         return result.getBytes();
     }
 
+    /*
+     * Most of the authority child classes will/should use this implementation.  However, the Vocabulary service's item schema is
+     * different enough that it will have to override this method in it's resource class.
+     */
+	protected String getOrderByField() {
+		String result = null;
+
+		result = NuxeoUtils.getPrimaryElPathPropertyName(
+				authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(),
+				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+
+		return result;
+	}
+	
+	protected String getPartialTermMatchField() {
+		String result = null;
+		
+		result = NuxeoUtils.getMultiElPathPropertyName(
+				authorityItemCommonSchemaName, getItemTermInfoGroupXPathBase(),
+				AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+
+		return result;
+	}
+    
     /**
      * Gets the authorityItem list for the specified authority
      * If partialPerm is specified, keywords will be ignored.
@@ -664,9 +696,6 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
 
-            String qualifiedDisplayNameField = authorityItemCommonSchemaName + ":"
-                    + AuthorityItemJAXBSchema.DISPLAY_NAME;
-
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 
@@ -684,7 +713,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // be on the displayName field
             String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
             if (sortBy == null || sortBy.isEmpty()) {
-                myFilter.setOrderByClause(qualifiedDisplayNameField);
+                String orderByField = getOrderByField();
+                myFilter.setOrderByClause(orderByField);
             }
 
             // If we are not wildcarding the parent, add a restriction
@@ -708,8 +738,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // NOTE: Partial terms searches are mutually exclusive to keyword and advanced-search, but
             // the PT query param trumps the KW and AS query params.
             if (partialTerm != null && !partialTerm.isEmpty()) {
+            	String partialTermMatchField = getPartialTermMatchField();
                 String ptClause = QueryManager.createWhereClauseForPartialMatch(
-                        qualifiedDisplayNameField, partialTerm);
+                		partialTermMatchField, partialTerm);
                 myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             } else if (keywords != null || advancedSearch != null) {
 //				String kwdClause = QueryManager.createWhereClauseFromKeywords(keywords);
@@ -718,7 +749,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             }
             if (logger.isDebugEnabled()) {
                 logger.debug("getAuthorityItemList filtered WHERE clause: "
-                        + myFilter.getWhereClause());
+                        + myFilter.getWhereClause() 
+                        + " and ORDER BY clause: " + myFilter.getOrderByClause());
             }
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             return (AbstractCommonList) handler.getCommonPartList();

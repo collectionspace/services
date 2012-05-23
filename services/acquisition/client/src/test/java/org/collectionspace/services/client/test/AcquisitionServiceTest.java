@@ -36,10 +36,11 @@ import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUti
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
-import org.collectionspace.services.acquisition.AcquisitionDateList;
+import org.collectionspace.services.acquisition.AcquisitionDateGroupList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
 import org.jboss.resteasy.client.ClientResponse;
+import org.collectionspace.services.acquisition.StructuredDateGroup;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -311,8 +312,7 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         Assert.assertTrue(acqSources.size() > 0);
         Assert.assertNotNull(acqSources.get(0));
 
-        List<String> acqDates =
-                acquisitionObject.getAcquisitionDates().getAcquisitionDate();
+        List<StructuredDateGroup> acqDates = acquisitionObject.getAcquisitionDateGroupList().getAcquisitionDateGroup();
         Assert.assertTrue(acqDates.size() > 0);
         Assert.assertNotNull(acqDates.get(0));
 
@@ -703,11 +703,15 @@ public class AcquisitionServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         acqSources.add("Museum Acquisition Source-" + identifier);
         acquisition.setAcquisitionSources(acqSourcesList);
 
-        AcquisitionDateList acqDatesList = new AcquisitionDateList();
-        List<String> acqDates = acqDatesList.getAcquisitionDate();
-        acqDates.add(CURRENT_DATE_UTC);
-        acqDates.add(CURRENT_DATE_UTC);
-        acquisition.setAcquisitionDates(acqDatesList);
+        AcquisitionDateGroupList acqDatesList = new AcquisitionDateGroupList();
+        List<StructuredDateGroup> acqDates = acqDatesList.getAcquisitionDateGroup();
+        StructuredDateGroup acqDate1 = new StructuredDateGroup();
+        acqDate1.setDateDisplayDate(CURRENT_DATE_UTC);
+        StructuredDateGroup acqDate2 = new StructuredDateGroup();
+        acqDate2.setDateDisplayDate(CURRENT_DATE_UTC);
+        acqDates.add(acqDate1);
+        acqDates.add(acqDate2);
+        acquisition.setAcquisitionDateGroupList(acqDatesList);
 
         OwnerList ownersList = new OwnerList();
         List<String> owners = ownersList.getOwner();

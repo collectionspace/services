@@ -1,37 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document name="persons">
   <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <nationalities />
-    <shortDisplayName />
-    <schoolsOrStyles />
-    <groups />
-    <occupations />
-    <displayNameComputed>false</displayNameComputed>
     <inAuthority>${inAuthority}</inAuthority>
-    <displayName>Finbar the DisplayName</displayName>
+    <shortIdentifier>${shortIdentifier}</shortIdentifier>
+    <refName>${refName}</refName>
   </ns2:persons_common>
-  <ns2:collectionspace_core xmlns:ns2="http://collectionspace.org/collectionspace_core/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <tenantId>1</tenantId>
-    <updatedAt>2011-04-23T23:02:16Z</updatedAt>
-    <createdAt>2011-04-23T23:02:16Z</createdAt>
-  </ns2:collectionspace_core>
-  <ns2:account_permission xmlns:ns2="http://collectionspace.org/services/authorization">
-    <account>
-      <accountId>6b296c92-bb90-42d8-a804-3ec87c5e21d6</accountId>
-      <userId>admin@core.collectionspace.org</userId>
-    </account>
-    <permission>
-      <permRelationshipId>70</permRelationshipId>
-      <permissionId>1aa2c5b8-ce60-412b-bb45-cadba34fab7d</permissionId>
-      <resourceName>/personauthorities/*/items/*/workflow/</resourceName>
-      <actionGroup>CRUDL</actionGroup>
-    </permission>
-    <permission>
-      <permRelationshipId>71</permRelationshipId>
-      <permissionId>a7f67d3d-ecee-41a5-9b8d-5a7f89345caa</permissionId>
-      <resourceName>persons</resourceName>
-      <actionGroup>CRUDL</actionGroup>
-    </permission>
-  </ns2:account_permission>
 </document>
 

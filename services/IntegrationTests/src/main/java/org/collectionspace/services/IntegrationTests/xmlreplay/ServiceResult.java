@@ -288,7 +288,7 @@ public class ServiceResult {
     /** This method may be called from a test case, using a syntax like ${oe9.reqValue("personauthorities_common","//shortIdentifier")}    */
     public String sent(String xpath) throws Exception {
         try {
-            String source = this.requestPayloadsRaw;
+            String source = this.requestPayload; // REM - 5/9/2012 : Changing to requestPayload from requestPayloadsRaw to get actual sent payload 
             if (source == null){
                 return "ERROR:null:requestPayloadsRaw";
             }

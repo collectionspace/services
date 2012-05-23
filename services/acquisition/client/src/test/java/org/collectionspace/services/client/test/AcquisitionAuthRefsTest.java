@@ -44,6 +44,8 @@ import org.collectionspace.services.acquisition.AcquisitionFunding;
 import org.collectionspace.services.acquisition.AcquisitionFundingList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
+import org.collectionspace.services.acquisition.StructuredDateGroup;
+import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -112,7 +114,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		createPersonRefs();
 
 		PoxPayloadOut multipart = createAcquisitionInstance(
-				"April 1, 2010",
+                "April 1, 2010",
 				acquisitionAuthorizerRefName,
 				acquisitionFundingSourcesRefNames,
 				ownersRefNames,
@@ -200,10 +202,16 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 		personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
 		personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
 		personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+                List<PersonTermGroup> personTerms = new ArrayList<PersonTermGroup>();
+                PersonTermGroup term = new PersonTermGroup();
+                String termName = firstName + " " + surName;
+                term.setTermDisplayName(termName);
+                term.setTermName(termName);
+                personTerms.add(term);
 		PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
 		PoxPayloadOut multipart = 
 			PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
-					authRefName, personInfo, personAuthClient.getItemCommonPartName());
+					authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
 		ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
 		int statusCode = res.getStatus();
 
@@ -367,14 +375,16 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 	}
 
 	private PoxPayloadOut createAcquisitionInstance(
-			String accessionDate,
+            String accessionDateDisplayDate,
 			String acquisitionAuthorizer,
 			List<String> acquisitionFundingSources,
 			List<String> acqOwners,
 			List<String> acquisitionSources) {
 
 		AcquisitionsCommon acquisition = new AcquisitionsCommon();
-		acquisition.setAccessionDate(accessionDate);
+		StructuredDateGroup accessionDateGroup = new StructuredDateGroup(); 
+		accessionDateGroup.setDateDisplayDate(accessionDateDisplayDate);
+        acquisition.setAccessionDateGroup(accessionDateGroup);
 		acquisition.setAcquisitionAuthorizer(acquisitionAuthorizer);
 
 		// AcquisitionFunding-related authrefs fields are *not* currently

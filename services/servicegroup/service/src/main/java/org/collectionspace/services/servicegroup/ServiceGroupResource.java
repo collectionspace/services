@@ -137,7 +137,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 	        fields[0] = ServiceGroupListItemJAXBSchema.NAME;
 	        fields[1] = ServiceGroupListItemJAXBSchema.URI;
 	        commonList.setFieldsReturned(fields);
-			HashMap<String,String> item = new HashMap<String,String>();
+			HashMap<String, Object> item = new HashMap<String, Object>();
 	        for(String groupName:svcGroups){
 	            item.put(ServiceGroupListItemJAXBSchema.NAME, groupName);
 	            String uri = "/" + getServiceName().toLowerCase() + "/" + groupName;
