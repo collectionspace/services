@@ -45,8 +45,29 @@ public interface IQueryManager {
 	//
 	// Query params for CMIS queries on the relationship (Relation) table.
 	//
-	final static String SEARCH_RELATED_TO_CSID_SUBJECT = "rt_sbj";
-	final static String SEARCH_RELATED_TO_CSID_OBJECT = "rd_obj";
+	final static String SEARCH_RELATED_TO_CSID_SUBJECT = "rtSbj";
+	final static String SEARCH_RELATED_TO_CSID_OBJECT = "rtObj";
+	
+	//
+	// Generic CMIS property mapping constants
+	//
+	final static String CMIS_OBJECT_ID = "cmis:objectId";
+	final static String CMIS_NAME = "cmis:name";
+	//
+	// Nuxeo related CMIS property mapping constants
+	final static String CMIS_NUXEO_ID = CMIS_OBJECT_ID;
+	final static String CMIS_NUXEO_NAME = CMIS_NAME;
+	final static String CMIS_NUXEO_TITLE = "dc:title";
+	
+	// CollectionSpace CMIS property mapping constants
+	final static String CMIS_TARGET_PREFIX = "DOC";
+	// Relations CMIS property mapping constants
+	final static String CMIS_RELATIONS_PREFIX = "REL";
+	
+	final static String CMIS_TARGET_NUXEO_ID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_ID;
+	final static String CMIS_TARGET_CSID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
+	final static String CMIS_TARGET_TITLE = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_TITLE;
+	final static String CMIS_TARGET_NAME = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
 
 	public void execQuery(String queryString);
 	

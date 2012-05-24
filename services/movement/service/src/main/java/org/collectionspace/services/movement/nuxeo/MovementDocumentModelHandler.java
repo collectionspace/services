@@ -23,10 +23,6 @@
  */
 package org.collectionspace.services.movement.nuxeo;
 
-import javax.ws.rs.core.MultivaluedMap;
-
-import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.movement.MovementResource;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.slf4j.Logger;
@@ -42,37 +38,5 @@ public class MovementDocumentModelHandler
         extends DocHandlerBase<MovementsCommon> {
 
     final Logger logger = LoggerFactory.getLogger(MovementDocumentModelHandler.class);
-	
-    /**
-     * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
-     * information in the current service context -which includes things like the query parameters, etc.
-     */
-    @Override
-    public String getCMISQuery() {
-    	String result = null;
-    	
-    	String subjectCsid = (String)getServiceContext().getQueryParams().get(IQueryManager.SEARCH_RELATED_TO_CSID_SUBJECT);
-    	
-    	//
-    	// For Debugging purposes only
-    	//
-        String cmis_movement = System.getenv("CMIS_MOVEMENT");
-
-        if (cmis_movement != null && !cmis_movement.isEmpty()) {
-        	result = cmis_movement;
-        } else {
-        	result = "SELECT M.cmis:name, M.dc:title, R.dc:title, R.relations_common:subjectCsid "
-        			+ "FROM Movement M JOIN Relation R ON R.relations_common:objectCsid = M.cmis:name "
-        			+ "WHERE R.relations_common:subjectCsid = "
-        			+ "'" + subjectCsid + "'";
-        }
-        
-        if (logger.isDebugEnabled() == true) {
-        	logger.debug("The CMIS query for the Movement service is: " + result);
-        }
-        
-        return result;
-    }
-	
 }
 

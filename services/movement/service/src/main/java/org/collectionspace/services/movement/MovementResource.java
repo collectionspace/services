@@ -78,30 +78,30 @@ public class MovementResource extends ResourceBase {
     	return result;
     }
 
-    @Override
-    protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
-        if (isSet(IQueryManager.SEARCH_RELATED_TO_CSID_SUBJECT, queryParams) == false) {
-        	//
-        	// It's not a "related to" query so we can use our normal call to getList and not our CMIS query
-        	//
-        	return super.getList(queryParams);
-        } else {
-        	//
-        	// We need to use CMIS query method since we'll be doing a join with the Relation table
-        	//
-	        try {
-	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
-	            DocumentHandler handler = createDocumentHandler(ctx);
-	        	String relationToCsid = queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_SUBJECT);
-	        		            
-	        	getRepositoryClient(ctx).getFilteredCMIS(ctx, handler);
-
-	            AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
-	            return list;
-	        } catch (Exception e) {
-	            throw bigReThrow(e, ServiceMessages.LIST_FAILED);
-	        }
-        }
-    }
+//    @Override
+//    protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
+//        if (isSet(IQueryManager.SEARCH_RELATED_TO_CSID_SUBJECT, queryParams) == false) {
+//        	//
+//        	// It's not a "related to" query so we can use our normal call to getList and not our CMIS query
+//        	//
+//        	return super.getList(queryParams);
+//        } else {
+//        	//
+//        	// We need to use CMIS query method since we'll be doing a join with the Relation table
+//        	//
+//	        try {
+//	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+//	            DocumentHandler handler = createDocumentHandler(ctx);
+//	        	String relationToCsid = queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_SUBJECT);
+//	        		            
+//	        	getRepositoryClient(ctx).getFilteredCMIS(ctx, handler);
+//
+//	            AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
+//	            return list;
+//	        } catch (Exception e) {
+//	            throw bigReThrow(e, ServiceMessages.LIST_FAILED);
+//	        }
+//        }
+//    }
     
 }

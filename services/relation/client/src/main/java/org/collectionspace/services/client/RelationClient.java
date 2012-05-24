@@ -34,6 +34,7 @@ import org.collectionspace.services.relation.RelationsCommonList;
  * The Class RelationClient.
  */
 public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommonList, RelationProxy> {
+	public static final String SERVICE_DOC_TYPE = "Relation"; // Used for CMIS queries only -should be the same as what's in the tenant bindings
 	public static final String SERVICE_NAME = "relations";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
@@ -43,6 +44,14 @@ public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommon
 
     public static final String SERVICE_COMMONPART_NAME = SERVICE_NAME + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
 
+	// Relations CMIS property mapping constants
+	public final static String CMIS_CSPACE_RELATIONS_SUBJECT_ID = IQueryManager.CMIS_RELATIONS_PREFIX
+			+ "." + SERVICE_COMMONPART_NAME + ":subjectCsid";
+	public final static String CMIS_CSPACE_RELATIONS_OBJECT_ID = IQueryManager.CMIS_RELATIONS_PREFIX
+			+ "." + SERVICE_COMMONPART_NAME + ":objectCsid";
+	public final static String CMIS_CSPACE_RELATIONS_TITLE = IQueryManager.CMIS_RELATIONS_PREFIX
+			+ "." + IQueryManager.CMIS_NUXEO_TITLE;
+    
 	@Override
 	public String getServiceName() {
 		return SERVICE_NAME;

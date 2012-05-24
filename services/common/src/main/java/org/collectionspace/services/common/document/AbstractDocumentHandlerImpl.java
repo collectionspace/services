@@ -423,4 +423,8 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     	//
     	return null;
     }
+    
+    public boolean isCMISQuery() {
+    	return false;
+    }
 }

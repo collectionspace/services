@@ -26,8 +26,12 @@ package org.collectionspace.services.nuxeo.client.java;
 import java.util.Collection;
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
@@ -346,4 +350,68 @@ public abstract class DocumentModelHandler<T, TL>
                     COLLECTIONSPACE_CORE_UPDATED_BY, userId);
     	}
     }
+    
+    /*
+     * If we see the "rtSbj" query param then we need to perform a CMIS query.  Currently, we have only one
+     * CMIS query, but we could add more.  If we do, this method should look at the incoming request and corresponding
+     * query params to determine if we need to do a CMIS query
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#isCMISQuery()
+     */
+    public boolean isCMISQuery() {
+    	boolean result = false;
+    	
+    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
+    	//
+    	// Look the query params to see if we need to make a CMSIS query.
+    	//
+    	String subjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_SUBJECT);    	
+    	if (subjectCsid != null) {
+    		result = true;
+    	}
+    	
+    	return result;
+    }
+    
+    /**
+     * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
+     * information in the current service context -which includes things like the query parameters, etc.
+     */
+    @Override
+    public String getCMISQuery() {
+    	String result = null;
+    	
+    	if (isCMISQuery() == true) {
+	    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
+	    	String subjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_SUBJECT);
+	    	String docType = this.getServiceContext().getDocumentType();
+	    	
+	    	String selectFields = IQueryManager.CMIS_TARGET_NAME + ", "
+	    			+ IQueryManager.CMIS_TARGET_TITLE + ", "
+	    			+ RelationClient.CMIS_CSPACE_RELATIONS_TITLE + ", "
+	    			+ RelationClient.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
+	    	String targetTable = docType + " " + IQueryManager.CMIS_TARGET_PREFIX;
+	    	String relationTable = RelationClient.SERVICE_DOC_TYPE + " " + IQueryManager.CMIS_RELATIONS_PREFIX;
+	    	String relationObjectCsid = RelationClient.CMIS_CSPACE_RELATIONS_OBJECT_ID;
+	    	String relationSubjectCsid = RelationClient.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
+	    	String targetCsid = IQueryManager.CMIS_TARGET_CSID;
+	    	
+	    	result = "SELECT " + selectFields
+	    			+ " FROM "	+ targetTable + " JOIN " + relationTable
+	    			+ " ON " + relationObjectCsid + " = " + targetCsid
+	    			+ " WHERE " + relationSubjectCsid + " = " + "'" + subjectCsid + "'";
+	        
+	        // SELECT D.cmis:name, D.dc:title, R.dc:title, R.relations_common:subjectCsid
+	        // FROM Dimension D JOIN Relation R
+	        // ON R.relations_common:objectCsid = D.cmis:name
+	        // WHERE R.relations_common:subjectCsid = '737527ec-a560-4776-99de'
+	        
+	        if (logger.isDebugEnabled() == true && result != null) {
+	        	logger.debug("The CMIS query for the Movement service is: " + result);
+	        }
+    	}
+        
+        return result;
+    }
+    
 }

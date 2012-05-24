@@ -335,4 +335,6 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * information in the current service context -which includes things like the query parameters, etc.
      */
     public String getCMISQuery();
+    
+    public boolean isCMISQuery();
 }

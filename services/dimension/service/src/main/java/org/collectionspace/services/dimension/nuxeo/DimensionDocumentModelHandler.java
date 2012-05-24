@@ -26,8 +26,11 @@ package org.collectionspace.services.dimension.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.collectionspace.services.dimension.DimensionJAXBSchema;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.dimension.DimensionsCommonList;
@@ -35,7 +38,6 @@ import org.collectionspace.services.dimension.DimensionsCommonList.DimensionList
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -136,6 +138,6 @@ public class DimensionDocumentModelHandler
     public String getQProperty(String prop) {
         return DimensionConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
-
+    
 }
 

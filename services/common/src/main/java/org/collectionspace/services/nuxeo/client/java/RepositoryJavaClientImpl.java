@@ -27,6 +27,7 @@ import java.util.UUID;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -700,6 +701,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * See CSPACE-5036 - How to make CMISQL queries from Nuxeo
      */
 	private IterableQueryResult makeCMISQLQuery(RepositoryInstance repoSession, String query) {
+		IterableQueryResult result = null;
+		
 		// the NuxeoRepository should be constructed only once, then cached
 		// (its construction is expensive)
 		try {
@@ -716,21 +719,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 			NuxeoCmisService cmisService = new NuxeoCmisService(repo,
 					callContext, repoSession);
 
-			IterableQueryResult result = repoSession.queryAndFetch(query,
+			result = repoSession.queryAndFetch(query,
 					"CMISQL", cmisService);
-			for (Map<String, Serializable> row : result) {
-				logger.debug(
-				// "dc:title is: " + (String)row.get("dc:title")
-				"" + " Hierarchy Table ID is:" + row.get("cmis:objectId")
-						+ " cmis:name is: " + row.get("cmis:name")
-				// + " nuxeo:lifecycleState is: " +
-				// row.get("nuxeo:lifecycleState")
-				);
-			}
 		} catch (ClientException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Encounter trouble making the following CMIS query: " + query, e);
 		}
+		
+		return result;
 	}
      
     /**
@@ -769,8 +765,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         	Profiler profiler = new Profiler(this, 2);
         	profiler.log("Executing NXQL query: " + query.toString());
         	profiler.start();
-        	if (handler.getCMISQuery() != null) {
-        		docList = getFilteredCMIS(ctx, handler, queryContext);
+        	if (handler.isCMISQuery() == true) {
+        		docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); //FIXME: REM - Need to deal with paging info in CMIS query
         	} else if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
                 docList = repoSession.query(query, null,
                         queryContext.getDocFilter().getPageSize(), queryContext.getDocFilter().getOffset(), true);
@@ -816,18 +812,22 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         	profiler.start();
         	//
         	IterableQueryResult queryResult = makeCMISQLQuery(repoSession, query);
-			for (Map<String, Serializable> row : queryResult) {
-				logger.debug(
-				// "dc:title is: " + (String)row.get("dc:title")
-				"" + " Hierarchy Table ID is:" + row.get("cmis:objectId")
-						+ " cmis:name is: " + row.get("cmis:name")
-				// + " nuxeo:lifecycleState is: " +
-				// row.get("nuxeo:lifecycleState")
-				);
-				String nuxeoId = (String) row.get("cmis:objectId");
-				DocumentModel docModel = NuxeoUtils.getDocumentModel(repoSession, nuxeoId);
-				result.add(docModel);
-			}        	
+        	try {
+				for (Map<String, Serializable> row : queryResult) {
+					logger.debug(
+					// "dc:title is: " + (String)row.get("dc:title")
+					"" + " Hierarchy Table ID is:" + row.get(IQueryManager.CMIS_TARGET_NUXEO_ID)
+							+ " cmis:name is: " + row.get(IQueryManager.CMIS_TARGET_NAME)
+					// + " nuxeo:lifecycleState is: " +
+					// row.get("nuxeo:lifecycleState")
+					);
+					String nuxeoId = (String) row.get(IQueryManager.CMIS_TARGET_NUXEO_ID);
+					DocumentModel docModel = NuxeoUtils.getDocumentModel(repoSession, nuxeoId);
+					result.add(docModel);
+				}
+        	} finally {
+        		queryResult.close();
+        	}
         	//
             profiler.stop();
 
@@ -836,10 +836,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 logger.debug("Caught exception ", e);
             }
             throw new DocumentException(e);
-        } finally {
-            if (repoSession != null) {
-                releaseRepositorySession(repoSession);
-            }
         }
         
         return result;
