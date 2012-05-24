@@ -34,6 +34,26 @@
 			</service:object>
 		</tenant:serviceBindings>
 
+		<tenant:serviceBindings merge:matcher="id" id="ObjectExit">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="objectexit_anthropology" updated="" order="3">
+					<service:properties>
+						<!-- Fields containing authority term references -->
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>newOwnerList|newOwner</types:value>
+						</types:item>
+					</service:properties>
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/objectexit/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/objectexit/domain/anthropology http://collectionspace.org/services/objectexit/domain/objectexit_anthropology.xsd" />
+					</service:content>
+				</service:part>
+				
+			</service:object>
+		</tenant:serviceBindings>
+
 		<tenant:serviceBindings merge:matcher="id" id="Media">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 				
