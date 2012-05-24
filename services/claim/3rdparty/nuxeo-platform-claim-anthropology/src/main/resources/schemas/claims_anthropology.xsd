@@ -19,7 +19,7 @@
 	version="0.1">
 	
 	<xs:element name="claimName" type="xs:string"/>
-	<xs:element name="clamTypeList" type="claimTypeList">
+	<xs:element name="clamTypeList" type="claimTypeList"/>
 
 	<xs:element name="claimNoteList" type="claimNoteList"/>
 	<xs:element name="claimAltNameGroupList" type="claimAltNameGroupList"/>
