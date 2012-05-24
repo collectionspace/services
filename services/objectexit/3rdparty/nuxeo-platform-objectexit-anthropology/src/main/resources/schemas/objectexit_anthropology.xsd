@@ -13,9 +13,9 @@
 
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:ns="http://collectionspace.org/objectexit/"
-    xmlns="http://collectionspace.org/objectexit/"
-    targetNamespace="http://collectionspace.org/objectexit/"
+    xmlns:ns="http://collectionspace.org/objectexit/domain/anthropology"
+    xmlns="http://collectionspace.org/objectexit/domain/anthropology"
+    targetNamespace="http://collectionspace.org/objectexit/domain/anthropology"
     version="0.1">
     
     <xs:element name="newOwnerList">
