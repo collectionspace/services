@@ -24,14 +24,17 @@
 
 package org.collectionspace.services.imports;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-import org.collectionspace.services.common.IFragmentHandler;
-import org.collectionspace.services.common.XmlSaxFragmenter;
-import org.collectionspace.services.common.XmlTools;
+import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.common.*;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 import org.dom4j.Document;
@@ -47,6 +50,8 @@ import org.xml.sax.InputSource;
  * @author Laramie Crocker
  */
 public class TemplateExpander {
+    
+    static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
 
     protected static String var(String theVar){
         return "\\$\\{"+theVar+"\\}";
@@ -81,6 +86,17 @@ public class TemplateExpander {
         String nowTime = GregorianCalendarDateTimeUtils.timestampUTC();
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "createdDate", nowTime);
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedDate", nowTime);
+        
+        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"),
+                getDocUri(tenantId, SERVICE_TYPE, docID));
+
+        /*
+        TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        ServiceBindingType sb = tReader.getServiceBindingForDocType(tenantId, SERVICE_TYPE);
+	String uri = "/" + sb.getName().toLowerCase() + "/" + docID;
+        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"), uri);
+        * 
+        */
 
         String serviceDir = outDir+'/'+docID;
         FileTools.saveFile(serviceDir, "document.xml", wrapperTmpl, true/*true=create parent dirs*/);
@@ -122,6 +138,71 @@ public class TemplateExpander {
         FragmentHandlerImpl callback = new FragmentHandlerImpl(tenantId, TEMPLATE_DIR, outputDir);
         XmlSaxFragmenter.parse(requestSource, chopPath, callback, false);
     }
+
+    private static String getDocUri(String tenantId, String SERVICE_TYPE, String docID) throws Exception {
+        
+        // FIXME: Use already-defined constants, likely to be found in another package
+        final String AUTHORITY_TYPE = "authority";
+        final String OBJECT_TYPE = "object";
+        final String PROCEDURE_TYPE = "procedure";
+
+        TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        ServiceBindingType sb = tReader.getServiceBindingForDocType(tenantId, SERVICE_TYPE);
+        
+        String serviceType = sb.getType();
+        String serviceName = "";
+        String uri = "";
+        if (serviceType.equalsIgnoreCase(AUTHORITY_TYPE)) {
+            String authoritySvcName = getAuthoritySvcName(SERVICE_TYPE);
+            if (authoritySvcName == null) {
+                return uri;
+            }
+            // FIXME: Get the inAuthority value from the payload or from a new param for this method
+            String inAuthorityID = "inAuthorityValueHere"; // stub
+            uri = getAuthorityUri(authoritySvcName, inAuthorityID, docID);
+       } else if (serviceType.equalsIgnoreCase(OBJECT_TYPE) ||
+               serviceType.equalsIgnoreCase(PROCEDURE_TYPE) ) {
+            serviceName = sb.getName().toLowerCase();
+            uri = getUri(serviceName, docID);
+       } else {
+           // Currently returns a blank URI for any other cases,
+           // including sub-resources like contacts
+         }
+        System.out.println("uri=" + uri); // temp for debugging
+        return uri;
+    }
+    
+    // Stub / mock of a registry of authority document types and their
+    // associated parent authority service names
+    private static Map<String,String> getDocTypeSvcNameRegistry() {
+        if (docTypeSvcNameRegistry.isEmpty()) {
+            docTypeSvcNameRegistry.put("Concept", "Conceptauthorities");
+            docTypeSvcNameRegistry.put("Location", "Locationauthorities");
+            docTypeSvcNameRegistry.put("Person", "Personauthorities");
+            docTypeSvcNameRegistry.put("Place", "Placeauthorities");
+            docTypeSvcNameRegistry.put("Organization", "Orgauthorities");
+            docTypeSvcNameRegistry.put("Taxon", "Taxonauthority");
+        }
+        return docTypeSvcNameRegistry;
+    }
+    
+    private static String getAuthoritySvcName(String docType) {
+        return getDocTypeSvcNameRegistry().get(docType);
+    }
+    
+    private static String getUri(String serviceName, String docID) {
+        return "/" + serviceName
+                + "/" + docID;
+    }
+
+    private static String getAuthorityUri(String authorityServiceName, String inAuthorityID, String docID) {
+        return "/" + authorityServiceName.toLowerCase()
+                + '/' + inAuthorityID
+                + '/' + AuthorityClient.ITEMS
+                + '/' + docID;
+    }
+    
+    // FIXME: Create equivalent getUri-type method(s) for sub-resources, such as contacts
 
     /** This inner class is the callback target for calls to XmlSaxFragmenter, for example:
      *     FragmentHandlerImpl callback = new FragmentHandlerImpl();
