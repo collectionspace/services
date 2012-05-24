@@ -149,7 +149,11 @@ public class TemplateExpander {
     private static String getDocUri(String tenantId, String SERVICE_TYPE, String docID,
             String partTmpl) throws Exception {
         
-        // FIXME: Use already-defined constants, likely to be found in another package
+        // FIXME: This is a quick hack, which assumes that URI construction
+        // behaviors are bound to categories of services.  Those behaviors
+        // should instead be specified on a per-service basis via a registry,
+        // the mechanism we are intending to use in v2.5.  (See comments below
+        // for more details.) - ADR 2012-05-24
         final String AUTHORITY_TYPE = "authority";
         final String OBJECT_TYPE = "object";
         final String PROCEDURE_TYPE = "procedure";
@@ -165,7 +169,6 @@ public class TemplateExpander {
             if (authoritySvcName == null) {
                 return uri;
             }
-            // FIXME: Get the inAuthority value from the payload or from a new param for this method
             String inAuthorityID = getInAuthorityValue(partTmpl);
             uri = getAuthorityUri(authoritySvcName, inAuthorityID, docID);
        } else if (serviceType.equalsIgnoreCase(OBJECT_TYPE) ||
@@ -176,19 +179,18 @@ public class TemplateExpander {
            // Currently returns a blank URI for any other cases,
            // including sub-resources like contacts
          }
-        System.out.println("uri=" + uri); // temp for debugging
         return uri;
     }
     
     // FIXME: This is a quick hack; a stub / mock of a registry of
     // authority document types and their associated parent authority
     // service names. This MUST be replaced by a more general mechanism
-    // in v2.5.
+    // in v2.5. That registry 
     // 
     // Per Patrick, this registry needs to be available system-wide, not
     // just here in the Imports service; extend to all relevant record types;
-    // and be automatically built via per-resource registration, from
-    // configuration, etc. - ADR 2012-05-24
+    // and be automatically built in some manner, such as via per-resource
+    // registration, from configuration, etc. - ADR 2012-05-24
     private static Map<String,String> getDocTypeSvcNameRegistry() {
         if (docTypeSvcNameRegistry.isEmpty()) {
             docTypeSvcNameRegistry.put("Concept", "Conceptauthorities");
@@ -205,6 +207,9 @@ public class TemplateExpander {
         return getDocTypeSvcNameRegistry().get(docType);
     }
     
+    // FIXME: These URI construction methods are also intended to be made
+    // generally available and associated to individual services, via the
+    // registry mechanism described above. - ADR, 2012-05-24
     private static String getUri(String serviceName, String docID) {
         return "/" + serviceName
                 + "/" + docID;
@@ -217,30 +222,30 @@ public class TemplateExpander {
                 + '/' + docID;
     }
     
-    // FIXME: Create equivalent getUri-type method(s) for sub-resources, such as contacts
+    // FIXME: Create equivalent getUri-type method(s) for sub-resources,
+    // such as contacts - ADR, 2012-05-24
     
+    // FIXME: It may also be desirable to explicitly validate the format of
+    // CSID values provided in fields such as inAuthority, and perhaps later on,
+    // their uniqueness against those already present in a running system.
+    // - ADR 2012-05-24
     private static String getInAuthorityValue(String xmlFragment) {
-        // We may also want to explicitly validate the format of CSID
-        // values provided in fields such as inAuthority, and perhaps later,
-        // their uniqueness against those already present in a running system.
-        // - ADR 2012-05-24
-        return getXpathValueFromXmlFragment(IN_AUTHORITY_XPATH, xmlFragment);
+        return extractValueFromXmlFragment(IN_AUTHORITY_XPATH, xmlFragment);
     }
     
-    private static String getXpathValueFromXmlFragment(String xpathExpr, String xmlFragment) {
-        String xpathValue = "";
+    // FIXME: Need to handle cases here where the xmlFragment may contain more
+    // than one matching expression. (Simply matching on instance [0] within
+    // the XPath expression might not be reasonable, as it won't always be
+    // evident if that specific value is pertinent.) - ADR 2012-05-24
+    private static String extractValueFromXmlFragment(String xpathExpr, String xmlFragment) {
+        String value = "";
         try {
             InputSource input = new InputSource(new StringReader(xmlFragment));
-            // FIXME: Need to handle cases where the xmlFragment may contain more
-            // than one matching expression, and thus a non-CSID value may be
-            // obtained. (Simply matching on instance [0] within the XPath expr
-            // might not be reasonable, as we won't always know which value is
-            // pertinent.) - ADR 2012-05-24
-            xpathValue = xpath.evaluate(xpathExpr, input);
+            value = xpath.evaluate(xpathExpr, input);
         } catch (XPathExpressionException e) {
             // Do nothing here.
         }
-        return xpathValue;
+        return value;
 
     }
     
