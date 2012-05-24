@@ -57,6 +57,7 @@ import org.xml.sax.InputSource;
 public class TemplateExpander {
     
     private static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
+    private static XPath xpath = XPathFactory.newInstance().newXPath();
     private static final String IN_AUTHORITY_XPATH = "//inAuthority";
 
     protected static String var(String theVar){
@@ -179,8 +180,15 @@ public class TemplateExpander {
         return uri;
     }
     
-    // Stub / mock of a registry of authority document types and their
-    // associated parent authority service names
+    // FIXME: This is a quick hack; a stub / mock of a registry of
+    // authority document types and their associated parent authority
+    // service names. This MUST be replaced by a more general mechanism
+    // in v2.5.
+    // 
+    // Per Patrick, this registry needs to be available system-wide, not
+    // just here in the Imports service; extend to all relevant record types;
+    // and be automatically built via per-resource registration, from
+    // configuration, etc. - ADR 2012-05-24
     private static Map<String,String> getDocTypeSvcNameRegistry() {
         if (docTypeSvcNameRegistry.isEmpty()) {
             docTypeSvcNameRegistry.put("Concept", "Conceptauthorities");
@@ -209,15 +217,25 @@ public class TemplateExpander {
                 + '/' + docID;
     }
     
+    // FIXME: Create equivalent getUri-type method(s) for sub-resources, such as contacts
+    
     private static String getInAuthorityValue(String xmlFragment) {
+        // We may also want to explicitly validate the format of CSID
+        // values provided in fields such as inAuthority, and perhaps later,
+        // their uniqueness against those already present in a running system.
+        // - ADR 2012-05-24
         return getXpathValueFromXmlFragment(IN_AUTHORITY_XPATH, xmlFragment);
     }
     
     private static String getXpathValueFromXmlFragment(String xpathExpr, String xmlFragment) {
         String xpathValue = "";
         try {
-            XPath xpath = XPathFactory.newInstance().newXPath();
             InputSource input = new InputSource(new StringReader(xmlFragment));
+            // FIXME: Need to handle cases where the xmlFragment may contain more
+            // than one matching expression, and thus a non-CSID value may be
+            // obtained. (Simply matching on instance [0] within the XPath expr
+            // might not be reasonable, as we won't always know which value is
+            // pertinent.) - ADR 2012-05-24
             xpathValue = xpath.evaluate(xpathExpr, input);
         } catch (XPathExpressionException e) {
             // Do nothing here.
@@ -226,8 +244,6 @@ public class TemplateExpander {
 
     }
     
-    // FIXME: Create equivalent getUri-type method(s) for sub-resources, such as contacts
-
     /** This inner class is the callback target for calls to XmlSaxFragmenter, for example:
      *     FragmentHandlerImpl callback = new FragmentHandlerImpl();
      *     XmlSaxFragmenter.parse(filename, "/imports/import", callback, false);
