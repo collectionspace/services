@@ -24,19 +24,24 @@
 
 package org.collectionspace.services.imports;
 
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.collectionspace.services.client.AuthorityClient;
-import org.collectionspace.services.common.*;
+import org.collectionspace.services.common.IFragmentHandler;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.XmlSaxFragmenter;
+import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.xml.sax.InputSource;
@@ -51,7 +56,8 @@ import org.xml.sax.InputSource;
  */
 public class TemplateExpander {
     
-    static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
+    private static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
+    private static final String IN_AUTHORITY_XPATH = "//inAuthority";
 
     protected static String var(String theVar){
         return "\\$\\{"+theVar+"\\}";
@@ -88,7 +94,7 @@ public class TemplateExpander {
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedDate", nowTime);
         
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"),
-                getDocUri(tenantId, SERVICE_TYPE, docID));
+                getDocUri(tenantId, SERVICE_TYPE, docID, partTmpl));
 
         /*
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
@@ -139,7 +145,8 @@ public class TemplateExpander {
         XmlSaxFragmenter.parse(requestSource, chopPath, callback, false);
     }
 
-    private static String getDocUri(String tenantId, String SERVICE_TYPE, String docID) throws Exception {
+    private static String getDocUri(String tenantId, String SERVICE_TYPE, String docID,
+            String partTmpl) throws Exception {
         
         // FIXME: Use already-defined constants, likely to be found in another package
         final String AUTHORITY_TYPE = "authority";
@@ -158,7 +165,7 @@ public class TemplateExpander {
                 return uri;
             }
             // FIXME: Get the inAuthority value from the payload or from a new param for this method
-            String inAuthorityID = "inAuthorityValueHere"; // stub
+            String inAuthorityID = getInAuthorityValue(partTmpl);
             uri = getAuthorityUri(authoritySvcName, inAuthorityID, docID);
        } else if (serviceType.equalsIgnoreCase(OBJECT_TYPE) ||
                serviceType.equalsIgnoreCase(PROCEDURE_TYPE) ) {
@@ -200,6 +207,23 @@ public class TemplateExpander {
                 + '/' + inAuthorityID
                 + '/' + AuthorityClient.ITEMS
                 + '/' + docID;
+    }
+    
+    private static String getInAuthorityValue(String xmlFragment) {
+        return getXpathValueFromXmlFragment(IN_AUTHORITY_XPATH, xmlFragment);
+    }
+    
+    private static String getXpathValueFromXmlFragment(String xpathExpr, String xmlFragment) {
+        String xpathValue = "";
+        try {
+            XPath xpath = XPathFactory.newInstance().newXPath();
+            InputSource input = new InputSource(new StringReader(xmlFragment));
+            xpathValue = xpath.evaluate(xpathExpr, input);
+        } catch (XPathExpressionException e) {
+            // Do nothing here.
+        }
+        return xpathValue;
+
     }
     
     // FIXME: Create equivalent getUri-type method(s) for sub-resources, such as contacts
