@@ -19,8 +19,8 @@
 	version="0.1">
 	
 	<xs:element name="claimName" type="xs:string"/>
-	<xs:element name="claimType" type="xs:string"/>
-	
+	<xs:element name="clamTypeList" type="claimTypeList">
+
 	<xs:element name="claimNoteList" type="claimNoteList"/>
 	<xs:element name="claimAltNameGroupList" type="claimAltNameGroupList"/>
 	
@@ -74,6 +74,12 @@
 	<xs:complexType name="claimNoteList">
 		<xs:sequence>
 			<xs:element name="claimNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="claimTypeList">
+		<xs:sequence>
+			<xs:element name="claimType" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	
