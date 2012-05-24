@@ -61,7 +61,7 @@ without parts.',
     </org.collectionspace.services.id.StringIDGeneratorPart>
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>9</maxLength>
-      <initialValue>100000</initialValue>
+      <initialValue>1</initialValue>
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
@@ -88,7 +88,58 @@ without parts.',
     </org.collectionspace.services.id.StringIDGeneratorPart>
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>9</maxLength>
-      <initialValue>100000</initialValue>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>');
+
+-- UC_LOANS_OUT_NUMBER
+
+INSERT INTO id_generators
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  VALUES 
+    ('9e1526e8-a0a3-4e1c-9ced-060ddc02450d',
+     'UC Loan Out Number',
+     'Identifies activities in which collection objects are
+loaned out of the institution.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>UC</initialValue>
+      <currentValue>UC</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>9</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>');
+
+
+-- JEPS_LOANS_OUT_NUMBER
+
+INSERT INTO id_generators
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  VALUES 
+    ('84e1bd24-c0cc-4873-9f2a-ef89fc1d4299',
+     'JEPS Loan Out Number',
+     'Identifies activities in which collection objects are
+loaned out of the institution.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>JEPS</initialValue>
+      <currentValue>JEPS</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>9</maxLength>
+      <initialValue>1</initialValue>
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
