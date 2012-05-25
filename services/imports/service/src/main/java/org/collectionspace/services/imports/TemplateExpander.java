@@ -139,7 +139,10 @@ public class TemplateExpander {
         XmlSaxFragmenter.parse(requestSource, chopPath, callback, false);
     }
 
-    private static String getDocUri(String tenantId, String SERVICE_TYPE, String docID,
+    // The docType parameter here is matched to the SERVICE_TYPE argument in
+    // the calling method doOneService(), above; both refer to a per-service
+    // document type name
+    private static String getDocUri(String tenantId, String docType, String docID,
             String partTmpl) throws Exception {
         
         // FIXME: This is a quick hack, which assumes that URI construction
@@ -147,24 +150,24 @@ public class TemplateExpander {
         // should instead be specified on a per-service basis via a registry,
         // the mechanism we are intending to use in v2.5.  (See comments below
         // for more details.) - ADR 2012-05-24
-        final String AUTHORITY_TYPE = "authority";
-        final String OBJECT_TYPE = "object";
-        final String PROCEDURE_TYPE = "procedure";
+        final String AUTHORITY_SERVICE_CATEGORY = "authority";
+        final String OBJECT_SERVICE_CATEGORY = "object";
+        final String PROCEDURE_SERVICE_CATEGORY = "procedure";
 
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        ServiceBindingType sb = tReader.getServiceBindingForDocType(tenantId, SERVICE_TYPE);
+        ServiceBindingType sb = tReader.getServiceBindingForDocType(tenantId, docType);
         
-        String serviceType = sb.getType();
+        String serviceCategory = sb.getType();
         String uri = "";
-        if (serviceType.equalsIgnoreCase(AUTHORITY_TYPE)) {
-            String authoritySvcName = getAuthoritySvcName(SERVICE_TYPE);
+        if (serviceCategory.equalsIgnoreCase(AUTHORITY_SERVICE_CATEGORY)) {
+            String authoritySvcName = getAuthoritySvcName(docType);
             if (authoritySvcName == null) {
                 return uri;
             }
             String inAuthorityID = getInAuthorityValue(partTmpl);
             uri = getAuthorityUri(authoritySvcName, inAuthorityID, docID);
-       } else if (serviceType.equalsIgnoreCase(OBJECT_TYPE) ||
-               serviceType.equalsIgnoreCase(PROCEDURE_TYPE) ) {
+       } else if (serviceCategory.equalsIgnoreCase(OBJECT_SERVICE_CATEGORY) ||
+               serviceCategory.equalsIgnoreCase(PROCEDURE_SERVICE_CATEGORY) ) {
             String serviceName = sb.getName().toLowerCase();
             uri = getUri(serviceName, docID);
        } else {
