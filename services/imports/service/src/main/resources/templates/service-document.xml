@@ -39,6 +39,7 @@
     <collectionspace_core:updatedAt>${updatedDate}</collectionspace_core:updatedAt>
     <collectionspace_core:createdAt>${createdDate}</collectionspace_core:createdAt>
     <collectionspace_core:tenantId>${tenantID}</collectionspace_core:tenantId>
+    <collectionspace_core:uri>${uri}</collectionspace_core:uri>
   </schema>
   ${Schema}
 </document>
