@@ -165,7 +165,7 @@ public class TemplateExpander {
                 return uri;
             }
             String inAuthorityID = getInAuthorityValue(partTmpl);
-            uri = getAuthorityUri(authoritySvcName, inAuthorityID, docID);
+            uri = getAuthorityItemUri(authoritySvcName, inAuthorityID, docID);
        } else if (serviceCategory.equalsIgnoreCase(OBJECT_SERVICE_CATEGORY) ||
                serviceCategory.equalsIgnoreCase(PROCEDURE_SERVICE_CATEGORY) ) {
             String serviceName = sb.getName().toLowerCase();
@@ -219,7 +219,7 @@ public class TemplateExpander {
                 + "/" + docID;
     }
 
-    private static String getAuthorityUri(String authorityServiceName, String inAuthorityID, String docID) {
+    private static String getAuthorityItemUri(String authorityServiceName, String inAuthorityID, String docID) {
         return "/" + authorityServiceName.toLowerCase()
                 + '/' + inAuthorityID
                 + '/' + AuthorityClient.ITEMS
