@@ -155,7 +155,6 @@ public class TemplateExpander {
         ServiceBindingType sb = tReader.getServiceBindingForDocType(tenantId, SERVICE_TYPE);
         
         String serviceType = sb.getType();
-        String serviceName = "";
         String uri = "";
         if (serviceType.equalsIgnoreCase(AUTHORITY_TYPE)) {
             String authoritySvcName = getAuthoritySvcName(SERVICE_TYPE);
@@ -166,7 +165,7 @@ public class TemplateExpander {
             uri = getAuthorityUri(authoritySvcName, inAuthorityID, docID);
        } else if (serviceType.equalsIgnoreCase(OBJECT_TYPE) ||
                serviceType.equalsIgnoreCase(PROCEDURE_TYPE) ) {
-            serviceName = sb.getName().toLowerCase();
+            String serviceName = sb.getName().toLowerCase();
             uri = getUri(serviceName, docID);
        } else {
            // Currently returns a blank URI for any other cases,
@@ -200,8 +199,8 @@ public class TemplateExpander {
         String authoritySvcName = getDocTypeSvcNameRegistry().get(docType);
         // If an authority document type name isn't matched by a name in the
         // registry, we may have been supplied with the tenant-qualified name
-        // of an extension to that document type. In that case, get the base
-        // document type.
+        // of an extension to that document type. In that case, get and use
+        // its base document type name in the registry lookup.
         if (Tools.isBlank(authoritySvcName)) {
             authoritySvcName = getDocTypeSvcNameRegistry().get(
                     ServiceBindingUtils.getUnqualifiedTenantDocType(docType));
