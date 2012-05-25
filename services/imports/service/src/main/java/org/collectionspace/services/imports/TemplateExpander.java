@@ -98,14 +98,6 @@ public class TemplateExpander {
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"),
                 getDocUri(tenantId, SERVICE_TYPE, docID, partTmpl));
 
-        /*
-        TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        ServiceBindingType sb = tReader.getServiceBindingForDocType(tenantId, SERVICE_TYPE);
-	String uri = "/" + sb.getName().toLowerCase() + "/" + docID;
-        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"), uri);
-        * 
-        */
-
         String serviceDir = outDir+'/'+docID;
         FileTools.saveFile(serviceDir, "document.xml", wrapperTmpl, true/*true=create parent dirs*/);
         return docID;
