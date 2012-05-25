@@ -178,7 +178,7 @@ public class TemplateExpander {
     // FIXME: This is a quick hack; a stub / mock of a registry of
     // authority document types and their associated parent authority
     // service names. This MUST be replaced by a more general mechanism
-    // in v2.5. That registry 
+    // in v2.5. 
     // 
     // Per Patrick, this registry needs to be available system-wide, not
     // just here in the Imports service; extend to all relevant record types;
@@ -209,8 +209,8 @@ public class TemplateExpander {
         return authoritySvcName;
     }
     
-    // FIXME: These URI construction methods are also intended to be made
-    // generally available and associated to individual services, via the
+    // FIXME: The following URI construction methods are also intended to be
+    // made generally available and associated to individual services, via the
     // registry mechanism described above. - ADR, 2012-05-24
     private static String getUri(String serviceName, String docID) {
         return "/" + serviceName
