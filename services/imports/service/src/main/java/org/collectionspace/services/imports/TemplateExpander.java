@@ -39,6 +39,7 @@ import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -204,7 +205,16 @@ public class TemplateExpander {
     }
     
     private static String getAuthoritySvcName(String docType) {
-        return getDocTypeSvcNameRegistry().get(docType);
+        String authoritySvcName = getDocTypeSvcNameRegistry().get(docType);
+        // If an authority document type name isn't matched by a name in the
+        // registry, we may have been supplied with the tenant-qualified name
+        // of an extension to that document type. In that case, get the base
+        // document type.
+        if (Tools.isBlank(authoritySvcName)) {
+            authoritySvcName = getDocTypeSvcNameRegistry().get(
+                    ServiceBindingUtils.getUnqualifiedTenantDocType(docType));
+        }
+        return authoritySvcName;
     }
     
     // FIXME: These URI construction methods are also intended to be made
