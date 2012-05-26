@@ -193,7 +193,7 @@ public class TemplateExpander {
             docTypeSvcNameRegistry.put("Person", "Personauthorities");
             docTypeSvcNameRegistry.put("Place", "Placeauthorities");
             docTypeSvcNameRegistry.put("Organization", "Orgauthorities");
-            docTypeSvcNameRegistry.put("Taxon", "Taxonauthority");
+            docTypeSvcNameRegistry.put("Taxon", "Taxonomyauthority");
         }
         return docTypeSvcNameRegistry;
     }
