@@ -183,6 +183,16 @@
 		<tenant:serviceBindings merge:matcher="id" id="Claims">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >		
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="claims_anthropology" updated="" order="3">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>claimSiteInvolvedGroupList/*/claimSiteInvolvedName</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>claimGroupInvolvedGroupList/*/groupInvolvedName</types:value>
+						</types:item>
+					</service:properties>
 					<service:content contentType="application/xml">
 						<service:xmlContent namespaceURI="http://collectionspace.org/services/claim/domain/anthropology" 
 							schemaLocation="http://collectionspace.org/services/claim/domain/anthropology http://collectionspace.org/services/claim/domain/claims_anthropology.xsd" />
