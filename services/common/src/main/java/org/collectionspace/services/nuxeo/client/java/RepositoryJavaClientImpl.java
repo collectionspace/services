@@ -27,6 +27,7 @@ import java.util.UUID;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -692,8 +693,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     @Override
     public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws ClientException {
     	DocumentModel docModel = wrappedDoc.getWrappedObject();
-        String uri = (String)docModel.getProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
-        			DocumentModelHandler.COLLECTIONSPACE_CORE_URI);
+        String uri = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+        		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
         return uri;
     }
 

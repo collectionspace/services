@@ -26,11 +26,7 @@ package org.collectionspace.services.dimension.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.collectionspace.services.dimension.DimensionJAXBSchema;
-import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.dimension.DimensionsCommonList;

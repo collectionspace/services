@@ -26,8 +26,6 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
 import org.jboss.resteasy.client.ClientResponse;
-
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 
 /**

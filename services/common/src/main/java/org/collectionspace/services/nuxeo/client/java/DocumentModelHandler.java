@@ -30,9 +30,9 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
@@ -388,13 +388,13 @@ public abstract class DocumentModelHandler<T, TL>
 	    	String docType = this.getServiceContext().getDocumentType();	    	
 	    	String selectFields = IQueryManager.CMIS_TARGET_CSID + ", "
 	    			+ IQueryManager.CMIS_TARGET_TITLE + ", "
-	    			+ RelationClient.CMIS_CSPACE_RELATIONS_TITLE + ", "
-	    			+ RelationClient.CMIS_CSPACE_RELATIONS_OBJECT_ID + ", "
-	    			+ RelationClient.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
+	    			+ IRelationsManager.CMIS_CSPACE_RELATIONS_TITLE + ", "
+	    			+ IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_ID + ", "
+	    			+ IRelationsManager.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
 	    	String targetTable = docType + " " + IQueryManager.CMIS_TARGET_PREFIX;
-	    	String relTable = RelationClient.SERVICE_DOC_TYPE + " " + IQueryManager.CMIS_RELATIONS_PREFIX;
-	    	String relObjectCsidCol = RelationClient.CMIS_CSPACE_RELATIONS_OBJECT_ID;
-	    	String relSubjectCsidCol = RelationClient.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
+	    	String relTable = IRelationsManager.DOC_TYPE + " " + IQueryManager.CMIS_RELATIONS_PREFIX;
+	    	String relObjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_ID;
+	    	String relSubjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
 	    	String targetCsidCol = IQueryManager.CMIS_TARGET_CSID;
 	    	//
 	    	// Build up the query arguments
