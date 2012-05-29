@@ -158,7 +158,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 			response.releaseConnection();
 		}
 		
-		//Next, create a two Dimension records to relate the collection object to
+		//Next, create two Dimension records to relate the collection object to
 	    multipart = this.createDimensionInstance(createIdentifier());
 	    // Make the call to create and check the response
 	    response = dimensionClient.create(multipart);
@@ -180,7 +180,17 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    } finally {
 	    	response.releaseConnection();
 	    }
-	    
+		//Next, create a the 3rd Dimension record
+	    multipart = this.createDimensionInstance(createIdentifier());
+	    // Make the call to create and check the response
+	    response = dimensionClient.create(multipart);
+	    String dimensionCsid3 = null;
+	    try {
+		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+		    dimensionCsid3 = extractId(response);
+	    } finally {
+	    	response.releaseConnection();
+	    }
 	    
 	    // Relate the entities, by creating a new relation object
 	    RelationsCommon relation = new RelationsCommon();
@@ -214,6 +224,25 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    try {
 		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
 		    relationCsid2 = extractId(response);
+	    } finally {
+	    	response.releaseConnection();
+	    }
+	    // Create the 3rd relationship - but invert it this time
+	    relation = new RelationsCommon();
+	    fillRelation(relation,
+	    		dimensionCsid3, DimensionsCommon.class.getSimpleName(),
+	    		collectionObjectCsid, CollectionobjectsCommon.class.getSimpleName(),
+	    		"collectionobject-dimension");
+	    // Create the part and fill it with the relation object
+	    multipart = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
+	    commonPart = multipart.addPart(relationClient.getCommonPartName(), relation);
+	    // Create the relationship
+	    response = relationClient.create(multipart);
+	    @SuppressWarnings("unused")
+		String relationCsid3 = null;
+	    try {
+		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+		    relationCsid3 = extractId(response);
 	    } finally {
 	    	response.releaseConnection();
 	    }
