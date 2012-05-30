@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -40,8 +41,6 @@ import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.query.QueryContext;
-import org.collectionspace.services.config.service.ListResultField;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
@@ -284,8 +283,8 @@ public class NuxeoUtils {
         //
         // Restrict search to the current tenant ID.  Is the domain path filter (above) still needed?
         //
-        query.append(/*IQueryManager.SEARCH_QUALIFIER_AND +*/ " WHERE " + DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA + ":"
-                + DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID
+        query.append(/*IQueryManager.SEARCH_QUALIFIER_AND +*/ " WHERE " + CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":"
+                + CollectionSpaceClient.COLLECTIONSPACE_CORE_TENANTID
                 + " = " + queryContext.getTenantId());
         //
         // Finally, append the incoming where clause
@@ -381,6 +380,17 @@ public class NuxeoUtils {
         appendNXQLOrderBy(query, queryContext);
         return query.toString();
     }
+    
+    static public final String buildCMISQuery(ServiceContext ctx, QueryContext queryContext) throws Exception {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+
+        /*
+         * This is a place holder for CMIS query creation -see buildNXQLQuery as a reference
+         */
+
+        return query.toString();
+    }
+    
     
     /**
      * Builds an NXQL SELECT query across multiple document types.

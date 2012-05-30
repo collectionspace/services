@@ -24,7 +24,6 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +38,7 @@ import javax.xml.bind.JAXBElement;
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -48,7 +48,6 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -59,7 +58,6 @@ import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
-import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -67,11 +65,8 @@ import org.dom4j.Element;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-
-import org.nuxeo.ecm.core.schema.types.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -210,7 +205,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                 continue; // unknown part, ignore
             }
             Map<String, Object> unQObjectProperties = extractPart(docModel, schema, partMeta);
-            if(COLLECTIONSPACE_CORE_SCHEMA.equals(schema)) {
+            if(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA.equals(schema)) {
             	addExtraCoreValues(docModel, unQObjectProperties);
             }
             addOutputPart(unQObjectProperties, schema, partMeta);
@@ -220,7 +215,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     
     private void addExtraCoreValues(DocumentModel docModel, Map<String, Object> unQObjectProperties)
     		throws Exception {
-        unQObjectProperties.put(COLLECTIONSPACE_CORE_WORKFLOWSTATE, docModel.getCurrentLifeCycleState());
+        unQObjectProperties.put(CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE, docModel.getCurrentLifeCycleState());
     }
     
     private void addAccountPermissionsPart() throws Exception {
@@ -319,11 +314,11 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     public void filterReadOnlyPropertiesForPart(
             Map<String, Object> objectProps, ObjectPartType partMeta) {
     	// Should add in logic to filter most of the core items on update
-    	if(partMeta.getLabel().equalsIgnoreCase(COLLECTIONSPACE_CORE_SCHEMA)) {
-        	objectProps.remove(COLLECTIONSPACE_CORE_CREATED_AT);
-        	objectProps.remove(COLLECTIONSPACE_CORE_CREATED_BY);
-        	objectProps.remove(COLLECTIONSPACE_CORE_URI);
-        	objectProps.remove(COLLECTIONSPACE_CORE_TENANTID);
+    	if(partMeta.getLabel().equalsIgnoreCase(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA)) {
+        	objectProps.remove(CollectionSpaceClient.COLLECTIONSPACE_CORE_CREATED_AT);
+        	objectProps.remove(CollectionSpaceClient.COLLECTIONSPACE_CORE_CREATED_BY);
+        	objectProps.remove(CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
+        	objectProps.remove(CollectionSpaceClient.COLLECTIONSPACE_CORE_TENANTID);
         	// Note that the updatedAt/updatedBy fields are set internally
         	// in DocumentModelHandler.handleCoreValues().
     	}

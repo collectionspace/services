@@ -42,6 +42,35 @@ public interface IQueryManager {
     final static String SEARCH_TYPE_INVOCATION = "inv";
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
+	//
+	// Query params for CMIS queries on the relationship (Relation) table.
+	//
+	final static String SEARCH_RELATED_TO_CSID_AS_SUBJECT = "rtSbj";
+	final static String SEARCH_RELATED_TO_CSID_AS_OBJECT = "rtObj";
+	final static String SEARCH_RELATED_TO_CSID_AS_EITHER = "rtEither";
+	
+	//
+	// Generic CMIS property mapping constants
+	//
+	final static String CMIS_OBJECT_ID = "cmis:objectId";
+	final static String CMIS_NAME = "cmis:name";
+	//
+	// Nuxeo related CMIS property mapping constants
+	final static String CMIS_NUXEO_ID = CMIS_OBJECT_ID;
+	final static String CMIS_NUXEO_NAME = CMIS_NAME;
+	final static String CMIS_NUXEO_TITLE = "dc:title";
+	final static String CMIS_CS_UPDATED_AT = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":" + CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
+	
+	// CollectionSpace CMIS property mapping constants
+	final static String CMIS_TARGET_PREFIX = "DOC";
+	// Relations CMIS property mapping constants
+	final static String CMIS_RELATIONS_PREFIX = "REL";
+	
+	final static String CMIS_TARGET_NUXEO_ID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_ID;
+	final static String CMIS_TARGET_CSID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
+	final static String CMIS_TARGET_TITLE = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_TITLE;
+	final static String CMIS_TARGET_NAME = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
+	final static String CMIS_TARGET_UPDATED_AT = CMIS_TARGET_PREFIX + "." + CMIS_CS_UPDATED_AT;
 
 	public void execQuery(String queryString);
 	

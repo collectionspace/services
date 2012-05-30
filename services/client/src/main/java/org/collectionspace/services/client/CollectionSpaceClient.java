@@ -26,8 +26,6 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
 import org.jboss.resteasy.client.ClientResponse;
-
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 
 /**
@@ -38,6 +36,15 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
  */
 public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P extends CollectionSpaceProxy<CLT>> {
 
+    public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
+    public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
+    public final static String COLLECTIONSPACE_CORE_URI = "uri";
+    public final static String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
+    public final static String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
+    public final static String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
+    public final static String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
+    public final static String COLLECTIONSPACE_CORE_WORKFLOWSTATE = "workflowState";
+    
     public static final String AUTH_PROPERTY = "cspace.auth";
     public static final String PASSWORD_PROPERTY = "cspace.password";
     public static final String SSL_PROPERTY = "cspace.ssl";

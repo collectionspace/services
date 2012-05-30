@@ -17,14 +17,18 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -48,11 +52,20 @@ import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
+//
+// CSPACE-5036 - How to make CMISQL queries from Nuxeo
+//
+import org.apache.chemistry.opencmis.commons.server.CallContext;
+import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
+import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
+import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -680,12 +693,43 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     @Override
     public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws ClientException {
     	DocumentModel docModel = wrappedDoc.getWrappedObject();
-        String uri = (String)docModel.getProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
-        			DocumentModelHandler.COLLECTIONSPACE_CORE_URI);
+        String uri = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+        		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
         return uri;
     }
 
+    /*
+     * See CSPACE-5036 - How to make CMISQL queries from Nuxeo
+     */
+	private IterableQueryResult makeCMISQLQuery(RepositoryInstance repoSession, String query) {
+		IterableQueryResult result = null;
+		
+		// the NuxeoRepository should be constructed only once, then cached
+		// (its construction is expensive)
+		try {
+			NuxeoRepository repo = new NuxeoRepository(
+					repoSession.getRepositoryName(), repoSession
+							.getRootDocument().getId());
+			logger.debug("Repository ID:" + repo.getId() + " Root folder:"
+					+ repo.getRootFolderId());
 
+			CallContextImpl callContext = new CallContextImpl(
+					CallContext.BINDING_LOCAL, repo.getId(), false);
+			callContext.put(CallContext.USERNAME, repoSession.getPrincipal()
+					.getName());
+			NuxeoCmisService cmisService = new NuxeoCmisService(repo,
+					callContext, repoSession);
+
+			result = repoSession.queryAndFetch(query,
+					"CMISQL", cmisService);
+		} catch (ClientException e) {
+			// TODO Auto-generated catch block
+			logger.error("Encounter trouble making the following CMIS query: " + query, e);
+		}
+		
+		return result;
+	}
+     
     /**
      * getFiltered get all documents for an entity service from the Document repository,
      * given filter parameters specified by the handler. 
@@ -709,6 +753,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         try {
             handler.prepare(Action.GET_ALL);
             repoSession = getRepositorySession();
+            
             DocumentModelList docList = null;
             String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
 
@@ -721,7 +766,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         	Profiler profiler = new Profiler(this, 2);
         	profiler.log("Executing NXQL query: " + query.toString());
         	profiler.start();
-            if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
+        	if (handler.isCMISQuery() == true) {
+        		docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); //FIXME: REM - Need to deal with paging info in CMIS query
+        	} else if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
                 docList = repoSession.query(query, null,
                         queryContext.getDocFilter().getPageSize(), queryContext.getDocFilter().getOffset(), true);
             } else {
@@ -748,6 +795,52 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         }
     }
 
+    private DocumentModelList getFilteredCMIS(RepositoryInstance repoSession, ServiceContext ctx, DocumentHandler handler, QueryContext queryContext)
+            throws DocumentNotFoundException, DocumentException {
+
+    	DocumentModelList result = new DocumentModelListImpl();
+        try {
+            String query = handler.getCMISQuery();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing CMIS query: " + query.toString());
+            }
+
+            // If we have limit and/or offset, then pass true to get totalSize
+            // in returned DocumentModelList.
+        	Profiler profiler = new Profiler(this, 2);
+        	profiler.log("Executing CMIS query: " + query.toString());
+        	profiler.start();
+        	//
+        	IterableQueryResult queryResult = makeCMISQLQuery(repoSession, query);
+        	try {
+				for (Map<String, Serializable> row : queryResult) {
+					logger.debug(""
+	//					+ " dc:title is: " + (String)row.get("dc:title")
+						+ " Hierarchy Table ID is:" + row.get(IQueryManager.CMIS_TARGET_NUXEO_ID)
+						+ " cmis:name is: " + row.get(IQueryManager.CMIS_TARGET_NAME)
+	//					+ " nuxeo:lifecycleState is: " + row.get("nuxeo:lifecycleState")
+					);
+					String nuxeoId = (String) row.get(IQueryManager.CMIS_TARGET_NUXEO_ID);
+					DocumentModel docModel = NuxeoUtils.getDocumentModel(repoSession, nuxeoId);
+					result.add(docModel);
+				}
+        	} finally {
+        		queryResult.close();
+        	}
+        	//
+            profiler.stop();
+
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        }
+        
+        return result;
+    }
+    
     private String logException(Exception e, String msg) {
     	String result = null;
     	
