@@ -39,6 +39,7 @@ import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.query.QueryContext;
 
 import org.dom4j.Document;
@@ -309,9 +310,8 @@ public class NuxeoUtils {
      * @throws DocumentException  if the supplied value of the orderBy clause is not valid.
      *
      */
-    static private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext)
+    static private final void appendNXQLOrderBy(StringBuilder query, String orderByClause)
             throws Exception {
-        String orderByClause = queryContext.getOrderByClause();
         if (orderByClause != null && ! orderByClause.trim().isEmpty()) {
             if (isValidOrderByClause(orderByClause)) {
                 query.append(" ORDER BY ");
@@ -321,6 +321,21 @@ public class NuxeoUtils {
                         + "': must be schema_name:fieldName followed by optional sort order (' ASC' or ' DESC').");
             }
         }
+    }
+
+    /**
+     * Append an ORDER BY clause to the NXQL query.
+     *
+     * @param query         the NXQL query to which the ORDER BY clause will be appended.
+     * @param queryContext  the query context, which provides the ORDER BY clause to append.
+     *
+     * @throws DocumentException  if the supplied value of the orderBy clause is not valid.
+     *
+     */
+    static private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext)
+            throws Exception {
+        String orderByClause = queryContext.getOrderByClause();
+        appendNXQLOrderBy(query, orderByClause);
     }
 
     /**
@@ -400,6 +415,8 @@ public class NuxeoUtils {
             query.append(docType);
         }
         appendNXQLWhere(query, queryContext);
+        // For a set of DocTypes, there is no sensible ordering other than by updatedAt
+        appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED);
         // FIXME add 'order by' clause here, if appropriate
         return query.toString();
     }
