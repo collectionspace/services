@@ -158,8 +158,9 @@ public class TemplateExpander {
         // We may have been supplied with the tenant-qualified name
         // of an extension to a document type, and thus need to
         // get the base document type name.
+        docType = ServiceBindingUtils.getUnqualifiedTenantDocType(docType);
         ServiceBindingType sb =
-            tReader.getServiceBindingForDocType(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(docType));
+            tReader.getServiceBindingForDocType(tenantId, docType);        
 
         String serviceCategory = sb.getType();
         String uri = "";
