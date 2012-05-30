@@ -155,7 +155,12 @@ public class TemplateExpander {
         final String PROCEDURE_SERVICE_CATEGORY = "procedure";
 
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        ServiceBindingType sb = tReader.getServiceBindingForDocType(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(docType));
+        // We may have been supplied with the tenant-qualified name
+        // of an extension to a document type, and thus need to
+        // get the base document type name.
+        docType = ServiceBindingUtils.getUnqualifiedTenantDocType(docType);
+        ServiceBindingType sb =
+            tReader.getServiceBindingForDocType(tenantId, docType);        
 
         String serviceCategory = sb.getType();
         String uri = "";
@@ -198,17 +203,11 @@ public class TemplateExpander {
         return docTypeSvcNameRegistry;
     }
     
+    /**
+     * Return the parent authority service name, based on the item document type.
+     */
     private static String getAuthoritySvcName(String docType) {
-        String authoritySvcName = getDocTypeSvcNameRegistry().get(docType);
-        // If an authority document type name isn't matched by a name in the
-        // registry, we may have been supplied with the tenant-qualified name
-        // of an extension to that document type. In that case, get and use
-        // its base document type name in the registry lookup.
-        if (Tools.isBlank(authoritySvcName)) {
-            authoritySvcName = getDocTypeSvcNameRegistry().get(
-                    ServiceBindingUtils.getUnqualifiedTenantDocType(docType));
-        }
-        return authoritySvcName;
+        return getDocTypeSvcNameRegistry().get(docType);
     }
     
     // FIXME: The following URI construction methods are also intended to be
