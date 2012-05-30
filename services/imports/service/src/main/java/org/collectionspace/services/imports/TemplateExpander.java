@@ -155,8 +155,8 @@ public class TemplateExpander {
         final String PROCEDURE_SERVICE_CATEGORY = "procedure";
 
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        ServiceBindingType sb = tReader.getServiceBindingForDocType(tenantId, docType);
-        
+        ServiceBindingType sb = tReader.getServiceBindingForDocType(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(docType));
+
         String serviceCategory = sb.getType();
         String uri = "";
         if (serviceCategory.equalsIgnoreCase(AUTHORITY_SERVICE_CATEGORY)) {
