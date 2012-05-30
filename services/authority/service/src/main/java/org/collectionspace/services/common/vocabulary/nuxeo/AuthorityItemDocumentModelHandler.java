@@ -527,7 +527,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	List<String> result = new ArrayList<String>();
     	
     	for (String termDisplayName : termDisplayNameList) {
-    		if (termDisplayName.contains(partialTerm) == true) {
+    		if (termDisplayName.toLowerCase().contains(partialTerm.toLowerCase()) == true) {
     			result.add(termDisplayName);
     		}
     	}
