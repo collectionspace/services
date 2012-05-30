@@ -50,6 +50,7 @@ import org.collectionspace.services.relation.RelationsCommonList.RelationListIte
 import org.collectionspace.services.relation.RelationsDocListItem;
 
 // HACK HACK HACK
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClient;
@@ -430,8 +431,8 @@ public class RelationDocumentModelHandler
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID),
 	        					csid);
 	
-	        String uri = (String) subjectOrObjectDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,
-	        															COLLECTIONSPACE_CORE_URI);
+	        String uri = (String) subjectOrObjectDocModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+	        		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_URI:RelationJAXBSchema.OBJECT_URI),
 	        					uri);
 	        
