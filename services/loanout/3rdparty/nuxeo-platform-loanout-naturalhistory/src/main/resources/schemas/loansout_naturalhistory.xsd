@@ -19,6 +19,8 @@
 	version="0.1">
 	
 	<xs:element name="collection" type="xs:string"/>
+	<xs:element name="majorGroup" type="xs:string"/>	
+	
 	<xs:element name="geographyList">
 		<xs:complexType>
 			<xs:sequence>
