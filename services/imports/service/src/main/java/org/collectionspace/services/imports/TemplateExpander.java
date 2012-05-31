@@ -239,15 +239,9 @@ public class TemplateExpander {
         // namespace-qualified elements, the second for unqualified elements.
         // (There may be a more elegant way to do this with a single XPath expression,
         // via an OR operator or the like.)
-        System.out.println("before setting inAuthority value");
         inAuthorityValue = extractValueFromXmlFragment(IN_AUTHORITY_NAMESPACE_XPATH, xmlFragment);
-        System.out.println("after setting namespaced inAuthority value: " + inAuthorityValue);
         if (Tools.isBlank(inAuthorityValue)) {
-            System.out.println("in if block ...");
             inAuthorityValue = extractValueFromXmlFragment(IN_AUTHORITY_NO_NAMESPACE_XPATH, xmlFragment);
-            System.out.println("after setting non-namespaced inAuthority value: " + inAuthorityValue);
-        } else {
-          System.out.println("bypassed if block ...");
         }
         return inAuthorityValue;
     }
