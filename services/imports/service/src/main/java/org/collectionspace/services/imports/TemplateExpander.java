@@ -59,7 +59,7 @@ public class TemplateExpander {
     
     private static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
     private static XPath xpath = XPathFactory.newInstance().newXPath();
-    private static final String IN_AUTHORITY_XPATH = "//inAuthority";
+    private static final String IN_AUTHORITY_XPATH = "//*[local-name()='inAuthority']";
 
     protected static String var(String theVar){
         return "\\$\\{"+theVar+"\\}";
@@ -193,10 +193,10 @@ public class TemplateExpander {
     // registration, from configuration, etc. - ADR 2012-05-24
     private static Map<String,String> getDocTypeSvcNameRegistry() {
         if (docTypeSvcNameRegistry.isEmpty()) {
-            docTypeSvcNameRegistry.put("Concept", "Conceptauthorities");
-            docTypeSvcNameRegistry.put("Location", "Locationauthorities");
+            docTypeSvcNameRegistry.put("Conceptitem", "Conceptauthorities");
+            docTypeSvcNameRegistry.put("Locationitem", "Locationauthorities");
             docTypeSvcNameRegistry.put("Person", "Personauthorities");
-            docTypeSvcNameRegistry.put("Place", "Placeauthorities");
+            docTypeSvcNameRegistry.put("Placeitem", "Placeauthorities");
             docTypeSvcNameRegistry.put("Organization", "Orgauthorities");
             docTypeSvcNameRegistry.put("Taxon", "Taxonomyauthority");
         }
