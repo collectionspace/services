@@ -59,7 +59,8 @@ public class TemplateExpander {
     
     private static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
     private static XPath xpath = XPathFactory.newInstance().newXPath();
-    private static final String IN_AUTHORITY_XPATH = "//*[local-name()='inAuthority']";
+    private static final String IN_AUTHORITY_NAMESPACE_XPATH = "//*[local-name()='inAuthority']";
+    private static final String IN_AUTHORITY_NO_NAMESPACE_XPATH = "//inAuthority";
 
     protected static String var(String theVar){
         return "\\$\\{"+theVar+"\\}";
@@ -233,7 +234,22 @@ public class TemplateExpander {
     // their uniqueness against those already present in a running system.
     // - ADR 2012-05-24
     private static String getInAuthorityValue(String xmlFragment) {
-        return extractValueFromXmlFragment(IN_AUTHORITY_XPATH, xmlFragment);
+        String inAuthorityValue = "";
+        // Check in two ways for the inAuthority value: one intended for records with
+        // namespace-qualified elements, the second for unqualified elements.
+        // (There may be a more elegant way to do this with a single XPath expression,
+        // via an OR operator or the like.)
+        System.out.println("before setting inAuthority value");
+        inAuthorityValue = extractValueFromXmlFragment(IN_AUTHORITY_NAMESPACE_XPATH, xmlFragment);
+        System.out.println("after setting namespaced inAuthority value: " + inAuthorityValue);
+        if (Tools.isBlank(inAuthorityValue)) {
+            System.out.println("in if block ...");
+            inAuthorityValue = extractValueFromXmlFragment(IN_AUTHORITY_NO_NAMESPACE_XPATH, xmlFragment);
+            System.out.println("after setting non-namespaced inAuthority value: " + inAuthorityValue);
+        } else {
+          System.out.println("bypassed if block ...");
+        }
+        return inAuthorityValue;
     }
     
     // FIXME: Need to handle cases here where the xmlFragment may contain more
@@ -243,10 +259,13 @@ public class TemplateExpander {
     private static String extractValueFromXmlFragment(String xpathExpr, String xmlFragment) {
         String value = "";
         try {
-            InputSource input = new InputSource(new StringReader(xmlFragment));
+            // FIXME: Cruelly ugly hack; at this point for imported records
+            // with more than one <schema> child, we have a non-well-formed fragment.
+            String xmlFragmentWrapped = "<root>" + xmlFragment + "</root>";
+            InputSource input = new InputSource(new StringReader(xmlFragmentWrapped));
             value = xpath.evaluate(xpathExpr, input);
         } catch (XPathExpressionException e) {
-            // Do nothing here.
+            System.out.println(e.getMessage());
         }
         return value;
 
