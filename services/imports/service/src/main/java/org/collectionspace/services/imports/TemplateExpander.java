@@ -26,6 +26,7 @@ package org.collectionspace.services.imports;
 
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import javax.xml.xpath.XPath;
@@ -43,6 +44,7 @@ import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.xml.sax.InputSource;
@@ -65,6 +67,14 @@ public class TemplateExpander {
     // non-namespace-qualified elements.
     private static final String IN_AUTHORITY_NAMESPACE_XPATH = "//*[local-name()='inAuthority']";
     private static final String IN_AUTHORITY_NO_NAMESPACE_XPATH = "//inAuthority";
+    
+    private static final String SERVICE_ATTRIBUTE = "service";
+    private static final String TYPE_ATTRIBUTE = "type";
+    private static final String CREATED_AT_ATTRIBUTE = "createdAt";
+    private static final String CREATED_BY_ATTRIBUTE = "createdBy";
+    private static final String UPDATED_AT_ATTRIBUTE = "updatedAt";
+    private static final String UPDATED_BY_ATTRIBUTE = "updatedBy";
+    
 
     protected static String var(String theVar){
         return "\\$\\{"+theVar+"\\}";
@@ -105,27 +115,44 @@ public class TemplateExpander {
      * @throws Exception  
      */
     public static String doOneService(String tenantId, String outDir, String partTmpl, String wrapperTmpl,
-                                      String SERVICE_TYPE, String SERVICE_NAME, String CSID) throws Exception {
+                                      String SERVICE_TYPE, String SERVICE_NAME, Map<String,String> perRecordAttributes,
+                                      String CSID) throws Exception {
         String docID;
+        // Generate a CSID if one was not provided with the import record.
         if (Tools.notBlank(CSID)){
             docID = CSID;
         } else {
             docID = UUID.randomUUID().toString();
         }
+        
         // Expand macro variables within the content to be imported.
         String part = searchAndReplaceVar(partTmpl, "docID", docID);
+        
         // Insert the content to be imported into the wrapper template.
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "Schema", part);
+        
         // Expand macro variables within the wrapper template.
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "docID", docID);
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "tenantID", tenantId);
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "ServiceType", SERVICE_TYPE);
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "ServiceName", SERVICE_NAME);
-        // TODO: Allow the user to provide created and updated timestamps,
-        // overriding the default values set below, per CSPACE-5241
         String nowTime = GregorianCalendarDateTimeUtils.timestampUTC();
-        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "createdDate", nowTime);
-        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedDate", nowTime);
+        String createdAtTime = getAttributeValue(perRecordAttributes, CREATED_AT_ATTRIBUTE);
+        if (Tools.notBlank(createdAtTime)) {
+            wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "createdAt", createdAtTime);
+        } else {
+            wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "createdAt", nowTime);
+        }
+        String updatedAtTime = getAttributeValue(perRecordAttributes, UPDATED_AT_ATTRIBUTE);
+        if (Tools.notBlank(updatedAtTime)) {
+            wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedAt", updatedAtTime);
+        } else {
+            wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedAt", nowTime);
+        }
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "createdBy",
+                getAttributeValue(perRecordAttributes, CREATED_BY_ATTRIBUTE));
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedBy", 
+                getAttributeValue(perRecordAttributes, UPDATED_BY_ATTRIBUTE));
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"),
                 getDocUri(tenantId, SERVICE_TYPE, docID, partTmpl));
 
@@ -142,6 +169,7 @@ public class TemplateExpander {
      * @param partTmpl  A template file that contains the schema part for the service, and which has macros such as ${docID} to be expanded.
      * @param SERVICE_NAME The name of the service, such as "CollectionObjects" or "Personauthorities".
      * @param SERVICE_TYPE The Nuxeo document type, such as "CollectionObject" or "Personauthority".
+     * @param perRecordAttributes a property bag of additional per-record attributes.
      * @param TEMPLATE_DIR The local filesystem location of all the standard templates that wrap up workspace documents;
      *                     once expanded, these spit out Nuxeo import format.
      * @param CSID an optional CollectionSpace ID (CSID) for the document. If no CSID was provided, it will be generated.
@@ -152,12 +180,13 @@ public class TemplateExpander {
             String partTmpl,
             String SERVICE_NAME,
             String SERVICE_TYPE,
+            Map<String,String> perRecordAttributes,
             String TEMPLATE_DIR,
             String OUTPUT_DIR,
             String CSID) throws Exception {
         String wrapperTmpl = FileTools.readFile(TEMPLATE_DIR, DEFAULT_WRAPPER_TEMPLATE_FILENAME);
         String outputDir = OUTPUT_DIR+'/'+SERVICE_NAME;
-        doOneService(tenantId, outputDir, partTmpl, wrapperTmpl, SERVICE_TYPE, SERVICE_NAME, CSID);
+        doOneService(tenantId, outputDir, partTmpl, wrapperTmpl, SERVICE_TYPE, SERVICE_NAME, perRecordAttributes, CSID);
     }
 
     public static void expand(String tenantId, String TEMPLATE_DIR, String outputDir, String requestFilename, String chopPath){
@@ -295,6 +324,14 @@ public class TemplateExpander {
 
     }
     
+    private static String getAttributeValue(Map<String,String> attributes, String attributeName){
+        String attributeVal = "";
+        if (attributes.containsKey(attributeName.toLowerCase())) {
+            attributeVal = (String) attributes.get(attributeName.toLowerCase());
+        }
+        return attributeVal;
+    }
+    
     /** This inner class is the callback target for calls to XmlSaxFragmenter, for example:
      *     FragmentHandlerImpl callback = new FragmentHandlerImpl();
      *     XmlSaxFragmenter.parse(filename, "/imports/import", callback, false);
@@ -302,8 +339,8 @@ public class TemplateExpander {
      *      &lt;import ID="1" service="Personauthorities" type="Personauthority">
      */
     public static class FragmentHandlerImpl implements IFragmentHandler {
-        public String SERVICE_NAME = "";   //You can provide a default.
-        public String SERVICE_TYPE = "";   //You can provide a default.
+        public String DEFAULT_SERVICE_NAME = "";   //You can provide a default.
+        public String DEFAULT_SERVICE_TYPE = "";   //You can provide a default.
         public String TEMPLATE_DIR = "";   //You MUST provide a default via constructor.
         public String OUPUT_DIR = "";      //You MUST provide a default via constructor.
         public String TENANT_ID = "";
@@ -312,11 +349,13 @@ public class TemplateExpander {
         public void onFragmentReady(Document context, Element fragmentParent, String currentPath, int fragmentIndex, String fragment){
             try {
                 dump(context, currentPath, fragmentIndex, fragment);
-                String serviceName = checkAttribute(fragmentParent, "service", SERVICE_NAME);
-                String serviceType = checkAttribute(fragmentParent, "type", SERVICE_TYPE);
+                String serviceName = checkAttribute(fragmentParent, SERVICE_ATTRIBUTE, DEFAULT_SERVICE_NAME);
+                String serviceType = checkAttribute(fragmentParent, TYPE_ATTRIBUTE, DEFAULT_SERVICE_TYPE);
+                Map<String,String> perRecordAttributes = getPerRecordAttributes(fragmentParent);
                 serviceType = NuxeoUtils.getTenantQualifiedDocType(TENANT_ID, serviceType); //REM - Ensure a tenant qualified Nuxeo doctype
                 String CSID  = fragmentParent.attributeValue("CSID");
-                TemplateExpander.createDocInWorkspace(TENANT_ID, fragment, serviceName, serviceType, TEMPLATE_DIR, OUPUT_DIR, CSID);
+                TemplateExpander.createDocInWorkspace(TENANT_ID, fragment, serviceName, serviceType,
+                        perRecordAttributes, TEMPLATE_DIR, OUPUT_DIR, CSID);
             } catch (Exception e){
                 System.err.println("ERROR calling expandXmlPayloadToDir"+e);
                 e.printStackTrace();
@@ -325,12 +364,23 @@ public class TemplateExpander {
         public void onEndDocument(Document document, int fragmentCount){
             System.out.println("====TemplateExpander DONE============\r\n"+ XmlTools.prettyPrint(document)+"================");
         }
+        
         //============helper methods==============================================================
         public FragmentHandlerImpl(String tenantId, String templateDir, String outputDir){
             TEMPLATE_DIR = templateDir;
             OUPUT_DIR = outputDir;
             TENANT_ID = tenantId;
         }
+        
+        private Map<String,String> getPerRecordAttributes(Element fragmentParent){
+            Map<String,String> perRecordAttributes = new HashMap<String,String>();
+            for ( Iterator<Attribute> attributesIterator = fragmentParent.attributeIterator(); attributesIterator.hasNext(); ) {
+                Attribute attr = attributesIterator.next();
+                perRecordAttributes.put(attr.getName().toLowerCase(), attr.getValue());
+            }
+            return perRecordAttributes;
+        }
+        
         private String checkAttribute(Element fragmentParent, String attName, String defaultVal){
             String val = fragmentParent.attributeValue(attName);
             if (Tools.notEmpty(val)){
@@ -338,6 +388,7 @@ public class TemplateExpander {
             }
             return defaultVal;
         }
+        
         private void dump(Document context, String currentPath, int fragmentIndex, String fragment){
             System.out.println("====Path============\r\n"+currentPath+'['+fragmentIndex+']');
             System.out.println("====Context=========\r\n"+ XmlTools.prettyPrint(context));
