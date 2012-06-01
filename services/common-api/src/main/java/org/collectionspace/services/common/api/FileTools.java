@@ -40,8 +40,11 @@ import javax.xml.bind.Unmarshaller;
  * $LastChangedDate:  $
  */
 public class FileTools {
+    
+    public static String DEFAULT_ENCODING = "";
+    public static String UTF8_ENCODING = "UTF-8";
+    public static boolean FORCE_CREATE_PARENT_DIRS = true;
 
-	
     /**
      * getObjectFromStream get object of given class from given inputstream
      * @param jaxbClass
@@ -160,14 +163,21 @@ public class FileTools {
         }
     }
 
-    public static File saveFile(String dir, String relativeName, String content, boolean forceParentDirs)
-    throws IOException {
+    public static File saveFile(String dir, String relativeName, String content, boolean forceParentDirs) {
+        return saveFile(dir, relativeName, content, forceParentDirs, DEFAULT_ENCODING);
+    }
+    
+    public static File saveFile(String dir, String relativeName, String content, boolean forceParentDirs, String encoding) {
         File result = null;
         PrintWriter writer;
         try{
             if (forceParentDirs) forceParentDirectories(dir+'/'+relativeName);
             result = new File(dir,relativeName);
-            writer = new PrintWriter(result, "UTF-8");
+            if (Tools.notBlank(encoding)) {
+                writer = new PrintWriter(result, encoding);
+            } else {
+                writer = new PrintWriter(result);
+            }
         }catch (Exception e){
             System.out.println("Can't write to file in FileTools.saveFile: " + relativeName + " :: " + e);
             return null;

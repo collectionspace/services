@@ -218,7 +218,8 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl {
     public static InputSource payloadToInputSource(String xmlPayload) throws Exception {
         xmlPayload = encodeAmpersands(xmlPayload);
         String requestDir = FileTools.createTmpDir("imports-request-").getCanonicalPath();
-        File requestFile = FileTools.saveFile(requestDir, "request.xml", xmlPayload, true);
+        File requestFile =
+                FileTools.saveFile(requestDir, "request.xml", xmlPayload, FileTools.FORCE_CREATE_PARENT_DIRS, FileTools.UTF8_ENCODING);
         if (requestFile == null){
             throw new FileNotFoundException("Could not create file in requestDir: "+requestDir);
         }
@@ -231,7 +232,8 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl {
     public static String payloadToFilename(String xmlPayload) throws Exception {
         xmlPayload = encodeAmpersands(xmlPayload);
         String requestDir = FileTools.createTmpDir("imports-request-").getCanonicalPath();
-        File requestFile = FileTools.saveFile(requestDir, "request.xml", xmlPayload, true);
+        File requestFile =
+                FileTools.saveFile(requestDir, "request.xml", xmlPayload, FileTools.FORCE_CREATE_PARENT_DIRS, FileTools.UTF8_ENCODING);
         if (requestFile == null){
             throw new FileNotFoundException("Could not create file in requestDir: "+requestDir);
         }

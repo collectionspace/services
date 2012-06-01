@@ -47,7 +47,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.xml.sax.InputSource;
 
-/** This class expands templates specifically for the imports service.
+/** This class expands variables in templates specifically for the imports service.
  *
  *  To see capability to create workspaces, see svn revision 4346 on branch
  *  https://source.collectionspace.org/collection-space/src/services/branches/CSPACE-3178/services
@@ -57,8 +57,12 @@ import org.xml.sax.InputSource;
  */
 public class TemplateExpander {
     
+    private static final String DEFAULT_WRAPPER_TEMPLATE_FILENAME = "service-document.xml";
     private static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
     private static XPath xpath = XPathFactory.newInstance().newXPath();
+    // XPath expressions to match the value of the inAuthority field in authority item records.
+    // The first expression matches namespace-qualified elements, while the second matches
+    // non-namespace-qualified elements.
     private static final String IN_AUTHORITY_NAMESPACE_XPATH = "//*[local-name()='inAuthority']";
     private static final String IN_AUTHORITY_NO_NAMESPACE_XPATH = "//inAuthority";
 
@@ -76,6 +80,30 @@ public class TemplateExpander {
         return Tools.searchAndReplaceWithQuoteReplacement(source, var(theVar), replace);
     }
 
+    /**
+     * <p>Creates a single document, representing a single record or resource, ready
+     * for import into a Nuxeo workspace.</p>
+     * 
+     * <p>Expands macro variables within this document, with values supplied during
+     * import, or obtained from the CollectionSpace system or its environment.</p>
+     * 
+     * @param tenantId a tenant ID.
+     * @param outDir an output directory name.
+     * @param partTmpl a template file containing the content to be imported.
+     *   This consists of content within one or more <schema> tags - one such tag
+     *   for each part of the record being imported - and may contain macro variables
+     *   such as ${docID} to be expanded.
+     * @param wrapperTmpl a wrapper template into which the content to be imported 
+     *   (in the partTmpl) will be inserted.  This template contains additional
+     *   metadata fields required by CollectionSpace and Nuxeo, some of whose values
+     *   are set in this method, via expansion of additional macro variables.
+     * @param SERVICE_TYPE the service document type.
+     * @param SERVICE_NAME the service name.
+     * @param CSID an optional CollectionSpace ID (CSID) for the document. If no
+     *   CSID was provided, it will be generated.
+     * @return the ID of the just-created document.
+     * @throws Exception  
+     */
     public static String doOneService(String tenantId, String outDir, String partTmpl, String wrapperTmpl,
                                       String SERVICE_TYPE, String SERVICE_NAME, String CSID) throws Exception {
         String docID;
@@ -84,23 +112,25 @@ public class TemplateExpander {
         } else {
             docID = UUID.randomUUID().toString();
         }
+        // Expand macro variables within the content to be imported.
         String part = searchAndReplaceVar(partTmpl, "docID", docID);
-
+        // Insert the content to be imported into the wrapper template.
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "Schema", part);
+        // Expand macro variables within the wrapper template.
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "docID", docID);
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "tenantID", tenantId);
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "ServiceType", SERVICE_TYPE);
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "ServiceName", SERVICE_NAME);
-        //TODO: set timestamp via creating a ${created} variable.
+        // TODO: Allow the user to provide created and updated timestamps,
+        // overriding the default values set below, per CSPACE-5241
         String nowTime = GregorianCalendarDateTimeUtils.timestampUTC();
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "createdDate", nowTime);
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedDate", nowTime);
-        
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"),
                 getDocUri(tenantId, SERVICE_TYPE, docID, partTmpl));
 
         String serviceDir = outDir+'/'+docID;
-        FileTools.saveFile(serviceDir, "document.xml", wrapperTmpl, true/*true=create parent dirs*/);
+        FileTools.saveFile(serviceDir, "document.xml", wrapperTmpl, FileTools.FORCE_CREATE_PARENT_DIRS);
         return docID;
     }
 
@@ -110,11 +140,11 @@ public class TemplateExpander {
      *  Internally, this method also gets called by the XmlSaxFragmenter callback via the public inner class FragmentHandlerImpl.
      *
      * @param partTmpl  A template file that contains the schema part for the service, and which has macros such as ${docID} to be expanded.
-     * @param SERVICE_NAME The name of the service, such as "Personauthorities"
-     * @param SERVICE_TYPE The Nuxeo document type, such as "Personauthority"
+     * @param SERVICE_NAME The name of the service, such as "CollectionObjects" or "Personauthorities".
+     * @param SERVICE_TYPE The Nuxeo document type, such as "CollectionObject" or "Personauthority".
      * @param TEMPLATE_DIR The local filesystem location of all the standard templates that wrap up workspace documents;
      *                     once expanded, these spit out Nuxeo import format.
-     * @param CSID An optional parameter which forces the document CSID, otherwise the CSID is set to a random UUID.
+     * @param CSID an optional CollectionSpace ID (CSID) for the document. If no CSID was provided, it will be generated.
      * @throws Exception
      */
     public static void createDocInWorkspace(
@@ -125,7 +155,7 @@ public class TemplateExpander {
             String TEMPLATE_DIR,
             String OUTPUT_DIR,
             String CSID) throws Exception {
-        String wrapperTmpl = FileTools.readFile(TEMPLATE_DIR,"service-document.xml");
+        String wrapperTmpl = FileTools.readFile(TEMPLATE_DIR, DEFAULT_WRAPPER_TEMPLATE_FILENAME);
         String outputDir = OUTPUT_DIR+'/'+SERVICE_NAME;
         doOneService(tenantId, outputDir, partTmpl, wrapperTmpl, SERVICE_TYPE, SERVICE_NAME, CSID);
     }
