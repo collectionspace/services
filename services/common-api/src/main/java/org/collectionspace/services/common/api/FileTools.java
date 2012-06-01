@@ -167,7 +167,7 @@ public class FileTools {
         try{
             if (forceParentDirs) forceParentDirectories(dir+'/'+relativeName);
             result = new File(dir,relativeName);
-            writer = new PrintWriter(new FileOutputStream(result));
+            writer = new PrintWriter(result, "UTF-8");
         }catch (Exception e){
             System.out.println("Can't write to file in FileTools.saveFile: " + relativeName + " :: " + e);
             return null;
