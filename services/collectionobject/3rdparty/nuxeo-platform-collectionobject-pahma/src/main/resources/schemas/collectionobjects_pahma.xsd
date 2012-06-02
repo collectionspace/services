@@ -21,7 +21,13 @@
 	<xs:element name="sortableObjectNumber" type="xs:string"/>
 	<xs:element name="pahmaTms2003DataSource" type="xs:string"/>
 	<xs:element name="pahmaTmsLegacyDepartment" type="xs:string"/>
-	<xs:element name="pahmaCollection" type="xs:string"/>
+	<xs:element name="pahmaCollectionList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pahmaCollection" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	<xs:element name="pahmaObjectStatus" type="xs:string"/>
 	<xs:element name="inventoryCount" type="xs:integer"/>
 	<xs:element name="portfolioSeries" type="xs:string"/>
