@@ -53,6 +53,8 @@ public class RefNameUtils {
     private static final int AUTH_INSTANCE_TOKEN = 2;	// name(Entry Methods)'Entry Methods'
     private static final int ITEMS_TOKEN = 3;			// 'item', 'person', etc.
     private static final int ITEM_INSTANCE_TOKEN = 4;	// name(Entry Methods)'Entry Methods'
+    private static final int AUTH_REFNAME_TOKENS = 3;	// domain, resource, auth
+    private static final int AUTH_ITEM_REFNAME_TOKENS = 5;	// domain, resource, auth, "items", item
     // Tokenizing the INSTANCE, these are indices for each item-part
     private static final int INSTANCE_SPEC_TYPE_TOKEN = 0;	// 'name' or 'id' 
     private static final int INSTANCE_SPEC_TOKEN = 1; 		// name or id value
@@ -193,14 +195,16 @@ public class RefNameUtils {
             throws IllegalArgumentException {
     	if(refName==null || !refName.startsWith(URN_PREFIX))
     		throw new IllegalArgumentException( "Null or invalid refName syntax");
-    	return new AuthorityInfo(refName.substring(URN_PREFIX_LEN).split(SEPARATOR));
+    	String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_REFNAME_TOKENS);
+    	return new AuthorityInfo(refNameTokens);
     }
 
     public static AuthorityTermInfo parseAuthorityTermInfo(String refName)
             throws IllegalArgumentException {
     	if(refName==null || !refName.startsWith(URN_PREFIX))
     		throw new IllegalArgumentException( "Null or invalid refName syntax");
-    	return new AuthorityTermInfo(refName.substring(URN_PREFIX_LEN).split(SEPARATOR));
+    	String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
+    	return new AuthorityTermInfo(refNameTokens);
     }
 
     public static String implodeStringArray(String tokens[], String separator) {
@@ -223,7 +227,7 @@ public class RefNameUtils {
     public static String getItemShortId(String refName) {
         String name = "";
         try {
-            String [] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR);
+        	String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
             AuthorityTermInfo authTermInfo = new AuthorityTermInfo(refNameTokens);
             name = authTermInfo.name;
         } catch(Exception e) {
