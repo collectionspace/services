@@ -30,7 +30,6 @@
      acquisitions_common."acquisitionmethod" AS acquisitions_common_acquisitionmethod,
      acquisitions_common."acquisitionauthorizerdate" AS acquisitions_common_acquisitionauthorizerdate,
      acquisitions_common."acquisitionauthorizer" AS acquisitions_common_acquisitionauthorizer,
-     acquisitions_common."accessiondate" AS acquisitions_common_accessiondate,
      acquisitions_common."acquisitionreason" AS acquisitions_common_acquisitionreason
 FROM
      "public"."acquisitions_common" acquisitions_common INNER JOIN "public"."hierarchy" hierarchy ON acquisitions_common."id" = hierarchy."id"
@@ -45,7 +44,6 @@ $P!{where_clause}]]>
 	<field name="acquisitions_common_acquisitionmethod" class="java.lang.String"/>
 	<field name="acquisitions_common_acquisitionauthorizerdate" class="java.lang.String"/>
 	<field name="acquisitions_common_acquisitionauthorizer" class="java.lang.String"/>
-	<field name="acquisitions_common_accessiondate" class="java.lang.String"/>
 	<field name="acquisitions_common_acquisitionreason" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
@@ -53,28 +51,21 @@ $P!{where_clause}]]>
 	<title>
 		<band height="102" splitType="Stretch">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="0" width="721" height="66" backcolor="#FFFFFF"/>
+				<reportElement mode="Opaque" x="0" y="0" width="797" height="76" backcolor="#FFFFFF"/>
 				<staticText>
-					<reportElement style="SubTitle" x="370" y="37" width="316" height="29"/>
+					<reportElement style="SubTitle" x="458" y="0" width="339" height="29"/>
 					<textElement textAlignment="Right">
 						<font fontName="DejaVu Sans" size="22" isBold="false"/>
 					</textElement>
 					<text><![CDATA[Acquisitions]]></text>
 				</staticText>
 				<image>
-					<reportElement x="11" y="2" width="366" height="61"/>
+					<reportElement x="0" y="0" width="349" height="67"/>
 					<imageExpression class="java.lang.String"><![CDATA["http://www.collectionspace.org/sites/all/themes/CStheme/images/CSpaceLogo.png"]]></imageExpression>
 				</image>
 			</frame>
 			<frame>
-				<reportElement mode="Opaque" x="0" y="70" width="721" height="32" forecolor="#000000" backcolor="#66FFFF"/>
-				<textField pattern="EEEEE dd MMMMM yyyy">
-					<reportElement x="553" y="12" width="144" height="20" forecolor="#FFFFFF"/>
-					<textElement textAlignment="Right">
-						<font fontName="DejaVu Sans" size="12"/>
-					</textElement>
-					<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
-				</textField>
+				<reportElement mode="Opaque" x="0" y="76" width="802" height="14" forecolor="#000000" backcolor="#66FFFF"/>
 			</frame>
 		</band>
 	</title>
@@ -82,44 +73,44 @@ $P!{where_clause}]]>
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="18" splitType="Stretch">
+		<band height="35" splitType="Stretch">
 			<staticText>
-				<reportElement style="Column header" x="141" y="0" width="87" height="18" forecolor="#000000"/>
+				<reportElement style="Column header" x="141" y="0" width="87" height="35" forecolor="#000000"/>
 				<textElement>
 					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Orig. Price]]></text>
+				<text><![CDATA[Original Price]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2" y="0" width="139" height="18" forecolor="#000000"/>
+				<reportElement style="Column header" x="2" y="0" width="139" height="35" forecolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Ref #]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="228" y="0" width="75" height="18" forecolor="#000000"/>
+				<reportElement style="Column header" x="228" y="0" width="144" height="35" forecolor="#000000"/>
 				<textElement>
 					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Auth. Date]]></text>
+				<text><![CDATA[Authorization Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="303" y="0" width="192" height="18" forecolor="#000000"/>
+				<reportElement style="Column header" x="372" y="0" width="155" height="35" forecolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Authorizer]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="495" y="0" width="169" height="18" forecolor="#000000"/>
+				<reportElement style="Column header" x="527" y="0" width="150" height="35" forecolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Reason]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="664" y="0" width="72" height="18" forecolor="#000000"/>
+				<reportElement style="Column header" x="677" y="0" width="125" height="35" forecolor="#000000"/>
 				<textElement textAlignment="Center">
 					<font fontName="DejaVu Sans" size="13" isBold="true"/>
 				</textElement>
@@ -133,7 +124,7 @@ $P!{where_clause}]]>
 				<reportElement style="Row" mode="Opaque" x="0" y="0" width="797" height="18"/>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="141" y="0" width="87" height="18"/>
-					<textElement>
+					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_originalobjectpurchasepricevalue}]]></textFieldExpression>
@@ -146,14 +137,14 @@ $P!{where_clause}]]>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionreferencenumber}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="Float" x="228" y="0" width="75" height="18"/>
-					<textElement>
+					<reportElement style="Detail" positionType="Float" x="228" y="0" width="144" height="18"/>
+					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionauthorizerdate}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="Float" x="303" y="0" width="192" height="18"/>
+					<reportElement style="Detail" positionType="Float" x="372" y="0" width="155" height="18"/>
 					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
@@ -164,14 +155,14 @@ $P!{where_clause}]]>
        $F{acquisitions_common_acquisitionauthorizer}.length()-1).replaceAll("[+]"," ")]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="Float" x="495" y="0" width="169" height="18"/>
+					<reportElement style="Detail" positionType="Float" x="527" y="0" width="150" height="18"/>
 					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionreason}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="Float" x="664" y="0" width="72" height="18"/>
+					<reportElement style="Detail" positionType="Float" x="677" y="0" width="120" height="18"/>
 					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
@@ -213,7 +204,7 @@ $P!{where_clause}]]>
 					<textElement verticalAlignment="Middle">
 						<font fontName="DejaVu Serif" size="10" isBold="false"/>
 					</textElement>
-					<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+					<textFieldExpression class="java.lang.String"><![CDATA[new java.util.Date()]]></textFieldExpression>
 				</textField>
 			</frame>
 		</band>
