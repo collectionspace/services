@@ -38,7 +38,7 @@ public interface IQueryManager {
     final static String SEARCH_TYPE_KEYWORDS_AS = "as";
     final static String SEARCH_TYPE_PARTIALTERM = "pt";
     final static String SEARCH_TYPE_DOCTYPE = "doctype";
-    final static String SEARCH_TYPE_INVCOATION_MODE = "mode";
+    final static String SEARCH_TYPE_INVOCATION_MODE = "mode";
     final static String SEARCH_TYPE_INVOCATION = "inv";
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
