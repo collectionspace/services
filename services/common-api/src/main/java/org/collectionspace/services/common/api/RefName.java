@@ -51,17 +51,6 @@ public class RefName {
     public static final String URN_PREFIX = "urn:cspace:";
     public static final String URN_NAME_PREFIX = "urn:cspace:name";
     public static final String REFNAME = "refName";
-    // public static final String AUTHORITY_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\)\\'?([^\\']*)\\'?";
-    // public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\):item:name\\((.*)\\)\\'?([^\\']*)\\'";
-    public static final String AUTHORITY_EXAMPLE = "urn:cspace:collectionspace.org:Loansin:name(shortID)'displayName'";
-    public static final String AUTHORITY_EXAMPLE2 = "urn:cspace:collectionspace.org:Loansin:name(shortID)";
-    public static final String AUTHORITY_ITEM_EXAMPLE = "urn:cspace:collectionspace.org:Loansin:name(shortID):item:name(itemShortID)'itemDisplayName'";
-    public static final String EX_tenantName = "collectionspace.org";
-    public static final String EX_resource = "Loansin";
-    public static final String EX_shortIdentifier = "shortID";
-    public static final String EX_displayName = "displayName";
-    public static final String EX_itemShortIdentifier = "itemShortID";
-    public static final String EX_itemDisplayName = "itemDisplayName";
 
     public static class Authority {
 
