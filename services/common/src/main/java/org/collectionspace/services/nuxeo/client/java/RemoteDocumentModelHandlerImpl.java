@@ -56,7 +56,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
-import org.collectionspace.services.common.vocabulary.RefNameUtils;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.config.service.InitHandler.Params.Field;
