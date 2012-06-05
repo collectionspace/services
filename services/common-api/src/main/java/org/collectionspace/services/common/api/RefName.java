@@ -2,7 +2,7 @@ package org.collectionspace.services.common.api;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class RefName {
     public static final String URN_NAME_PREFIX = "urn:cspace:name";
     public static final String REFNAME = "refName";
     public static final String AUTHORITY_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\)\\'?([^\\']*)\\'?";
-    public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\):item:name\\((.*)\\)\\'?([^\\']*)\\'?";
+    public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\):item:name\\((.*)\\)\\'?([^\\']*)\\'";
     public static final String AUTHORITY_EXAMPLE = "urn:cspace:collectionspace.org:Loansin:name(shortID)'displayName'";
     public static final String AUTHORITY_EXAMPLE2 = "urn:cspace:collectionspace.org:Loansin:name(shortID)";
     public static final String AUTHORITY_ITEM_EXAMPLE = "urn:cspace:collectionspace.org:Loansin:name(shortID):item:name(itemShortID)'itemDisplayName'";
@@ -123,26 +123,32 @@ public class RefName {
         public String displayName = "";
 
         public static AuthorityItem parse(String urn) {
-            Authority info = new Authority();
-            AuthorityItem termInfo = new AuthorityItem();
-            termInfo.inAuthority = info;
-            Pattern p = Pattern.compile(AUTHORITY_ITEM_REGEX);
-            Matcher m = p.matcher(urn);
-            if (m.find()) {
-                if (m.groupCount() < 5) {
-                	if (m.groupCount() == 4 && logger.isDebugEnabled()) {
-                		logger.debug("AuthorityItem.parse only found 4 items; Missing displayName? Urn:"+urn);
-                	}
-                    return null;
+            Authority authority = new Authority();
+            AuthorityItem authorityItem = new AuthorityItem();
+            try {
+                RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils.parseAuthorityTermInfo(urn);
+
+                authority.tenantName = termInfo.inAuthority.domain;
+                authority.resource = termInfo.inAuthority.resource;
+                if (termInfo.inAuthority.name != null &&
+                        ! termInfo.inAuthority.name.trim().isEmpty()) {
+                    authority.shortIdentifier = termInfo.inAuthority.name;
+                } else {
+                    authority.shortIdentifier = termInfo.inAuthority.csid;
                 }
-                termInfo.inAuthority.tenantName = m.group(1);
-                termInfo.inAuthority.resource = m.group(2);
-                termInfo.inAuthority.shortIdentifier = m.group(3);
-                termInfo.shortIdentifier = m.group(4);
-                termInfo.displayName = m.group(5);
-                return termInfo;
+                authorityItem.inAuthority = authority;
+
+                if (termInfo.name != null &&
+                        ! termInfo.name.trim().isEmpty()) {
+                    authorityItem.shortIdentifier = termInfo.name;
+                } else {
+                    authorityItem.shortIdentifier = termInfo.csid;
+                }
+                authorityItem.displayName = termInfo.displayName;
+            } catch (IllegalArgumentException iae) {
+                return null;
             }
-            return null;
+            return authorityItem;
         }
         
         public String getParentShortIdentifier() {
