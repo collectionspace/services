@@ -1,59 +1,58 @@
 package org.collectionspace.services.common.api;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.collectionspace.services.common.api.RefNameUtils;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityInfo;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Usage for this class, if you have a URN and would like to get at its fields, is to call one of these methods:
+ * Usage for this class, if you have a URN and would like to get at its fields,
+ * is to call one of these methods:
  *
- *   RefName.AuthorityItem item = RefName.AuthorityItem.parse(RefName.AUTHORITY_ITEM_EXAMPLE);
- * or
- *   RefName.Authority authority = RefName.Authority.parse(RefName.AUTHORITY_EXAMPLE);
+ * RefName.AuthorityItem item =
+ * RefName.AuthorityItem.parse(RefName.AUTHORITY_ITEM_EXAMPLE); or
+ * RefName.Authority authority =
+ * RefName.Authority.parse(RefName.AUTHORITY_EXAMPLE);
  *
  * From the object returned, you may set/get any of the public fields.
  *
- * If you want to format a string urn, then you need to construct either a RefName.AuthorityItem  or RefName.Authority.
- * You can parse a URN to do so, as shown above, or you can construct one with a constructor, setting its fields afterwards.
- * A better way is to use one of the build*() methods on this class:
+ * If you want to format a string urn, then you need to construct either a
+ * RefName.AuthorityItem or RefName.Authority. You can parse a URN to do so, as
+ * shown above, or you can construct one with a constructor, setting its fields
+ * afterwards. A better way is to use one of the build*() methods on this class:
  *
- *      RefName.Authority authority2 = RefName.buildAuthority(tenantName, serviceName, authorityShortIdentifier, authorityDisplayName);
+ * RefName.Authority authority2 = RefName.buildAuthority(tenantName,
+ * serviceName, authorityShortIdentifier, authorityDisplayName);
  *
- *      RefName.AuthorityItem item2 = RefName.buildAuthorityItem(authority2,
- *                                                               RefName.EX_itemShortIdentifier,
- *                                                               RefName.EX_itemDisplayName);
+ * RefName.AuthorityItem item2 = RefName.buildAuthorityItem(authority2,
+ * RefName.EX_itemShortIdentifier, RefName.EX_itemDisplayName);
  *
- * Note that authority2 is an object, not a String, and is passed in to RefName.buildAuthorityItem().
+ * Note that authority2 is an object, not a String, and is passed in to
+ * RefName.buildAuthorityItem().
  *
  * Then simply call toString() on the object:
  *
- *   String authorityURN = authority2.toString();
+ * String authorityURN = authority2.toString();
  *
- *   String itemURN = item2.toString();
+ * String itemURN = item2.toString();
  *
  * These test cases are kept up-to-date in
  *
- *   org.collectionspace.services.common.api.test.RefNameTest
+ * org.collectionspace.services.common.api.test.RefNameTest
  *
  * User: laramie
  */
 public class RefName {
-	
-    /** The logger. */
-    private static final Logger logger = LoggerFactory.getLogger(RefName.class);
 
-    public static final String HACK_VOCABULARIES = "Vocabularies"; //TODO: get rid of these.
-    public static final String HACK_ORGANIZATIONS = "Organizations"; //TODO: get rid of these.
-    public static final String HACK_ORGAUTHORITIES = "Orgauthorities";  //TODO: get rid of these.
-    public static final String HACK_PERSONAUTHORITIES = "Personauthorities";  //TODO: get rid of these.
-    public static final String HACK_LOCATIONAUTHORITIES = "Locationauthorities";  //TODO: get rid of these.
+    /**
+     * The logger.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(RefName.class);
     public static final String URN_PREFIX = "urn:cspace:";
     public static final String URN_NAME_PREFIX = "urn:cspace:name";
     public static final String REFNAME = "refName";
-    public static final String AUTHORITY_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\)\\'?([^\\']*)\\'?";
-    public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\):item:name\\((.*)\\)\\'?([^\\']*)\\'";
+    // public static final String AUTHORITY_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\)\\'?([^\\']*)\\'?";
+    // public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*):name\\((.*)\\):item:name\\((.*)\\)\\'?([^\\']*)\\'";
     public static final String AUTHORITY_EXAMPLE = "urn:cspace:collectionspace.org:Loansin:name(shortID)'displayName'";
     public static final String AUTHORITY_EXAMPLE2 = "urn:cspace:collectionspace.org:Loansin:name(shortID)";
     public static final String AUTHORITY_ITEM_EXAMPLE = "urn:cspace:collectionspace.org:Loansin:name(shortID):item:name(itemShortID)'itemDisplayName'";
@@ -72,22 +71,17 @@ public class RefName {
         public String displayName = "";
 
         public static Authority parse(String urn) {
-            Authority info = new Authority();
-            Pattern p = Pattern.compile(AUTHORITY_REGEX);
-            Matcher m = p.matcher(urn);
-            if (m.find()) {
-                if (m.groupCount() < 4) {
-                    return null;
-                }
-                info.tenantName = m.group(1);
-                info.resource = m.group(2);
-                info.shortIdentifier = m.group(3);
-                info.displayName = m.group(4);
-                return info;
+            Authority authority;
+            try {
+                RefNameUtils.AuthorityInfo authorityInfo =
+                        RefNameUtils.parseAuthorityInfo(urn);
+                authority = authorityFromAuthorityInfo(authorityInfo, true);
+            } catch (IllegalArgumentException iae) {
+                return null;
             }
-            return null;
+            return authority;
         }
-        
+
         public String getShortIdentifier() {
             return this.shortIdentifier;
         }
@@ -123,42 +117,25 @@ public class RefName {
         public String displayName = "";
 
         public static AuthorityItem parse(String urn) {
-            Authority authority = new Authority();
-            AuthorityItem authorityItem = new AuthorityItem();
+            AuthorityItem authorityItem = null;
             try {
-                RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils.parseAuthorityTermInfo(urn);
-
-                authority.tenantName = termInfo.inAuthority.domain;
-                authority.resource = termInfo.inAuthority.resource;
-                if (termInfo.inAuthority.name != null &&
-                        ! termInfo.inAuthority.name.trim().isEmpty()) {
-                    authority.shortIdentifier = termInfo.inAuthority.name;
-                } else {
-                    authority.shortIdentifier = termInfo.inAuthority.csid;
-                }
-                authorityItem.inAuthority = authority;
-
-                if (termInfo.name != null &&
-                        ! termInfo.name.trim().isEmpty()) {
-                    authorityItem.shortIdentifier = termInfo.name;
-                } else {
-                    authorityItem.shortIdentifier = termInfo.csid;
-                }
-                authorityItem.displayName = termInfo.displayName;
+                RefNameUtils.AuthorityTermInfo termInfo =
+                        RefNameUtils.parseAuthorityTermInfo(urn);
+                authorityItem = authorityItemFromTermInfo(termInfo);
             } catch (IllegalArgumentException iae) {
                 return null;
             }
             return authorityItem;
         }
-        
+
         public String getParentShortIdentifier() {
             return this.inAuthority.shortIdentifier;
         }
-        
+
         public String getShortIdentifier() {
             return this.shortIdentifier;
         }
-    
+
         public boolean equals(Object other) {
             if (other == null) {
                 return false;
@@ -225,13 +202,68 @@ public class RefName {
         return item;
     }
 
-    /** Use this method to avoid formatting any urn's outside of this unit;
+    /**
+     * Use this method to avoid formatting any urn's outside of this unit;
      * Caller passes in a shortId, such as "TestAuthority", and method returns
-     * the correct urn path element, without any path delimiters such as '/'
-     * so that calling shortIdToPath("TestAuthority") returns "urn:cspace:name(TestAuthority)", and
-     * then this value may be put into a path, such as "/personauthorities/urn:cspace:name(TestAuthority)/items".
+     * the correct urn path element, without any path delimiters such as '/' so
+     * that calling shortIdToPath("TestAuthority") returns
+     * "urn:cspace:name(TestAuthority)", and then this value may be put into a
+     * path, such as "/personauthorities/urn:cspace:name(TestAuthority)/items".
      */
     public static String shortIdToPath(String shortId) {
         return URN_NAME_PREFIX + '(' + shortId + ')';
+    }
+
+    /**
+     * Glue to create an AuthorityTermInfo object, used in RefNameUtils, from the
+     * highly similar AuthorityItem object, used in this class.
+     *
+     * @param termInfo an AuthorityTermInfo object
+     * @return an AuthorityItem object
+     */
+    private static AuthorityItem authorityItemFromTermInfo(AuthorityTermInfo termInfo) {
+        if (termInfo == null) {
+            return null;
+        }
+        AuthorityItem authorityItem = new AuthorityItem();
+        authorityItem.inAuthority =
+                authorityFromAuthorityInfo(termInfo.inAuthority, false);
+        if (termInfo.name != null
+                && !termInfo.name.trim().isEmpty()) {
+            authorityItem.shortIdentifier = termInfo.name;
+        } else {
+            authorityItem.shortIdentifier = termInfo.csid;
+        }
+        authorityItem.displayName = termInfo.displayName;
+        return authorityItem;
+    }
+
+    /**
+     * Glue to create an AuthorityInfo object, used in RefNameUtils, from the
+     * highly similar Authority object, used in this class.
+     *
+     * @param authorityInfo an AuthorityInfo object
+     * @param includeDisplayName true to include the display name during creation;
+     *   false to exclude it.
+     * @return an Authority object
+     */
+    private static Authority authorityFromAuthorityInfo(AuthorityInfo authorityInfo,
+            boolean includeDisplayName) {
+        if (authorityInfo == null) {
+            return null;
+        }
+        Authority authority = new Authority();
+        authority.tenantName = authorityInfo.domain;
+        authority.resource = authorityInfo.resource;
+        if (authorityInfo.name != null
+                && !authorityInfo.name.trim().isEmpty()) {
+            authority.shortIdentifier = authorityInfo.name;
+        } else {
+            authority.shortIdentifier = authorityInfo.csid;
+        }
+        if (includeDisplayName) {
+            authority.displayName = authorityInfo.displayName;
+        }
+        return authority;
     }
 }
