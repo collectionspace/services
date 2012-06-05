@@ -124,7 +124,9 @@ public class RefNameTest {
     }
 
     /**
-     * Test display names containing characters which are also used as separators in refNames.
+     * Test display names containing refName separator characters, such as
+     * colons and parens, to ensure that these characters may be validly used
+     * in display names without adversely impacting refName parsing.
      */
     @Test
     public void testSeparatorsInDisplayNames() {
@@ -138,7 +140,7 @@ public class RefNameTest {
                 "Short identifier from item " + itemDisplayNameContainsColon.getShortIdentifier()
                 + "does not match expected value " + EX_itemShortIdentifier);
         Assert.assertEquals(itemDisplayNameContainsColon.displayName, EX_itemDisplayNameContainsColon,
-                "Short identifier from item " + itemDisplayNameContainsColon.displayName
+                "Display name from item " + itemDisplayNameContainsColon.displayName
                 + "does not match expected value " + EX_itemDisplayNameContainsColon);
         
         RefName.AuthorityItem itemDisplayNameContainsParens =
@@ -149,7 +151,7 @@ public class RefNameTest {
                 "Short identifier from item " + itemDisplayNameContainsParens.getShortIdentifier()
                 + "does not match expected value " + EX_itemShortIdentifier);
         Assert.assertEquals(itemDisplayNameContainsParens.displayName, EX_itemDisplayNameContainsParens,
-                "Short identifier from item " + itemDisplayNameContainsParens.displayName
+                "Display name from item " + itemDisplayNameContainsParens.displayName
                 + "does not match expected value " + EX_itemDisplayNameContainsParens);
     }
 }
