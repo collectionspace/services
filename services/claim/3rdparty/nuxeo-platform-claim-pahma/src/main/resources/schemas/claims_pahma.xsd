@@ -28,129 +28,42 @@
 	targetNamespace="http://collectionspace.org/services/claim/local/pahma"
 	version="0.1">
 
-	<xs:element name="sentToOversightCommitteeGroupList" type="sentToOversightCommitteeGroupList"/>
-	
-	<xs:element name="recommendationOfOversightCommitteeGroupList" type="recommendationOfOversightCommitteeGroupList"/>
-	
-	<xs:element name="dispositionPossibilitiesDiscussedGroup" type="dispositionPossibilitiesDiscussedGroup"/>
-	<xs:element name="surroundingTribesContactedGroup" type="surroundingTribesContactedGroup"/>
-	<xs:element name="workingTeamNotifiedGroup" type="workingTeamNotifiedGroup"/>
-	<xs:element name="siteFileResearchCompletedGroup" type="siteFileResearchCompletedGroup"/>
-	<xs:element name="accessionFileResearchCompletedGroup" type="accessionFileResearchCompletedGroup"/>
-	<xs:element name="objectsLocatedAndCountedGroup" type="objectsLocatedAndCountedGroup"/>
-	<xs:element name="objectsConsolidatedGroup" type="objectsConsolidatedGroup"/>
-	<xs:element name="objectsPhotographedGroup" type="objectsPhotographedGroup"/>
-	<xs:element name="registrationDocumentsDraftedGroup" type="registrationDocumentsDraftedGroup"/>
-	<xs:element name="tribeContactedForPackingPreferencesGroup" type="tribeContactedForPackingPreferencesGroup"/>
-	<xs:element name="dateArrangedForTransferGroup" type="dateArrangedForTransferGroup"/>
-	<xs:element name="objectsMarkedAsDeaccessionedGroup" type="objectsMarkedAsDeaccessionedGroup"/>
-	
-	<xs:complexType name="sentToOversightCommitteeGroupList">
-		<xs:sequence>
-			<xs:element name="sentToOversightCommitteeGroup" type="sentToOversightCommitteeGroup" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="sentToOversightCommitteeGroup">
-		<xs:sequence>
-			<xs:element name="sentToOversightCommitteeDate" type="xs:date"/>
-			<xs:element name="sentToOversightCommitteeNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
+	<xs:element name="dispositionPossibilitiesDiscussed" type="xs:boolean"/>
+	<xs:element name="dispositionPossibilitiesDiscussedNote" type="xs:string"/>
 
-	<xs:complexType name="recommendationOfOversightCommitteeGroupList">
-		<xs:sequence>
-			<xs:element name="recommendationOfOversightCommitteeGroup" type="recommendationOfOversightCommitteeGroup" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="recommendationOfOversightCommitteeGroup">
-		<xs:sequence>
-			<xs:element name="recommendationOfOversightCommitteeDate" type="xs:date"/>
-			<xs:element name="recommendationOfOversightCommitteeNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="dispositionPossibilitiesDiscussedGroup">
-		<xs:sequence>
-			<xs:element name="dispositionPossibilitiesDiscussedCheckbox" type="xs:string"/>
-			<xs:element name="dispositionPossibilitiesDiscussedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="surroundingTribesContactedGroup">
-		<xs:sequence>
-			<xs:element name="surroundingTribesContactedCheckbox" type="xs:string"/>
-			<xs:element name="surroundingTribesContactedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="workingTeamNotifiedGroup">
-		<xs:sequence>
-			<xs:element name="workingTeamNotifiedCheckbox" type="xs:string"/>
-			<xs:element name="workingTeamNotifiedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="siteFileResearchCompletedGroup">
-		<xs:sequence>
-			<xs:element name="siteFileResearchCompletedCheckbox" type="xs:string"/>
-			<xs:element name="siteFileResearchCompletedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="accessionFileResearchCompletedGroup">
-		<xs:sequence>
-			<xs:element name="accessionFileResearchCompletedCheckbox" type="xs:string"/>
-			<xs:element name="accessionFileResearchCompletedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="objectsLocatedAndCountedGroup">
-		<xs:sequence>
-			<xs:element name="objectsLocatedAndCountedCheckbox" type="xs:string"/>
-			<xs:element name="objectsLocatedAndCountedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="objectsConsolidatedGroup">
-		<xs:sequence>
-			<xs:element name="objectsConsolidatedCheckbox" type="xs:string"/>
-			<xs:element name="objectsConsolidatedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="objectsPhotographedGroup">
-		<xs:sequence>
-			<xs:element name="objectsPhotographedCheckbox" type="xs:string"/>
-			<xs:element name="objectsPhotographedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="registrationDocumentsDraftedGroup">
-		<xs:sequence>
-			<xs:element name="registrationDocumentsDraftedCheckbox" type="xs:string"/>
-			<xs:element name="registrationDocumentsDraftedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="tribeContactedForPackingPreferencesGroup">
-		<xs:sequence>
-			<xs:element name="tribeContactedForPackingPreferencesCheckbox" type="xs:string"/>
-			<xs:element name="tribeContactedForPackingPreferencesNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="dateArrangedForTransferGroup">
-		<xs:sequence>
-			<xs:element name="dateArrangedForTransferCheckbox" type="xs:string"/>
-			<xs:element name="dateArrangedForTransferNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="objectsMarkedAsDeaccessionedGroup">
-		<xs:sequence>
-			<xs:element name="objectsMarkedAsDeaccessionedCheckbox" type="xs:string"/>
-			<xs:element name="objectsMarkedAsDeaccessionedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-		
+	<xs:element name="surroundingTribesContacted" type="xs:boolean"/>
+	<xs:element name="surroundingTribesContactedNote" type="xs:string"/>
+
+	<xs:element name="workingTeamNotified" type="xs:boolean"/>
+	<xs:element name="workingTeamNotifiedNote" type="xs:string"/>
+
+	<xs:element name="siteFileResearchCompleted" type="xs:boolean"/>
+	<xs:element name="siteFileResearchCompletedNote" type="xs:string"/>
+
+	<xs:element name="accessionFileResearchCompleted" type="xs:boolean"/>
+	<xs:element name="accessionFileResearchCompletedNote" type="xs:string"/>
+
+	<xs:element name="objectsLocatedAndCounted" type="xs:boolean"/>
+	<xs:element name="objectsLocatedAndCountedNote" type="xs:string"/>
+
+	<xs:element name="objectsConsolidated" type="xs:boolean"/>
+	<xs:element name="objectsConsolidatedNote" type="xs:string"/>
+
+	<xs:element name="objectsPhotographed" type="xs:boolean"/>
+	<xs:element name="objectsPhotographedNote" type="xs:string"/>
+
+	<xs:element name="registrationDocumentsDrafted" type="xs:boolean"/>
+	<xs:element name="registrationDocumentsDraftedNote" type="xs:string"/>
+
+	<xs:element name="tribeContactedForPackingPreferences" type="xs:boolean"/>
+	<xs:element name="tribeContactedForPackingPreferencesNote" type="xs:string"/>
+
+	<xs:element name="dateArrangedForTransfer" type="xs:boolean"/>
+	<xs:element name="dateArrangedForTransferNote" type="xs:string"/>
+
+	<xs:element name="objectsMarkedAsDeaccessioned" type="xs:boolean"/>
+	<xs:element name="objectsMarkedAsDeaccessionedNote" type="xs:string"/>
+
+	<xs:element name="documentsArchived" type="xs:boolean"/>
+	<xs:element name="documentsArchivedNote" type="xs:string"/>
 </xs:schema>
