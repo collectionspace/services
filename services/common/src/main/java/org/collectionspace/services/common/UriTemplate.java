@@ -25,33 +25,38 @@ package org.collectionspace.services.common;
 import java.net.URI;
 import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriBuilderException;
 import org.collectionspace.services.common.api.Tools;
 
 public class UriTemplate {
 
     UriBuilder builder;
-    String path;
+    String uriPath;
 
     public UriTemplate(String path) {
         setUriPath(path);
         setBuilder();
     }
 
+    private void setUriPath(String path) {
+        if (Tools.notBlank(path)) {
+            this.uriPath = path;
+        }
+    }
+    
+    private String getUriPath() {
+        return uriPath;
+    }
+
     private void setBuilder() {
         if (builder == null) {
             try {
-                builder = UriBuilder.fromPath(path);
+                builder = UriBuilder.fromPath(getUriPath());
             } catch (IllegalArgumentException iae) {
                 // FIXME: Need to add logger and log error
-                // Will silently fail to initialize builder if relative URI is null
-                // No other checking of path format is apparently done
+                // URIBuilder can't be created if path is null
+                // No other checking of path format is performed
             }
-        }
-    }
-
-    private void setUriPath(String path) {
-        if (Tools.notBlank(this.path)) {
-            this.path = this.path;
         }
     }
 
@@ -61,14 +66,29 @@ public class UriTemplate {
         }
         return builder;
     }
-
-    public String buildUri(Map<String, String> varsMap) {
-        URI uri = getBuilder().buildFromMap(varsMap);
-        if (uri != null) {
-            return uri.toString();
-        } else {
-            return "";
-        }
+    
+    @Override
+    public String toString() {
+        return getUriPath();
     }
 
+    public String buildUri(Map<String, String> varsMap) {
+        URI uri = null;
+        try {
+            uri = getBuilder().buildFromMap(varsMap);
+        } catch (IllegalArgumentException iae) {
+            // FIXME: Need to add logger and log error
+            // One or more parameters are missing or null.
+        } catch (UriBuilderException ube) {
+            // FIXME: Need to add logger and log error
+            // URI can't be constructed based on current state of the builder
+        } finally {
+            if (uri != null) {
+                return uri.toString();
+            } else {
+                return "";
+            }
+        }
+    }
+    
 }

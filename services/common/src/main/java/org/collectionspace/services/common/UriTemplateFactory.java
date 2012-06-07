@@ -22,39 +22,25 @@
  */
 package org.collectionspace.services.common;
 
-public class UriTemplateBuilder {
+public class UriTemplateFactory {
 
-    UriTemplateType uriTemplateType = null;
-    final static String RESOURCE_TEMPLATE_PATTERN =
+    public final static String RESOURCE_TEMPLATE_PATTERN =
             "/{servicename}/{identifier}";
     // FIXME: Get static strings below (e.g. "items") from already-declared
     // constants elsewhere
-    final static String ITEM_TEMPLATE_PATTERN =
+    public final static String ITEM_TEMPLATE_PATTERN =
             "/{servicename}/{identifier}/items/{itemIdentifier}";
-    final static String CONTACT_TEMPLATE_PATTERN =
+    public final static String CONTACT_TEMPLATE_PATTERN =
             "/{servicename}/{identifier}/items/{itemIdentifier}/contacts/{contactIdentifier}";
-    final static UriTemplate RESOURCE_URI_TEMPLATE =
+    private final static UriTemplate RESOURCE_URI_TEMPLATE =
             new UriTemplate(RESOURCE_TEMPLATE_PATTERN);
-    final static UriTemplate ITEM_URI_TEMPLATE =
+    private final static UriTemplate ITEM_URI_TEMPLATE =
             new UriTemplate(ITEM_TEMPLATE_PATTERN);
-    final static UriTemplate CONTACT_URI_TEMPLATE =
+    private final static UriTemplate CONTACT_URI_TEMPLATE =
             new UriTemplate(CONTACT_TEMPLATE_PATTERN);
 
-    public UriTemplateBuilder(UriTemplateType type) {
-        this.uriTemplateType = type;
-    }
-
-    public UriTemplateType getType() {
-        return this.uriTemplateType;
-    }
-
-    @Override
-    public String toString() {
-        return "URI Builder of type " + getType().toString();
-    }
-
-    public UriTemplate getURITemplate() {
-        switch (uriTemplateType) {
+    public static UriTemplate getURITemplate(UriTemplateType type) {
+        switch (type) {
             case RESOURCE:
                 return RESOURCE_URI_TEMPLATE;
 
