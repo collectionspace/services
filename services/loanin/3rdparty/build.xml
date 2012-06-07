@@ -111,7 +111,7 @@
     <target name="deploy" depends="install"
     description="deploy loanin in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-loanin/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="nuxeo-platform-loanin-pahma/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-loanin-pahma/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
