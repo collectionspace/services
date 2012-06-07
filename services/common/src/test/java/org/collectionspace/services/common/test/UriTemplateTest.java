@@ -32,10 +32,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class UriTemplateTest {
-    
+
     final static String EXAMPLE_SERVICE_NAME = "examples";
     final static String CSID = "a87f6616-4146-4c17-a41a-048597cc12aa";
-
     private static final Logger logger = LoggerFactory.getLogger(UriTemplateTest.class);
 
     private void testBanner(String msg) {
@@ -47,22 +46,48 @@ public class UriTemplateTest {
     public void createResourceUriTemplate() {
         testBanner("createResourceUriTemplate");
         UriTemplate resourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);
-        Assert.assertNotNull(resourceTemplate, "Resource template is null.");
+        Assert.assertNotNull(resourceTemplate, "Resource template is null; it was not created successfully.");
         logger.debug("Resource template URI path = " + resourceTemplate.toString());
-        Assert.assertNotNull(resourceTemplate.toString(), "Resource template URI path is null.");
+        Assert.assertNotNull(resourceTemplate.toString(), "Resource template URI path is null; it was not set successfully.");
         Assert.assertEquals(resourceTemplate.toString(), UriTemplateFactory.RESOURCE_TEMPLATE_PATTERN,
                 "Resource template URI path doesn't match expected path.");
     }
-    
-    @Test (dependsOnMethods = {"createResourceUriTemplate"})
+
+    @Test(dependsOnMethods = {"createResourceUriTemplate"})
     public void buildResourceUri() {
         testBanner("buildResourceUri");
         UriTemplate resourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);
-        Map<String,String> resourceUriVars = new HashMap<String,String>();
+        Map<String, String> resourceUriVars = new HashMap<String, String>();
         resourceUriVars.put("servicename", EXAMPLE_SERVICE_NAME);
         resourceUriVars.put("identifier", CSID);
         String uriStr = resourceTemplate.buildUri(resourceUriVars);
         Assert.assertFalse(Tools.isBlank(uriStr), "Generated URI string is null or blank.");
+        logger.debug("Generated URI string = " + uriStr);
+    }
+
+    @Test(dependsOnMethods = {"createResourceUriTemplate"})
+    public void buildResourceUriWithMissingValue() {
+        testBanner("buildResourceUriWithMissingValue");
+        UriTemplate resourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);
+        Map<String, String> resourceUriVars = new HashMap<String, String>();
+        resourceUriVars.put("servicename", EXAMPLE_SERVICE_NAME);
+        // The required 'identifier' value is missing from the Map from which the URI will be built
+        logger.debug("This is a negative test, and an error message is expected here:");
+        String uriStr = resourceTemplate.buildUri(resourceUriVars);
+        Assert.assertTrue(Tools.isBlank(uriStr), "Generated URI string was not blank, but should have been.");
+        logger.debug("Generated URI string = " + uriStr);
+    }
+
+    @Test(dependsOnMethods = {"createResourceUriTemplate"})
+    public void buildResourceUriWithNullValue() {
+        testBanner("buildResourceUriWithNullValue");
+        UriTemplate resourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);
+        Map<String, String> resourceUriVars = new HashMap<String, String>();
+        resourceUriVars.put("servicename", EXAMPLE_SERVICE_NAME);
+        resourceUriVars.put("identifier", null);
+        logger.debug("This is a negative test, and an error message is expected here:");
+        String uriStr = resourceTemplate.buildUri(resourceUriVars);
+        Assert.assertTrue(Tools.isBlank(uriStr), "Generated URI string was not blank, but should have been.");
         logger.debug("Generated URI string = " + uriStr);
     }
 }
