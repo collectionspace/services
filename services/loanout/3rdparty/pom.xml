@@ -18,7 +18,15 @@
         3rd party build for loanout service
     </description>
 
+    <properties>
+        <ServiceName>loanout</ServiceName>
+        <NuxeoDocTypeName>Loanout</NuxeoDocTypeName>
+        <CommonSchemaName>loansout_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+    </properties>
+
     <modules>
         <module>nuxeo-platform-cs-loanout</module>
+        <module>nuxeo-platform-loanout-pahma</module>
     </modules>
 </project>
