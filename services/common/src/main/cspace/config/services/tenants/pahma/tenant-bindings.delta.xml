@@ -107,6 +107,26 @@
 			</service:object>
 		</tenant:serviceBindings>
 
+		<tenant:serviceBindings merge:matcher="id" id="Loansin">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansin_pahma" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/loanin/local/pahma" schemaLocation="http://collectionspace.org/services/loanin/local/pahma http://collectionspace.org/services/loanin/local/loansin_pahma.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Loansout">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansout_pahma" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/loanout/local/pahma" schemaLocation="http://collectionspace.org/services/loanout/local/pahma http://collectionspace.org/services/loanout/local/loansout_pahma.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
 		<tenant:serviceBindings merge:matcher="id" id="ObjectExit">
 			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
 				<service:params>
