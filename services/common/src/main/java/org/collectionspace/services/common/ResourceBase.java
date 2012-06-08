@@ -382,52 +382,33 @@ public abstract class ResourceBase
     	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
     }
     
-    // FIXME: For authority items, we will need to return an array / collection of uriTemplate objects,
-    // since there are two different doctypes, with associated uriTemplates, to insert into the registry.
-    // (One of those uriTemplates will also need to be of type ITEM, while in AuthorityResourceWithContacts,
-    // a third uriTemplate will need to be of type CONCEPT.)
-    
-    // The following is a placeholder to test proof of concept, adding a single item from each resource
-    // to the registry.
-    
     public String getDocType() {
         // FIXME: Proof of concept placeholder
         return getServiceName();
     }
     
     public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
-        // Return cached copy of URI template map, if available
         Map<String,StoredValuesUriTemplate> uriTemplateMap = new HashMap<String,StoredValuesUriTemplate>();
-        if (this.cachedUriTemplateMap != null && !this.cachedUriTemplateMap.isEmpty()) {
-            uriTemplateMap.putAll(cachedUriTemplateMap);
-            return uriTemplateMap;
-        } else {
-            // Construct and return a resource URI template as the sole item in the map
-            String docType = getDocType();
-            StoredValuesUriTemplate resourceUriTemplate = getResourceUriTemplate();
-            if (docType == null) {
-                return uriTemplateMap; // return an empty map
-            }
-            if (resourceUriTemplate == null) {
-                return uriTemplateMap; // return an empty map
-            }
-            uriTemplateMap.put(docType, resourceUriTemplate);
-            cacheUriTemplateMap(uriTemplateMap);
-            return uriTemplateMap;
+        // Construct and return a resource URI template as the sole item in the map
+        String docType = getDocType();
+        StoredValuesUriTemplate resourceUriTemplate = getUriTemplate(UriTemplateFactory.RESOURCE);
+        if (docType == null) {
+            return uriTemplateMap; // return an empty map
         }
+        if (resourceUriTemplate == null) {
+            return uriTemplateMap; // return an empty map
+        }
+        uriTemplateMap.put(docType, resourceUriTemplate);
+        return uriTemplateMap;
     }
     
-    private StoredValuesUriTemplate getResourceUriTemplate() {
+    protected StoredValuesUriTemplate getUriTemplate(UriTemplateFactory.UriTemplateType type) {
         Map<String,String> storedValuesMap = new HashMap<String,String>();
         storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
         StoredValuesUriTemplate template =
-                UriTemplateFactory.getURITemplate(UriTemplateFactory.RESOURCE,
-                storedValuesMap);
+                UriTemplateFactory.getURITemplate(type, storedValuesMap);
         return template;
     }
 
-    public void cacheUriTemplateMap(Map<String, StoredValuesUriTemplate> uriTemplateMap) {
-            this.cachedUriTemplateMap = uriTemplateMap;
-    }
 
 }

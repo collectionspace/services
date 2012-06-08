@@ -51,11 +51,17 @@ public class StoredValuesUriTemplate extends UriTemplate {
 
     public StoredValuesUriTemplate(UriTemplateType type, String path, Map<String, String> storedValuesMap) {
         super(type, path);
-        setStoredValuesMap(storedValuesMap);
+        setStoredValues(storedValuesMap);
     }
 
-    // Private access ensures that stored values can only be set via a constructor
-    private void setStoredValuesMap(Map<String, String> storedValuesMap) {
+    public void setStoredValuesMap(Map<String, String> storedValuesMap) {
+        setStoredValues(storedValuesMap);
+    }
+
+    // Called by both constructor and public setter
+    // Avoids having a subclass-overridable call in the constructor
+    // See http://stackoverflow.com/questions/6104262/java-overridable-call-in-constructor#comment7087131_6104273
+    private void setStoredValues(Map<String, String> storedValuesMap) {
         if (storedValuesMap != null && !storedValuesMap.isEmpty()) {
             this.storedValuesMap = storedValuesMap;
         }

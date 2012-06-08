@@ -970,9 +970,9 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
         // Get resource URI template from superclass
         Map<String,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap();
-        // Add item URI template
+        // Add item URI template, and return both templates in the map
         String itemDocType = getItemDocType();
-        StoredValuesUriTemplate itemUriTemplate = getItemUriTemplate();
+        StoredValuesUriTemplate itemUriTemplate = getUriTemplate(UriTemplateFactory.ITEM);
         if (itemDocType == null) {
             return uriTemplateMap; // return map as obtained from superclass
         }
@@ -980,16 +980,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             return uriTemplateMap; // return map as obtained from superclass
         }
         uriTemplateMap.put(itemDocType, itemUriTemplate);
-        cacheUriTemplateMap(uriTemplateMap);
         return uriTemplateMap;
     }
-    
-    private StoredValuesUriTemplate getItemUriTemplate() {
-        Map<String,String> storedValuesMap = new HashMap<String,String>();
-        storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
-        StoredValuesUriTemplate template =
-                UriTemplateFactory.getURITemplate(UriTemplateFactory.ITEM,
-                storedValuesMap);
-        return template;
-    }
+  
 }

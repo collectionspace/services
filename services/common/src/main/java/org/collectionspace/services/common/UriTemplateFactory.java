@@ -23,6 +23,7 @@
 package org.collectionspace.services.common;
 
 import java.util.Map;
+import org.collectionspace.services.client.AuthorityClient;
 
 /**
  * UriTemplateFactory.java
@@ -47,21 +48,29 @@ public class UriTemplateFactory {
     public final static String IDENTIFIER_VAR = "identifier";
     public final static String ITEM_IDENTIFIER_VAR = "itemIdentifier";
     public final static String CONTACT_IDENTIFIER_VAR = "contactIdentifier";
+    
+    public final static String AUTHORITY_ITEM_PATH_COMPONENT = AuthorityClient.ITEMS;
+    // FIXME: Get this currently hard-coded value from an external authoritative source.
+    // The only candidate so far identified is ContactClient.SERVICE_PATH_COMPONENT;
+    // is this appropriate?
+    public final static String CONTACT_PATH_COMPONENT = "contacts";
 
     public final static String RESOURCE_PATH_PATTERN =
             "/"
             + "{" + SERVICENAME_VAR + "}"
             + "/"
             + "{" + IDENTIFIER_VAR + "}";
-    // FIXME: Get static strings below (e.g. "items", "contacts") from
-    // already-declared constants elsewhere
     public final static String ITEM_PATH_PATTERN =
             RESOURCE_PATH_PATTERN
-            + "/items/"
+            + "/"
+            + AUTHORITY_ITEM_PATH_COMPONENT
+            + "/"
             + "{" + ITEM_IDENTIFIER_VAR + "}";
     public final static String CONTACT_PATH_PATTERN =
             ITEM_PATH_PATTERN
-            + "/contacts/"
+            + "/"
+            + CONTACT_PATH_COMPONENT
+            + "/"
             + "{" + CONTACT_IDENTIFIER_VAR + "}";
 
     public static UriTemplate getURITemplate(UriTemplateType type) {

@@ -39,10 +39,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-
-import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.*;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
@@ -308,26 +305,17 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
         // Get resource and item URI templates from superclass
         Map<String,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap();
-        // Add item URI template
+        // Add contact URI template, and return all three templates in the map
         String contactDocType = getContactDocType();
-        StoredValuesUriTemplate itemUriTemplate = getItemUriTemplate();
+        StoredValuesUriTemplate contactUriTemplate = getUriTemplate(UriTemplateFactory.CONTACT);
         if (contactDocType == null) {
             return uriTemplateMap; // return map as obtained from superclass
         }
-        if (itemUriTemplate == null) {
+        if (contactUriTemplate == null) {
             return uriTemplateMap; // return map as obtained from superclass
         }
-        uriTemplateMap.put(contactDocType, itemUriTemplate);
-        cacheUriTemplateMap(uriTemplateMap);
+        uriTemplateMap.put(contactDocType, contactUriTemplate);
         return uriTemplateMap;
     }
-    
-    private StoredValuesUriTemplate getItemUriTemplate() {
-        Map<String,String> storedValuesMap = new HashMap<String,String>();
-        storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
-        StoredValuesUriTemplate template =
-                UriTemplateFactory.getURITemplate(UriTemplateFactory.ITEM,
-                storedValuesMap);
-        return template;
-    }
+
 }
