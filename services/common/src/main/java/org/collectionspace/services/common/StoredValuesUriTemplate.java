@@ -35,10 +35,10 @@ import org.slf4j.LoggerFactory;
  * replace variables within the template.
  *
  * In this subclass of UriTemplate, some of the values which will replace
- * variables in a URI template are static, and can be stored alongside the
- * template for reuse. Additional values that will replace variables within the
- * template are also dynamically accepted, and are merged with stored values
- * when building URIs.
+ * variables in an internal URI template are static, and can be stored alongside
+ * the URI template for reuse. Additional values that will replace variables
+ * within the template are also dynamically accepted, and will be merged with
+ * stored values when building URIs.
  */
 public class StoredValuesUriTemplate extends UriTemplate {
 
@@ -54,13 +54,14 @@ public class StoredValuesUriTemplate extends UriTemplate {
         setStoredValuesMap(storedValuesMap);
     }
 
-    final public void setStoredValuesMap(Map<String, String> storedValuesMap) {
+    // Private access ensures that stored values can only be set via a constructor
+    private void setStoredValuesMap(Map<String, String> storedValuesMap) {
         if (storedValuesMap != null && !storedValuesMap.isEmpty()) {
             this.storedValuesMap = storedValuesMap;
         }
     }
 
-    private Map<String, String> getStoredValuesMap() {
+    public Map<String, String> getStoredValuesMap() {
         return this.storedValuesMap;
     }
 

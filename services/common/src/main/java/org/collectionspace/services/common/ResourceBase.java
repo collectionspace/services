@@ -66,6 +66,8 @@ public abstract class ResourceBase
     public static final String LIST = "list";
     //FIXME retrieve client type from configuration
     static ClientType CLIENT_TYPE;
+    
+    Map<String,StoredValuesUriTemplate> cachedUriTemplateMap = new HashMap<String,StoredValuesUriTemplate>();
 
     /*
      * REM - 11/14/2011 - I discovered this static block of code and don't understand why it exists.  However, a side-effect of this static block is that ServiceMain is trying
@@ -393,21 +395,26 @@ public abstract class ResourceBase
         return getServiceName();
     }
     
-    // As generally mentioned by Patrick, we will want to cache generated values, and
-    // only generate one time if the cached value has not yet been populated. 
-
     public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
+        // Return cached copy of URI template map, if available
         Map<String,StoredValuesUriTemplate> uriTemplateMap = new HashMap<String,StoredValuesUriTemplate>();
-        String docType = getDocType();
-        StoredValuesUriTemplate resourceUriTemplate = getResourceUriTemplate();
-        if (docType == null) {
-            return uriTemplateMap; // return an empty map
+        if (this.cachedUriTemplateMap != null && !this.cachedUriTemplateMap.isEmpty()) {
+            uriTemplateMap.putAll(cachedUriTemplateMap);
+            return uriTemplateMap;
+        } else {
+            // Construct and return a resource URI template as the sole item in the map
+            String docType = getDocType();
+            StoredValuesUriTemplate resourceUriTemplate = getResourceUriTemplate();
+            if (docType == null) {
+                return uriTemplateMap; // return an empty map
+            }
+            if (resourceUriTemplate == null) {
+                return uriTemplateMap; // return an empty map
+            }
+            uriTemplateMap.put(docType, resourceUriTemplate);
+            cacheUriTemplateMap(uriTemplateMap);
+            return uriTemplateMap;
         }
-        if (resourceUriTemplate == null) {
-            return uriTemplateMap; // return an empty map
-        }
-        uriTemplateMap.put(docType, resourceUriTemplate);
-        return uriTemplateMap;
     }
     
     private StoredValuesUriTemplate getResourceUriTemplate() {
@@ -417,6 +424,10 @@ public abstract class ResourceBase
                 UriTemplateFactory.getURITemplate(UriTemplateFactory.RESOURCE,
                 storedValuesMap);
         return template;
+    }
+
+    public void cacheUriTemplateMap(Map<String, StoredValuesUriTemplate> uriTemplateMap) {
+            this.cachedUriTemplateMap = uriTemplateMap;
     }
 
 }

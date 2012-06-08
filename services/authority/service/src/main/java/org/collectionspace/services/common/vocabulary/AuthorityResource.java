@@ -81,8 +81,11 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.collectionspace.services.client.*;
+import org.collectionspace.services.common.*;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 /**
@@ -956,5 +959,37 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         } catch (Exception e) {
             throw bigReThrow(e, "Error showing hierarchy", itemcsid);
         }
+    }
+    
+    public String getItemDocType() {
+        // FIXME: Proof of concept placeholder
+        return getServiceName();
+    }
+
+    @Override
+    public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
+        // Get resource URI template from superclass
+        Map<String,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap();
+        // Add item URI template
+        String itemDocType = getItemDocType();
+        StoredValuesUriTemplate itemUriTemplate = getItemUriTemplate();
+        if (itemDocType == null) {
+            return uriTemplateMap; // return map as obtained from superclass
+        }
+        if (itemUriTemplate == null) {
+            return uriTemplateMap; // return map as obtained from superclass
+        }
+        uriTemplateMap.put(itemDocType, itemUriTemplate);
+        cacheUriTemplateMap(uriTemplateMap);
+        return uriTemplateMap;
+    }
+    
+    private StoredValuesUriTemplate getItemUriTemplate() {
+        Map<String,String> storedValuesMap = new HashMap<String,String>();
+        storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
+        StoredValuesUriTemplate template =
+                UriTemplateFactory.getURITemplate(UriTemplateFactory.ITEM,
+                storedValuesMap);
+        return template;
     }
 }

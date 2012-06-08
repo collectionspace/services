@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.contact;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -41,6 +43,8 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -293,5 +297,37 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
                     + ": or one of the specifiers for authority:" + parentspecifier
                     + ": and item:" + itemspecifier + ": was not found.", csid);
         }
+    }
+    
+    public String getContactDocType() {
+        // FIXME: Proof of concept placeholder
+        return getServiceName();
+    }
+
+    @Override
+    public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
+        // Get resource and item URI templates from superclass
+        Map<String,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap();
+        // Add item URI template
+        String contactDocType = getContactDocType();
+        StoredValuesUriTemplate itemUriTemplate = getItemUriTemplate();
+        if (contactDocType == null) {
+            return uriTemplateMap; // return map as obtained from superclass
+        }
+        if (itemUriTemplate == null) {
+            return uriTemplateMap; // return map as obtained from superclass
+        }
+        uriTemplateMap.put(contactDocType, itemUriTemplate);
+        cacheUriTemplateMap(uriTemplateMap);
+        return uriTemplateMap;
+    }
+    
+    private StoredValuesUriTemplate getItemUriTemplate() {
+        Map<String,String> storedValuesMap = new HashMap<String,String>();
+        storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
+        StoredValuesUriTemplate template =
+                UriTemplateFactory.getURITemplate(UriTemplateFactory.ITEM,
+                storedValuesMap);
+        return template;
     }
 }
