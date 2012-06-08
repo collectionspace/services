@@ -68,6 +68,7 @@ import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.common.ResourceMapImpl;
+import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.security.SecurityInterceptor;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -89,6 +90,7 @@ public class CollectionSpaceJaxRsApplication extends Application
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
     private ResourceMap resourceMap = new ResourceMapImpl();
+    private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
     private ServletContext servletContext = null;
 
     public CollectionSpaceJaxRsApplication() {    	
@@ -140,6 +142,7 @@ public class CollectionSpaceJaxRsApplication extends Application
     private void addResourceToMapAndSingletons(ResourceBase resource) {
         singletons.add(resource);
         resourceMap.put(resource.getServiceName(), resource);
+        // uriTemplateRegistry.put(resource.getDocType(), resource.getUriTemplate());
     }
 
     @Override

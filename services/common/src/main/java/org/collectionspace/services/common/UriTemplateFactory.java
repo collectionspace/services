@@ -5,7 +5,7 @@
  *
  * http://www.collectionspace.org http://wiki.collectionspace.org
  *
- * Copyright 2009-2012 University of California, Berkeley
+ * Copyright © 2009-2012 University of California, Berkeley
  *
  * Licensed under the Educational Community License (ECL), Version 2.0. You may
  * not use this file except in compliance with this License.
@@ -22,12 +22,18 @@
  */
 package org.collectionspace.services.common;
 
+/**
+ * UriTemplateFactory.java
+ *
+ * A factory for building instances of URITemplate classes, based on a provided
+ * template type.
+ */
 public class UriTemplateFactory {
 
     public final static String RESOURCE_TEMPLATE_PATTERN =
             "/{servicename}/{identifier}";
-    // FIXME: Get static strings below (e.g. "items") from already-declared
-    // constants elsewhere
+    // FIXME: Get static strings below (e.g. "items", "contacts") from
+    // already-declared constants elsewhere
     public final static String ITEM_TEMPLATE_PATTERN =
             "/{servicename}/{identifier}/items/{itemIdentifier}";
     public final static String CONTACT_TEMPLATE_PATTERN =

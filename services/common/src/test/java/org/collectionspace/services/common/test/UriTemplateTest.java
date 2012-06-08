@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
 public class UriTemplateTest {
 
     final static String EXAMPLE_SERVICE_NAME = "examples";
-    final static String CSID = "a87f6616-4146-4c17-a41a-048597cc12aa";
+    final static String EXAMPLE_CSID = "a87f6616-4146-4c17-a41a-048597cc12aa";
     private static final Logger logger = LoggerFactory.getLogger(UriTemplateTest.class);
 
     private void testBanner(String msg) {
@@ -59,13 +59,13 @@ public class UriTemplateTest {
         UriTemplate resourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);
         Map<String, String> resourceUriVars = new HashMap<String, String>();
         resourceUriVars.put("servicename", EXAMPLE_SERVICE_NAME);
-        resourceUriVars.put("identifier", CSID);
+        resourceUriVars.put("identifier", EXAMPLE_CSID);
         String uriStr = resourceTemplate.buildUri(resourceUriVars);
         Assert.assertFalse(Tools.isBlank(uriStr), "Generated URI string is null or blank.");
         logger.debug("Generated URI string = " + uriStr);
     }
 
-    @Test(dependsOnMethods = {"createResourceUriTemplate"})
+    @Test(dependsOnMethods = {"buildResourceUri"})
     public void buildResourceUriWithMissingValue() {
         testBanner("buildResourceUriWithMissingValue");
         UriTemplate resourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);
@@ -78,7 +78,7 @@ public class UriTemplateTest {
         logger.debug("Generated URI string = " + uriStr);
     }
 
-    @Test(dependsOnMethods = {"createResourceUriTemplate"})
+    @Test(dependsOnMethods = {"buildResourceUri"})
     public void buildResourceUriWithNullValue() {
         testBanner("buildResourceUriWithNullValue");
         UriTemplate resourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);

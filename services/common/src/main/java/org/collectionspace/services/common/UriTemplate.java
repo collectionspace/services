@@ -5,7 +5,7 @@
  *
  * http://www.collectionspace.org http://wiki.collectionspace.org
  *
- * Copyright 2009-2012 University of California, Berkeley
+ * Copyright © 2009-2012 University of California, Berkeley
  *
  * Licensed under the Educational Community License (ECL), Version 2.0. You may
  * not use this file except in compliance with this License.
@@ -30,6 +30,12 @@ import org.collectionspace.services.common.api.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * UriTemplate.java
+ *
+ * Generates URI strings by combining a URI template with provided values, which
+ * replace variables within the template.
+ */
 public class UriTemplate {
 
     private static final Logger logger = LoggerFactory.getLogger(UriTemplate.class);
@@ -76,10 +82,10 @@ public class UriTemplate {
         return getUriPath();
     }
 
-    public String buildUri(Map<String, String> varsMap) {
+    public String buildUri(Map<String, String> valuesMap) {
         URI uri = null;
         try {
-            uri = getBuilder().buildFromMap(varsMap);
+            uri = getBuilder().buildFromMap(valuesMap);
         } catch (IllegalArgumentException iae) {
             logger.warn("One or more required parameter values were missing "
                     + "when building URI value via URI Template: " + iae.getMessage());
