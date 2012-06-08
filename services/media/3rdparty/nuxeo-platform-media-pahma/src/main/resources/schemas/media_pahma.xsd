@@ -16,7 +16,7 @@
   targetNamespace="http://collectionspace.org/services/media/local/pahma"
   version="0.1">
  
-	<xs:element name="approvedForWeb" type="xs:string"/>
-	<xs:element name="primaryDisplay" type="xs:string"/>
+	<xs:element name="approvedForWeb" type="xs:boolean"/>
+	<xs:element name="primaryDisplay" type="xs:boolean"/>
  
 </xs:schema>
