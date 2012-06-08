@@ -31,4 +31,11 @@ import java.util.HashMap;
  * accessing instances of those documents.
  */
 public class UriTemplateRegistry extends HashMap<String, StoredValuesUriTemplate> {
+
+    public void dump() {
+        for (String docTypeKey : this.keySet()) {
+            StoredValuesUriTemplate uriTemplate = this.get(docTypeKey);
+            System.out.println("Key = " + docTypeKey + ", Value = " + uriTemplate.getUriTemplateType() + " : " + uriTemplate.toString());
+        }
+    }
 }

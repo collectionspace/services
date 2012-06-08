@@ -59,16 +59,13 @@ import javax.ws.rs.core.Context;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 //import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
-import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.ResourceMapHolder;
-import org.collectionspace.services.common.ResourceMapImpl;
-import org.collectionspace.services.common.UriTemplateRegistry;
+import org.collectionspace.services.common.*;
 import org.collectionspace.services.common.security.SecurityInterceptor;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -131,6 +128,10 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new ReportResource());
 
         singletons.add(new IDResource());
+        
+        // FIXME: Temporary for CSPACE-5271
+        uriTemplateRegistry.dump();
+        
         /*
         singletons.add(new WorkflowResource());
         */

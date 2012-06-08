@@ -298,7 +298,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     
     public String getContactDocType() {
         // FIXME: Proof of concept placeholder
-        return getServiceName();
+        return "contact-" + getServiceName();
     }
 
     @Override

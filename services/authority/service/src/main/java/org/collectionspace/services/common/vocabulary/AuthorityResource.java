@@ -963,7 +963,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     
     public String getItemDocType() {
         // FIXME: Proof of concept placeholder
-        return getServiceName();
+        return "item-" + getServiceName();
     }
 
     @Override
