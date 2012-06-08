@@ -396,11 +396,25 @@ public abstract class ResourceBase
     // As generally mentioned by Patrick, we will want to cache generated values, and
     // only generate one time if the cached value has not yet been populated. 
 
-    public StoredValuesUriTemplate getUriTemplate() {
+    public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
+        Map<String,StoredValuesUriTemplate> uriTemplateMap = new HashMap<String,StoredValuesUriTemplate>();
+        String docType = getDocType();
+        StoredValuesUriTemplate resourceUriTemplate = getResourceUriTemplate();
+        if (docType == null) {
+            return uriTemplateMap; // return an empty map
+        }
+        if (resourceUriTemplate == null) {
+            return uriTemplateMap; // return an empty map
+        }
+        uriTemplateMap.put(docType, resourceUriTemplate);
+        return uriTemplateMap;
+    }
+    
+    private StoredValuesUriTemplate getResourceUriTemplate() {
         Map<String,String> storedValuesMap = new HashMap<String,String>();
         storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
         StoredValuesUriTemplate template =
-                UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE,
+                UriTemplateFactory.getURITemplate(UriTemplateFactory.RESOURCE,
                 storedValuesMap);
         return template;
     }

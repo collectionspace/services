@@ -32,13 +32,24 @@ import java.util.Map;
  */
 public class UriTemplateFactory {
     
+    // For coding convenience, each item in the enum is also available as a field
+    // in the enclosing class.
+    public final static UriTemplateType RESOURCE = UriTemplateType.RESOURCE;
+    public final static UriTemplateType ITEM = UriTemplateType.ITEM;
+    public final static UriTemplateType CONTACT = UriTemplateType.CONTACT;
+
+    public enum UriTemplateType {
+
+        RESOURCE, ITEM, CONTACT
+    };
+    
     public final static String SERVICENAME_VAR = "servicename";
     public final static String IDENTIFIER_VAR = "identifier";
     public final static String ITEM_IDENTIFIER_VAR = "itemIdentifier";
     public final static String CONTACT_IDENTIFIER_VAR = "contactIdentifier";
 
     public final static String RESOURCE_PATH_PATTERN =
-            "/ +"
+            "/"
             + "{" + SERVICENAME_VAR + "}"
             + "/"
             + "{" + IDENTIFIER_VAR + "}";
@@ -54,11 +65,11 @@ public class UriTemplateFactory {
             + "{" + CONTACT_IDENTIFIER_VAR + "}";
 
     public static StoredValuesUriTemplate getURITemplate(UriTemplateType type) {
-        return new StoredValuesUriTemplate(getUriPathPattern(type));
+        return new StoredValuesUriTemplate(type, getUriPathPattern(type));
     }
     
     public static StoredValuesUriTemplate getURITemplate(UriTemplateType type, Map<String,String> storedValuesMap) {
-        return new StoredValuesUriTemplate(getUriPathPattern(type), storedValuesMap);
+        return new StoredValuesUriTemplate(type, getUriPathPattern(type), storedValuesMap);
     }
 
     private static String getUriPathPattern(UriTemplateType type) {
@@ -77,8 +88,4 @@ public class UriTemplateFactory {
         }
     }
 
-    public enum UriTemplateType {
-
-        RESOURCE, ITEM, CONTACT
-    };
 }

@@ -24,6 +24,7 @@ package org.collectionspace.services.common;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.collectionspace.services.common.UriTemplateFactory.UriTemplateType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +45,12 @@ public class StoredValuesUriTemplate extends UriTemplate {
     private static final Logger logger = LoggerFactory.getLogger(StoredValuesUriTemplate.class);
     private Map<String, String> storedValuesMap = new HashMap<String, String>();
 
-    public StoredValuesUriTemplate(String path) {
-        super(path);
+    public StoredValuesUriTemplate(UriTemplateType type, String path) {
+        super(type, path);
     }
 
-    public StoredValuesUriTemplate(String path, Map<String, String> storedValuesMap) {
-        super(path);
+    public StoredValuesUriTemplate(UriTemplateType type, String path, Map<String, String> storedValuesMap) {
+        super(type, path);
         setStoredValuesMap(storedValuesMap);
     }
 

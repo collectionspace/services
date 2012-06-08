@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.UriTemplateFactory.UriTemplateType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +40,26 @@ import org.slf4j.LoggerFactory;
 public abstract class UriTemplate {
 
     private static final Logger logger = LoggerFactory.getLogger(UriTemplate.class);
-    private UriBuilder builder;
-    private String uriPath;
+    private UriTemplateType uriTemplateType = null;
+    private String uriPath = "";
+    private UriBuilder builder = null;
     private final static String EMPTY_STRING = "";
 
-    public UriTemplate(String path) {
+
+    public UriTemplate(UriTemplateType type, String path) {
+        setUriTemplateType(type);
         setUriPath(path);
         setBuilder();
+    }
+    
+    private void setUriTemplateType(UriTemplateType type) {
+        if (type != null) {
+            this.uriTemplateType = type;
+        }
+    }
+
+    public UriTemplateType getUriTemplateType() {
+        return this.uriTemplateType;
     }
 
     private void setUriPath(String path) {
@@ -55,7 +69,7 @@ public abstract class UriTemplate {
     }
 
     private String getUriPath() {
-        return uriPath;
+        return this.uriPath;
     }
 
     private void setBuilder() {
