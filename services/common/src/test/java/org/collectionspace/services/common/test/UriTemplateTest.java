@@ -51,7 +51,7 @@ public class UriTemplateTest {
         Assert.assertNotNull(resourceTemplate, "Resource template is null; it was not created successfully.");
         logger.debug("Resource template URI path = " + resourceTemplate.toString());
         Assert.assertNotNull(resourceTemplate.toString(), "Resource template URI path is null; it was not set successfully.");
-        Assert.assertEquals(resourceTemplate.toString(), UriTemplateFactory.RESOURCE_TEMPLATE_PATTERN,
+        Assert.assertEquals(resourceTemplate.toString(), UriTemplateFactory.RESOURCE_PATH_PATTERN,
                 "Resource template URI path doesn't match expected path.");
     }
 
@@ -72,10 +72,10 @@ public class UriTemplateTest {
     @Test(dependsOnMethods = {"buildResourceUri"})
     public void buildResourceUriWithStoredValues() {
         testBanner("buildResourceUriWithStoredValues");
-        StoredValuesUriTemplate storedValuesResourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);
         Map<String, String> storedValuesMap = new HashMap<String, String>();
         storedValuesMap.put("servicename", EXAMPLE_SERVICE_NAME);
-        storedValuesResourceTemplate.setStoredValuesMap(storedValuesMap);
+        StoredValuesUriTemplate storedValuesResourceTemplate =
+                UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE, storedValuesMap);
         Map<String, String> additionalValues = new HashMap<String, String>();
         additionalValues.put("identifier", EXAMPLE_CSID);
         String uriStr = storedValuesResourceTemplate.buildUri(additionalValues);

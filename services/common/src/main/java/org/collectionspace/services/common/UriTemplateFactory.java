@@ -27,40 +27,43 @@ import java.util.Map;
 /**
  * UriTemplateFactory.java
  *
- * A factory for building instances of URITemplate classes, based on a provided
- * template type.
+ * A factory for building instances of subclasses of URITemplate, based on a
+ * provided template type.
  */
 public class UriTemplateFactory {
 
-    public final static String RESOURCE_TEMPLATE_PATTERN =
+    public final static String RESOURCE_PATH_PATTERN =
             "/{servicename}/{identifier}";
     // FIXME: Get static strings below (e.g. "items", "contacts") from
     // already-declared constants elsewhere
-    public final static String ITEM_TEMPLATE_PATTERN =
+    public final static String ITEM_PATH_PATTERN =
             "/{servicename}/{identifier}/items/{itemIdentifier}";
-    public final static String CONTACT_TEMPLATE_PATTERN =
+    public final static String CONTACT_PATH_PATTERN =
             "/{servicename}/{identifier}/items/{itemIdentifier}/contacts/{contactIdentifier}";
-    
-    private final static StoredValuesUriTemplate RESOURCE_URI_TEMPLATE =
-            new StoredValuesUriTemplate(RESOURCE_TEMPLATE_PATTERN);
-    private final static StoredValuesUriTemplate ITEM_URI_TEMPLATE =
-            new StoredValuesUriTemplate(ITEM_TEMPLATE_PATTERN);
-    private final static StoredValuesUriTemplate CONTACT_URI_TEMPLATE =
-            new StoredValuesUriTemplate(CONTACT_TEMPLATE_PATTERN);
 
     public static StoredValuesUriTemplate getURITemplate(UriTemplateType type) {
+        return new StoredValuesUriTemplate(getUriPathPattern(type));
+    }
+    
+    public static StoredValuesUriTemplate getURITemplate(UriTemplateType type, Map<String,String> storedValuesMap) {
+        StoredValuesUriTemplate template = new StoredValuesUriTemplate(getUriPathPattern(type));
+        template.setStoredValuesMap(storedValuesMap);
+        return template;
+    }
+
+    private static String getUriPathPattern(UriTemplateType type) {
         switch (type) {
             case RESOURCE:
-                return RESOURCE_URI_TEMPLATE;
+                return RESOURCE_PATH_PATTERN;
 
             case ITEM:
-                return ITEM_URI_TEMPLATE;
+                return ITEM_PATH_PATTERN;
 
             case CONTACT:
-                return CONTACT_URI_TEMPLATE;
+                return CONTACT_PATH_PATTERN;
 
             default:
-                return RESOURCE_URI_TEMPLATE;
+                return RESOURCE_PATH_PATTERN;
         }
     }
 

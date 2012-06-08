@@ -43,17 +43,17 @@ public class StoredValuesUriTemplate extends UriTemplate {
 
     private static final Logger logger = LoggerFactory.getLogger(StoredValuesUriTemplate.class);
     private Map<String, String> storedValuesMap = new HashMap<String, String>();
-    
+
     public StoredValuesUriTemplate(String path) {
         super(path);
     }
-    
+
     public StoredValuesUriTemplate(String path, Map<String, String> storedValuesMap) {
         super(path);
         setStoredValuesMap(storedValuesMap);
     }
 
-    public void setStoredValuesMap(Map<String, String> storedValuesMap) {
+    final public void setStoredValuesMap(Map<String, String> storedValuesMap) {
         if (storedValuesMap != null && !storedValuesMap.isEmpty()) {
             this.storedValuesMap = storedValuesMap;
         }
@@ -64,21 +64,22 @@ public class StoredValuesUriTemplate extends UriTemplate {
     }
 
     /**
-     * Builds a URI string from a combination of previously-stored values (such
-     * as static URI path components) and additional values (such as resource
-     * identifiers), both of which will replace variables within the URI
-     * template.
+     * Builds a URI string from a combination of previously-stored values, if
+     * any (such as static URI path components) and additional values, if any
+     * (such as resource identifiers), both of which will replace variables
+     * within the URI template.
      *
-     * @param additionalValuesMap a map of values that will replace variables
-     * within the URI template
+     * @param additionalValuesMap an optional map of values that will replace
+     * variables within the URI template
      * @return a URI string
      */
+    @Override
     public String buildUri(Map<String, String> additionalValuesMap) {
         Map<String, String> allValuesMap = new HashMap<String, String>();
         try {
-            Map<String,String> storedValuesMap = getStoredValuesMap();
-            if (storedValuesMap != null && !storedValuesMap.isEmpty()) {
-                allValuesMap.putAll(storedValuesMap);
+            Map<String, String> storedValsMap = getStoredValuesMap();
+            if (storedValsMap != null && !storedValsMap.isEmpty()) {
+                allValuesMap.putAll(storedValsMap);
             }
             if (additionalValuesMap != null && !additionalValuesMap.isEmpty()) {
                 allValuesMap.putAll(additionalValuesMap);
