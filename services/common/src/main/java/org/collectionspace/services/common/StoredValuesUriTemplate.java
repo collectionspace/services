@@ -24,6 +24,8 @@ package org.collectionspace.services.common;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * StoredValuesUriTemplate.java
@@ -31,13 +33,15 @@ import java.util.Map;
  * Generates URI strings by combining a URI template with provided values, which
  * replace variables within the template.
  *
- * In this subclass, some of the values which will replace variables in a URI
- * template are static, and can be stored alongside the template for reuse.
- * Additional values that will replace variables within the template are also
- * dynamically accepted, and are merged with stored values when building URIs.
+ * In this subclass of UriTemplate, some of the values which will replace
+ * variables in a URI template are static, and can be stored alongside the
+ * template for reuse. Additional values that will replace variables within the
+ * template are also dynamically accepted, and are merged with stored values
+ * when building URIs.
  */
 public class StoredValuesUriTemplate extends UriTemplate {
 
+    private static final Logger logger = LoggerFactory.getLogger(StoredValuesUriTemplate.class);
     private Map<String, String> storedValuesMap = new HashMap<String, String>();
 
     public StoredValuesUriTemplate(String path, Map<String, String> storedValuesMap) {
@@ -61,15 +65,22 @@ public class StoredValuesUriTemplate extends UriTemplate {
      * identifiers), both of which will replace variables within the URI
      * template.
      *
-     * @param varsMap a map of values that will replace variables within the URI
-     * template
+     * @param additionalValuesMap a map of values that will replace variables
+     * within the URI template
      * @return a URI string
      */
     public String buildUri(Map<String, String> additionalValuesMap) {
         Map<String, String> allValuesMap = new HashMap<String, String>();
-        allValuesMap.putAll(getStoredValuesMap());
-        if (storedValuesMap != null && !storedValuesMap.isEmpty()) {
-            allValuesMap.putAll(additionalValuesMap);
+        try {
+            Map<String,String> storedValuesMap = getStoredValuesMap();
+            if (storedValuesMap != null && !storedValuesMap.isEmpty()) {
+                allValuesMap.putAll(storedValuesMap);
+            }
+            if (additionalValuesMap != null && !additionalValuesMap.isEmpty()) {
+                allValuesMap.putAll(additionalValuesMap);
+            }
+        } catch (Exception e) {
+            logger.warn("Some values could not be added to values map when building URI string: " + e.getMessage());
         }
         return super.buildUri(allValuesMap);
     }

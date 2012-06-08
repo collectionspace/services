@@ -85,12 +85,15 @@ public class UriTemplate {
     public String buildUri(Map<String, String> valuesMap) {
         URI uri = null;
         try {
+            if (valuesMap == null || valuesMap.isEmpty()) {
+                throw new IllegalArgumentException("Map of values for building URI string was null or empty");
+            }
             uri = getBuilder().buildFromMap(valuesMap);
         } catch (IllegalArgumentException iae) {
-            logger.warn("One or more required parameter values were missing "
-                    + "when building URI value via URI Template: " + iae.getMessage());
+            logger.warn("One or more required values were missing "
+                    + "when building URI string: " + iae.getMessage());
         } catch (UriBuilderException ube) {
-            logger.warn("URI value can't be constructed due to state of URIBuilder: " + ube.getMessage());
+            logger.warn("URI string can't be constructed due to state of URIBuilder: " + ube.getMessage());
         } finally {
             if (uri != null) {
                 return uri.toString();
