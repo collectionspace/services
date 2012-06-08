@@ -47,7 +47,9 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * $LastChangedRevision:  $
@@ -376,6 +378,26 @@ public abstract class ResourceBase
     public DocumentModel getDocModelForRefName(RepositoryInstance repoSession, String refName) 
    			throws Exception, DocumentNotFoundException {
     	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
+    }
+    
+    // FIXME: For authority items, we will need to return an array / collection of uriTemplate objects,
+    // since there are two different doctypes, with associated uriTemplates, to insert into the registry.
+    // The following is a placeholder to test proof of concept, adding a single item from each resource
+    // to the registry.
+    
+    public String getDocType() {
+        // FIXME: Proof of concept placeholder
+        return getServiceName();
+    }
+    
+
+    public StoredValuesUriTemplate getUriTemplate() {
+        Map<String,String> storedValuesMap = new HashMap<String,String>();
+        storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
+        StoredValuesUriTemplate template =
+                UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE,
+                storedValuesMap);
+        return template;
     }
 
 }

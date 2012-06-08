@@ -142,7 +142,9 @@ public class CollectionSpaceJaxRsApplication extends Application
     private void addResourceToMapAndSingletons(ResourceBase resource) {
         singletons.add(resource);
         resourceMap.put(resource.getServiceName(), resource);
-        // uriTemplateRegistry.put(resource.getDocType(), resource.getUriTemplate());
+        // FIXME: Accept multiple entries from each resource into the registry.
+        // See also similar comments in ResourceBase.
+        uriTemplateRegistry.put(resource.getDocType(), resource.getUriTemplate());
     }
 
     @Override

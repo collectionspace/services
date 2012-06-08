@@ -31,24 +31,34 @@ import java.util.Map;
  * provided template type.
  */
 public class UriTemplateFactory {
+    
+    public final static String SERVICENAME_VAR = "servicename";
+    public final static String IDENTIFIER_VAR = "identifier";
+    public final static String ITEM_IDENTIFIER_VAR = "itemIdentifier";
+    public final static String CONTACT_IDENTIFIER_VAR = "contactIdentifier";
 
     public final static String RESOURCE_PATH_PATTERN =
-            "/{servicename}/{identifier}";
+            "/ +"
+            + "{" + SERVICENAME_VAR + "}"
+            + "/"
+            + "{" + IDENTIFIER_VAR + "}";
     // FIXME: Get static strings below (e.g. "items", "contacts") from
     // already-declared constants elsewhere
     public final static String ITEM_PATH_PATTERN =
-            "/{servicename}/{identifier}/items/{itemIdentifier}";
+            RESOURCE_PATH_PATTERN
+            + "/items/"
+            + "{" + ITEM_IDENTIFIER_VAR + "}";
     public final static String CONTACT_PATH_PATTERN =
-            "/{servicename}/{identifier}/items/{itemIdentifier}/contacts/{contactIdentifier}";
+            ITEM_PATH_PATTERN
+            + "/contacts/"
+            + "{" + CONTACT_IDENTIFIER_VAR + "}";
 
     public static StoredValuesUriTemplate getURITemplate(UriTemplateType type) {
         return new StoredValuesUriTemplate(getUriPathPattern(type));
     }
     
     public static StoredValuesUriTemplate getURITemplate(UriTemplateType type, Map<String,String> storedValuesMap) {
-        StoredValuesUriTemplate template = new StoredValuesUriTemplate(getUriPathPattern(type));
-        template.setStoredValuesMap(storedValuesMap);
-        return template;
+        return new StoredValuesUriTemplate(getUriPathPattern(type), storedValuesMap);
     }
 
     private static String getUriPathPattern(UriTemplateType type) {
