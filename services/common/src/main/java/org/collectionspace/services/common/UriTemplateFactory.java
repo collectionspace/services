@@ -22,6 +22,8 @@
  */
 package org.collectionspace.services.common;
 
+import java.util.Map;
+
 /**
  * UriTemplateFactory.java
  *
@@ -38,14 +40,15 @@ public class UriTemplateFactory {
             "/{servicename}/{identifier}/items/{itemIdentifier}";
     public final static String CONTACT_TEMPLATE_PATTERN =
             "/{servicename}/{identifier}/items/{itemIdentifier}/contacts/{contactIdentifier}";
-    private final static UriTemplate RESOURCE_URI_TEMPLATE =
-            new UriTemplate(RESOURCE_TEMPLATE_PATTERN);
-    private final static UriTemplate ITEM_URI_TEMPLATE =
-            new UriTemplate(ITEM_TEMPLATE_PATTERN);
-    private final static UriTemplate CONTACT_URI_TEMPLATE =
-            new UriTemplate(CONTACT_TEMPLATE_PATTERN);
+    
+    private final static StoredValuesUriTemplate RESOURCE_URI_TEMPLATE =
+            new StoredValuesUriTemplate(RESOURCE_TEMPLATE_PATTERN);
+    private final static StoredValuesUriTemplate ITEM_URI_TEMPLATE =
+            new StoredValuesUriTemplate(ITEM_TEMPLATE_PATTERN);
+    private final static StoredValuesUriTemplate CONTACT_URI_TEMPLATE =
+            new StoredValuesUriTemplate(CONTACT_TEMPLATE_PATTERN);
 
-    public static UriTemplate getURITemplate(UriTemplateType type) {
+    public static StoredValuesUriTemplate getURITemplate(UriTemplateType type) {
         switch (type) {
             case RESOURCE:
                 return RESOURCE_URI_TEMPLATE;

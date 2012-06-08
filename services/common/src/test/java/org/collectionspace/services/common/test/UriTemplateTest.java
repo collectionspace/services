@@ -23,6 +23,7 @@ package org.collectionspace.services.common.test;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.api.Tools;
@@ -35,6 +36,7 @@ public class UriTemplateTest {
 
     final static String EXAMPLE_SERVICE_NAME = "examples";
     final static String EXAMPLE_CSID = "a87f6616-4146-4c17-a41a-048597cc12aa";
+    final static HashMap<String, String> EMPTY_VALUES_MAP = new HashMap<String, String>();
     private static final Logger logger = LoggerFactory.getLogger(UriTemplateTest.class);
 
     private void testBanner(String msg) {
@@ -62,6 +64,24 @@ public class UriTemplateTest {
         resourceUriVars.put("identifier", EXAMPLE_CSID);
         String uriStr = resourceTemplate.buildUri(resourceUriVars);
         Assert.assertFalse(Tools.isBlank(uriStr), "Generated URI string is null or blank.");
+        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected value: " + EXAMPLE_SERVICE_NAME);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected value: " + EXAMPLE_CSID);
+        logger.debug("Generated URI string = " + uriStr);
+    }
+
+    @Test(dependsOnMethods = {"buildResourceUri"})
+    public void buildResourceUriWithStoredValues() {
+        testBanner("buildResourceUriWithStoredValues");
+        StoredValuesUriTemplate storedValuesResourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);
+        Map<String, String> storedValuesMap = new HashMap<String, String>();
+        storedValuesMap.put("servicename", EXAMPLE_SERVICE_NAME);
+        storedValuesResourceTemplate.setStoredValuesMap(storedValuesMap);
+        Map<String, String> additionalValues = new HashMap<String, String>();
+        additionalValues.put("identifier", EXAMPLE_CSID);
+        String uriStr = storedValuesResourceTemplate.buildUri(additionalValues);
+        Assert.assertFalse(Tools.isBlank(uriStr), "Generated URI string is null or blank.");
+        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected value: " + EXAMPLE_SERVICE_NAME);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected value: " + EXAMPLE_CSID);
         logger.debug("Generated URI string = " + uriStr);
     }
 
@@ -87,6 +107,16 @@ public class UriTemplateTest {
         resourceUriVars.put("identifier", null);
         logger.debug("This is a negative test, and an error message is expected here:");
         String uriStr = resourceTemplate.buildUri(resourceUriVars);
+        Assert.assertTrue(Tools.isBlank(uriStr), "Generated URI string was not blank, but should have been.");
+        logger.debug("Generated URI string = " + uriStr);
+    }
+
+    @Test(dependsOnMethods = {"buildResourceUri"})
+    public void buildResourceUriWithEmptyValuesMap() {
+        testBanner("buildResourceUriWithEmptyValuesMap");
+        UriTemplate resourceTemplate = UriTemplateFactory.getURITemplate(UriTemplateFactory.UriTemplateType.RESOURCE);
+        logger.debug("This is a negative test, and an error message is expected here:");
+        String uriStr = resourceTemplate.buildUri(EMPTY_VALUES_MAP);
         Assert.assertTrue(Tools.isBlank(uriStr), "Generated URI string was not blank, but should have been.");
         logger.debug("Generated URI string = " + uriStr);
     }

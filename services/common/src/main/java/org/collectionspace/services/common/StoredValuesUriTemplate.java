@@ -43,13 +43,17 @@ public class StoredValuesUriTemplate extends UriTemplate {
 
     private static final Logger logger = LoggerFactory.getLogger(StoredValuesUriTemplate.class);
     private Map<String, String> storedValuesMap = new HashMap<String, String>();
-
+    
+    public StoredValuesUriTemplate(String path) {
+        super(path);
+    }
+    
     public StoredValuesUriTemplate(String path, Map<String, String> storedValuesMap) {
         super(path);
         setStoredValuesMap(storedValuesMap);
     }
 
-    private void setStoredValuesMap(Map<String, String> storedValuesMap) {
+    public void setStoredValuesMap(Map<String, String> storedValuesMap) {
         if (storedValuesMap != null && !storedValuesMap.isEmpty()) {
             this.storedValuesMap = storedValuesMap;
         }

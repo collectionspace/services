@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * Generates URI strings by combining a URI template with provided values, which
  * replace variables within the template.
  */
-public class UriTemplate {
+public abstract class UriTemplate {
 
     private static final Logger logger = LoggerFactory.getLogger(UriTemplate.class);
     private UriBuilder builder;
