@@ -382,6 +382,9 @@ public abstract class ResourceBase
     
     // FIXME: For authority items, we will need to return an array / collection of uriTemplate objects,
     // since there are two different doctypes, with associated uriTemplates, to insert into the registry.
+    // (One of those uriTemplates will also need to be of type ITEM, while in AuthorityResourceWithContacts,
+    // a third uriTemplate will need to be of type CONCEPT.)
+    
     // The following is a placeholder to test proof of concept, adding a single item from each resource
     // to the registry.
     
@@ -390,6 +393,8 @@ public abstract class ResourceBase
         return getServiceName();
     }
     
+    // As generally mentioned by Patrick, we will want to cache generated values, and
+    // only generate one time if the cached value has not yet been populated. 
 
     public StoredValuesUriTemplate getUriTemplate() {
         Map<String,String> storedValuesMap = new HashMap<String,String>();
