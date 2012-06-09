@@ -72,8 +72,8 @@ public class UriTemplateTest {
         String uriStr = resourceTemplate.buildUri(resourceUriVars);
         logger.debug("Generated URI string = " + uriStr);
         Assert.assertFalse(Tools.isBlank(uriStr), "Generated URI string is null or blank.");
-        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected value: " + EXAMPLE_SERVICE_NAME);
-        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected value: " + EXAMPLE_CSID);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected service name value: " + EXAMPLE_SERVICE_NAME);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected identifier value: " + EXAMPLE_CSID);
     }
 
     @Test(dependsOnMethods = {"buildResourceUri"})
@@ -88,8 +88,8 @@ public class UriTemplateTest {
         String uriStr = storedValuesResourceTemplate.buildUri(additionalValues);
         logger.debug("Generated URI string = " + uriStr);
         Assert.assertTrue(Tools.notBlank(uriStr), "Generated URI string is null or blank.");
-        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected value: " + EXAMPLE_SERVICE_NAME);
-        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected value: " + EXAMPLE_CSID);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected service name value: " + EXAMPLE_SERVICE_NAME);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected identifier value: " + EXAMPLE_CSID);
     }
 
     @Test(dependsOnMethods = {"buildResourceUriWithStoredValues"})
@@ -105,9 +105,9 @@ public class UriTemplateTest {
         String uriStr = itemTemplate.buildUri(additionalValues);
         logger.debug("Generated URI string = " + uriStr);
         Assert.assertTrue(Tools.notBlank(uriStr), "Generated URI string is null or blank.");
-        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected value: " + EXAMPLE_SERVICE_NAME);
-        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected value: " + EXAMPLE_CSID);
-        Assert.assertTrue(uriStr.contains(EXAMPLE_ITEM_CSID), "Generated URI string does not contain expected item value: " + EXAMPLE_ITEM_CSID);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected service name value: " + EXAMPLE_SERVICE_NAME);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected identifier value: " + EXAMPLE_CSID);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_ITEM_CSID), "Generated URI string does not contain expected item identifier value: " + EXAMPLE_ITEM_CSID);
     }
 
     @Test(dependsOnMethods = {"buildItemUri"})
@@ -123,10 +123,10 @@ public class UriTemplateTest {
         String uriStr = contactTemplate.buildUri(additionalValues);
         logger.debug("Generated URI string = " + uriStr);
         Assert.assertTrue(Tools.notBlank(uriStr), "Generated URI string is null or blank.");
-        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected value: " + EXAMPLE_SERVICE_NAME);
-        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected value: " + EXAMPLE_CSID);
-        Assert.assertTrue(uriStr.contains(EXAMPLE_ITEM_CSID), "Generated URI string does not contain expected item value: " + EXAMPLE_ITEM_CSID);
-        Assert.assertTrue(uriStr.contains(EXAMPLE_CONTACT_CSID), "Generated URI string does not contain expected value: " + EXAMPLE_CONTACT_CSID);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_SERVICE_NAME), "Generated URI string does not contain expected service name value: " + EXAMPLE_SERVICE_NAME);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_CSID), "Generated URI string does not contain expected identifier value: " + EXAMPLE_CSID);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_ITEM_CSID), "Generated URI string does not contain expected item identifier value: " + EXAMPLE_ITEM_CSID);
+        Assert.assertTrue(uriStr.contains(EXAMPLE_CONTACT_CSID), "Generated URI string does not contain expected contact identifier value: " + EXAMPLE_CONTACT_CSID);
     }
 
     // Negative tests: errors are anticipated and checked for in each of the following tests
