@@ -301,9 +301,9 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         return ContactConstants.NUXEO_DOCTYPE;
     }
 
-    // FIXME: This currently populates only one entry in the UriTemplateRegistry
+    // This currently populates only one entry in the UriTemplateRegistry
     // for the Contacts docType, even though contacts can be a sub-resource of
-    // multiple authority item resources.  (This method is called more than once,
+    // multiple authority item resources.  (This method may be called more than once,
     // but each time the existing item with the same key in the map is overwritten.)
     @Override
     public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
@@ -318,6 +318,9 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         if (contactUriTemplate == null) {
             return uriTemplateMap; // return map as obtained from superclass
         }
+        // Remove any service name value stored in the template, as the service name
+        // for contact resources will vary, and must be provided at URI build time 
+        contactUriTemplate.getStoredValuesMap().put(UriTemplateFactory.SERVICENAME_VAR, "");
         uriTemplateMap.put(contactDocType, contactUriTemplate);
         return uriTemplateMap;
     }

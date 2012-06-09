@@ -398,13 +398,13 @@ public abstract class ResourceBase
     
     public String getDocType(String serviceName) {
         String docType = "";
-        String arbitraryTenantId = "";
+        String anyTenantId = "";
         TenantBindingConfigReaderImpl reader = ServiceMain.getInstance().getTenantBindingConfigReader();
         // FIXME: Makes the likely unsupportable assumption that the list of service names and associated
         // document types is materially identical across tenants
-        arbitraryTenantId = getArbitraryTenantId(reader);
-        if (Tools.notBlank(arbitraryTenantId)) {
-            ServiceBindingType sb = reader.getServiceBinding(arbitraryTenantId, serviceName);
+        anyTenantId = getAnyTenantId(reader);
+        if (Tools.notBlank(anyTenantId)) {
+            ServiceBindingType sb = reader.getServiceBinding(anyTenantId, serviceName);
             docType = sb.getObject().getName(); // reads the Nuxeo Document Type from tenant bindings configuration
         }
         return docType;
@@ -433,19 +433,19 @@ public abstract class ResourceBase
         return template;
     }
 
-    public String getArbitraryTenantId(TenantBindingConfigReaderImpl reader) {
-        String arbitraryTenantId = "";
+    public String getAnyTenantId(TenantBindingConfigReaderImpl reader) {
+        String anyTenantId = "";
         Hashtable<String, TenantBindingType> tenantBindings = reader.getTenantBindings();
         if (tenantBindings != null && !tenantBindings.isEmpty()) {
             Enumeration keys = tenantBindings.keys();
             while (keys.hasMoreElements()) {
-               arbitraryTenantId = (String) keys.nextElement();
-               if (Tools.notBlank(arbitraryTenantId)) {
+               anyTenantId = (String) keys.nextElement();
+               if (Tools.notBlank(anyTenantId)) {
                    break;
                }
             }
         }
-        return arbitraryTenantId;
+        return anyTenantId;
     }
 
 }
