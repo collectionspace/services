@@ -86,6 +86,10 @@ import java.util.List;
 import java.util.Map;
 import org.collectionspace.services.client.*;
 import org.collectionspace.services.common.*;
+
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.config.service.ServiceBindingType;
+
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 /**
@@ -963,7 +967,33 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     
     public String getItemDocType() {
         // FIXME: Proof of concept placeholder
-        return "item-" + getServiceName();
+        // return "item-" + getServiceName();
+        
+        return super.getDocType(getItemServiceName());
+        
+        /*
+        // FIXME: Replace this outrageous hack; a tenant with this ID may not exist
+        String docType = "";
+        final String DEFAULT_TENANT_ID = "1";
+        TenantBindingConfigReaderImpl reader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        ServiceBindingType sb = reader.getServiceBinding(DEFAULT_TENANT_ID, getItemServiceName());
+        docType = sb.getObject().getName();
+        return docType;
+        
+        String docType = "";
+        String arbitraryTenantId = "";
+        ServiceBindingType sb;
+        TenantBindingConfigReaderImpl reader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        // FIXME: Makes the outrageous assumption that the list of service names and associated
+        // document types is essentially identical across tenants
+        arbitraryTenantId = getArbitraryTenantId(reader);
+        if (Tools.notBlank(arbitraryTenantId)) {
+            ServiceBindingType sb = reader.getServiceBinding(arbitraryTenantId, getItemServiceName());
+            docType = sb.getObject().getName();
+        }
+        return docType;
+        * 
+        */
     }
 
     @Override

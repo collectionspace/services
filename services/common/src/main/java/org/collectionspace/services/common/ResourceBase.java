@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common;
 
+import java.util.*;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -47,9 +48,11 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+
 
 /**
  * $LastChangedRevision:  $
@@ -383,8 +386,29 @@ public abstract class ResourceBase
     }
     
     public String getDocType() {
-        // FIXME: Proof of concept placeholder
-        return getServiceName();
+        return getDocType(getServiceName());
+    }
+        
+    // FIXME: This may well be a dreadful hack, just to get this initially working.
+    //
+    // Question:
+    // At the point we're seeking to populate docTypes in the uriTemplateRegistry, during system startup,
+    // we're not yet logged into any tenant, but instead it appears we are acting as the user SPRING_ADMIN.
+    // Could this potentially suggest reasonable method(s), other than those below, by which we can obtain
+    // the docType(s) associated with the current resource?
+    
+    public String getDocType(String serviceName) {
+        String docType = "";
+        String arbitraryTenantId = "";
+        TenantBindingConfigReaderImpl reader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        // FIXME: Makes the outrageous assumption that the list of service names and associated
+        // document types is essentially identical across tenants
+        arbitraryTenantId = getArbitraryTenantId(reader);
+        if (Tools.notBlank(arbitraryTenantId)) {
+            ServiceBindingType sb = reader.getServiceBinding(arbitraryTenantId, serviceName);
+            docType = sb.getObject().getName();
+        }
+        return docType;
     }
     
     public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
@@ -410,5 +434,19 @@ public abstract class ResourceBase
         return template;
     }
 
+    public String getArbitraryTenantId(TenantBindingConfigReaderImpl reader) {
+        String arbitraryTenantId = "";
+        Hashtable<String, TenantBindingType> tenantBindings = reader.getTenantBindings();
+        if (tenantBindings != null && !tenantBindings.isEmpty()) {
+            Enumeration keys = tenantBindings.keys();
+            while (keys.hasMoreElements()) {
+               arbitraryTenantId = (String) keys.nextElement();
+               if (Tools.notBlank(arbitraryTenantId)) {
+                   break;
+               }
+            }
+        }
+        return arbitraryTenantId;
+    }
 
 }

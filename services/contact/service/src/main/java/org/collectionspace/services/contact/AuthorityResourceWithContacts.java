@@ -49,6 +49,7 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactJAXBSchema;
+import org.collectionspace.services.contact.nuxeo.ContactConstants;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -297,8 +298,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     }
     
     public String getContactDocType() {
-        // FIXME: Proof of concept placeholder
-        return "contact-" + getServiceName();
+        return ContactConstants.NUXEO_DOCTYPE;
     }
 
     @Override
