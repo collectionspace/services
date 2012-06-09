@@ -46,7 +46,9 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.AbstractServiceContextImpl;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -55,6 +57,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
@@ -314,6 +317,10 @@ public class RefNameServiceUtils {
 		        	nRefsFound += nRefsFoundThisPage;
 		        }
 		        pageNumProcessed++;
+		        if(docList.size()<pageSize) {
+	        		logger.debug("updateAuthorityRefDocs: assuming no more results, as nResults < pageSize");
+		        	break;
+		        }
         	}
         } catch (Exception e) {
     		logger.error("Internal error updating the AuthorityRefDocs: " + e.getLocalizedMessage());
@@ -347,12 +354,9 @@ public class RefNameServiceUtils {
         // Filter the list for current user rights
         servicebindings = SecurityUtils.getReadableServiceBindingsForCurrentUser(servicebindings);
         
-        // Need to escape the quotes in the refName
-        // TODO What if they are already escaped?
-        String escapedRefName = refName.replaceAll("'", "\\\\'");
         ArrayList<String> docTypes = new ArrayList<String>();
         
-        String query = computeWhereClauseForAuthorityRefDocs(escapedRefName, refPropName, docTypes, servicebindings, 
+        String query = computeWhereClauseForAuthorityRefDocs(refName, refPropName, docTypes, servicebindings, 
         											queriedServiceBindings, authRefFieldsByService );
         if (query == null) { // found no authRef fields - nothing to query
             return null;
@@ -369,13 +373,13 @@ public class RefNameServiceUtils {
     private static final boolean READY_FOR_COMPLEX_QUERY = true;
     
     private static String computeWhereClauseForAuthorityRefDocs(
-    		String escapedRefName,
+    		String refName,
     		String refPropName,
     		ArrayList<String> docTypes,
     		List<ServiceBindingType> servicebindings,
     		Map<String, ServiceBindingType> queriedServiceBindings,
     		Map<String, List<AuthRefConfigInfo>> authRefFieldsByService ) {
-        StringBuilder whereClause = new StringBuilder();
+
         boolean fFirst = true;
         List<String> authRefFieldPaths;
         for (ServiceBindingType sb : servicebindings) {
@@ -397,35 +401,30 @@ public class RefNameServiceUtils {
             queriedServiceBindings.put(docType, sb);
             authRefFieldsByService.put(docType, authRefsInfo);
             docTypes.add(docType);
-            for (AuthRefConfigInfo arci : authRefsInfo) {
-                // Build up the where clause for each authRef field
-            	if(!READY_FOR_COMPLEX_QUERY) {	// filter complex field references
-            		if(arci.pathEls.length>1)
-            			continue;				// skip this one
-            	}
-                if (fFirst) {
-                    fFirst = false;
-                } else {
-                    whereClause.append(" OR ");
-                }
-                //whereClause.append(prefix);
-                whereClause.append(arci.getFullPath());
-                whereClause.append("='");
-                whereClause.append(escapedRefName);
-                whereClause.append("'");
-            }
+            fFirst = false;
         }
-        
-        String whereClauseStr = whereClause.toString(); // for debugging
-        if (logger.isTraceEnabled()) {
-        	logger.trace("The 'where' clause of the xyz method is: ", whereClauseStr);
-        }
-        
         if (fFirst) { // found no authRef fields - nothing to query
             return null;
-        } else {
-        	return whereClause.toString(); 
         }
+        // We used to build a complete matches query, but that was too complex.
+        // Just build a keyword query based upon some key pieces - the urn syntax elements and the shortID
+        // Note that this will also match the Item itself, but that will get filtered out when
+        // we compute actual matches.
+        AuthorityTermInfo authTermInfo = RefNameUtils.parseAuthorityTermInfo(refName);
+        	
+        String keywords = RefNameUtils.URN_PREFIX 
+        				+ " AND " + (authTermInfo.inAuthority.name!=null?
+        						authTermInfo.inAuthority.name:authTermInfo.inAuthority.csid)
+        				+ " AND " + (authTermInfo.name!=null?
+        						authTermInfo.name:authTermInfo.csid);
+        
+        String whereClauseStr = QueryManager.createWhereClauseFromKeywords(keywords);
+        
+        if (logger.isTraceEnabled()) {
+        	logger.trace("The 'where' clause to find refObjs is: ", whereClauseStr);
+        }
+        
+        return whereClauseStr; 
     }
     
     /*
@@ -519,9 +518,11 @@ public class RefNameServiceUtils {
                         "getAuthorityRefDocs: Problem fetching values from repo: " + ce.getLocalizedMessage());
             }
             if (nRefsFoundInDoc == 0) {
-                throw new RuntimeException(
-                        "getAuthorityRefDocs: Could not find refname in object:"
-                        + docType + ":" + NuxeoUtils.getCsid(docModel));
+                logger.warn(
+                        "getAuthorityRefDocs: Result: "
+                        + docType + " [" + NuxeoUtils.getCsid(docModel)
+                        + "] does not reference ["
+                        + refName + "]");
             }
             nRefsFoundTotal += nRefsFoundInDoc;
         }
