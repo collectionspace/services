@@ -301,6 +301,10 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         return ContactConstants.NUXEO_DOCTYPE;
     }
 
+    // FIXME: This currently populates only one entry in the UriTemplateRegistry
+    // for the Contacts docType, even though contacts can be a sub-resource of
+    // multiple authority item resources.  (This method is called more than once,
+    // but each time the existing item with the same key in the map is overwritten.)
     @Override
     public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
         // Get resource and item URI templates from superclass

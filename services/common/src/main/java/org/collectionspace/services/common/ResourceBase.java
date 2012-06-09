@@ -389,24 +389,25 @@ public abstract class ResourceBase
         return getDocType(getServiceName());
     }
         
-    // FIXME: This may well be a dreadful hack, just to get this initially working.
+    // FIXME: The technique in getDocType(String) may well be a dreadful hack, just to get this initially working.
     //
     // Question:
     // At the point we're seeking to populate docTypes in the uriTemplateRegistry, during system startup,
     // we're not yet logged into any tenant, but instead it appears we are acting as the user SPRING_ADMIN.
-    // Could this potentially suggest reasonable method(s), other than those below, by which we can obtain
-    // the docType(s) associated with the current resource?
+    // Could this potentially suggest reasonable method(s), other than those below, which reads from
+    // tenant bindings configuration for an arbitrary tenant, by which we can obtain the docType(s)
+    // associated with the current resource?
     
     public String getDocType(String serviceName) {
         String docType = "";
         String arbitraryTenantId = "";
         TenantBindingConfigReaderImpl reader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        // FIXME: Makes the outrageous assumption that the list of service names and associated
-        // document types is essentially identical across tenants
+        // FIXME: Makes the likely unsupportable assumption that the list of service names and associated
+        // document types is materially identical across tenants
         arbitraryTenantId = getArbitraryTenantId(reader);
         if (Tools.notBlank(arbitraryTenantId)) {
             ServiceBindingType sb = reader.getServiceBinding(arbitraryTenantId, serviceName);
-            docType = sb.getObject().getName();
+            docType = sb.getObject().getName(); // reads the Nuxeo Document Type from tenant bindings configuration
         }
         return docType;
     }
