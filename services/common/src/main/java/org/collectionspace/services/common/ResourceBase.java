@@ -69,8 +69,6 @@ public abstract class ResourceBase
     public static final String LIST = "list";
     //FIXME retrieve client type from configuration
     static ClientType CLIENT_TYPE;
-    
-    Map<String,StoredValuesUriTemplate> cachedUriTemplateMap = new HashMap<String,StoredValuesUriTemplate>();
 
     /*
      * REM - 11/14/2011 - I discovered this static block of code and don't understand why it exists.  However, a side-effect of this static block is that ServiceMain is trying
