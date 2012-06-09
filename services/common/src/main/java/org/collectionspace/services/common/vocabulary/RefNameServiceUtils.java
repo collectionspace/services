@@ -54,6 +54,7 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -214,10 +215,12 @@ public class RefNameServiceUtils {
             List<String> serviceTypes,
             String refName,
             String refPropName,
-            int pageSize, int pageNum, boolean computeTotal)
+            DocumentFilter filter, boolean computeTotal)
             		throws DocumentException, DocumentNotFoundException {
     	AuthorityRefDocList wrapperList = new AuthorityRefDocList();
         AbstractCommonList commonList = (AbstractCommonList) wrapperList;
+        int pageNum = filter.getStartPage();
+        int pageSize = filter.getPageSize(); 
         commonList.setPageNum(pageNum);
         commonList.setPageSize(pageSize);
         List<AuthorityRefDocList.AuthorityRefDocItem> list =
@@ -229,7 +232,8 @@ public class RefNameServiceUtils {
         RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)repoClient;
     	try {
 	        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
-	        		serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService, pageSize, pageNum, computeTotal);
+	        		serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
+	        		filter.getWhereClause(), pageSize, pageNum, computeTotal);
 	
 	        if (docList == null) { // found no authRef fields - nothing to process
 	            return wrapperList;
@@ -288,7 +292,7 @@ public class RefNameServiceUtils {
         		// reliable (stateless).
 		        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
 		        		getRefNameServiceTypes(), oldRefName, refPropName,
-		        		queriedServiceBindings, authRefFieldsByService, pageSize, 0, false);
+		        		queriedServiceBindings, authRefFieldsByService, null, pageSize, 0, false);
 		
 		        if((docList == null) 			// found no authRef fields - nothing to do
 		        	|| (docList.size() == 0)) {	// No more to handle
@@ -326,6 +330,7 @@ public class RefNameServiceUtils {
             String refPropName,
             Map<String, ServiceBindingType> queriedServiceBindings,
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
+            String whereClauseAdditions,
             int pageSize, int pageNum, boolean computeTotal) throws DocumentException, DocumentNotFoundException {
 
         // Get the service bindings for this tenant
@@ -346,6 +351,10 @@ public class RefNameServiceUtils {
         											queriedServiceBindings, authRefFieldsByService );
         if (query == null) { // found no authRef fields - nothing to query
             return null;
+        }
+        // Additional qualifications, like workflow state
+        if(whereClauseAdditions!=null) {
+        	query += " AND " + whereClauseAdditions;
         }
         // Now we have to issue the search
         RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)repoClient;
