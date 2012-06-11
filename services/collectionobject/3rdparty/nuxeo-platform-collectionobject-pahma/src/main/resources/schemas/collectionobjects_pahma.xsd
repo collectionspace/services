@@ -29,13 +29,14 @@
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="pahmaObjectStatus" type="xs:string"/>
-	<xs:element name="inventoryCount" type="xs:integer"/>
+	<xs:element name="inventoryCount" type="xs:string"/>
 	<xs:element name="portfolioSeries" type="xs:string"/>
 	<xs:element name="pahmaObjectID" type="xs:string"/>
 	<xs:element name="isComponent" type="xs:string"/>
 
 	<xs:element name="pahmaAltNumGroupList" type="pahmaAltNumGroupList"/> <!-- TEMPORARY INSERTION TO ALLOW NOTES ON OTHER/ALTERNATE NUMBERS. TO BE REMOVED ONCE NOTE IS INCLUDED IN COMMON SCHEMA FOR OTHER NUMBER -->
 	<xs:element name="ownershipHistoryGroupList" type="ownershipHistoryGroupList"/> <!-- TEMPORARY REPLACEMENT UNTIL COMMON SCHEMA HAS REPEATABLE, LINKED OWNERSHIP DETAILS -->
+	<xs:element name="ageEstimateGroupList" type="ageEstimateGroupList"/>
 	
 	<xs:complexType name="pahmaAltNumGroupList">
 		<xs:sequence>
@@ -47,6 +48,20 @@
 			<xs:element name="pahmaAltNum" type="xs:string"/>
 			<xs:element name="pahmaAltNumType" type="xs:string"/>
 			<xs:element name="pahmaAltNumNote" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="ageEstimateGroupList">
+		<xs:sequence>
+			<xs:element name="ageEstimateGroup" type="ageEstimateGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>	
+	<xs:complexType name="ageEstimateGroup">
+		<xs:sequence>
+			<xs:element name="ageEstimate" type="xs:integer"/>
+			<xs:element name="ageEstimateQualifier" type="xs:string"/>
+			<xs:element name="ageEstimateUnit" type="xs:string"/>
+			<xs:element name="ageEstimateNote" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	
@@ -92,6 +107,16 @@
 		</xs:complexType>
 	</xs:element>
 
+	<xs:element name="pahmaFieldCollectionPlaceList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pahmaFieldCollectionPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="pahmaFieldLocVerbatim" type="xs:string"/>
+	
 	<xs:complexType name="structuredDateGroup">
 		<xs:sequence>
 			<xs:element name="dateDisplayDate" type="xs:string"/>
