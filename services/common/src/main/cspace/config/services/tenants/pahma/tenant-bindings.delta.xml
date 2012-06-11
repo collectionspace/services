@@ -96,6 +96,10 @@
 							<types:key>authRef</types:key>
 							<types:value>ownershipHistoryGroupList/*/ownershipPlace</types:value>
 						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>pahmaFieldCollectionPlaceList|pahmaFieldCollectionPlace</types:value>
+						</types:item>
 					</service:properties>
 
 					<service:content contentType="application/xml">
