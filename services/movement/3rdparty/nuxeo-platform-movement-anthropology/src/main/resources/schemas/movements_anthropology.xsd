@@ -27,5 +27,8 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
- 
+    
+    <xs:element name="computedSummary" type="xs:string"/>
+        
+
 </xs:schema>
