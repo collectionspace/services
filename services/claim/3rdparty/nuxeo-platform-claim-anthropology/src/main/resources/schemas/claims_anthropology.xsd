@@ -26,7 +26,13 @@
 	
 	<xs:element name="claimInventoryInvolvedGroupList" type="claimInventoryInvolvedGroupList"/>
 	<xs:element name="claimSiteInvolvedGroupList" type="claimSiteInvolvedGroupList"/>
-	<xs:element name="claimPeriodInvolvedGroupGroupList" type="claimPeriodInvolvedGroupGroupList"/>  <!-- NOT A TYPO: THIS REALLY *IS* A LIST OF GROUPS OF GROUPS -->
+	<xs:element name="claimPeriodInvolvedDateGroupList" type="claimPeriodInvolvedDateGroupList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="claimPeriodInvolvedDateGroup" type="structuredDateGroup" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 	<xs:element name="claimGroupInvolvedGroupList" type="claimGroupInvolvedGroupList"/>
 	
 	<xs:element name="dateOfInitialResponseGroupList" type="dateOfInitialResponseGroupList"/>
@@ -106,46 +112,6 @@
 			<xs:element name="claimSiteInvolvedNote" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
-	
-	<xs:complexType name="claimPeriodInvolvedGroupGroupList">
-		<xs:sequence>
-			<xs:element name="claimPeriodInvolvedGroupGroup" type="claimPeriodInvolvedGroupGroup" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="claimPeriodInvolvedGroupGroup">
-		<xs:sequence>
-			<!--<xs:element name="claimPeriodInvolvedGroup" type="claimPeriodInvolvedGroup"/>-->
-			<xs:element name="claimPeriodInvolvedGroup" type="xs:string"/>
-			<xs:element name="claimPeriodInvolvedNote" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
-	<!--<xs:complexType name="claimPeriodInvolvedGroup">
-		<xs:sequence>
-			<xs:element name="dateDisplayDate" type="xs:string"/>
-			<xs:element name="dateAssociation" type="xs:string"/>
-			<xs:element name="dateEarliestSingleYear" type="xs:integer"/>
-			<xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
-			<xs:element name="dateEarliestSingleDay" type="xs:integer"/>
-			<xs:element name="dateEarliestSingleEra" type="xs:string"/>
-			<xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
-			<xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
-			<xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
-			<xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
-			<xs:element name="dateLatestYear" type="xs:integer"/>
-			<xs:element name="dateLatestMonth" type="xs:integer"/>
-			<xs:element name="dateLatestDay" type="xs:integer"/>
-			<xs:element name="dateLatestEra" type="xs:string"/>
-			<xs:element name="dateLatestCertainty" type="xs:string"/>
-			<xs:element name="dateLatestQualifier" type="xs:string"/>
-			<xs:element name="dateLatestQualifierValue" type="xs:integer"/>
-			<xs:element name="dateLatestQualifierUnit" type="xs:string"/>
-			<xs:element name="datePeriod" type="xs:string"/>
-			<xs:element name="dateNote" type="xs:string"/>
-			<xs:element name="dateEarliestScalarValue" type="xs:date"/>
-			<xs:element name="dateLatestScalarValue" type="xs:date"/>
-			<xs:element name="scalarValuesComputed" type="xs:boolean"/>
-		</xs:sequence>
-	</xs:complexType>-->
 	
 	<xs:complexType name="claimGroupInvolvedGroupList">
 		<xs:sequence>
@@ -286,5 +252,32 @@
 			<xs:element name="claimDocumentsArchivedNote" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
-	
+
+	<xs:complexType name="structuredDateGroup">
+		<xs:sequence>
+			<xs:element name="dateDisplayDate" type="xs:string"/>
+			<xs:element name="dateAssociation" type="xs:string"/>
+			<xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleEra" type="xs:string"/>
+			<xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+			<xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+			<xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+			<xs:element name="dateLatestYear" type="xs:integer"/>
+			<xs:element name="dateLatestMonth" type="xs:integer"/>
+			<xs:element name="dateLatestDay" type="xs:integer"/>
+			<xs:element name="dateLatestEra" type="xs:string"/>
+			<xs:element name="dateLatestCertainty" type="xs:string"/>
+			<xs:element name="dateLatestQualifier" type="xs:string"/>
+			<xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+			<xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+			<xs:element name="datePeriod" type="xs:string"/>
+			<xs:element name="dateNote" type="xs:string"/>
+			<xs:element name="dateEarliestScalarValue" type="xs:date"/>
+			<xs:element name="dateLatestScalarValue" type="xs:date"/>
+			<xs:element name="scalarValuesComputed" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
 </xs:schema>
