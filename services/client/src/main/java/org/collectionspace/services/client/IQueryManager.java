@@ -63,6 +63,7 @@ public interface IQueryManager {
 	
 	// CollectionSpace CMIS property mapping constants
 	final static String CMIS_TARGET_PREFIX = "DOC";
+	final static String CMIS_CORESCHEMA_PREFIX = "CORE";
 	// Relations CMIS property mapping constants
 	final static String CMIS_RELATIONS_PREFIX = "REL";
 	

@@ -310,11 +310,14 @@ public class NuxeoUtils {
      * @throws DocumentException  if the supplied value of the orderBy clause is not valid.
      *
      */
-    static private final void appendNXQLOrderBy(StringBuilder query, String orderByClause)
+    static private final void appendNXQLOrderBy(StringBuilder query, String orderByClause, String orderByPrefix)
             throws Exception {
         if (orderByClause != null && ! orderByClause.trim().isEmpty()) {
             if (isValidOrderByClause(orderByClause)) {
                 query.append(" ORDER BY ");
+                if (orderByPrefix != null) {
+                	query.append(orderByPrefix);
+                }
                 query.append(orderByClause);
             } else {
                 throw new DocumentException("Invalid format in sort request '" + orderByClause
@@ -335,7 +338,13 @@ public class NuxeoUtils {
     static private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext)
             throws Exception {
         String orderByClause = queryContext.getOrderByClause();
-        appendNXQLOrderBy(query, orderByClause);
+        appendNXQLOrderBy(query, orderByClause, null);
+    }
+        
+    static public final void appendCMISOrderBy(StringBuilder query, QueryContext queryContext)
+            throws Exception {
+        String orderByClause = queryContext.getOrderByClause();
+        appendNXQLOrderBy(query, orderByClause, IQueryManager.CMIS_TARGET_PREFIX + ".");
     }
 
     /**
@@ -416,7 +425,7 @@ public class NuxeoUtils {
         }
         appendNXQLWhere(query, queryContext);
         // For a set of DocTypes, there is no sensible ordering other than by updatedAt
-        appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED);
+        appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED, null);
         // FIXME add 'order by' clause here, if appropriate
         return query.toString();
     }

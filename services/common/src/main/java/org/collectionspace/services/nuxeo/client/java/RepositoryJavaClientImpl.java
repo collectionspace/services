@@ -701,7 +701,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     /*
      * See CSPACE-5036 - How to make CMISQL queries from Nuxeo
      */
-	private IterableQueryResult makeCMISQLQuery(RepositoryInstance repoSession, String query) {
+	private IterableQueryResult makeCMISQLQuery(RepositoryInstance repoSession, String query, QueryContext queryContext) {
 		IterableQueryResult result = null;
 		
 		// the NuxeoRepository should be constructed only once, then cached
@@ -720,8 +720,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 			NuxeoCmisService cmisService = new NuxeoCmisService(repo,
 					callContext, repoSession);
 
-			result = repoSession.queryAndFetch(query,
-					"CMISQL", cmisService);
+			result = repoSession.queryAndFetch(query, "CMISQL", cmisService);
 		} catch (ClientException e) {
 			// TODO Auto-generated catch block
 			logger.error("Encounter trouble making the following CMIS query: " + query, e);
@@ -745,7 +744,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         DocumentFilter filter = handler.getDocumentFilter();
         String oldOrderBy = filter.getOrderByClause();
         if (isClauseEmpty(oldOrderBy) == true){
-            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);  //per http://issues.collectionspace.org/browse/CSPACE-705 (Doesn't this conflict with what happens with the QueryContext instance that we create below?)
+            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);
         }
         QueryContext queryContext = new QueryContext(ctx, handler);
 
@@ -800,7 +799,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
     	DocumentModelList result = new DocumentModelListImpl();
         try {
-            String query = handler.getCMISQuery();
+            String query = handler.getCMISQuery(queryContext);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Executing CMIS query: " + query.toString());
@@ -812,7 +811,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         	profiler.log("Executing CMIS query: " + query.toString());
         	profiler.start();
         	//
-        	IterableQueryResult queryResult = makeCMISQLQuery(repoSession, query);
+        	IterableQueryResult queryResult = makeCMISQLQuery(repoSession, query, queryContext);
         	try {
 				for (Map<String, Serializable> row : queryResult) {
 					logger.debug(""

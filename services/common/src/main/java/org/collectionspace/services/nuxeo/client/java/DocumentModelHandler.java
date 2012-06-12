@@ -41,6 +41,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
+import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
@@ -381,7 +382,7 @@ public abstract class DocumentModelHandler<T, TL>
 	 * 		3. Document 'B' is either the object or the subject of the relationship
 	 */
     @Override
-    public String getCMISQuery() {
+    public String getCMISQuery(QueryContext queryContext) {
     	String result = null;
     	
     	if (isCMISQuery() == true) {
@@ -429,20 +430,30 @@ public abstract class DocumentModelHandler<T, TL>
 	    		logger.error("Attempt to make CMIS query failed because the HTTP request was missing valid query parameters.");
 	    	}
 	    	
+	    	StringBuilder query = new StringBuilder();
 	    	// assemble the query from the string arguments
-	    	result = "SELECT " + selectFields
-	    			+ " FROM "	+ targetTable + " JOIN " + relTable
-	    			+ " ON " + theOnClause
-	    			+ " WHERE " + theWhereClause;
+	    	query.append("SELECT ");
+	    	query.append(selectFields);
+	    	query.append(" FROM " + targetTable + " JOIN " + relTable);
+	    	query.append(" ON " + theOnClause);
+	    	query.append(" WHERE " + theWhereClause);
+	    	
+	        try {
+				NuxeoUtils.appendCMISOrderBy(query, queryContext);
+			} catch (Exception e) {
+				logger.error("Could not append ORDER BY clause to CMIS query", e);
+			}
 	        
 	    	// An example:
 	        // SELECT D.cmis:name, D.dc:title, R.dc:title, R.relations_common:subjectCsid
 	        // FROM Dimension D JOIN Relation R
 	        // ON R.relations_common:objectCsid = D.cmis:name
 	        // WHERE R.relations_common:subjectCsid = '737527ec-a560-4776-99de'
+	        // ORDER BY D.collectionspace_core:updatedAt DESC
 	        
+	        result = query.toString();
 	        if (logger.isDebugEnabled() == true && result != null) {
-	        	logger.debug("The CMIS query for the Movement service is: " + result);
+	        	logger.debug("The CMIS query is: " + result);
 	        }
     	}
         
