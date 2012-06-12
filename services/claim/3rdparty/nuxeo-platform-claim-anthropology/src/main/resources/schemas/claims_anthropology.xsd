@@ -26,13 +26,7 @@
 	
 	<xs:element name="claimInventoryInvolvedGroupList" type="claimInventoryInvolvedGroupList"/>
 	<xs:element name="claimSiteInvolvedGroupList" type="claimSiteInvolvedGroupList"/>
-	<xs:element name="claimPeriodInvolvedDateGroupList" type="claimPeriodInvolvedDateGroupList">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="claimPeriodInvolvedDateGroup" type="structuredDateGroup" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	<xs:element name="claimPeriodInvolvedGroupList" type="claimPeriodInvolvedGroupList"/>
 	<xs:element name="claimGroupInvolvedGroupList" type="claimGroupInvolvedGroupList"/>
 	
 	<xs:element name="dateOfInitialResponseGroupList" type="dateOfInitialResponseGroupList"/>
@@ -124,7 +118,19 @@
 			<xs:element name="groupInvolvedNote" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
-	
+
+	<xs:complexType name="claimPeriodInvolvedGroupList">
+		<xs:sequence>
+			<xs:element name="claimPeriodInvolvedGroup" type="claimPeriodInvolvedGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="claimPeriodInvolvedGroup">
+		<xs:sequence>
+			<xs:element name="claimPeriodInvolvedDateGroup" type="structuredDateGroup"/>
+			<xs:element name="claimPeriodInvolvedNote" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+		
 	<xs:complexType name="dateOfInitialResponseGroupList">
 		<xs:sequence>
 			<xs:element name="dateOfInitialResponseGroup" type="dateOfInitialResponseGroup" minOccurs="0" maxOccurs="unbounded"/>
