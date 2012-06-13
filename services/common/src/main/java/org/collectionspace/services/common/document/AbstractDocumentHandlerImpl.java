@@ -29,6 +29,7 @@ import java.util.Map;
 
 import java.util.StringTokenizer;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.query.QueryContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -411,5 +412,22 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         for (ValidatorHandler handler : valHandlers) {
             handler.validate(action, serviceContext);
         }
+    }
+    
+    /**
+     * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
+     * information in the current service context -which includes things like the query parameters, etc.
+     */
+    @Override
+    public String getCMISQuery(QueryContext queryContext) {
+    	//
+    	// By default, return nothing.  Child classes can override if they want.
+    	//
+    	return null;
+    }
+    
+    @Override
+    public boolean isCMISQuery() {
+    	return false;
     }
 }

@@ -459,7 +459,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                         serviceTypes,
                         refName,
                         propertyName,
-                        myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/);
+                        myFilter, true /*computeTotal*/);
     		} catch (PropertyException pe) {
     			throw pe;
     		} catch (DocumentException de) {
@@ -527,7 +527,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	List<String> result = new ArrayList<String>();
     	
     	for (String termDisplayName : termDisplayNameList) {
-    		if (termDisplayName.contains(partialTerm) == true) {
+    		if (termDisplayName.toLowerCase().contains(partialTerm.toLowerCase()) == true) {
     			result.add(termDisplayName);
     		}
     	}

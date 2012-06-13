@@ -71,9 +71,6 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
         return MultipartServiceContextFactory.get();
     }
 
-
-
-
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
         return createDocumentHandler(ctx, ctx.getCommonPartLabel(), getCommonPartClass());

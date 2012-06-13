@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -38,9 +39,8 @@ import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.query.QueryContext;
-import org.collectionspace.services.config.service.ListResultField;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
@@ -283,8 +283,8 @@ public class NuxeoUtils {
         //
         // Restrict search to the current tenant ID.  Is the domain path filter (above) still needed?
         //
-        query.append(/*IQueryManager.SEARCH_QUALIFIER_AND +*/ " WHERE " + DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA + ":"
-                + DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID
+        query.append(/*IQueryManager.SEARCH_QUALIFIER_AND +*/ " WHERE " + CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":"
+                + CollectionSpaceClient.COLLECTIONSPACE_CORE_TENANTID
                 + " = " + queryContext.getTenantId());
         //
         // Finally, append the incoming where clause
@@ -310,18 +310,41 @@ public class NuxeoUtils {
      * @throws DocumentException  if the supplied value of the orderBy clause is not valid.
      *
      */
-    static private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext)
+    static private final void appendNXQLOrderBy(StringBuilder query, String orderByClause, String orderByPrefix)
             throws Exception {
-        String orderByClause = queryContext.getOrderByClause();
         if (orderByClause != null && ! orderByClause.trim().isEmpty()) {
             if (isValidOrderByClause(orderByClause)) {
                 query.append(" ORDER BY ");
+                if (orderByPrefix != null) {
+                	query.append(orderByPrefix);
+                }
                 query.append(orderByClause);
             } else {
                 throw new DocumentException("Invalid format in sort request '" + orderByClause
                         + "': must be schema_name:fieldName followed by optional sort order (' ASC' or ' DESC').");
             }
         }
+    }
+
+    /**
+     * Append an ORDER BY clause to the NXQL query.
+     *
+     * @param query         the NXQL query to which the ORDER BY clause will be appended.
+     * @param queryContext  the query context, which provides the ORDER BY clause to append.
+     *
+     * @throws DocumentException  if the supplied value of the orderBy clause is not valid.
+     *
+     */
+    static private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext)
+            throws Exception {
+        String orderByClause = queryContext.getOrderByClause();
+        appendNXQLOrderBy(query, orderByClause, null);
+    }
+        
+    static public final void appendCMISOrderBy(StringBuilder query, QueryContext queryContext)
+            throws Exception {
+        String orderByClause = queryContext.getOrderByClause();
+        appendNXQLOrderBy(query, orderByClause, IQueryManager.CMIS_TARGET_PREFIX + ".");
     }
 
     /**
@@ -367,6 +390,17 @@ public class NuxeoUtils {
         return query.toString();
     }
     
+    static public final String buildCMISQuery(ServiceContext ctx, QueryContext queryContext) throws Exception {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+
+        /*
+         * This is a place holder for CMIS query creation -see buildNXQLQuery as a reference
+         */
+
+        return query.toString();
+    }
+    
+    
     /**
      * Builds an NXQL SELECT query across multiple document types.
      *
@@ -390,6 +424,8 @@ public class NuxeoUtils {
             query.append(docType);
         }
         appendNXQLWhere(query, queryContext);
+        // For a set of DocTypes, there is no sensible ordering other than by updatedAt
+        appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED, null);
         // FIXME add 'order by' clause here, if appropriate
         return query.toString();
     }

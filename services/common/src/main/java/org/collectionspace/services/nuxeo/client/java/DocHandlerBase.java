@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.common.ReflectionMapper;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -67,9 +68,9 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     
     protected static final int NUM_STANDARD_LIST_RESULT_FIELDS = 4;
     protected static final String STANDARD_LIST_CSID_FIELD = "csid";
-    protected static final String STANDARD_LIST_URI_FIELD = COLLECTIONSPACE_CORE_URI;
-    protected static final String STANDARD_LIST_UPDATED_AT_FIELD = COLLECTIONSPACE_CORE_UPDATED_AT;
-    protected static final String STANDARD_LIST_WORKFLOW_FIELD = COLLECTIONSPACE_CORE_WORKFLOWSTATE;
+    protected static final String STANDARD_LIST_URI_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_URI;
+    protected static final String STANDARD_LIST_UPDATED_AT_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
+    protected static final String STANDARD_LIST_WORKFLOW_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE;
 
     @Override
     public AbstractCommonList getCommonPartList() {
@@ -166,8 +167,8 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 
 	public static String getUpdatedAtAsString(DocumentModel docModel) throws Exception {
 			GregorianCalendar cal = (GregorianCalendar)
-								docModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,
-											COLLECTIONSPACE_CORE_UPDATED_AT);
+								docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+										CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT);
 			String updatedAt = DateTimeFormatUtils.formatAsISO8601Timestamp(cal);
 			return updatedAt;
 	}

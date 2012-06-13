@@ -114,7 +114,7 @@ public interface StorageClient {
      * @throws DocumentException
      */
     void getFiltered(ServiceContext ctx, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
-
+    
     /**
      * update given entity in the persistence store
      * @param ctx service context under which this method is invoked

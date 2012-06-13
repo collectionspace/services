@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -109,29 +110,10 @@ public class CommonList extends AbstractCommonList {
 	 */
 	public void setFieldsReturned(String[] fieldKeys) {
 		this.fieldKeys = fieldKeys;
-		String fieldsImploded = implode(fieldKeys, "|");  
+		String fieldsImploded = Tools.implode(fieldKeys, "|");  
 		setFieldsReturned(fieldsImploded);
 	}
 
-	// TODO This should be in common, but then we have mutual dependencies. Sigh.
-	private String implode(String strings[], String sep) {
-		String implodedString;
-		if (strings.length == 0) {
-			implodedString = "";
-		} else {
-			StringBuffer sb = new StringBuffer();
-			sb.append(strings[0]);
-			for (int i = 1; i < strings.length; i++) {
-				if (strings[i] != null && !strings[i].trim().isEmpty()) {
-					sb.append(sep);
-					sb.append(strings[i]);
-				}
-			}
-			implodedString = sb.toString();
-		}
-		return implodedString;
-	}
-		
 	private void addItem(List<Element> anyList, String key, Object value) {
 		if (value != null ) {
 			Element el = doc.createElement(key);
