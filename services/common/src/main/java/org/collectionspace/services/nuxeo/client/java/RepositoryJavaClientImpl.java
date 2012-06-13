@@ -837,6 +837,20 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         }
         
+        //
+        // Since we're not supporting paging yet for CMIS queries, we need to perform
+        // a workaround for the paging information we return in our list of results
+        //
+        if (result != null) {
+        	int totalSize = result.size();
+        	DocumentFilter docFilter = handler.getDocumentFilter();
+        	docFilter.setStartPage(0);
+        	if (totalSize > docFilter.getPageSize()) {
+        		docFilter.setPageSize(totalSize);
+            	((DocumentModelListImpl)result).setTotalSize(totalSize);
+        	}
+        }
+        
         return result;
     }
     
