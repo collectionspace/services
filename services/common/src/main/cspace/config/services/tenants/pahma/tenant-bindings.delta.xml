@@ -8,6 +8,18 @@
 		<tenant:repositoryDomain name="default-domain" storageName="pahma-domain" repositoryClient="nuxeo-java" />
 		
 		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields>
+						<service:ListResultField merge:matcher="skip" merge:action="insert">
+							<service:element>taxon</service:element>
+							<service:schema>collectionobjects_naturalhistory</service:schema>
+							<service:xpath>taxonomicIdentGroupList/[0]/taxon</service:xpath>
+						</service:ListResultField>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+			
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 				<service:part id="1" merge:matcher="id">
 					<service:properties merge:matcher="tag">
