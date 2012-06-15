@@ -459,7 +459,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                         serviceTypes,
                         refName,
                         propertyName,
-                        myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/);
+                        myFilter, true /*computeTotal*/);
     		} catch (PropertyException pe) {
     			throw pe;
     		} catch (DocumentException de) {
