@@ -995,6 +995,68 @@
         </tenant:serviceBindings>
     <!-- end loanout service meta-data -->
     
+        <!-- begin conditioncheck service meta-data -->
+        <tenant:serviceBindings id="Conditionchecks" name="Conditionchecks" type="procedure" version="0.1">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.conditioncheck.nuxeo.ConditioncheckDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.conditioncheck.nuxeo.ConditioncheckDocumentModelHandler</service:classname>
+                <service:params>
+                    <service:SchemaName>conditionchecks</service:SchemaName>
+                    <service:DublinCoreTitle>conditionchecks</service:DublinCoreTitle>
+                    <service:SummaryFields>conditionCheckRefNumber|conditionCheckDate|uri|csid</service:SummaryFields>
+                    <service:AbstractCommonListClassname />
+                    <service:CommonListItemClassname />
+                    <service:ListResultsItemMethodName>getConditioncheckListItem</service:ListResultsItemMethodName>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>conditionCheckRefNumber</service:element>
+                            <service:xpath>conditionCheckRefNumber</service:xpath>
+                        </service:ListResultField>
+                        <!--<service:ListResultField>
+                            <service:element>conditionChecker</service:element>
+                            <service:xpath>conditionCheckers/[0]/conditionChecker</service:xpath>
+                        </service:ListResultField>-->
+                        <service:ListResultField>
+                            <service:element>conditionCheckDate</service:element>
+                            <service:xpath>conditionCheckDate</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.conditioncheck.nuxeo.ConditioncheckValidatorHandler</service:validatorHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>conditionCheckers/[0]/conditionChecker</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>conditionCheckRefNumber</types:value>
+                </types:item>
+            </service:properties>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Conditioncheck" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="conditionchecks-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="conditionchecks_common" updated="" order="1">
+                    <service:properties>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/conditioncheck" schemaLocation="http://collectionspace.org/services/conditioncheck http://services.collectionspace.org/conditioncheck/conditionchecks_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end conditioncheck service meta-data -->
+
     <!-- begin objectexit service meta-data -->
         <tenant:serviceBindings id="ObjectExit" name="ObjectExit" type="procedure" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>

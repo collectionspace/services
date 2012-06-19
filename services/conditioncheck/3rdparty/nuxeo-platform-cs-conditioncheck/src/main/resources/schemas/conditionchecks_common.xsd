@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Condition check schema (XSD)
+    
+    Entity  : Conditioncheck
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/services/conditioncheck/"
+    xmlns="http://collectionspace.org/services/conditioncheck/"
+    targetNamespace="http://collectionspace.org/services/conditioncheck/"
+    version="0.1">
+    
+
+    <!--  Object Condition and Technical Assessment Information Group -->
+    <xs:element name="objectAuditCategory" type="xs:string"/>
+    <xs:element name="completenessGroupList" type="completenessGroupList"/>
+    <xs:element name="conditionGroupList" type="conditionGroupList"/>
+    <xs:element name="conservationTreatmentPriority" type="xs:string"/>
+    <xs:element name="envConditionGroupList" type="envConditionGroupList"/>
+    <xs:element name="newConditionCheckDate" type="xs:date"/>
+    <xs:element name="techAssessmentGroupList" type="techAssessmentGroupList"/>
+    <xs:element name="hazardGroupList" type="hazardGroupList"/>
+
+    <!--  Condition Check and Technical Assessment Information Group -->
+    <xs:element name="conditionCheckDate" type="xs:date"/>
+    <xs:element name="conditionCheckMethods">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="conditionCheckMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="conditionCheckNote" type="xs:string"/>
+    <xs:element name="conditionCheckReasons">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="conditionCheckReason" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="conditionCheckRefNumber" type="xs:string"/>
+    <xs:element name="conditionCheckers">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="conditionChecker" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!--  Object Requirement Information Group -->
+    <xs:element name="displayRecommendations" type="xs:string"/>
+    <xs:element name="envRecommendations" type="xs:string"/>
+    <xs:element name="handlingRecommendations" type="xs:string"/>
+    <xs:element name="packingRecommendations" type="xs:string"/>
+    <xs:element name="securityRecommendations" type="xs:string"/>
+    <xs:element name="storageRequirements" type="xs:string"/>
+    <xs:element name="salvagePriorityCode" type="xs:string"/>
+    <xs:element name="salvagePriorityCodeDate" type="xs:date"/>
+    <xs:element name="legalRequirements" type="xs:string"/>
+    <xs:element name="legalReqsHeldGroupList" type="legalReqsHeldGroupList"/>
+
+
+    <!-- Repeating Groups -->
+    <!-- =================================================================
+        Completeness Group repeating structure
+        ================================================================= -->
+    <xs:complexType name="completenessGroupList">
+        <xs:sequence>
+            <xs:element name="completenessGroup" type="completenessGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="completenessGroup">
+        <xs:sequence>
+            <xs:element name="completeness" type="xs:string"/>
+            <xs:element name="completenessDate" type="xs:date"/>
+            <xs:element name="completenessNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Condition Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="conditionGroupList">
+        <xs:sequence>
+            <xs:element name="conditionGroup" type="conditionGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="conditionGroup">
+        <xs:sequence>
+            <xs:element name="condition" type="xs:string"/>
+            <xs:element name="conditionDate" type="xs:date"/>
+            <xs:element name="conditionNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Environmental Condition Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="envConditionGroupList">
+        <xs:sequence>
+            <xs:element name="envConditionGroup" type="envConditionGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="envConditionGroup">
+        <xs:sequence>
+            <xs:element name="envCondition" type="xs:string"/>
+            <xs:element name="envConditionDate" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Technical Assessment Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="techAssessmentGroupList">
+        <xs:sequence>
+            <xs:element name="techAssessmentGroup" type="techAssessmentGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="techAssessmentGroup">
+        <xs:sequence>
+            <xs:element name="techAssessment" type="xs:string"/>
+            <xs:element name="techAssessmentDate" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Hazard Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="hazardGroupList">
+        <xs:sequence>
+            <xs:element name="hazardGroup" type="hazardGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="hazardGroup">
+        <xs:sequence>
+            <xs:element name="hazardDate" type="xs:date"/>
+            <xs:element name="hazardNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Legal/License Requirements Held Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="legalReqsHeldGroupList">
+        <xs:sequence>
+            <xs:element name="legalReqsHeldGroup" type="legalReqsHeldGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="legalReqsHeldGroup">
+        <xs:sequence>
+            <xs:element name="legalReqsHeld" type="xs:string"/>
+            <xs:element name="legalReqsHeldBeginDate" type="xs:date"/>
+            <xs:element name="legalReqsHeldEndDate" type="xs:date"/>
+            <xs:element name="legalReqsHeldNumber" type="xs:string"/>
+            <xs:element name="legalReqsHeldRenewDate" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <!-- SINGLE REPEATABLE FIELD EXAMPLE
+
+    <xs:element name="briefDescriptions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="briefDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    -->
+
+
+
+    <!-- REPEATABLE GROUP EXAMPLE
+
+    <xs:element name="GroupList" type="GroupList"/>
+    
+    <xs:complexType name="GroupList">
+        <xs:sequence>
+            <xs:element name="Group" type="Group" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Group">
+        <xs:sequence>
+            <xs:element name="termDisplayName" type="xs:string"/>
+            <xs:element name="termName" type="xs:string"/>
+            <xs:element name="termPrefForLang" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    -->
+</xs:schema>
