@@ -48,6 +48,6 @@ public interface ReportProxy extends CollectionSpaceCommonListPoxProxy {
     @Produces({"application/xml"})
     ClientResponse<AbstractCommonList> readListFiltered(
     		@QueryParam(IQueryManager.SEARCH_TYPE_DOCTYPE) String docType,
-    		@QueryParam(IQueryManager.SEARCH_TYPE_INVCOATION_MODE) String mode);
+    		@QueryParam(IQueryManager.SEARCH_TYPE_INVOCATION_MODE) String mode);
     
 }

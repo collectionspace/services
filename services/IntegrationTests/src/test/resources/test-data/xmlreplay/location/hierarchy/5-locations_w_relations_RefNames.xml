@@ -2,8 +2,16 @@
 <document name="locations">
   <ns2:locations_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
     <shortIdentifier>${shortIdentifier}</shortIdentifier>
-    <displayName>${name}</displayName>
-    <displayNameComputed>false</displayNameComputed>
+
+	<locTermGroupList>
+	    <locTermGroup>
+	        <termPrefForLang>false</termPrefForLang>
+	        <termName>${name}</termName>
+	        <termDisplayName>${name}</termDisplayName>
+	        <termStatus>Approved</termStatus>
+	    </locTermGroup>
+	</locTermGroupList>
+	    
   </ns2:locations_common>
   <!-- 
        WARNING: ${itemCSID} does NOT get expanded by XmlReplay. 

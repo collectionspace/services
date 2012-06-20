@@ -1,68 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<!--
-    Relation schema (XSD)
-    
-    Entity  : Relation
-    Part    : Common
-    Used for: Nuxeo EP core document type
+<!-- Relation schema (XSD) Entity : Relation Part : Common Used for: Nuxeo 
+	EP core document type $LastChangedRevision$ $LastChangedDate$ -->
 
-    $LastChangedRevision$
-    $LastChangedDate$
--->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://collectionspace.org/relation/"
+	xmlns:rel="http://collectionspace.org/relation/" targetNamespace="http://collectionspace.org/relation/"
+	version="0.1">
 
-<xs:schema 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns="http://collectionspace.org/relation/"
-    xmlns:rel="http://collectionspace.org/relation/"
-    targetNamespace="http://collectionspace.org/relation/"
-    version="0.1">
+	<!-- Note: nuxeo ecm types does not support xs:anyURI type -->
+	<!-- if xs:anyURI is used, it fails to register that doctype -->
 
-            <!-- Note: nuxeo ecm types does not support xs:anyURI type -->
-            <!-- if xs:anyURI is used, it fails to register that doctype -->
+	<!-- conventions for describing relationships -->
+	<!-- 1. left to right in alphabetical order for the association relations -->
+	<!-- e.g. for association between collectionobject and intake entities -->
+	<!-- document-id-1 would be the id of the collectionobject -->
+	<!-- document-type-1 would be the doc-type of the collectionobject -->
+	<!-- document-id-2 would be the id of the intake -->
+	<!-- document-type-2 would be the doc-type of the intake -->
+	<!-- 2. left to right container and containee or children -->
+	<!-- e.g. for collectionobject containing other collectionobjects -->
+	<!-- document-id-1 would be the id of the container collectionobject -->
+	<!-- document-type-1 would be the doc-type of the container collectionobject -->
+	<!-- document-id-2 would be the id of the contained (or child) collectionobject -->
+	<!-- document-type-2 would be the doc-type of the collectionobejct -->
+	
+	<xs:element name="subjectCsid" type="xs:string" minOccurs="1"
+		maxOccurs="1" />     <!-- new name for documentId1 -->
+	<xs:element name="subjectDocumentType" type="xs:string"
+		minOccurs="1" maxOccurs="1" />     <!-- new name for documentType1 -->
 
-            <!-- conventions for describing relationships -->
-            <!-- 1. left to right in alphabetical order for the association relations -->
-            <!-- e.g. for association between collectionobject and intake entities -->
-            <!-- document-id-1 would be the id of the collectionobject -->
-            <!-- document-type-1 would be the doc-type of the collectionobject -->
-            <!-- document-id-2 would be the id of the intake -->
-`            <!-- document-type-2 would be the doc-type of the intake -->
-            <!-- 2. left to right container and containee or children -->
-            <!-- e.g. for collectionobject containing other collectionobjects -->
-            <!-- document-id-1 would be the id of the container collectionobject -->
-            <!-- document-type-1 would be the doc-type of the container collectionobject -->
-            <!-- document-id-2 would be the id of the contained (or child) collectionobject -->
-            <!-- document-type-2 would be the doc-type of the collectionobejct -->
-    <xs:element name="subjectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentId1 -->
-    <xs:element name="subjectDocumentType" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentType1 -->
+	<xs:element name="objectCsid" type="xs:string" minOccurs="1"
+		maxOccurs="1" />        <!-- new name for documentId2 -->
+	<xs:element name="objectDocumentType" type="xs:string"
+		minOccurs="1" maxOccurs="1" />        <!-- new name for documentType2 -->
 
-    <xs:element name="objectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentId2 -->
-    <xs:element name="objectDocumentType" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentType2 -->
+	<!-- type of relationship between two entities -->
+	<xs:element name="relationshipType" type="rel:RelationshipType"
+		minOccurs="1" maxOccurs="1" />
+	<xs:element name="predicate" type="rel:RelationshipType"
+		minOccurs="1" maxOccurs="1" />   <!-- new name for relationshipType -->
+	<xs:element name="predicateDisplayName" type="xs:string"
+		minOccurs="1" />
 
-            <!-- type of relationship between two entities -->
-    <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
-    <xs:element name="predicate" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>   <!-- new name for relationshipType -->
-    <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
+	<xs:element name="subjectUri" type="xs:string" />
+	<xs:element name="objectUri" type="xs:string" />
 
-    <xs:element name="subjectUri" type="xs:string"/>
-    <xs:element name="objectUri" type="xs:string"/>
-    
-    <xs:element name="subjectRefName" type="xs:string"/>
-    <xs:element name="objectRefName" type="xs:string"/>    
+	<xs:element name="subjectRefName" type="xs:string" />
+	<xs:element name="objectRefName" type="xs:string" />
 
-    <!-- enumeration defining the type of relationship between two entities -->
-    <xs:simpleType name="RelationshipType">
-        <xs:restriction base="xs:string">
-            <!-- document with id as document-id-1 is associated with document with id as document-id-2 -->
-            <xs:enumeration value="association" />
-            <!-- document with id as document-id-1 contains one or more document with id as document-id-2 -->
-            <xs:enumeration value="contains" />
-            <!-- document with id as document-id-1 has parent document with id as document-id-2 -->
-            <xs:enumeration value="hasBroader" />
-        </xs:restriction>
-    </xs:simpleType>
-
+	<!-- enumeration defining the type of relationship between two entities -->
+	<xs:simpleType name="RelationshipType">
+		<xs:restriction base="xs:string">
+			<!-- document with id as document-id-1 is associated with document with 
+				id as document-id-2 -->
+			<xs:enumeration value="association" />
+			<!-- document with id as document-id-1 contains one or more document with 
+				id as document-id-2 -->
+			<xs:enumeration value="contains" />
+			<!-- document with id as document-id-1 has parent document with id as 
+				document-id-2 -->
+			<xs:enumeration value="hasBroader" />
+		</xs:restriction>
+	</xs:simpleType>
 
 </xs:schema>
 

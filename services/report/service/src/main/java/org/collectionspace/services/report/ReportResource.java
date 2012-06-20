@@ -88,7 +88,7 @@ public class ReportResource extends ResourceBase {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
-            String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVCOATION_MODE);
+            String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
             String whereClause = null;
             DocumentFilter documentFilter = null;
             String common_part =ctx.getCommonPartLabel(); 

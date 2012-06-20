@@ -34,6 +34,7 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
@@ -203,13 +204,19 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest<AbstractComm
         //
         String shortId = firstName+lastName;
         personMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId );
-        personMap.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "true");
-        personMap.put(PersonJAXBSchema.FORE_NAME, firstName);
-        personMap.put(PersonJAXBSchema.SUR_NAME, lastName);
+        
+        List<PersonTermGroup> terms = new ArrayList<PersonTermGroup>();
+        PersonTermGroup term = new PersonTermGroup();
+        term.setTermDisplayName(firstName + " " + lastName);
+        term.setTermName(firstName + " " + lastName);
+        term.setForeName(firstName);
+        term.setSurName(lastName);
+        terms.add(term);
+        
         Map<String, List<String>> personRepeatablesMap = new HashMap<String, List<String>>();
         PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonInstance(authId, null, //authRefName, 
-            		personMap, personRepeatablesMap, client.getItemCommonPartName() );
+            		personMap, terms, personRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
         ClientResponse<Response> res = client.createItem(authId, multipart);

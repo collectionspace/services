@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUti
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.location.LocTermGroup;
+import org.collectionspace.services.location.LocTermGroupList;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.collectionspace.services.location.LocationsCommon;
 
@@ -61,8 +64,6 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     /** The logger. */
     private final String CLASS_NAME = LocationAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(LocationAuthorityServiceTest.class);
-    private final String REFNAME = "refName";
-    private final String DISPLAYNAME = "displayName";
     private final static String CURRENT_DATE_UTC =
         GregorianCalendarDateTimeUtils.currentDateUTC();
 
@@ -119,7 +120,6 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
         LocationAuthorityClient client = new LocationAuthorityClient();
         Map<String, String> shelf1Map = new HashMap<String,String>();
         // TODO Make loc type and status be controlled vocabs.
-        shelf1Map.put(LocationJAXBSchema.NAME, TEST_NAME);
         shelf1Map.put(LocationJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE, TEST_CONDITION_NOTE);
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE_DATE, TEST_CONDITION_NOTE_DATE);
@@ -127,10 +127,17 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
         shelf1Map.put(LocationJAXBSchema.ACCESS_NOTE, TEST_ACCESS_NOTE);
         shelf1Map.put(LocationJAXBSchema.ADDRESS, TEST_ADDRESS);
         shelf1Map.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
-        shelf1Map.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
         
+        List<LocTermGroup> shelf1Terms = new ArrayList<LocTermGroup>();
+        LocTermGroup term = new LocTermGroup();
+        term.setTermDisplayName(TEST_NAME);
+        term.setTermName(TEST_NAME);
+        term.setTermStatus(TEST_STATUS);
+        shelf1Terms.add(term);
+                shelf1Map.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
+
         String newID = LocationAuthorityClientUtils.createItemInAuthority(vcsid,
-        		authRefName, shelf1Map, client );
+        		authRefName, shelf1Map, shelf1Terms, client );
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -150,118 +157,12 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
     }
 
     /**
-     * Verify item display name.
-     *
-     * @param testName the test name
-     * @throws Exception the exception
-     */
-    @Test(dataProvider="testName",
-        dependsOnMethods = {"readItem", "updateItem"})
-    public void verifyItemDisplayName(String testName) throws Exception {
-        // Perform setup.
-        setupRead();
-        //
-        // First, read our known item resource
-        //
-        LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
-        LocationsCommon location = null;
-        try {
-            assertStatusCode(res, testName);
-	        // Check whether location has expected displayName.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        location = (LocationsCommon) extractPart(input,
-	                client.getItemCommonPartName(), LocationsCommon.class);
-	        Assert.assertNotNull(location);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-        //
-        // Now prepare an updated payload.
-        //
-        String displayName = location.getDisplayName();
-        // Make sure displayName matches computed form
-        String expectedDisplayName = 
-            LocationAuthorityClientUtils.prepareDefaultDisplayName(TEST_NAME);
-        Assert.assertNotNull(displayName, expectedDisplayName);
-        
-        // Update the shortName and verify the computed name is updated.
-        location.setCsid(null);
-        location.setDisplayNameComputed(true);
-        location.setName("updated-" + TEST_NAME);
-        expectedDisplayName = 
-            LocationAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_NAME);
-
-        // Submit the updated resource to the service and store the response.
-        PoxPayloadOut output = new PoxPayloadOut(LocationAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = output.addPart(client.getItemCommonPartName(), location);
-
-        setupUpdate();        
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        LocationsCommon updatedLocation = null;
-        try {
-        	assertStatusCode(res, testName);
-	        // Retrieve the updated resource and verify that its contents exist.
-        	PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        updatedLocation = (LocationsCommon) extractPart(input,
-	                        client.getItemCommonPartName(), LocationsCommon.class);
-	        Assert.assertNotNull(updatedLocation);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedLocation.getName(), location.getName(),
-            "Updated ForeName in Location did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedLocation.getDisplayName(), expectedDisplayName,
-            "Updated ForeName in Location not reflected in computed DisplayName.");
-        //
-        // Now Update the displayName, not computed and verify the computed name is overriden.
-        //
-        location.setDisplayNameComputed(false);
-        expectedDisplayName = "TestName";
-        location.setDisplayName(expectedDisplayName);
-
-        // Submit the updated resource to the service and store the response.
-        output = new PoxPayloadOut(LocationAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        commonPart = output.addPart(client.getItemCommonPartName(), location);
-        setupUpdate();        
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        try {
-	        assertStatusCode(res, testName);
-	        // Retrieve the updated resource and verify that its contents exist.
-	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	        updatedLocation = (LocationsCommon) extractPart(input,
-	        		client.getItemCommonPartName(), LocationsCommon.class);
-	        Assert.assertNotNull(updatedLocation);
-        } finally {
-        	if (res != null) {
-                res.releaseConnection();
-            }
-        }
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedLocation.isDisplayNameComputed(), false,
-                "Updated displayNameComputed in Location did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedLocation.getDisplayName(),
-        		expectedDisplayName,
-                "Updated DisplayName (not computed) in Location not stored.");
-    }
-
-    /**
      * Verify illegal item display name.
      *
      * @param testName the test name
      * @throws Exception the exception
      */
-    @Test(dataProvider="testName",
-            dependsOnMethods = {"verifyItemDisplayName"})
+    @Test(dataProvider="testName")
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
         // Perform setup for read.
         setupRead();
@@ -282,9 +183,18 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
             }
 	    }
 	        
-        // Try to Update with computed false and no displayName
-        location.setDisplayNameComputed(false);
-        location.setDisplayName(null);
+        //
+        // Make an invalid UPDATE request, without a display name
+        //
+        LocTermGroupList termList = location.getLocTermGroupList();
+        Assert.assertNotNull(termList);
+        List<LocTermGroup> terms = termList.getLocTermGroup();
+        Assert.assertNotNull(terms);
+        Assert.assertTrue(terms.size() > 0);
+        terms.get(0).setTermDisplayName(null);
+        terms.get(0).setTermName(null);
+        
+        setupUpdateWithInvalidBody(); // we expect a failure
         
         // Submit the updated resource to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(LocationAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
@@ -367,11 +277,11 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 
 		for (AbstractCommonList.ListItem item : items) {
 			String value = AbstractCommonListUtils.ListItemGetElementValue(
-					item, REFNAME);
+					item, LocationJAXBSchema.REF_NAME);
 			Assert.assertTrue((null != value), "Item refName is null!");
 			value = AbstractCommonListUtils.ListItemGetElementValue(item,
-					DISPLAYNAME);
-			Assert.assertTrue((null != value), "Item displayName is null!");
+					LocationJAXBSchema.TERM_DISPLAY_NAME);
+			Assert.assertTrue((null != value), "Item termDisplayName is null!");
 		}
 		if (logger.isTraceEnabled()) {
 			AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger,
@@ -553,19 +463,38 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 
 	@Override
 	protected LocationsCommon updateItemInstance(LocationsCommon locationsCommon) {
-		LocationsCommon result = new LocationsCommon();
 		
-        result.setName("updated-" + locationsCommon.getName());
-		result.setDisplayName("updated-" + locationsCommon.getDisplayName());
-		
-		return result;
+            LocTermGroupList termList = locationsCommon.getLocTermGroupList();
+            Assert.assertNotNull(termList);
+            List<LocTermGroup> terms = termList.getLocTermGroup();
+            Assert.assertNotNull(terms);
+            Assert.assertTrue(terms.size() > 0);
+            terms.get(0).setTermDisplayName("updated-" + terms.get(0).getTermDisplayName());
+            terms.get(0).setTermName("updated-" + terms.get(0).getTermName());
+            locationsCommon.setLocTermGroupList(termList);
+
+            return locationsCommon;
+
 	}
 
 	@Override
 	protected void compareUpdatedItemInstances(LocationsCommon original,
 			LocationsCommon updated) throws Exception {
-        Assert.assertEquals(updated.getName(), original.getName(),
-                "Data in updated Location did not match submitted data.");
+            LocTermGroupList originalTermList = original.getLocTermGroupList();
+            Assert.assertNotNull(originalTermList);
+            List<LocTermGroup> originalTerms = originalTermList.getLocTermGroup();
+            Assert.assertNotNull(originalTerms);
+            Assert.assertTrue(originalTerms.size() > 0);
+            
+            LocTermGroupList updatedTermList = updated.getLocTermGroupList();
+            Assert.assertNotNull(updatedTermList);
+            List<LocTermGroup> updatedTerms = updatedTermList.getLocTermGroup();
+            Assert.assertNotNull(updatedTerms);
+            Assert.assertTrue(updatedTerms.size() > 0);
+            
+            Assert.assertEquals(updatedTerms.get(0).getTermDisplayName(),
+                originalTerms.get(0).getTermDisplayName(),
+                "Value in updated record did not match submitted data.");
 	}
 
 	@Override
@@ -578,15 +507,13 @@ public class LocationAuthorityServiceTest extends AbstractAuthorityServiceTest<L
 	@Override
 	protected PoxPayloadOut createNonExistenceItemInstance(
 			String commonPartName, String identifier) {
-        Map<String, String> nonexMap = new HashMap<String,String>();
-        nonexMap.put(LocationJAXBSchema.NAME, TEST_NAME);
-        nonexMap.put(LocationJAXBSchema.SHORT_IDENTIFIER, "nonEx");
-        nonexMap.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
-        nonexMap.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
-        final String EMPTY_REFNAME = "";
-        PoxPayloadOut result = 
-                LocationAuthorityClientUtils.createLocationInstance(EMPTY_REFNAME, 
-    			nonexMap, commonPartName);
-		return result;
+            Map<String, String> nonexMap = new HashMap<String, String>();
+            nonexMap.put(LocationJAXBSchema.SHORT_IDENTIFIER, "nonExistent");
+            final String EMPTY_REFNAME = "";
+            PoxPayloadOut result = 
+                LocationAuthorityClientUtils.createLocationInstance(EMPTY_REFNAME, nonexMap,
+                LocationAuthorityClientUtils.getTermGroupInstance(""), commonPartName);
+            return result;
+
 	}
 }

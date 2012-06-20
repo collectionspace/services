@@ -2,8 +2,17 @@
 <document name="persons">
 	<ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
 		<shortIdentifier>connieContactPerson</shortIdentifier>
-		<displayNameComputed>true</displayNameComputed>
-		<foreName>Connie</foreName>
-		<surName>ContactPerson</surName>
+	
+		<personTermGroupList>
+			<personTermGroup>
+				<termName>Connie ContactPerson</termName>
+				<termPrefForLang>false</termPrefForLang>
+				<termDisplayName>Connie ContactPerson</termDisplayName>
+				<termStatus>${termStatus}</termStatus>
+				<foreName>Connie</foreName>
+				<surName>ContactPerson</surName>
+			</personTermGroup>
+		</personTermGroupList>
+		
 	</ns2:persons_common>
 </document>

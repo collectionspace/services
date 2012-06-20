@@ -113,6 +113,13 @@ public class Tools {
         String output = matcher.replaceAll(replace);
         return output;
     }
+    
+    public static String searchAndReplaceWithQuoteReplacement(String source, String find, String replace){
+        Pattern pattern = Pattern.compile(find);
+        Matcher matcher = pattern.matcher(source);
+        String output = matcher.replaceAll(matcher.quoteReplacement(replace));
+        return output;
+    }
 
     static boolean m_fileSystemIsDOS = "\\".equals(File.separator);
     static boolean m_fileSystemIsMac = ":".equals(File.separator);
@@ -150,6 +157,26 @@ public class Tools {
     public static String getStackTrace(Throwable e){
         return getStackTrace(e, -1);
     }
+    
+    public static String implode(String strings[], String sep) {
+		String implodedString;
+		if (strings.length == 0) {
+			implodedString = "";
+		} else {
+			StringBuffer sb = new StringBuffer();
+			sb.append(strings[0]);
+			for (int i = 1; i < strings.length; i++) {
+				if (strings[i] != null && !strings[i].trim().isEmpty()) {
+					sb.append(sep);
+					sb.append(strings[i]);
+				}
+			}
+			implodedString = sb.toString();
+		}
+		return implodedString;
+	}
+		
+
 
 
     /** @param includeLines if zero, returns all lines */

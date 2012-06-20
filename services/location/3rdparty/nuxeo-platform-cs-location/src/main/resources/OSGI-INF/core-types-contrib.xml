@@ -1,25 +1,30 @@
 <?xml version="1.0"?>
 <component name="org.collectionspace.location.coreTypes">
-  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
-    <schema name="locationauthorities_common" prefix="locationauthorities_common" src="schemas/locationauthorities_common.xsd"/>
-  </extension>
-  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
-    <schema name="locations_common" prefix="locations_common" src="schemas/locations_common.xsd"/>
-  </extension>
-  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
-    <doctype name="Locationauthority" extends="Document">
-      <schema name="common"/>
-      <schema name="collectionspace_core"/>
-      <schema name="dublincore"/>
-      <schema name="locationauthorities_common"/>
-    </doctype>
-  </extension>
-  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
-    <doctype name="Locationitem" extends="Document">
-      <schema name="common"/>
-      <schema name="collectionspace_core"/>
-      <schema name="dublincore"/>
-      <schema name="locations_common"/>
-    </doctype>
-  </extension>
+    <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
+        <schema name="locationauthorities_common" prefix="locationauthorities_common" src="schemas/locationauthorities_common.xsd"/>
+    </extension>
+    <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
+        <schema name="locations_common" prefix="locations_common" src="schemas/locations_common.xsd"/>
+    </extension>
+    <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
+        <doctype name="Locationauthority" extends="Document">
+            <schema name="common"/>
+            <schema name="collectionspace_core"/>
+            <schema name="dublincore"/>
+            <schema name="locationauthorities_common"/>
+        </doctype>
+    </extension>
+    <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
+        <doctype name="Locationitem" extends="Document">
+            <schema name="common"/>
+            <schema name="collectionspace_core"/>
+            <schema name="dublincore"/>
+            <schema name="locations_common"/>
+            <prefetch>
+                locations_common:locTermGroupList/0/termDisplayName
+                locations_common:refName
+                locations_common:shortIdentifier
+            </prefetch>
+        </doctype>
+    </extension>
 </component>

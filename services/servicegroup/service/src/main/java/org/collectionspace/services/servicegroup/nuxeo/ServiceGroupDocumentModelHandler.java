@@ -87,7 +87,7 @@ public class ServiceGroupDocumentModelHandler
     		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
     		repoSession = this.getRepositorySession();
     		if (repoSession == null) {
-    			repoSession = repoClient.getRepositorySession();
+    			repoSession = repoClient.getRepositorySession(ctx);
     			releaseRepoSession = true;
     		}
             DocumentFilter myFilter = getDocumentFilter();
@@ -163,7 +163,7 @@ public class ServiceGroupDocumentModelHandler
     			throw new DocumentException(e);
     		} finally {
     			if (releaseRepoSession && repoSession != null) {
-    				repoClient.releaseRepositorySession(repoSession);
+    				repoClient.releaseRepositorySession(ctx, repoSession);
     			}
     		}
     	} catch (Exception e) {
@@ -209,7 +209,7 @@ public class ServiceGroupDocumentModelHandler
         fields[6] = DOC_TYPE_FIELD;
         list.setFieldsReturned(fields);
         Iterator<DocumentModel> iter = docList.iterator();
-		HashMap<String,String> item = new HashMap<String,String>();
+		HashMap<String, Object> item = new HashMap<String, Object>();
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             String docType = docModel.getDocumentType().getName();

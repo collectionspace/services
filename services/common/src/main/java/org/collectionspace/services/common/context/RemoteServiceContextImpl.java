@@ -163,7 +163,7 @@ public class RemoteServiceContextImpl<IT, OT>
     @Override
     public ServiceContext getLocalContext(String localContextClassName) throws Exception {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
-        Class ctxClass = cloader.loadClass(localContextClassName);
+        Class<?> ctxClass = cloader.loadClass(localContextClassName);
         if (!ServiceContext.class.isAssignableFrom(ctxClass)) {
             throw new IllegalArgumentException("getLocalContext requires "
                     + " implementation of " + ServiceContext.class.getName());
@@ -172,5 +172,5 @@ public class RemoteServiceContextImpl<IT, OT>
         Constructor ctor = ctxClass.getConstructor(java.lang.String.class);
         ServiceContext ctx = (ServiceContext) ctor.newInstance(getServiceName());
         return ctx;
-    }    
+    }
 }
