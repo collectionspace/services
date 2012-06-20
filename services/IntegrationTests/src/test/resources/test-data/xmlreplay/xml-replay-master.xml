@@ -37,16 +37,12 @@
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
     <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
     <run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
-<!--     
- -->
  
     <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchCommonSchema" />
     <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchExtensionSchema" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
     <run controlFile="relation/relation.xml" testGroup="makeRelations" />
-<!--
--->
 
 <!-- No - this test is broken
 	<run controlFile="relation/relation.xml" testGroup="r2only" />
@@ -66,6 +62,5 @@
     <run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
     <run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
     <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
-    
 </xmlReplayMaster>
 

@@ -23,13 +23,12 @@ import org.nuxeo.ecm.core.io.impl.plugins.DocumentModelWriter;
 // based loosely on package org.nuxeo.ecm.shell.commands.io.ImportCommand;
 public class ImportCommand {
     private static final Log logger = LogFactory.getLog(ImportCommand.class);
-    private static final int DEFAULT_TX_TIMOUT = 600; //timeout period in seconds
 
-    public String run(String src, String dest) throws Exception {
+    public String run(String src, String dest, int timeOut) throws Exception {
         File file = new File(src);
         ///cspace way of configuring client and auth:
         NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
-        RepositoryInstance  repoSession = client.openRepository(DEFAULT_TX_TIMOUT);
+        RepositoryInstance  repoSession = client.openRepository(timeOut);
         try {
         	String msg = String.format("Start of import is Local time: %tT", Calendar.getInstance());
         	logger.debug(msg);
