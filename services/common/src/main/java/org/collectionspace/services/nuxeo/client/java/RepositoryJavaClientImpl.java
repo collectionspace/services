@@ -154,7 +154,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.CREATE);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
             DocumentModel wspaceDoc = repoSession.getDocument(nuxeoWspace);
             String wspacePath = wspaceDoc.getPathAsString();
@@ -179,7 +179,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
 
@@ -207,7 +207,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
             DocumentModel docModel = null;
             try {
@@ -235,7 +235,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -256,7 +256,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         try {
             handler.prepare(Action.GET);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
 
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
@@ -287,7 +287,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -335,7 +335,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         try {
         	// Open a new repository session
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             wrapDoc = getDoc(repoSession, ctx, csid);
         } catch (IllegalArgumentException iae) {
             throw iae;
@@ -348,7 +348,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
         
@@ -413,13 +413,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         DocumentWrapper<DocumentModel> wrapDoc = null;
 
         try {
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             wrapDoc = findDoc(repoSession, ctx, whereClause);
         } catch (Exception e) {
 			throw new DocumentException("Unable to create a Nuxeo repository session.", e);
 		} finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
         
@@ -443,8 +443,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         String csid = null;
         boolean releaseSession = false;
         try {
-        	if(repoSession== null) {
-        		repoSession = this.getRepositorySession();
+        	if (repoSession == null) {
+        		repoSession = this.getRepositorySession(ctx);
         		releaseSession = true;
         	}
             DocumentWrapper<DocumentModel> wrapDoc = findDoc(repoSession, ctx, whereClause);
@@ -463,7 +463,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
         	if(releaseSession && (repoSession != null)) {
-        		this.releaseRepositorySession(repoSession);
+        		this.releaseRepositorySession(ctx, repoSession);
         	}
         }
         return csid;
@@ -520,7 +520,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         DocumentWrapper<DocumentModelList> wrapDoc = null;
 
         try {
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             wrapDoc = findDocs(ctx, repoSession, docTypes, whereClause,
             		pageSize, pageNum, computeTotal);
         } catch (IllegalArgumentException iae) {
@@ -532,7 +532,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
         
@@ -557,7 +557,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentModelList docModelList = new DocumentModelListImpl();
             //FIXME: Should be using NuxeoUtils.createPathRef for security reasons
             for (String csid : csidList) {
@@ -580,7 +580,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -613,7 +613,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentRef wsDocRef = new IdRef(nuxeoWspaceId);
             DocumentModelList docList = repoSession.getChildren(wsDocRef);
             //set reposession to handle the document
@@ -630,7 +630,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -669,11 +669,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         DocumentWrapper<DocumentModel> result = null;
         RepositoryInstance repoSession = null;
         try {
-        	repoSession = getRepositorySession();
+        	repoSession = getRepositorySession(ctx);
         	result = getDocFromCsid(ctx, repoSession, csid);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
         
@@ -751,7 +751,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx); //Need a refcount here for the repository session?
             
             DocumentModelList docList = null;
             String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
@@ -789,7 +789,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -893,7 +893,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.UPDATE);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentRef docRef = NuxeoUtils.createPathRef(ctx, csid);
             DocumentModel doc = null;
             try {
@@ -924,7 +924,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -974,7 +974,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             boolean fSaveSession)
             throws ClientException, DocumentException {
         try {
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentModel[] docModelArray = new DocumentModel[docList.size()];
             repoSession.saveDocuments(docList.toArray(docModelArray));
             if (fSaveSession) {
@@ -1012,7 +1012,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
         	handler.prepare(Action.DELETE);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentWrapper<DocumentModel> wrapDoc = null;
             try {
             	DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
@@ -1035,7 +1035,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -1064,7 +1064,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         	//
         	// First create the top-level domain directory
         	//
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(null);
             DocumentRef parentDocRef = new PathRef("/");
             DocumentModel parentDoc = repoSession.getDocument(parentDocRef);
             DocumentModel domainDoc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
@@ -1101,7 +1101,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw e;
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(null, repoSession);
             }
         }
         
@@ -1115,7 +1115,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         
         if (domainName != null && !domainName.isEmpty()) {
 	        try {
-	            repoSession = getRepositorySession();
+	            repoSession = getRepositorySession(null);
 	            DocumentRef docRef = new PathRef(
 	                    "/" + domainName);
 	            DocumentModel domain = repoSession.getDocument(docRef);
@@ -1129,7 +1129,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 	            return null;
 	        } finally {
 	            if (repoSession != null) {
-	                releaseRepositorySession(repoSession);
+	                releaseRepositorySession(null, repoSession);
 	            }
 	        }
         }
@@ -1174,7 +1174,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         String workspaceId = null;
         try {
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(null);
             DocumentModel parentDoc = getWorkspacesRoot(repoSession, domainName);            
             DocumentModel doc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
                     workspaceName, NuxeoUtils.WORKSPACE_DOCUMENT_TYPE);
@@ -1195,7 +1195,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw e;
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(null, repoSession);
             }
         }
         return workspaceId;
@@ -1210,7 +1210,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         
         RepositoryInstance repoSession = null;
         try {
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(null);
             DocumentRef docRef = new PathRef(
                     "/" + tenantDomain
                     + "/" + NuxeoUtils.Workspaces
@@ -1226,7 +1226,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(null, repoSession);
             }
         }
         
@@ -1240,19 +1240,37 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @return the repository session
      * @throws Exception the exception
      */
-    public RepositoryInstance getRepositorySession() throws Exception {
-        // FIXME: is it possible to reuse repository session?
-        // Authentication failures happen while trying to reuse the session
+    public RepositoryInstance getRepositorySession(ServiceContext ctx) throws Exception {
+    	RepositoryInstance repoSession = null;
+    	
     	Profiler profiler = new Profiler("getRepositorySession():", 2);
     	profiler.start();
-    	
-        NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
-        RepositoryInstance repoSession = client.openRepository();
+    	    	
+        if (ctx != null) {
+        	repoSession = (RepositoryInstance)ctx.getCurrentRepositorySession();
+            if (logger.isDebugEnabled() == true) {
+            	if (repoSession != null) {
+            		logger.warn("Reusing the current context's repository session.");
+            	}
+            }        	
+        }
+        
+        // If we couldn't find a repoSession from the service context then we need to create a new one
+        if (repoSession == null) {
+	        NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
+	        repoSession = client.openRepository();
+        }
+        
         if (logger.isTraceEnabled()) {
             logger.trace("Testing call to getRepository() repository root: " + repoSession.getRootDocument());
         }
         
         profiler.stop();
+        
+        if (ctx != null) {
+        	ctx.setCurrentRepositorySession(repoSession); // For reusing, save the repository session in the current service context
+        }
+        
         return repoSession;
     }
 
@@ -1261,11 +1279,18 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      *
      * @param repoSession the repo session
      */
-    public void releaseRepositorySession(RepositoryInstance repoSession) {
+    public void releaseRepositorySession(ServiceContext ctx, RepositoryInstance repoSession) {
         try {
             NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
             // release session
-            client.releaseRepository(repoSession);
+            if (ctx != null) {
+            	ctx.clearCurrentRepositorySession(); //clear the current context of the now closed repo session
+            	if (ctx.getCurrentRepositorySession() == null) {
+                    client.releaseRepository(repoSession); //release the repo session if the service context's ref count is zeo.
+            	}
+            } else {
+                client.releaseRepository(repoSession); //repo session was acquired without a service context
+            }
         } catch (Exception e) {
             logger.error("Could not close the repository session", e);
             // no need to throw this service specific exception

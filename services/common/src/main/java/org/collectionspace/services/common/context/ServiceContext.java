@@ -60,6 +60,21 @@ public interface ServiceContext<IT, OT> {
     /** Used to qualify document types **/
 	public static final String TENANT_SUFFIX = "Tenant";    
 
+	/* 
+	 * Sets the current/open repository session
+	 */
+	public void setCurrentRepositorySession(Object repoSession) throws Exception;
+	
+	/*
+	 * Decrements the context's repo session ref count and nulls it if the count becomes 0.
+	 */
+	public void clearCurrentRepositorySession();
+	
+	/*
+	 * If a current repository session exists, returns it.
+	 */
+	public Object getCurrentRepositorySession();
+	
     /**
      * getSecurityContext is contains security info. for the service layer
      */

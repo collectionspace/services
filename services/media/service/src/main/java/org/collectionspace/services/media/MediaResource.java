@@ -299,7 +299,7 @@ public class MediaResource extends ResourceBase {
         	//
         	// Now that we've handled the related Blob record, delete the Media record
         	//
-            return super.delete(csid, ctx);
+            return super.delete(ctx, csid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
         }

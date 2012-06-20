@@ -484,7 +484,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
         	RepositoryInstance repoSession = this.getRepositorySession();
         	if (repoSession == null) {
-        		repoSession = repoClient.getRepositorySession();
+        		repoSession = repoClient.getRepositorySession(ctx);
         		releaseRepoSession = true;
         	}
         	
@@ -504,7 +504,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	           	}
         	} finally {
         		if (releaseRepoSession == true) {
-        			repoClient.releaseRepositorySession(repoSession);
+        			repoClient.releaseRepositorySession(ctx, repoSession);
         		}
         	}
         	

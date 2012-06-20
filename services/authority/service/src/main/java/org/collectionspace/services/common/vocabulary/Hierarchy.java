@@ -24,6 +24,8 @@
 
 package org.collectionspace.services.common.vocabulary;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -49,25 +51,28 @@ public class Hierarchy {
      * @param uri informational, optional - if not known, pass an empty String.
      * @return String of XML document, including xml processing instruction, root node is "&lt;hierarchy&gt;".
      */
-    public static String dive(ServiceContext ctx, String itemcsid, String uri) {
+    public static String dive(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String itemcsid, String uri) {
         String result = dive(ctx, itemcsid, uri, true);
         result =  "<?xml version='1.0' ?><hierarchy>"+result+"</hierarchy>";
         try {
             result = XmlTools.prettyPrint(result);
         } catch (Exception e){
+        	// Do nothing
         }
         return result;
     }
 
-    private static String dive(ServiceContext ctx, String itemcsid, String uri, boolean lookupFirstName) {
-        MultivaluedMap queryParams = ctx.getUriInfo().getQueryParameters();
+    private static String dive(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String itemcsid, String uri, boolean lookupFirstName) {
+        MultivaluedMap<String, String> queryParams = ctx.getUriInfo().getQueryParameters();
         //Run getList() once as sent to get childListOuter:
         queryParams.putSingle(IRelationsManager.PREDICATE_QP, RelationshipType.HAS_BROADER.value());
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, null);
         queryParams.putSingle(IRelationsManager.SUBJECT_TYPE_QP, null);
         queryParams.putSingle(IRelationsManager.OBJECT_QP, itemcsid);
         queryParams.putSingle(IRelationsManager.OBJECT_TYPE_QP, null);
-        RelationsCommonList childListOuter = (new RelationResource()).getList(ctx.getUriInfo());    //magically knows all query params because they are in the context.
+        
+        RelationResource relationResource = new RelationResource();
+        RelationsCommonList childListOuter = relationResource.getList(ctx);    // Knows all query params because they are in the context.
         List<RelationsCommonList.RelationListItem> childList = childListOuter.getRelationListItem();
 
         StringBuffer sb = new StringBuffer();
@@ -80,8 +85,10 @@ public class Hierarchy {
         } else {
             sb.append("<uri>" + uri + "</uri>\r\n");
         }
+        
         sb.append("<csid>" + itemcsid + "</csid>\r\n");
         sb.append("<children>\r\n");
+        
         for (RelationsCommonList.RelationListItem item : childList) {
             RelationsDocListItem parent = item.getObject();
             RelationsDocListItem child = item.getSubject();
@@ -98,28 +105,33 @@ public class Hierarchy {
         return sb.toString();
     }
 
-    public static String surface(ServiceContext ctx, String itemcsid, String uri) {
+    public static String surface(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String itemcsid, String uri) {
         String result = surface(ctx, itemcsid, uri, true).resultBuffer.toString();
         result =  "<?xml version='1.0' ?><hierarchy direction='"+direction_parents+"'>"+result+"</hierarchy>";
         try {
             result = XmlTools.prettyPrint(result);
         } catch (Exception e){
+        	// Do nothing
         }
         return result;
     }
+    
     private static class SurfaceResultStruct {
         public StringBuffer resultBuffer;
         public boolean noParents = false;
     }
-    private static SurfaceResultStruct surface(ServiceContext ctx, String itemcsid, String uri, boolean first) {
-        MultivaluedMap queryParams = ctx.getUriInfo().getQueryParameters();
+    
+    private static SurfaceResultStruct surface(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String itemcsid, String uri, boolean first) {
+        MultivaluedMap<String, String> queryParams = ctx.getUriInfo().getQueryParameters();
         //Run getList() once as sent to get parentListOuter:
         queryParams.putSingle(IRelationsManager.PREDICATE_QP, RelationshipType.HAS_BROADER.value());
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, itemcsid);
         queryParams.putSingle(IRelationsManager.SUBJECT_TYPE_QP, null);
         queryParams.putSingle(IRelationsManager.OBJECT_QP, null);
         queryParams.putSingle(IRelationsManager.OBJECT_TYPE_QP, null);
-        RelationsCommonList parentListOuter = (new RelationResource()).getList(ctx.getUriInfo());    //magically knows all query params because they are in the context.
+        
+        RelationResource relationResource = new RelationResource();
+        RelationsCommonList parentListOuter = relationResource.getList(ctx);    // Knows all query params because they are in the context.
         List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
 
         StringBuffer sbOuter = new StringBuffer();
@@ -141,6 +153,7 @@ public class Hierarchy {
         if (parentList.size()==0){
             resultStruct.noParents = true;
         }
+        
         for (RelationsCommonList.RelationListItem item : parentList) {
             resultStruct.noParents = false;
             RelationsDocListItem parent = item.getObject();
@@ -188,5 +201,4 @@ public class Hierarchy {
 
         return resultStruct;
     }
-
 }

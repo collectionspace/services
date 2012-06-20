@@ -122,7 +122,7 @@
             <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}/config"/>
             <filterset>
                 <filter token="DB" value="${db}" />
-				<filter token="DB_URL" value="jdbc:${db}://localhost:${db.port}/nuxeo${db.url.suffix}" />
+				<filter token="DB_URL" value="jdbc:${db}://localhost:${db.port}/nuxeo"/>
 				<filter token="XA_DATASOURCE" value="${db.xaDataSource}" />
                 <filter token="NUXEO_USER" value="${db.nuxeo.user}" />
                 <filter token="NUXEO_PW" value="${db.nuxeo.user.password}" />

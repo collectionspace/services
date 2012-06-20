@@ -30,6 +30,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
+
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.RefName;
@@ -46,24 +47,24 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.nuxeo.client.java.CommonList; //FIXME: REM - 5/15/2012 - CommonList should be moved out of this package and into a more "common" package
+
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
+
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
@@ -71,6 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import java.util.ArrayList;
@@ -441,11 +443,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	RepositoryInstance repoSession = null;
     	boolean releaseRepoSession = false;
         
-    	try { 
+    	try {
     		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
     		repoSession = this.getRepositorySession();
     		if (repoSession == null) {
-    			repoSession = repoClient.getRepositorySession();
+    			repoSession = repoClient.getRepositorySession(ctx);
     			releaseRepoSession = true;
     		}
             DocumentFilter myFilter = getDocumentFilter();
@@ -470,8 +472,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     			}
     			throw new DocumentException(e);
     		} finally {
+    			// If we got/aquired a new seesion then we're responsible for releasing it.
     			if (releaseRepoSession && repoSession != null) {
-    				repoClient.releaseRepositorySession(repoSession);
+    				repoClient.releaseRepositorySession(ctx, repoSession);
     			}
     		}
     	} catch (Exception e) {
@@ -479,7 +482,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     			logger.debug("Caught exception ", e);
     		}
     		throw new DocumentException(e);
-    	}	        
+    	}
+    	
         return authRefDocList;
     }
 
@@ -818,13 +822,13 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         DocumentModel docModel = wrapDoc.getWrappedObject();
 		String itemRefName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
 
-        ServiceContext ctx = getServiceContext();
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
         //Do magic replacement of ${itemCSID} and fix URI's.
         fixupInboundListItems(ctx, inboundList, docModel, itemCSID);
 
         String HAS_BROADER = RelationshipType.HAS_BROADER.value();
         UriInfo uriInfo = ctx.getUriInfo();
-        MultivaluedMap queryParams = uriInfo.getQueryParameters();
+        MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 
         if (fUpdate) {
             //Run getList() once as sent to get childListOuter:
@@ -834,13 +838,15 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             queryParams.putSingle(IRelationsManager.SUBJECT_TYPE_QP, null);
             queryParams.putSingle(IRelationsManager.OBJECT_QP, itemCSID);
             queryParams.putSingle(IRelationsManager.OBJECT_TYPE_QP, null);
-            RelationsCommonList childListOuter = (new RelationResource()).getList(ctx.getUriInfo());    //magically knows all query params because they are in the context.
+            
+            RelationResource relationResource = new RelationResource();
+            RelationsCommonList childListOuter = relationResource.getList(ctx);    // Knows all query params because they are in the context.
 
             //Now run getList() again, leaving predicate, swapping subject and object, to get parentListOuter.
             queryParams.putSingle(IRelationsManager.PREDICATE_QP, predicate);
             queryParams.putSingle(IRelationsManager.SUBJECT_QP, itemCSID);
             queryParams.putSingle(IRelationsManager.OBJECT_QP, null);
-            RelationsCommonList parentListOuter = (new RelationResource()).getList(ctx.getUriInfo());
+            RelationsCommonList parentListOuter = relationResource.getList(ctx);
 
 
             childList = childListOuter.getRelationListItem();
@@ -854,7 +860,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 logger.trace("AuthItemDocHndler.updateRelations for: " + itemCSID + " got existing relations.");
             }
         }
-
 
         for (RelationsCommonList.RelationListItem inboundItem : inboundList) {
             // Note that the relations may specify the other (non-item) bit with a refName, not a CSID,
@@ -939,12 +944,15 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return relationsCommonListBody;
     }
 
-    private void ensureChildHasNoOtherParents(ServiceContext ctx, MultivaluedMap queryParams, String childCSID) {
+    private void ensureChildHasNoOtherParents(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		MultivaluedMap<String, String> queryParams, String childCSID) {
         logger.trace("ensureChildHasNoOtherParents for: " + childCSID );
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, childCSID);
         queryParams.putSingle(IRelationsManager.PREDICATE_QP, RelationshipType.HAS_BROADER.value());
         queryParams.putSingle(IRelationsManager.OBJECT_QP, null);  //null means ANY
-        RelationsCommonList parentListOuter = (new RelationResource()).getList(ctx.getUriInfo());
+        
+        RelationResource relationResource = new RelationResource();
+        RelationsCommonList parentListOuter = relationResource.getList(ctx);
         List<RelationsCommonList.RelationListItem> parentList = parentListOuter.getRelationListItem();
         //logger.warn("ensureChildHasNoOtherParents preparing to delete relations on "+childCSID+"\'s parent list: \r\n"+dumpList(parentList, "duplicate parent list"));
         deleteRelations(parentList, ctx, "parentList-delete");
@@ -981,7 +989,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return sb.toString();
     }
     private final static String CR = "\r\n";
-    private final static String T = " ";
 
     private String dumpList(List<RelationsCommonList.RelationListItem> list, String label) {
         StringBuilder sb = new StringBuilder();
@@ -1045,7 +1052,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
 
     // this method calls the RelationResource to have it create the relations and persist them.
-    private void createRelations(List<RelationsCommonList.RelationListItem> inboundList, ServiceContext ctx) throws Exception {
+    private void createRelations(List<RelationsCommonList.RelationListItem> inboundList,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
         for (RelationsCommonList.RelationListItem item : inboundList) {
             RelationsCommon rc = new RelationsCommon();
             //rc.setCsid(item.getCsid());
@@ -1083,12 +1091,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             PayloadOutputPart outputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMONPART_NAME, rc);
             payloadOut.addPart(outputPart);
             RelationResource relationResource = new RelationResource();
-            Object res = relationResource.create(ctx.getResourceMap(),
+            Response res = relationResource.create(ctx, ctx.getResourceMap(),
                     ctx.getUriInfo(), payloadOut.toXML());    //NOTE ui recycled from above to pass in unknown query params.
         }
     }
 
-    private void deleteRelations(List<RelationsCommonList.RelationListItem> list, ServiceContext ctx, String listName) {
+    private void deleteRelations(List<RelationsCommonList.RelationListItem> list,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		String listName) {
         try {
             for (RelationsCommonList.RelationListItem item : list) {
                 RelationResource relationResource = new RelationResource();
@@ -1097,7 +1107,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                 	itemToString(sb, "==== TO DELETE: ", item);
                 	logger.trace(sb.toString());
                 }
-                Object res = relationResource.delete(item.getCsid());
+                Response res = relationResource.deleteWithParentCtx(ctx, item.getCsid());
+                if (logger.isDebugEnabled()) {
+                	logger.debug("Status of authority item deleteRelations method call was: " + res.getStatus());
+                }
             }
         } catch (Throwable t) {
             String msg = "Unable to deleteRelations: " + Tools.errorToString(t, true);
@@ -1206,14 +1219,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
     //================= TODO: move this to common, refactoring this and  CollectionObjectResource.java
     public RelationsCommonList getRelations(String subjectCSID, String objectCSID, String predicate) throws Exception {
-        ServiceContext ctx = getServiceContext();
-        MultivaluedMap queryParams = ctx.getQueryParams();
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
+        MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         queryParams.putSingle(IRelationsManager.PREDICATE_QP, predicate);
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, subjectCSID);
         queryParams.putSingle(IRelationsManager.OBJECT_QP, objectCSID);
 
         RelationResource relationResource = new RelationResource(); //is this still acting like a singleton as it should be?
-        RelationsCommonList relationsCommonList = relationResource.getList(ctx.getUriInfo());
+        RelationsCommonList relationsCommonList = relationResource.getList(ctx);
         return relationsCommonList;
     }
     //============================= END TODO refactor ==========================
