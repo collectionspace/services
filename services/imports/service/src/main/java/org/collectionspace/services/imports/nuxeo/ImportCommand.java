@@ -45,6 +45,7 @@ public class ImportCommand {
     }
 
     String importTree(RepositoryInstance repoSession, File file, String toPath) throws Exception {
+    	Exception failed = null;
         DocumentReader reader = null;
         DocumentWriter writer = null;
         DocumentModel docModel = null;
@@ -63,7 +64,7 @@ public class ImportCommand {
             pipe.setReader(reader);
             pipe.setWriter(writer);
             DocumentTranslationMap dtm = pipe.run();
-            Map<DocumentRef,DocumentRef> documentRefs = dtm.getDocRefMap();
+            Map<DocumentRef,DocumentRef> documentRefs = dtm.getDocRefMap(); // FIXME: Should be checking for null here!
             dump.append("<importedRecords>");
             for (Map.Entry entry: documentRefs.entrySet()) {
                 keyDocRef = (DocumentRef) entry.getKey();
@@ -88,8 +89,11 @@ public class ImportCommand {
             }
             dump.append("</importedRecords>");
         } catch (Exception e) {
-            throw e;
+        	failed = e;
+            throw failed;
         } finally {
+        	String status = failed == null ? "Success" : "Failed";
+        	dump.append("<status>" + status + "</status>");
             dump.append("<totalRecordsImported>"+totalRecordsImported+"</totalRecordsImported>");
             dump.append("<numRecordsImportedByDocType>");
             TreeSet<String> keys = new TreeSet<String>(recordsImportedForDocType.keySet());
@@ -106,6 +110,12 @@ public class ImportCommand {
             }
             if (writer != null) {
                 writer.close();
+            }
+            
+            if (failed != null) {
+            	String msg = "The Import service encountered an exception: " + failed.getLocalizedMessage();
+            	logger.error(msg, failed);
+            	System.err.println(msg);
             }
         }
         return dump.toString();
