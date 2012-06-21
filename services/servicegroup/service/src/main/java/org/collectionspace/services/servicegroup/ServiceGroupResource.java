@@ -231,7 +231,22 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 	        	groupsList = new ArrayList<String>();
 	        	groupsList.add(serviceGroupName);
 	        }
-            list = handler.getItemsForGroup(ctx, groupsList, keywords);
+	        // set up a keyword search
+	        if (keywords != null && !keywords.isEmpty()) {
+	            String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+	            if(Tools.isEmpty(whereClause)) {
+	                if (logger.isDebugEnabled()) {
+	                	logger.debug("The WHERE clause is empty for keywords: ["+keywords+"]");
+	                }
+	            } else {
+		            DocumentFilter documentFilter = handler.getDocumentFilter();
+		            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+		            if (logger.isDebugEnabled()) {
+		                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+		            }
+	            }
+	        }
+            list = handler.getItemsForGroup(ctx, groupsList);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, serviceGroupName);
         }

@@ -13,6 +13,8 @@ public interface IRelationsManager {
 			+ "." + SERVICE_COMMONPART_NAME + ":subjectCsid";
 	public final static String CMIS_CSPACE_RELATIONS_OBJECT_ID = IQueryManager.CMIS_RELATIONS_PREFIX
 			+ "." + SERVICE_COMMONPART_NAME + ":objectCsid";
+	public final static String CMIS_CSPACE_RELATIONS_OBJECT_TYPE = IQueryManager.CMIS_RELATIONS_PREFIX
+			+ "." + SERVICE_COMMONPART_NAME + ":objectDocumentType";
 	public final static String CMIS_CSPACE_RELATIONS_TITLE = IQueryManager.CMIS_RELATIONS_PREFIX
 			+ "." + IQueryManager.CMIS_NUXEO_TITLE;
 
