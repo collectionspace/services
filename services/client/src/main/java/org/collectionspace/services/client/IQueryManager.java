@@ -48,6 +48,8 @@ public interface IQueryManager {
 	final static String SEARCH_RELATED_TO_CSID_AS_SUBJECT = "rtSbj";
 	final static String SEARCH_RELATED_TO_CSID_AS_OBJECT = "rtObj";
 	final static String SEARCH_RELATED_TO_CSID_AS_EITHER = "rtEither";
+	final static String SEARCH_RELATED_MATCH_OBJ_DOCTYPES = "rtObjDocTypes";
+	final static String SELECT_DOC_TYPE_FIELD = "selectDocType";
 	
 	//
 	// Generic CMIS property mapping constants
