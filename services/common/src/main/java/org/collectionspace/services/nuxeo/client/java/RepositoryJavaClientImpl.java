@@ -64,6 +64,7 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 //
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
+import org.apache.chemistry.opencmis.server.support.query.CmisQlExtParser_CmisBaseGrammar.boolean_factor_return;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoRepository;
 
@@ -489,7 +490,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("findDocs() NXQL: "+query);
             }
-            docList = repoSession.query(query, null, pageSize, pageNum, computeTotal);
+            docList = repoSession.query(query, null, pageSize, pageSize*pageNum, computeTotal);
             wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
         } catch (IllegalArgumentException iae) {
             throw iae;
@@ -502,6 +503,73 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 
         return wrapDoc;
     }
+    
+    protected static String buildInListForDocTypes(List<String> docTypes) {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("(");
+    	boolean first = true;
+    	for(String docType:docTypes) {
+    		if(first) {
+    			first = false;
+    		} else {
+    			sb.append(",");
+    		}
+			sb.append("'");
+    		sb.append(docType);
+			sb.append("'");
+    	}
+    	sb.append(")");
+    	return sb.toString();
+    }
+    
+    public DocumentWrapper<DocumentModelList> findDocs(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            DocumentHandler handler,
+            RepositoryInstance repoSession,
+            List<String> docTypes)
+            		throws DocumentNotFoundException, DocumentException {
+        DocumentWrapper<DocumentModelList> wrapDoc = null;
+
+        DocumentFilter filter = handler.getDocumentFilter();
+        String oldOrderBy = filter.getOrderByClause();
+        QueryContext queryContext = new QueryContext(ctx, handler);
+
+        try {
+            if (docTypes == null || docTypes.size() < 1) {
+                throw new DocumentNotFoundException(
+                        "The findDocs() method must specify at least one DocumentType.");
+            }
+            DocumentModelList docList = null;
+        	if (handler.isCMISQuery() == true) {
+        		// We have to omit the ORDER BY until we can get the "Document" table bug addressed.
+        		// CF Nuxeo JIRA NXP-9562
+        		String inList = buildInListForDocTypes(docTypes);
+        		ctx.getQueryParams().add(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES, inList);
+        		docList = getFilteredCMIS(repoSession, ctx, handler, queryContext);
+            } else {
+                if (isClauseEmpty(oldOrderBy) == true){
+                    filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);
+                }
+                String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("findDocs() NXQL: "+query);
+                }
+                docList = repoSession.query(query, null, filter.getPageSize(), filter.getOffset(), true);
+            }
+            wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        }
+                
+        return wrapDoc;
+    }
+    
+
     
     /**
      * Find a list of documentModels from the Nuxeo repository
@@ -801,8 +869,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         try {
             String query = handler.getCMISQuery(queryContext);
 
+        	DocumentFilter docFilter = handler.getDocumentFilter();
+            int pageSize = docFilter.getPageSize();
+            int offset = docFilter.getOffset();
             if (logger.isDebugEnabled()) {
-                logger.debug("Executing CMIS query: " + query.toString());
+                logger.debug("Executing CMIS query: " + query.toString()
+                		+ "with pageSize: "+pageSize+" at offset: "+offset);
             }
 
             // If we have limit and/or offset, then pass true to get totalSize
@@ -813,17 +885,29 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         	//
         	IterableQueryResult queryResult = makeCMISQLQuery(repoSession, query, queryContext);
         	try {
-				for (Map<String, Serializable> row : queryResult) {
-					logger.debug(""
-	//					+ " dc:title is: " + (String)row.get("dc:title")
-						+ " Hierarchy Table ID is:" + row.get(IQueryManager.CMIS_TARGET_NUXEO_ID)
-						+ " cmis:name is: " + row.get(IQueryManager.CMIS_TARGET_NAME)
-	//					+ " nuxeo:lifecycleState is: " + row.get("nuxeo:lifecycleState")
-					);
-					String nuxeoId = (String) row.get(IQueryManager.CMIS_TARGET_NUXEO_ID);
-					DocumentModel docModel = NuxeoUtils.getDocumentModel(repoSession, nuxeoId);
-					result.add(docModel);
-				}
+            	int totalSize = (int)queryResult.size();
+            	((DocumentModelListImpl)result).setTotalSize(totalSize);
+				// Skip the rows before our offset
+        		if(offset>0) {
+        			queryResult.skipTo(offset);
+        		}
+        		int nRows = 0;
+        		for (Map<String, Serializable> row : queryResult) {
+        			logger.debug(""
+        					//					+ " dc:title is: " + (String)row.get("dc:title")
+        					+ " Hierarchy Table ID is:" + row.get(IQueryManager.CMIS_TARGET_NUXEO_ID)
+        					+ " cmis:name is: " + row.get(IQueryManager.CMIS_TARGET_NAME)
+        					//					+ " nuxeo:lifecycleState is: " + row.get("nuxeo:lifecycleState")
+        					);
+        			String nuxeoId = (String) row.get(IQueryManager.CMIS_TARGET_NUXEO_ID);
+        			DocumentModel docModel = NuxeoUtils.getDocumentModel(repoSession, nuxeoId);
+        			result.add(docModel);
+        			nRows++;
+        			if(nRows >= pageSize) {
+        				logger.debug("Got page full of items - quitting");
+        				break;
+        			}
+        		}
         	} finally {
         		queryResult.close();
         	}
@@ -841,15 +925,15 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // Since we're not supporting paging yet for CMIS queries, we need to perform
         // a workaround for the paging information we return in our list of results
         //
+        /*
         if (result != null) {
-        	int totalSize = result.size();
-        	DocumentFilter docFilter = handler.getDocumentFilter();
         	docFilter.setStartPage(0);
         	if (totalSize > docFilter.getPageSize()) {
         		docFilter.setPageSize(totalSize);
             	((DocumentModelListImpl)result).setTotalSize(totalSize);
         	}
         }
+        */
         
         return result;
     }

@@ -76,8 +76,7 @@ public class ServiceGroupDocumentModelHandler
 
     public AbstractCommonList getItemsForGroup(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-    		List<String> serviceGroupNames,
-    		String keywords) throws Exception {
+    		List<String> serviceGroupNames) throws Exception {
         CommonList commonList = new CommonList();
         AbstractCommonList list = (AbstractCommonList)commonList;
     	RepositoryInstance repoSession = null;
@@ -91,25 +90,9 @@ public class ServiceGroupDocumentModelHandler
     			releaseRepoSession = true;
     		}
             DocumentFilter myFilter = getDocumentFilter();
-            String whereClause = null;
-	        if (keywords != null) {
-	            whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-	            if(Tools.isEmpty(whereClause)) {
-	                if (logger.isDebugEnabled()) {
-	                	logger.debug("The WHERE clause is empty for keywords: ["+keywords+"]");
-	                }
-	            } else {
-		            myFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
-		            if (logger.isDebugEnabled()) {
-		                logger.debug("The WHERE clause is: " + myFilter.getWhereClause());
-		            }
-	            }
-	        }
 	        // Make sure we pick up workflow state, etc. 
-	        whereClause = myFilter.getWhereClause();
 	        int pageSize = myFilter.getPageSize();
 	        int pageNum = myFilter.getStartPage();
-	        final boolean computeTotal = true; 
 	        list.setPageNum(pageNum);
 	        list.setPageSize(pageSize);
 
@@ -139,12 +122,15 @@ public class ServiceGroupDocumentModelHandler
                         queriedServiceBindings.put(docType, binding);
             		}
             	}
+            	
+            	// This should be "Document" but CMIS is gagging on that right now.
+            	ctx.getQueryParams().add(IQueryManager.SELECT_DOC_TYPE_FIELD, "cmis:document");
     	        
     	        // Now we have to issue the search
             	// findDocs qill build a QueryContext, which wants to see a docType for our context
             	ctx.setDocumentType("Document");
-    	        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
-    	                docTypes, whereClause, pageSize, pageNum, computeTotal);
+    	        DocumentWrapper<DocumentModelList> docListWrapper = 
+    	        		nuxeoRepoClient.findDocs(ctx, this, repoSession, docTypes );
     	        // Now we gather the info for each document into the list and return
     	        DocumentModelList docList = docListWrapper.getWrappedObject();
     	        
