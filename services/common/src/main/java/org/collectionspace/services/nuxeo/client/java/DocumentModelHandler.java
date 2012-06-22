@@ -41,6 +41,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
+import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
@@ -381,11 +382,26 @@ public abstract class DocumentModelHandler<T, TL>
 	 * 		3. Document 'B' is either the object or the subject of the relationship
 	 */
     @Override
-    public String getCMISQuery() {
+    public String getCMISQuery(QueryContext queryContext) {
     	String result = null;
     	
     	if (isCMISQuery() == true) {
-	    	String docType = this.getServiceContext().getDocumentType();	    	
+	    	//
+	    	// Build up the query arguments
+	    	//
+	    	String theOnClause = "";
+	    	String theWhereClause = "";
+	    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
+	    	String asSubjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
+	    	String asObjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
+	    	String asEitherCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
+	    	String matchObjDocTypes = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES);
+	    	String selectDocType = (String)queryParams.getFirst(IQueryManager.SELECT_DOC_TYPE_FIELD);
+
+	    	String docType = this.getServiceContext().getDocumentType();
+	    	if (selectDocType != null && !selectDocType.isEmpty()) {  
+	    		docType = selectDocType;
+	    	}
 	    	String selectFields = IQueryManager.CMIS_TARGET_CSID + ", "
 	    			+ IQueryManager.CMIS_TARGET_TITLE + ", "
 	    			+ IRelationsManager.CMIS_CSPACE_RELATIONS_TITLE + ", "
@@ -396,15 +412,6 @@ public abstract class DocumentModelHandler<T, TL>
 	    	String relObjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_ID;
 	    	String relSubjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
 	    	String targetCsidCol = IQueryManager.CMIS_TARGET_CSID;
-	    	//
-	    	// Build up the query arguments
-	    	//
-	    	String theOnClause = "";
-	    	String theWhereClause = "";
-	    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
-	    	String asSubjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
-	    	String asObjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
-	    	String asEitherCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
 
 	    	//
 	    	// Create the "ON" and "WHERE" query clauses based on the params passed into the HTTP request.  
@@ -429,20 +436,37 @@ public abstract class DocumentModelHandler<T, TL>
 	    		logger.error("Attempt to make CMIS query failed because the HTTP request was missing valid query parameters.");
 	    	}
 	    	
+	    	// Now consider a constraint on the object doc types (for search by service group)
+	    	if (matchObjDocTypes != null && !matchObjDocTypes.isEmpty()) {  
+	    		// Since our query param is the "subject" value, join the tables where the CSID of the document is the other side (the "object") of the relationship.
+	    		theWhereClause += " AND (" + IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_TYPE 
+	    							+ " IN " + matchObjDocTypes + ")";
+	    	}
+	    	
+	    	StringBuilder query = new StringBuilder();
 	    	// assemble the query from the string arguments
-	    	result = "SELECT " + selectFields
-	    			+ " FROM "	+ targetTable + " JOIN " + relTable
-	    			+ " ON " + theOnClause
-	    			+ " WHERE " + theWhereClause;
+	    	query.append("SELECT ");
+	    	query.append(selectFields);
+	    	query.append(" FROM " + targetTable + " JOIN " + relTable);
+	    	query.append(" ON " + theOnClause);
+	    	query.append(" WHERE " + theWhereClause);
+	    	
+	        try {
+				NuxeoUtils.appendCMISOrderBy(query, queryContext);
+			} catch (Exception e) {
+				logger.error("Could not append ORDER BY clause to CMIS query", e);
+			}
 	        
 	    	// An example:
 	        // SELECT D.cmis:name, D.dc:title, R.dc:title, R.relations_common:subjectCsid
 	        // FROM Dimension D JOIN Relation R
 	        // ON R.relations_common:objectCsid = D.cmis:name
 	        // WHERE R.relations_common:subjectCsid = '737527ec-a560-4776-99de'
+	        // ORDER BY D.collectionspace_core:updatedAt DESC
 	        
+	        result = query.toString();
 	        if (logger.isDebugEnabled() == true && result != null) {
-	        	logger.debug("The CMIS query for the Movement service is: " + result);
+	        	logger.debug("The CMIS query is: " + result);
 	        }
     	}
         

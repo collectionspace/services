@@ -129,7 +129,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
-			repoSession = repoClient.getRepositorySession();
+			repoSession = repoClient.getRepositorySession(ctx);
 			releaseRepoSession = true;
 		}
 
@@ -172,7 +172,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 			throw new DocumentException(e);
 		} finally {
 			if (releaseRepoSession && repoSession != null) {
-				repoClient.releaseRepositorySession(repoSession);
+				repoClient.releaseRepositorySession(ctx, repoSession);
 			}
 		}
        	return buildReportResponse(csid, params, reportFileName);

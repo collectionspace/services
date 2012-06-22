@@ -93,8 +93,12 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     private DocumentHandler docHandler = null;
     /** security context */
     private SecurityContext securityContext;
-
+    /** The sessions JAX-RS URI information */
     private UriInfo uriInfo;
+    /** The current repository session */
+    private Object currentRepositorySession;
+    /** A reference count for the current repository session */
+    private int currentRepoSesssionRefCount = 0;
 
     /**
      * Instantiates a new abstract service context impl.
@@ -626,8 +630,47 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         this.uriInfo = ui;
     }
 
-   @Override
-   public UriInfo getUriInfo(){
-        return this.uriInfo;
-    }
+	@Override
+	public UriInfo getUriInfo() {
+		return this.uriInfo;
+	}
+	
+	/*
+	 * We expect the 'currentRepositorySession' member to be set only once per instance.  Also, we expect only one open repository session
+	 * per HTTP request.  We'll log an error if we see more than one attempt to set a service context's current repo session.
+	 * (non-Javadoc)
+	 * @see org.collectionspace.services.common.context.ServiceContext#setCurrentRepositorySession(java.lang.Object)
+	 */
+	@Override
+	public void setCurrentRepositorySession(Object repoSession) throws Exception {
+		if (repoSession == null) {
+			String errMsg = "Setting a service context's repository session to null is not allowed.";
+			logger.error(errMsg);
+			throw new Exception(errMsg);
+		} else if (currentRepositorySession != null && currentRepositorySession != repoSession) {
+			String errMsg = "The current service context's repository session was replaced.  This may cause unexpected behavior and/or data loss.";
+			logger.error(errMsg);
+			throw new Exception(errMsg);
+		}
+		
+		currentRepositorySession = repoSession;
+		this.currentRepoSesssionRefCount++;
+	}
+	
+	@Override
+	public void clearCurrentRepositorySession() {
+		if (this.currentRepoSesssionRefCount > 0) {
+			currentRepoSesssionRefCount--;
+		}
+		
+		if (currentRepoSesssionRefCount == 0) {
+			this.currentRepositorySession = null;
+		}
+	}
+	
+	@Override
+	public Object getCurrentRepositorySession() {
+		// TODO Auto-generated method stub
+		return currentRepositorySession;
+	}	
 }

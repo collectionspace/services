@@ -727,7 +727,7 @@ public class NuxeoImageUtils {
 					.getDigestAlgorithm(); // Need some way on initializing the
 											// FileManager with a call.
 			
-			logger.debug("Start --> Calling Nuxeo to create an image blob.");
+			logger.debug("Start --> Calling Nuxeo to create an image blob."); // See Nuxeo's DefaultPictureAdapter class for details
 			DocumentModel documentModel = getFileManagerService()
 					.createDocumentFromBlob(nuxeoSession, fileBlob,
 							blobLocation.getPathAsString(), true,

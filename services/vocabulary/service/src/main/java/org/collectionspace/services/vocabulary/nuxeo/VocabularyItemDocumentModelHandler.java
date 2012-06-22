@@ -74,7 +74,7 @@ public class VocabularyItemDocumentModelHandler
      */
 	@Override
 	protected String getPrimaryDisplayName(DocumentModel docModel,
-			String schema, String complexPropertyName, String fieldName) {
+			String schema, String complexPropertyName, String fieldName) { // ignore 'complexPropertyName', and 'fieldName' -use VocabularyItem specific alternatives instead.
 		String result = null;
 
 		try {

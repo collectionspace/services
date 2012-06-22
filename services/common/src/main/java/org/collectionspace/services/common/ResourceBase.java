@@ -43,6 +43,7 @@ import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import javax.ws.rs.*;
@@ -57,7 +58,7 @@ import org.collectionspace.services.config.tenant.TenantBindingType;
 /**
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
- * Author: laramie
+ * Author: Laramie Crocker
  */
 public abstract class ResourceBase
         extends AbstractMultiPartCollectionSpaceResourceImpl {
@@ -89,22 +90,36 @@ public abstract class ResourceBase
     //======================= CREATE ====================================================
     
     @POST
-    public Response create(@Context ResourceMap resourceMap, @Context UriInfo ui,
+    public Response create(@Context ResourceMap resourceMap,
+    		@Context UriInfo ui,
             String xmlPayload) {
+        return this.create(null, resourceMap, ui, xmlPayload);
+    }
+    
+    public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo ui,
+            String xmlPayload) {
+    	Response result = null;
+    	
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-            //System.out.println("\r\n\r\n==============================\r\nxmlPayload:\r\n"+xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             ctx.setResourceMap(resourceMap);
-            return create(input, ctx);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }            
+            result = create(input, ctx);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
-    }
-
+        
+        return result;
+    }    
+    
     protected Response create(PoxPayloadIn input, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
         try {
-            DocumentHandler handler = createDocumentHandler(ctx);
+            DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
             UriBuilder path = UriBuilder.fromResource(this.getClass());
             return create(input, ctx, handler, path); //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
@@ -115,7 +130,7 @@ public abstract class ResourceBase
     /** Subclasses may override this overload, which gets called from @see #create(MultipartInput)   */
     protected Response create(PoxPayloadIn input,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            DocumentHandler handler,
+            DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler,
             UriBuilder path)
             throws Exception {
         String csid = getRepositoryClient(ctx).create(ctx, handler);
@@ -168,7 +183,7 @@ public abstract class ResourceBase
         ensureCSID(csid, DELETE);
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            return delete(csid, ctx);  //==> CALL implementation method, which subclasses may override.
+            return delete(ctx, csid);  //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
         }
@@ -176,12 +191,27 @@ public abstract class ResourceBase
 
     /** subclasses may override this method, which is called from #delete(String)
      *  which handles setup of ServiceContext, and does Exception handling.  */
-    protected Response delete(String csid, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
+    protected Response delete(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid)
             throws Exception {
-    	DocumentHandler handler = createDocumentHandler(ctx);
+    	DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
         getRepositoryClient(ctx).delete(ctx, csid, handler);
         return Response.status(HttpResponseCodes.SC_OK).build();
     }
+    
+    public Response deleteWithParentCtx(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+    		String csid)
+            throws Exception {
+        ensureCSID(csid, DELETE);
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // reuse the repo session if one exists
+            }
+            return delete(ctx, csid);  //==> CALL implementation method, which subclasses may override.
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
+        }
+    }    
 
     //======================= GET ====================================================
     @GET
@@ -249,7 +279,7 @@ public abstract class ResourceBase
         }
         return list;
     }
-
+    
     protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
