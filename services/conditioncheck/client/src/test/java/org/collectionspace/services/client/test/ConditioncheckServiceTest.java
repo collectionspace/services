@@ -787,7 +787,7 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
     /**
      * Creates an instance of a Conditioncheck record for testing.
      *
-     * @param conditionCheckRefNumber A conditoncheck number.
+     * @param conditionCheckRefNumber A conditioncheck number.
      * @return Multipart output suitable for use as a payload
      *     in a create or update request.
      */

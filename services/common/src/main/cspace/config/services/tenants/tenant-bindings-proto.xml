@@ -996,7 +996,7 @@
     <!-- end loanout service meta-data -->
     
         <!-- begin conditioncheck service meta-data -->
-        <tenant:serviceBindings id="Conditionchecks" name="Conditionchecks" type="procedure" version="0.1">
+        <!--<tenant:serviceBindings id="Conditionchecks" name="Conditionchecks" type="procedure" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.conditioncheck.nuxeo.ConditioncheckDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
@@ -1013,10 +1013,6 @@
                             <service:element>conditionCheckRefNumber</service:element>
                             <service:xpath>conditionCheckRefNumber</service:xpath>
                         </service:ListResultField>
-                        <!--<service:ListResultField>
-                            <service:element>conditionChecker</service:element>
-                            <service:xpath>conditionCheckers/[0]/conditionChecker</service:xpath>
-                        </service:ListResultField>-->
                         <service:ListResultField>
                             <service:element>conditionCheckDate</service:element>
                             <service:xpath>conditionCheckDate</service:xpath>
@@ -1054,7 +1050,7 @@
                     </service:content>
                 </service:part>
             </service:object>
-        </tenant:serviceBindings>
+        </tenant:serviceBindings>-->
         <!-- end conditioncheck service meta-data -->
 
     <!-- begin objectexit service meta-data -->
