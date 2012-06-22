@@ -23,6 +23,7 @@
         <NuxeoDocTypeName>Movement</NuxeoDocTypeName>
         <CommonSchemaName>movements_common</CommonSchemaName>
         <TenantPrefix>Tenant</TenantPrefix>
+        <Lifecycle>cs_locking</Lifecycle>
     </properties>
 
     <modules>
