@@ -17,6 +17,8 @@
 	xmlns="http://collectionspace.org/services/collectionobject/domain/anthropology"
 	targetNamespace="http://collectionspace.org/services/collectionobject/domain/anthropology"
 	version="0.1">
+
+	<xs:element name="homeLocation" type="xs:string"/>
 	
 	<xs:element name="nagpraInventoryName" type="xs:string"/>
 	<xs:element name="nagpraApplicability" type="xs:string"/>
