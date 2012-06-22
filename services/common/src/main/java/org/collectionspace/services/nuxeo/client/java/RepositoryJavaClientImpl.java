@@ -532,6 +532,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         DocumentFilter filter = handler.getDocumentFilter();
         String oldOrderBy = filter.getOrderByClause();
+        if (isClauseEmpty(oldOrderBy) == true){
+            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);
+        }
         QueryContext queryContext = new QueryContext(ctx, handler);
 
         try {
@@ -541,15 +544,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
             DocumentModelList docList = null;
         	if (handler.isCMISQuery() == true) {
-        		// We have to omit the ORDER BY until we can get the "Document" table bug addressed.
-        		// CF Nuxeo JIRA NXP-9562
         		String inList = buildInListForDocTypes(docTypes);
         		ctx.getQueryParams().add(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES, inList);
         		docList = getFilteredCMIS(repoSession, ctx, handler, queryContext);
             } else {
-                if (isClauseEmpty(oldOrderBy) == true){
-                    filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);
-                }
                 String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
                 if (logger.isDebugEnabled()) {
                     logger.debug("findDocs() NXQL: "+query);

@@ -124,7 +124,7 @@ public class ServiceGroupDocumentModelHandler
             	}
             	
             	// This should be "Document" but CMIS is gagging on that right now.
-            	ctx.getQueryParams().add(IQueryManager.SELECT_DOC_TYPE_FIELD, "cmis:document");
+            	ctx.getQueryParams().add(IQueryManager.SELECT_DOC_TYPE_FIELD, "CollectionSpaceDocument");
     	        
     	        // Now we have to issue the search
             	// findDocs qill build a QueryContext, which wants to see a docType for our context
