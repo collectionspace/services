@@ -3,7 +3,7 @@
     <type>${ServiceType}</type>
     <path>${ServiceName}/${docID}</path>
     <lifecycle-state>project</lifecycle-state>
-    <lifecycle-policy>default</lifecycle-policy>
+    <lifecycle-policy>cs_default</lifecycle-policy>
     <access-control>
       <acl name="inherited">
         <entry principal="Administrator" permission="Everything" grant="true"/>
