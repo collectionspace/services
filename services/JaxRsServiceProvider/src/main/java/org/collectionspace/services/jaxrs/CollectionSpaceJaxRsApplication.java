@@ -129,7 +129,8 @@ public class CollectionSpaceJaxRsApplication extends Application
 
         singletons.add(new IDResource());
         
-        // FIXME: Temporary for CSPACE-5271
+        // FIXME: Temporary for CSPACE-5271 - please remove once
+        // that issue is resolved
         uriTemplateRegistry.dump();
         
         /*
@@ -143,7 +144,15 @@ public class CollectionSpaceJaxRsApplication extends Application
     private void addResourceToMapAndSingletons(ResourceBase resource) {
         singletons.add(resource);
         resourceMap.put(resource.getServiceName(), resource);
-        uriTemplateRegistry.putAll(resource.getUriTemplateMap());
+        // Contacts itself should not have an entry in the URI template registry;
+        // there should be a Contacts entry in that registry only for use in
+        // building URIs for resources that have contacts as a sub-resource
+        //
+        // FIXME: There may be a more elegant way to filter this out; or it may
+        // fall out during implementation of CSPACE-2698
+        if (! (resource instanceof ContactResource)) {
+            uriTemplateRegistry.putAll(resource.getUriTemplateMap());
+        }
     }
 
     @Override

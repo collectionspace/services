@@ -73,7 +73,7 @@ public class UriTemplateFactory {
             + "/"
             + "{" + CONTACT_IDENTIFIER_VAR + "}";
 
-    public static UriTemplate getURITemplate(UriTemplateType type) {
+    public static StoredValuesUriTemplate getURITemplate(UriTemplateType type) {
         return new StoredValuesUriTemplate(type, getUriPathPattern(type));
     }
     
