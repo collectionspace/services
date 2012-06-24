@@ -200,6 +200,29 @@
 		</tenant:serviceBindings>
 		
 		<tenant:serviceBindings merge:matcher="id" id="Movements">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields>
+						<service:ListResultField merge:matcher="skip" merge:action="insert">
+							<service:element>computedSummary</service:element>
+							<service:schema>movements_anthropology</service:schema>
+							<service:xpath>computedSummary</service:xpath>
+						</service:ListResultField>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+			
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNameProperty</types:key>
+					<types:value>currentLocation</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNumberProperty</types:key>
+					<types:value>computedSummary</types:value>
+				</types:item>
+			</service:properties>
+			
 			<service:object xmlns:service="http://collectionspace.org/services/config/service">
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="movements_anthropology" updated="" order="3">
 					<service:properties>
@@ -217,6 +240,29 @@
 		</tenant:serviceBindings>
 
 		<tenant:serviceBindings merge:matcher="id" id="Claims">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields>
+						<service:ListResultField merge:matcher="skip" merge:action="insert">
+							<service:element>claimName</service:element>
+							<service:schema>claims_anthropology</service:schema>
+							<service:xpath>claimName</service:xpath>
+						</service:ListResultField>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+			
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNameProperty</types:key>
+					<types:value>claimName</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNumberProperty</types:key>
+					<types:value>claimNumber</types:value>
+				</types:item>
+			</service:properties>
+			
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >		
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="claims_anthropology" updated="" order="3">
 					<service:properties merge:matcher="tag">
