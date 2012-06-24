@@ -29,6 +29,5 @@
     </xs:element>
     
     <xs:element name="computedSummary" type="xs:string"/>
-        
-
+    <xs:element name="crate" type="xs:string"/>
 </xs:schema>
