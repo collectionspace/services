@@ -9,7 +9,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.group.3rdparty</artifactId>
     <name>services.group.3rdparty</name>
     <packaging>pom</packaging>
@@ -17,6 +16,14 @@
     <description>
         3rd party build for group service
     </description>
+
+	<properties>
+		<ServiceName>group</ServiceName>
+		<NuxeoDocTypeName>Group</NuxeoDocTypeName>	
+		<CommonSchemaName>groups_common</CommonSchemaName>
+		<TenantPrefix>Tenant</TenantPrefix>
+		<Lifecycle>cs_default</Lifecycle>
+	</properties>
 
     <modules>
         <module>nuxeo-platform-cs-group</module>
