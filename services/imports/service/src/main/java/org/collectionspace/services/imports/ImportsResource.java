@@ -285,8 +285,8 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 		}
 		String requestFilename = requestFile.getCanonicalPath();
 		InputSource inputSource = new InputSource(requestFilename);
-		System.out.println("############## REQUEST_FILENAME: "
-				+ requestFilename);
+		// System.out.println("############## REQUEST_FILENAME: "
+		// 		+ requestFilename);
 		return inputSource;
 	}
 
@@ -302,8 +302,8 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 					"Could not create file in requestDir: " + requestDir);
 		}
 		String requestFilename = requestFile.getCanonicalPath();
-		System.out.println("############## REQUEST_FILENAME: "
-				+ requestFilename);
+		// System.out.println("############## REQUEST_FILENAME: "
+		// 		+ requestFilename);
 		return requestFilename;
 	}
 
@@ -333,8 +333,8 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	public static void expandXmlPayloadToDir(String tenantId,
 			String inputFilename, String templateDir, String outputDir)
 			throws Exception {
-		System.out.println("############## TEMPLATE_DIR: " + templateDir);
-		System.out.println("############## OUTPUT_DIR:" + outputDir);
+		// System.out.println("############## TEMPLATE_DIR: " + templateDir);
+		// System.out.println("############## OUTPUT_DIR:" + outputDir);
 		File file = new File(inputFilename);
 		FileInputStream is = new FileInputStream(file);
 		InputSource inputSource = new InputSource(is);
@@ -361,8 +361,8 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	public static void expandXmlPayloadToDir(String tenantId,
 			InputSource inputSource, String templateDir, String outputDir)
 			throws Exception {
-		System.out.println("############## TEMPLATE_DIR: " + templateDir);
-		System.out.println("############## OUTPUT_DIR:" + outputDir);
+		// System.out.println("############## TEMPLATE_DIR: " + templateDir);
+		// System.out.println("############## OUTPUT_DIR:" + outputDir);
 		TemplateExpander.expandInputSource(tenantId, templateDir, outputDir,
 				inputSource, "/imports/import");
 		// TemplateExpander.expandInputSource(templateDir, outputDir,
@@ -384,14 +384,14 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 		try {
 			InputStream fileStream = null;
 			String preamble = partFormData.getPreamble();
-			System.out.println("Preamble type is:" + preamble);
+			// System.out.println("Preamble type is:" + preamble);
 			Map<String, List<InputPart>> partsMap = partFormData
 					.getFormDataMap();
 			List<InputPart> fileParts = partsMap.get("file");
 			int timeout = this.getTimeoutParam(ui);
 			for (InputPart part : fileParts) {
 				String mediaType = part.getMediaType().toString();
-				System.out.println("Media type is:" + mediaType);
+				// System.out.println("Media type is:" + mediaType);
 				if (mediaType.equalsIgnoreCase(MediaType.APPLICATION_XML)
 						|| mediaType.equalsIgnoreCase(MediaType.TEXT_XML)) {
 					// FIXME For an alternate approach, potentially preferable,
@@ -419,8 +419,8 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 					File zipfile = FileUtils.createTmpFile(fileStream,
 							getServiceName() + "_");
 					String zipfileName = zipfile.getCanonicalPath();
-					System.out.println("Imports zip file saved to:"
-							+ zipfileName);
+					// System.out.println("Imports zip file saved to:"
+					// 		+ zipfileName);
 
 					String baseOutputDir = FileTools.createTmpDir("imports-")
 							.getCanonicalPath();
@@ -430,7 +430,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 					String result = "\r\n<zipResult>Zipfile " + zipfileName
 							+ "extracted to: " + indir.getCanonicalPath()
 							+ "</zipResult>";
-					System.out.println(result);
+					// System.out.println(result);
 
 					long start = System.currentTimeMillis();
 					// TODO: now call import service...

@@ -48,6 +48,8 @@ import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.xml.sax.InputSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** This class expands variables in templates specifically for the imports service.
  *
@@ -58,7 +60,8 @@ import org.xml.sax.InputSource;
  * @author Laramie Crocker
  */
 public class TemplateExpander {
-    
+    private static final Logger logger = LoggerFactory.getLogger(TemplateExpander.class);
+
     private static final String DEFAULT_WRAPPER_TEMPLATE_FILENAME = "service-document.xml";
     private static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
     private static XPath xpath = XPathFactory.newInstance().newXPath();
@@ -318,7 +321,7 @@ public class TemplateExpander {
             InputSource input = new InputSource(new StringReader(xmlFragmentWrapped));
             value = xpath.evaluate(xpathExpr, input);
         } catch (XPathExpressionException e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
         }
         return value;
 
@@ -348,7 +351,7 @@ public class TemplateExpander {
         //============IFragmentHandler===========================================================
         public void onFragmentReady(Document context, Element fragmentParent, String currentPath, int fragmentIndex, String fragment){
             try {
-                dump(context, currentPath, fragmentIndex, fragment);
+                // dump(context, currentPath, fragmentIndex, fragment);
                 String serviceName = checkAttribute(fragmentParent, SERVICE_ATTRIBUTE, DEFAULT_SERVICE_NAME);
                 String serviceType = checkAttribute(fragmentParent, TYPE_ATTRIBUTE, DEFAULT_SERVICE_TYPE);
                 Map<String,String> perRecordAttributes = getPerRecordAttributes(fragmentParent);
@@ -357,12 +360,12 @@ public class TemplateExpander {
                 TemplateExpander.createDocInWorkspace(TENANT_ID, fragment, serviceName, serviceType,
                         perRecordAttributes, TEMPLATE_DIR, OUPUT_DIR, CSID);
             } catch (Exception e){
-                System.err.println("ERROR calling expandXmlPayloadToDir"+e);
-                e.printStackTrace();
+                logger.error("ERROR calling expandXmlPayloadToDir"+e);
+                // e.printStackTrace();
             }
         }
         public void onEndDocument(Document document, int fragmentCount){
-            System.out.println("====TemplateExpander DONE============\r\n"+ XmlTools.prettyPrint(document)+"================");
+            // System.out.println("====TemplateExpander DONE============\r\n"+ XmlTools.prettyPrint(document)+"================");
         }
         
         //============helper methods==============================================================

@@ -25,18 +25,18 @@ public class LoggedXMLDirectoryReader extends AbstractDocumentReader {
 
     protected Document loadXML(File file) throws IOException {
         String filename = file.getCanonicalPath();
-        System.out.println("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename);
+        // System.out.println("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename);
         BufferedInputStream in = null;
         try {
             in = new BufferedInputStream(new FileInputStream(file));
-            System.out.println("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename+" :: DONE");
+            // System.out.println("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename+" :: DONE");
             reportList.add("READ: "+filename);
             return new SAXReader().read(in);
         } catch (DocumentException e) {
             IOException ioe = new IOException("Failed to read file document "
                     + file + ": " + e.getMessage());
             ioe.setStackTrace(e.getStackTrace());
-            System.out.println("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename+" :: ERROR");
+            // System.out.println("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename+" :: ERROR");
             reportList.add("ERROR: "+filename);
             throw ioe;
         } finally {

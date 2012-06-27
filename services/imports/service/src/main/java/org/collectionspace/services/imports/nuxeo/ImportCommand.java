@@ -5,8 +5,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -22,7 +22,7 @@ import org.nuxeo.ecm.core.io.impl.plugins.DocumentModelWriter;
 
 // based loosely on package org.nuxeo.ecm.shell.commands.io.ImportCommand;
 public class ImportCommand {
-    private static final Log logger = LogFactory.getLog(ImportCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ImportCommand.class);
 
     public String run(String src, String dest, int timeOut) throws Exception {
         File file = new File(src);
@@ -31,15 +31,15 @@ public class ImportCommand {
         RepositoryInstance  repoSession = client.openRepository(timeOut);
         try {
         	String msg = String.format("Start of import is Local time: %tT", Calendar.getInstance());
-        	logger.debug(msg);
-        	System.out.println(msg);
+        	logger.info(msg);
+        	// System.out.println(msg);
             return importTree(repoSession, file, dest);
         } catch (Exception e) {
             throw e;
         } finally {
         	String msg = String.format("End of import is Local time: %tT", Calendar.getInstance());
-        	logger.debug(msg);
-        	System.out.println(msg);
+        	logger.info(msg);
+        	// System.out.println(msg);
             client.releaseRepository(repoSession);
         }
     }
@@ -55,7 +55,7 @@ public class ImportCommand {
         Integer numRecordsImportedForDocType = new Integer(0);
         int totalRecordsImported = 0;
         try {
-            System.out.println("importTree reading file: "+file+(file!=null ? " exists? "+file.exists() : " file param is null"));
+            // System.out.println("importTree reading file: "+file+(file!=null ? " exists? "+file.exists() : " file param is null"));
             reader = new LoggedXMLDirectoryReader(file);  //our overload of XMLDirectoryReader.
             writer = new DocumentModelWriter(repoSession, toPath, 10);
             DocumentPipe pipe = new DocumentPipeImpl(10);
