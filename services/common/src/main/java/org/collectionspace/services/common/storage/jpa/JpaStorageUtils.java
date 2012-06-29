@@ -566,7 +566,7 @@ public class JpaStorageUtils {
     	if (result == null && !persistenceUnit.equalsIgnoreCase(CS_AUTHZ_PERSISTENCE_UNIT)) try {
     		result = Persistence.createEntityManagerFactory(CS_AUTHZ_PERSISTENCE_UNIT);
     	} catch (javax.persistence.PersistenceException e) {
-    		logger.warn("Could not find a persistence unit for: " + CS_AUTHZ_PERSISTENCE_UNIT);
+    		logger.warn("Problem with the persistence unit for: " + CS_AUTHZ_PERSISTENCE_UNIT, e);
     	}
 
         return result;

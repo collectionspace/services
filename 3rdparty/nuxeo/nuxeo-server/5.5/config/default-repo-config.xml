@@ -10,6 +10,7 @@
 				<!-- The transactional datasource for Nuxeo -->
 				<xa-datasource>@XA_DATASOURCE@</xa-datasource>				
 				<property name="URL">@DB_URL@</property>
+				<property name="ServerName">@DB_SERVER_HOSTNAME@</property>				
 				<property name="DatabaseName">nuxeo</property>
 				<property name="User">@NUXEO_USER@</property>
 				<property name="Password">@NUXEO_PW@</property>

@@ -75,7 +75,7 @@
            username="${db.user}"
            password="${db.user.password}"
            driverClassName="${db.jdbc.driver.class}"
-           url="jdbc:${db}://localhost:${db.port}/cspace"
+           url="jdbc:${db}://${db.host}:${db.port}/cspace"
            maxActive="8"
            maxIdle="4"/>
 		
@@ -85,7 +85,7 @@
            username="${db.user}"
            password="${db.user.password}"
            driverClassName="${db.jdbc.driver.class}"
-           url="jdbc:${db}://localhost:${db.port}/nuxeo"
+           url="jdbc:${db}://${db.host}:${db.port}/nuxeo"
            maxActive="8"
            maxIdle="4"/>	
 
