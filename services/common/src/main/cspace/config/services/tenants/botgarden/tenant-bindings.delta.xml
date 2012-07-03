@@ -109,6 +109,32 @@
 
         <tenant:serviceBindings merge:matcher="id" id="Loansin">
             <service:object xmlns:service="http://collectionspace.org/services/config/service">
+                <service:properties>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>taxonomyList|taxonomy</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferInOrg</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferInPerson</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferOutGroupList/*/transferOutOrg</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferOutGroupList/*/transferOutPerson</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferOutGroupList/*/transferOutDirector</types:value>
+                    </types:item>
+                </service:properties>
                 <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansin_naturalhistory" updated="" order="3">
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/loanin/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/loanin/domain/naturalhistory http://collectionspace.org/services/loanin/domain/loansin_naturalhistory.xsd" />
