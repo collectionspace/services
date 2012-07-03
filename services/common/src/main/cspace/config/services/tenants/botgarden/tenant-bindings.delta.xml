@@ -68,12 +68,16 @@
                             <types:value>annotationGroupList/*/annotationAuthor</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                          <types:key>authRef</types:key>
-                          <types:value>typeSpecimenGroupList/*/typeSpecimenAssertionBy</types:value>
+                            <types:key>authRef</types:key>
+                            <types:value>typeSpecimenGroupList/*/typeSpecimenAssertionBy</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                          <types:key>authRef</types:key>
-                          <types:value>typeSpecimenGroupList/*/typeSpecimenBasionym</types:value>
+                            <types:key>authRef</types:key>
+                            <types:value>typeSpecimenGroupList/*/typeSpecimenBasionym</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>localityGroupList/*/fieldLocPlace</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
