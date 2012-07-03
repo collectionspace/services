@@ -64,7 +64,7 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>associatedTaxaGroupList/*/taxon</types:value>
+                            <types:value>associatedTaxaGroupList/*/associatedTaxon</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -102,6 +102,16 @@
                 <service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_ucjeps" updated="" order="4">
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/local/ucjeps" schemaLocation="http://collectionspace.org/services/collectionobject/local/ucjeps http://collectionspace.org/services/collectionobject/local/collectionobjects_ucjeps.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+
+        <tenant:serviceBindings merge:matcher="id" id="Loansout">
+            <service:object xmlns:service="http://collectionspace.org/services/config/service">
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansout_naturalhistory" updated="" order="3">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/loanout/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/loanout/domain/naturalhistory http://collectionspace.org/services/loanout/domain/loansout_naturalhistory.xsd" />
                     </service:content>
                 </service:part>
             </service:object>
