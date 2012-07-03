@@ -197,10 +197,12 @@ public class ServiceBindingUtils {
     private static ArrayList<String> commonServiceTypes = null;
     private static ArrayList<String> commonProcedureServiceTypes = null;
    
-    public static ArrayList<String> getCommonServiceTypes() {
+    public static ArrayList<String> getCommonServiceTypes(boolean includeAuthorities) {
     	if(commonServiceTypes == null) {
     		commonServiceTypes = new ArrayList<String>();
-				// Problematic at this point:	commonServiceTypes.add(SERVICE_TYPE_AUTHORITY);
+    		if (includeAuthorities == true) {
+    			commonServiceTypes.add(SERVICE_TYPE_AUTHORITY); // REM - CSPACE-5359: Added back authorities to resolve this issue.
+    		}
     		commonServiceTypes.add(SERVICE_TYPE_OBJECT);
     		commonServiceTypes.add(SERVICE_TYPE_PROCEDURE);
     	}

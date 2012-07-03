@@ -82,6 +82,8 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     
+    private final static boolean EXCLUDE_AUTHORITIES = false;
+    
     @Override
     public String getServiceName(){
         return ServiceGroupClient.SERVICE_NAME;
@@ -170,7 +172,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
             // We need to get all the procedures, authorities, and objects.
 	        ArrayList<String> groupsList = null;  
 	        if("common".equalsIgnoreCase(groupname)) {
-	        	groupsList = ServiceBindingUtils.getCommonServiceTypes();
+	        	groupsList = ServiceBindingUtils.getCommonServiceTypes(false); // CSPACE-5359: Excluding Authority type to stay backward compat with v2.4
 	        } else {
 	        	groupsList = new ArrayList<String>();
 	        	groupsList.add(groupname);
@@ -226,7 +228,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 	        				createDocumentHandler(ctx);
 	        ArrayList<String> groupsList = null;  
 	        if("common".equalsIgnoreCase(serviceGroupName)) {
-	        	groupsList = ServiceBindingUtils.getCommonServiceTypes();
+	        	groupsList = ServiceBindingUtils.getCommonServiceTypes(); //CSPACE-5359: Exclude authorities to remain backward compat with v2.4
 	        } else {
 	        	groupsList = new ArrayList<String>();
 	        	groupsList.add(serviceGroupName);
