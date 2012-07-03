@@ -296,17 +296,17 @@ public class RefNameServiceUtils {
         if(!(repoClient instanceof RepositoryJavaClientImpl)) {
     		throw new InternalError("updateAuthorityRefDocs() called with unknown repoClient type!");
         }
-        try {
-        	final int pageSize = N_OBJS_TO_UPDATE_PER_LOOP;	
+        try { // REM - How can we deal with transaction and timeout issues hear.
+        	final int pageSize = N_OBJS_TO_UPDATE_PER_LOOP;	// Set a limit of num of objects -something like 1000K objects and also add a log Warning after some threshold
         	int pageNumProcessed = 1;
         	while(true) {	// Keep looping until we find all the refs.
         		logger.debug("updateAuthorityRefDocs working on page: "+pageNumProcessed);
         		// Note that we always ask the Repo for the first page, since each page we process
         		// should not be found in successive searches. Slightly inefficient, but more
         		// reliable (stateless).
-		        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
+		        DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession, //is there an orderBy clause?  set the orderby clause to something non-transient like createAt
 		        		getRefNameServiceTypes(), oldRefName, refPropName,
-		        		queriedServiceBindings, authRefFieldsByService, null, pageSize, 0, false);
+		        		queriedServiceBindings, authRefFieldsByService, null, pageSize, 0, false /*don't compute total*/); //loop through the pages until we're finished -i.e., don't just keep getting the first page
 		
 		        if((docList == null) 			// found no authRef fields - nothing to do
 		        	|| (docList.size() == 0)) {	// No more to handle
