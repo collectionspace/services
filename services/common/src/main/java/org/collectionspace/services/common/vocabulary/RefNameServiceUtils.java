@@ -257,10 +257,10 @@ public class RefNameServiceUtils {
 	        String fieldList = "docType|docId|docNumber|docName|sourceField|uri|updatedAt|workflowState";
 	        commonList.setFieldsReturned(fieldList);
 	        
-	        int nRefsFound = processRefObjsDocList(docList, refName, queriedServiceBindings, authRefFieldsByService,
+	        int nRefsFound = processRefObjsDocList(docList, refName, queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
 					       			list, null);
 	        if(logger.isDebugEnabled() && (nRefsFound < docList.size())) {
-	        	logger.debug("Internal curiosity: got fewer matches of refs than # docs matched...");
+	        	logger.debug("Internal curiosity: got fewer matches of refs than # docs matched..."); // We found a ref to ourself and have excluded it.
 	        }
     	} catch (Exception e) {
 			logger.error("Could not retrieve the Nuxeo repository", e);
