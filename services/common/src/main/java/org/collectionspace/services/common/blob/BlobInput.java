@@ -160,11 +160,11 @@ public class BlobInput {
 			theBlobFile = FileUtils.toFile(blobUrl);
 			if (theBlobFile.exists() == false || theBlobFile.canRead() == false) {
 				String msg = FILE_ACCESS_ERROR + theBlobFile.getAbsolutePath();
-				logger.equals(msg);
+				logger.error(msg);
 				throw new DocumentException(msg);
 			}
 		} else {
-			
+			throw new MalformedURLException("Could not create a blob file from: " + blobUrl);
 		}
     	this.setBlobFile(theBlobFile);
     	this.setBlobUri(blobUri);

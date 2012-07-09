@@ -65,7 +65,7 @@ public class BlobResource extends ResourceBase {
 
 	@Override
     public String getServiceName(){
-        return BlobUtil.BLOB_RESOURCE_NAME;
+        return BlobClient.SERVICE_NAME;
     }
 
     @Override
@@ -217,12 +217,13 @@ public class BlobResource extends ResourceBase {
     	String blobUri = queryParams.getFirst(BlobClient.BLOB_URI_PARAM);
     	
     	try {
-    		if (blobUri != null) {
+    		if (blobUri != null) { // If we were passed a URI than try to create a blob from it
 		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-		    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
-		    	blobInput.createBlobFile(blobUri);
-		    	response = this.create(null, ctx);
+		    	BlobInput blobInput = BlobUtil.getBlobInput(ctx); // We're going to store a reference to the blob in the current context for the doc handler to use later
+		    	blobInput.createBlobFile(blobUri); // This call creates a temp blob file and points our blobInput to it
+		    	response = this.create(null, ctx); // Now finish the create.  We'll ignore the xmlPayload since we'll derive it from the blob itself
     		} else {
+    			// No URI was passed in so we're just going to create a blob record
     			response = super.create(resourceMap, ui, xmlPayload);
     		}
     	} catch (Exception e) {

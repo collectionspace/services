@@ -1257,7 +1257,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         String workspaceId = null;
         try {
             repoSession = getRepositorySession(null);
-            DocumentModel parentDoc = getWorkspacesRoot(repoSession, domainName);            
+            DocumentModel parentDoc = getWorkspacesRoot(repoSession, domainName);
+            
+            if (logger.isTraceEnabled()) {
+	            for (String facet : parentDoc.getFacets()) {
+	            	logger.debug("Facet: " + facet);
+	            }
+            }
+            
             DocumentModel doc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
                     workspaceName, NuxeoUtils.WORKSPACE_DOCUMENT_TYPE);
             doc.setPropertyValue("dc:title", workspaceName);
