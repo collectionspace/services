@@ -46,15 +46,13 @@ public class TaxonValidatorHandler extends ValidatorHandlerImpl {
     final Logger logger = LoggerFactory.getLogger(TaxonValidatorHandler.class);
     // 'Bad pattern' for shortIdentifiers matches any non-word characters
     private static final Pattern SHORT_ID_BAD_PATTERN = Pattern.compile("[\\W]");
-    private static final String VALIDATION_ERROR =
-            "The record payload was invalid. See log file for more details.";
     private static final String SHORT_ID_BAD_CHARS_ERROR =
             "shortIdentifier must only contain standard word characters";
     private static final String HAS_NO_TERMS_ERROR =
             "Authority items must contain at least one term.";
     private static final String TERM_HAS_EMPTY_DISPLAYNAME_ERROR =
             "Each term group in an authority item must contain "
-            + "a non-empty term display name.";
+            + "a non-empty display name.";
 
     @Override
     protected Class getCommonPartClass() {
@@ -63,21 +61,21 @@ public class TaxonValidatorHandler extends ValidatorHandlerImpl {
 
     @Override
     protected void handleCreate() throws InvalidDocumentException {
-        TaxonCommon organization = (TaxonCommon) getCommonPart();
+        TaxonCommon taxon = (TaxonCommon) getCommonPart();
         // No guarantee that there is a common part in every post/update.
-        if (organization != null) {
+        if (taxon != null) {
             try {
-                String shortId = organization.getShortIdentifier();
+                String shortId = taxon.getShortIdentifier();
                 if (shortId != null) {
                     CS_ASSERT(shortIdentifierContainsOnlyValidChars(shortId), SHORT_ID_BAD_CHARS_ERROR);
                 }
-                CS_ASSERT(containsAtLeastOneTerm(organization), HAS_NO_TERMS_ERROR);
-                CS_ASSERT(allTermsContainDisplayName(organization), TERM_HAS_EMPTY_DISPLAYNAME_ERROR);
+                CS_ASSERT(containsAtLeastOneTerm(taxon), HAS_NO_TERMS_ERROR);
+                CS_ASSERT(allTermsContainDisplayName(taxon), TERM_HAS_EMPTY_DISPLAYNAME_ERROR);
             } catch (AssertionError e) {
                 if (logger.isErrorEnabled()) {
                     logger.error(e.getMessage(), e);
                 }
-                throw new InvalidDocumentException(VALIDATION_ERROR, e);
+                throw new InvalidDocumentException(e.getMessage(), e);
             }
         }
     }
@@ -92,20 +90,20 @@ public class TaxonValidatorHandler extends ValidatorHandlerImpl {
 
     @Override
     protected void handleUpdate() throws InvalidDocumentException {
-        TaxonCommon organization = (TaxonCommon) getCommonPart();
+        TaxonCommon taxon = (TaxonCommon) getCommonPart();
         // No guarantee that there is a common part in every post/update.
-        if (organization != null) {
+        if (taxon != null) {
             try {
                 // shortIdentifier is among a set of fields that are
                 // prevented from being changed on an update, and thus
                 // we don't need to check its value here.
-                CS_ASSERT(containsAtLeastOneTerm(organization), HAS_NO_TERMS_ERROR);
-                CS_ASSERT(allTermsContainDisplayName(organization), TERM_HAS_EMPTY_DISPLAYNAME_ERROR);
+                CS_ASSERT(containsAtLeastOneTerm(taxon), HAS_NO_TERMS_ERROR);
+                CS_ASSERT(allTermsContainDisplayName(taxon), TERM_HAS_EMPTY_DISPLAYNAME_ERROR);
             } catch (AssertionError e) {
                 if (logger.isErrorEnabled()) {
                     logger.error(e.getMessage(), e);
                 }
-                throw new InvalidDocumentException(VALIDATION_ERROR, e);
+                throw new InvalidDocumentException(e.getMessage(), e);
             }
         }
     }
@@ -122,8 +120,8 @@ public class TaxonValidatorHandler extends ValidatorHandlerImpl {
         return true;
     }
 
-    private boolean containsAtLeastOneTerm(TaxonCommon organization) {
-        TaxonTermGroupList termGroupList = organization.getTaxonTermGroupList();
+    private boolean containsAtLeastOneTerm(TaxonCommon taxon) {
+        TaxonTermGroupList termGroupList = taxon.getTaxonTermGroupList();
         if (termGroupList == null) {
             return false;
         }
@@ -134,8 +132,8 @@ public class TaxonValidatorHandler extends ValidatorHandlerImpl {
         return true;
     }
 
-    private boolean allTermsContainDisplayName(TaxonCommon organization) {
-        TaxonTermGroupList termGroupList = organization.getTaxonTermGroupList();
+    private boolean allTermsContainDisplayName(TaxonCommon taxon) {
+        TaxonTermGroupList termGroupList = taxon.getTaxonTermGroupList();
         List<TaxonTermGroup> termGroups = termGroupList.getTaxonTermGroup();
         for (TaxonTermGroup termGroup : termGroups) {
             if (Tools.isBlank(termGroup.getTermDisplayName())) {
