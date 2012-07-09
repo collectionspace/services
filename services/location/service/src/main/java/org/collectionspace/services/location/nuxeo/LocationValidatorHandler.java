@@ -51,7 +51,7 @@ public class LocationValidatorHandler extends ValidatorHandlerImpl {
     private static final String HAS_NO_TERMS_ERROR =
             "Authority items must contain at least one term.";
     private static final String TERM_HAS_EMPTY_DISPLAYNAME_ERROR =
-            "Each term in an authority item must contain "
+            "Each term group in an authority item must contain "
             + "a non-empty display name.";
 
     @Override
