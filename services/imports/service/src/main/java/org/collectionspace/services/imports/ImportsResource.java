@@ -84,7 +84,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 
 	public static final String SERVICE_NAME = "imports";
 	public static final String SERVICE_PATH = "/" + SERVICE_NAME;
-	private static final int DEFAULT_TX_TIMOUT = 600; // timeout period in
+	private static final int DEFAULT_TX_TIMOUT = 600; // timeout period in seconds
 
 	/*
 	 * ASSUMPTION: All Nuxeo services of a given tenancy store their stuff in
