@@ -291,9 +291,8 @@ public class RefNameServiceUtils {
         return refNameServiceTypes;
     }
     // Seems like a good value - no real data to set this well.
-    // private static final int N_OBJS_TO_UPDATE_PER_LOOP = 100;
-    // FIXME: This value is set to 3 during debugging; needs to be set higher during production - ADR 2012-07-10
-    private static final int N_OBJS_TO_UPDATE_PER_LOOP = 3;
+    // Note: can set this value lower; e.g. to 3 during debugging; - ADR 2012-07-10
+    private static final int N_OBJS_TO_UPDATE_PER_LOOP = 100;
 
     public static int updateAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
@@ -404,7 +403,7 @@ public class RefNameServiceUtils {
         // Now we have to issue the search
         RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
         DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
-                docTypes, query, pageSize, pageNum, computeTotal);
+                docTypes, query, orderByClause, pageSize, pageNum, computeTotal);
         // Now we gather the info for each document into the list and return
         DocumentModelList docList = docListWrapper.getWrappedObject();
         return docList;
