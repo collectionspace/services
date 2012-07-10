@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
@@ -20,23 +19,33 @@ import org.nuxeo.ecm.core.io.ExportedDocument;
 import org.nuxeo.ecm.core.io.impl.AbstractDocumentReader;
 import org.nuxeo.ecm.core.io.impl.ExportedDocumentImpl;
 import org.nuxeo.runtime.services.streaming.FileSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoggedXMLDirectoryReader extends AbstractDocumentReader {
+    
+    private final Logger logger = LoggerFactory.getLogger(LoggedXMLDirectoryReader.class);
+
 
     protected Document loadXML(File file) throws IOException {
         String filename = file.getCanonicalPath();
-        System.out.println("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename);
+        
+        if (logger.isTraceEnabled()) {
+            logger.trace("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename);
+        }
         BufferedInputStream in = null;
         try {
             in = new BufferedInputStream(new FileInputStream(file));
-            System.out.println("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename+" :: DONE");
+            if (logger.isTraceEnabled()) {
+                logger.trace("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename+" :: DONE");
+            }
             reportList.add("READ: "+filename);
             return new SAXReader().read(in);
         } catch (DocumentException e) {
             IOException ioe = new IOException("Failed to read file document "
                     + file + ": " + e.getMessage());
             ioe.setStackTrace(e.getStackTrace());
-            System.out.println("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename+" :: ERROR");
+            logger.error("~~~~~~~~~~~~~~~~~~~ LoggedXMLDirectoryReader :: "+filename+" :: ERROR");
             reportList.add("ERROR: "+filename);
             throw ioe;
         } finally {
