@@ -47,6 +47,8 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 /** This class expands variables in templates specifically for the imports service.
@@ -58,6 +60,8 @@ import org.xml.sax.InputSource;
  * @author Laramie Crocker
  */
 public class TemplateExpander {
+    
+    private final static Logger logger = LoggerFactory.getLogger(TemplateExpander.class);
     
     private static final String DEFAULT_WRAPPER_TEMPLATE_FILENAME = "service-document.xml";
     private static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
@@ -318,7 +322,7 @@ public class TemplateExpander {
             InputSource input = new InputSource(new StringReader(xmlFragmentWrapped));
             value = xpath.evaluate(xpathExpr, input);
         } catch (XPathExpressionException e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
         }
         return value;
 
@@ -357,12 +361,14 @@ public class TemplateExpander {
                 TemplateExpander.createDocInWorkspace(TENANT_ID, fragment, serviceName, serviceType,
                         perRecordAttributes, TEMPLATE_DIR, OUPUT_DIR, CSID);
             } catch (Exception e){
-                System.err.println("ERROR calling expandXmlPayloadToDir"+e);
+                logger.error("ERROR calling expandXmlPayloadToDir"+e);
                 e.printStackTrace();
             }
         }
         public void onEndDocument(Document document, int fragmentCount){
-            System.out.println("====TemplateExpander DONE============\r\n"+ XmlTools.prettyPrint(document)+"================");
+            if (logger.isTraceEnabled()) {
+                logger.trace("====TemplateExpander DONE============\r\n"+ XmlTools.prettyPrint(document)+"================");
+            }
         }
         
         //============helper methods==============================================================
@@ -390,9 +396,11 @@ public class TemplateExpander {
         }
         
         private void dump(Document context, String currentPath, int fragmentIndex, String fragment){
-            System.out.println("====Path============\r\n"+currentPath+'['+fragmentIndex+']');
-            System.out.println("====Context=========\r\n"+ XmlTools.prettyPrint(context));
-            System.out.println("====Fragment========\r\n"+fragment+"\r\n===================\r\n");
+            if (logger.isTraceEnabled()) {
+                logger.trace("====Path============\r\n"+currentPath+'['+fragmentIndex+']');
+                logger.trace("====Context=========\r\n"+ XmlTools.prettyPrint(context));
+                logger.trace("====Fragment========\r\n"+fragment+"\r\n===================\r\n");
+            }
         }
     }
 

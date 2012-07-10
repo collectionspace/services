@@ -67,6 +67,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // The modified Nuxeo ImportCommand from nuxeo's shell:
 
@@ -77,11 +79,12 @@ import java.util.Map;
 @Produces({ "application/xml" })
 @Consumes({ "application/xml" })
 public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayloadIn, PoxPayloadOut> {
+    
+        private final static Logger logger = LoggerFactory.getLogger(TemplateExpander.class);
 
 	public static final String SERVICE_NAME = "imports";
 	public static final String SERVICE_PATH = "/" + SERVICE_NAME;
 	private static final int DEFAULT_TX_TIMOUT = 600; // timeout period in
-														// seconds
 
 	/*
 	 * ASSUMPTION: All Nuxeo services of a given tenancy store their stuff in
@@ -285,8 +288,10 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 		}
 		String requestFilename = requestFile.getCanonicalPath();
 		InputSource inputSource = new InputSource(requestFilename);
-		System.out.println("############## REQUEST_FILENAME: "
+                if (logger.isTraceEnabled()) {
+                    logger.trace("############## REQUEST_FILENAME: "
 				+ requestFilename);
+                }
 		return inputSource;
 	}
 
@@ -302,8 +307,10 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 					"Could not create file in requestDir: " + requestDir);
 		}
 		String requestFilename = requestFile.getCanonicalPath();
-		System.out.println("############## REQUEST_FILENAME: "
+                if (logger.isTraceEnabled()) {
+		    logger.trace("############## REQUEST_FILENAME: "
 				+ requestFilename);
+                }
 		return requestFilename;
 	}
 
@@ -333,8 +340,10 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	public static void expandXmlPayloadToDir(String tenantId,
 			String inputFilename, String templateDir, String outputDir)
 			throws Exception {
-		System.out.println("############## TEMPLATE_DIR: " + templateDir);
-		System.out.println("############## OUTPUT_DIR:" + outputDir);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("############## TEMPLATE_DIR: " + templateDir);
+                    logger.trace("############## OUTPUT_DIR:" + outputDir);
+                }
 		File file = new File(inputFilename);
 		FileInputStream is = new FileInputStream(file);
 		InputSource inputSource = new InputSource(is);
@@ -361,8 +370,10 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	public static void expandXmlPayloadToDir(String tenantId,
 			InputSource inputSource, String templateDir, String outputDir)
 			throws Exception {
-		System.out.println("############## TEMPLATE_DIR: " + templateDir);
-		System.out.println("############## OUTPUT_DIR:" + outputDir);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("############## TEMPLATE_DIR: " + templateDir);
+                    logger.trace("############## OUTPUT_DIR:" + outputDir);
+                }
 		TemplateExpander.expandInputSource(tenantId, templateDir, outputDir,
 				inputSource, "/imports/import");
 		// TemplateExpander.expandInputSource(templateDir, outputDir,
@@ -384,14 +395,18 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 		try {
 			InputStream fileStream = null;
 			String preamble = partFormData.getPreamble();
-			System.out.println("Preamble type is:" + preamble);
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("Preamble type is:" + preamble);
+                        }
 			Map<String, List<InputPart>> partsMap = partFormData
 					.getFormDataMap();
 			List<InputPart> fileParts = partsMap.get("file");
 			int timeout = this.getTimeoutParam(ui);
 			for (InputPart part : fileParts) {
 				String mediaType = part.getMediaType().toString();
-				System.out.println("Media type is:" + mediaType);
+                                if (logger.isTraceEnabled()) {
+                                    logger.trace("Media type is:" + mediaType);
+                                }
 				if (mediaType.equalsIgnoreCase(MediaType.APPLICATION_XML)
 						|| mediaType.equalsIgnoreCase(MediaType.TEXT_XML)) {
 					// FIXME For an alternate approach, potentially preferable,
@@ -419,19 +434,22 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 					File zipfile = FileUtils.createTmpFile(fileStream,
 							getServiceName() + "_");
 					String zipfileName = zipfile.getCanonicalPath();
-					System.out.println("Imports zip file saved to:"
-							+ zipfileName);
+                                        if (logger.isTraceEnabled()) {
+                                            logger.trace("Imports zip file saved to:"
+                                                            + zipfileName);
+                                        }
 
 					String baseOutputDir = FileTools.createTmpDir("imports-")
 							.getCanonicalPath();
 					File indir = new File(baseOutputDir + "/in");
 					indir.mkdir();
 					ZipTools.unzip(zipfileName, indir.getCanonicalPath());
-					String result = "\r\n<zipResult>Zipfile " + zipfileName
-							+ "extracted to: " + indir.getCanonicalPath()
-							+ "</zipResult>";
-					System.out.println(result);
-
+                                        String result = "\r\n<zipResult>Zipfile " + zipfileName
+                                                + "extracted to: " + indir.getCanonicalPath()
+                                                + "</zipResult>";
+                                        if (logger.isTraceEnabled()) {
+                                            logger.trace(result);
+                                        }
 					long start = System.currentTimeMillis();
 					// TODO: now call import service...
 					resultBuf.append(result);
@@ -463,7 +481,9 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 			+ "      <input name='file' type='file' accept='application/xml,text/xml' />\n"
 			+ "      <br />\n"
 			+ "      <input type='submit' value='Upload File' />\n"
-			+ "    </form>\n" + "  </body>\n" + "</html>\n";
+			+ "    </form>\n"
+                        + "  </body>\n"
+                        + "</html>\n";
 
 	@GET
 	@Produces("text/html")
