@@ -45,15 +45,13 @@ public class PersonValidatorHandler extends ValidatorHandlerImpl {
     final Logger logger = LoggerFactory.getLogger(PersonValidatorHandler.class);
     // 'Bad pattern' for shortIdentifiers matches any non-word characters
     private static final Pattern SHORT_ID_BAD_PATTERN = Pattern.compile("[\\W]");
-    private static final String VALIDATION_ERROR =
-            "The record payload was invalid. See log file for more details.";
     private static final String SHORT_ID_BAD_CHARS_ERROR =
             "shortIdentifier must only contain standard word characters";
     private static final String HAS_NO_TERMS_ERROR =
             "Authority items must contain at least one term.";
     private static final String TERM_HAS_EMPTY_DISPLAYNAME_ERROR =
             "Each term group in an authority item must contain "
-            + "a non-empty term display name.";
+            + "a non-empty display name.";
 
     @Override
     protected Class getCommonPartClass() {
@@ -76,7 +74,7 @@ public class PersonValidatorHandler extends ValidatorHandlerImpl {
                 if (logger.isErrorEnabled()) {
                     logger.error(e.getMessage(), e);
                 }
-                throw new InvalidDocumentException(VALIDATION_ERROR, e);
+                throw new InvalidDocumentException(e.getMessage(), e);
             }
         }
     }
@@ -104,7 +102,7 @@ public class PersonValidatorHandler extends ValidatorHandlerImpl {
                 if (logger.isErrorEnabled()) {
                     logger.error(e.getMessage(), e);
                 }
-                throw new InvalidDocumentException(VALIDATION_ERROR, e);
+                throw new InvalidDocumentException(e.getMessage(), e);
             }
         }
     }
