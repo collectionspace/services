@@ -405,8 +405,12 @@ public class NuxeoUtils {
             query.append(docType);
         }
         appendNXQLWhere(query, queryContext);
-        // For a set of DocTypes, there is no sensible ordering other than by updatedAt
-        appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED);
+        if (Tools.notBlank(queryContext.getOrderByClause())) {
+            appendNXQLOrderBy(query, queryContext.getOrderByClause());
+        } else {
+            // Across a set of mixed DocTypes, updatedAt is the most sensible default ordering
+            appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED);
+        }
         // FIXME add 'order by' clause here, if appropriate
         return query.toString();
     }
