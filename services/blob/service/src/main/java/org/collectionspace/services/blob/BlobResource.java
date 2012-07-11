@@ -116,7 +116,7 @@ public class BlobResource extends ResourceBase {
     	return result;
     }
     
-    private InputStream getBlobContent(String csid, String derivativeTerm) throws WebApplicationException {
+    private InputStream getBlobContent(String csid, String derivativeTerm, StringBuffer outMimeType) throws WebApplicationException {
     	InputStream result = null;
     	
     	try {
@@ -132,7 +132,12 @@ public class BlobResource extends ResourceBase {
 	    	//
 	    	// The result of a successful get should have put the results in the
 	    	// blobInput instance
-	    	//	    	
+	    	//
+	    	
+	    	String mimeType = blobInput.getMimeType();
+	    	if (mimeType != null) {
+	    		outMimeType.append(mimeType); // blobInput's mime type was set on call to "get" above by the doc handler
+	    	}
 	    	result = BlobUtil.getBlobInput(ctx).getContentStream();
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
@@ -235,23 +240,29 @@ public class BlobResource extends ResourceBase {
     
     @GET
     @Path("{csid}/content")
-    @Produces({"image/jpeg", "image/png", "image/tiff", "application/pdf"})
-    public InputStream getBlobContent(
-    		@PathParam("csid") String csid) {
-    	InputStream result = null;
-	    result = getBlobContent(csid, null /*derivative term*/);    	
+    public Response getBlobContent(	@PathParam("csid") String csid) {
+    	Response result = null;
+
+    	StringBuffer mimeType = new StringBuffer();
+    	InputStream contentStream = getBlobContent(csid, null /*derivative term*/, mimeType /*will get set*/);
+	    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+	    
+    	result = responseBuilder.build();
     	return result;
     }
 
     @GET
     @Path("{csid}/derivatives/{derivativeTerm}/content")
-    @Produces({"image/jpeg", "image/png", "image/tiff"})
-    public InputStream getDerivativeContent(
+    public Response getDerivativeContent(
     		@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
-    	InputStream result = null;
-	    result = getBlobContent(csid, derivativeTerm);
+    	Response result = null;
+    	
+    	StringBuffer mimeType = new StringBuffer();
+    	InputStream contentStream = getBlobContent(csid, derivativeTerm, mimeType);	    
+	    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
 	    
+    	result = responseBuilder.build();
     	return result;
     }
     

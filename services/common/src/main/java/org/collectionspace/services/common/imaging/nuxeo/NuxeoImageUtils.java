@@ -115,6 +115,7 @@ public class NuxeoImageUtils {
 	private static final Logger logger = LoggerFactory
 			.getLogger(NuxeoImageUtils.class);
 
+	private static final String MIME_JPEG = "image/jpeg";
 	/*
 	 * FIXME: REM - These constants should be coming from configuration and NOT
 	 * hard coded.
@@ -271,10 +272,29 @@ public class NuxeoImageUtils {
 		return metadataMap;
 	}
 
+	private static String[] imageTypes = {"jpeg", "bmp", "gif", "png", "tiff", "octet-stream"};
+	static private boolean isImageMedia(Blob nuxeoBlob) {
+		boolean result = false;
+		
+		String mimeType = nuxeoBlob.getMimeType().toLowerCase().trim();
+		String[] parts = mimeType.split("/"); // split strings like "application/xml" into an array of two strings
+		if (parts.length == 2) {
+			for (String type : imageTypes) {
+				if (parts[1].equalsIgnoreCase(type)) {
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	static private MeasuredPartGroupList getDimensions(
 			DocumentModel documentModel, Blob nuxeoBlob) {
 		MeasuredPartGroupList result = null;
-		try {
+		
+		if (isImageMedia(nuxeoBlob) == true) try {
 			ImagingService service = Framework.getService(ImagingService.class);
 			ImageInfo imageInfo = service.getImageInfo(nuxeoBlob);
 			Map<String, Object> metadataMap = getMetadata(nuxeoBlob);
@@ -692,12 +712,12 @@ public class NuxeoImageUtils {
 			DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
 			DocumentModel wspaceDoc = repoSession.getDocument(nuxeoWspace);
 			
-            if (logger.isDebugEnabled()) {
+            if (logger.isTraceEnabled()) {
 	            for (String facet : wspaceDoc.getFacets()) {
-	            	logger.debug("Facet: " + facet);
+	            	logger.trace("Facet: " + facet);
 	            }
 	            for (String docType : wspaceDoc.getDocumentType().getChildrenTypes()) {
-	            	logger.debug("Child type: " + docType);
+	            	logger.trace("Child type: " + docType);
 	            }
             }			
 
@@ -790,7 +810,8 @@ public class NuxeoImageUtils {
 			RepositoryInstance repoSession,
 			String repositoryId,
 			String derivativeTerm,
-			Boolean getContentFlag) {
+			Boolean getContentFlag,
+			StringBuffer outMimeType) {
 		BlobOutput result = new BlobOutput();
 
 		if (repositoryId != null && repositoryId.isEmpty() == false)
@@ -811,6 +832,8 @@ public class NuxeoImageUtils {
 					PictureBlobHolder pictureBlobHolder = (PictureBlobHolder) docBlobHolder;
 					if (derivativeTerm != null) {
 						docBlob = pictureBlobHolder.getBlob(derivativeTerm);
+						// Nuxeo derivatives are all JPEG
+						outMimeType.append(MIME_JPEG);
 					} else {
 						docBlob = pictureBlobHolder.getBlob();
 					}

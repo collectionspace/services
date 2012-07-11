@@ -27,6 +27,7 @@ public class BlobInput {
 	private String blobCsid = null;
 	private File blobFile = null;
 	private String blobUri = null;
+	private String blobMimeType = null;
 	
 	private String derivativeTerm;
 	private boolean derivativeListRequested = false;
@@ -168,6 +169,14 @@ public class BlobInput {
 		}
     	this.setBlobFile(theBlobFile);
     	this.setBlobUri(blobUri);
+	}
+
+	public String getMimeType() {
+		return blobMimeType;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.blobMimeType = mimeType;
 	}	
 	
 }

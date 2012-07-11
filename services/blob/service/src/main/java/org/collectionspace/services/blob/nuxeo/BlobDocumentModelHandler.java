@@ -136,7 +136,7 @@ extends DocHandlerBase<BlobsCommon> {
 	public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
 			throws Exception {
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-		BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+		BlobInput blobInput = BlobUtil.getBlobInput(ctx); // the blobInput was set by the Blob JAX-RS resource code and put into the service context
 		RepositoryInstance repoSession = this.getRepositorySession();
 		DocumentModel docModel = wrapDoc.getWrappedObject();
 		BlobsCommon blobsCommon = this.getCommonPartProperties(docModel);		
@@ -160,8 +160,9 @@ extends DocHandlerBase<BlobsCommon> {
 		// fall into this block of code.  Otherwise, we'll just call our parent to deal with a plain-old-blob payload.
 		//
 		if (derivativeTerm != null || getContentFlag == true) {
+			StringBuffer mimeTypeBuffer = new StringBuffer();
 			BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession, //FIXME: REM - If the blob's binary has been removed from the file system, then this call will return null.  We need to at least spit out a meaningful error/warning message
-					blobRepositoryId, derivativeTerm, getContentFlag);
+					blobRepositoryId, derivativeTerm, getContentFlag, mimeTypeBuffer);
 			if (getContentFlag == true) {
 				blobInput.setContentStream(blobOutput.getBlobInputStream());
 			}
@@ -171,6 +172,13 @@ extends DocHandlerBase<BlobsCommon> {
 				blobsCommon = blobOutput.getBlobsCommon();
 				blobsCommon.setUri(getDerivativePathBase(docModel) +
 						derivativeTerm + "/" + BlobInput.URI_CONTENT_PATH);				
+			}
+			
+			String mimeType = mimeTypeBuffer.toString();
+			if (mimeType != null && !mimeType.isEmpty()) { // MIME type for derivatives might be different from original
+				blobInput.setMimeType(mimeType);
+			} else {
+				blobInput.setMimeType(blobsCommon.getMimeType());
 			}
 			
 			blobsCommon.setRepositoryId(null); //hide the repository id from the GET results payload since it is private
