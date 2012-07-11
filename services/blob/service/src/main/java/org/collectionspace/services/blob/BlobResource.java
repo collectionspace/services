@@ -259,7 +259,7 @@ public class BlobResource extends ResourceBase {
     	Response result = null;
     	
     	StringBuffer mimeType = new StringBuffer();
-    	InputStream contentStream = getBlobContent(csid, derivativeTerm, mimeType);	    
+    	InputStream contentStream = getBlobContent(csid, derivativeTerm, mimeType);
 	    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
 	    
     	result = responseBuilder.build();
@@ -292,12 +292,11 @@ public class BlobResource extends ResourceBase {
         
     @GET
     @Path("{csid}/derivatives")
-    public CommonList getDerivatives(
-    		@PathParam("csid") String csid) {
+    public CommonList getDerivatives(@PathParam("csid") String csid) {
     	CommonList result = null;
 
     	ensureCSID(csid, READ);
-        try {
+    	try {
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             result = this.getDerivativeList(ctx, csid);
             if (result == null) {

@@ -852,7 +852,7 @@ public class NuxeoImageUtils {
 					InputStream remoteStream = docBlob.getStream();
 					BufferedInputStream bufferedInputStream = new BufferedInputStream(
 							remoteStream); 	// FIXME: REM - To improve performance, try
-											// BufferedInputStream(InputStream in, int size)
+											// BufferedInputStream(InputStream in, int size)?
 					result.setBlobInputStream(bufferedInputStream);
 				}
 

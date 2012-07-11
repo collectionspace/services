@@ -177,6 +177,7 @@ extends DocHandlerBase<BlobsCommon> {
 			String mimeType = mimeTypeBuffer.toString();
 			if (mimeType != null && !mimeType.isEmpty()) { // MIME type for derivatives might be different from original
 				blobInput.setMimeType(mimeType);
+				blobsCommon.setMimeType(mimeType);
 			} else {
 				blobInput.setMimeType(blobsCommon.getMimeType());
 			}
