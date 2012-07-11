@@ -475,7 +475,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             RepositoryInstance repoSession,
             List<String> docTypes,
             String whereClause,
-            int pageSize, int pageNum, boolean computeTotal)
+            String orderByClause,
+            int pageSize,
+            int pageNum,
+            boolean computeTotal)
             		throws DocumentNotFoundException, DocumentException {
         DocumentWrapper<DocumentModelList> wrapDoc = null;
 
@@ -485,7 +488,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                         "The findDocs() method must specify at least one DocumentType.");
             }
             DocumentModelList docList = null;
-            QueryContext queryContext = new QueryContext(ctx, whereClause);
+            QueryContext queryContext = new QueryContext(ctx, whereClause, orderByClause);
             String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
             if (logger.isDebugEnabled()) {
                 logger.debug("findDocs() NXQL: "+query);
@@ -587,7 +590,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         try {
             repoSession = getRepositorySession(ctx);
-            wrapDoc = findDocs(ctx, repoSession, docTypes, whereClause,
+            wrapDoc = findDocs(ctx, repoSession, docTypes, whereClause, null,
             		pageSize, pageNum, computeTotal);
         } catch (IllegalArgumentException iae) {
             throw iae;
