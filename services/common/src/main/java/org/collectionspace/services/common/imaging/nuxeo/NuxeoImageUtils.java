@@ -26,6 +26,10 @@
  */
 package org.collectionspace.services.common.imaging.nuxeo;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -36,6 +40,9 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import org.nuxeo.runtime.api.Framework;
 //import org.nuxeo.runtime.api.ServiceManager;
@@ -152,6 +159,10 @@ public class NuxeoImageUtils {
 	//
 	public static final String SCHEMA_IPTC = "iptc";
 	public static final String SCHEMA_IMAGE_METADATA = "image_metadata";
+
+	private static final int THUMB_SIZE_HEIGHT = 100;
+
+	private static final int THUMB_SIZE_WIDTH = 75;
 
 	// static DefaultBinaryManager binaryManager = new DefaultBinaryManager();
 	// //can we get this from Nuxeo? i.e.,
@@ -813,6 +824,7 @@ public class NuxeoImageUtils {
 			Boolean getContentFlag,
 			StringBuffer outMimeType) {
 		BlobOutput result = new BlobOutput();
+		boolean isNonImageDerivative = false;
 
 		if (repositoryId != null && repositoryId.isEmpty() == false)
 			try {
@@ -839,6 +851,9 @@ public class NuxeoImageUtils {
 					}
 				} else {
 					docBlob = docBlobHolder.getBlob();
+					if (derivativeTerm != null) { // If its a derivative request on a non-image blob, then return just a document image thumnail
+						isNonImageDerivative = true;
+					}
 				}
 
 				//
@@ -849,13 +864,19 @@ public class NuxeoImageUtils {
 				BlobsCommon blobsCommon = createBlobsCommon(documentModel, docBlob);
 				result.setBlobsCommon(blobsCommon);
 				if (getContentFlag == true) {
-					InputStream remoteStream = docBlob.getStream();
+					InputStream remoteStream = null;
+					if (isNonImageDerivative == false) {
+						remoteStream = docBlob.getStream();
+					} else {
+						remoteStream = NuxeoImageUtils.class.getClassLoader() // for now, non-image derivatives are just placeholder document images
+					            .getResourceAsStream("documentImage.jpg");
+						outMimeType.append(MIME_JPEG);
+					}
 					BufferedInputStream bufferedInputStream = new BufferedInputStream(
 							remoteStream); 	// FIXME: REM - To improve performance, try
 											// BufferedInputStream(InputStream in, int size)?
 					result.setBlobInputStream(bufferedInputStream);
 				}
-
 			} catch (Exception e) {
 				if (logger.isErrorEnabled() == true) {
 					logger.error(e.getMessage(), e);
@@ -864,7 +885,7 @@ public class NuxeoImageUtils {
 			}
 
 		return result;
-	}
+	}	
 }
 
 /*
