@@ -144,7 +144,7 @@ public class ServiceGroupDocumentModelHandler
             	// findDocs qill build a QueryContext, which wants to see a docType for our context
             	ctx.setDocumentType("Document");
     	        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
-    	                docTypes, whereClause, pageSize, pageNum, computeTotal);
+    	                docTypes, whereClause, null, pageSize, pageNum, computeTotal);
     	        // Now we gather the info for each document into the list and return
     	        DocumentModelList docList = docListWrapper.getWrappedObject();
     	        
