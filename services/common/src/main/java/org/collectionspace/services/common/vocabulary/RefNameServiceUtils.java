@@ -240,9 +240,13 @@ public class RefNameServiceUtils {
 
         RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
         try {
+            // Ignore any provided page size and number query parameters in
+            // the following call, as they pertain to the list of authority
+            // references to be returned, not to the list of documents to be
+            // scanned for those references.
             DocumentModelList docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
                     serviceTypes, refName, refPropName, queriedServiceBindings, authRefFieldsByService,
-                    filter.getWhereClause(), null, pageSize, pageNum, computeTotal);
+                    filter.getWhereClause(), null, 0 /* pageSize */, 0 /* pageNum */, computeTotal);
 
             if (docList == null) { // found no authRef fields - nothing to process
                 return wrapperList;
@@ -287,30 +291,47 @@ public class RefNameServiceUtils {
             // Slice the list to return only the specified page of items
             // in the list results.
             //
-            // FIXME: There may well be a pattern-based way to do this in our framework.
+            // FIXME: There may well be a pattern-based way to do this
+            // in our framework.
             int startIndex = 0;
             int endIndex = 0;
-            // Return all results if pageSize is 0
+            // Return all results if pageSize is 0.
             if (pageSize == 0) {
                 startIndex = 0;
                 endIndex = list.size();
             } else {
                startIndex = pageNum * pageSize;
-               int pageEndIndex = ((startIndex + pageSize) - 1);
-               endIndex = (pageEndIndex > list.size()) ? list.size() : pageEndIndex;
             }
-            // Adjust for the second argument to List.subList() being exclusive
-            // of the last item in the slice
-            endIndex++;
-            list = new ArrayList<AuthorityRefDocList.AuthorityRefDocItem>
-                    (list.subList(startIndex, endIndex));
-            commonList.setItemsInPage(list.size());
+            
+            // Return an empty list if the start of the requested page is
+            // beyond the last item in the list.
+            if (startIndex > list.size()) {
+                wrapperList = null;
+                return wrapperList;
+            }
+
+            // Otherwise, return a list of items from the start of the specified
+            // page through the last item on that page, or otherwise through the last
+            // item in the entire list, if it occurs prior to the end of that page.
+            if (endIndex == 0) {
+                int pageEndIndex = ((startIndex + pageSize));
+                endIndex = (pageEndIndex > list.size()) ? list.size() : pageEndIndex;
+            }
+            
+            // Slice the list to return only the specified page.
+            // Note: the second argument to List.subList() is exclusive of the
+            // item at its index position, reflecting the zero-index nature of
+            // the list.
+            List<AuthorityRefDocList.AuthorityRefDocItem> currentPageList = list.subList(startIndex, endIndex);
+            wrapperList.getAuthorityRefDocItem().clear();
+            wrapperList.getAuthorityRefDocItem().addAll(currentPageList);
+            commonList.setItemsInPage(currentPageList.size());
             
             if (logger.isDebugEnabled() && (nRefsFound < docList.size())) {
                 logger.debug("Internal curiosity: got fewer matches of refs than # docs matched..."); // We found a ref to ourself and have excluded it.
             }
         } catch (Exception e) {
-            logger.error("Could not retrieve the Nuxeo repository", e);
+            logger.error("Could not retrieve a list of documents referring to the specified authority item", e);
             wrapperList = null;
         }
 
