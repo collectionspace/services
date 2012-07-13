@@ -376,6 +376,16 @@
 			</service:DocHandlerParams>
 		</tenant:serviceBindings>
 
+		<tenant:serviceBindings merge:matcher="id" id="Acquisitions">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="acquisitions_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/acquisition/domain/anthropology" schemaLocation="http://collectionspace.org/services/acquisition/domain/anthropology http://collectionspace.org/services/acquisition/domain/acquisitions_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		
 		<tenant:serviceBindings merge:matcher="id" id="Contacts">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="contacts_anthropology" updated="" order="3">
