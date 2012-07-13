@@ -231,8 +231,7 @@ public class RefNameServiceUtils {
         AbstractCommonList commonList = (AbstractCommonList) wrapperList;
         int pageNum = filter.getStartPage();
         int pageSize = filter.getPageSize();
-        commonList.setPageNum(pageNum);
-        commonList.setPageSize(pageSize);
+        
         List<AuthorityRefDocList.AuthorityRefDocItem> list =
                 wrapperList.getAuthorityRefDocItem();
 
@@ -248,10 +247,7 @@ public class RefNameServiceUtils {
             if (docList == null) { // found no authRef fields - nothing to process
                 return wrapperList;
             }
-            // Set num of items in list. this is useful to our testing framework.
-            commonList.setItemsInPage(docList.size());
-            // set the total result size
-            commonList.setTotalItems(docList.totalSize());
+
             // set the fieldsReturned list. Even though this is a fixed schema, app layer treats
             // this like other abstract common lists
             /*
@@ -268,8 +264,48 @@ public class RefNameServiceUtils {
             String fieldList = "docType|docId|docNumber|docName|sourceField|uri|updatedAt|workflowState";
             commonList.setFieldsReturned(fieldList);
 
+            // As a side-effect, the method called below modifies the value of
+            // the 'list' variable, which holds the list of references to
+            // an authority item.
+            //
+            // There can be more than one reference to a particular authority
+            // item within any individual document scanned, so the number of
+            // authority references may potentially exceed the total number
+            // of documents scanned.
             int nRefsFound = processRefObjsDocList(docList, refName, queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
                     list, null);
+
+            commonList.setPageSize(pageSize);
+            
+            // Values returned in the pagination block above the list items
+            // need to reflect the number of references to authority items
+            // returned, rather than the number of documents originally scanned
+            // to find such references.
+            commonList.setPageNum(pageNum);
+            commonList.setTotalItems(list.size());
+
+            // Slice the list to return only the specified page of items
+            // in the list results.
+            //
+            // FIXME: There may well be a pattern-based way to do this in our framework.
+            int startIndex = 0;
+            int endIndex = 0;
+            // Return all results if pageSize is 0
+            if (pageSize == 0) {
+                startIndex = 0;
+                endIndex = list.size();
+            } else {
+               startIndex = pageNum * pageSize;
+               int pageEndIndex = ((startIndex + pageSize) - 1);
+               endIndex = (pageEndIndex > list.size()) ? list.size() : pageEndIndex;
+            }
+            // Adjust for the second argument to List.subList() being exclusive
+            // of the last item in the slice
+            endIndex++;
+            list = new ArrayList<AuthorityRefDocList.AuthorityRefDocItem>
+                    (list.subList(startIndex, endIndex));
+            commonList.setItemsInPage(list.size());
+            
             if (logger.isDebugEnabled() && (nRefsFound < docList.size())) {
                 logger.debug("Internal curiosity: got fewer matches of refs than # docs matched..."); // We found a ref to ourself and have excluded it.
             }
@@ -319,11 +355,11 @@ public class RefNameServiceUtils {
             DocumentModelList docList;
             boolean morePages = true;
             while (morePages) {
-                
+
                 docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
                         getRefNameServiceTypes(), oldRefName, refPropName,
                         queriedServiceBindings, authRefFieldsByService, WHERE_CLAUSE_ADDITIONS_VALUE, ORDER_BY_VALUE, pageSize, currentPage, false);
-                
+
                 if (docList == null) {
                     logger.debug("updateAuthorityRefDocs: no documents could be found that referenced the old refName");
                     break;
@@ -345,7 +381,7 @@ public class RefNameServiceUtils {
                     ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true);
                     nRefsFound += nRefsFoundThisPage;
                 }
-                
+
                 // FIXME: Per REM, set a limit of num objects - something like
                 // 1000K objects - and also add a log Warning after some threshold
                 docsScanned += docsInCurrentPage;
@@ -399,7 +435,7 @@ public class RefNameServiceUtils {
         // Additional qualifications, like workflow state
         if (Tools.notBlank(whereClauseAdditions)) {
             query += " AND " + whereClauseAdditions;
-        }        
+        }
         // Now we have to issue the search
         RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
         DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
