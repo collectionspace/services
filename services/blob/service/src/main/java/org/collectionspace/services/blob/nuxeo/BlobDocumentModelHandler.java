@@ -26,7 +26,6 @@ package org.collectionspace.services.blob.nuxeo;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.client.BlobClient;
-import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -39,7 +38,6 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 
@@ -48,12 +46,10 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.schema.types.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -113,7 +109,6 @@ extends DocHandlerBase<BlobsCommon> {
 	}
 	
 	private void extractMetadata(String nuxeoImageID, String metadataLabel) {		
-		PayloadOutputPart result = null;
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         ObjectPartType partMeta = partsMetaMap.get(metadataLabel);
 
@@ -140,8 +135,8 @@ extends DocHandlerBase<BlobsCommon> {
 	@Override
 	public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
 			throws Exception {
-		ServiceContext ctx = this.getServiceContext();
-		BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+		BlobInput blobInput = BlobUtil.getBlobInput(ctx); // the blobInput was set by the Blob JAX-RS resource code and put into the service context
 		RepositoryInstance repoSession = this.getRepositorySession();
 		DocumentModel docModel = wrapDoc.getWrappedObject();
 		BlobsCommon blobsCommon = this.getCommonPartProperties(docModel);		
@@ -165,8 +160,9 @@ extends DocHandlerBase<BlobsCommon> {
 		// fall into this block of code.  Otherwise, we'll just call our parent to deal with a plain-old-blob payload.
 		//
 		if (derivativeTerm != null || getContentFlag == true) {
+			StringBuffer mimeTypeBuffer = new StringBuffer();
 			BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession, //FIXME: REM - If the blob's binary has been removed from the file system, then this call will return null.  We need to at least spit out a meaningful error/warning message
-					blobRepositoryId, derivativeTerm, getContentFlag);
+					blobRepositoryId, derivativeTerm, getContentFlag, mimeTypeBuffer);
 			if (getContentFlag == true) {
 				blobInput.setContentStream(blobOutput.getBlobInputStream());
 			}
@@ -176,6 +172,14 @@ extends DocHandlerBase<BlobsCommon> {
 				blobsCommon = blobOutput.getBlobsCommon();
 				blobsCommon.setUri(getDerivativePathBase(docModel) +
 						derivativeTerm + "/" + BlobInput.URI_CONTENT_PATH);				
+			}
+			
+			String mimeType = mimeTypeBuffer.toString();
+			if (mimeType != null && !mimeType.isEmpty()) { // MIME type for derivatives might be different from original
+				blobInput.setMimeType(mimeType);
+				blobsCommon.setMimeType(mimeType);
+			} else {
+				blobInput.setMimeType(blobsCommon.getMimeType());
 			}
 			
 			blobsCommon.setRepositoryId(null); //hide the repository id from the GET results payload since it is private
@@ -195,16 +199,18 @@ extends DocHandlerBase<BlobsCommon> {
 
 	@Override
 	public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
-		ServiceContext ctx = this.getServiceContext();
-		BlobInput blobInput = BlobUtil.getBlobInput(ctx);
-		if (blobInput.getBlobFile() != null) {    		
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+		BlobInput blobInput = BlobUtil.getBlobInput(ctx); // The blobInput should have been put into the context by the Blob or Media resource
+		if (blobInput != null && blobInput.getBlobFile() != null) {    		
 			//
 			// If blobInput has a file then we just received a multipart/form-data file post or a URI query parameter
 			//
 			DocumentModel documentModel = wrapDoc.getWrappedObject();
 			RepositoryInstance repoSession = this.getRepositorySession();    	
-			BlobsCommon blobsCommon = NuxeoImageUtils.createPicture(ctx, repoSession, blobInput);
-	        PoxPayloadIn input = (PoxPayloadIn)ctx.getInput();
+			BlobsCommon blobsCommon = NuxeoImageUtils.createBlobInRepository(ctx, repoSession, blobInput);
+			blobInput.setBlobCsid(documentModel.getName()); //Assumption here is that the documentModel "name" field is storing a CSID
+
+	        PoxPayloadIn input = ctx.getInput();
 	        //
 	        // If the input payload is null, then we're creating a new blob from a post or a uri.  This means there
 	        // is no "input" payload for our framework to process.  Therefore we need to synthesize a payload from
@@ -216,9 +222,13 @@ extends DocHandlerBase<BlobsCommon> {
 		        output.addPart(commonPart);
 		        input = new PoxPayloadIn(output.toXML());
 		        ctx.setInput(input);
-	        }
-//			this.setCommonPartProperties(documentModel, blobsCommon);
-			blobInput.setBlobCsid(documentModel.getName()); //Assumption here is that the documentModel "name" field is storing a CSID
+	        } else {
+	        	// At this point, we've created a blob document in the Nuxeo repository.  Usually, we use the blob to create and instance of BlobsCommon and use
+	        	// that to populate the resource record.  However, since the "input" var is not null the requester provided their own resource record data
+	        	// so we'll use it rather than deriving one from the blob.
+	        	logger.warn("A resource record payload was provided along with the actually blob binary file.  This payload is usually derived from the blob binary.  Since a payload was provided, we're creating the resource record from the payload and not from the corresponding blob binary." +
+	        			" The data in blob resource record fields may not correspond completely with the persisted blob binary file.");
+	        }	        
 		}
 
 		super.fillAllParts(wrapDoc, action);
