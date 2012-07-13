@@ -292,9 +292,12 @@ public class RefNameServiceUtils {
             // in the list results.
             //
             // FIXME: There may well be a pattern-based way to do this
-            // in our framework.
+            // in our framework, and if we can eliminate much of the
+            // non-DRY code below, that would be desirable.
+            
             int startIndex = 0;
             int endIndex = 0;
+            
             // Return all results if pageSize is 0.
             if (pageSize == 0) {
                 startIndex = 0;
@@ -303,25 +306,27 @@ public class RefNameServiceUtils {
                startIndex = pageNum * pageSize;
             }
             
-            // Return an empty list if the start of the requested page is
+            // Return an empty list when the start of the requested page is
             // beyond the last item in the list.
             if (startIndex > list.size()) {
-                wrapperList = null;
+                wrapperList.getAuthorityRefDocItem().clear();
+                commonList.setItemsInPage(wrapperList.getAuthorityRefDocItem().size());
                 return wrapperList;
             }
 
             // Otherwise, return a list of items from the start of the specified
-            // page through the last item on that page, or otherwise through the last
-            // item in the entire list, if it occurs prior to the end of that page.
+            // page through the last item on that page, or otherwise through the
+            // last item in the entire list, if that occurs earlier than the end
+            // of the specified page.
             if (endIndex == 0) {
                 int pageEndIndex = ((startIndex + pageSize));
                 endIndex = (pageEndIndex > list.size()) ? list.size() : pageEndIndex;
             }
             
-            // Slice the list to return only the specified page.
-            // Note: the second argument to List.subList() is exclusive of the
-            // item at its index position, reflecting the zero-index nature of
-            // the list.
+            // Slice the list to return only the specified page of results.
+            // Note: the second argument to List.subList(), endIndex, is
+            // exclusive of the item at its index position, reflecting the
+            // zero-index nature of the list.
             List<AuthorityRefDocList.AuthorityRefDocItem> currentPageList =
                     new ArrayList<AuthorityRefDocList.AuthorityRefDocItem>(list.subList(startIndex, endIndex));
             wrapperList.getAuthorityRefDocItem().clear();
