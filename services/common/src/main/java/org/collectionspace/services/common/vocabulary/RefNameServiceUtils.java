@@ -322,7 +322,8 @@ public class RefNameServiceUtils {
             // Note: the second argument to List.subList() is exclusive of the
             // item at its index position, reflecting the zero-index nature of
             // the list.
-            List<AuthorityRefDocList.AuthorityRefDocItem> currentPageList = list.subList(startIndex, endIndex);
+            List<AuthorityRefDocList.AuthorityRefDocItem> currentPageList =
+                    new ArrayList<AuthorityRefDocList.AuthorityRefDocItem>(list.subList(startIndex, endIndex));
             wrapperList.getAuthorityRefDocItem().clear();
             wrapperList.getAuthorityRefDocItem().addAll(currentPageList);
             commonList.setItemsInPage(currentPageList.size());
