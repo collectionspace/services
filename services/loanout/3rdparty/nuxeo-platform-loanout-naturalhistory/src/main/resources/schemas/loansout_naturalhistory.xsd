@@ -54,6 +54,8 @@
 	<xs:element name="transferGroupList" type="transferGroupList"/>
 	<xs:element name="objectGroupList" type="objectGroupList"/>
 	<xs:element name="returnGroupList" type="returnGroupList"/>
+	
+    <xs:element name="loanoutItems" type="xs:string"/>
 
 	<xs:complexType name="transferGroupList">
 		<xs:sequence>
