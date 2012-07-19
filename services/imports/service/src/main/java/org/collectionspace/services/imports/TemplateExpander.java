@@ -32,7 +32,6 @@ import java.util.UUID;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.collectionspace.services.client.AuthorityClient;
 import org.collectionspace.services.common.IFragmentHandler;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.XmlSaxFragmenter;
@@ -40,6 +39,7 @@ import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.config.URIUtils;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -64,7 +64,6 @@ public class TemplateExpander {
     private final static Logger logger = LoggerFactory.getLogger(TemplateExpander.class);
     
     private static final String DEFAULT_WRAPPER_TEMPLATE_FILENAME = "service-document.xml";
-    private static Map<String,String> docTypeSvcNameRegistry = new HashMap<String,String>();
     private static XPath xpath = XPathFactory.newInstance().newXPath();
     // XPath expressions to match the value of the inAuthority field in authority item records.
     // The first expression matches namespace-qualified elements, while the second matches
@@ -208,15 +207,7 @@ public class TemplateExpander {
     // document type name
     private static String getDocUri(String tenantId, String docType, String docID,
             String partTmpl) throws Exception {
-        
-        // FIXME: This is a quick hack, which assumes that URI construction
-        // behaviors are bound to categories of services.  Those behaviors
-        // should instead be specified on a per-service basis via a registry,
-        // the mechanism we are intending to use in v2.5.  (See comments below
-        // for more details.) - ADR 2012-05-24
-        final String AUTHORITY_SERVICE_CATEGORY = "authority";
-        final String OBJECT_SERVICE_CATEGORY = "object";
-        final String PROCEDURE_SERVICE_CATEGORY = "procedure";
+
 
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
         // We may have been supplied with the tenant-qualified name
@@ -228,69 +219,23 @@ public class TemplateExpander {
 
         String serviceCategory = sb.getType();
         String uri = "";
-        if (serviceCategory.equalsIgnoreCase(AUTHORITY_SERVICE_CATEGORY)) {
-            String authoritySvcName = getAuthoritySvcName(docType);
+        if (serviceCategory.equalsIgnoreCase(URIUtils.AUTHORITY_SERVICE_CATEGORY)) {
+            String authoritySvcName = URIUtils.getAuthoritySvcName(docType);
             if (authoritySvcName == null) {
                 return uri;
             }
             String inAuthorityID = getInAuthorityValue(partTmpl);
-            uri = getAuthorityItemUri(authoritySvcName, inAuthorityID, docID);
-       } else if (serviceCategory.equalsIgnoreCase(OBJECT_SERVICE_CATEGORY) ||
-               serviceCategory.equalsIgnoreCase(PROCEDURE_SERVICE_CATEGORY) ) {
-            String serviceName = sb.getName().toLowerCase();
-            uri = getUri(serviceName, docID);
+            uri = URIUtils.getAuthorityItemUri(authoritySvcName, inAuthorityID, docID);
+       } else if (serviceCategory.equalsIgnoreCase(URIUtils.OBJECT_SERVICE_CATEGORY) ||
+               serviceCategory.equalsIgnoreCase(URIUtils.PROCEDURE_SERVICE_CATEGORY) ) {
+            String serviceName = sb.getName();
+            uri = URIUtils.getUri(serviceName, docID);
        } else {
            // Currently returns a blank URI for any other cases,
            // including sub-resources like contacts
          }
         return uri;
     }
-    
-    // FIXME: This is a quick hack; a stub / mock of a registry of
-    // authority document types and their associated parent authority
-    // service names. This MUST be replaced by a more general mechanism
-    // in v2.5. 
-    // 
-    // Per Patrick, this registry needs to be available system-wide, not
-    // just here in the Imports service; extend to all relevant record types;
-    // and be automatically built in some manner, such as via per-resource
-    // registration, from configuration, etc. - ADR 2012-05-24
-    private static Map<String,String> getDocTypeSvcNameRegistry() {
-        if (docTypeSvcNameRegistry.isEmpty()) {
-            docTypeSvcNameRegistry.put("Conceptitem", "Conceptauthorities");
-            docTypeSvcNameRegistry.put("Locationitem", "Locationauthorities");
-            docTypeSvcNameRegistry.put("Person", "Personauthorities");
-            docTypeSvcNameRegistry.put("Placeitem", "Placeauthorities");
-            docTypeSvcNameRegistry.put("Organization", "Orgauthorities");
-            docTypeSvcNameRegistry.put("Taxon", "Taxonomyauthority");
-        }
-        return docTypeSvcNameRegistry;
-    }
-    
-    /**
-     * Return the parent authority service name, based on the item document type.
-     */
-    private static String getAuthoritySvcName(String docType) {
-        return getDocTypeSvcNameRegistry().get(docType);
-    }
-    
-    // FIXME: The following URI construction methods are also intended to be
-    // made generally available and associated to individual services, via the
-    // registry mechanism described above. - ADR, 2012-05-24
-    private static String getUri(String serviceName, String docID) {
-        return "/" + serviceName
-                + "/" + docID;
-    }
-
-    private static String getAuthorityItemUri(String authorityServiceName, String inAuthorityID, String docID) {
-        return "/" + authorityServiceName.toLowerCase()
-                + '/' + inAuthorityID
-                + '/' + AuthorityClient.ITEMS
-                + '/' + docID;
-    }
-    
-    // FIXME: Create equivalent getUri-type method(s) for sub-resources,
-    // such as contacts - ADR, 2012-05-24
     
     // FIXME: It may also be desirable to explicitly validate the format of
     // CSID values provided in fields such as inAuthority, and perhaps later on,
