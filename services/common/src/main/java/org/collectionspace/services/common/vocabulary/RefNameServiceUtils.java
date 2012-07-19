@@ -51,6 +51,7 @@ import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.config.URIUtils;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -59,6 +60,7 @@ import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
+// import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
@@ -556,7 +558,6 @@ public class RefNameServiceUtils {
                 throw new RuntimeException(
                         "getAuthorityRefDocs: No Service Binding for docType: " + docType);
             }
-            String serviceContextPath = "/" + sb.getName().toLowerCase() + "/";
 
             if (list == null) { // no list - should be update refName case.
                 if (newAuthorityRefName == null) {
@@ -570,7 +571,22 @@ public class RefNameServiceUtils {
                 ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
                 String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
                 ilistItem.setDocId(csid);
-                ilistItem.setUri(serviceContextPath + csid);
+                String uri = "";
+                // FIXME: Hack for CSPACE-5406; this instead should use the (forthcoming)
+                // URL pattern-to-Doctype registry described in CSPACE-5471 - ADR 2012-07-18
+                if (sb.getType().equalsIgnoreCase(URIUtils.AUTHORITY_SERVICE_CATEGORY)) {
+                    String authoritySvcName = URIUtils.getAuthoritySvcName(docType);
+                    String inAuthorityCsid;
+                    try {
+                        inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
+                        uri = URIUtils.getAuthorityItemUri(authoritySvcName, inAuthorityCsid, csid);
+                    } catch (Exception e) {
+                        logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
+                    }
+                } else {
+                    uri = URIUtils.getUri(sb.getName(), csid);;
+                }
+                ilistItem.setUri(uri);
                 try {
                     ilistItem.setWorkflowState(docModel.getCurrentLifeCycleState());
                     ilistItem.setUpdatedAt(DocHandlerBase.getUpdatedAtAsString(docModel));
