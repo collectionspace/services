@@ -1,33 +1,35 @@
 package org.collectionspace.services.common.config;
 
+// client module is built after this config module, so we can't currently include this
 // import org.collectionspace.services.client.AuthorityClient;
 import java.util.HashMap;
 import java.util.Map;
 
-// Hack for CSPACE-5
+// This class is a hack for CSPACE-5406
 
 public class URIUtils {
 
     private static Map<String, String> docTypeSvcNameRegistry = new HashMap<String, String>();
+    private static final String ITEMS_PATH_COMPONENT = "items";
     
     // FIXME: This is a quick hack, which assumes that URI construction
     // behaviors are bound to categories of services.  Those behaviors
     // should instead be specified on a per-service basis via a registry,
-    // the mechanism we are intending to use in v2.5.  (See comments below
-    // for more details.) - ADR 2012-05-24
+    // mechanism.  (See comments below for more details.) - ADR 2012-05-24
     public static final String AUTHORITY_SERVICE_CATEGORY = "authority";
     public static final String OBJECT_SERVICE_CATEGORY = "object";
     public static final String PROCEDURE_SERVICE_CATEGORY = "procedure";
 
     // FIXME: This is a quick hack; a stub / mock of a registry of
     // authority document types and their associated parent authority
-    // service names. This MUST be replaced by a more general mechanism
-    // in v2.5. 
+    // service names. This MUST be replaced by a more general registry mechanism.
+    // If not, the manually-entered values below represent a DRY violation,
+    // and risk falling out of sync with comparable values elsewhere.
     // 
-    // Per Patrick, this registry needs to be available system-wide, not
-    // just here in the Imports service; extend to all relevant record types;
-    // and be automatically built in some manner, such as via per-resource
-    // registration, from configuration, etc. - ADR 2012-05-24
+    // Per Patrick, this registry needs to be available system-wide;
+    // extend to all relevant record types; and be automatically built
+    // in some manner, such as via per-resource registration, from
+    // existing configuration, etc. - ADR 2012-05-24
     private static Map<String, String> getDocTypeSvcNameRegistry() {
         if (docTypeSvcNameRegistry.isEmpty()) {
             docTypeSvcNameRegistry.put("Conceptitem", "Conceptauthorities");
@@ -59,7 +61,7 @@ public class URIUtils {
     public static String getAuthorityItemUri(String authorityServiceName, String inAuthorityID, String docID) {
         return "/" + authorityServiceName.toLowerCase()
                 + '/' + inAuthorityID
-                + '/' + "items" // AuthorityClient.ITEMS
+                + '/' + ITEMS_PATH_COMPONENT // AuthorityClient.ITEMS
                 + '/' + docID;
     }
     

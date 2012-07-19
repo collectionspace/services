@@ -593,7 +593,6 @@ public class RefNameServiceUtils {
                 } catch (Exception e) {
                     logger.error("Error getting core values for doc [" + csid + "]: " + e.getLocalizedMessage());
                 }
-                // The id and URI are the same on all doctypes
                 ilistItem.setDocType(docType);
                 ilistItem.setDocNumber(
                         ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NUMBER_PROP, docModel));
