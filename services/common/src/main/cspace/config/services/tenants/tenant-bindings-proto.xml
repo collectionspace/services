@@ -221,7 +221,7 @@
                             <types:key>authRef</types:key>
                             <types:value>textualInscriptionGroupList/*/inscriptionContentInscriber</types:value>
                         </types:item>
-                        <!-- Uncomment when Concept authority is implemented in Services -->
+                        <!-- Uncomment when Concept authority/Method vocabulary is implemented in Services -->
                         <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -240,15 +240,12 @@
                             <types:key>authRef</types:key>
                             <types:value>materialGroupList/*/material</types:value>
                         </types:item>
-                        <!-- The following field may become part of a repeatable sub-group -->
-                        <!-- for materialComponent, per CSPACE-4563. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
+                        <!-- The materialComponent field may become part of a repeatable sub-group -->
+                        <!-- per CSPACE-4563. -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>materialGroupList/*/materialComponentSubGroupList/*/materialComponent</types:value>
+                            <types:value>materialGroupList/*/materialComponent</types:value>
                         </types:item>
-                        -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>materialGroupList/*/materialSource</types:value>
@@ -290,27 +287,28 @@
                             <types:value>techniqueGroupList/*/techniqueType</types:value>
                         </types:item>
                         <!-- Object History and Association Information group -->
-                        <!-- The following fields may become part of a repeatable group -->
+                        <!-- The following four fields may become part of a repeatable group -->
                         <!-- for associatedEvent, per CSPACE-3229. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventOrganization</types:value>
+                            <types:value>assocEventOrganizations|assocEventOrganization</types:value>
                         </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                             <types:key>authRef</types:key>
-                             <types:value>assocEventGroupList/*/assocEventPeople</types:value>
-                        </types:item>
+                        <!-- Uncomment when People authority is implemented in Services -->
+                        <!--<types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>assocEventPeoples|assocEventPeople</types:value>
+                        </types:item>-->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventPerson</types:value>
+                            <types:value>assocEventPersons|assocEventPerson</types:value>
                         </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- Uncomment when this field is tied to Place authority -->
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventPlace</types:value>
+                            <types:value>assocEventPlaces|assocEventPlace</types:value>
                         </types:item>
                         -->
+                        <!-- End of proposed associatedEvent group, CSPACE-3229 -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>assocOrganizationGroupList/*/assocOrganization</types:value>
@@ -330,28 +328,23 @@
                             <types:key>authRef</types:key>
                             <types:value>assocPlaceGroupList/*/assocPlace</types:value>
                         </types:item>
-                        <!-- The following fields may become part of a repeatable group -->
+                        <!-- The owner field may become part of a repeatable group -->
                         <!-- for 'owner', per CSPACE-3229. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>ownerGroupList/*/owner</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>ownerGroupList/*/ownershipPlace</types:value>
-                        </types:item>
-                        -->
+                            <types:value>owners|owner</types:value>
+                        </types:item> 
                         <!-- Object Owner's Contribution Information group -->
                         <!-- There are currently no authority term references in this group -->
                         <!-- Object Viewer's Contribution Information group -->
                         <!-- There are currently no authority term references in this group -->
                         <!-- Reference Information group -->
+                        <!-- Uncomment when Citation authority is implemented in Services -->
+                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>referenceGroupList/*/reference</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Object Collection Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -532,19 +525,8 @@
                             <types:key>termRef</types:key>
                             <types:value>assocCulturalContextGroupList/*/assocCulturalContext</types:value>
                         </types:item>
-                        <!-- The following fields may become part of a repeatable group -->
-                        <!-- for associatedEvent, per CSPACE-3229. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventName</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventNameType</types:value>
-                        </types:item>
-                        -->
+                        <!-- Two fields not included here, assocEventName and assocEventNameType, may become -->
+                        <!-- term lists as part of a repeatable group for associatedEvent, per CSPACE-3229. -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>assocObjectGroupList/*/assocObject</types:value>
@@ -555,21 +537,23 @@
                         </types:item>
                         <!-- The following fields may become part of a repeatable group -->
                         <!-- for 'owner', per CSPACE-3229. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>ownerGroupList/*/ownershipAccess</types:value>
+                            <types:value>ownershipAccess</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>ownerGroupList/*/ownershipCategory</types:value>
+                            <types:value>ownershipCategory</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>ownerGroupList/*/ownershipExchangeMethod</types:value>
+                            <types:value>ownershipExchangeMethod</types:value>
                         </types:item>
-                        -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>ownershipExchangePriceCurrency</types:value>
+                        </types:item>
+                        <!-- End of fields for CSPACE-3229 --> 
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>usageGroupList/*/usage</types:value>
@@ -1768,14 +1752,18 @@
                             <types:key>authRef</types:key>
                             <types:value>foundingPlace</types:value>
                         </types:item>
+                        <!-- Uncomment when Concept authority/Group (or whatever) vocabulary is implemented in Services -->
+                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>groups|group</types:value>
-                        </types:item>
+                        </types:item> -->
+                      <!-- Uncomment when Concept authority/Function (line of business) vocabulary is implemented in Services -->
+                        <!--                       
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>functions|function</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -1948,22 +1936,30 @@
                             <types:key>authRef</types:key>
                             <types:value>deathPlace</types:value>
                         </types:item>
+                        <!-- Uncomment when Concept authority/Group (Ethnicity, whatever) vocabulary is implemented in Services -->
+                        <!--                       
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>groups|group</types:value>
-                        </types:item>
+                        </types:item> -->
+                        <!-- Uncomment when Concept authority/Nationality vocabulary is implemented in Services -->
+                        <!--                        
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>nationalities|nationality</types:value>
-                        </types:item>
+                        </types:item> -->
+                        <!-- Uncomment when Concept authority/Occupation vocabulary is implemented in Services -->
+                        <!--                                               
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>occupations|occupation</types:value>
-                        </types:item>
+                        </types:item> -->
+                        <!-- Uncomment when Concept authority/School or Style vocabulary is implemented in Services -->
+                        <!--                       
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>schoolsOrStyles|schoolOrStyle</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
