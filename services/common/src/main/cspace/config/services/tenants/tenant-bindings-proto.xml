@@ -2642,6 +2642,10 @@
                             <types:key>termRef</types:key>
                             <types:value>conceptTermGroupList/*/termStatus</types:value>
                         </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conceptTermGroupList/*/historicalStatus</types:value>
+                        </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/concept" schemaLocation="http://collectionspace.org/services/concept http://services.collectionspace.org/concept/concepts_common.xsd" />

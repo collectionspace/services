@@ -157,7 +157,7 @@ public class MediaResource extends ResourceBase {
 	    		//
 	    		// First, create the blob
 	    		//
-		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME, input);
+		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobClient.SERVICE_NAME, input);
 		    	BlobInput blobInput = BlobUtil.getBlobInput(blobContext);
 		    	blobInput.createBlobFile(req, null);
 		    	response = this.create(input, blobContext);
@@ -185,7 +185,7 @@ public class MediaResource extends ResourceBase {
     	
 	    try {
 	        String blobCsid = this.getBlobCsid(csid);
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME);
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobClient.SERVICE_NAME);
 	    	result = this.get(blobCsid, blobContext);	        
 	    } catch (Exception e) {
 	        throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
@@ -196,10 +196,9 @@ public class MediaResource extends ResourceBase {
     
     @GET
     @Path("{csid}/blob/content")
-    @Produces({"image/jpeg", "image/png", "image/tiff"})
-    public InputStream getBlobContent(
+    public Response getBlobContent(
     		@PathParam("csid") String csid) {
-    	InputStream result = null;
+    	Response result = null;
     	
 	    try {
 	    	ensureCSID(csid, READ);
@@ -214,11 +213,10 @@ public class MediaResource extends ResourceBase {
     
     @GET
     @Path("{csid}/blob/derivatives/{derivativeTerm}/content")
-    @Produces({"image/jpeg", "image/png", "image/tiff"})
-    public InputStream getDerivativeContent(
+    public Response getDerivativeContent(
     		@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
-    	InputStream result = null;
+    	Response result = null;
     	
 	    try {
 	    	ensureCSID(csid, READ);
@@ -240,7 +238,7 @@ public class MediaResource extends ResourceBase {
 	    try {
 	    	ensureCSID(csid, READ);
 	        String blobCsid = this.getBlobCsid(csid);
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME);
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobClient.SERVICE_NAME);
 	    	String xmlPayload = getBlobResource().getDerivative(blobCsid, derivativeTerm);
 	    	result = new PoxPayloadOut(xmlPayload.getBytes());
 	    } catch (Exception e) {
@@ -260,7 +258,7 @@ public class MediaResource extends ResourceBase {
 	    try {
 	    	ensureCSID(csid, READ);
 	        String blobCsid = this.getBlobCsid(csid);
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME);
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobClient.SERVICE_NAME);
 	    	result = getBlobResource().getDerivatives(blobCsid);	        
 	    } catch (Exception e) {
 	        throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);

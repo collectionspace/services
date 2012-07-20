@@ -384,11 +384,11 @@ public class RefNameServiceUtils {
             DocumentModelList docList;
             boolean morePages = true;
             while (morePages) {
-                
+
                 docList = findAuthorityRefDocs(ctx, repoClient, repoSession,
                         getRefNameServiceTypes(), oldRefName, refPropName,
                         queriedServiceBindings, authRefFieldsByService, WHERE_CLAUSE_ADDITIONS_VALUE, ORDER_BY_VALUE, pageSize, currentPage, false);
-                
+
                 if (docList == null) {
                     logger.debug("updateAuthorityRefDocs: no documents could be found that referenced the old refName");
                     break;
@@ -410,7 +410,7 @@ public class RefNameServiceUtils {
                     ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true);
                     nRefsFound += nRefsFoundThisPage;
                 }
-                
+
                 // FIXME: Per REM, set a limit of num objects - something like
                 // 1000K objects - and also add a log Warning after some threshold
                 docsScanned += docsInCurrentPage;
@@ -464,7 +464,7 @@ public class RefNameServiceUtils {
         // Additional qualifications, like workflow state
         if (Tools.notBlank(whereClauseAdditions)) {
             query += " AND " + whereClauseAdditions;
-        }        
+        }
         // Now we have to issue the search
         RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl) repoClient;
         DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(ctx, repoSession,
