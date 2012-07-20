@@ -151,7 +151,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
     }
 
     /** The number of authority references expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 4;
+    private final int NUM_AUTH_REFS_EXPECTED = 7;
     
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
