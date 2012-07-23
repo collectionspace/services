@@ -51,6 +51,7 @@ public interface IQueryManager {
 	final static String SEARCH_RELATED_MATCH_OBJ_DOCTYPES = "rtObjDocTypes";
 	final static String SELECT_DOC_TYPE_FIELD = "selectDocType";
 	
+	final static String MARK_RELATED_TO_CSID_AS_SUBJECT = "mkRtSbj";
 	//
 	// Generic CMIS property mapping constants
 	//
