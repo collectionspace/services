@@ -897,7 +897,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         			logger.debug(""
         					//					+ " dc:title is: " + (String)row.get("dc:title")
         					+ " Hierarchy Table ID is:" + row.get(IQueryManager.CMIS_TARGET_NUXEO_ID)
-        					+ " cmis:name is: " + row.get(IQueryManager.CMIS_TARGET_NAME)
+        					+ " nuxeo:pathSegment is: " + row.get(IQueryManager.CMIS_TARGET_NAME)
         					//					+ " nuxeo:lifecycleState is: " + row.get("nuxeo:lifecycleState")
         					);
         			String nuxeoId = (String) row.get(IQueryManager.CMIS_TARGET_NUXEO_ID);
