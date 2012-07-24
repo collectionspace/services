@@ -79,7 +79,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     protected static final String STANDARD_LIST_URI_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_URI;
     protected static final String STANDARD_LIST_UPDATED_AT_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
     protected static final String STANDARD_LIST_WORKFLOW_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE;
-    protected static final String STANDARD_LIST_MARK_RT_FIELD = "relTo";
+    protected static final String STANDARD_LIST_MARK_RT_FIELD = "related";
 
     @Override
     public AbstractCommonList getCommonPartList() {
@@ -242,7 +242,9 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 				item.put(STANDARD_LIST_CSID_FIELD, id);
 		        if(markRtSbj!=null) {
 		            String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, id, null);
-		            QueryContext queryContext = new QueryContext(sc, relationClause);
+		            String whereClause = relationClause + IQueryManager.SEARCH_QUALIFIER_AND + 
+		            						NuxeoUtils.buildWorkflowNotDeletedWhereClause();
+		            QueryContext queryContext = new QueryContext(sc, whereClause);
 		            queryContext.setDocType(IRelationsManager.DOC_TYPE);
 		            String query = NuxeoUtils.buildNXQLQuery(sc, queryContext);
 		            // Search for 1 relation that matches. 1 is enough to fail the filter
