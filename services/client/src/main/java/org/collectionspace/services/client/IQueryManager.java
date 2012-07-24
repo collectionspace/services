@@ -56,11 +56,11 @@ public interface IQueryManager {
 	// Generic CMIS property mapping constants
 	//
 	final static String CMIS_OBJECT_ID = "cmis:objectId";
-	final static String CMIS_NAME = "cmis:name";
+	final static String CMIS_NUXEO_PATHSEGMENT = "nuxeo:pathSegment";
 	//
 	// Nuxeo related CMIS property mapping constants
 	final static String CMIS_NUXEO_ID = CMIS_OBJECT_ID;
-	final static String CMIS_NUXEO_NAME = CMIS_NAME;
+	final static String CMIS_NUXEO_NAME = CMIS_NUXEO_PATHSEGMENT;
 	final static String CMIS_NUXEO_TITLE = "dc:title";
 	final static String CMIS_CS_UPDATED_AT = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":" + CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
 	
