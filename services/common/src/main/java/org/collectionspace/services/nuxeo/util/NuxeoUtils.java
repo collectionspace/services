@@ -400,6 +400,10 @@ public class NuxeoUtils {
         return query.toString();
     }
     
+    static public final String buildWorkflowNotDeletedWhereClause() {
+    	return "ecm:currentLifeCycleState <> 'deleted'";
+    }
+    
     
     /**
      * Builds an NXQL SELECT query across multiple document types.
