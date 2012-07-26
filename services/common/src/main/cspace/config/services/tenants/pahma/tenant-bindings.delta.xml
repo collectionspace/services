@@ -80,6 +80,14 @@
 					<service:properties>
 						<types:item xmlns:types="http://collectionspace.org/services/config/types">
 							<types:key>authRef</types:key>
+							<types:value>homeLocation</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>homeCrate</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
 							<types:value>accessRestrictionGroupList/*/accessRestrictionRequestor</types:value>
 						</types:item>
 						<types:item xmlns:types="http://collectionspace.org/services/config/types">
