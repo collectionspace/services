@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.vocabulary.nuxeo;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
@@ -41,7 +43,9 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 public class VocabularyItemDocumentModelHandler
 		extends AuthorityItemDocumentModelHandler<VocabularyitemsCommon> {
 
-    private static final String COMMON_PART_LABEL = "vocabularyitems_common";   
+    private static final String COMMON_PART_LABEL = "vocabularyitems_common"; 
+    private static List<ListResultField> listItemFields = new ArrayList<ListResultField>();
+
     
     public VocabularyItemDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
@@ -107,7 +111,19 @@ public class VocabularyItemDocumentModelHandler
 		result.setXpath(AuthorityItemJAXBSchema.TERM_STATUS);
 
 		return result;
-    }    
+    }
+    
+    @Override
+    protected synchronized void setListItemFields(List<ListResultField> list) {
+        if (getListItemFields().isEmpty()) {
+            listItemFields.addAll(list);
+        }
+    }
+    
+    @Override
+    protected List<ListResultField> getListItemFields() {
+        return listItemFields;
+    }
     
 }
 

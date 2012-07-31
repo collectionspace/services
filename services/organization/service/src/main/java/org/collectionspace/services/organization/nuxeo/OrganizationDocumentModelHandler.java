@@ -23,10 +23,13 @@
  */
 package org.collectionspace.services.organization.nuxeo;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -47,6 +50,8 @@ public class OrganizationDocumentModelHandler
      * Common part schema label
      */
     private static final String COMMON_PART_LABEL = "organizations_common";   
+    private static List<ListResultField> listItemFields = new ArrayList<ListResultField>();
+
     
     public OrganizationDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
@@ -133,6 +138,19 @@ public class OrganizationDocumentModelHandler
     public String getQProperty(String prop) {
         return OrganizationConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
-
+    
+    
+    @Override
+    protected synchronized void setListItemFields(List<ListResultField> list) {
+        if (getListItemFields().isEmpty()) {
+            listItemFields.addAll(list);
+        }
+    }
+    
+    @Override
+    protected List<ListResultField> getListItemFields() {
+        return listItemFields;
+    }
+    
 }
 

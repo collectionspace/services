@@ -23,10 +23,13 @@
  */
 package org.collectionspace.services.location.nuxeo;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.collectionspace.services.LocationJAXBSchema;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
+import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.location.LocationsCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
@@ -47,6 +50,7 @@ public class LocationDocumentModelHandler
      * Common part schema label
      */
     private static final String COMMON_PART_LABEL = "locations_common";
+    private static List<ListResultField> listItemFields = new ArrayList<ListResultField>();
     
     public LocationDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
@@ -116,6 +120,18 @@ public class LocationDocumentModelHandler
     @Override
     public String getQProperty(String prop) {
         return LocationConstants.NUXEO_SCHEMA_NAME + ":" + prop;
+    }
+    
+    @Override
+    protected synchronized void setListItemFields(List<ListResultField> list) {
+        if (getListItemFields().isEmpty()) {
+            listItemFields.addAll(list);
+        }
+    }
+    
+    @Override
+    protected List<ListResultField> getListItemFields() {
+        return listItemFields;
     }
 }
 

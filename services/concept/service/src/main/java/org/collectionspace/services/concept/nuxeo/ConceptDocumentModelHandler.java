@@ -23,9 +23,12 @@
  */
 package org.collectionspace.services.concept.nuxeo;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.collectionspace.services.client.ConceptAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.concept.ConceptsCommon;
+import org.collectionspace.services.config.service.ListResultField;
 
 /**
  * ConceptDocumentModelHandler
@@ -39,6 +42,8 @@ import org.collectionspace.services.concept.ConceptsCommon;
  */
 public class ConceptDocumentModelHandler
         extends AuthorityItemDocumentModelHandler<ConceptsCommon> {
+
+    private static List<ListResultField> listItemFields = new ArrayList<ListResultField>();
 
     public ConceptDocumentModelHandler() {
     	super(ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
@@ -61,6 +66,18 @@ public class ConceptDocumentModelHandler
     @Override
     public String getQProperty(String prop) {
         return ConceptConstants.NUXEO_SCHEMA_NAME + ":" + prop;
+    }
+    
+    @Override
+    protected synchronized void setListItemFields(List<ListResultField> list) {
+        if (getListItemFields().isEmpty()) {
+            listItemFields.addAll(list);
+        }
+    }
+    
+    @Override
+    protected List<ListResultField> getListItemFields() {
+        return listItemFields;
     }
 }
 

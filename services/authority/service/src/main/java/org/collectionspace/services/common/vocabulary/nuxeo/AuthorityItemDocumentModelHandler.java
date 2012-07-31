@@ -104,7 +104,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String oldDisplayNameOnUpdate = null;
     protected String oldRefNameOnUpdate = null;
     protected String newRefNameOnUpdate = null;
-
+    
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
     }
@@ -186,22 +186,38 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	return AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName) || VocabularyItemJAXBSchema.DISPLAY_NAME.equals(elName);
     }
     
+    /**
+     * Returns a list of the fields that should be included within
+     * each item returned in list results.
+     * 
+     * Combines the fields specified in per-tenant configuration
+     * for each individual authority item service, with a set of
+     * default fields that are common to all authority items.
+     * 
+     * @return  a list of the fields included in each item in list results.
+     */
     @Override
     public List<ListResultField> getListItemsArray() throws DocumentException {
         
-        // Get the set of fields that should appear, in each item of the list
-        // results, for a specific authority item service.
-        List<ListResultField> list = super.getListItemsArray();
+        // One-time initialization for each authority item service.
+        if (getListItemFields().isEmpty()) {
+            // Get the set of fields that should be included in each item of
+            // the list results, for a specific authority item service.
+            List<ListResultField> list = super.getListItemsArray();
+
+            // Add a default set of fields; that is, fields that should always be
+            // included in each list item (and common across all authority items),
+            // to that service-specific set of fields.
+            //
+            // Note: We're updating the "global" service and tenant bindings
+            // instance here: the list instance here is a reference to the
+            // tenant bindings instance in the singleton ServiceMain.
+            list = addDefaultListItemFields(list);
+            // Cache the list of fields for all subsequent requests.
+            setListItemFields(list);
+        }
         
-        // Add a default set of fields; that is, fields that should always be
-        // present in each list item (and common across all authority items),
-        // to that service-specific set of fields.
-        //
-        // Note: We're updating the "global" service and tenant bindings
-        // instance here: the list instance here is a reference to the
-        // tenant bindings instance in the singleton ServiceMain.
-        list = addDefaultListItemFields(list);
-        return list;
+        return getListItemFields();
     }
     
     public synchronized List<ListResultField> addDefaultListItemFields(List<ListResultField> list) {
@@ -1261,4 +1277,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String getAuthorityItemCommonSchemaName() {
     	return authorityItemCommonSchemaName;
     }
+
+    abstract protected void setListItemFields(List<ListResultField> list);
+    
+    abstract protected List<ListResultField> getListItemFields();
+
 }
