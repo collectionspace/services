@@ -263,9 +263,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             field = getListResultsTermStatusField();
             list.add(field);
         }
-        
-        // FIXME: Add a flag after the first time these fields are added
-        // to avoid having to repeately execute this method.
                 
         return list;
     }
