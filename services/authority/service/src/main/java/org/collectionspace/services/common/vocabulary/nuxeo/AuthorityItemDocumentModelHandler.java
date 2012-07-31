@@ -188,9 +188,25 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     @Override
     public List<ListResultField> getListItemsArray() throws DocumentException {
+        
+        // Get the set of fields that should appear, in each item of the list
+        // results, for a specific authority item service.
         List<ListResultField> list = super.getListItemsArray();
+        
+        // Add a default set of fields; that is, fields that should always be
+        // present in each list item (and common across all authority items),
+        // to that service-specific set of fields.
+        //
+        // Note: We're updating the "global" service and tenant bindings
+        // instance here: the list instance here is a reference to the
+        // tenant bindings instance in the singleton ServiceMain.
+        list = addDefaultListItemFields(list);
+        return list;
+    }
+    
+    public synchronized List<ListResultField> addDefaultListItemFields(List<ListResultField> list) {
         int nFields = list.size();
-        // Ensure that each item in a list of Authority items includes
+        // Ensure that each item in a list of authority items includes
         // a set of common fields, so we do not depend upon configuration
         // for general logic.
         boolean hasDisplayName = false;
@@ -212,8 +228,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
         ListResultField field;
         if (!hasDisplayName) {
-        	field = getListResultsDisplayNameField();
-            list.add(field);  //Note: We're updating the "global" service and tenant bindings instance here -the list instance here is a reference to the tenant bindings instance in the singleton ServiceMain.
+            field = getListResultsDisplayNameField();
+            list.add(field);
         }
         if (!hasShortId) {
             field = new ListResultField();
@@ -231,6 +247,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             field = getListResultsTermStatusField();
             list.add(field);
         }
+        
+        // FIXME: Add a flag after the first time these fields are added
+        // to avoid having to repeately execute this method.
                 
         return list;
     }
