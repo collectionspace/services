@@ -885,7 +885,8 @@ public class NuxeoImageUtils {
 			}
 
 		return result;
-	}	
+	}
+	
 }
 
 /*

@@ -1,29 +1,62 @@
 <?xml version="1.0"?>
 <component name="org.collectionspace.collectionspace_core.coreTypes">
-  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
-    <schema name="collectionspace_core" prefix="collectionspace_core" src="schemas/collectionspace_core.xsd"/>
-    <schema name="subitem" prefix="subitem" src="schemas/subitem.xsd"/>
-  </extension>
-  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
-    <doctype name="CollectionSpaceDocument" extends="Document">
-      <schema name="common"/>
-      <schema name="dublincore"/>
-      <schema name="collectionspace_core"/>
-    </doctype>
-  </extension>  
-  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
-    <doctype name="CollectionSpace_Core" extends="Document">
-      <schema name="common"/>
-      <schema name="dublincore"/>
-      <schema name="collectionspace_core"/>
-    </doctype>
-  </extension>
-  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
-    <doctype name="Subitem" extends="Document">
-      <schema name="common"/>
-      <schema name="dublincore"/>
-      <schema name="collectionspace_core"/>
-      <schema name="subitem"/>
-    </doctype>
-  </extension>
+	<extension target="org.nuxeo.ecm.core.schema.TypeService"
+		point="schema">
+		<schema name="collectionspace_core" prefix="collectionspace_core"
+			src="schemas/collectionspace_core.xsd" />
+		<schema name="subitem" prefix="subitem" src="schemas/subitem.xsd" />
+	</extension>
+	<extension target="org.nuxeo.ecm.core.schema.TypeService"
+		point="doctype">
+		<doctype name="CollectionSpaceDocument" extends="Document">
+			<schema name="common" />
+			<schema name="dublincore" />
+			<schema name="collectionspace_core" />
+		</doctype>
+	</extension>
+	<extension target="org.nuxeo.ecm.core.schema.TypeService"
+		point="doctype">
+		<doctype name="CollectionSpace_Core" extends="Document">
+			<schema name="common" />
+			<schema name="dublincore" />
+			<schema name="collectionspace_core" />
+		</doctype>
+	</extension>
+	<extension target="org.nuxeo.ecm.core.schema.TypeService"
+		point="doctype">
+		<doctype name="Subitem" extends="Document">
+			<schema name="common" />
+			<schema name="dublincore" />
+			<schema name="collectionspace_core" />
+			<schema name="subitem" />
+		</doctype>
+	</extension>
+
+	<!-- Support for creation of document/blob thumbnails.  All of this code was take from the following two
+	     blog posts:
+	     	http://dev.blogs.nuxeo.com/2012/06/qa-friday-thumbnails-pdf-psd-documents.html
+	     	http://dev.blogs.nuxeo.com/2012/06/monday-dev-heaven-adding-thumbnail-preview-document-content-nuxeo.html
+	-->
+	<extension target="org.nuxeo.ecm.core.schema.TypeService"
+		point="schema">
+		<schema name="thumbnail" src="schemas/thumbnail.xsd" prefix="thumb" />
+	</extension>
+	<extension target="org.nuxeo.ecm.core.schema.TypeService"
+		point="doctype">
+		<facet name="Thumbnail">
+			<schema name="thumbnail" />
+		</facet>
+	</extension>
+	<extension target="org.nuxeo.ecm.platform.commandline.executor.service.CommandLineExecutorComponent" point="command">
+		<command name="toThumbnail" enabled="true">
+			<commandLine>convert</commandLine>
+			<parameterString>-strip -thumbnail 100x100 -background transparent -gravity center -extent 100x100 -format png -quality 75 #{inputFilePath}[0] #{outputFilePath}</parameterString>
+			<winParameterString>-strip -thumbnail 100x100 -background transparent -gravity center -extent 100x100 -format png -quality 75 #{inputFilePath}[0] #{outputFilePath}</winParameterString>
+			<installationDirective>You need to install ImageMagick.</installationDirective>
+		</command>
+	</extension>
+	<extension target="org.nuxeo.ecm.core.convert.service.ConversionServiceImpl" point="converter">
+		<converter name="toThumbnail" class="org.collectionspace.services.common.imaging.nuxeo.ThumbnailConverter">
+		</converter>
+	</extension>
 </component>
