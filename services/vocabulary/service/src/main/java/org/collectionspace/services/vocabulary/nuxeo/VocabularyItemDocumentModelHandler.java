@@ -113,17 +113,6 @@ public class VocabularyItemDocumentModelHandler
 		return result;
     }
     
-    @Override
-    protected synchronized void setListItemFields(List<ListResultField> list) {
-        if (getListItemFields().isEmpty()) {
-            listItemFields.addAll(list);
-        }
-    }
-    
-    @Override
-    protected List<ListResultField> getListItemFields() {
-        return listItemFields;
-    }
     
 }
 

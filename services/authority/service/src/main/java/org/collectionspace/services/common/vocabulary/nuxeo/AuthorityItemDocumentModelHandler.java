@@ -105,6 +105,8 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String oldRefNameOnUpdate = null;
     protected String newRefNameOnUpdate = null;
     
+    protected List<ListResultField> listItemFields = new ArrayList<ListResultField>();
+    
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
     }
@@ -1275,8 +1277,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	return authorityItemCommonSchemaName;
     }
 
-    abstract protected void setListItemFields(List<ListResultField> list);
+    protected synchronized void setListItemFields(List<ListResultField> list) {
+        if (getListItemFields().isEmpty()) {
+            this.listItemFields.addAll(list);
+        }
+    }
     
-    abstract protected List<ListResultField> getListItemFields();
+    protected List<ListResultField> getListItemFields() {
+        return this.listItemFields;
+    }
 
 }

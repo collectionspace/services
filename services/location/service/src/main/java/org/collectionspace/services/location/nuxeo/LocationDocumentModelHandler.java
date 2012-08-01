@@ -121,17 +121,6 @@ public class LocationDocumentModelHandler
     public String getQProperty(String prop) {
         return LocationConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
-    
-    @Override
-    protected synchronized void setListItemFields(List<ListResultField> list) {
-        if (getListItemFields().isEmpty()) {
-            listItemFields.addAll(list);
-        }
-    }
-    
-    @Override
-    protected List<ListResultField> getListItemFields() {
-        return listItemFields;
-    }
+
 }
 
