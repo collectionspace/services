@@ -23,10 +23,13 @@
  */
 package org.collectionspace.services.taxonomy.nuxeo;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.TaxonJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
+import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.taxonomy.TaxonCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
@@ -47,6 +50,7 @@ public class TaxonDocumentModelHandler
      * Common part schema label
      */
     private static final String COMMON_PART_LABEL = "taxon_common";
+    private static List<ListResultField> listItemFields = new ArrayList<ListResultField>();
 
     public TaxonDocumentModelHandler() {
         super(COMMON_PART_LABEL);
@@ -114,5 +118,6 @@ public class TaxonDocumentModelHandler
     public String getQProperty(String prop) {
         return TaxonConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+
 }
 

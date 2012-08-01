@@ -23,12 +23,14 @@
  */
 package org.collectionspace.services.person.nuxeo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.PersonJAXBSchema;
+import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.person.PersonsCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
@@ -51,6 +53,8 @@ public class PersonDocumentModelHandler
      * Common part schema label
      */
     private static final String COMMON_PART_LABEL = "persons_common";
+    private static List<ListResultField> listItemFields = new ArrayList<ListResultField>();
+
     
     public PersonDocumentModelHandler() {
     	super(COMMON_PART_LABEL);
@@ -175,5 +179,6 @@ public class PersonDocumentModelHandler
     public String getQProperty(String prop) {
         return PersonConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+    
 }
 
