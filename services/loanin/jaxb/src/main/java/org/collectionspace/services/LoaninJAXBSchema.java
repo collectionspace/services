@@ -10,7 +10,6 @@ public interface LoaninJAXBSchema {
     final static String LENDERS_AUTHORIZER = "lendersAuthorizer";
     final static String LENDERS_AUTHORIZATION_DATE = "lendersAuthorizationDate";
     final static String LENDERS_CONTACT = "lendersContact";
-    final static String LOAN_IN_CONTACT = "loanInContact";
     final static String LOAN_IN_CONDITIONS = "loanInConditions";
     final static String LOAN_IN_DATE = "loanInDate";
     final static String LOAN_RETURN_DATE = "loanReturnDate";
