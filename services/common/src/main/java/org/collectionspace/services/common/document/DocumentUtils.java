@@ -31,6 +31,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +79,7 @@ import org.nuxeo.ecm.core.schema.types.SimpleType;
 import org.nuxeo.ecm.core.schema.types.Type;
 import org.nuxeo.ecm.core.schema.types.JavaTypes;
 import org.nuxeo.ecm.core.schema.types.primitives.DateType;
+import org.nuxeo.ecm.core.schema.types.primitives.DoubleType;
 import org.nuxeo.ecm.core.schema.types.primitives.StringType;
 import org.nuxeo.ecm.core.schema.types.FieldImpl;
 import org.nuxeo.ecm.core.schema.types.QName;
@@ -578,52 +582,56 @@ public class DocumentUtils {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	private static void buildProperty(Document document, Element parent, 
-			Field field, Object value) throws IOException {
-		Type type = field.getType();
-		//no need to qualify each element name as namespace is already added
-		String propName = field.getName().getLocalName();
-		Element element = document.createElement(propName);
-		parent.appendChild(element);
-		// extract the element content
-		if (type.isSimpleType()) {
-            String encodedVal = type.encode(value);
-            /*
-             * We need a way to produce just a Date when the specified data
-             * type is an xs:date vs. xs:datetime. Nuxeo maps both to a Calendar. Sigh.
-			if(logger.isTraceEnabled() && isDateType(type)) {
-				String dateValType = "unknown";
-				if (value instanceof java.util.Date) {
-					dateValType = "java.util.Date";
-		        } else if (value instanceof java.util.Calendar) {
-					dateValType = "java.util.Calendar";
-		        }
-				logger.trace("building XML for date type: "+type.getName()
-						+" value type: "+dateValType
-						+" encoded: "+encodedVal);
-			}
-			*/
-            element.setTextContent(encodedVal);
-		} else if (type.isComplexType()) {
-			ComplexType ctype = (ComplexType) type;
-			if (ctype.getName().equals(TypeConstants.CONTENT)) {
-				throw new RuntimeException(
-						"Unexpected schema type: BLOB for field: "+propName);
-			} else {
-				buildComplex(document, element, ctype, (Map) value);
-			}
-		} else if (type.isListType()) {
-			if (value instanceof List) {
-				buildList(document, element, (ListType) type, (List) value);
-			} else if (value.getClass().getComponentType() != null) {
-				buildList(document, element, (ListType) type,
-						PrimitiveArrays.toList(value));
-			} else {
-				throw new IllegalArgumentException(
-						"A value of list type is neither list neither array: "
-						+ value);
-			}
-		}
-	}
+            Field field, Object value) throws IOException {
+            Type type = field.getType(); 
+           //no need to qualify each element name as namespace is already added
+            String propName = field.getName().getLocalName();
+            Element element = document.createElement(propName);
+            parent.appendChild(element);
+            // extract the element content
+            if (type.isSimpleType()) {
+                if (isDecimalType(type)) {
+                    element.setTextContent(decimalValueToString(value));
+               /*
+                * We need a way to produce just a Date when the specified data
+                * type is an xs:date vs. xs:datetime. Nuxeo maps both to a Calendar. Sigh.
+                if(logger.isTraceEnabled() && isDateType(type)) {
+                    String dateValType = "unknown";
+                    if (value instanceof java.util.Date) {
+                        dateValType = "java.util.Date";
+                    } else if (value instanceof java.util.Calendar) {
+                        dateValType = "java.util.Calendar";
+                    }
+                    logger.trace("building XML for date type: "+type.getName()
+                            +" value type: "+dateValType
+                            +" encoded: "+encodedVal);
+                }
+                */
+                } else {
+                    String encodedVal = type.encode(value);
+                    element.setTextContent(encodedVal);
+                }
+            } else if (type.isComplexType()) {
+                ComplexType ctype = (ComplexType) type;
+                if (ctype.getName().equals(TypeConstants.CONTENT)) {
+                    throw new RuntimeException(
+                            "Unexpected schema type: BLOB for field: "+propName);
+                } else {
+                    buildComplex(document, element, ctype, (Map) value);
+                }
+            } else if (type.isListType()) {
+                if (value instanceof List) {
+                    buildList(document, element, (ListType) type, (List) value);
+                } else if (value.getClass().getComponentType() != null) {
+                    buildList(document, element, (ListType) type,
+                            PrimitiveArrays.toList(value));
+                } else {
+                    throw new IllegalArgumentException(
+                            "A value of list type is neither list neither array: "
+                            + value);
+                }
+            }
+        }
 
 	/**
 	 * Builds the complex.
@@ -860,7 +868,35 @@ public class DocumentUtils {
 		}
 		return isComplex;
 	}
-
+        
+        /*
+         * Identifies whether a property type is a Nuxeo decimal type.
+         * 
+         * (Currently, elements declared as xs:decimal in XSD schemas
+         * are handled as the Nuxeo primitive DoubleType.)
+         *
+         * @param type   a type.
+	 * @return       true, if is a Nuxeo decimal type;
+         *               false, if it is not a Nuxeo decimal type.
+         */
+        private static boolean isDecimalType(Type type) {
+            // FIXME: DoubleType.validate(value) might work here as well.  See:
+            // http://community.nuxeo.com/api/nuxeo/5.5/javadoc/org/nuxeo/ecm/core/schema/types/primitives/DoubleType.html
+            return ((SimpleType)type).getPrimitiveType() instanceof DoubleType;
+        }
+        
+        private static String decimalValueToString(Object value) {
+            Double decimalVal;
+            try {
+                decimalVal = (Double) value;
+            } catch (ClassCastException cce) {
+                // FIXME: For CSPACE-4691 demonstration; we should handle this error better
+                return "";
+            }
+            // Number format will use the conventions for the current default Locale
+            NumberFormat formatter = new DecimalFormat("#.##");
+            return formatter.format(decimalVal.doubleValue());
+       }
 
         /*
          * Identifies whether a property type is a date type.
