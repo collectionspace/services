@@ -78,7 +78,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     private String lenderRefName = null;
     private String lendersAuthorizerRefName = null;
     private String lendersContactRefName = null;
-    private String loanInContactRefName = null;
+    private String borrowersContactRefName = null;
     private String borrowersAuthorizerRefName = null;
     private final int NUM_AUTH_REFS_EXPECTED = 5;
     private final static String CURRENT_DATE_UTC =
@@ -126,7 +126,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 		lenderRefName,
                 lendersAuthorizerRefName,
                 lendersContactRefName,
-                loanInContactRefName,
+                borrowersContactRefName,
                 borrowersAuthorizerRefName);
         ClientResponse<Response> response = loaninClient.create(multipart);
         int statusCode = response.getStatus();
@@ -192,9 +192,9 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personIdsCreated.add(csid);
         lendersContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         
-        csid = createPerson("Carrie", "Loanincontact", "carrieLoanincontact", authRefName);
+        csid = createPerson("Carrie", "Borrowerscontact", "carrieBorrowerscontact", authRefName);
         personIdsCreated.add(csid);
-        loanInContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        borrowersContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
         csid = createPerson("Bonnie", "Borrowersauthorizer", "bonnieBorrowersauthorizer", authRefName);
         personIdsCreated.add(csid);
@@ -260,7 +260,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Assert.assertEquals(loaninCommon.getLendersAuthorizer(), lendersAuthorizerRefName);
         // Assert.assertEquals(loaninCommon.getLendersContact(), lendersContactRefName);
         //
-        Assert.assertEquals(loaninCommon.getLoanInContact(), loanInContactRefName);
+        Assert.assertEquals(loaninCommon.getBorrowersContact(), borrowersContactRefName);
         Assert.assertEquals(loaninCommon.getBorrowersAuthorizer(), borrowersAuthorizerRefName);
         
         // Get the auth refs and check them
@@ -373,7 +373,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     		String lender,
     		String lendersAuthorizer,
     		String lendersContact,
-    		String loaninContact,
+    		String borrowersContact,
     		String borrowersAuthorizer) {
     	LoansinCommon loaninCommon = new LoansinCommon();
     	loaninCommon.setLoanInNumber(loaninNumber);
@@ -385,7 +385,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     	lenderGroup.setLendersContact(lendersContact);
     	lenderGroupList.getLenderGroup().add(lenderGroup);
     	loaninCommon.setLenderGroupList(lenderGroupList);
-    	loaninCommon.setLoanInContact(loaninContact);
+    	loaninCommon.setBorrowersContact(borrowersContact);
     	loaninCommon.setBorrowersAuthorizer(borrowersAuthorizer);
 
     	PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
