@@ -861,10 +861,6 @@
                             <types:key>authRef</types:key>
                             <types:value>borrowersContact</types:value>
                         </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>loanInContact</types:value>
-                        </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
