@@ -51,15 +51,16 @@ public interface IQueryManager {
 	final static String SEARCH_RELATED_MATCH_OBJ_DOCTYPES = "rtObjDocTypes";
 	final static String SELECT_DOC_TYPE_FIELD = "selectDocType";
 	
+	final static String MARK_RELATED_TO_CSID_AS_SUBJECT = "mkRtSbj";
 	//
 	// Generic CMIS property mapping constants
 	//
 	final static String CMIS_OBJECT_ID = "cmis:objectId";
-	final static String CMIS_NAME = "cmis:name";
+	final static String CMIS_NUXEO_PATHSEGMENT = "nuxeo:pathSegment";
 	//
 	// Nuxeo related CMIS property mapping constants
 	final static String CMIS_NUXEO_ID = CMIS_OBJECT_ID;
-	final static String CMIS_NUXEO_NAME = CMIS_NAME;
+	final static String CMIS_NUXEO_NAME = CMIS_NUXEO_PATHSEGMENT;
 	final static String CMIS_NUXEO_TITLE = "dc:title";
 	final static String CMIS_CS_UPDATED_AT = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":" + CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
 	

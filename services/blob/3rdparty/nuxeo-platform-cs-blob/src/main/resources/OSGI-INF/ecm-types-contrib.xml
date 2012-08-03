@@ -13,6 +13,8 @@
       </layouts>        
     </type>
 
+	<!-- We may not need to declare that Folder's accept Blob and Picture instances
+		since we only store these inside Workspace folders -->
     <type id="Folder" coretype="Folder">
       <subtypes>
         <type>Picture</type>
@@ -24,6 +26,7 @@
       <subtypes>
         <type>Picture</type>
         <type>Blob</type>
+		<type>File</type>
       </subtypes>
     </type>
 

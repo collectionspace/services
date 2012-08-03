@@ -26,6 +26,10 @@
  */
 package org.collectionspace.services.common.imaging.nuxeo;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -36,6 +40,9 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import org.nuxeo.runtime.api.Framework;
 //import org.nuxeo.runtime.api.ServiceManager;
@@ -80,6 +87,7 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 
+import org.nuxeo.ecm.core.schema.DocumentType;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.types.Schema;
 
@@ -114,6 +122,7 @@ public class NuxeoImageUtils {
 	private static final Logger logger = LoggerFactory
 			.getLogger(NuxeoImageUtils.class);
 
+	private static final String MIME_JPEG = "image/jpeg";
 	/*
 	 * FIXME: REM - These constants should be coming from configuration and NOT
 	 * hard coded.
@@ -151,6 +160,10 @@ public class NuxeoImageUtils {
 	public static final String SCHEMA_IPTC = "iptc";
 	public static final String SCHEMA_IMAGE_METADATA = "image_metadata";
 
+	private static final int THUMB_SIZE_HEIGHT = 100;
+
+	private static final int THUMB_SIZE_WIDTH = 75;
+
 	// static DefaultBinaryManager binaryManager = new DefaultBinaryManager();
 	// //can we get this from Nuxeo? i.e.,
 	// Framework.getService(BinaryManger.class)
@@ -171,6 +184,9 @@ public class NuxeoImageUtils {
 		// empty constructor
 	}
 
+	/*
+	 * Use this for debugging Nuxeo's PictureView class
+	 */
 	private static String toStringPictureView(PictureView pictureView) {
 		StringBuffer strBuffer = new StringBuffer();
 		strBuffer.append("Description: " + pictureView.getDescription() + '\n');
@@ -267,10 +283,29 @@ public class NuxeoImageUtils {
 		return metadataMap;
 	}
 
+	private static String[] imageTypes = {"jpeg", "bmp", "gif", "png", "tiff", "octet-stream"};
+	static private boolean isImageMedia(Blob nuxeoBlob) {
+		boolean result = false;
+		
+		String mimeType = nuxeoBlob.getMimeType().toLowerCase().trim();
+		String[] parts = mimeType.split("/"); // split strings like "application/xml" into an array of two strings
+		if (parts.length == 2) {
+			for (String type : imageTypes) {
+				if (parts[1].equalsIgnoreCase(type)) {
+					result = true;
+					break;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	static private MeasuredPartGroupList getDimensions(
 			DocumentModel documentModel, Blob nuxeoBlob) {
 		MeasuredPartGroupList result = null;
-		try {
+		
+		if (isImageMedia(nuxeoBlob) == true) try {
 			ImagingService service = Framework.getService(ImagingService.class);
 			ImageInfo imageInfo = service.getImageInfo(nuxeoBlob);
 			Map<String, Object> metadataMap = getMetadata(nuxeoBlob);
@@ -376,6 +411,7 @@ public class NuxeoImageUtils {
 			DocumentModel documentModel, Blob blob) {
 		DefaultBinaryManager binaryManager = null;
 		RepositoryDescriptor descriptor = null;
+		File file = null;
 
 		try {
 			RepositoryService repositoryService1 = (RepositoryService) Framework
@@ -386,6 +422,7 @@ public class NuxeoImageUtils {
 					.getRepositoryManager();
 			descriptor = repositoryManager.getDescriptor(repositoryName);
 
+// Keep this code around for future work/enhancements			
 //			binaryManager = new DefaultBinaryManager();
 //
 //			File storageDir = binaryManager.getStorageDir();
@@ -397,26 +434,28 @@ public class NuxeoImageUtils {
 			e.printStackTrace();
 		}
 
-		try {
-			binaryManager.initialize(SQLRepository.getDescriptor(descriptor));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+// Keep this code around for future work/enhancements
+//		try {
+//			binaryManager.initialize(SQLRepository.getDescriptor(descriptor));
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
-		File storageDir = binaryManager.getStorageDir();
-		// SQLBlob blob = (SQLBlob)
-		// documentModel.getPropertyValue("schema:blobField");
-		File file = binaryManager.getFileForDigest(blob.getDigest(), false);
+// Keep this code around for future work/enhancements
+//		File storageDir = binaryManager.getStorageDir();
+//		SQLBlob blob = (SQLBlob)
+//		documentModel.getPropertyValue("schema:blobField");
+//		File file = binaryManager.getFileForDigest(blob.getDigest(), false);
 
 		return file;
 	}
 
 	/**
-	 * Returns a schema, given the name of a schema.
+	 * Returns a schema, given the name of a schema.  Possibly usefule in the future
 	 * 
 	 * @param schemaName
 	 *            a schema name.
@@ -435,7 +474,7 @@ public class NuxeoImageUtils {
 	}
 
 	/**
-	 * Gets the blob.
+	 * Gets the blob.  Not in use now, but might be useful in the future.
 	 * 
 	 * @param nuxeoSession
 	 *            the nuxeo session
@@ -461,7 +500,7 @@ public class NuxeoImageUtils {
 	}
 
 	/**
-	 * Gets the type service.
+	 * Gets the type service.  Not in use, but please keep for future reference
 	 * 
 	 * @return the type service
 	 * @throws ClientException
@@ -506,7 +545,7 @@ public class NuxeoImageUtils {
 	}
 
 	/**
-	 * Creates the serializable blob.
+	 * Creates the serializable blob.  We may need this code, do not remove.
 	 * 
 	 * @param fileInputStream
 	 *            the file input stream
@@ -613,7 +652,7 @@ public class NuxeoImageUtils {
 		return blob;
 	}
 
-	private static Blob createFileBlob(File file) {
+	private static Blob createNuxeoFileBasedBlob(File file) {
 		Blob result = null;
 
 		result = new FileBlob(file);
@@ -672,9 +711,10 @@ public class NuxeoImageUtils {
 	 * @param filePath
 	 *            the file path
 	 * @return the string
+	 * @throws Exception 
 	 */
-	public static BlobsCommon createPicture(ServiceContext ctx,
-			RepositoryInstance repoSession, BlobInput blobInput) {
+	public static BlobsCommon createBlobInRepository(ServiceContext ctx,
+			RepositoryInstance repoSession, BlobInput blobInput) throws Exception {
 		BlobsCommon result = null;
 
 		try {
@@ -682,17 +722,20 @@ public class NuxeoImageUtils {
 			String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
 			DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
 			DocumentModel wspaceDoc = repoSession.getDocument(nuxeoWspace);
+			
+            if (logger.isTraceEnabled()) {
+	            for (String facet : wspaceDoc.getFacets()) {
+	            	logger.trace("Facet: " + facet);
+	            }
+	            for (String docType : wspaceDoc.getDocumentType().getChildrenTypes()) {
+	            	logger.trace("Child type: " + docType);
+	            }
+            }			
 
-			// FileInputStream inputStream = new FileInputStream(blobFile);
-			// //FIXME: REM - With an embedded Nuxeo server, we may no longer
-			// need to pass in a stream but instead just pass them the File
-			// instance
-			// if (inputStream != null) {
-			result = createImage(repoSession, wspaceDoc,
-			/* inputStream, */blobFile, null);
-			// }
+			result = createBlobInRepository(repoSession, wspaceDoc, blobFile, null /*mime type*/);
 		} catch (Exception e) {
-			logger.error("Could not create image blob", e); //FIXME: REM - We should probably be re-throwing the exception?
+			logger.error("Could not create image blob", e);
+			throw e;
 		}
 
 		return result;
@@ -713,7 +756,7 @@ public class NuxeoImageUtils {
 	 *            the mime type
 	 * @return the string
 	 */
-	static public BlobsCommon createImage(RepositoryInstance nuxeoSession,
+	static public BlobsCommon createBlobInRepository(RepositoryInstance nuxeoSession,
 			DocumentModel blobLocation,
 			// InputStream file,
 			File file, String mimeType) {
@@ -722,22 +765,21 @@ public class NuxeoImageUtils {
 		try {
 			// Blob fileBlob = createStreamingBlob(blobFile, blobFile.getName(),
 			// mimeType);
-			Blob fileBlob = createFileBlob(file);
+			Blob fileBlob = createNuxeoFileBasedBlob(file);
 			String digestAlgorithm = getFileManagerService()
-					.getDigestAlgorithm(); // Need some way on initializing the
-											// FileManager with a call.
+					.getDigestAlgorithm(); // Only call this because we seem to need some way of initializing Nuxeo's FileManager with a call.
 			
-			logger.debug("Start --> Calling Nuxeo to create an image blob."); // See Nuxeo's DefaultPictureAdapter class for details
+			logger.debug("Start --> Starting call to Nuxeo to create the blob document."); // For example, see Nuxeo's DefaultPictureAdapter class for details
 			DocumentModel documentModel = getFileManagerService()
 					.createDocumentFromBlob(nuxeoSession, fileBlob,
 							blobLocation.getPathAsString(), true,
 							file.getName());
-			logger.debug("Stop --> Calling Nuxeo to create an image blob.");
+			logger.debug("Stop --> Finished calling Nuxeo to create the blob document.");
 			
-			result = createBlobsCommon(documentModel, fileBlob);
+			result = createBlobsCommon(documentModel, fileBlob); // Now create our metadata resource document
 		} catch (Exception e) {
 			result = null;
-			logger.error("Could not create new image blob", e); //FIXME: REM - This should probably be re-throwing the exception?
+			logger.error("Could not create new Nuxeo blob document.", e); //FIXME: REM - This should probably be re-throwing the exception?
 		}
 
 		return result;
@@ -776,31 +818,25 @@ public class NuxeoImageUtils {
 	 * @return the image
 	 */
 	static public BlobOutput getBlobOutput(ServiceContext ctx,
-			RepositoryInstance repoSession, String repositoryId,
-			String derivativeTerm, Boolean getContentFlag) {
+			RepositoryInstance repoSession,
+			String repositoryId,
+			String derivativeTerm,
+			Boolean getContentFlag,
+			StringBuffer outMimeType) {
 		BlobOutput result = new BlobOutput();
+		boolean isNonImageDerivative = false;
 
 		if (repositoryId != null && repositoryId.isEmpty() == false)
 			try {
 				IdRef documentRef = new IdRef(repositoryId);
-				DocumentModel documentModel = repoSession
-						.getDocument(documentRef);
+				DocumentModel documentModel = repoSession.getDocument(documentRef);
 
 				Blob docBlob = null;
 				DocumentBlobHolder docBlobHolder = (DocumentBlobHolder) documentModel
 						.getAdapter(BlobHolder.class);
-				if (docBlobHolder instanceof PictureBlobHolder) { // if it is a
-																	// PictureDocument
-																	// then it
-																	// has these
-																	// Nuxeo
-																	// schemas:
-																	// [dublincore,
-																	// uid,
-																	// picture,
-																	// iptc,
-																	// common,
-																	// image_metadata]
+				if (docBlobHolder instanceof PictureBlobHolder) {
+					// if it is a PictureDocument then it has these
+					// Nuxeo schemas: [dublincore, uid, picture, iptc, common, image_metadata]
 					//
 					// Need to add the "MultiviewPictureAdapter" support here to
 					// get the view data, see above.
@@ -808,34 +844,39 @@ public class NuxeoImageUtils {
 					PictureBlobHolder pictureBlobHolder = (PictureBlobHolder) docBlobHolder;
 					if (derivativeTerm != null) {
 						docBlob = pictureBlobHolder.getBlob(derivativeTerm);
+						// Nuxeo derivatives are all JPEG
+						outMimeType.append(MIME_JPEG);
 					} else {
 						docBlob = pictureBlobHolder.getBlob();
 					}
 				} else {
 					docBlob = docBlobHolder.getBlob();
+					if (derivativeTerm != null) { // If its a derivative request on a non-image blob, then return just a document image thumnail
+						isNonImageDerivative = true;
+					}
 				}
 
 				//
-				// Create the result instance that will contain the blob
-				// metadata
+				// Create the result instance that will contain the blob metadata
 				// and an InputStream with the bits if the 'getContentFlag' is
-				// set
+				// set.
 				//
-				BlobsCommon blobsCommon = createBlobsCommon(documentModel,
-						docBlob);
+				BlobsCommon blobsCommon = createBlobsCommon(documentModel, docBlob);
 				result.setBlobsCommon(blobsCommon);
 				if (getContentFlag == true) {
-					InputStream remoteStream = docBlob.getStream();
+					InputStream remoteStream = null;
+					if (isNonImageDerivative == false) {
+						remoteStream = docBlob.getStream();
+					} else {
+						remoteStream = NuxeoImageUtils.class.getClassLoader() // for now, non-image derivatives are just placeholder document images
+					            .getResourceAsStream("documentImage.jpg");
+						outMimeType.append(MIME_JPEG);
+					}
 					BufferedInputStream bufferedInputStream = new BufferedInputStream(
-							remoteStream); // FIXME: REM - To improve
-											// performance, try
-											// BufferedInputStream(InputStream
-											// in, int size)
-					result.setBlobInputStream(bufferedInputStream); // the input
-																	// stream of
-																	// blob bits
+							remoteStream); 	// FIXME: REM - To improve performance, try
+											// BufferedInputStream(InputStream in, int size)?
+					result.setBlobInputStream(bufferedInputStream);
 				}
-
 			} catch (Exception e) {
 				if (logger.isErrorEnabled() == true) {
 					logger.error(e.getMessage(), e);
@@ -844,7 +885,7 @@ public class NuxeoImageUtils {
 			}
 
 		return result;
-	}
+	}	
 }
 
 /*

@@ -6,14 +6,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services</artifactId>
-	<version>2.5-SNAPSHOT</version>
+	<version>2.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>services</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
-		<nuxeo.general.release>5.5</nuxeo.general.release>
+		<nuxeo.general.release>5.5.0-HF07</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>		
@@ -22,8 +22,8 @@
 		<nuxeo.platform.version>5.5-I20111104_1115</nuxeo.platform.version>
 		<nuxeo.core.version>5.5-I20111104_1115</nuxeo.core.version>
 -->
-		<cspace.services.version>2.5-SNAPSHOT</cspace.services.version>
-		<cspace.services.client.version>2.5-SNAPSHOT</cspace.services.client.version>
+		<cspace.services.version>2.6-SNAPSHOT</cspace.services.version>
+		<cspace.services.client.version>2.6-SNAPSHOT</cspace.services.client.version>
 		<spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.2.RELEASE</spring.security.version>
 	</properties>

@@ -400,6 +400,10 @@ public class NuxeoUtils {
         return query.toString();
     }
     
+    static public final String buildWorkflowNotDeletedWhereClause() {
+    	return "ecm:currentLifeCycleState <> 'deleted'";
+    }
+    
     
     /**
      * Builds an NXQL SELECT query across multiple document types.
@@ -424,8 +428,12 @@ public class NuxeoUtils {
             query.append(docType);
         }
         appendNXQLWhere(query, queryContext);
-        // For a set of DocTypes, there is no sensible ordering other than by updatedAt
-        appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED, null);
+        if (Tools.notBlank(queryContext.getOrderByClause())) {
+            appendNXQLOrderBy(query, queryContext.getOrderByClause(), null);
+        } else {
+            // Across a set of mixed DocTypes, updatedAt is the most sensible default ordering
+            appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED, null);
+        }
         // FIXME add 'order by' clause here, if appropriate
         return query.toString();
     }
