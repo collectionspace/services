@@ -87,8 +87,6 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
-                    <service:DublinCoreTitle>collectionobjects</service:DublinCoreTitle>
-                    <service:ListResultsItemMethodName>getCollectionObjectListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>objectNumber</service:element>
@@ -656,14 +654,7 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.intake.nuxeo.IntakeDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.group.nuxeo.IntakeDocumentModelHandler</service:classname>
                 <service:params>
-                    <service:SchemaName>intakes</service:SchemaName>
-                    <service:DublinCoreTitle>intakes</service:DublinCoreTitle>
-                    <service:SummaryFields> entryNumber|depositor|currentOwner|uri|csid</service:SummaryFields>
-                    <service:AbstractCommonListClassname />
-                    <service:CommonListItemClassname />
-                    <service:ListResultsItemMethodName>getIntakeListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>entryNumber</service:element>
@@ -797,14 +788,7 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.loanin.nuxeo.LoaninDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.loanin.nuxeo.LoaninDocumentModelHandler</service:classname>
                 <service:params>
-                    <service:SchemaName>loansin</service:SchemaName>
-                    <service:DublinCoreTitle>loansin</service:DublinCoreTitle>
-                    <service:SummaryFields>loanInNumber|lenderList|loanReturnDate|uri|csid</service:SummaryFields>
-                    <service:AbstractCommonListClassname />
-                    <service:CommonListItemClassname />
-                    <service:ListResultsItemMethodName>getLoaninListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>loanInNumber</service:element>
@@ -980,7 +964,6 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:classname>
                 <service:params>
                     <service:ListResultsFields>
                         <service:ListResultField>
@@ -1149,14 +1132,7 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.imports.nuxeo.ImportsDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.imports.nuxeo.ImportsDocumentModelHandler</service:classname>
                 <service:params>
-                    <service:SchemaName>imports</service:SchemaName>
-                    <service:DublinCoreTitle>imports</service:DublinCoreTitle>
-                    <service:SummaryFields>importsField|uri|csid</service:SummaryFields>
-                    <service:AbstractCommonListClassname>org.collectionspace.services.imports.ImportsCommonList</service:AbstractCommonListClassname>
-                    <service:CommonListItemClassname>org.collectionspace.services.imports.ImportsCommonList$ImportsListItem</service:CommonListItemClassname>
-                    <service:ListResultsItemMethodName>getImportsListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>importsField</service:element>
@@ -1567,7 +1543,7 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <service:ListResultField>
                             <service:element>order</service:element>
                             <service:xpath>order</service:xpath>
@@ -1698,7 +1674,7 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -1872,7 +1848,7 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <service:ListResultField>
                             <service:element>foreName</service:element>
                             <service:xpath>personTermGroupList/[0]/foreName</service:xpath>
@@ -2067,7 +2043,7 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -2212,7 +2188,7 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -2395,7 +2371,7 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <!-- Uncomment when bug in returning list result values from complex types,
                              currently in the CSPACE-4813 branch (P/NP term work in services), is fixed -->
                         <!--
@@ -2581,7 +2557,7 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
