@@ -8,10 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
@@ -23,6 +20,8 @@ import org.collectionspace.services.config.service.InitHandler;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.init.AddIndices;
+import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.JDBCTools;
@@ -206,6 +205,36 @@ public class ServiceMain {
             }
         }
     }
+    
+    /**
+     * Create required indices (aka indexes) in database tables not associated
+     * with any specific tenant.
+     * 
+     * @throws Exception 
+     */
+    void createRequiredIndices() throws Exception {
+         DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
+                   
+         final String COLLECTIONSPACE_CORE_TABLE_NAME = "collectionspace_core";
+         final String NUXEO_FULLTEXT_TABLE_NAME = "fulltext";
+         final String NUXEO_HIERARCHY_TABLE_NAME = "hierarchy";
+         
+         Map<String,String> indexableFields = new HashMap<String,String>();
+         indexableFields.put("tenantid", COLLECTIONSPACE_CORE_TABLE_NAME);
+         indexableFields.put("updatedat", COLLECTIONSPACE_CORE_TABLE_NAME);
+         indexableFields.put("jobid", NUXEO_FULLTEXT_TABLE_NAME);
+         indexableFields.put("name", NUXEO_HIERARCHY_TABLE_NAME);
+       
+         AddIndices addindices = new AddIndices();
+         for (Map.Entry<String,String> entry : indexableFields.entrySet()) {
+             List<Field> fields = new ArrayList<Field>();
+             Field field = new Field();
+             field.setTable(entry.getValue());
+             field.setCol(entry.getKey());
+             fields.add(field);
+             addindices.onRepositoryInitialized(dataSource, null, fields, null);
+         }
+    }
 
     public void firePostInitHandlers() throws Exception {
     	DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
@@ -345,4 +374,6 @@ public class ServiceMain {
     public TenantBindingConfigReaderImpl getTenantBindingConfigReader() {
         return tenantBindingConfigReader;
     }
+
+
 }
