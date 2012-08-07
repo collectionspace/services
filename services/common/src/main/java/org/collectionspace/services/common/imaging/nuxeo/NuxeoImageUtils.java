@@ -107,6 +107,7 @@ import org.collectionspace.services.blob.MeasuredPartGroupList;
 //import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+import org.collectionspace.services.nuxeo.extension.thumbnail.ThumbnailConstants;
 import org.collectionspace.services.common.blob.BlobOutput;
 
 import org.collectionspace.services.config.service.ListResultField;
@@ -398,6 +399,29 @@ public class NuxeoImageUtils {
 			if (measuredPartGroupList != null) {
 				result.setMeasuredPartGroupList(measuredPartGroupList);
 			}
+			
+			// Check to see if a thumbnail preview was created by Nuxeo
+            if (documentModel.hasFacet(ThumbnailConstants.THUMBNAIL_FACET)) {
+    			String errorMsg = null;
+            	String thumbnailName = null;
+				try {
+					thumbnailName = (String)documentModel.getProperty(ThumbnailConstants.THUMBNAIL_SCHEMA_NAME,
+					        ThumbnailConstants.THUMBNAIL_FILENAME_PROPERTY_NAME);
+					Blob thumbnailBlob = (Blob)documentModel.getProperty(ThumbnailConstants.THUMBNAIL_SCHEMA_NAME,
+					        ThumbnailConstants.THUMBNAIL_PROPERTY_NAME);
+				} catch (ClientException e) {
+					errorMsg = "Could not extract the name of the thumbnail preview image file.";
+					if (logger.isTraceEnabled()) {
+						logger.trace(errorMsg, e);
+					}
+				}
+				
+				if (errorMsg == null) {
+					logger.info("A thumbnail preview was created for this document blob: " + thumbnailName);
+				} else {
+					logger.warn(errorMsg);
+				}
+            }
 		}
 
 		return result;
