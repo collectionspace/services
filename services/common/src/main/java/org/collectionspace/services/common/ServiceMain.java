@@ -226,14 +226,15 @@ public class ServiceMain {
          indexableFields.put("name", NUXEO_HIERARCHY_TABLE_NAME);
        
          AddIndices addindices = new AddIndices();
+         List<Field> fields = new ArrayList<Field>();
          for (Map.Entry<String,String> entry : indexableFields.entrySet()) {
-             List<Field> fields = new ArrayList<Field>();
              Field field = new Field();
-             field.setTable(entry.getValue());
              field.setCol(entry.getKey());
+             field.setTable(entry.getValue());
              fields.add(field);
-             addindices.onRepositoryInitialized(dataSource, null, fields, null);
          }
+         addindices.onRepositoryInitialized(dataSource, null, fields, null);
+
     }
 
     public void firePostInitHandlers() throws Exception {
