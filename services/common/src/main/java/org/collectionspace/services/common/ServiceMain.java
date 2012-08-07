@@ -213,8 +213,9 @@ public class ServiceMain {
      * @throws Exception 
      */
     void createRequiredIndices() throws Exception {
-         DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
                    
+         // Define a set of columns (fields) and their associated
+         // tables, on which database indexes should always be created
          final String COLLECTIONSPACE_CORE_TABLE_NAME = "collectionspace_core";
          final String NUXEO_FULLTEXT_TABLE_NAME = "fulltext";
          final String NUXEO_HIERARCHY_TABLE_NAME = "hierarchy";
@@ -225,6 +226,10 @@ public class ServiceMain {
          indexableFields.put("jobid", NUXEO_FULLTEXT_TABLE_NAME);
          indexableFields.put("name", NUXEO_HIERARCHY_TABLE_NAME);
        
+         // Invoke existing post-init code to create these indexes,
+         // sending in the set of values above, in contrast to
+         // drawing these values from per-tenant configuration.
+         DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
          AddIndices addindices = new AddIndices();
          List<Field> fields = new ArrayList<Field>();
          for (Map.Entry<String,String> entry : indexableFields.entrySet()) {

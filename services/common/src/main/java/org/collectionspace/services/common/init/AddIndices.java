@@ -74,7 +74,7 @@ import org.slf4j.LoggerFactory;
                 &lt;/s:params>
             &lt;/s:initHandler>
  *
- * $LastChangedRevision$4
+ * $LastChangedRevision$
  * $LastChangedDate$
  */
 public class AddIndices extends InitHandler implements IInitHandler {
