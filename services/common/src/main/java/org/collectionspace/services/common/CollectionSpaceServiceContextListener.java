@@ -24,7 +24,7 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
             
             svcMain.retrieveAllWorkspaceIds();
             
-            // Create required indexes / indices in tables not associated
+            // Create required indexes (aka indices) in tables not associated
             // with any specific tenant.
             svcMain.createRequiredIndices();
             //

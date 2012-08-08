@@ -207,7 +207,7 @@ public class ServiceMain {
     }
     
     /**
-     * Create required indices (aka indexes) in database tables not associated
+     * Create required indexes (aka indices) in database tables not associated
      * with any specific tenant.
      * 
      * @throws Exception 
@@ -220,11 +220,11 @@ public class ServiceMain {
          final String NUXEO_FULLTEXT_TABLE_NAME = "fulltext";
          final String NUXEO_HIERARCHY_TABLE_NAME = "hierarchy";
          
-         Map<String,String> indexableFields = new HashMap<String,String>();
-         indexableFields.put("tenantid", COLLECTIONSPACE_CORE_TABLE_NAME);
-         indexableFields.put("updatedat", COLLECTIONSPACE_CORE_TABLE_NAME);
-         indexableFields.put("jobid", NUXEO_FULLTEXT_TABLE_NAME);
-         indexableFields.put("name", NUXEO_HIERARCHY_TABLE_NAME);
+         Map<Integer,List<String>> fieldsToIndex = new HashMap<Integer,List<String>>();
+         fieldsToIndex.put(1, new ArrayList(Arrays.asList(COLLECTIONSPACE_CORE_TABLE_NAME, "tenantid")));
+         fieldsToIndex.put(2, new ArrayList(Arrays.asList(COLLECTIONSPACE_CORE_TABLE_NAME, "updatedat")));
+         fieldsToIndex.put(3, new ArrayList(Arrays.asList(NUXEO_FULLTEXT_TABLE_NAME, "jobid")));
+         fieldsToIndex.put(4, new ArrayList(Arrays.asList(NUXEO_HIERARCHY_TABLE_NAME, "name")));
        
          // Invoke existing post-init code to create these indexes,
          // sending in the set of values above, in contrast to
@@ -232,10 +232,10 @@ public class ServiceMain {
          DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
          AddIndices addindices = new AddIndices();
          List<Field> fields = new ArrayList<Field>();
-         for (Map.Entry<String,String> entry : indexableFields.entrySet()) {
+         for (Map.Entry<Integer,List<String>> entry : fieldsToIndex.entrySet()) {
              Field field = new Field();
-             field.setCol(entry.getKey());
-             field.setTable(entry.getValue());
+             field.setTable(entry.getValue().get(0)); // Table name from List item 0
+             field.setCol(entry.getValue().get(1)); // Column name from List item 1
              fields.add(field);
          }
          addindices.onRepositoryInitialized(dataSource, null, fields, null);
