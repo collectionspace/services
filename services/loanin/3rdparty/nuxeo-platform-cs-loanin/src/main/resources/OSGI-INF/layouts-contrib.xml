@@ -31,7 +31,6 @@ $LastChangedDate: $
                 <row><widget>lendersAuthorizer</widget></row>
                 <row><widget>lendersAuthorizationDate</widget></row>
                 <row><widget>lendersContact</widget></row>
-                <row><widget>loanInContact</widget></row>
                 <row><widget>loanInConditions</widget></row>
                 <row><widget>loanInDate</widget></row>
                 <row><widget>loanReturnDate</widget></row>
@@ -100,19 +99,6 @@ $LastChangedDate: $
                 <translated>true</translated>
                 <fields>
                     <field schema="loansin_common">lendersContact</field>
-                </fields>
-                <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
-                </properties>
-            </widget>
-
-            <widget name="loanInContact" type="text">
-                <labels>
-                    <label mode="any">loanInContact</label>
-                </labels>
-                <translated>true</translated>
-                <fields>
-                    <field schema="loansin_common">loanInContact</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>

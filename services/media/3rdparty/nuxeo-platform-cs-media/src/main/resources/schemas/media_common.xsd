@@ -106,6 +106,7 @@
     </xs:element>
     <xs:element name="uri" type="xs:string" />
     <xs:element name="blobCsid" type="xs:string" />
+    <xs:element name="externalUrl" type="xs:string" />
 
     <!-- Changed names, as of v1.13: dimensionGroupList became measuredPartGroupList, dimensionGroup became measuredPartGroup. -->
     <xs:complexType name="measuredPartGroupList">
