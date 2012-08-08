@@ -77,6 +77,7 @@ import org.nuxeo.ecm.core.schema.types.ListType;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.SimpleType;
 import org.nuxeo.ecm.core.schema.types.Type;
+import org.nuxeo.ecm.core.schema.types.TypeException;
 import org.nuxeo.ecm.core.schema.types.JavaTypes;
 import org.nuxeo.ecm.core.schema.types.primitives.DateType;
 import org.nuxeo.ecm.core.schema.types.primitives.DoubleType;
@@ -126,6 +127,8 @@ public class DocumentUtils {
 
 	/** The XML elements with this suffix will indicate. */
 	private static String STRUCTURED_TYPE_SUFFIX = "List";
+       
+
 
 	/**
 	 * The Class NameValue.
@@ -590,8 +593,8 @@ public class DocumentUtils {
             parent.appendChild(element);
             // extract the element content
             if (type.isSimpleType()) {
-                if (isDecimalType(type)) {
-                    element.setTextContent(decimalValueToString(value));
+                if (isNuxeoDecimalType(type) && valueMatchesNuxeoType(type, value)) {
+                    element.setTextContent(nuxeoDecimalValueToDecimalString(value));
                /*
                 * We need a way to produce just a Date when the specified data
                 * type is an xs:date vs. xs:datetime. Nuxeo maps both to a Calendar. Sigh.
@@ -872,30 +875,53 @@ public class DocumentUtils {
         /*
          * Identifies whether a property type is a Nuxeo decimal type.
          * 
-         * (Currently, elements declared as xs:decimal in XSD schemas
-         * are handled as the Nuxeo primitive DoubleType.)
+         * Note: currently, elements declared as xs:decimal in XSD schemas
+         * are handled as the Nuxeo primitive DoubleType.  If this type
+         * changes, the test below should be changed accordingly.
          *
          * @param type   a type.
 	 * @return       true, if is a Nuxeo decimal type;
          *               false, if it is not a Nuxeo decimal type.
          */
-        private static boolean isDecimalType(Type type) {
-            // FIXME: DoubleType.validate(value) might work here as well.  See:
-            // http://community.nuxeo.com/api/nuxeo/5.5/javadoc/org/nuxeo/ecm/core/schema/types/primitives/DoubleType.html
+        private static boolean isNuxeoDecimalType(Type type) {
             return ((SimpleType)type).getPrimitiveType() instanceof DoubleType;
         }
         
-        private static String decimalValueToString(Object value) {
-            Double decimalVal;
+        /*
+         * Returns a string representation of the value of a Nuxeo decimal type.
+         * 
+         * Note: currently, elements declared as xs:decimal in XSD schemas
+         * are handled as the Nuxeo primitive DoubleType, and their values
+         * are convertible into the Java Double type.  If this type
+         * changes, the conversion below should be changed accordingly.
+         *
+	 * @return  a string representation of the value of a Nuxeo decimal type.
+         *     An empty string is returned if the value cannot be cast to the
+         *     appropriate type.
+         */
+        private static String nuxeoDecimalValueToDecimalString(Object value) {
+            Double doubleVal;
             try {
-                decimalVal = (Double) value;
+                doubleVal = (Double) value;
             } catch (ClassCastException cce) {
-                // FIXME: For CSPACE-4691 demonstration; we should handle this error better
+                logger.warn("Could not convert a Nuxeo decimal value to its string equivalent: "
+                        + cce.getMessage());
                 return "";
             }
-            // Number format will use the conventions for the current default Locale
-            NumberFormat formatter = new DecimalFormat("#.##");
-            return formatter.format(decimalVal.doubleValue());
+            // FIXME: Without a Locale supplied as an argument, NumberFormat will
+            // use the decimal separator and other numeric formatting conventions
+            // for the current default Locale.  In some Locales, this could
+            // potentially result in returning values that might not be capable
+            // of being round-tripped; this should be invetigated. Alternately,
+            // we might standardize on a particular locale whose values are known
+            // to be capable of also being ingested on return. - ADR 2012-08-07
+            NumberFormat formatter = NumberFormat.getInstance();
+            if (formatter instanceof DecimalFormat) {
+                // This pattern allows up to 15 decimal digits, and will prepend
+                // a '0' if only fractional digits are included in the value.
+                ((DecimalFormat) formatter).applyPattern("0.###############");
+            }
+            return formatter.format(doubleVal.doubleValue());
        }
 
         /*
@@ -905,12 +931,14 @@ public class DocumentUtils {
 	 * @return       true, if is a date type;
          *               false, if it is not a date type.
          */
-        private static boolean isDateType(Type type) {
-    		// TODO simplify this to return ((SimpleType)type).getPrimitiveType() instanceof DateType;
-            SimpleType st = (SimpleType) type;
-            if (st.getPrimitiveType() instanceof DateType) {
-                return true;
-            } else {
+        private static boolean isNuxeoDateType(Type type) {
+            return ((SimpleType)type).getPrimitiveType() instanceof DateType;
+        }
+                
+        private static boolean valueMatchesNuxeoType(Type type, Object value) {
+            try {
+                return type.validate(value);
+            } catch (TypeException te) {
                 return false;
             }
         }
@@ -1221,7 +1249,7 @@ public class DocumentUtils {
                 String dateStr = "";
 		
 		if (type.isSimpleType()) {
-                        if (isDateType(type)) {
+                        if (isNuxeoDateType(type)) {
                             String dateVal = element.getText();
                             if (dateVal == null || dateVal.trim().isEmpty()) {
                                 result = type.decode("");
