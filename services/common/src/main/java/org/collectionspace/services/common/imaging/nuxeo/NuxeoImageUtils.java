@@ -869,7 +869,7 @@ public class NuxeoImageUtils {
 					if (derivativeTerm != null) {
 						docBlob = pictureBlobHolder.getBlob(derivativeTerm);
 						// Nuxeo derivatives are all JPEG
-						outMimeType.append(MIME_JPEG);
+						outMimeType.append(docBlob.getMimeType());
 					} else {
 						docBlob = pictureBlobHolder.getBlob();
 					}
