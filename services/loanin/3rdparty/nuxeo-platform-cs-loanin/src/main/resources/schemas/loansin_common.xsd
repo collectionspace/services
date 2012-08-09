@@ -23,7 +23,6 @@
     <!--  Loan In Information Group -->
     <xs:element name="loanInNumber" type="xs:string"/>
     <xs:element name="lenderGroupList" type="lenderGroupList"/>
-    <xs:element name="loanInContact" type="xs:string"/>
     <xs:element name="borrowersContact" type="xs:string"/>
     <xs:element name="borrowersAuthorizer" type="xs:string"/>
     <xs:element name="borrowersAuthorizationDate" type="xs:date"/>

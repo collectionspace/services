@@ -8,10 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
@@ -23,6 +20,8 @@ import org.collectionspace.services.config.service.InitHandler;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.init.AddIndices;
+import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.JDBCTools;
@@ -206,6 +205,42 @@ public class ServiceMain {
             }
         }
     }
+    
+    /**
+     * Create required indexes (aka indices) in database tables not associated
+     * with any specific tenant.
+     * 
+     * @throws Exception 
+     */
+    void createRequiredIndices() throws Exception {
+                   
+         // Define a set of columns (fields) and their associated
+         // tables, on which database indexes should always be created
+         final String COLLECTIONSPACE_CORE_TABLE_NAME = "collectionspace_core";
+         final String NUXEO_FULLTEXT_TABLE_NAME = "fulltext";
+         final String NUXEO_HIERARCHY_TABLE_NAME = "hierarchy";
+         
+         Map<Integer,List<String>> fieldsToIndex = new HashMap<Integer,List<String>>();
+         fieldsToIndex.put(1, new ArrayList(Arrays.asList(COLLECTIONSPACE_CORE_TABLE_NAME, "tenantid")));
+         fieldsToIndex.put(2, new ArrayList(Arrays.asList(COLLECTIONSPACE_CORE_TABLE_NAME, "updatedat")));
+         fieldsToIndex.put(3, new ArrayList(Arrays.asList(NUXEO_FULLTEXT_TABLE_NAME, "jobid")));
+         fieldsToIndex.put(4, new ArrayList(Arrays.asList(NUXEO_HIERARCHY_TABLE_NAME, "name")));
+       
+         // Invoke existing post-init code to create these indexes,
+         // sending in the set of values above, in contrast to
+         // drawing these values from per-tenant configuration.
+         DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
+         AddIndices addindices = new AddIndices();
+         List<Field> fields = new ArrayList<Field>();
+         for (Map.Entry<Integer,List<String>> entry : fieldsToIndex.entrySet()) {
+             Field field = new Field();
+             field.setTable(entry.getValue().get(0)); // Table name from List item 0
+             field.setCol(entry.getValue().get(1)); // Column name from List item 1
+             fields.add(field);
+         }
+         addindices.onRepositoryInitialized(dataSource, null, fields, null);
+
+    }
 
     public void firePostInitHandlers() throws Exception {
     	DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
@@ -345,4 +380,6 @@ public class ServiceMain {
     public TenantBindingConfigReaderImpl getTenantBindingConfigReader() {
         return tenantBindingConfigReader;
     }
+
+
 }

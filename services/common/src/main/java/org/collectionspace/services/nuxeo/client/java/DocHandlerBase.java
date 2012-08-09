@@ -163,25 +163,6 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         throw new UnsupportedOperationException();
     }
 
-    // This is an old hack restored by Laramie in confusion about how the 
-	// replacement model works. Will be removed ASAP.
-    public AbstractCommonList extractCommonPartListLaramieHACK(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        String label = getServiceContext().getCommonPartLabel();
-        AbstractCommonList commonList = createAbstractCommonListImpl();
-        //LC extractPagingInfo((commonList), wrapDoc);
-        commonList.setFieldsReturned(getSummaryFields(commonList));
-        List list = createItemsList(commonList);
-        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
-        while(iter.hasNext()){
-            DocumentModel docModel = iter.next();
-            String id = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
-            Object item = createItemForCommonList(docModel, label, id);
-            list.add(item);
-        }
-        extractPagingInfo((commonList), wrapDoc); //LC
-        return commonList;
-    }
-
 	public static String getUpdatedAtAsString(DocumentModel docModel) throws Exception {
 			GregorianCalendar cal = (GregorianCalendar)
 								docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
@@ -193,9 +174,6 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     @Override
     public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         String classname = getDocHandlerParams().getAbstractCommonListClassname();
-        if (!Tools.isBlank(classname)){
-             return extractCommonPartListLaramieHACK(wrapDoc);
-        }
     	CommonList commonList = new CommonList();
         String markRtSbj = null;
     	RepositoryInstance repoSession = null;
