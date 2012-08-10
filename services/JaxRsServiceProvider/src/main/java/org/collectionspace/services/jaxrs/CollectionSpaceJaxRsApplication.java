@@ -87,7 +87,7 @@ public class CollectionSpaceJaxRsApplication extends Application
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
     private ResourceMap resourceMap = new ResourceMapImpl();
-    private static UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
+    private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
     private ServletContext servletContext = null;
 
     public CollectionSpaceJaxRsApplication() {    	
@@ -159,9 +159,9 @@ public class CollectionSpaceJaxRsApplication extends Application
         ResourceMap resources = getResourceMap();
         for (Map.Entry<String, ResourceBase> entry : resources.entrySet()) {
             resource = entry.getValue();
-            System.out.println(resource.getServiceName()); // for debugging
-            getUriTemplateRegistry().putAll(resource.getUriRegistryEntries());
-            getUriTemplateRegistry().dump(); // for debugging
+            Map<UriTemplateRegistryKey, Map<UriTemplateFactory.UriTemplateType, StoredValuesUriTemplate>> entries =
+                    resource.getUriRegistryEntries();
+            getUriTemplateRegistry().putAll(entries);
         }
         // Contacts itself should not have an entry in the URI template registry;
         // there should be a Contacts entry in that registry only for use in
@@ -189,6 +189,10 @@ public class CollectionSpaceJaxRsApplication extends Application
         return resourceMap;
     }
     
+    private void setUriTemplateRegistry(UriTemplateRegistry registry) {
+        this.uriTemplateRegistry = registry;
+    }
+    
     public UriTemplateRegistry getUriTemplateRegistry() {
         return uriTemplateRegistry;
     }
@@ -200,5 +204,6 @@ public class CollectionSpaceJaxRsApplication extends Application
     public ServletContext getServletContext() {
     	return this.servletContext;
     }
+
 }
 

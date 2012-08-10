@@ -300,35 +300,24 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     protected String getContactDocType() {
         return ContactConstants.NUXEO_DOCTYPE;
     }
-
+    
    /**
-    * Constructs and returns a map of URI templates for the current resource,
-    * for the specified tenant
+    * Constructs and returns a map of URI templates for the current resource.
+    * This map assumes that there will be only one URI template of a given type
+    * ("resource", "item", "contacts" etc.) for each resource.
     * 
-    * @param tenantId a tenant ID
-    * @return a map of URI templates for the current resource, for the specified tenant
+    * @return a map of URI templates for the current resource
     */
-    // FIXME: This method currently populates only one entry in the UriTemplateRegistry
-    // for the Contacts docType, even though contacts can be a sub-resource of
-    // multiple authority item resources.  (This method may be called more than once,
-    // but each time the existing item with the same key in the map is overwritten.)
     @Override
-    protected Map<String,StoredValuesUriTemplate> getUriTemplateMap(String tenantId) {
+    protected Map<UriTemplateFactory.UriTemplateType,StoredValuesUriTemplate> getUriTemplateMap() {
         // Get the resource and item URI templates from the superclass
-        Map<String,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap(tenantId);
+        Map<UriTemplateFactory.UriTemplateType,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap();
         // Add the contact URI template here, and return all three templates in the map
-        String contactDocType = getContactDocType();
-        if (contactDocType == null) {
-            return uriTemplateMap; // return map as obtained from superclass
-        }
         StoredValuesUriTemplate contactUriTemplate = getUriTemplate(UriTemplateFactory.CONTACT);
         if (contactUriTemplate == null) {
             return uriTemplateMap; // return map as obtained from superclass
         }
-        // Remove any service name value stored in the template, as the service name
-        // for contact resources will vary, and must be provided at URI build time 
-        contactUriTemplate.getStoredValuesMap().put(UriTemplateFactory.SERVICENAME_VAR, "");
-        uriTemplateMap.put(contactDocType, contactUriTemplate);
+        uriTemplateMap.put(contactUriTemplate.getUriTemplateType(), contactUriTemplate);
         return uriTemplateMap;
     }
 

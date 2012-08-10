@@ -964,28 +964,24 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     protected String getItemDocType(String tenantId) {
         return super.getDocType(tenantId, getItemServiceName());
     }
-
+    
    /**
-    * Constructs and returns a map of URI templates for the current resource,
-    * for the specified tenant
+    * Constructs and returns a map of URI templates for the current resource.
+    * This map assumes that there will be only one URI template of a given type
+    * ("resource", "item", etc.) for each resource.
     * 
-    * @param tenantId a tenant ID
-    * @return a map of URI templates for the current resource, for the specified tenant
+    * @return a map of URI templates for the current resource
     */
     @Override
-    protected Map<String,StoredValuesUriTemplate> getUriTemplateMap(String tenantId) {
+    protected Map<UriTemplateFactory.UriTemplateType,StoredValuesUriTemplate> getUriTemplateMap() {
         // Get the resource URI template from the superclass
-        Map<String,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap(tenantId);
+        Map<UriTemplateFactory.UriTemplateType,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap();
         // Add the item URI template here, and return both templates in the map
-        String itemDocType = getItemDocType(tenantId);
-        if (itemDocType == null) {
-            return uriTemplateMap; // return map as obtained from superclass
-        }
         StoredValuesUriTemplate itemUriTemplate = getUriTemplate(UriTemplateFactory.ITEM);
         if (itemUriTemplate == null) {
             return uriTemplateMap; // return map as obtained from superclass
         }
-        uriTemplateMap.put(itemDocType, itemUriTemplate);
+        uriTemplateMap.put(itemUriTemplate.getUriTemplateType(), itemUriTemplate);
         return uriTemplateMap;
     }
   

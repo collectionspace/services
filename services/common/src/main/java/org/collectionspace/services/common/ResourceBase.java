@@ -27,6 +27,8 @@ import java.util.*;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.UriTemplateFactory.UriTemplateType;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -417,13 +419,25 @@ public abstract class ResourceBase
         return getDocType(tenantId, getServiceName());
     }
     
+    /**
+     * Returns the Nuxeo document type associated with a specified service, within a specified tenant.
+     * 
+     * @param tenantId a tenant ID
+     * @param serviceName a service name
+     * @return the Nuxeo document type associated with that service and tenant.
+     */
     // FIXME: This method may properly belong in a different services package or class.
+    // Also, we need to check for any existing methods that may duplicate this one.
     protected String getDocType(String tenantId, String serviceName) {
         String docType = "";
-        if (Tools.notBlank(tenantId)) {
-            ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, serviceName);
-            docType = sb.getObject().getName(); // Reads the Nuxeo Document Type from tenant bindings configuration
+        if (Tools.isBlank(tenantId)) {
+            return docType;
         }
+        ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, serviceName);
+        if (sb == null) {
+            return docType;
+        }
+        docType = sb.getObject().getName(); // Reads the Nuxeo Document Type from tenant bindings configuration
         return docType;
     }
     
@@ -433,47 +447,48 @@ public abstract class ResourceBase
      * 
      * @return a map of URI templates for the current resource, for all tenants
      */
-    public HashMap<String,Map<String,StoredValuesUriTemplate>> getUriRegistryEntries() {
-        HashMap<String,Map<String,StoredValuesUriTemplate>> uriRegistryEntriesMap =
-                new HashMap<String, Map<String,StoredValuesUriTemplate>>();
+    public Map<UriTemplateRegistryKey,Map<UriTemplateType,StoredValuesUriTemplate>> getUriRegistryEntries() {
+        Map<UriTemplateRegistryKey,Map<UriTemplateType,StoredValuesUriTemplate>> uriRegistryEntriesMap =
+                new HashMap<UriTemplateRegistryKey,Map<UriTemplateType,StoredValuesUriTemplate>>();
         List<String> tenantIds = getTenantIds();
+        UriTemplateRegistryKey key;
+        String docType = "";
         for (String tenantId : tenantIds) {
-            uriRegistryEntriesMap.put(tenantId, getUriTemplateMap(tenantId));
+            docType = getDocType(tenantId);
+            if (Tools.notBlank(docType)) {
+                key = new UriTemplateRegistryKey();
+                key.setTenantId(tenantId);
+                key.setDocType(docType); 
+                uriRegistryEntriesMap.put(key, getUriTemplateMap());
+            }
         }
         return uriRegistryEntriesMap;
     }
     
    
    /**
-    * Constructs and returns a map of URI templates for the current resource,
-    * for the specified tenant
+    * Constructs and returns a map of URI templates for the current resource.
+    * This map assumes that there will be only one URI template of a given type
+    * ("reesource", "item", etc.) for each resource.
     * 
-    * @param tenantId a tenant ID
-    * @return a map of URI templates for the current resource, for the specified tenant
+    * @return a map of URI templates for the current resource
     */
-   protected Map<String,StoredValuesUriTemplate> getUriTemplateMap(String tenantId) {
-        Map<String,StoredValuesUriTemplate> uriTemplateMap = new HashMap<String, StoredValuesUriTemplate>();
-        if (tenantId == null) {
-            return uriTemplateMap; // return an empty map
-        }
-        String docType = getDocType(tenantId);
-        if (docType == null) {
-            return uriTemplateMap; // return an empty map
-        }
+   protected Map<UriTemplateType,StoredValuesUriTemplate> getUriTemplateMap() {
+        Map<UriTemplateType,StoredValuesUriTemplate> uriTemplateMap = new HashMap<UriTemplateType, StoredValuesUriTemplate>();
         StoredValuesUriTemplate resourceUriTemplate = getUriTemplate(UriTemplateFactory.RESOURCE);
         if (resourceUriTemplate == null) {
             return uriTemplateMap; // return an empty map
         }
-        uriTemplateMap.put(docType, resourceUriTemplate);
+        uriTemplateMap.put(resourceUriTemplate.getUriTemplateType(), resourceUriTemplate);
         return uriTemplateMap;
     }
     
     /**
-     * Returns a UriTemplate of the appropriate type, populated with the
+     * Returns a URI template of the appropriate type, populated with the
      * current service name as one of its stored values.
-     * 
-     * @param type a UriTemplate type
-     * @return a UriTemplate of the appropriate type
+     *      * 
+     * @param type a URI template type
+     * @return a URI template of the appropriate type.
      */
     protected StoredValuesUriTemplate getUriTemplate(UriTemplateFactory.UriTemplateType type) {
         Map<String,String> storedValuesMap = new HashMap<String,String>();
@@ -489,6 +504,7 @@ public abstract class ResourceBase
      * @return a list of tenant IDs
      */
     // FIXME: This method may properly belong in a different services package or class.
+    // Also, we need to check for any existing methods that may duplicate this one.
     protected List<String> getTenantIds() {
         List<String> tenantIds = new ArrayList<String>();
         String tenantId;

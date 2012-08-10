@@ -24,24 +24,36 @@ package org.collectionspace.services.common;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
+import org.collectionspace.services.common.UriTemplateFactory.UriTemplateType;
 
 /**
  * UriTemplateRegistry.java
  *
  * Maps document types to templates for building URIs, per tenant.
  */
-public class UriTemplateRegistry extends HashMap<String, Map<String, StoredValuesUriTemplate>> {
+public class UriTemplateRegistry extends HashMap<UriTemplateRegistryKey, Map<UriTemplateType, StoredValuesUriTemplate>> {
 
-    // For debugging
+    /**
+     * Dump all registry settings, For debugging purposes.
+     */
     public void dump() {
-        for (String tenantId : this.keySet()) {
-            System.out.println("###############################");
-            System.out.println("Tenant ID = " + tenantId);
-            System.out.println("###############################");
-            for (Map.Entry<String, StoredValuesUriTemplate> uriTemplateEntry : this.get(tenantId).entrySet()) {
-                System.out.println("Key = " + uriTemplateEntry.getKey()
-                        + ", Value = " + uriTemplateEntry.getValue().getUriTemplateType()
-                        + " : " + uriTemplateEntry.getValue().toString());
+        for (Map.Entry<UriTemplateRegistryKey, Map<UriTemplateType, StoredValuesUriTemplate>> uriTemplateEntry : this.entrySet()) {
+
+            System.out.println(
+                    "Tenant : DocType = "
+                    + uriTemplateEntry.getKey().getTenantId()
+                    + " : "
+                    + uriTemplateEntry.getKey().getDocType());
+
+            System.out.println(" Value(s) of TemplateType : Template = ");
+            for (Map.Entry<UriTemplateType, StoredValuesUriTemplate> template : uriTemplateEntry.getValue().entrySet()) {
+                System.out.println(
+                        "  "
+                        + template.getKey()
+                        + " : "
+                        + template.getValue().toString());
             }
         }
     }
