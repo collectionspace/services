@@ -297,24 +297,31 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         }
     }
     
-    public String getContactDocType() {
+    protected String getContactDocType() {
         return ContactConstants.NUXEO_DOCTYPE;
     }
 
-    // This currently populates only one entry in the UriTemplateRegistry
+   /**
+    * Constructs and returns a map of URI templates for the current resource,
+    * for the specified tenant
+    * 
+    * @param tenantId a tenant ID
+    * @return a map of URI templates for the current resource, for the specified tenant
+    */
+    // FIXME: This method currently populates only one entry in the UriTemplateRegistry
     // for the Contacts docType, even though contacts can be a sub-resource of
     // multiple authority item resources.  (This method may be called more than once,
     // but each time the existing item with the same key in the map is overwritten.)
     @Override
-    public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
-        // Get resource and item URI templates from superclass
-        Map<String,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap();
-        // Add contact URI template, and return all three templates in the map
+    protected Map<String,StoredValuesUriTemplate> getUriTemplateMap(String tenantId) {
+        // Get the resource and item URI templates from the superclass
+        Map<String,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap(tenantId);
+        // Add the contact URI template here, and return all three templates in the map
         String contactDocType = getContactDocType();
-        StoredValuesUriTemplate contactUriTemplate = getUriTemplate(UriTemplateFactory.CONTACT);
         if (contactDocType == null) {
             return uriTemplateMap; // return map as obtained from superclass
         }
+        StoredValuesUriTemplate contactUriTemplate = getUriTemplate(UriTemplateFactory.CONTACT);
         if (contactUriTemplate == null) {
             return uriTemplateMap; // return map as obtained from superclass
         }

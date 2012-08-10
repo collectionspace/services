@@ -82,12 +82,12 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * $LastChangedDate$
  */
 public class CollectionSpaceJaxRsApplication extends Application
-					implements ResourceMapHolder {
+					implements ResourceMapHolder, UriTemplateRegistryHolder {
 
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
     private ResourceMap resourceMap = new ResourceMapImpl();
-    private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
+    private static UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
     private ServletContext servletContext = null;
 
     public CollectionSpaceJaxRsApplication() {    	
@@ -129,6 +129,7 @@ public class CollectionSpaceJaxRsApplication extends Application
 
         singletons.add(new IDResource());
         
+        buildUriTemplateRegistry();
         // FIXME: Temporary for CSPACE-5271 - please remove once
         // that issue is resolved
         uriTemplateRegistry.dump();
@@ -144,16 +145,35 @@ public class CollectionSpaceJaxRsApplication extends Application
     private void addResourceToMapAndSingletons(ResourceBase resource) {
         singletons.add(resource);
         resourceMap.put(resource.getServiceName(), resource);
+    }
+    
+    /**
+     *  Build a registry of URI templates by querying each resource
+     *  for its own entry in the registry.
+     * 
+     *  That entry consists of a tenant-qualified map of URI templates, each
+     *  associated with a specific document type
+     */
+    private void buildUriTemplateRegistry() {
+        ResourceBase resource = null;
+        ResourceMap resources = getResourceMap();
+        for (Map.Entry<String, ResourceBase> entry : resources.entrySet()) {
+            resource = entry.getValue();
+            System.out.println(resource.getServiceName()); // for debugging
+            getUriTemplateRegistry().putAll(resource.getUriRegistryEntries());
+            getUriTemplateRegistry().dump(); // for debugging
+        }
         // Contacts itself should not have an entry in the URI template registry;
         // there should be a Contacts entry in that registry only for use in
         // building URIs for resources that have contacts as a sub-resource
         //
         // FIXME: There may be a more elegant way to filter this out; or it may
         // fall out during implementation of CSPACE-2698
-        if (! (resource instanceof ContactResource)) {
-            uriTemplateRegistry.putAll(resource.getUriTemplateMap());
-        }
+        //
+        // final String CONTACT_DOCTYPE = "Contact";
+        // uriTemplateRegistry.remove(CONTACT_DOCTYPE);
     }
+    
 
     @Override
     public Set<Class<?>> getClasses() {
@@ -167,6 +187,10 @@ public class CollectionSpaceJaxRsApplication extends Application
 
     public ResourceMap getResourceMap() {
         return resourceMap;
+    }
+    
+    public UriTemplateRegistry getUriTemplateRegistry() {
+        return uriTemplateRegistry;
     }
     
     public void setServletContext(ServletContext servletContext) {

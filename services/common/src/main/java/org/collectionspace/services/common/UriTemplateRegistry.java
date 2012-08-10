@@ -23,19 +23,26 @@
 package org.collectionspace.services.common;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * UriTemplateRegistry.java
  *
- * Maps document types to templates for building URIs, used in turn for
- * accessing instances of those documents.
+ * Maps document types to templates for building URIs, per tenant.
  */
-public class UriTemplateRegistry extends HashMap<String, StoredValuesUriTemplate> {
+public class UriTemplateRegistry extends HashMap<String, Map<String, StoredValuesUriTemplate>> {
 
+    // For debugging
     public void dump() {
-        for (String docTypeKey : this.keySet()) {
-            StoredValuesUriTemplate uriTemplate = this.get(docTypeKey);
-            System.out.println("Key = " + docTypeKey + ", Value = " + uriTemplate.getUriTemplateType() + " : " + uriTemplate.toString());
+        for (String tenantId : this.keySet()) {
+            System.out.println("###############################");
+            System.out.println("Tenant ID = " + tenantId);
+            System.out.println("###############################");
+            for (Map.Entry<String, StoredValuesUriTemplate> uriTemplateEntry : this.get(tenantId).entrySet()) {
+                System.out.println("Key = " + uriTemplateEntry.getKey()
+                        + ", Value = " + uriTemplateEntry.getValue().getUriTemplateType()
+                        + " : " + uriTemplateEntry.getValue().toString());
+            }
         }
     }
 }

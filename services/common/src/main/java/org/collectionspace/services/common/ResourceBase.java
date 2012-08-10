@@ -413,41 +413,54 @@ public abstract class ResourceBase
     	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
     }
     
-    public String getDocType() {
-        return getDocType(getServiceName());
+    protected String getDocType(String tenantId) {
+        return getDocType(tenantId, getServiceName());
     }
-        
-    // FIXME: The technique in getDocType(String) may well be a dreadful hack, just to get this initially working.
-    //
-    // Question:
-    // At the point we're seeking to populate docTypes in the uriTemplateRegistry, during system startup,
-    // we're not yet logged into any tenant, but instead it appears we are acting as the user SPRING_ADMIN.
-    // Could this potentially suggest reasonable method(s), other than those below, which reads from
-    // tenant bindings configuration for an arbitrary tenant, by which we can obtain the docType(s)
-    // associated with the current resource?
     
-    public String getDocType(String serviceName) {
+    // FIXME: This method may properly belong in a different services package or class.
+    protected String getDocType(String tenantId, String serviceName) {
         String docType = "";
-        String anyTenantId = "";
-        TenantBindingConfigReaderImpl reader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        // FIXME: Makes the likely unsupportable assumption that the list of service names and associated
-        // document types is materially identical across tenants
-        anyTenantId = getAnyTenantId(reader);
-        if (Tools.notBlank(anyTenantId)) {
-            ServiceBindingType sb = reader.getServiceBinding(anyTenantId, serviceName);
-            docType = sb.getObject().getName(); // reads the Nuxeo Document Type from tenant bindings configuration
+        if (Tools.notBlank(tenantId)) {
+            ServiceBindingType sb = getTenantBindingsReader().getServiceBinding(tenantId, serviceName);
+            docType = sb.getObject().getName(); // Reads the Nuxeo Document Type from tenant bindings configuration
         }
         return docType;
     }
     
-    public Map<String,StoredValuesUriTemplate> getUriTemplateMap() {
-        Map<String,StoredValuesUriTemplate> uriTemplateMap = new HashMap<String,StoredValuesUriTemplate>();
-        // Construct and return a resource URI template as the sole item in the map
-        String docType = getDocType();
-        StoredValuesUriTemplate resourceUriTemplate = getUriTemplate(UriTemplateFactory.RESOURCE);
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for all tenants
+     * 
+     * @return a map of URI templates for the current resource, for all tenants
+     */
+    public HashMap<String,Map<String,StoredValuesUriTemplate>> getUriRegistryEntries() {
+        HashMap<String,Map<String,StoredValuesUriTemplate>> uriRegistryEntriesMap =
+                new HashMap<String, Map<String,StoredValuesUriTemplate>>();
+        List<String> tenantIds = getTenantIds();
+        for (String tenantId : tenantIds) {
+            uriRegistryEntriesMap.put(tenantId, getUriTemplateMap(tenantId));
+        }
+        return uriRegistryEntriesMap;
+    }
+    
+   
+   /**
+    * Constructs and returns a map of URI templates for the current resource,
+    * for the specified tenant
+    * 
+    * @param tenantId a tenant ID
+    * @return a map of URI templates for the current resource, for the specified tenant
+    */
+   protected Map<String,StoredValuesUriTemplate> getUriTemplateMap(String tenantId) {
+        Map<String,StoredValuesUriTemplate> uriTemplateMap = new HashMap<String, StoredValuesUriTemplate>();
+        if (tenantId == null) {
+            return uriTemplateMap; // return an empty map
+        }
+        String docType = getDocType(tenantId);
         if (docType == null) {
             return uriTemplateMap; // return an empty map
         }
+        StoredValuesUriTemplate resourceUriTemplate = getUriTemplate(UriTemplateFactory.RESOURCE);
         if (resourceUriTemplate == null) {
             return uriTemplateMap; // return an empty map
         }
@@ -455,6 +468,13 @@ public abstract class ResourceBase
         return uriTemplateMap;
     }
     
+    /**
+     * Returns a UriTemplate of the appropriate type, populated with the
+     * current service name as one of its stored values.
+     * 
+     * @param type a UriTemplate type
+     * @return a UriTemplate of the appropriate type
+     */
     protected StoredValuesUriTemplate getUriTemplate(UriTemplateFactory.UriTemplateType type) {
         Map<String,String> storedValuesMap = new HashMap<String,String>();
         storedValuesMap.put(UriTemplateFactory.SERVICENAME_VAR, getServiceName());
@@ -463,19 +483,37 @@ public abstract class ResourceBase
         return template;
     }
 
-    public String getAnyTenantId(TenantBindingConfigReaderImpl reader) {
-        String anyTenantId = "";
-        Hashtable<String, TenantBindingType> tenantBindings = reader.getTenantBindings();
+    /**
+     * Returns a list of tenant IDs, from tenant bindings configuration
+     * 
+     * @return a list of tenant IDs
+     */
+    // FIXME: This method may properly belong in a different services package or class.
+    protected List<String> getTenantIds() {
+        List<String> tenantIds = new ArrayList<String>();
+        String tenantId;
+        Hashtable<String, TenantBindingType> tenantBindings =
+                getTenantBindingsReader().getTenantBindings();
         if (tenantBindings != null && !tenantBindings.isEmpty()) {
             Enumeration keys = tenantBindings.keys();
             while (keys.hasMoreElements()) {
-               anyTenantId = (String) keys.nextElement();
-               if (Tools.notBlank(anyTenantId)) {
-                   break;
+               tenantId = (String) keys.nextElement();
+               if (Tools.notBlank(tenantId)) {
+                   tenantIds.add(tenantId);
                }
             }
         }
-        return anyTenantId;
+        return tenantIds;
     }
+    
+    /**
+     * Returns a reader for reading values from tenant bindings configuration
+     * 
+     * @return a tenant bindings configuration reader
+     */
+    protected TenantBindingConfigReaderImpl getTenantBindingsReader() {
+        return ServiceMain.getInstance().getTenantBindingConfigReader();
+    }
+
 
 }
