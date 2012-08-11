@@ -34,6 +34,18 @@ import org.collectionspace.services.common.UriTemplateFactory.UriTemplateType;
  * Maps document types to templates for building URIs, per tenant.
  */
 public class UriTemplateRegistry extends HashMap<UriTemplateRegistryKey, Map<UriTemplateType, StoredValuesUriTemplate>> {
+    
+    /**
+     * Get a URI template by tenant, document type, and template type.
+     * 
+     */
+    public StoredValuesUriTemplate get(UriTemplateRegistryKey key, UriTemplateType type) {
+        if (get(key) != null) {
+            return get(key).get(type);
+        } else {
+            return null;
+        }
+    }
 
     /**
      * Dump all registry settings, For debugging purposes.

@@ -149,10 +149,10 @@ public class CollectionSpaceJaxRsApplication extends Application
     
     /**
      *  Build a registry of URI templates by querying each resource
-     *  for its own entry in the registry.
+     *  for its own entries in the registry.
      * 
-     *  That entry consists of a tenant-qualified map of URI templates, each
-     *  associated with a specific document type
+     *  These entries consist of one or more URI templates for
+     *  building URIs for accessing that resource.
      */
     private void buildUriTemplateRegistry() {
         ResourceBase resource = null;
