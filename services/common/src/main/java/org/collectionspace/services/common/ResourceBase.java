@@ -95,10 +95,10 @@ public abstract class ResourceBase
     public Response create(@Context ResourceMap resourceMap,
     		@Context UriInfo ui,
             String xmlPayload) {
-        return this.create(null, resourceMap, ui, xmlPayload);
+        return this.create(null, resourceMap, ui, xmlPayload); 
     }
     
-    public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+    public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 8/13/2012 - Some sub-classes will override this method -e.g., MediaResource does.
     		@Context ResourceMap resourceMap,
     		@Context UriInfo ui,
             String xmlPayload) {
@@ -106,7 +106,7 @@ public abstract class ResourceBase
     	
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input, ui.getQueryParameters());
             ctx.setResourceMap(resourceMap);
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
             	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
