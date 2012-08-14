@@ -67,6 +67,9 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     private final static BigDecimal KNOWN_IMAGE_WIDTH = new BigDecimal(640.0);
     private final static BigDecimal KNOWN_IMAGE_HEIGHT = new BigDecimal(480.0);
     
+    private final static String PUBLIC_URL_BIRD = "http://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg";
+    private final static String PUBLIC_URL_DECK = "http://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
+    
     
     private boolean blobCleanup = true;
 
@@ -237,8 +240,14 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
-    public void createBlobWithURL(String testName) throws Exception {
-    	createBlob(testName, true /*with URI*/, "http://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");
+    public void createBlobWithURL1(String testName) throws Exception {
+    	createBlob(testName, true /*with URI*/, PUBLIC_URL_BIRD);
+    }    
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"CRUDTests"})
+    public void createBlobWithURL2(String testName) throws Exception {
+    	createBlob(testName, true /*with URI*/, PUBLIC_URL_DECK);
     }    
     
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
