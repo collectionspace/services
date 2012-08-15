@@ -791,6 +791,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public AuthorityRefDocList getReferencingObjects(
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
+            @Context UriTemplateRegistry uriTemplateRegistry,
             @Context UriInfo ui) {
         AuthorityRefDocList authRefDocList = null;
         try {
@@ -811,7 +812,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             AuthorityItemDocumentModelHandler<?> handler = (AuthorityItemDocumentModelHandler<?>)
             											createItemDocumentHandler(ctx, parentcsid, null);
 
-            authRefDocList = handler.getReferencingObjects(ctx, serviceTypes, getRefPropName(), itemcsid);
+            authRefDocList = handler.getReferencingObjects(ctx, uriTemplateRegistry, serviceTypes, getRefPropName(), itemcsid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }

@@ -23,7 +23,6 @@
 package org.collectionspace.services.common.vocabulary;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -43,15 +42,17 @@ import org.slf4j.LoggerFactory;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriTemplateFactory;
+import org.collectionspace.services.common.UriTemplateRegistry;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.AbstractServiceContextImpl;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.api.RefNameUtils.AuthorityTermInfo;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.config.URIUtils;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -60,15 +61,14 @@ import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
-// import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
-import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 /**
  * RefNameServiceUtils is a collection of services utilities related to refName
@@ -223,6 +223,7 @@ public class RefNameServiceUtils {
     public static AuthorityRefDocList getAuthorityRefDocs(
             RepositoryInstance repoSession,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            UriTemplateRegistry uriTemplateRegistry,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             List<String> serviceTypes,
             String refName,
@@ -278,7 +279,7 @@ public class RefNameServiceUtils {
             // item within any individual document scanned, so the number of
             // authority references may potentially exceed the total number
             // of documents scanned.
-            int nRefsFound = processRefObjsDocList(docList, refName, queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
+            int nRefsFound = processRefObjsDocList(docList, ctx.getTenantId(), refName, queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
                     list, null);
 
             commonList.setPageSize(pageSize);
@@ -356,7 +357,7 @@ public class RefNameServiceUtils {
         return refNameServiceTypes;
     }
     // Seems like a good value - no real data to set this well.
-    // Note: can set this value lower; e.g. to 3 during debugging; - ADR 2012-07-10
+    // Note: can set this value lower during debugging; e.g. to 3 - ADR 2012-07-10
     private static final int N_OBJS_TO_UPDATE_PER_LOOP = 100;
 
     public static int updateAuthorityRefDocs(
@@ -404,7 +405,7 @@ public class RefNameServiceUtils {
                     morePages = false;
                 }
 
-                int nRefsFoundThisPage = processRefObjsDocList(docList, oldRefName, queriedServiceBindings, authRefFieldsByService,
+                int nRefsFoundThisPage = processRefObjsDocList(docList, ctx.getTenantId(), oldRefName, queriedServiceBindings, authRefFieldsByService,
                         null, newRefName);
                 if (nRefsFoundThisPage > 0) {
                     ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true);
@@ -540,6 +541,7 @@ public class RefNameServiceUtils {
      */
     private static int processRefObjsDocList(
             DocumentModelList docList,
+            String tenantId,
             String refName,
             Map<String, ServiceBindingType> queriedServiceBindings,
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
@@ -571,22 +573,22 @@ public class RefNameServiceUtils {
                 ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
                 String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
                 ilistItem.setDocId(csid);
-                String uri = "";
-                // FIXME: Hack for CSPACE-5406; this instead should use the (forthcoming)
-                // URL pattern-to-Doctype registry described in CSPACE-5471 - ADR 2012-07-18
-                if (sb.getType().equalsIgnoreCase(URIUtils.AUTHORITY_SERVICE_CATEGORY)) {
-                    String authoritySvcName = URIUtils.getAuthoritySvcName(docType);
-                    String inAuthorityCsid;
+                UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
+                StoredValuesUriTemplate storedValuesResourceTemplate = uriTemplateRegistry.get(new UriTemplateRegistryKey(docType, tenantId));
+                Map<String, String> additionalValues = new HashMap<String, String>();
+                if (storedValuesResourceTemplate.getUriTemplateType() == UriTemplateFactory.ITEM) {
                     try {
-                        inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
-                        uri = URIUtils.getAuthorityItemUri(authoritySvcName, inAuthorityCsid, csid);
+                        String inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
+                        additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
+                        additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, csid);
                     } catch (Exception e) {
                         logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
                     }
                 } else {
-                    uri = URIUtils.getUri(sb.getName(), csid);;
+                    additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, csid);
                 }
-                ilistItem.setUri(uri);
+                String uriStr = storedValuesResourceTemplate.buildUri(additionalValues);
+                ilistItem.setUri(uriStr);
                 try {
                     ilistItem.setWorkflowState(docModel.getCurrentLifeCycleState());
                     ilistItem.setUpdatedAt(DocHandlerBase.getUpdatedAtAsString(docModel));

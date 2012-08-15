@@ -10,10 +10,10 @@ public class UriTemplateRegistryKey {
     private String tenantId;
     private String docType;
     
-    public void UriTemplateRegistryKey() {
+    public UriTemplateRegistryKey() {
     }
 
-    public void UriTemplateRegistryKey(String tenantId, String docType) {
+    public UriTemplateRegistryKey(String tenantId, String docType) {
         this.tenantId = tenantId;
         this.docType = docType;
     }
