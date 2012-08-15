@@ -16,9 +16,9 @@
  */
 
 /*
- * load_ucjeps_id_generators.sql
+ * load_botgarden_id_generators.sql
  *
- * Loads ucjeps-specific data into the "id_generators" table,
+ * Loads botgarden-specific data into the "id_generators" table,
  * used by the ID Service.
  *
  * $LastChangedRevision$

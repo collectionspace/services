@@ -9,17 +9,17 @@
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <artifactId>org.collectionspace.services.collectionobject.3rdparty.ucjeps.nuxeo</artifactId>
-    <name>services.collectionobject.3rdparty.ucjeps.nuxeo</name>
+    <artifactId>org.collectionspace.services.collectionobject.3rdparty.botgarden.nuxeo</artifactId>
+    <name>services.collectionobject.3rdparty.botgarden.nuxeo</name>
     <packaging>jar</packaging>
     <description>
-        CollectionObject Nuxeo document type for UCJeps tenant
+        CollectionObject Nuxeo document type for BotGarden tenant
     </description>
 
 	<properties>
-	    <CustomSchemaName>collectionobjects_ucjeps</CustomSchemaName>
+	    <CustomSchemaName>collectionobjects_botgarden</CustomSchemaName>
 	    <TenantId>20</TenantId>
-	    <TenantLabel>ucjeps</TenantLabel>
+	    <TenantLabel>botgarden</TenantLabel>
 	</properties>
    
     <build>

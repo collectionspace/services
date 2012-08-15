@@ -3,8 +3,8 @@
 <!--
     Media schema (XSD)
     
-    Entity  : media_ucjeps
-    Part    : ucjeps extension
+    Entity  : media_botgarden
+    Part    : botgarden extension
     Used for: Nuxeo EP core document type
 
     $LastChangedRevision: 2316 $
@@ -13,9 +13,9 @@
 
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:ns="http://collectionspace.org/media/local/ucjeps"
-    xmlns="http://collectionspace.org/media/local/ucjeps"
-    targetNamespace="http://collectionspace.org/media/local/ucjeps"
+    xmlns:ns="http://collectionspace.org/media/local/botgarden"
+    xmlns="http://collectionspace.org/media/local/botgarden"
+    targetNamespace="http://collectionspace.org/media/local/botgarden"
     version="0.1">
     
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Media+Handling+Schema -->

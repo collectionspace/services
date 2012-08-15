@@ -27,6 +27,6 @@
 
     <modules>
         <module>nuxeo-platform-cs-media</module>
-        <module>nuxeo-platform-media-ucjeps</module>
+        <module>nuxeo-platform-media-botgarden</module>
     </modules>
 </project>

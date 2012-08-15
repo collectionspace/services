@@ -1,7 +1,7 @@
 
-<project name="nuxeo-platform-media-ucjeps" default="package" basedir=".">
+<project name="nuxeo-platform-loanin-botgarden" default="package" basedir=".">
     <description>
-        media nuxeo document type for ucjeps tenant
+        loanin nuxeo document type for botgarden tenant
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>
@@ -10,10 +10,10 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="nuxeo.media.jar"
-        value="org.collectionspace.services.media.3rdparty.ucjeps.nuxeo-${cspace.release}.jar"/>
-    <property name="nuxeo.media.jars.all"
-        value="org.collectionspace.services.media.3rdparty.*.nuxeo-*.jar"/>
+    <property name="nuxeo.loanin.jar"
+        value="org.collectionspace.services.loanin.3rdparty.botgarden.nuxeo-${cspace.release}.jar"/>
+    <property name="nuxeo.loanin.jars.all"
+        value="org.collectionspace.services.loanin.3rdparty.*.nuxeo-*.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -113,25 +113,24 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy media doctype in ${jee.server.nuxeo}">
-        <copy file="${basedir}/target/${nuxeo.media.jar}"
+        description="deploy loanin doctype in ${jee.server.nuxeo}">
+        <copy file="${basedir}/target/${nuxeo.loanin.jar}"
         todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy media doctype from ${jee.server.nuxeo}">
+        description="undeploy loanin doctype from ${jee.server.nuxeo}">
         <delete>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.media.jars.all}"/>
+                <include name="${nuxeo.loanin.jars.all}"/>
             </fileset>
         </delete>
     </target>
 
-
     <target name="dist"
-        description="generate distribution for media doctype" depends="package">
+        description="generate distribution for loanin doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
-            <fileset file="${basedir}/target/${nuxeo.media.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.loanin.jar}"/>
         </copy>
     </target>
 

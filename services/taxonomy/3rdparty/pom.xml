@@ -27,6 +27,6 @@
     <modules>
         <module>nuxeo-platform-cs-taxonomy</module>
         <module>nuxeo-platform-taxonomy-naturalhistory</module>
-        <module>nuxeo-platform-taxonomy-ucjeps</module>
+        <module>nuxeo-platform-taxonomy-botgarden</module>
     </modules>
 </project>

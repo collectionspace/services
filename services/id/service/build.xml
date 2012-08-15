@@ -131,7 +131,7 @@
             url="${db.jdbc.nuxeo.url}"
             userid="${db.nuxeo.user}"
             password="${db.nuxeo.user.password}"
-            src="${db.script.dir}/load_ucjeps_id_generators.sql" >
+            src="${db.script.dir}/load_botgarden_id_generators.sql" >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>

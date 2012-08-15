@@ -11,17 +11,17 @@
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <artifactId>org.collectionspace.services.loanout.3rdparty.ucjeps.nuxeo</artifactId>
-    <name>services.loanout.3rdparty.ucjeps.nuxeo</name>
+    <artifactId>org.collectionspace.services.loanout.3rdparty.botgarden.nuxeo</artifactId>
+    <name>services.loanout.3rdparty.botgarden.nuxeo</name>
     <packaging>jar</packaging>
     <description>
-        Loanout Nuxeo Document Type for ucjeps tenant
+        Loanout Nuxeo Document Type for botgarden tenant
     </description>
 
     <properties>
-        <CustomSchemaName>loansout_ucjeps</CustomSchemaName>
+        <CustomSchemaName>loansout_botgarden</CustomSchemaName>
         <TenantId>20</TenantId>
-		<TenantLabel>ucjeps</TenantLabel>
+		<TenantLabel>botgarden</TenantLabel>
     </properties>
 
     <build>

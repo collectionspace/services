@@ -27,6 +27,6 @@
     <modules>
         <module>nuxeo-platform-cs-organization</module>
         <module>nuxeo-platform-organization-naturalhistory</module>
-        <module>nuxeo-platform-organization-ucjeps</module>
+        <module>nuxeo-platform-organization-botgarden</module>
     </modules>
 </project>

@@ -1,7 +1,7 @@
 
-<project name="nuxeo-platform-taxonomy-ucjeps" default="package" basedir=".">
+<project name="nuxeo-platform-media-botgarden" default="package" basedir=".">
     <description>
-        taxonomy nuxeo document type for ucjeps tenant
+        media nuxeo document type for botgarden tenant
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>
@@ -10,10 +10,10 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="nuxeo.taxonomy.jar"
-        value="org.collectionspace.services.taxonomy.3rdparty.ucjeps.nuxeo-${cspace.release}.jar"/>
-    <property name="nuxeo.taxonomy.jars.all"
-        value="org.collectionspace.services.taxonomy.3rdparty.*.nuxeo-*.jar"/>
+    <property name="nuxeo.media.jar"
+        value="org.collectionspace.services.media.3rdparty.botgarden.nuxeo-${cspace.release}.jar"/>
+    <property name="nuxeo.media.jars.all"
+        value="org.collectionspace.services.media.3rdparty.*.nuxeo-*.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -113,31 +113,25 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy taxonomy doctype in ${jee.server.nuxeo}">
-        <copy file="${basedir}/target/${nuxeo.taxonomy.jar}"
+        description="deploy media doctype in ${jee.server.nuxeo}">
+        <copy file="${basedir}/target/${nuxeo.media.jar}"
         todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy taxonomy doctype from ${jee.server.nuxeo}">
+        description="undeploy media doctype from ${jee.server.nuxeo}">
         <delete>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.taxonomy.jars.all}"/>
+                <include name="${nuxeo.media.jars.all}"/>
             </fileset>
         </delete>
     </target>
 
-    <target name="dist"
-        description="generate distribution for taxonomy doctype" depends="package">
-        <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
-            <fileset file="${basedir}/target/${nuxeo.taxonomy.jar}"/>
-        </copy>
-    </target>
 
-    <target name="dist_installer"
-    	description="Creates an installer distribution for taxonomy doctype" depends="package">
-        <copy todir="${services.trunk}/${dist.installer.services}/taxonomy/nuxeo">
-            <fileset file="${basedir}/target/${nuxeo.taxonomy.jar}"/>
+    <target name="dist"
+        description="generate distribution for media doctype" depends="package">
+        <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
+            <fileset file="${basedir}/target/${nuxeo.media.jar}"/>
         </copy>
     </target>
 

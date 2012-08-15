@@ -28,6 +28,6 @@
     <modules>
         <module>nuxeo-platform-cs-loanin</module>
         <module>nuxeo-platform-loanin-naturalhistory</module>
-        <module>nuxeo-platform-loanin-ucjeps</module>
+        <module>nuxeo-platform-loanin-botgarden</module>
     </modules>
 </project>

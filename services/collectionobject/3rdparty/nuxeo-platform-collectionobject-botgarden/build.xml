@@ -1,7 +1,7 @@
 
-<project name="nuxeo-platform-loanin-ucjeps" default="package" basedir=".">
+<project name="nuxeo-platform-collectionobject-botgarden" default="package" basedir=".">
     <description>
-        loanin nuxeo document type for ucjeps tenant
+        CollectionObject Nuxeo document type for BotGarden tenant
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>
@@ -10,10 +10,12 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="nuxeo.loanin.jar"
-        value="org.collectionspace.services.loanin.3rdparty.ucjeps.nuxeo-${cspace.release}.jar"/>
-    <property name="nuxeo.loanin.jars.all"
-        value="org.collectionspace.services.loanin.3rdparty.*.nuxeo-*.jar"/>
+    <property name="build" location="build"/>
+    <property name="dist"  location="dist"/>
+    <property name="nuxeo.collectionobject.jar"
+        value="org.collectionspace.services.collectionobject.3rdparty.botgarden.nuxeo-${cspace.release}.jar"/>
+    <property name="nuxeo.collectionobject.jars.all"
+        value="org.collectionspace.services.collectionobject.3rdparty.*.nuxeo-*.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -25,6 +27,8 @@
     <target name="init" >
         <!-- Create the time stamp -->
         <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}"/>
     </target>
 
     <target name="package" depends="package-unix,package-windows"
@@ -53,7 +57,7 @@
     </target>
 
     <target name="install" depends="install-unix,install-windows"
-        description="Install" />
+  description="Install" />
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="install" />
@@ -76,7 +80,7 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-
+    
     <target name="clean" depends="clean-unix,clean-windows"
         description="Delete target directories" >
         <delete dir="${build}"/>
@@ -113,26 +117,31 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy loanin doctype in ${jee.server.nuxeo}">
-        <copy file="${basedir}/target/${nuxeo.loanin.jar}"
+        description="Deploy CollectionObjectsCommon doctype in ${jee.server.nuxeo}">
+        <copy file="${basedir}/target/${nuxeo.collectionobject.jar}"
         todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy loanin doctype from ${jee.server.nuxeo}">
+        description="Undeploy CollectionObjectsCommon doctype from ${jee.server.nuxeo}">
         <delete>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.loanin.jars.all}"/>
+                <include name="${nuxeo.collectionobject.jars.all}"/>
             </fileset>
         </delete>
     </target>
 
     <target name="dist"
-        description="generate distribution for loanin doctype" depends="package">
+    	description="generate distribution for collectionobject doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
-            <fileset file="${basedir}/target/${nuxeo.loanin.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.collectionobject.jar}"/>
         </copy>
     </target>
 
+    <target name="dist_installer"
+    	description="Creates an installer distribution for CollectionObjectsCommon doctype" depends="package">
+        <copy todir="${services.trunk}/${dist.installer.services}/collectionobject/nuxeo">
+            <fileset file="${basedir}/target/${nuxeo.collectionobject.jar}"/>
+        </copy>
+    </target>
 </project>
-

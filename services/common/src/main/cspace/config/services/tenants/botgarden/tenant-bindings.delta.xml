@@ -3,9 +3,9 @@
 	xmlns:merge='http://xmlmerge.el4j.elca.ch'
 	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
 	    	 
-    <tenant:tenantBinding id="25" name="botgarden.cspace.berkeley.edu" displayName="CollectionSpace Botanical Garden Tenant" version="0.1">
+    <tenant:tenantBinding id="20" name="botgarden.cspace.berkeley.edu" displayName="CollectionSpace BotGarden Tenant" version="0.1">
         <tenant:repositoryDomain name="default-domain" storageName="botgarden-domain" repositoryClient="nuxeo-java" />
-        
+
         <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
@@ -99,9 +99,9 @@
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd" />
                     </service:content>
                 </service:part>
-                <service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_ucjeps" updated="" order="4">
+                <service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_botgarden" updated="" order="4">
                     <service:content contentType="application/xml">
-                        <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/local/ucjeps" schemaLocation="http://collectionspace.org/services/collectionobject/local/ucjeps http://collectionspace.org/services/collectionobject/local/collectionobjects_ucjeps.xsd" />
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/local/botgarden" schemaLocation="http://collectionspace.org/services/collectionobject/local/botgarden http://collectionspace.org/services/collectionobject/local/collectionobjects_botgarden.xsd" />
                     </service:content>
                 </service:part>
             </service:object>
@@ -174,14 +174,14 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    
+
         <tenant:serviceBindings merge:matcher="id" id="Media">
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
                         <service:ListResultField merge:matcher="skip" merge:action="insert">
                             <service:element>scientificTaxonomy</service:element>
-                            <service:schema>media_ucjeps</service:schema>
+                            <service:schema>media_botgarden</service:schema>
                             <service:xpath>scientificTaxonomy</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>
@@ -198,9 +198,9 @@
                     <types:value>identificationNumber</types:value>
                 </types:item>
             </service:properties>
-            
+
             <service:object xmlns:service="http://collectionspace.org/services/config/service" >
-                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="media_ucjeps" updated="" order="3">
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="media_botgarden" updated="" order="3">
                     <service:properties>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -208,7 +208,7 @@
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
-                        <service:xmlContent namespaceURI="http://collectionspace.org/services/media/local/ucjeps" schemaLocation="http://collectionspace.org/services/media/local/ucjeps http://collectionspace.org/services/media/local/media_ucjeps.xsd" />
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/media/local/botgarden" schemaLocation="http://collectionspace.org/services/media/local/botgarden http://collectionspace.org/services/media/local/media_botgarden.xsd" />
                     </service:content>
                 </service:part>
             </service:object>
@@ -241,7 +241,7 @@
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
-            
+
             <service:object xmlns:service="http://collectionspace.org/services/config/service" >
                 <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="taxon_naturalhistory" updated="" order="3">
                     <service:properties>
@@ -266,7 +266,6 @@
 
         </tenant:serviceBindings>
 
-        
     </tenant:tenantBinding>
 	    	       
 </tenant:TenantBindingConfig>

@@ -112,21 +112,21 @@
     description="deploy loanout in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-loanout/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-loanout-naturalhistory/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="nuxeo-platform-loanout-ucjeps/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-loanout-botgarden/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy loanout from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-loanout/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-loanout-naturalhistory/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="nuxeo-platform-loanout-ucjeps/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-loanout-botgarden/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for loanout" depends="package">
         <ant antfile="nuxeo-platform-cs-loanout/build.xml" target="dist" inheritall="false"/>
         <ant antfile="nuxeo-platform-loanout-naturalhistory/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="nuxeo-platform-loanout-ucjeps/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-loanout-botgarden/build.xml" target="dist" inheritall="false"/>
     </target>
 
 
