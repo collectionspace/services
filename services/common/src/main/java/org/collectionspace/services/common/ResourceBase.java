@@ -418,7 +418,7 @@ public abstract class ResourceBase
     protected String getDocType(String tenantId) {
         return getDocType(tenantId, getServiceName());
     }
-    
+
     /**
      * Returns the Nuxeo document type associated with a specified service, within a specified tenant.
      * 
@@ -438,6 +438,7 @@ public abstract class ResourceBase
             return docType;
         }
         docType = sb.getObject().getName(); // Reads the Nuxeo Document Type from tenant bindings configuration
+        System.out.println(tenantId + " : " + serviceName + " : " + docType); // FIXME: for debugging
         return docType;
     }
     
@@ -447,40 +448,35 @@ public abstract class ResourceBase
      * 
      * @return a map of URI templates for the current resource, for all tenants
      */
-    public Map<UriTemplateRegistryKey,Map<UriTemplateType,StoredValuesUriTemplate>> getUriRegistryEntries() {
-        Map<UriTemplateRegistryKey,Map<UriTemplateType,StoredValuesUriTemplate>> uriRegistryEntriesMap =
-                new HashMap<UriTemplateRegistryKey,Map<UriTemplateType,StoredValuesUriTemplate>>();
-        List<String> tenantIds = getTenantIds();
-        UriTemplateRegistryKey key;
-        String docType = "";
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
+        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
         for (String tenantId : tenantIds) {
-            docType = getDocType(tenantId);
-            if (Tools.notBlank(docType)) {
-                key = new UriTemplateRegistryKey();
-                key.setTenantId(tenantId);
-                key.setDocType(docType); 
-                uriRegistryEntriesMap.put(key, getUriTemplateMap());
-            }
+                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getDocType(tenantId), UriTemplateFactory.RESOURCE));
         }
         return uriRegistryEntriesMap;
     }
     
-   
-   /**
-    * Constructs and returns a map of URI templates for the current resource.
-    * This map assumes that there will be only one URI template of a given type
-    * ("reesource", "item", etc.) for each resource.
-    * 
-    * @return a map of URI templates for the current resource
-    */
-   protected Map<UriTemplateType,StoredValuesUriTemplate> getUriTemplateMap() {
-        Map<UriTemplateType,StoredValuesUriTemplate> uriTemplateMap = new HashMap<UriTemplateType, StoredValuesUriTemplate>();
-        StoredValuesUriTemplate resourceUriTemplate = getUriTemplate(UriTemplateFactory.RESOURCE);
-        if (resourceUriTemplate == null) {
-            return uriTemplateMap; // return an empty map
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for a specified tenants
+     * 
+     * @return a map of URI templates for the current resource, for a specified tenant
+     */
+    protected Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries(String tenantId,
+            String docType, UriTemplateFactory.UriTemplateType type) {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                new HashMap<UriTemplateRegistryKey,StoredValuesUriTemplate>();
+        UriTemplateRegistryKey key;
+        if (Tools.isBlank(tenantId) || Tools.isBlank(docType)) {
+            return uriRegistryEntriesMap;
         }
-        uriTemplateMap.put(resourceUriTemplate.getUriTemplateType(), resourceUriTemplate);
-        return uriTemplateMap;
+        key = new UriTemplateRegistryKey();
+        key.setTenantId(tenantId);
+        key.setDocType(docType); 
+        uriRegistryEntriesMap.put(key, getUriTemplate(type));
+        return uriRegistryEntriesMap;
     }
     
     /**
@@ -498,30 +494,6 @@ public abstract class ResourceBase
         return template;
     }
 
-    /**
-     * Returns a list of tenant IDs, from tenant bindings configuration
-     * 
-     * @return a list of tenant IDs
-     */
-    // FIXME: This method may properly belong in a different services package or class.
-    // Also, we need to check for any existing methods that may duplicate this one.
-    protected List<String> getTenantIds() {
-        List<String> tenantIds = new ArrayList<String>();
-        String tenantId;
-        Hashtable<String, TenantBindingType> tenantBindings =
-                getTenantBindingsReader().getTenantBindings();
-        if (tenantBindings != null && !tenantBindings.isEmpty()) {
-            Enumeration keys = tenantBindings.keys();
-            while (keys.hasMoreElements()) {
-               tenantId = (String) keys.nextElement();
-               if (Tools.notBlank(tenantId)) {
-                   tenantIds.add(tenantId);
-               }
-            }
-        }
-        return tenantIds;
-    }
-    
     /**
      * Returns a reader for reading values from tenant bindings configuration
      * 

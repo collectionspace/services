@@ -26,32 +26,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
-import org.collectionspace.services.common.UriTemplateFactory.UriTemplateType;
 
 /**
  * UriTemplateRegistry.java
  *
  * Maps document types to templates for building URIs, per tenant.
  */
-public class UriTemplateRegistry extends HashMap<UriTemplateRegistryKey, Map<UriTemplateType, StoredValuesUriTemplate>> {
-    
-    /**
-     * Get a URI template by tenant, document type, and template type.
-     * 
-     */
-    public StoredValuesUriTemplate get(UriTemplateRegistryKey key, UriTemplateType type) {
-        if (get(key) != null) {
-            return get(key).get(type);
-        } else {
-            return null;
-        }
-    }
+public class UriTemplateRegistry extends HashMap<UriTemplateRegistryKey, StoredValuesUriTemplate> {
 
     /**
-     * Dump all registry settings, For debugging purposes.
+     * Dumps all registry settings for debugging purposes.
      */
     public void dump() {
-        for (Map.Entry<UriTemplateRegistryKey, Map<UriTemplateType, StoredValuesUriTemplate>> uriTemplateEntry : this.entrySet()) {
+        for (Map.Entry<UriTemplateRegistryKey, StoredValuesUriTemplate> uriTemplateEntry : this.entrySet()) {
 
             System.out.println(
                     "Tenant : DocType = "
@@ -59,14 +46,8 @@ public class UriTemplateRegistry extends HashMap<UriTemplateRegistryKey, Map<Uri
                     + " : "
                     + uriTemplateEntry.getKey().getDocType());
 
-            System.out.println(" Value(s) of TemplateType : Template = ");
-            for (Map.Entry<UriTemplateType, StoredValuesUriTemplate> template : uriTemplateEntry.getValue().entrySet()) {
-                System.out.println(
-                        "  "
-                        + template.getKey()
-                        + " : "
-                        + template.getValue().toString());
-            }
+            System.out.println(" Value of Template = ");
+            System.out.println("  " + uriTemplateEntry.getValue().toString());
         }
     }
 }

@@ -962,27 +962,24 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     }
     
     protected String getItemDocType(String tenantId) {
-        return super.getDocType(tenantId, getItemServiceName());
+        return getDocType(tenantId, getItemServiceName());
     }
-    
-   /**
-    * Constructs and returns a map of URI templates for the current resource.
-    * This map assumes that there will be only one URI template of a given type
-    * ("resource", "item", etc.) for each resource.
-    * 
-    * @return a map of URI templates for the current resource
-    */
+        
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for all tenants
+     * 
+     * @return a map of URI templates for the current resource, for all tenants
+     */
     @Override
-    protected Map<UriTemplateFactory.UriTemplateType,StoredValuesUriTemplate> getUriTemplateMap() {
-        // Get the resource URI template from the superclass
-        Map<UriTemplateFactory.UriTemplateType,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap();
-        // Add the item URI template here, and return both templates in the map
-        StoredValuesUriTemplate itemUriTemplate = getUriTemplate(UriTemplateFactory.ITEM);
-        if (itemUriTemplate == null) {
-            return uriTemplateMap; // return map as obtained from superclass
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                super.getUriRegistryEntries();
+        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
+        for (String tenantId : tenantIds) {
+                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getItemDocType(tenantId), UriTemplateFactory.ITEM));
         }
-        uriTemplateMap.put(itemUriTemplate.getUriTemplateType(), itemUriTemplate);
-        return uriTemplateMap;
+        return uriRegistryEntriesMap;
     }
   
 }

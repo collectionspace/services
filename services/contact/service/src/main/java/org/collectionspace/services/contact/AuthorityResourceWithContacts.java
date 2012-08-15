@@ -24,6 +24,7 @@
 package org.collectionspace.services.contact;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -42,6 +43,7 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.client.*;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -301,24 +303,21 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
         return ContactConstants.NUXEO_DOCTYPE;
     }
     
-   /**
-    * Constructs and returns a map of URI templates for the current resource.
-    * This map assumes that there will be only one URI template of a given type
-    * ("resource", "item", "contacts" etc.) for each resource.
-    * 
-    * @return a map of URI templates for the current resource
-    */
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for all tenants
+     * 
+     * @return a map of URI templates for the current resource, for all tenants
+     */
     @Override
-    protected Map<UriTemplateFactory.UriTemplateType,StoredValuesUriTemplate> getUriTemplateMap() {
-        // Get the resource and item URI templates from the superclass
-        Map<UriTemplateFactory.UriTemplateType,StoredValuesUriTemplate> uriTemplateMap = super.getUriTemplateMap();
-        // Add the contact URI template here, and return all three templates in the map
-        StoredValuesUriTemplate contactUriTemplate = getUriTemplate(UriTemplateFactory.CONTACT);
-        if (contactUriTemplate == null) {
-            return uriTemplateMap; // return map as obtained from superclass
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                super.getUriRegistryEntries();
+        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
+        for (String tenantId : tenantIds) {
+                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getContactDocType(), UriTemplateFactory.CONTACT));
         }
-        uriTemplateMap.put(contactUriTemplate.getUriTemplateType(), contactUriTemplate);
-        return uriTemplateMap;
+        return uriRegistryEntriesMap;
     }
 
 }
