@@ -573,10 +573,11 @@ public class RefNameServiceUtils {
                 ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
                 String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
                 ilistItem.setDocId(csid);
-                UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
-                StoredValuesUriTemplate storedValuesResourceTemplate = uriTemplateRegistry.get(new UriTemplateRegistryKey(docType, tenantId));
+                UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
+                UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, docType);
+                StoredValuesUriTemplate template = registry.get(key);
                 Map<String, String> additionalValues = new HashMap<String, String>();
-                if (storedValuesResourceTemplate.getUriTemplateType() == UriTemplateFactory.ITEM) {
+                if (template.getUriTemplateType() == UriTemplateFactory.ITEM) {
                     try {
                         String inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
                         additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
@@ -587,7 +588,7 @@ public class RefNameServiceUtils {
                 } else {
                     additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, csid);
                 }
-                String uriStr = storedValuesResourceTemplate.buildUri(additionalValues);
+                String uriStr = template.buildUri(additionalValues);
                 ilistItem.setUri(uriStr);
                 try {
                     ilistItem.setWorkflowState(docModel.getCurrentLifeCycleState());

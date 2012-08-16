@@ -63,9 +63,11 @@ public class UriTemplateRegistryKey {
         // Cast the compared-to object to an object of this type
         UriTemplateRegistryKey key = (UriTemplateRegistryKey) o;
 
-        // If either the tenant ID or docType values dont't match, whether
-        // only one is null, or via a failure of an 'equals' test of their
-        // values, return false
+        // FIXME: Look into possible case-sensitivity issues for registry keys - ADR 2012-08-15
+        
+        // If either the tenant ID or docType values don't match,
+        // whether only one is null, or via a failure of an 'equals'
+        // test of their values, return false
         if (tenantId == null ? key.tenantId != null : !tenantId.equals(key.tenantId)) {
             return false;
         }
