@@ -215,26 +215,33 @@ public class TemplateExpander {
         UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
         UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, docType);
         StoredValuesUriTemplate template = registry.get(key);
-        // FIXME: Need to check here for any failure to retrieve a URI Template
-        // from the registry, given a tenant ID and docType
-        Map<String, String> additionalValues = new HashMap<String, String>();
-        if (template.getUriTemplateType() == UriTemplateFactory.ITEM) {
-            try {
-                String inAuthorityCsid = getInAuthorityValue(partTmpl);
-                additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
-                additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, docID);
+        if (template != null) {
+            Map<String, String> additionalValues = new HashMap<String, String>();
+            if (template.getUriTemplateType() == UriTemplateFactory.RESOURCE) {
+                additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, docID);
                 uri = template.buildUri(additionalValues);
-
-            } catch (Exception e) {
-                logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
+            } else if (template.getUriTemplateType() == UriTemplateFactory.ITEM) {
+                try {
+                    String inAuthorityCsid = getInAuthorityValue(partTmpl);
+                    additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
+                    additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, docID);
+                    uri = template.buildUri(additionalValues);
+                } catch (Exception e) {
+                    logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
+                    // Returns the default (empty string) value for uri
+                }
+            } else if (template.getUriTemplateType() == UriTemplateFactory.CONTACT) {
+                // FIXME: Generating contact sub-resource URIs requires additional work,
+                // as a follow-on to CSPACE-5271 - ADR 2012-08-16
+                // Returns the default (empty string) value for uri, for now
+            } else {
+                logger.warn("Unrecognized URI template type = " + template.getUriTemplateType());
+                // Returns the default (empty string) value for uri
             }
-            // FIXME: Generating contact sub-resource URIs requires additional work,
-            // beyond CSPACE-5271 - ADR 2012-08-16
-        } else if (template.getUriTemplateType() == UriTemplateFactory.CONTACT) {
-            return uri;
-        } else {
-            additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, docID);
-            uri = template.buildUri(additionalValues);
+        } else { // (if template == null)
+            logger.warn("Could not retrieve URI template from registry via tenant ID "
+                    + tenantId + " and docType " + docType);
+            // Returns the default (empty string) value for uri
         }
         return uri;
     }
