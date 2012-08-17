@@ -573,23 +573,31 @@ public class RefNameServiceUtils {
                 ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
                 String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
                 ilistItem.setDocId(csid);
+                String uri = "";
                 UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
                 UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, docType);
                 StoredValuesUriTemplate template = registry.get(key);
+                // FIXME: Need to check here for any failure to retrieve a URI Template
+                // from the registry, given a tenant ID and docType
                 Map<String, String> additionalValues = new HashMap<String, String>();
                 if (template.getUriTemplateType() == UriTemplateFactory.ITEM) {
                     try {
                         String inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
                         additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
                         additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, csid);
+                        uri = template.buildUri(additionalValues);
                     } catch (Exception e) {
                         logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
                     }
+                    // FIXME: Generating contact sub-resource URIs requires additional work,
+                    // beyond CSPACE-5271 - ADR 2012-08-16
+                } else if (template.getUriTemplateType() == UriTemplateFactory.CONTACT) {
+                    // Return the default (empty string) value for URI, for now.
                 } else {
                     additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, csid);
+                    uri = template.buildUri(additionalValues);
                 }
-                String uriStr = template.buildUri(additionalValues);
-                ilistItem.setUri(uriStr);
+                ilistItem.setUri(uri);
                 try {
                     ilistItem.setWorkflowState(docModel.getCurrentLifeCycleState());
                     ilistItem.setUpdatedAt(DocHandlerBase.getUpdatedAtAsString(docModel));

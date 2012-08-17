@@ -34,6 +34,10 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.collectionspace.services.common.IFragmentHandler;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriTemplateFactory;
+import org.collectionspace.services.common.UriTemplateRegistry;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.XmlSaxFragmenter;
 import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
@@ -207,33 +211,31 @@ public class TemplateExpander {
     // document type name
     private static String getDocUri(String tenantId, String docType, String docID,
             String partTmpl) throws Exception {
-
-
-        TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        // We may have been supplied with the tenant-qualified name
-        // of an extension to a document type, and thus need to
-        // get the base document type name.
-        docType = ServiceBindingUtils.getUnqualifiedTenantDocType(docType);
-        ServiceBindingType sb =
-            tReader.getServiceBindingForDocType(tenantId, docType);        
-
-        String serviceCategory = sb.getType();
         String uri = "";
-        if (serviceCategory.equalsIgnoreCase(URIUtils.AUTHORITY_SERVICE_CATEGORY)) {
-            String authoritySvcName = URIUtils.getAuthoritySvcName(docType);
-            if (authoritySvcName == null) {
-                return uri;
+        UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
+        UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, docType);
+        StoredValuesUriTemplate template = registry.get(key);
+        // FIXME: Need to check here for any failure to retrieve a URI Template
+        // from the registry, given a tenant ID and docType
+        Map<String, String> additionalValues = new HashMap<String, String>();
+        if (template.getUriTemplateType() == UriTemplateFactory.ITEM) {
+            try {
+                String inAuthorityCsid = getInAuthorityValue(partTmpl);
+                additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
+                additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, docID);
+                uri = template.buildUri(additionalValues);
+
+            } catch (Exception e) {
+                logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
             }
-            String inAuthorityID = getInAuthorityValue(partTmpl);
-            uri = URIUtils.getAuthorityItemUri(authoritySvcName, inAuthorityID, docID);
-       } else if (serviceCategory.equalsIgnoreCase(URIUtils.OBJECT_SERVICE_CATEGORY) ||
-               serviceCategory.equalsIgnoreCase(URIUtils.PROCEDURE_SERVICE_CATEGORY) ) {
-            String serviceName = sb.getName();
-            uri = URIUtils.getUri(serviceName, docID);
-       } else {
-           // Currently returns a blank URI for any other cases,
-           // including sub-resources like contacts
-         }
+            // FIXME: Generating contact sub-resource URIs requires additional work,
+            // beyond CSPACE-5271 - ADR 2012-08-16
+        } else if (template.getUriTemplateType() == UriTemplateFactory.CONTACT) {
+            return uri;
+        } else {
+            additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, docID);
+            uri = template.buildUri(additionalValues);
+        }
         return uri;
     }
     
