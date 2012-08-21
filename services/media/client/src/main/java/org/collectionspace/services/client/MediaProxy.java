@@ -39,5 +39,6 @@ public interface MediaProxy extends CollectionSpaceCommonListPoxProxy {
 	@Produces("application/xml")
 	@Consumes("application/xml")
     ClientResponse<Response>createMediaAndBlobWithUri(byte[] xmlPayload,
-    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri);    
+    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,
+    		@QueryParam(BlobClient.BLOB_PURGE_ORIGINAL) boolean purgeOriginal);    
 }

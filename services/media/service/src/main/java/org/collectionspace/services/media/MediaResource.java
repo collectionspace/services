@@ -124,9 +124,11 @@ public class MediaResource extends ResourceBase {
     	Response response = null;
     	
     	try {
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(BlobClient.SERVICE_NAME, (PoxPayloadIn)null); // The blobUri argument is our payload
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(BlobClient.SERVICE_NAME,
+	    			queryParams);
 	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx); // the blob doc handler will look for this in the context
-	    	blobInput.createBlobFile(blobUri);
+	    	blobInput.createBlobFile(blobUri); // The blobUri argument is our payload
 	    	response = this.create((PoxPayloadIn)null, ctx); // By now the binary bits have been created and we just need to create the metadata blob record -this info is in the blobInput var
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
@@ -136,7 +138,7 @@ public class MediaResource extends ResourceBase {
     }
     
     /*
-     * Looks for a blobUri query param from a POST.  If it finds one then it creates a blob and a media resource and associates them.
+     * Looks for a blobUri query param from a POST.  If it finds one then it creates a blob AND a media resource and associates them.
      * (non-Javadoc)
      * @see org.collectionspace.services.common.ResourceBase#create(org.collectionspace.services.common.context.ServiceContext, org.collectionspace.services.common.ResourceMap, javax.ws.rs.core.UriInfo, java.lang.String)
      */
@@ -153,7 +155,7 @@ public class MediaResource extends ResourceBase {
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         String blobUri = queryParams.getFirst(BlobClient.BLOB_URI_PARAM);
         if (blobUri != null && blobUri.isEmpty() == false) {
-        	result = createBlobWithUri(resourceMap, ui, xmlPayload, blobUri);
+        	result = createBlobWithUri(resourceMap, ui, xmlPayload, blobUri); // uses the blob resource and doc handler to create the blob
         	String blobCsid = CollectionSpaceClientUtils.extractId(result);
         	queryParams.add(BlobClient.BLOB_CSID_PARAM, blobCsid); // Add the new blob's csid as an artificial query param -the media doc handler will look for this
         }
@@ -180,7 +182,7 @@ public class MediaResource extends ResourceBase {
 	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(BlobClient.SERVICE_NAME, input);
 	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 	    	blobInput.createBlobFile(blobUri);
-	    	response = this.create(input, ctx);
+	    	response = this.create(input, ctx); // calls the blob resource/doc-handler to create the blob
 	    	//
 	    	// Next, update the Media record to be linked to the blob
 	    	//

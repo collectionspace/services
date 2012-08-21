@@ -14,6 +14,12 @@
     <name>services.blob.client</name>
     
     <dependencies>
+        <dependency>
+			<groupId>org.nuxeo.ecm.core</groupId>
+			<artifactId>nuxeo-core-storage-sql-management</artifactId>
+			<version>5.5.0-HF07</version>
+        </dependency>
+		
         <!-- keep slf4j dependencies on the top -->
         <dependency>
             <groupId>org.slf4j</groupId>

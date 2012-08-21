@@ -3,6 +3,10 @@
  */
 package org.collectionspace.services.common;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +22,7 @@ import org.collectionspace.authentication.AuthN;
 
 import org.collectionspace.services.config.service.InitHandler;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
+import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.init.AddIndices;
@@ -320,6 +325,15 @@ public class ServiceMain {
      */
     public String getServerRootDir() {
         return serverRootDir;
+    }
+    
+    public InputStream getResourceAsStream(String resourceName) throws FileNotFoundException {
+    	InputStream result = null;
+    	
+    	String resourcePath = getServerRootDir() + File.separator + ConfigReader.RESOURCES_DIR_PATH + File.separator + resourceName;
+    	result = new FileInputStream(new File(resourcePath));
+    	
+    	return result;
     }
 
     /*

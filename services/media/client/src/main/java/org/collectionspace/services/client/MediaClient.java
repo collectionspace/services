@@ -78,8 +78,8 @@ public class MediaClient extends AbstractCommonListPoxServiceClientImpl<MediaPro
     /*
      * Create both a new media record
      */
-    public ClientResponse<Response> createMediaAndBlobWithUri(PoxPayloadOut xmlPayload, String blobUri) {
-    	return getProxy().createMediaAndBlobWithUri(xmlPayload.getBytes(), blobUri);
+    public ClientResponse<Response> createMediaAndBlobWithUri(PoxPayloadOut xmlPayload, String blobUri, boolean purgeOriginal) {
+    	return getProxy().createMediaAndBlobWithUri(xmlPayload.getBytes(), blobUri, purgeOriginal);
     }
         
     /**
