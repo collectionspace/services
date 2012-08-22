@@ -144,7 +144,7 @@ public abstract class AbstractConfigReaderImpl<T>
     protected String getAbsoluteFileName(String configFileName) {
         return serverRootDir
                 + File.separator + CSPACE_DIR_NAME
-                + File.separator + CONFIG_DIR_NAME
+                + File.separator + CONFIG_DIR_PATH
                 + File.separator + configFileName;
     }
 
@@ -155,6 +155,6 @@ public abstract class AbstractConfigReaderImpl<T>
     protected String getConfigRootDir() {
         return serverRootDir
         + File.separator + CSPACE_DIR_NAME
-        + File.separator + CONFIG_DIR_NAME;
+        + File.separator + CONFIG_DIR_PATH;
     }
 }

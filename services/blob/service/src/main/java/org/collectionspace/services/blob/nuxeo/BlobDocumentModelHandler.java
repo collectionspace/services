@@ -53,6 +53,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.dom4j.Element;
 
 /**
@@ -161,10 +163,16 @@ extends DocHandlerBase<BlobsCommon> {
 		//
 		if (derivativeTerm != null || getContentFlag == true) {
 			StringBuffer mimeTypeBuffer = new StringBuffer();
-			BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession, //FIXME: REM - If the blob's binary has been removed from the file system, then this call will return null.  We need to at least spit out a meaningful error/warning message
+			BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession,
 					blobRepositoryId, derivativeTerm, getContentFlag, mimeTypeBuffer);
 			if (getContentFlag == true) {
-				blobInput.setContentStream(blobOutput.getBlobInputStream());
+				if (blobOutput != null) {
+					blobInput.setContentStream(blobOutput.getBlobInputStream());
+				} else {
+					// If we can't find the blob's content, we'll return a "missing document" image
+					blobInput.setContentStream(NuxeoImageUtils.getResource(NuxeoImageUtils.DOCUMENT_MISSING_PLACEHOLDER_IMAGE));
+					mimeTypeBuffer.append(NuxeoImageUtils.MIME_JPEG);
+				}
 			}
 	
 			if (derivativeTerm != null) {
@@ -179,7 +187,7 @@ extends DocHandlerBase<BlobsCommon> {
 				blobInput.setMimeType(mimeType);
 				blobsCommon.setMimeType(mimeType);
 			} else {
-				blobInput.setMimeType(blobsCommon.getMimeType());
+				blobInput.setMimeType(blobsCommon.getMimeType());  // Set the MIME type to the one in blobsCommon
 			}
 			
 			blobsCommon.setRepositoryId(null); //hide the repository id from the GET results payload since it is private
@@ -202,12 +210,19 @@ extends DocHandlerBase<BlobsCommon> {
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
 		BlobInput blobInput = BlobUtil.getBlobInput(ctx); // The blobInput should have been put into the context by the Blob or Media resource
 		if (blobInput != null && blobInput.getBlobFile() != null) {    		
+			boolean purgeOriginal = false;
+			MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+			String purgeOriginalStr = queryParams.getFirst(BlobClient.BLOB_PURGE_ORIGINAL);
+			if (purgeOriginalStr != null && purgeOriginalStr.isEmpty() == false) { // Find our if the caller wants us to purge/delete the original
+				purgeOriginal = true;
+			}
 			//
 			// If blobInput has a file then we just received a multipart/form-data file post or a URI query parameter
 			//
 			DocumentModel documentModel = wrapDoc.getWrappedObject();
-			RepositoryInstance repoSession = this.getRepositorySession();    	
-			BlobsCommon blobsCommon = NuxeoImageUtils.createBlobInRepository(ctx, repoSession, blobInput);
+			RepositoryInstance repoSession = this.getRepositorySession();
+	        
+			BlobsCommon blobsCommon = NuxeoImageUtils.createBlobInRepository(ctx, repoSession, blobInput, purgeOriginal);
 			blobInput.setBlobCsid(documentModel.getName()); //Assumption here is that the documentModel "name" field is storing a CSID
 
 	        PoxPayloadIn input = ctx.getInput();

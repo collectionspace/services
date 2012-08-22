@@ -31,7 +31,9 @@ import java.io.File;
 public interface ConfigReader<T> {
 
     final public static String CSPACE_DIR_NAME = "cspace";
-    final public static String CONFIG_DIR_NAME = "config" + File.separator + "services";
+    final public static String CONFIG_DIR_PATH = "config" + File.separator + "services";
+    final public static String RESOURCES_DIR_NAME = "resources";
+    final public static String RESOURCES_DIR_PATH = CSPACE_DIR_NAME + File.separator + CONFIG_DIR_PATH + File.separator + RESOURCES_DIR_NAME;
 
     /**
      * getFileName - get configuration file name

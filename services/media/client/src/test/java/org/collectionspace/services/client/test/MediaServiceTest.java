@@ -206,11 +206,12 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     public void createMediaAndBlobWithUri(String testName) throws Exception {
 		MediaClient client = new MediaClient();
 		PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-		ClientResponse<Response> mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK);
+		ClientResponse<Response> mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true); // purge the original
 		String mediaCsid = null;
 		try {
 			assertStatusCode(mediaRes, testName);
 			mediaCsid = extractId(mediaRes);
+//			allResourceIdsCreated.add(mediaCsid); // Re-enable this and also add code to delete the associated blob
 		} finally {
 			if (mediaRes != null) {
 				mediaRes.releaseConnection();
