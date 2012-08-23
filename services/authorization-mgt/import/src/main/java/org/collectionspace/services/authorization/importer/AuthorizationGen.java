@@ -226,7 +226,7 @@ public class AuthorizationGen {
         if (result == null) {
     		// the role doesn't exist already, so we need to create it
     		String description = "Generated tenant " + type + " role.";
-	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_ADMINISTRATOR, description);
+	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_ADMINISTRATOR, description, true /*immutable*/);
         }
         
         return result;
@@ -239,7 +239,7 @@ public class AuthorizationGen {
         if (result == null) {
     		// the role doesn't exist already, so we need to create it
     		String description = "Generated tenant " + type + " role.";
-	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_READER, description);
+	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_READER, description, true /*immutable*/);
         }
         
         return result;
