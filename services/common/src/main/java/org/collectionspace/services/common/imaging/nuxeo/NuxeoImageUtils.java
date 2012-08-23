@@ -798,6 +798,20 @@ public class NuxeoImageUtils {
 
 		return result;
 	}
+	
+	/*
+	 * Find out if this document's blob/file-contents are allowed to be purged.  For instance, we currently
+	 * only want to allow the purging the contents of Nuxeo "Picture" documents. 
+	 */
+	static private boolean isPurgeAllowed(DocumentModel docModel) {
+		boolean result = false;
+		
+		if (docModel.hasFacet(ImagingDocumentConstants.PICTURE_FACET) == true) {
+			result = true; // Yes, delete/purge the original content
+		}
+		
+		return result;
+	}
 
 	/**
 	 * Creates the image blob.
@@ -837,8 +851,8 @@ public class NuxeoImageUtils {
 
 			result = createBlobsCommon(documentModel, fileBlob); // Now create our metadata resource document
 
-			// If the sender only wanted use to generate derivatives, we need to clear the original content
-			if (purgeOriginal == true) {
+			// If the sender wanted us to generate only derivatives, we need to purge/clear the original contents
+			if (purgeOriginal == true && isPurgeAllowed(documentModel) == true) {
 				// Empty the document model's "content" property -this does not delete the actual file/blob
 				documentModel.setPropertyValue("file:content", (Serializable) null);
 				
