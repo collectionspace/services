@@ -24,7 +24,7 @@
   <xs:element name="fieldLocPlace" type="xs:string"/>
   <xs:element name="catalogDate" type="xs:string"/>
   -->
-  
+
     <xs:element name="hybridName" type="xs:string"/>
     <xs:element name="labelHeader" type="xs:string"/>
     <xs:element name="labelFooter" type="xs:string"/>
