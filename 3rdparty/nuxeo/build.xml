@@ -141,7 +141,9 @@
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
+		<!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems
 		<ant antfile="nuxeo-platform-thumbnail/build.xml" target="undeploy" inheritall="false"/>
+		-->
     </target>
 
     <target name="dist"
