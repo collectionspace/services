@@ -8,7 +8,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.3rdparty.nuxeo</artifactId>
     <packaging>pom</packaging>
     <name>services.3rdparty.nuxeo</name>
@@ -17,9 +16,7 @@
 		<module>nuxeo-platform-collectionspace</module>
 		<module>nuxeo-platform-quote-api</module>
 		<module>nuxeo-platform-quote</module>
-		<!-- REM : 8/23/2012 - Disabled due to integration and dependency issues between ImageMagick and Ghostscript on Linux machines
 		<module>nuxeo-platform-thumbnail</module>
-		-->
 	</modules>
 
     <dependencies>

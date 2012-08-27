@@ -17,12 +17,12 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.config</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.3rdparty.nuxeo.thumbnail</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common-api</artifactId>
