@@ -30,17 +30,24 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.ByteArrayOutputStream;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.lang.reflect.Field;
 
 import javax.imageio.ImageIO;
 
@@ -51,6 +58,7 @@ import org.nuxeo.runtime.api.Framework;
 //import org.nuxeo.common.utils.FileUtils;
 
 import org.nuxeo.ecm.platform.picture.api.ImageInfo;
+import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
 import org.nuxeo.ecm.platform.picture.api.ImagingService;
 import org.nuxeo.ecm.platform.picture.api.PictureView;
 
@@ -69,7 +77,12 @@ import org.nuxeo.ecm.core.repository.RepositoryService;
 //import org.nuxeo.ecm.core.api.ejb.DocumentManagerBean;
 //import org.nuxeo.ecm.core.storage.sql.RepositoryImpl;
 //import org.nuxeo.ecm.core.storage.sql.Repository;
+import org.nuxeo.ecm.core.storage.sql.Binary;
+import org.nuxeo.ecm.core.storage.sql.BinaryManager;
 import org.nuxeo.ecm.core.storage.sql.DefaultBinaryManager;
+import org.nuxeo.ecm.core.storage.sql.RepositoryImpl;
+import org.nuxeo.ecm.core.storage.sql.RepositoryResolver;
+import org.nuxeo.ecm.core.storage.sql.coremodel.SQLBlob;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLRepository;
 //import org.nuxeo.ecm.core.storage.sql.RepositoryDescriptor;
 
@@ -77,6 +90,7 @@ import org.nuxeo.ecm.core.storage.sql.coremodel.SQLRepository;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
+import org.nuxeo.ecm.core.api.impl.DocumentModelImpl;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.core.api.impl.blob.StreamingBlob;
 import org.nuxeo.ecm.core.api.impl.blob.ByteArrayBlob;
@@ -95,6 +109,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.nuxeo.ecm.core.repository.jcr.testing.RepositoryOSGITestCase;
 
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
@@ -108,22 +123,24 @@ import org.collectionspace.services.blob.MeasuredPartGroupList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.extension.thumbnail.ThumbnailConstants;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.blob.BlobOutput;
 
 import org.collectionspace.services.config.service.ListResultField;
 
-//import org.collectionspace.ecm.platform.quote.api.QuoteManager;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class NuxeoImageUtils.
  */
 public class NuxeoImageUtils {
+		
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory
 			.getLogger(NuxeoImageUtils.class);
 
-	private static final String MIME_JPEG = "image/jpeg";
+	public static final String DOCUMENT_PLACEHOLDER_IMAGE = "documentImage.jpg";
+	public static final String DOCUMENT_MISSING_PLACEHOLDER_IMAGE = "documentImageMissing.jpg";
+	public static final String MIME_JPEG = "image/jpeg";
 	/*
 	 * FIXME: REM - These constants should be coming from configuration and NOT
 	 * hard coded.
@@ -267,8 +284,10 @@ public class NuxeoImageUtils {
 		// List<BlobListItem> blobListItems = result.getBlobListItem();
 		HashMap<String, Object> item = null;
 		for (Blob blob : docBlobs) {
-			item = createBlobListItem(blob, uri);
-			commonList.addItem(item);
+			if (blob != null) {
+				item = createBlobListItem(blob, uri);
+				commonList.addItem(item);
+			}
 		}
 
 		return commonList;
@@ -724,6 +743,19 @@ public class NuxeoImageUtils {
 		}
 		return result;
 	}
+	
+	private static BinaryManager getBinaryManagerService() throws ClientException {
+		BinaryManager result = null;
+		try {
+			result = Framework.getService(BinaryManager.class);
+		} catch (Exception e) {
+			String msg = "Unable to get Nuxeo's BinaryManager service.";
+			logger.error(msg, e);
+			throw new ClientException("msg", e);
+		}
+		return result;
+	}
+	
 
 	/**
 	 * Creates the picture.
@@ -738,7 +770,9 @@ public class NuxeoImageUtils {
 	 * @throws Exception 
 	 */
 	public static BlobsCommon createBlobInRepository(ServiceContext ctx,
-			RepositoryInstance repoSession, BlobInput blobInput) throws Exception {
+			RepositoryInstance repoSession,
+			BlobInput blobInput,
+			boolean purgeOriginal) throws Exception {
 		BlobsCommon result = null;
 
 		try {
@@ -756,12 +790,26 @@ public class NuxeoImageUtils {
 	            }
             }			
 
-			result = createBlobInRepository(repoSession, wspaceDoc, blobFile, null /*mime type*/);
+			result = createBlobInRepository(repoSession, wspaceDoc, purgeOriginal, blobFile, null /*mime type*/);
 		} catch (Exception e) {
 			logger.error("Could not create image blob", e);
 			throw e;
 		}
 
+		return result;
+	}
+	
+	/*
+	 * Find out if this document's blob/file-contents are allowed to be purged.  For instance, we currently
+	 * only want to allow the purging the contents of Nuxeo "Picture" documents. 
+	 */
+	static private boolean isPurgeAllowed(DocumentModel docModel) {
+		boolean result = false;
+		
+		if (docModel.hasFacet(ImagingDocumentConstants.PICTURE_FACET) == true) {
+			result = true; // Yes, delete/purge the original content
+		}
+		
 		return result;
 	}
 
@@ -782,8 +830,9 @@ public class NuxeoImageUtils {
 	 */
 	static public BlobsCommon createBlobInRepository(RepositoryInstance nuxeoSession,
 			DocumentModel blobLocation,
-			// InputStream file,
-			File file, String mimeType) {
+			boolean purgeOriginal,
+			File file,
+			String mimeType) {
 		BlobsCommon result = null;
 
 		try {
@@ -799,8 +848,29 @@ public class NuxeoImageUtils {
 							blobLocation.getPathAsString(), true,
 							file.getName());
 			logger.debug("Stop --> Finished calling Nuxeo to create the blob document.");
-			
+
 			result = createBlobsCommon(documentModel, fileBlob); // Now create our metadata resource document
+
+			// If the sender wanted us to generate only derivatives, we need to purge/clear the original contents
+			if (purgeOriginal == true && isPurgeAllowed(documentModel) == true) {
+				// Empty the document model's "content" property -this does not delete the actual file/blob
+				documentModel.setPropertyValue("file:content", (Serializable) null);
+				
+				if (documentModel.hasFacet(ImagingDocumentConstants.PICTURE_FACET)) {
+					// Now with no content, the derivative listener wants to update the derivatives. So to
+					// prevent the listener, we remove the "Picture" facet from the document
+					NuxeoUtils.removeFacet(documentModel, ImagingDocumentConstants.PICTURE_FACET); // Removing this facet ensures the original derivatives are unchanged.
+					nuxeoSession.saveDocument(documentModel);
+					// Now that we've emptied the document model's content field, we can add back the Picture facet
+					NuxeoUtils.addFacet(documentModel, ImagingDocumentConstants.PICTURE_FACET);
+				}
+				
+				nuxeoSession.saveDocument(documentModel);
+				// Next, we need to remove the actual file from Nuxeo's data directory
+				DocumentBlobHolder docBlobHolder = (DocumentBlobHolder) documentModel
+						.getAdapter(BlobHolder.class);
+				boolean deleteSuccess = NuxeoUtils.deleteFileOfBlob(docBlobHolder.getBlob());
+			}
 		} catch (Exception e) {
 			result = null;
 			logger.error("Could not create new Nuxeo blob document.", e); //FIXME: REM - This should probably be re-throwing the exception?
@@ -829,6 +899,18 @@ public class NuxeoImageUtils {
 	// }
 	// }
 	// }
+	
+	public static InputStream getResource(String resourceName) {
+		InputStream result = null;
+		
+		try {
+			result = ServiceMain.getInstance().getResourceAsStream(resourceName);
+		} catch (FileNotFoundException e) {
+			logger.error("Missing Services resource: " + resourceName, e);
+		}
+        
+		return result;
+	}
 
 	/**
 	 * Gets the image.
@@ -869,7 +951,7 @@ public class NuxeoImageUtils {
 					if (derivativeTerm != null) {
 						docBlob = pictureBlobHolder.getBlob(derivativeTerm);
 						// Nuxeo derivatives are all JPEG
-						outMimeType.append(docBlob.getMimeType());
+						outMimeType.append(MIME_JPEG); // All Nuxeo image derivatives are JPEG images.
 					} else {
 						docBlob = pictureBlobHolder.getBlob();
 					}
@@ -890,15 +972,13 @@ public class NuxeoImageUtils {
 				if (getContentFlag == true) {
 					InputStream remoteStream = null;
 					if (isNonImageDerivative == false) {
-						remoteStream = docBlob.getStream();
+						remoteStream = docBlob.getStream(); // This will fail if the blob's file has been deleted. FileNotFoundException thrown.
 					} else {
-						remoteStream = NuxeoImageUtils.class.getClassLoader() // for now, non-image derivatives are just placeholder document images
-					            .getResourceAsStream("documentImage.jpg");
+						remoteStream = getResource(DOCUMENT_PLACEHOLDER_IMAGE);
 						outMimeType.append(MIME_JPEG);
 					}
 					BufferedInputStream bufferedInputStream = new BufferedInputStream(
-							remoteStream); 	// FIXME: REM - To improve performance, try
-											// BufferedInputStream(InputStream in, int size)?
+							remoteStream); 	
 					result.setBlobInputStream(bufferedInputStream);
 				}
 			} catch (Exception e) {

@@ -25,7 +25,6 @@ package org.collectionspace.services.client.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
