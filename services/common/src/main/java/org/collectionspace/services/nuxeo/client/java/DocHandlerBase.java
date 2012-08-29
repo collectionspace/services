@@ -126,17 +126,6 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         		docModel, label, id, true);
     }
 
-	public DocHandlerParams.Params getDocHandlerParams() throws DocumentException {
-		MultipartServiceContext sc = (MultipartServiceContext) getServiceContext();
-		ServiceBindingType sb = sc.getServiceBinding();
-		DocHandlerParams dhb = sb.getDocHandlerParams();
-		if (dhb != null && dhb.getParams() != null) {
-			return dhb.getParams();
-		}
-		throw new DocumentException("No DocHandlerParams configured for: "
-				+ sb.getName());
-	}
-
     public String getSummaryFields(AbstractCommonList theCommonList) throws DocumentException {
         return getDocHandlerParams().getSummaryFields();
     }

@@ -49,6 +49,7 @@ import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -58,8 +59,10 @@ import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
+import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
+import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Element;
 
@@ -96,6 +99,37 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             throw new IllegalArgumentException("setServiceContext requires instance of "
                     + MultipartServiceContext.class.getName());
         }
+    }
+
+    /*
+     * Returns the document handler parameters that were loaded at startup from the
+     * tenant bindings config file.
+     */
+	public DocHandlerParams.Params getDocHandlerParams() throws DocumentException {
+		MultipartServiceContext sc = (MultipartServiceContext) getServiceContext();
+		ServiceBindingType sb = sc.getServiceBinding();
+		DocHandlerParams dhb = sb.getDocHandlerParams();
+		if (dhb != null && dhb.getParams() != null) {
+			return dhb.getParams();
+		}
+		throw new DocumentException("No DocHandlerParams configured for: "
+				+ sb.getName());
+	}
+    
+    @Override
+    public boolean supportsHierarchy() {
+    	boolean result;
+    	
+    	DocHandlerParams.Params params = null;
+    	try {
+			params = getDocHandlerParams();
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			logger.error(String.format("Could not get document handler params for class %s", this.getClass().getName()), e);
+		}
+		result = params.isSupportsHierarchy();
+    	
+    	return result;
     }
 
 	@Override
