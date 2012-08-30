@@ -22,15 +22,15 @@
  *  limitations under the License.
  */
 
-package org.collectionspace.services.common.vocabulary;
+package org.collectionspace.services.common.document;
 
+import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.relation.IRelationsManager;
-import org.collectionspace.services.relation.RelationResource;
+import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;

@@ -6,7 +6,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.collectionspace.services.relation.RelationsCommonList;
-import org.collectionspace.services.common.relation.IRelationsManager;
+import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 
 import org.jboss.resteasy.client.ClientResponse;

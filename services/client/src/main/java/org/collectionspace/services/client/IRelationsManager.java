@@ -17,5 +17,20 @@ public interface IRelationsManager {
 			+ "." + SERVICE_COMMONPART_NAME + ":objectDocumentType";
 	public final static String CMIS_CSPACE_RELATIONS_TITLE = IQueryManager.CMIS_RELATIONS_PREFIX
 			+ "." + IQueryManager.CMIS_NUXEO_TITLE;
-
+			
+    /** The Constant SUBJECT. */
+    static public final String SUBJECT = "subjectCsid";
+    static public final String SUBJECT_QP = "sbj";
+    static public final String SUBJECT_TYPE = "subjectType";
+    static public final String SUBJECT_TYPE_QP = SUBJECT_QP + "Type";
+    
+    /** The Constant PREDICATE. */
+    static public final String PREDICATE = "predicate";
+    static public final String PREDICATE_QP = "prd";
+    
+    /** The Constant OBJECT. */
+    static public final String OBJECT = "objectCsid";
+    static public final String OBJECT_QP = "obj";
+    static public final String OBJECT_TYPE = "objectType";
+    static public final String OBJECT_TYPE_QP = OBJECT_QP + "Type";
 }

@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
@@ -40,7 +41,6 @@ import org.collectionspace.services.common.document.AbstractMultipartDocumentHan
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;

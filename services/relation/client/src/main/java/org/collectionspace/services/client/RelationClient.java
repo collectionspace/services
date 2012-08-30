@@ -40,9 +40,7 @@ public class RelationClient extends AbstractPoxServiceClientImpl<RelationsCommon
 	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 	public static final String SERVICE_COMMON_LIST_NAME = "relations-common-list";
-
     public static final String SERVICE_COMMONPART_NAME = IRelationsManager.SERVICE_COMMONPART_NAME;
-
     
 	@Override
 	public String getServiceName() {
