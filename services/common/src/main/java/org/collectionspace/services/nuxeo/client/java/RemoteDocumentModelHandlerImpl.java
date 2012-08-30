@@ -137,16 +137,19 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     
     @Override
     public boolean supportsHierarchy() {
-    	boolean result;
+    	boolean result = false;
     	
     	DocHandlerParams.Params params = null;
     	try {
 			params = getDocHandlerParams();
+			Boolean bool = params.isSupportsHierarchy();
+			if (bool != null) {
+				result = bool.booleanValue();
+			}
 		} catch (DocumentException e) {
 			// TODO Auto-generated catch block
 			logger.error(String.format("Could not get document handler params for class %s", this.getClass().getName()), e);
 		}
-		result = params.isSupportsHierarchy();
     	
     	return result;
     }
