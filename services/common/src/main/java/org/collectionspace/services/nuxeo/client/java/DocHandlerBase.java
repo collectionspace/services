@@ -36,17 +36,15 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.common.ReflectionMapper;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.AbstractServiceContextImpl;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
-import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
@@ -156,7 +154,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 			GregorianCalendar cal = (GregorianCalendar)
 								docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
 										CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT);
-			String updatedAt = DateTimeFormatUtils.formatAsISO8601Timestamp(cal);
+			String updatedAt = GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp(cal);
 			return updatedAt;
 	}
 

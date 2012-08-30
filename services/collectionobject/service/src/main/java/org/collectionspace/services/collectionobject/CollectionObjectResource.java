@@ -27,10 +27,9 @@ package org.collectionspace.services.collectionobject;
 
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
 import org.jboss.resteasy.util.HttpResponseCodes;
