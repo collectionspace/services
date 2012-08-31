@@ -17,6 +17,7 @@
 
     <xs:element name="tenantId" type="xs:string"/>
     <xs:element name="uri" type="xs:string"/>
+    <xs:element name="refname" type="xs:string"/>
     <!--<xs:element name="createdAt" type="xs:string"/>-->
     <xs:element name="createdAt" type="xs:dateTime"/>
     <xs:element name="updatedAt" type="xs:dateTime"/>

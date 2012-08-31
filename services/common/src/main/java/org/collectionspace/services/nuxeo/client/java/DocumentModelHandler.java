@@ -35,6 +35,7 @@ import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
@@ -317,6 +318,14 @@ public abstract class DocumentModelHandler<T, TL>
             //
             documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
             		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI, getUri(documentModel));
+            //
+            // Add the resource's refname
+            //
+            String csid = documentModel.getName();
+            String refname = RefName.Authority.buildAuthority(ctx.getTenantName(), ctx.getServiceName(),
+            		csid, "" /*authorityDisplayName*/).toString();
+            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+            		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME, refname);            
         	//
         	// Add the CSID to the DublinCore title so we can see the CSID in the default
         	// Nuxeo webapp.

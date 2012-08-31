@@ -97,6 +97,18 @@ public class RefName {
             String displaySuffix = (displayName != null && (!displayName.isEmpty())) ? '\'' + displayName + '\'' : "";
             return URN_PREFIX + tenantName + ':' + resource + ":" + "name" + "(" + shortIdentifier + ")" + displaySuffix;
         }
+
+        public static Authority buildAuthority(String tenantName, String serviceName, String authorityShortIdentifier, String authorityDisplayName) {
+            Authority authority = new Authority();
+            authority.tenantName = tenantName;
+            authority.resource = serviceName;
+            if (Tools.notEmpty(authority.resource)) {
+                authority.resource = authority.resource.toLowerCase();
+            }
+            authority.shortIdentifier = authorityShortIdentifier;
+            authority.displayName = authorityDisplayName;
+            return authority;
+        }
     }
 
     public static class AuthorityItem {
@@ -159,21 +171,9 @@ public class RefName {
         }
     }
 
-    public static Authority buildAuthority(String tenantName, String serviceName, String authorityShortIdentifier, String authorityDisplayName) {
-        Authority authority = new Authority();
-        authority.tenantName = tenantName;
-        authority.resource = serviceName;
-        if (Tools.notEmpty(authority.resource)) {
-            authority.resource = authority.resource.toLowerCase();
-        }
-        authority.shortIdentifier = authorityShortIdentifier;
-        authority.displayName = authorityDisplayName;
-        return authority;
-    }
-
     public static AuthorityItem buildAuthorityItem(String tenantName, String serviceName, String authorityShortIdentifier,
             String itemShortIdentifier, String itemDisplayName) {
-        Authority authority = buildAuthority(tenantName, serviceName, authorityShortIdentifier, "");
+        Authority authority = Authority.buildAuthority(tenantName, serviceName, authorityShortIdentifier, "");
         return buildAuthorityItem(authority, itemShortIdentifier, itemDisplayName);
     }
 
