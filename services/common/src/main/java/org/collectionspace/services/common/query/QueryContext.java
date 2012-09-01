@@ -68,6 +68,22 @@ public class QueryContext {
         this(ctx);
         whereClause = theWhereClause;
     }
+    
+    /**
+     * Instantiates a new query context.
+     *
+     * @param ctx the ctx
+     * @param theWhereClause the where clause
+     * @param theOrderByClause the order by clause
+     * @throws DocumentNotFoundException the document not found exception
+     * @throws DocumentException the document exception
+     */
+    public QueryContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            String theWhereClause, String theOrderByClause) throws DocumentNotFoundException, DocumentException {
+        this(ctx);
+        whereClause = theWhereClause;
+        orderByClause = theOrderByClause;
+    }
 
     /**
      * Instantiates a new query context.

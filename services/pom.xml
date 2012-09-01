@@ -48,6 +48,7 @@
         <module>relation</module>
         <module>query</module>
         <module>acquisition</module>
+        <module>claim</module>
         <module>vocabulary</module>
         <module>organization</module>
         <module>person</module>
