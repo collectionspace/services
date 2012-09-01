@@ -87,6 +87,13 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                	<service:SupportsHierarchy>false</service:SupportsHierarchy>
+                	<service:RefnameDisplayNameField>
+                        <service:ListResultField>
+                            <service:element>objectNumber</service:element>
+                            <service:xpath>objectNumber</service:xpath>
+                        </service:ListResultField>
+                	</service:RefnameDisplayNameField>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>objectNumber</service:element>
@@ -1543,6 +1550,12 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                 	<service:SupportsHierarchy>true</service:SupportsHierarchy>
+                	<service:RefnameDisplayNameField>
+                        <service:ListResultField>
+                            <service:element>order</service:element>
+                            <service:xpath>order</service:xpath>
+                        </service:ListResultField>
+                	</service:RefnameDisplayNameField>
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <service:ListResultField>

@@ -41,6 +41,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
@@ -300,13 +301,32 @@ public abstract class DocumentModelHandler<T, TL>
     abstract public AuthorityRefList getAuthorityRefs(String csid,
     		List<AuthRefConfigInfo> authRefsInfo) throws PropertyException;    
 
+    /*
+     * Subclasses should override this method if they need to customize their refname generation
+     */
+    public RefName.RefNameInterface getRefName(ServiceContext ctx,
+    		DocumentModel docModel) {
+    	return getRefName(new DocumentWrapperImpl<DocumentModel>(docModel), ctx.getTenantName(), ctx.getServiceName());
+    }
+    
+    @Override
+	public RefName.RefNameInterface getRefName(DocumentWrapper<DocumentModel> docWrapper,
+			String tenantName, String serviceName) {
+    	DocumentModel docModel = docWrapper.getWrappedObject();
+    	String csid = docModel.getName();
+    	String refnameDisplayName = this.getRefnameDisplayName(docWrapper);
+    	RefName.RefNameInterface refname = RefName.Authority.buildAuthority(tenantName, serviceName,
+        		csid, refnameDisplayName);
+    	return refname;
+	}
+
     private void handleCoreValues(DocumentWrapper<DocumentModel> docWrapper, 
     		Action action)  throws ClientException {
     	DocumentModel documentModel = docWrapper.getWrappedObject();
         String now = GregorianCalendarDateTimeUtils.timestampUTC();
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
     	String userId = ctx.getUserId();
-    	if(action==Action.CREATE) {
+    	if (action == Action.CREATE) {
             //
             // Add the tenant ID value to the new entity
             //
@@ -321,9 +341,7 @@ public abstract class DocumentModelHandler<T, TL>
             //
             // Add the resource's refname
             //
-            String csid = documentModel.getName();
-            String refname = RefName.Authority.buildAuthority(ctx.getTenantName(), ctx.getServiceName(),
-            		csid, "" /*authorityDisplayName*/).toString();
+            String refname = getRefName(ctx, documentModel).toString();
             documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
             		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME, refname);            
         	//

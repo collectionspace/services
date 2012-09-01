@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.StringTokenizer;
+
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 
@@ -66,6 +68,13 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     	// Empty constructor
     }
 
+    abstract protected String getRefnameDisplayName(DocumentWrapper<WT> docWrapper);
+    
+    /*
+     * Should return a reference name for the wrapper object
+     */
+    abstract public RefName.RefNameInterface getRefName(DocumentWrapper<WT> docWrapper, String tenantName, String serviceName);
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#getServiceContext()
      */

@@ -37,6 +37,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
@@ -95,6 +96,54 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
     }
 
+    @Override
+    protected String getRefnameDisplayName(DocumentWrapper<DocumentModel> docWrapper) {
+    	String result = null;
+    	
+    	DocumentModel docModel = docWrapper.getWrappedObject();
+    	ServiceContext ctx = this.getServiceContext();
+    	RefName.AuthorityItem refname = (RefName.AuthorityItem)getRefName(ctx, docModel);
+    	result = refname.getDisplayName();
+    	
+    	return result;
+    }
+    
+    /*
+     * Before calling this method, be sure that the 'this.handleCreate()' was called and was successful.
+     * (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getRefName(org.collectionspace.services.common.context.ServiceContext, org.nuxeo.ecm.core.api.DocumentModel)
+     */
+    @Override
+    public RefName.RefNameInterface getRefName(ServiceContext ctx,
+    		DocumentModel docModel) {
+    	RefName.RefNameInterface refname = null;
+    	
+    	try {
+	        String shortIdentifier = (String) docModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+	        if (Tools.isEmpty(shortIdentifier)) {
+	            throw new Exception("The shortIdentifier for this authority term was empty or not set.");
+	        }
+	        
+	        String displayName = getPrimaryDisplayName(docModel, authorityItemCommonSchemaName,
+	                    getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+	        if (Tools.isEmpty(displayName)) {
+	            throw new Exception("The displayName for this authority term was empty or not set.");
+	        }
+	        
+	        String authorityRefBaseName = getAuthorityRefNameBase();
+	        if (Tools.isEmpty(authorityRefBaseName)) {
+	            throw new Exception("Could not create the refName for this authority term, because the refName for its authority parent was empty.");
+	        }
+	        
+	        RefName.Authority parentsRefName = RefName.Authority.parse(authorityRefBaseName);
+	        refname = RefName.buildAuthorityItem(parentsRefName, shortIdentifier, displayName);
+    	} catch (Exception e) {
+    		logger.error(e.getMessage(), e);
+    	}
+
+        return refname;
+    }
+    
     public void setInAuthority(String inAuthority) {
         this.inAuthority = inAuthority;
     }
@@ -365,17 +414,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
             String schemaName,
             String authorityRefBaseName) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-        String displayName = getPrimaryDisplayName(docModel, authorityItemCommonSchemaName,
-                    getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-        
-        if (Tools.isEmpty(authorityRefBaseName)) {
-            throw new Exception("Could not create the refName for this authority term, because the refName for its authority parent was empty.");
-        }
-        
-        RefName.Authority authority = RefName.Authority.parse(authorityRefBaseName);
-        String refName = RefName.buildAuthorityItem(authority, shortIdentifier, displayName).toString();
-        docModel.setProperty(schemaName, AuthorityItemJAXBSchema.REF_NAME, refName);
+        RefName.RefNameInterface refname = getRefName(this.getServiceContext(), docModel);
+        String refNameStr = refname.toString();
+        docModel.setProperty(schemaName, AuthorityItemJAXBSchema.REF_NAME, refNameStr);
     }
 
     /**

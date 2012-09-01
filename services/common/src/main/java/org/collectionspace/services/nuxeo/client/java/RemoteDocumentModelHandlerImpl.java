@@ -136,6 +136,35 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	}
     
     @Override
+    protected String getRefnameDisplayName(DocumentWrapper<DocumentModel> docWrapper) {
+    	return getRefnameDisplayName(docWrapper.getWrappedObject());
+    }
+	
+	private String getRefnameDisplayName(DocumentModel docModel) {
+		String result = null;
+		
+    	DocHandlerParams.Params params = null;
+    	try {
+			params = getDocHandlerParams();
+			ListResultField field = params.getRefnameDisplayNameField();
+			
+			String schema = field.getSchema();
+			if (schema == null || schema.trim().isEmpty()) {
+				schema = getServiceContext().getCommonPartLabel();
+			}
+			
+			result = getStringValue(docModel, schema, field);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			if (logger.isWarnEnabled()) {
+				logger.warn(String.format("Call failed to getRefnameDisplayName() for class %s", this.getClass().getName()));
+			}
+		}
+		
+		return result;
+	}
+	
+    @Override
     public boolean supportsHierarchy() {
     	boolean result = false;
     	
@@ -806,8 +835,22 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 		
 		return result;
 	}
-   
 	
+	protected String getStringValue(DocumentModel docModel,
+			String schema, ListResultField field) {
+		String result = null;
+		
+		Object value = getListResultValue(docModel, schema, field);
+		if (value != null && value instanceof String) {
+			String strValue = (String) value;
+			if (strValue.trim().isEmpty() == false) {
+				result = strValue;
+			}
+		}
+		
+		return result;
+	}
+   
     protected void removeFromList(List<RelationsCommonList.RelationListItem> list, RelationsCommonList.RelationListItem item) {
         list.remove(item);
     }

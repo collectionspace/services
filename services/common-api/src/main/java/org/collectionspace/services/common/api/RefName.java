@@ -51,8 +51,12 @@ public class RefName {
     public static final String URN_PREFIX = "urn:cspace:";
     public static final String URN_NAME_PREFIX = "urn:cspace:name";
     public static final String REFNAME = "refName";
+    
+    public static interface RefNameInterface {
+    	public String toString();
+    }
 
-    public static class Authority {
+    public static class Authority implements RefNameInterface {
 
         public String tenantName = "";
         public String resource = "";
@@ -71,6 +75,10 @@ public class RefName {
             return authority;
         }
 
+        public String getDisplayName() {
+        	return this.getDisplayName();
+        }
+        
         public String getShortIdentifier() {
             return this.shortIdentifier;
         }
@@ -111,7 +119,7 @@ public class RefName {
         }
     }
 
-    public static class AuthorityItem {
+    public static class AuthorityItem implements RefNameInterface {
 
         public Authority inAuthority;
         public String shortIdentifier = "";
@@ -129,6 +137,10 @@ public class RefName {
             return authorityItem;
         }
 
+        public String getDisplayName() {
+        	return this.displayName;
+        }
+        
         public String getParentShortIdentifier() {
             return this.inAuthority.shortIdentifier;
         }
@@ -171,10 +183,10 @@ public class RefName {
         }
     }
 
-    public static AuthorityItem buildAuthorityItem(String tenantName, String serviceName, String authorityShortIdentifier,
-            String itemShortIdentifier, String itemDisplayName) {
-        Authority authority = Authority.buildAuthority(tenantName, serviceName, authorityShortIdentifier, "");
-        return buildAuthorityItem(authority, itemShortIdentifier, itemDisplayName);
+    public static AuthorityItem buildAuthorityItem(String tenantName, String serviceName, String authorityShortID,
+            String itemShortID, String itemDisplayName) {
+        Authority authority = Authority.buildAuthority(tenantName, serviceName, authorityShortID, "");
+        return buildAuthorityItem(authority, itemShortID, itemDisplayName);
     }
 
     public static AuthorityItem buildAuthorityItem(String authorityRefName, String itemShortID, String itemDisplayName) {
@@ -183,10 +195,10 @@ public class RefName {
         return item;
     }
 
-    public static AuthorityItem buildAuthorityItem(Authority authority, String itemShortIdentifier, String itemDisplayName) {
+    public static AuthorityItem buildAuthorityItem(Authority authority, String itemShortID, String itemDisplayName) {
         AuthorityItem item = new AuthorityItem();
         item.inAuthority = authority;
-        item.shortIdentifier = itemShortIdentifier;
+        item.shortIdentifier = itemShortID;
         item.displayName = itemDisplayName;
         return item;
     }

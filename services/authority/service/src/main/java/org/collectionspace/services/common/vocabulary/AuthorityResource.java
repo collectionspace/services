@@ -254,7 +254,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
     protected String buildAuthorityRefNameBase(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String shortIdentifier) {
-        RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
+        RefName.Authority authority = RefName.Authority.buildAuthority(ctx.getTenantName(),
                 ctx.getServiceName(), shortIdentifier, null);
         return authority.toString();
     }

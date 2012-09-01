@@ -239,6 +239,7 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="SchemaName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="RefnameDisplayNameField" type="ListResultField" minOccurs="0" maxOccurs="1"/>  <!-- Should rename 'ListResultField' to a more generic name -->
                         <xs:element name="SupportsHierarchy" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>
                         <xs:element name="DublinCoreTitle" type="xs:string" minOccurs="0" maxOccurs="1"/>
                         <xs:element name="SummaryFields" type="xs:string" minOccurs="0" maxOccurs="1"/>

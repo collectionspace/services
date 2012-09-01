@@ -157,7 +157,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 		return result;
 	}
 	
-	protected static String getUpdatedAtAsString(DocumentModel docModel) throws Exception {
+	public static String getUpdatedAtAsString(DocumentModel docModel) throws Exception {
 			GregorianCalendar cal = (GregorianCalendar)
 								docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
 										CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT);
@@ -176,7 +176,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     	
     	AbstractServiceContextImpl sc = (AbstractServiceContextImpl)getServiceContext();
     	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
-    	markRtSbj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT);
+    	markRtSbj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT);  // REM - We need to document what this query param is for -i.e., what's its purpose?
     	if(markRtSbj!=null && markRtSbj.isEmpty())
     		markRtSbj = null;
   
@@ -244,13 +244,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 					if (schema == null || schema.trim().isEmpty()) {
 						schema = commonSchema;
 					}
-					Object value = getListResultValue(docModel, schema, field);
-					if (value != null && value instanceof String) {
-						String strValue = (String) value;
-						if (strValue.trim().isEmpty() == true) {
-							value = null;
-						}
-					}
+					Object value = getStringValue(docModel, schema, field);
 					if (value != null) {
 						item.put(field.getElement(), value);
 					}
