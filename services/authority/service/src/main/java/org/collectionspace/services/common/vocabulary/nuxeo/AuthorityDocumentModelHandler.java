@@ -133,6 +133,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	                ctx.getServiceName(),
 	                shortIdentifier,
 	                displayName);
+	        refname = authority;
     	} catch (Exception e) {
     		logger.error(e.getMessage(), e);
     	}

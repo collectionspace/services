@@ -88,11 +88,9 @@
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                 	<service:SupportsHierarchy>false</service:SupportsHierarchy>
-                	<service:RefnameDisplayNameField>
-                        <service:ListResultField>
-                            <service:element>objectNumber</service:element>
-                            <service:xpath>objectNumber</service:xpath>
-                        </service:ListResultField>
+                	<service:RefnameDisplayNameField> <!-- The field used as the display name in an object's refname -->
+	                    <service:element>objectNumber</service:element>
+	                    <service:xpath>objectNumber</service:xpath>
                 	</service:RefnameDisplayNameField>
                     <service:ListResultsFields>
                         <service:ListResultField>

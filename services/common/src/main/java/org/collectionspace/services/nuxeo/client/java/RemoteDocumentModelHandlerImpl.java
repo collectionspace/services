@@ -140,7 +140,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	return getRefnameDisplayName(docWrapper.getWrappedObject());
     }
 	
-	private String getRefnameDisplayName(DocumentModel docModel) {
+	private String getRefnameDisplayName(DocumentModel docModel) { // Look in the tenant bindings to see what field should be our display name for our refname value
 		String result = null;
 		
     	DocHandlerParams.Params params = null;
