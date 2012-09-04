@@ -20,7 +20,7 @@
 
     <properties>
 	    <CustomSchemaName>media_botgarden</CustomSchemaName>
-	    <TenantId>20</TenantId>
+	    <TenantId>35</TenantId>
 	    <TenantLabel>botgarden</TenantLabel>
     </properties>
     

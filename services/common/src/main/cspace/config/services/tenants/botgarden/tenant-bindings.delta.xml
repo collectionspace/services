@@ -3,7 +3,7 @@
 	xmlns:merge='http://xmlmerge.el4j.elca.ch'
 	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
 	    	 
-    <tenant:tenantBinding id="20" name="botgarden.cspace.berkeley.edu" displayName="CollectionSpace BotGarden Tenant" version="0.1">
+    <tenant:tenantBinding id="35" name="botgarden.cspace.berkeley.edu" displayName="CollectionSpace BotGarden Tenant" version="0.1">
         <tenant:repositoryDomain name="default-domain" storageName="botgarden-domain" repositoryClient="nuxeo-java" />
 
         <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
