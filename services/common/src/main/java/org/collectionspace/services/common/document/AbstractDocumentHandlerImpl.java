@@ -70,6 +70,8 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 
     abstract protected String getRefnameDisplayName(DocumentWrapper<WT> docWrapper);
     
+    abstract protected String getOrderByField();    
+    
     /*
      * Should return a reference name for the wrapper object
      */

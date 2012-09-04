@@ -652,6 +652,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * Most of the authority child classes will/should use this implementation.  However, the Vocabulary service's item schema is
      * different enough that it will have to override this method in it's resource class.
      */
+    @Override
 	protected String getOrderByField() {
 		String result = null;
 

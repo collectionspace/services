@@ -139,6 +139,30 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     protected String getRefnameDisplayName(DocumentWrapper<DocumentModel> docWrapper) {
     	return getRefnameDisplayName(docWrapper.getWrappedObject());
     }
+    
+    /*
+     * Used get the order by field for list results if one is not specified with an HTTP query param.
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#getOrderByField()
+     */
+    @Override
+    protected String getOrderByField() {
+    	String result = null;
+    	
+    	DocHandlerParams.Params params = null;
+    	try {
+			params = getDocHandlerParams();
+			ListResultField field = params.getRefnameDisplayNameField();
+			result = field.getSchema() + ":" + field.getXpath();
+    	} catch (Exception e) {
+			if (logger.isWarnEnabled()) {
+				logger.warn(String.format("Call failed to getOrderByField() for class %s", this.getClass().getName()));
+			}
+    	}
+    	
+    	return result;
+    }
 	
 	private String getRefnameDisplayName(DocumentModel docModel) { // Look in the tenant bindings to see what field should be our display name for our refname value
 		String result = null;
@@ -155,7 +179,6 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 			
 			result = getStringValue(docModel, schema, field);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			if (logger.isWarnEnabled()) {
 				logger.warn(String.format("Call failed to getRefnameDisplayName() for class %s", this.getClass().getName()));
 			}
