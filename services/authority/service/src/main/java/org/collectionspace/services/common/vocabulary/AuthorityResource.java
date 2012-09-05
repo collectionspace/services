@@ -653,7 +653,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * different enough that it will have to override this method in it's resource class.
      */
     @Override
-	protected String getOrderByField() {
+	protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		String result = null;
 
 		result = NuxeoUtils.getPrimaryElPathPropertyName(
@@ -663,7 +663,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 		return result;
 	}
 	
-	protected String getPartialTermMatchField() {
+    @Override
+	protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		String result = null;
 		
 		result = NuxeoUtils.getMultiElPathPropertyName(

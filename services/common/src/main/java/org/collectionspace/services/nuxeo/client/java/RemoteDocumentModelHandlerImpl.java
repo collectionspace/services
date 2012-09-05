@@ -50,6 +50,7 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -119,62 +120,24 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                     + MultipartServiceContext.class.getName());
         }
     }
-
-    /*
-     * Returns the document handler parameters that were loaded at startup from the
-     * tenant bindings config file.
-     */
-	public DocHandlerParams.Params getDocHandlerParams() throws DocumentException {
-		MultipartServiceContext sc = (MultipartServiceContext) getServiceContext();
-		ServiceBindingType sb = sc.getServiceBinding();
-		DocHandlerParams dhb = sb.getDocHandlerParams();
-		if (dhb != null && dhb.getParams() != null) {
-			return dhb.getParams();
-		}
-		throw new DocumentException("No DocHandlerParams configured for: "
-				+ sb.getName());
-	}
     
     @Override
     protected String getRefnameDisplayName(DocumentWrapper<DocumentModel> docWrapper) {
     	return getRefnameDisplayName(docWrapper.getWrappedObject());
     }
-    
-    /*
-     * Used get the order by field for list results if one is not specified with an HTTP query param.
-     * 
-     * (non-Javadoc)
-     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#getOrderByField()
-     */
-    @Override
-    protected String getOrderByField() {
-    	String result = null;
     	
-    	DocHandlerParams.Params params = null;
-    	try {
-			params = getDocHandlerParams();
-			ListResultField field = params.getRefnameDisplayNameField();
-			result = field.getSchema() + ":" + field.getXpath();
-    	} catch (Exception e) {
-			if (logger.isWarnEnabled()) {
-				logger.warn(String.format("Call failed to getOrderByField() for class %s", this.getClass().getName()));
-			}
-    	}
-    	
-    	return result;
-    }
-	
 	private String getRefnameDisplayName(DocumentModel docModel) { // Look in the tenant bindings to see what field should be our display name for our refname value
 		String result = null;
+		ServiceContext ctx = this.getServiceContext();
 		
     	DocHandlerParams.Params params = null;
     	try {
-			params = getDocHandlerParams();
+			params = ServiceConfigUtils.getDocHandlerParams(ctx);
 			ListResultField field = params.getRefnameDisplayNameField();
 			
 			String schema = field.getSchema();
 			if (schema == null || schema.trim().isEmpty()) {
-				schema = getServiceContext().getCommonPartLabel();
+				schema = ctx.getCommonPartLabel();
 			}
 			
 			result = getStringValue(docModel, schema, field);

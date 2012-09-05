@@ -63,7 +63,11 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     public ServiceContextFactory<PoxPayloadIn, PoxPayloadOut> getServiceContextFactory() {
         return MultipartServiceContextFactory.get();
     }
+    
+    abstract protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx);    
 
+	abstract protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx);
+    
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
         return createDocumentHandler(ctx, ctx.getCommonPartLabel(), getCommonPartClass());

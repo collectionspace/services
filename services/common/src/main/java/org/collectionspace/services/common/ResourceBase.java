@@ -29,6 +29,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -37,6 +38,8 @@ import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.config.ClientType;
+import org.collectionspace.services.config.service.DocHandlerParams;
+import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -379,6 +382,50 @@ public abstract class ResourceBase
     }
     
     //======================== UTILITY : getDocModelForRefName ========================================
+
+    /*
+     * Used get the order by field for list results if one is not specified with an HTTP query param.
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#getOrderByField()
+     */
+    @Override
+    protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+    	String result = null;
+    	
+    	DocHandlerParams.Params params = null;
+    	try {
+			result = getPartialTermMatchField(ctx);
+			if (result == null) {
+				throw new Exception();
+			}
+    	} catch (Exception e) {
+			if (logger.isWarnEnabled()) {
+				logger.warn(String.format("Call failed to getOrderByField() for class %s", this.getClass().getName()));
+			}
+    	}
+    	
+    	return result;
+    }
+
+    @Override
+	protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+    	String result = null;
+    	
+    	DocHandlerParams.Params params = null;
+    	try {
+			params = ServiceConfigUtils.getDocHandlerParams(ctx);
+			ListResultField field = params.getRefnameDisplayNameField();
+			result = field.getSchema() + ":" + field.getXpath();
+    	} catch (Exception e) {
+			if (logger.isWarnEnabled()) {
+				logger.warn(String.format("Call failed to getPartialTermMatchField() for class %s", this.getClass().getName()));
+			}
+    	}
+    	
+    	return result;
+	}
+	
     /*
      * ResourceBase create and update calls will set the resourceMap into the service context
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
@@ -408,4 +455,5 @@ public abstract class ResourceBase
     	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
     }
 
+    
 }
