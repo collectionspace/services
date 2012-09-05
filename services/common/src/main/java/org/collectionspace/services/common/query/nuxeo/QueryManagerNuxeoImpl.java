@@ -339,7 +339,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	public String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude) {
     	// Start with the qualified termStatus field
     	StringBuilder filterClause = new StringBuilder(qualifiedField);
-    	if(filterTerms.length == 1) {
+    	if (filterTerms.length == 1) {
     		filterClause.append(fExclude?" <> '":" = '");
     		filterClause.append(filterTerms[0]);
     		filterClause.append('\'');  

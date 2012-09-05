@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common;
 
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -267,13 +268,14 @@ public abstract class ResourceBase
     @GET
     public AbstractCommonList getList(@Context UriInfo ui) {
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
         String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
         String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
         String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
 
         AbstractCommonList list;
         if (keywords != null || advancedSearch != null) {
-            list = search(queryParams, keywords, advancedSearch);
+            list = search(queryParams, orderBy, keywords, advancedSearch, partialTerm);
         } else {
             list = getList(queryParams);
         }
@@ -301,16 +303,26 @@ public abstract class ResourceBase
         }
     }
 
-    protected AbstractCommonList search(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    protected AbstractCommonList search(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		DocumentHandler handler, 
     		MultivaluedMap<String, String> queryParams,
+    		String orderBy,
     		String keywords,
     		String advancedSearch,
     		String partialTerm) throws Exception {
+        DocumentFilter docFilter = handler.getDocumentFilter();      
+        if (orderBy == null || orderBy.isEmpty()) {
+            String orderByField = getOrderByField(ctx);
+            docFilter.setOrderByClause(orderByField);
+        }
         
-        DocumentFilter docFilter = handler.getDocumentFilter();
+        //
+        //NOTE: Partial-term (PT) searches are mutually exclusive to keyword and advanced-search, but
+        // the PT query param trumps the keyword search.
+        //
         if (partialTerm != null && !partialTerm.isEmpty()) {
-        	String partialTermMatchField = getPartialTermMatchField();
+        	String partialTermMatchField = getPartialTermMatchField(ctx);
             String ptClause = QueryManager.createWhereClauseForPartialMatch(
             		partialTermMatchField, partialTerm);
             docFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
@@ -327,9 +339,9 @@ public abstract class ResourceBase
                 }
             }
         }
-        
+                
         //
-        // Add an advance search clause if one was specified
+        // Add an advance search clause if one was specified -even if PT search was requested?
         //
         if (advancedSearch != null && !advancedSearch.isEmpty()) {
             String whereClause = QueryManager.createWhereClauseFromAdvancedSearch(advancedSearch);
@@ -338,25 +350,29 @@ public abstract class ResourceBase
                 logger.debug("The WHERE clause is: " + docFilter.getWhereClause());
             }
         }
-        getRepositoryClient(ctx).getFiltered(ctx, handler);
         
+        getRepositoryClient(ctx).getFiltered(ctx, handler);        
         return (AbstractCommonList) handler.getCommonPartList();
     }
 
-    protected AbstractCommonList search(MultivaluedMap<String, String> queryParams,
+    private AbstractCommonList search(
+    		MultivaluedMap<String, String> queryParams,
+    		String orderBy,
     		String keywords,
     		String advancedSearch,
     		String partialTerm) {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
-            AbstractCommonList result = null;
-			try {
-				ctx = createServiceContext(queryParams);
-		        DocumentHandler handler = createDocumentHandler(ctx);
-				result = search(ctx, handler, queryParams, keywords, advancedSearch, partialTerm);
-			} catch (Exception e) {
-	            throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
-			}
-            return result;
+    	AbstractCommonList result = null;
+
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
+    	try {
+    		ctx = createServiceContext(queryParams);
+    		DocumentHandler handler = createDocumentHandler(ctx);
+    		result = search(ctx, handler, queryParams, orderBy, keywords, advancedSearch, partialTerm);
+    	} catch (Exception e) {
+    		throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
+    	}
+
+    	return result;
     }
     
     //FIXME: REM - This should not be @Deprecated since we may want to implement this -it has been on the wish list.

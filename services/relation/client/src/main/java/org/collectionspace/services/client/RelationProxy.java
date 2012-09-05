@@ -54,7 +54,7 @@ public interface RelationProxy extends CollectionSpacePoxProxy<RelationsCommonLi
     		@QueryParam(IRelationsManager.PREDICATE_QP) String predicate,
     		@QueryParam(IRelationsManager.OBJECT_QP) String objectCsid,
     		@QueryParam(IRelationsManager.OBJECT_TYPE_QP) String objectType,
-            @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortBy,
+            @QueryParam(IClientQueryParams.ORDER_BY_PARAM) String sortBy,
             @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
     	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);
 }

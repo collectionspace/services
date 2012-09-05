@@ -156,7 +156,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	
     	DocHandlerParams.Params params = null;
     	try {
-			params = getDocHandlerParams();
+        	ServiceContext ctx = this.getServiceContext();
+			params = ServiceConfigUtils.getDocHandlerParams(ctx);
 			Boolean bool = params.isSupportsHierarchy();
 			if (bool != null) {
 				result = bool.booleanValue();
