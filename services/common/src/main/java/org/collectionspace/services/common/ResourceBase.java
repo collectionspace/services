@@ -266,6 +266,8 @@ public abstract class ResourceBase
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
         String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
+        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+
         AbstractCommonList list;
         if (keywords != null || advancedSearch != null) {
             list = search(queryParams, keywords, advancedSearch);
@@ -300,29 +302,37 @@ public abstract class ResourceBase
     		DocumentHandler handler, 
     		MultivaluedMap<String, String> queryParams,
     		String keywords,
-    		String advancedSearch) throws Exception {
+    		String advancedSearch,
+    		String partialTerm) throws Exception {
         
-        // perform a keyword search
-        if (keywords != null && !keywords.isEmpty()) {
+        DocumentFilter docFilter = handler.getDocumentFilter();
+        if (partialTerm != null && !partialTerm.isEmpty()) {
+        	String partialTermMatchField = getPartialTermMatchField();
+            String ptClause = QueryManager.createWhereClauseForPartialMatch(
+            		partialTermMatchField, partialTerm);
+            docFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
+        } else if (keywords != null && !keywords.isEmpty()) {
             String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-            if(Tools.isEmpty(whereClause)) {
-                if (logger.isDebugEnabled()) {
-                	logger.debug("The WHERE clause is empty for keywords: ["+keywords+"]");
-                }
-            } else {
-	            DocumentFilter documentFilter = handler.getDocumentFilter();
-	            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            if (Tools.isEmpty(whereClause) == false) {
+            	docFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
 	            if (logger.isDebugEnabled()) {
-	                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+	                logger.debug("The WHERE clause is: " + docFilter.getWhereClause());
 	            }
+            } else {
+                if (logger.isWarnEnabled()) {
+                	logger.warn("The WHERE clause is empty for keywords: ["+keywords+"]");
+                }
             }
         }
+        
+        //
+        // Add an advance search clause if one was specified
+        //
         if (advancedSearch != null && !advancedSearch.isEmpty()) {
             String whereClause = QueryManager.createWhereClauseFromAdvancedSearch(advancedSearch);
-            DocumentFilter documentFilter = handler.getDocumentFilter();
-            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            docFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             if (logger.isDebugEnabled()) {
-                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+                logger.debug("The WHERE clause is: " + docFilter.getWhereClause());
             }
         }
         getRepositoryClient(ctx).getFiltered(ctx, handler);
@@ -332,13 +342,14 @@ public abstract class ResourceBase
 
     protected AbstractCommonList search(MultivaluedMap<String, String> queryParams,
     		String keywords,
-    		String advancedSearch) {
+    		String advancedSearch,
+    		String partialTerm) {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
             AbstractCommonList result = null;
 			try {
 				ctx = createServiceContext(queryParams);
 		        DocumentHandler handler = createDocumentHandler(ctx);
-				result = search(ctx, handler, queryParams, keywords, advancedSearch);
+				result = search(ctx, handler, queryParams, keywords, advancedSearch, partialTerm);
 			} catch (Exception e) {
 	            throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
 			}

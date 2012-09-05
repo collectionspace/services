@@ -50,6 +50,7 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -125,14 +126,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * tenant bindings config file.
      */
 	public DocHandlerParams.Params getDocHandlerParams() throws DocumentException {
-		MultipartServiceContext sc = (MultipartServiceContext) getServiceContext();
-		ServiceBindingType sb = sc.getServiceBinding();
-		DocHandlerParams dhb = sb.getDocHandlerParams();
-		if (dhb != null && dhb.getParams() != null) {
-			return dhb.getParams();
-		}
-		throw new DocumentException("No DocHandlerParams configured for: "
-				+ sb.getName());
+		return ServiceConfigUtils.getDocHandlerParams(this.getServiceContext());
 	}
     
     @Override
