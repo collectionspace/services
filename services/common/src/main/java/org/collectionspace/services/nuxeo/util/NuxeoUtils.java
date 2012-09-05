@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.File;
+import java.lang.reflect.Field;
 
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -49,6 +50,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
@@ -64,6 +66,8 @@ import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
 
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.search.api.client.querymodel.descriptor.QueryModelDescriptor;
+import org.nuxeo.ecm.core.storage.sql.Binary;
+import org.nuxeo.ecm.core.storage.sql.coremodel.SQLBlob;
 import org.nuxeo.runtime.api.Framework;
 
 
@@ -91,7 +95,94 @@ public class NuxeoUtils {
     //private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?(, \\w+(_\\w+)?:\\w+( ASC| DESC)?)*";    
 		// Allow paths so can sort on complex fields. CSPACE-4601
     private static final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?(, \\w+(_\\w+)?:\\w+(/(\\*|\\w+))*( ASC| DESC)?)*";
+	
+    /* 
+     * Keep this method private.  This method uses reflection to gain access to a protected field in Nuxeo's "Binary" class.  Once we learn how
+     * to locate the "file" field of a Binary instance without breaking our "contract" with this class, we should minimize
+     * our use of this method.
+     */
+    private static File getFileOfBlob(Blob blob) {
+    	File result = null;
+    	
+    	if (blob instanceof SQLBlob) {
+    		SQLBlob sqlBlob = (SQLBlob)blob;
+    		Binary binary = sqlBlob.getBinary();
+    		try {
+    			Field fileField = binary.getClass().getDeclaredField("file");
+    			boolean accessibleState = fileField.isAccessible();
+    			if (accessibleState == false) {
+    				fileField.setAccessible(true);
+    			}
+    			result = (File)fileField.get(binary);
+    			fileField.setAccessible(accessibleState); // set it back to its original access state
+    		} catch (Exception e) {
+    			logger.error("Was not able to find the 'file' field", e);
+    		}    		
+    	}
+    	
+    	return result;
+    }
+    
+    static public boolean deleteFileOfBlob(Blob blob) {
+    	boolean result = false;
+    	
+    	File fileToDelete = getFileOfBlob(blob);
+    	result = fileToDelete.delete();
+		if (result == false) {
+			logger.warn("Could not delete the blob file at: " + fileToDelete.getAbsolutePath());
+		}
+    	
+    	return result;
+    }
+    
+    /*
+     * This method will fail to return a facet list if non exist or if Nuxeo changes the
+     * DocumentModelImpl class "facets" field to be of a different type or if they remove it altogether.
+     */
+    public static Set<String> getFacets(DocumentModel docModel) {
+    	Set<String> result = null;
+    	
+    	try {
+			Field f = docModel.getClass().getDeclaredField("facets");
+			f.setAccessible(true);
+			result = (Set<String>) f.get(docModel);
+			f.setAccessible(false);
+    	} catch (Exception e) {
+    		logger.error("Could not remove facet from DocumentModel instance: " + docModel.getId(), e);
+    	}
+    	
+    	return result;
+    }
+    
+    /*
+     * Remove a Nuxeo facet from a document model instance
+     */
+    public static boolean removeFacet(DocumentModel docModel, String facet) {
+    	boolean result = false;
+    	
+    	Set<String> facets = getFacets(docModel);
+    	if (facets != null && facets.contains(facet)) {
+    		facets.remove(facet);
+    		result = true;
+    	}
 		
+		return result;
+    }
+    
+    /*
+     * Adds a Nuxeo facet to a document model instance
+     */
+    public static boolean addFacet(DocumentModel docModel, String facet) {
+    	boolean result = false;
+    	
+    	Set<String> facets = getFacets(docModel);
+    	if (facets != null && !facets.contains(facet)) {
+    		facets.add(facet);
+    		result = true;
+    	}
+		
+		return result;
+    }    
 
     public static void exportDocModel(DocumentModel src) {
     	DocumentReader reader = null;
