@@ -605,24 +605,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         super.extractAllParts(wrapDoc);
-
-        String showSiblings = ctx.getQueryParams().getFirst(CommonAPI.showSiblings_QP);
-        if (Tools.isTrue(showSiblings)) {
-            showSiblings(wrapDoc, ctx);
-            return;   // actual result is returned on ctx.addOutputPart();
-        }
-
-        String showRelations = ctx.getQueryParams().getFirst(CommonAPI.showRelations_QP);
-        if (Tools.isTrue(showRelations)) {
-            showRelations(wrapDoc, ctx);
-            return;   // actual result is returned on ctx.addOutputPart();
-        }
-
-        String showAllRelations = ctx.getQueryParams().getFirst(CommonAPI.showAllRelations_QP);
-        if (Tools.isTrue(showAllRelations)) {
-            showAllRelations(wrapDoc, ctx);
-            return;   // actual result is returned on ctx.addOutputPart();
-        }
     }
 
     @Override
