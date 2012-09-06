@@ -2,6 +2,8 @@
 <xmlReplay>
     <testGroup ID="HierarchicCollectionObject" autoDeletePOSTS="true">
         
+        <!-- Create a set of CollectionObjects -->
+        
         <!-- Chess set box -->
         <!-- (parent of chess board, bags of white and black chess pieces -->
         <test ID="CreateChessSetBox" auth="admin@core.collectionspace.org">
@@ -107,9 +109,75 @@
         <test ID="ReadBlackRook" auth="admin@core.collectionspace.org">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
-        </test>           
+        </test>
+        
+        <!-- Create hierarchical relationships -->
+        
+        <!-- Post an update to one of the chess piece records, which includes -->
+        <!-- a list of hierarchical relationships to be created between the -->
+        <!-- various CollectionObjects created in tests above -->
+        <test ID="CreateHierarchy">
+            <method>PUT</method>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
+            <filename>collectionobject/hierarchy/2-collectionobjects_w_relations_CSID.xml</filename>
+            <vars>
+                <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
+                <var ID="chessBoardCSID">${CreateChessBoard.CSID}</var>
+                <var ID="bagOfWhiteChessPiecesCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
+                <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                <var ID="whiteRookCSID">${CreateWhiteRook.CSID}</var>
+                <var ID="whiteBishopCSID">${CreateWhiteBishop.CSID}</var>
+                <var ID="blackQueenCSID">${CreateBlackQueen.CSID}</var>
+                <var ID="blackRookCSID">${CreateBlackRook.CSID}</var>
+            </vars>
+        </test>
+        
+        <!-- Read hierarchical relationships -->
+        
+        <test ID="ReadHierarchyForTopLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}?showRelations=true</uri>
+            <!-- Need to test response payload here -->
+        </test>
+        
+        <test ID="ReadHierarchyForMidLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}?showRelations=true</uri>
+            <!-- Need to test response payload here -->
+        </test>
+        
+        <test ID="ReadHierarchyForBottomLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}?showRelations=true</uri>
+            <!-- Need to test response payload here -->
+        </test>
+        
+        <test ID="ReadAllRelations">
+             <method>GET</method>
+             <uri>/cspace-services/relations</uri>
+             <!-- Need to test response payload here -->
+         </test>
+         
+         <test ID="GetRelationsAsSubject">
+             <method>GET</method>
+             <uri>/cspace-services/relations?sbj=${CreateBagOfBlackChessPieces.CSID}</uri>
+             <!-- Need to test response payload here -->
+        </test>
+         
+        <test ID="GetRelationsAsObject">
+            <method>GET</method>
+            <uri>/cspace-services/relations?obj=${CreateBagOfBlackChessPieces.CSID}</uri>
+            <!-- Need to test response payload here -->
+       </test>
+            
         
         <!-- Cleanup-->
+        <!--
+        <test ID="DeleteHierarchy">
+        </test>
+        -->
+        <!-- The following is likely unnecessary with 'autoDeletePOSTS="true"' -->
+        <!--
         <test ID="DeleteBlackRook" auth="admin@core.collectionspace.org">
             <method>DELETE</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
@@ -142,6 +210,8 @@
             <method>DELETE</method>
             <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}</uri>
         </test>
+        -->
+        
         
         
         
