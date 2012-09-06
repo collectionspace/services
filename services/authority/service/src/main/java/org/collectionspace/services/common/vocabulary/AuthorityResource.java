@@ -46,6 +46,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
@@ -253,7 +254,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
     protected String buildAuthorityRefNameBase(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String shortIdentifier) {
-        RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
+        RefName.Authority authority = RefName.Authority.buildAuthority(ctx.getTenantName(),
                 ctx.getServiceName(), shortIdentifier, null);
         return authority.toString();
     }
@@ -428,7 +429,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
             // be on the displayName field
-            String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
+            String sortBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
             if (sortBy == null || sortBy.isEmpty()) {
                 String qualifiedDisplayNameField = authorityCommonSchemaName + ":"
                         + AuthorityItemJAXBSchema.DISPLAY_NAME;
@@ -516,7 +517,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input);
             ctx.setResourceMap(resourceMap);
-            ctx.setUriInfo(ui);    //Laramie
+            ctx.setUriInfo(ui);
 
             // Note: must have the parentShortId, to do the create.
             CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(specifier, "createAuthorityItem", "CREATE_ITEM", null);
@@ -651,7 +652,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * Most of the authority child classes will/should use this implementation.  However, the Vocabulary service's item schema is
      * different enough that it will have to override this method in it's resource class.
      */
-	protected String getOrderByField() {
+    @Override
+	protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		String result = null;
 
 		result = NuxeoUtils.getPrimaryElPathPropertyName(
@@ -661,7 +663,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 		return result;
 	}
 	
-	protected String getPartialTermMatchField() {
+    @Override
+	protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		String result = null;
 		
 		result = NuxeoUtils.getMultiElPathPropertyName(
@@ -687,36 +690,27 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Produces("application/xml")
     public AbstractCommonList getAuthorityItemList(@PathParam("csid") String specifier,
             @Context UriInfo ui) {
+    	AbstractCommonList result = null;
+    	
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+            String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
             String termStatus = queryParams.getFirst(SEARCH_TYPE_TERMSTATUS);
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
+            String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
 
-            // Note that docType defaults to the ServiceName, so we're fine with that.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-
-            String parentcsid = PARENT_WILDCARD.equals(specifier)?null:
-            					lookupParentCSID(specifier, "getAuthorityItemList", "LIST", queryParams);
-
-            ctx = createServiceContext(getItemServiceName(), queryParams);
-
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), queryParams);
             // For the wildcard case, parentcsid is null, but docHandler will deal with this.
             // We omit the parentShortId, only needed when doing a create...
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parentcsid, null);
+            String parentcsid = PARENT_WILDCARD.equals(specifier) ? null :
+				lookupParentCSID(specifier, "getAuthorityItemList", "LIST", queryParams);
+            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler =
+            	createItemDocumentHandler(ctx, parentcsid, null);
             
             DocumentFilter myFilter = handler.getDocumentFilter();
-            // Need to make the default sort order for authority items
-            // be on the displayName field
-            String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
-            if (sortBy == null || sortBy.isEmpty()) {
-                String orderByField = getOrderByField();
-                myFilter.setOrderByClause(orderByField);
-            }
-
             // If we are not wildcarding the parent, add a restriction
-            if(parentcsid!=null) {
+            if (parentcsid != null) {
 	            myFilter.appendWhereClause(authorityItemCommonSchemaName + ":"
 	                    + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
 	                    + "'" + parentcsid + "'",
@@ -731,30 +725,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             	String tsClause = QueryManager.createWhereClauseToFilterFromStringList(qualifiedTermStatusField, filterTerms, IQueryManager.FILTER_EXCLUDE);
                 myFilter.appendWhereClause(tsClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
-                
-            // AND vocabularyitems_common:displayName LIKE '%partialTerm%'
-            // NOTE: Partial terms searches are mutually exclusive to keyword and advanced-search, but
-            // the PT query param trumps the KW and AS query params.
-            if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String partialTermMatchField = getPartialTermMatchField();
-                String ptClause = QueryManager.createWhereClauseForPartialMatch(
-                		partialTermMatchField, partialTerm);
-                myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
-            } else if (keywords != null || advancedSearch != null) {
-//				String kwdClause = QueryManager.createWhereClauseFromKeywords(keywords);
-//				myFilter.appendWhereClause(kwdClause, IQueryManager.SEARCH_QUALIFIER_AND);
-                return search(ctx, handler, queryParams, keywords, advancedSearch);
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("getAuthorityItemList filtered WHERE clause: "
-                        + myFilter.getWhereClause() 
-                        + " and ORDER BY clause: " + myFilter.getOrderByClause());
-            }
-            getRepositoryClient(ctx).getFiltered(ctx, handler);
-            return handler.getCommonPartList();
+
+            result = search(ctx, handler, queryParams, orderBy, keywords, advancedSearch, partialTerm);            
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
+        
+        return result;
     }
 
     /**

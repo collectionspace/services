@@ -23,8 +23,11 @@
  */
 package org.collectionspace.services.vocabulary;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.context.ServiceContext;
 //import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 //import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -78,7 +81,7 @@ public class VocabularyResource extends
     }
 	
 	@Override
-	protected String getOrderByField() {
+	protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		String result = null;
 
 		result = authorityItemCommonSchemaName + ":" + VocabularyItemJAXBSchema.DISPLAY_NAME;
@@ -87,8 +90,8 @@ public class VocabularyResource extends
 	}
 	
 	@Override
-	protected String getPartialTermMatchField() {
-		return getOrderByField();
+	protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+		return getOrderByField(ctx);
 	}
 
 	/*

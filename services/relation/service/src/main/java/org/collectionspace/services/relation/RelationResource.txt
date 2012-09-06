@@ -1,0 +1,3 @@
+Because of a dependency cycle with the "Common" module, the RelationResource class was moved to the "Common" module at:
+
+..\services\common\src\main\java\org\collectionspace\services\common\relation

@@ -24,7 +24,7 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-package org.collectionspace.services.relation;
+package org.collectionspace.services.common.relation;
 
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -34,8 +34,11 @@ import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.relation.IRelationsManager;
+import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
+import org.collectionspace.services.relation.RelationsCommon;
+import org.collectionspace.services.relation.RelationsCommonList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -28,19 +28,22 @@ import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.RefName.RefNameInterface;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
@@ -299,13 +302,38 @@ public abstract class DocumentModelHandler<T, TL>
     abstract public AuthorityRefList getAuthorityRefs(String csid,
     		List<AuthRefConfigInfo> authRefsInfo) throws PropertyException;    
 
+    /*
+     * Subclasses should override this method if they need to customize their refname generation
+     */
+    protected RefName.RefNameInterface getRefName(ServiceContext ctx,
+    		DocumentModel docModel) {
+    	return getRefName(new DocumentWrapperImpl<DocumentModel>(docModel), ctx.getTenantName(), ctx.getServiceName());
+    }
+    
+    /*
+     * By default, we'll use the CSID as the short ID.  Sub-classes can override this method if they want to use
+     * something else for a short ID.
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#getRefName(org.collectionspace.services.common.document.DocumentWrapper, java.lang.String, java.lang.String)
+     */
+    @Override
+	protected RefName.RefNameInterface getRefName(DocumentWrapper<DocumentModel> docWrapper,
+			String tenantName, String serviceName) {
+    	String csid = docWrapper.getWrappedObject().getName();
+    	String refnameDisplayName = getRefnameDisplayName(docWrapper);
+    	RefName.RefNameInterface refname = RefName.Authority.buildAuthority(tenantName, serviceName,
+        		csid, refnameDisplayName);
+    	return refname;
+	}
+
     private void handleCoreValues(DocumentWrapper<DocumentModel> docWrapper, 
     		Action action)  throws ClientException {
     	DocumentModel documentModel = docWrapper.getWrappedObject();
         String now = GregorianCalendarDateTimeUtils.timestampUTC();
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
     	String userId = ctx.getUserId();
-    	if(action==Action.CREATE) {
+    	if (action == Action.CREATE) {
             //
             // Add the tenant ID value to the new entity
             //
@@ -317,6 +345,15 @@ public abstract class DocumentModelHandler<T, TL>
             //
             documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
             		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI, getUri(documentModel));
+            //
+            // Add the resource's refname
+            //
+            RefNameInterface refname = getRefName(ctx, documentModel); // Sub-classes may override the getRefName() method called here.
+            if (refname != null) {
+            	String refnameStr = refname.toString();
+	            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+	            		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME, refnameStr);
+            }
         	//
         	// Add the CSID to the DublinCore title so we can see the CSID in the default
         	// Nuxeo webapp.

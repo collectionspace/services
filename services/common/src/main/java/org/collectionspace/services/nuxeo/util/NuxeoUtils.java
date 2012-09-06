@@ -35,6 +35,7 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -758,7 +759,7 @@ public class NuxeoUtils {
 			if (value == null) {
 				// Nothing to do - leave returnVal null
 			} else if (value instanceof GregorianCalendar) {
-				returnVal = DateTimeFormatUtils.formatAsISO8601Timestamp((GregorianCalendar) value);
+				returnVal = GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp((GregorianCalendar) value);
 			} else {
 				returnVal = value.toString();
 			}

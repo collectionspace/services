@@ -36,17 +36,17 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.common.ReflectionMapper;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.AbstractServiceContextImpl;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
-import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
@@ -74,9 +74,10 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 
     private AbstractCommonList commonList;
     
-    protected static final int NUM_STANDARD_LIST_RESULT_FIELDS = 4;
+    protected static final int NUM_STANDARD_LIST_RESULT_FIELDS = 5;
     protected static final String STANDARD_LIST_CSID_FIELD = "csid";
     protected static final String STANDARD_LIST_URI_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_URI;
+    protected static final String STANDARD_LIST_REFNAME_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME;
     protected static final String STANDARD_LIST_UPDATED_AT_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
     protected static final String STANDARD_LIST_WORKFLOW_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE;
     protected static final String STANDARD_LIST_MARK_RT_FIELD = "related";
@@ -111,7 +112,8 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
      */
     public AbstractCommonList createAbstractCommonListImpl() throws Exception {
         //  String classname = this.commonList.getClass().getName();
-        String classname = getDocHandlerParams().getAbstractCommonListClassname();
+    	ServiceContext ctx = this.getServiceContext();
+        String classname = ServiceConfigUtils.getDocHandlerParams(ctx).getAbstractCommonListClassname();
         if (classname == null){
             throw new Exception("in createAbstractCommonListImpl. getDocHandlerParams().getAbstractCommonListClassname() is null");
         }
@@ -122,35 +124,29 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 
     /** DocHandlerBase calls this method with the CSID as id */
     public Object createItemForCommonList(DocumentModel docModel, String label, String id) throws Exception {
-        return createItemForCommonList(getDocHandlerParams().getCommonListItemClassname(),
+    	ServiceContext ctx = this.getServiceContext();
+        return createItemForCommonList(ServiceConfigUtils.getDocHandlerParams(ctx).getCommonListItemClassname(),
         		docModel, label, id, true);
     }
 
-	public DocHandlerParams.Params getDocHandlerParams() throws DocumentException {
-		MultipartServiceContext sc = (MultipartServiceContext) getServiceContext();
-		ServiceBindingType sb = sc.getServiceBinding();
-		DocHandlerParams dhb = sb.getDocHandlerParams();
-		if (dhb != null && dhb.getParams() != null) {
-			return dhb.getParams();
-		}
-		throw new DocumentException("No DocHandlerParams configured for: "
-				+ sb.getName());
-	}
-
     public String getSummaryFields(AbstractCommonList theCommonList) throws DocumentException {
-        return getDocHandlerParams().getSummaryFields();
+    	ServiceContext ctx = this.getServiceContext();
+        return ServiceConfigUtils.getDocHandlerParams(ctx).getSummaryFields();
     }
 
     public void setListItemArrayExtended(boolean isExtended) throws DocumentException {
-    	getDocHandlerParams().getListResultsFields().setExtended(isExtended);
+    	ServiceContext ctx = this.getServiceContext();
+    	ServiceConfigUtils.getDocHandlerParams(ctx).getListResultsFields().setExtended(isExtended);
     }
     
     public boolean isListItemArrayExtended() throws DocumentException {
-		return getDocHandlerParams().getListResultsFields().isExtended();
+    	ServiceContext ctx = this.getServiceContext();
+		return ServiceConfigUtils.getDocHandlerParams(ctx).getListResultsFields().isExtended();
     }
     
     public List<ListResultField> getListItemsArray() throws DocumentException {
-        return getDocHandlerParams().getListResultsFields().getListResultField();
+    	ServiceContext ctx = this.getServiceContext();
+        return ServiceConfigUtils.getDocHandlerParams(ctx).getListResultsFields().getListResultField();
     }
 
     @Override
@@ -163,17 +159,22 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         throw new UnsupportedOperationException();
     }
 
+	protected static String getRefname(DocumentModel docModel) throws Exception {
+		String result = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+				CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
+		return result;
+	}
+	
 	public static String getUpdatedAtAsString(DocumentModel docModel) throws Exception {
 			GregorianCalendar cal = (GregorianCalendar)
 								docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
 										CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT);
-			String updatedAt = DateTimeFormatUtils.formatAsISO8601Timestamp(cal);
+			String updatedAt = GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp(cal);
 			return updatedAt;
 	}
 
     @Override
     public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        String classname = getDocHandlerParams().getAbstractCommonListClassname();
     	CommonList commonList = new CommonList();
         String markRtSbj = null;
     	RepositoryInstance repoSession = null;
@@ -183,7 +184,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     	
     	AbstractServiceContextImpl sc = (AbstractServiceContextImpl)getServiceContext();
     	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
-    	markRtSbj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT);
+    	markRtSbj = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT);  // REM - We need to document what this query param is for -i.e., what's its purpose?
     	if(markRtSbj!=null && markRtSbj.isEmpty())
     		markRtSbj = null;
   
@@ -207,13 +208,14 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 	        	nFields++;
 	        	baseFields++;
 	        }
-	        String fields[] = new String[nFields];
+	        String fields[] = new String[nFields]; // REM - Why can't this just be a static array defined once at the top?  Then there'd be no need for these hardcoded "[x]" statements and no need for NUM_STANDARD_LIST_RESULT_FIELDS constant as well. 
 	        fields[0] = STANDARD_LIST_CSID_FIELD;
 	        fields[1] = STANDARD_LIST_URI_FIELD;
-	        fields[2] = STANDARD_LIST_UPDATED_AT_FIELD;
-	        fields[3] = STANDARD_LIST_WORKFLOW_FIELD;
-	        if(markRtSbj!=null) {
-	            fields[4] = STANDARD_LIST_MARK_RT_FIELD;
+	        fields[2] = STANDARD_LIST_REFNAME_FIELD;
+	        fields[3] = STANDARD_LIST_UPDATED_AT_FIELD;
+	        fields[4] = STANDARD_LIST_WORKFLOW_FIELD;
+	        if(markRtSbj != null) {
+	            fields[5] = STANDARD_LIST_MARK_RT_FIELD;
 	        }
 	        for(int i = baseFields; i < nFields; i++) {
 	        	ListResultField field = resultsFields.get(i - baseFields); 
@@ -239,6 +241,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 		        }
 				String uri = getUri(docModel);
 				item.put(STANDARD_LIST_URI_FIELD, uri);
+				item.put(STANDARD_LIST_REFNAME_FIELD, getRefname(docModel));
 				item.put(STANDARD_LIST_UPDATED_AT_FIELD,
 						getUpdatedAtAsString(docModel));
 				item.put(STANDARD_LIST_WORKFLOW_FIELD,
@@ -249,13 +252,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 					if (schema == null || schema.trim().isEmpty()) {
 						schema = commonSchema;
 					}
-					Object value = getListResultValue(docModel, schema, field);
-					if (value != null && value instanceof String) {
-						String strValue = (String) value;
-						if (strValue.trim().isEmpty() == true) {
-							value = null;
-						}
-					}
+					Object value = getStringValue(docModel, schema, field);
 					if (value != null) {
 						item.put(field.getElement(), value);
 					}
@@ -281,7 +278,8 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     // TODO - get rid of this if we can - appears to be unused.
     @Override
     public String getQProperty(String prop) throws DocumentException {
-        return getDocHandlerParams().getSchemaName() + ":" + prop;
+    	ServiceContext ctx = this.getServiceContext();
+        return ServiceConfigUtils.getDocHandlerParams(ctx).getSchemaName() + ":" + prop;
     }
 
     //============= dublin core handling =======================================
@@ -305,13 +303,13 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     protected void fillDublinCoreObject(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	DocHandlerParams.Params docHandlerParams = null;
     	try {
-    		docHandlerParams = getDocHandlerParams();
+    		docHandlerParams = ServiceConfigUtils.getDocHandlerParams(getServiceContext());
     	} catch (Exception e) {
     		logger.warn(e.getMessage());
     	}
     	
     	if (docHandlerParams != null) {
-	        String title = getDocHandlerParams().getDublinCoreTitle();
+	        String title = docHandlerParams.getDublinCoreTitle();
 	        if (Tools.isEmpty(title) == false){
 		        DocumentModel docModel = wrapDoc.getWrappedObject();
 		        docModel.setPropertyValue("dublincore:title", title);
@@ -361,8 +359,9 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
      *  field for you if specified.
      */
     public List createItemsList(AbstractCommonList commonList) throws Exception {
+    	ServiceContext ctx = this.getServiceContext();
         return createItemsList(commonList, 
-        		getDocHandlerParams().getListResultsItemMethodName());
+        		ServiceConfigUtils.getDocHandlerParams(ctx).getListResultsItemMethodName());
     }
 
     /** e.g. createItemsList(commonList, "getObjectexitListItem" */

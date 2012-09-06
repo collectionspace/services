@@ -23,12 +23,14 @@
  */
 package org.collectionspace.services.common;
 
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -37,6 +39,8 @@ import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.config.ClientType;
+import org.collectionspace.services.config.service.DocHandlerParams;
+import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -259,19 +263,37 @@ public abstract class ResourceBase
         getRepositoryClient(ctx).get(ctx, csid, handler);
         return ctx.getOutput();
     }
+    
+    protected boolean isGetAllRequest(MultivaluedMap<String, String> queryParams) {
+    	boolean result = false;
+    	
+        String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+        String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
+        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        
+        if (Tools.isBlank(keywords) && Tools.isBlank(advancedSearch) && Tools.isBlank(partialTerm)) {
+        	result = true;
+        }
+        
+    	return result;
+    }
 
     //======================= GET without csid. List, search, etc. =====================================
     @GET
     public AbstractCommonList getList(@Context UriInfo ui) {
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
-        String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
-        AbstractCommonList list;
-        if (keywords != null || advancedSearch != null) {
-            list = search(queryParams, keywords, advancedSearch);
+        AbstractCommonList list = null;
+        
+        if (isGetAllRequest(queryParams) == false) {
+            String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
+            String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+            String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
+            String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+            list = search(queryParams, orderBy, keywords, advancedSearch, partialTerm);
         } else {
             list = getList(queryParams);
         }
+        
         return list;
     }
     
@@ -296,53 +318,76 @@ public abstract class ResourceBase
         }
     }
 
-    protected AbstractCommonList search(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    protected AbstractCommonList search(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		DocumentHandler handler, 
     		MultivaluedMap<String, String> queryParams,
+    		String orderBy,
     		String keywords,
-    		String advancedSearch) throws Exception {
+    		String advancedSearch,
+    		String partialTerm) throws Exception {
+        DocumentFilter docFilter = handler.getDocumentFilter();      
+        if (orderBy == null || orderBy.isEmpty()) {
+            String orderByField = getOrderByField(ctx);
+            docFilter.setOrderByClause(orderByField);
+        }
         
-        // perform a keyword search
-        if (keywords != null && !keywords.isEmpty()) {
+        //
+        // NOTE: Partial-term (PT) queries are mutually exclusive to keyword and
+        // partial-term queries trump keyword queries.
+        //
+        if (partialTerm != null && !partialTerm.isEmpty()) {
+        	String partialTermMatchField = getPartialTermMatchField(ctx);
+            String ptClause = QueryManager.createWhereClauseForPartialMatch(
+            		partialTermMatchField, partialTerm);
+            docFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
+        } else if (keywords != null && !keywords.isEmpty()) {
             String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-            if(Tools.isEmpty(whereClause)) {
-                if (logger.isDebugEnabled()) {
-                	logger.debug("The WHERE clause is empty for keywords: ["+keywords+"]");
-                }
-            } else {
-	            DocumentFilter documentFilter = handler.getDocumentFilter();
-	            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            if (Tools.isEmpty(whereClause) == false) {
+            	docFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
 	            if (logger.isDebugEnabled()) {
-	                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+	                logger.debug("The WHERE clause is: " + docFilter.getWhereClause());
 	            }
+            } else {
+                if (logger.isWarnEnabled()) {
+                	logger.warn("The WHERE clause is empty for keywords: ["+keywords+"]");
+                }
             }
         }
+                
+        //
+        // Add an advance search clause if one was specified -even if PT search was requested?
+        //
         if (advancedSearch != null && !advancedSearch.isEmpty()) {
             String whereClause = QueryManager.createWhereClauseFromAdvancedSearch(advancedSearch);
-            DocumentFilter documentFilter = handler.getDocumentFilter();
-            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            docFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             if (logger.isDebugEnabled()) {
-                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+                logger.debug("The WHERE clause is: " + docFilter.getWhereClause());
             }
         }
-        getRepositoryClient(ctx).getFiltered(ctx, handler);
         
+        getRepositoryClient(ctx).getFiltered(ctx, handler);        
         return (AbstractCommonList) handler.getCommonPartList();
     }
 
-    protected AbstractCommonList search(MultivaluedMap<String, String> queryParams,
+    private AbstractCommonList search(
+    		MultivaluedMap<String, String> queryParams,
+    		String orderBy,
     		String keywords,
-    		String advancedSearch) {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
-            AbstractCommonList result = null;
-			try {
-				ctx = createServiceContext(queryParams);
-		        DocumentHandler handler = createDocumentHandler(ctx);
-				result = search(ctx, handler, queryParams, keywords, advancedSearch);
-			} catch (Exception e) {
-	            throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
-			}
-            return result;
+    		String advancedSearch,
+    		String partialTerm) {
+    	AbstractCommonList result = null;
+
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
+    	try {
+    		ctx = createServiceContext(queryParams);
+    		DocumentHandler handler = createDocumentHandler(ctx);
+    		result = search(ctx, handler, queryParams, orderBy, keywords, advancedSearch, partialTerm);
+    	} catch (Exception e) {
+    		throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
+    	}
+
+    	return result;
     }
     
     //FIXME: REM - This should not be @Deprecated since we may want to implement this -it has been on the wish list.
@@ -379,6 +424,58 @@ public abstract class ResourceBase
     }
     
     //======================== UTILITY : getDocModelForRefName ========================================
+
+    /*
+     * Used get the order by field for list results if one is not specified with an HTTP query param.
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#getOrderByField()
+     */
+    @Override
+    protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+    	String result = null;
+    	
+    	// We only want to use the partial term field to order the results if a PT query param exists
+        String partialTerm = ctx.getQueryParams().getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        if (Tools.notBlank(partialTerm) == true) {
+	    	DocHandlerParams.Params params = null;
+	    	try {
+				result = getPartialTermMatchField(ctx);
+				if (result == null) {
+					throw new Exception();
+				}
+	    	} catch (Exception e) {
+				if (logger.isWarnEnabled()) {
+					logger.warn(String.format("Call failed to getOrderByField() for class %s", this.getClass().getName()));
+				}
+	    	}
+        }
+    	    	
+    	return result;
+    }
+
+    @Override
+	protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+    	String result = null;
+    	
+    	DocHandlerParams.Params params = null;
+    	try {
+			params = ServiceConfigUtils.getDocHandlerParams(ctx);
+			ListResultField field = params.getRefnameDisplayNameField();
+			String schema = field.getSchema();
+			if (schema == null || schema.trim().isEmpty()) {
+				schema = ctx.getCommonPartLabel();
+			}
+			result = schema + ":" + field.getXpath();
+    	} catch (Exception e) {
+			if (logger.isWarnEnabled()) {
+				logger.warn(String.format("Call failed to getPartialTermMatchField() for class %s", this.getClass().getName()));
+			}
+    	}
+    	
+    	return result;
+	}
+	
     /*
      * ResourceBase create and update calls will set the resourceMap into the service context
      * for all inheriting resource classes. Just use ServiceContext.getResourceMap() to get
@@ -408,4 +505,5 @@ public abstract class ResourceBase
     	return getDocModelForAuthorityItem(repoSession, RefName.AuthorityItem.parse(refName));
     }
 
+    
 }
