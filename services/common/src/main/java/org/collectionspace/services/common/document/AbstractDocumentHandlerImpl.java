@@ -73,7 +73,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     /*
      * Should return a reference name for the wrapper object
      */
-    abstract public RefName.RefNameInterface getRefName(DocumentWrapper<WT> docWrapper, String tenantName, String serviceName);
+    abstract protected RefName.RefNameInterface getRefName(DocumentWrapper<WT> docWrapper, String tenantName, String serviceName);
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#getServiceContext()

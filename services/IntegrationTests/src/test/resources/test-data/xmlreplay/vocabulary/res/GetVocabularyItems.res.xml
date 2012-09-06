@@ -6,7 +6,7 @@
 	<pageNum>0</pageNum>
     <itemsInPage>3</itemsInPage>
     <totalItems>3</totalItems>
-    <fieldsReturned>csid|uri|updatedAt|workflowState|order|displayName|shortIdentifier|refName|termStatus</fieldsReturned>
+    <fieldsReturned>csid|uri|refname|updatedAt|workflowState|order|displayName|shortIdentifier|refName|termStatus</fieldsReturned>
     <list-item>
         <displayName>${Item1.displayName}</displayName>
         <shortIdentifier>${Item1.itemID}</shortIdentifier>

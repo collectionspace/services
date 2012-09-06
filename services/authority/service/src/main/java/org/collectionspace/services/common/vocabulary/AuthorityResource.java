@@ -517,7 +517,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input);
             ctx.setResourceMap(resourceMap);
-            ctx.setUriInfo(ui);    //Laramie
+            ctx.setUriInfo(ui);
 
             // Note: must have the parentShortId, to do the create.
             CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(specifier, "createAuthorityItem", "CREATE_ITEM", null);

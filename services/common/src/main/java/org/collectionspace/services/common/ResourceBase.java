@@ -443,7 +443,11 @@ public abstract class ResourceBase
     	try {
 			params = ServiceConfigUtils.getDocHandlerParams(ctx);
 			ListResultField field = params.getRefnameDisplayNameField();
-			result = field.getSchema() + ":" + field.getXpath();
+			String schema = field.getSchema();
+			if (schema == null || schema.trim().isEmpty()) {
+				schema = ctx.getCommonPartLabel();
+			}
+			result = schema + ":" + field.getXpath();
     	} catch (Exception e) {
 			if (logger.isWarnEnabled()) {
 				logger.warn(String.format("Call failed to getPartialTermMatchField() for class %s", this.getClass().getName()));

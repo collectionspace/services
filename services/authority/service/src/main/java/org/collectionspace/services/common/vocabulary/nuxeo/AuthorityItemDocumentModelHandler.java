@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -109,7 +110,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
     
     /*
-     * Before calling this method, be sure that the 'this.handleCreate()' was called and was successful.
+     * After calling this method successfully, the document model will contain an updated refname and short ID
      * (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getRefName(org.collectionspace.services.common.context.ServiceContext, org.nuxeo.ecm.core.api.DocumentModel)
      */
@@ -119,15 +120,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	RefName.RefNameInterface refname = null;
     	
     	try {
-	        String shortIdentifier = (String) docModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-	        if (Tools.isEmpty(shortIdentifier)) {
-	            throw new Exception("The shortIdentifier for this authority term was empty or not set.");
-	        }
-	        
 	        String displayName = getPrimaryDisplayName(docModel, authorityItemCommonSchemaName,
-	                    getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
+                    getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
 	        if (Tools.isEmpty(displayName)) {
 	            throw new Exception("The displayName for this authority term was empty or not set.");
+	        }
+        
+	        String shortIdentifier = (String) docModel.getProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+	        if (Tools.isEmpty(shortIdentifier)) {
+	        	// We didn't find a short ID in the payload request, so we need to synthesize one.
+	        	shortIdentifier = handleDisplayNameAsShortIdentifier(docModel); // updates the document model with the new short ID as a side-effect
 	        }
 	        
 	        String authorityRefBaseName = getAuthorityRefNameBase();
@@ -135,8 +137,13 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 	            throw new Exception("Could not create the refName for this authority term, because the refName for its authority parent was empty.");
 	        }
 	        
+	        // Create the items refname using the parent's as a base
 	        RefName.Authority parentsRefName = RefName.Authority.parse(authorityRefBaseName);
 	        refname = RefName.buildAuthorityItem(parentsRefName, shortIdentifier, displayName);
+	        // Now update the document model with the refname value
+	        String refNameStr = refname.toString();
+	        docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, refNameStr);
+
     	} catch (Exception e) {
     		logger.error(e.getMessage(), e);
     	}
@@ -293,21 +300,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      */
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        // first fill all the parts of the document
+        // first fill all the parts of the document, refname and short ID get set as well
         super.handleCreate(wrapDoc);
         // Ensure we have required fields set properly
-        handleInAuthority(wrapDoc.getWrappedObject());
-        
-        // FIXME: This call to synthesize a shortIdentifier from the termDisplayName
-        // of the preferred term may have been commented out, in the course of
-        // adding support for preferred / non-preferred terms, in CSPACE-4813
-        // and linked issues. Revisit this to determine whether we want to
-        // re-enable it.
-        //
-        // CSPACE-3178:
-        handleDisplayNameAsShortIdentifier(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName);
-        // refName includes displayName, so we force a correct value here.
-        updateRefnameForAuthorityItem(wrapDoc, authorityItemCommonSchemaName, getAuthorityRefNameBase());
+        handleInAuthority(wrapDoc.getWrappedObject());        
     }
 
     /*
@@ -376,12 +372,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * If no short identifier was provided in the input payload, generate a
      * short identifier from the preferred term display name or term name.
      */
-	private void handleDisplayNameAsShortIdentifier(DocumentModel docModel,
-			String schemaName) throws Exception {
-		String shortIdentifier = (String) docModel.getProperty(schemaName,
+	private String handleDisplayNameAsShortIdentifier(DocumentModel docModel) throws Exception {
+		String result = (String) docModel.getProperty(authorityItemCommonSchemaName,
 				AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
 
-		if (Tools.isEmpty(shortIdentifier)) {
+		if (Tools.isEmpty(result)) {
 			String termDisplayName = getPrimaryDisplayName(
 					docModel, authorityItemCommonSchemaName,
 					getItemTermInfoGroupXPathBase(),
@@ -394,9 +389,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 
 			String generatedShortIdentifier = AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(termDisplayName,
 							termName);
-			docModel.setProperty(schemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER,
+			docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER,
 					generatedShortIdentifier);
+			result = generatedShortIdentifier;
 		}
+		
+		return result;
 	}
 
     /**
@@ -410,13 +408,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * @see #filterReadOnlyPropertiesForPart(Map<String, Object>, org.collectionspace.services.common.service.ObjectPartType)
      * 
      */
-    protected void updateRefnameForAuthorityItem(DocumentWrapper<DocumentModel> wrapDoc,
-            String schemaName,
-            String authorityRefBaseName) throws Exception {
-        DocumentModel docModel = wrapDoc.getWrappedObject();
-        RefName.RefNameInterface refname = getRefName(this.getServiceContext(), docModel);
+    protected String updateRefnameForAuthorityItem(DocumentModel docModel,
+            String schemaName) throws Exception {
+    	String result = null;
+    	
+        RefName.RefNameInterface refname = getRefName(getServiceContext(), docModel);
         String refNameStr = refname.toString();
         docModel.setProperty(schemaName, AuthorityItemJAXBSchema.REF_NAME, refNameStr);
+        result = refNameStr;
+        
+        return result;
     }
 
     /**

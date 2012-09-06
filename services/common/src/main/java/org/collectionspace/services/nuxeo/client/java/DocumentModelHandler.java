@@ -36,6 +36,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.RefName.RefNameInterface;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
@@ -304,17 +305,23 @@ public abstract class DocumentModelHandler<T, TL>
     /*
      * Subclasses should override this method if they need to customize their refname generation
      */
-    public RefName.RefNameInterface getRefName(ServiceContext ctx,
+    protected RefName.RefNameInterface getRefName(ServiceContext ctx,
     		DocumentModel docModel) {
     	return getRefName(new DocumentWrapperImpl<DocumentModel>(docModel), ctx.getTenantName(), ctx.getServiceName());
     }
     
+    /*
+     * By default, we'll use the CSID as the short ID.  Sub-classes can override this method if they want to use
+     * something else for a short ID.
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#getRefName(org.collectionspace.services.common.document.DocumentWrapper, java.lang.String, java.lang.String)
+     */
     @Override
-	public RefName.RefNameInterface getRefName(DocumentWrapper<DocumentModel> docWrapper,
+	protected RefName.RefNameInterface getRefName(DocumentWrapper<DocumentModel> docWrapper,
 			String tenantName, String serviceName) {
-    	DocumentModel docModel = docWrapper.getWrappedObject();
-    	String csid = docModel.getName();
-    	String refnameDisplayName = this.getRefnameDisplayName(docWrapper);
+    	String csid = docWrapper.getWrappedObject().getName();
+    	String refnameDisplayName = getRefnameDisplayName(docWrapper);
     	RefName.RefNameInterface refname = RefName.Authority.buildAuthority(tenantName, serviceName,
         		csid, refnameDisplayName);
     	return refname;
@@ -341,9 +348,12 @@ public abstract class DocumentModelHandler<T, TL>
             //
             // Add the resource's refname
             //
-            String refname = getRefName(ctx, documentModel).toString();
-            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
-            		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME, refname);            
+            RefNameInterface refname = getRefName(ctx, documentModel); // Sub-classes may override the getRefName() method called here.
+            if (refname != null) {
+            	String refnameStr = refname.toString();
+	            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+	            		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME, refnameStr);
+            }
         	//
         	// Add the CSID to the DublinCore title so we can see the CSID in the default
         	// Nuxeo webapp.
