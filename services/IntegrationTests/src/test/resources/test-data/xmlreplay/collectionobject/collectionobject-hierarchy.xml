@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xmlReplay>
     <testGroup ID="HierarchicCollectionObject" autoDeletePOSTS="true">
         
@@ -134,48 +134,102 @@
         
         <!-- Read hierarchical relationships -->
         
+        <!-- Read hierarchical relationships via 'showRelations' -->
+        
         <test ID="ReadHierarchyForTopLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}?showRelations=true</uri>
-            <!-- Need to test response payload here -->
+            <!-- Also need to test response payload here -->
         </test>
         
         <test ID="ReadHierarchyForMidLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}?showRelations=true</uri>
-            <!-- Need to test response payload here -->
+            <!-- Also need to test response payload here -->
         </test>
         
         <test ID="ReadHierarchyForBottomLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}?showRelations=true</uri>
-            <!-- Need to test response payload here -->
+            <!-- Also need to test response payload here -->
         </test>
         
-        <test ID="ReadAllRelations">
-             <method>GET</method>
-             <uri>/cspace-services/relations</uri>
-             <!-- Need to test response payload here -->
-         </test>
-         
-         <test ID="GetRelationsAsSubject">
+        <!-- Read hierarchical relationships via 'showSiblings' -->
+
+        <test ID="ReadSiblingsForTopLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}?showSiblings=true</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/read-siblings-top-level.res.xml</filename>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+            </response>
+        </test>
+        
+        <test ID="ReadSiblingsForMidLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}?showSiblings=true</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/read-siblings-mid-level.res.xml</filename>
+                <vars>
+                    <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
+                    <var ID="chessBoardCSID">${CreateChessBoard.CSID}</var>
+                    <var ID="bagOfWhiteChessPiecesCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
+                </vars>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+            </response>
+        </test>
+        
+        <test ID="ReadSiblingsForBottomLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBlackQueen.CSID}?showSiblings=true</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/read-siblings-bottom-level.res.xml</filename>
+                <vars>
+                    <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                    <var ID="blackRookCSID">${CreateBlackRook.CSID}</var>
+                </vars>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+            </response>
+        </test>
+        
+        <!-- Read hierarchical relationships via 'showAllRelations' -->
+
+        <test ID="ReadAllRelationsForTopLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}?showAllRelations=true</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/read-all-relations.res.xml</filename>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+             </response>
+             
+        </test>
+        
+        <!-- Read hierarchical relationships via the relations service -->
+
+        <test ID="GetRelationsAsSubject">
              <method>GET</method>
              <uri>/cspace-services/relations?sbj=${CreateBagOfBlackChessPieces.CSID}</uri>
-             <!-- Need to test response payload here -->
+             <!-- Also need to test response payload here -->
         </test>
          
         <test ID="GetRelationsAsObject">
             <method>GET</method>
             <uri>/cspace-services/relations?obj=${CreateBagOfBlackChessPieces.CSID}</uri>
-            <!-- Need to test response payload here -->
-       </test>
-            
+            <!-- Also need to test response payload here -->
+        </test>
+       
         
         <!-- Cleanup-->
+        
         <!--
         <test ID="DeleteHierarchy">
         </test>
         -->
+        
         <!-- The following is likely unnecessary with 'autoDeletePOSTS="true"' -->
         <!--
         <test ID="DeleteBlackRook" auth="admin@core.collectionspace.org">
@@ -209,126 +263,6 @@
         <test ID="DeleteChessSetBox" auth="admin@core.collectionspace.org">
             <method>DELETE</method>
             <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}</uri>
-        </test>
-        -->
-        
-        
-        
-        
-        <!--
-        <test ID="LocationChild3">
-            <method>POST</method>
-            <uri>/cspace-services/collectionobjects/${LocationAuth1.CSID}/items/</uri>
-            <filename>collectionobject/hierarchy/2-item.xml</filename>
-            <vars>
-                <var ID="inAuthority">${LocationAuth1.CSID}</var>
-                <var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
-                <var ID="shortIdentifier">Shelf3</var>
-                <var ID="name">Shelf 3</var>
-            </vars>
-        </test>
-        
-        <test ID="LocationParent">
-            <method>POST</method>
-            <uri>/cspace-services/collectionobjects/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
-            <filename>collectionobject/hierarchy/2-item.xml</filename>
-            <vars>
-                <var ID="inAuthority">${LocationAuth1.CSID}</var>
-                <var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
-                <var ID="shortIdentifier">Aisle3</var>
-                <var ID="name">Aisle 3</var>
-            </vars>
-        </test>
-
-                <test ID="Location1_old">
-            <method>POST</method>
-            <uri>/cspace-services/collectionobjects/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
-            <filename>collectionobject/hierarchy/3-locations_w_relations_CSID.xml</filename>
-            <vars>
-                            <var ID="name">Cabinet 1</var>
-                <var ID="parentCSID">${LocationParent.CSID}</var>
-                <var ID="childCSID">${LocationChild1.CSID}</var>
-                <var ID="child2CSID">${LocationChild2.CSID}</var>
-                <var ID="child3CSID">${LocationChild3.CSID}</var>
-            </vars>
-        </test>
-        
-        <test ID="Location1">
-            <method>POST</method>
-            <uri>/cspace-services/collectionobjects/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
-            <filename>collectionobject/hierarchy/5-locations_w_relations_RefNames.xml</filename>
-            <vars>
-                <var ID="shortIdentifier">Cabinet1a</var>
-                            <var ID="name">Cabinet 1a</var>
-                <var ID="childCSID">${LocationChild1.CSID}</var>
-                <var ID="child2CSID">${LocationChild2.CSID}</var>
-                <var ID="child3CSID">${LocationChild3.CSID}</var>
-            </vars>
-        </test>
-        
-        <test ID="GetLocation">
-            <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${LocationAuth1.CSID}/items/${Location1.CSID}?showRelations=true</uri>
-        </test>
-        
-        -->
-        
-        <!-- NOTE: item  on url is .../items/${LocationChild1.CSID} so this looks for
-                   siblings of Child1, which would be child2 and child3.
-        -->
-        
-        <!--
-        <test ID="Get_siblings">
-            <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${LocationAuth1.CSID}/items/${LocationChild1.CSID}?showSiblings=true</uri>
-            <response>
-                <expected level="ADDOK" />
-                <filename>collectionobject/hierarchy/res/Get_siblings.res.xml</filename>
-                <vars>
-                    <var ID="locationCSID">${Location1.CSID}</var>
-                    <var ID="child1CSID">${LocationChild1.CSID}</var>
-                    <var ID="child2CSID">${LocationChild2.CSID}</var>
-                </vars>
-                <startElement>/document/*[local-name()='relations-common-list']</startElement>
-         </response>
-        </test>
-        -->
-        <!--
-        <test ID="Get_allRelations">
-            <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${LocationAuth1.CSID}/items/${Location1.CSID}?showAllRelations=true</uri>
-            <response>
-                <expected level="ADDOK" />
-                <filename>collectionobject/hierarchy/res/Get_allRelations.res.xml</filename>
-        -->
-                <!-- NOTE: vars are referenced in showAllRelations.res.xml
-                     from tests in this test group, e.g. 
-                     LocationParent.CSID :: ${LocationParent.CSID} 
-                     These vars are all in the expression context while this group is active,
-                     because we hang onto all ServiceResult objects for the duration of the group,
-                     and ServiceObjects keep their vars.
-                -->
-         <!--
-
-                <startElement>/document/*[local-name()='relations-common-list']</startElement>
-             </response>
-             
-        </test>
-         -->
-         <!--
-         <test ID="relationsGET">
-             <method>GET</method>
-             <uri>/cspace-services/relations/</uri>
-         </test>
-         
-         <test ID="relations_sbj">
-             <method>GET</method>
-             <uri>/cspace-services/relations?sbj=${Location1.CSID}</uri>
-         </test>
-         
-        <test ID="relations_obj">
-            <method>GET</method>
-            <uri>/cspace-services/relations?obj=${Location1.CSID}</uri>
         </test>
         -->
         
