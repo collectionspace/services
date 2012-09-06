@@ -263,22 +263,37 @@ public abstract class ResourceBase
         getRepositoryClient(ctx).get(ctx, csid, handler);
         return ctx.getOutput();
     }
+    
+    protected boolean isGetAllRequest(MultivaluedMap<String, String> queryParams) {
+    	boolean result = false;
+    	
+        String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+        String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
+        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        
+        if (Tools.isBlank(keywords) && Tools.isBlank(advancedSearch) && Tools.isBlank(partialTerm)) {
+        	result = true;
+        }
+        
+    	return result;
+    }
 
     //======================= GET without csid. List, search, etc. =====================================
     @GET
     public AbstractCommonList getList(@Context UriInfo ui) {
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
-        String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
-        String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
-        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
-
-        AbstractCommonList list;
-        if (keywords != null || advancedSearch != null) {
+        AbstractCommonList list = null;
+        
+        if (isGetAllRequest(queryParams) == false) {
+            String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
+            String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+            String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
+            String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
             list = search(queryParams, orderBy, keywords, advancedSearch, partialTerm);
         } else {
             list = getList(queryParams);
         }
+        
         return list;
     }
     
@@ -318,8 +333,8 @@ public abstract class ResourceBase
         }
         
         //
-        //NOTE: Partial-term (PT) searches are mutually exclusive to keyword and advanced-search, but
-        // the PT query param trumps the keyword search.
+        // NOTE: Partial-term (PT) queries are mutually exclusive to keyword and
+        // partial-term queries trump keyword queries.
         //
         if (partialTerm != null && !partialTerm.isEmpty()) {
         	String partialTermMatchField = getPartialTermMatchField(ctx);
@@ -420,18 +435,22 @@ public abstract class ResourceBase
     protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	String result = null;
     	
-    	DocHandlerParams.Params params = null;
-    	try {
-			result = getPartialTermMatchField(ctx);
-			if (result == null) {
-				throw new Exception();
-			}
-    	} catch (Exception e) {
-			if (logger.isWarnEnabled()) {
-				logger.warn(String.format("Call failed to getOrderByField() for class %s", this.getClass().getName()));
-			}
-    	}
-    	
+    	// We only want to use the partial term field to order the results if a PT query param exists
+        String partialTerm = ctx.getQueryParams().getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        if (Tools.notBlank(partialTerm) == true) {
+	    	DocHandlerParams.Params params = null;
+	    	try {
+				result = getPartialTermMatchField(ctx);
+				if (result == null) {
+					throw new Exception();
+				}
+	    	} catch (Exception e) {
+				if (logger.isWarnEnabled()) {
+					logger.warn(String.format("Call failed to getOrderByField() for class %s", this.getClass().getName()));
+				}
+	    	}
+        }
+    	    	
     	return result;
     }
 
