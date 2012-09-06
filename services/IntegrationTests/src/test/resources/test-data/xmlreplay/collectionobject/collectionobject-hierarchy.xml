@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <testGroup ID="HierarchicCollectionObject" autoDeletePOSTS="true">
+        
+        <!-- Chess set box -->
+        <!-- (parent of chess board, bags of white and black chess pieces -->
+        <test ID="CreateChessSetBox" auth="admin@core.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5518-ChessSetBox</var>
+            </vars>
+        </test>
+        <test ID="ReadChessSetBox" auth="admin@core.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}</uri>
+        </test>
+        
+        <!-- Chess board -->
+        <!-- (child of chess set box, sibling of bags of white and black chess pieces) -->
+        <test ID="CreateChessBoard" auth="admin@core.collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5518-ChessBoard</var>
+            </vars>
+        </test>
+        <test ID="ReadChessBoard" auth="admin@core.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateChessBoard.CSID}</uri>
+        </test>
+        
+        <!-- Bags of white and black chess pieces -->
+        <!-- (child of chess set box, sibling of chess board, parents of chess pieces) -->
+        <test ID="CreateBagOfWhiteChessPieces">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5518-BagOfWhiteChessPieces</var>
+            </vars>
+        </test>
+        <test ID="ReadBagOfWhiteChessPieces" auth="admin@core.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBagOfWhiteChessPieces.CSID}</uri>
+        </test>
+        <test ID="CreateBagOfBlackChessPieces">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5518-BagOfBlackChessPieces</var>
+            </vars>
+        </test>
+        <test ID="ReadBagOfBlackChessPieces" auth="admin@core.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}</uri>
+        </test>
+        
+        <!-- Individual chess pieces in those bags -->
+        <test ID="CreateWhiteRook">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5518-WhiteRook</var>
+            </vars>
+        </test>
+        <test ID="ReadWhiteRook" auth="admin@core.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateWhiteRook.CSID}</uri>
+        </test>
+        <test ID="CreateWhiteBishop">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5518-WhiteBishop</var>
+            </vars>
+        </test>
+        <test ID="ReadWhiteBishop" auth="admin@core.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateWhiteBishop.CSID}</uri>
+        </test>
+       <test ID="CreateBlackQueen">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5518-BlackQueen</var>
+            </vars>
+        </test>
+        <test ID="ReadBlackQueen" auth="admin@core.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBlackQueen.CSID}</uri>
+        </test>  
+        <test ID="CreateBlackRook">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5518-BlackRook</var>
+            </vars>
+        </test>
+        <test ID="ReadBlackRook" auth="admin@core.collectionspace.org">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
+        </test>           
+        
+        <!-- Cleanup-->
+        <test ID="DeleteBlackRook" auth="admin@core.collectionspace.org">
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
+        </test>
+        <test ID="DeleteBlackQueen" auth="admin@core.collectionspace.org">
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/${CreateBlackQueen.CSID}</uri>
+        </test>
+        <test ID="DeleteWhiteBishop" auth="admin@core.collectionspace.org">
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/${CreateWhiteBishop.CSID}</uri>
+        </test>
+        <test ID="DeleteWhiteRook" auth="admin@core.collectionspace.org">
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/${CreateWhiteRook.CSID}</uri>
+        </test>
+        <test ID="DeleteBagOfBlackChessPieces" auth="admin@core.collectionspace.org">
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}</uri>
+        </test>
+        <test ID="DeleteBagOfWhiteChessPieces" auth="admin@core.collectionspace.org">
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/${CreateBagOfWhiteChessPieces.CSID}</uri>
+        </test>
+        <test ID="DeleteChessBoard" auth="admin@core.collectionspace.org">
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/${CreateChessBoard.CSID}</uri>
+        </test>
+        <test ID="DeleteChessSetBox" auth="admin@core.collectionspace.org">
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}</uri>
+        </test>
+        
+        
+        
+        <!--
+        <test ID="LocationChild3">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/${LocationAuth1.CSID}/items/</uri>
+            <filename>collectionobject/hierarchy/2-item.xml</filename>
+            <vars>
+                <var ID="inAuthority">${LocationAuth1.CSID}</var>
+                <var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
+                <var ID="shortIdentifier">Shelf3</var>
+                <var ID="name">Shelf 3</var>
+            </vars>
+        </test>
+        
+        <test ID="LocationParent">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
+            <filename>collectionobject/hierarchy/2-item.xml</filename>
+            <vars>
+                <var ID="inAuthority">${LocationAuth1.CSID}</var>
+                <var ID="authShortIdentifier">CSPACE3739LocationAuthority</var>
+                <var ID="shortIdentifier">Aisle3</var>
+                <var ID="name">Aisle 3</var>
+            </vars>
+        </test>
+
+                <test ID="Location1_old">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
+            <filename>collectionobject/hierarchy/3-locations_w_relations_CSID.xml</filename>
+            <vars>
+                            <var ID="name">Cabinet 1</var>
+                <var ID="parentCSID">${LocationParent.CSID}</var>
+                <var ID="childCSID">${LocationChild1.CSID}</var>
+                <var ID="child2CSID">${LocationChild2.CSID}</var>
+                <var ID="child3CSID">${LocationChild3.CSID}</var>
+            </vars>
+        </test>
+        
+        <test ID="Location1">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/urn:cspace:name(CSPACE3739LocationAuthority)/items/</uri>
+            <filename>collectionobject/hierarchy/5-locations_w_relations_RefNames.xml</filename>
+            <vars>
+                <var ID="shortIdentifier">Cabinet1a</var>
+                            <var ID="name">Cabinet 1a</var>
+                <var ID="childCSID">${LocationChild1.CSID}</var>
+                <var ID="child2CSID">${LocationChild2.CSID}</var>
+                <var ID="child3CSID">${LocationChild3.CSID}</var>
+            </vars>
+        </test>
+        
+        <test ID="GetLocation">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${LocationAuth1.CSID}/items/${Location1.CSID}?showRelations=true</uri>
+        </test>
+        
+        -->
+        
+        <!-- NOTE: item  on url is .../items/${LocationChild1.CSID} so this looks for
+                   siblings of Child1, which would be child2 and child3.
+        -->
+        
+        <!--
+        <test ID="Get_siblings">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${LocationAuth1.CSID}/items/${LocationChild1.CSID}?showSiblings=true</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/Get_siblings.res.xml</filename>
+                <vars>
+                    <var ID="locationCSID">${Location1.CSID}</var>
+                    <var ID="child1CSID">${LocationChild1.CSID}</var>
+                    <var ID="child2CSID">${LocationChild2.CSID}</var>
+                </vars>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+         </response>
+        </test>
+        -->
+        <!--
+        <test ID="Get_allRelations">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${LocationAuth1.CSID}/items/${Location1.CSID}?showAllRelations=true</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/Get_allRelations.res.xml</filename>
+        -->
+                <!-- NOTE: vars are referenced in showAllRelations.res.xml
+                     from tests in this test group, e.g. 
+                     LocationParent.CSID :: ${LocationParent.CSID} 
+                     These vars are all in the expression context while this group is active,
+                     because we hang onto all ServiceResult objects for the duration of the group,
+                     and ServiceObjects keep their vars.
+                -->
+         <!--
+
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+             </response>
+             
+        </test>
+         -->
+         <!--
+         <test ID="relationsGET">
+             <method>GET</method>
+             <uri>/cspace-services/relations/</uri>
+         </test>
+         
+         <test ID="relations_sbj">
+             <method>GET</method>
+             <uri>/cspace-services/relations?sbj=${Location1.CSID}</uri>
+         </test>
+         
+        <test ID="relations_obj">
+            <method>GET</method>
+            <uri>/cspace-services/relations?obj=${Location1.CSID}</uri>
+        </test>
+        -->
+        
+    </testGroup>
+</xmlReplay>
