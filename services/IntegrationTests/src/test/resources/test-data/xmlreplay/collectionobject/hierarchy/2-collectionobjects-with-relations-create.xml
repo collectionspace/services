@@ -4,7 +4,6 @@
     <ns2:collectionobjects_common
         xmlns:ns2="http://collectionspace.org/services/collectionobject">
         <objectNumber>${objectNumber}</objectNumber>
-        <distinguishingFeatures>${distinguishingFeatures}</distinguishingFeatures>
     </ns2:collectionobjects_common>
 
     <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation"
@@ -18,9 +17,11 @@
             <predicate>hasBroader</predicate>
             <subject>
                 <csid>${chessBoardCSID}</csid>
+                <documentType>CollectionObject</documentType>
             </subject>
             <object>
                 <csid>${chessSetBoxCSID}</csid>
+                <documentType>CollectionObject</documentType>
             </object>
         </relation-list-item>
         
@@ -28,32 +29,40 @@
             <predicate>hasBroader</predicate>
             <subject>
                 <csid>${bagOfWhiteChessPiecesCSID}</csid>
-            </subject>
+                <documentType>CollectionObject</documentType>
+           </subject>
             <object>
                 <csid>${chessSetBoxCSID}</csid>
-            </object>
+                <documentType>CollectionObject</documentType>
+           </object>
         </relation-list-item>
         
         <relation-list-item>
             <predicate>hasBroader</predicate>
             <subject>
                 <csid>${bagOfBlackChessPiecesCSID}</csid>
+                <documentType>CollectionObject</documentType>
             </subject>
             <object>
                 <csid>${chessSetBoxCSID}</csid>
+                <documentType>CollectionObject</documentType>
             </object>
         </relation-list-item>
         
-        <!-- Create hierarchical relationships between the bags of white -->
-        <!-- and black chess pieces, and the pieces they contain. -->
+        <!--
+            Create hierarchical relationships between the bags of white 
+            and black chess pieces, and the pieces they contain.
+        -->
         
         <relation-list-item>
             <predicate>hasBroader</predicate>
             <subject>
                 <csid>${whiteRookCSID}</csid>
-            </subject>
+                <documentType>CollectionObject</documentType>
+           </subject>
             <object>
                 <csid>${bagOfWhiteChessPiecesCSID}</csid>
+                <documentType>CollectionObject</documentType>
             </object>
         </relation-list-item>
 
@@ -61,9 +70,11 @@
             <predicate>hasBroader</predicate>
             <subject>
                 <csid>${whiteBishopCSID}</csid>
+                <documentType>CollectionObject</documentType>
             </subject>
             <object>
                 <csid>${bagOfWhiteChessPiecesCSID}</csid>
+                <documentType>CollectionObject</documentType>
             </object>
         </relation-list-item>
 
@@ -71,21 +82,16 @@
             <predicate>hasBroader</predicate>
             <subject>
                 <csid>${blackQueenCSID}</csid>
+                <documentType>CollectionObject</documentType>
             </subject>
             <object>
                 <csid>${bagOfBlackChessPiecesCSID}</csid>
+                <documentType>CollectionObject</documentType>
             </object>
         </relation-list-item>
-
-        <relation-list-item>
-            <predicate>hasBroader</predicate>
-            <subject>
-                <csid>${blackRookCSID}</csid>
-            </subject>
-            <object>
-                <csid>${bagOfBlackChessPiecesCSID}</csid>
-            </object>
-        </relation-list-item>
+        
+        <!-- The relationship between the bag of black pieces -->
+        <!-- and the black rook is set in a separate payload. -->
         
     </ns3:relations-common-list>
 </document>

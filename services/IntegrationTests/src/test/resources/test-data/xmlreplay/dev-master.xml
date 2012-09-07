@@ -34,15 +34,12 @@
     <protoHostPort>http://localhost:8180</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
-    <dump payloads="false" dumpServiceResult="detailed" />
+    <dump payloads="true" dumpServiceResult="full" />
     
     <auths default="admin@core.collectionspace.org">
        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
     
-	<!-- EXAMPLES. JUST UNCOMMENT THEM, AND RUN AS SHOWN ABOVE.
-	<run controlFile="person/person.xml" testGroup="PersonAddRelsDeleteRels" />
-	<run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
-    -->
+    <run controlFile="collectionobject/collectionobject-hierarchy.xml" testGroup="HierarchicCollectionObject" />
 </xmlReplayMaster>
 
