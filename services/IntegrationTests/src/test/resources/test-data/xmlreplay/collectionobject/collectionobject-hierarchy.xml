@@ -145,6 +145,7 @@
             <uri>/cspace-services/collectionobjects</uri>
             <filename>collectionobject/hierarchy/2-collectionobjects-with-relations-create.xml</filename>
             <vars>
+                <var ID="objectNumber">CSPACE-5518-BlackRook</var>
                 <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
                 <var ID="chessBoardCSID">${CreateChessBoard.CSID}</var>
                 <var ID="bagOfWhiteChessPiecesCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
