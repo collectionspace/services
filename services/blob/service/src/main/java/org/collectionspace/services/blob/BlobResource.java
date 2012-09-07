@@ -79,12 +79,6 @@ public class BlobResource extends ResourceBase {
     	return BlobsCommon.class;
     }
 
-    //FIXME: Is this method used/needed?
-    @Deprecated
-    private CommonList getBlobList(MultivaluedMap<String, String> queryParams) {
-        return (CommonList)getList(queryParams);
-    }
-
     @Deprecated
     public CommonList getBlobList(List<String> csidList) {
         return (CommonList) getList(csidList);

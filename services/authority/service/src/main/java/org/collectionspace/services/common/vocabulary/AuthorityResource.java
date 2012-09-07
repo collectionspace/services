@@ -425,7 +425,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public AbstractCommonList getAuthorityList(@Context UriInfo ui) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
@@ -919,7 +919,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // All items in dive can look at their child uri's to get uri.  So we calculate the very first one.  We could also do a GET and look at the common part uri field, but why...?
             String calledUri = ui.getPath();
             String uri = "/" + calledUri.substring(0, (calledUri.length() - ("/" + hierarchy).length()));
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName());
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), ui);
             ctx.setUriInfo(ui);
             String direction = ui.getQueryParameters().getFirst(Hierarchy.directionQP);
             if (Tools.notBlank(direction) && Hierarchy.direction_parents.equals(direction)) {

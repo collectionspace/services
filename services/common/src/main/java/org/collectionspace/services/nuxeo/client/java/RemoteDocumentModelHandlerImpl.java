@@ -208,10 +208,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	                    }
                     }
                 } catch (Throwable t){
-                    logger.error("Unable to addOutputPart: "+partLabel
-                                               +" in serviceContextPath: "+this.getServiceContextPath()
-                                               +" with URI: "+this.getServiceContext().getUriInfo().getPath()
-                                               +" error: "+t);
+                    logger.error("Unable to addOutputPart: " + partLabel
+                                               + " in serviceContextPath: "+this.getServiceContextPath()
+                                               + " with URI: " + this.getServiceContext().getUriInfo().getPath()
+                                               + " error: " + t);
                 }
 	        }
         } else {

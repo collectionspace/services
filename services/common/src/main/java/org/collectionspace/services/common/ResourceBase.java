@@ -225,8 +225,7 @@ public abstract class ResourceBase
         PoxPayloadOut result = null;
         ensureCSID(csid, READ);
         try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(queryParams);
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(ui);
             result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
@@ -285,9 +284,9 @@ public abstract class ResourceBase
     //======================= GET without csid. List, search, etc. =====================================
     @GET
     public AbstractCommonList getList(@Context UriInfo ui) {
-        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         AbstractCommonList list = null;
         
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         if (isGetAllRequest(queryParams) == false) {
             String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
@@ -295,15 +294,15 @@ public abstract class ResourceBase
             String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
             list = search(queryParams, orderBy, keywords, advancedSearch, partialTerm);
         } else {
-            list = getList(queryParams);
+            list = getCommonList(ui);
         }
         
         return list;
     }
     
-    protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
+    protected AbstractCommonList getCommonList(UriInfo ui) {
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
@@ -325,7 +324,7 @@ public abstract class ResourceBase
     protected AbstractCommonList search(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		DocumentHandler handler, 
-    		MultivaluedMap<String, String> queryParams,
+    		UriInfo ui,
     		String orderBy,
     		String keywords,
     		String advancedSearch,
@@ -375,7 +374,7 @@ public abstract class ResourceBase
     }
 
     private AbstractCommonList search(
-    		MultivaluedMap<String, String> queryParams,
+    		UriInfo ui,
     		String orderBy,
     		String keywords,
     		String advancedSearch,
@@ -384,9 +383,9 @@ public abstract class ResourceBase
 
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
     	try {
-    		ctx = createServiceContext(queryParams);
+    		ctx = createServiceContext(ui);
     		DocumentHandler handler = createDocumentHandler(ctx);
-    		result = search(ctx, handler, queryParams, orderBy, keywords, advancedSearch, partialTerm);
+    		result = search(ctx, handler, ui, orderBy, keywords, advancedSearch, partialTerm);
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
     	}
@@ -416,8 +415,7 @@ public abstract class ResourceBase
             @Context UriInfo ui) {
         AuthorityRefList authRefList = null;
         try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> handler = (DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>) createDocumentHandler(ctx);
             List<AuthRefConfigInfo> authRefsInfo = RefNameServiceUtils.getConfiguredAuthorityRefs(ctx);
             authRefList = handler.getAuthorityRefs(csid, authRefsInfo);

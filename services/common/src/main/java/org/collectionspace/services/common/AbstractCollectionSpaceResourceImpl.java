@@ -184,6 +184,17 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         return ctx;
     }
     
+    protected ServiceContext<IT, OT> createServiceContext(String serviceName, UriInfo ui) throws Exception {    	
+        ServiceContext<IT, OT> ctx = createServiceContext(
+        		serviceName,
+        		(IT)null, // The input part
+        		null, // The resource map
+        		(MultivaluedMap<String, String>)null, // The queryParams
+        		(Class<?>)null  /*input type's Class*/);
+        ctx.setUriInfo(ui);
+        return ctx;
+    }    
+    
     /**
      * Creates the service context.
      * 
@@ -221,35 +232,16 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         return ctx;
     }    
 
-    /**
-     * Creates the service context.
-     * 
-     * @param queryParams the query params
-     * 
-     * @return the service context< i t, o t>
-     * 
-     * @throws Exception the exception
-     */
-    protected ServiceContext<IT, OT> createServiceContext(MultivaluedMap<String, String> queryParams) throws Exception {
-        ServiceContext<IT, OT> ctx = createServiceContext(
-        		(IT)null, /*input*/
-        		queryParams,
-        		(Class<?>)null  /*input type's Class*/);
-        return ctx;
-    }
-
     protected ServiceContext<IT, OT> createServiceContext(UriInfo ui) throws Exception {
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         ServiceContext<IT, OT> ctx = createServiceContext(
         		(IT)null, /*input*/
         		queryParams,
         		(Class<?>)null  /*input type's Class*/);
+        ctx.setUriInfo(ui);
         return ctx;
     }
 
-
-
-        
     /**
      * Creates the service context.
      * 

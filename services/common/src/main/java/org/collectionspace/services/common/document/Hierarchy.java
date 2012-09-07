@@ -63,7 +63,7 @@ public class Hierarchy {
     }
 
     private static String dive(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String itemcsid, String uri, boolean lookupFirstName) {
-        MultivaluedMap<String, String> queryParams = ctx.getUriInfo().getQueryParameters();
+        MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         //Run getList() once as sent to get childListOuter:
         queryParams.putSingle(IRelationsManager.PREDICATE_QP, RelationshipType.HAS_BROADER.value());
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, null);
@@ -122,7 +122,7 @@ public class Hierarchy {
     }
     
     private static SurfaceResultStruct surface(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String itemcsid, String uri, boolean first) {
-        MultivaluedMap<String, String> queryParams = ctx.getUriInfo().getQueryParameters();
+        MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         //Run getList() once as sent to get parentListOuter:
         queryParams.putSingle(IRelationsManager.PREDICATE_QP, RelationshipType.HAS_BROADER.value());
         queryParams.putSingle(IRelationsManager.SUBJECT_QP, itemcsid);
