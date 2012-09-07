@@ -332,7 +332,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         String currentServiceName = ctx.getServiceName();
         String workflowSubResource = "/";
         JaxRsContext jaxRsContext = ctx.getJaxRsContext();
-        if (jaxRsContext != null) {
+        if (jaxRsContext != null) { // If not null then we're dealing with an authority item
         	String resourceName = SecurityUtils.getResourceName(jaxRsContext.getUriInfo());
         	workflowSubResource = workflowSubResource + resourceName + WorkflowClient.SERVICE_PATH + "/";
         } else {
@@ -343,7 +343,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         org.collectionspace.services.authorization.ObjectFactory objectFactory =
         	new org.collectionspace.services.authorization.ObjectFactory();
         JAXBElement<AccountPermission> ap = objectFactory.createAccountPermission(accountPermission);
-        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", ap);
+        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", ap); // REM - "account_permission" should be using a constant and not a literal
         ctx.addOutputPart(accountPermissionPart);
         
         profiler.stop();
@@ -1149,7 +1149,9 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         List<RelationsCommonList.RelationListItem> childList = null;
         List<RelationsCommonList.RelationListItem> parentList = null;
         DocumentModel docModel = wrapDoc.getWrappedObject();
-		String itemRefName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
+//		String itemRefName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME); cow;
+		String itemRefName = (String) docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+        		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
 
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
         //Do magic replacement of ${itemCSID} and fix URI's.

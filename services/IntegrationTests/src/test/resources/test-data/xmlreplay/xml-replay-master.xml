@@ -10,6 +10,9 @@
     </auths>
     
     
+    <run controlFile="collectionobject/collectionobject-hierarchy.xml" testGroup="HierarchicCollectionObject" />
+    
+    
     <run controlFile="./security.xml" testGroup="deleteBug" />
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
     <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
