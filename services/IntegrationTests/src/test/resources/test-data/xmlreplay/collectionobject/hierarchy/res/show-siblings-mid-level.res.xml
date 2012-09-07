@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <document name="collectionobjects">
+    <!-- Contents of the specified CollectionObject record itself are -->
+    <!-- ignored here; we are interested only in the relations list below. -->
+    
     <!--
         Siblings of the bag of black chess pieces:
         1. chess board
         2. bag of white chess pieces
     -->
-    <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
         <pageNum>0</pageNum>
-        <itemsInPage>3</itemsInPage>
-        <totalItems>3</totalItems>
+        <itemsInPage>2</itemsInPage>
+        <totalItems>2</totalItems>
         <relation-list-item>
             <subjectCsid>${chessBoardCSID}</subjectCsid>
             <objectCsid>${chessSetBoxCSID}</objectCsid>
@@ -31,17 +34,6 @@
                 <csid>${chessSetBoxCSID}</csid>
             </object>
         </relation-list-item>
-        <relation-list-item>
-            <subjectCsid>${bagOfBlackChessPiecesCSID}</subjectCsid>
-            <objectCsid>${chessSetBoxCSID}</objectCsid>
-            <predicate>hasBroader</predicate>
-            <subject>
-                <csid>${bagOfBlackChessPiecesCSID}</csid>
-            </subject>
-            <object>
-                <csid>${chessSetBoxCSID}</csid>
-            </object>
-        </relation-list-item>
-    </ns2:relations-common-list>
+    </ns3:relations-common-list>
 </document>
 
