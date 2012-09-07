@@ -205,21 +205,30 @@
                 <filename>collectionobject/hierarchy/res/read-all-relations.res.xml</filename>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
              </response>
-             
         </test>
         
         <!-- Read hierarchical relationships via the relations service -->
 
-        <test ID="GetRelationsAsSubject">
+        <test ID="GetRelationsAsSubjectForTopLevelItem">
              <method>GET</method>
-             <uri>/cspace-services/relations?sbj=${CreateBagOfBlackChessPieces.CSID}</uri>
+             <uri>/cspace-services/relations?sbj=${CreateChessSetBox.CSID}</uri>
              <!-- Also need to test response payload here -->
         </test>
          
-        <test ID="GetRelationsAsObject">
+        <test ID="GetRelationsAsObjectForTopLevelItem">
             <method>GET</method>
-            <uri>/cspace-services/relations?obj=${CreateBagOfBlackChessPieces.CSID}</uri>
-            <!-- Also need to test response payload here -->
+            <uri>/cspace-services/relations?obj=${CreateChessSetBox.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/read-as-object-top-level.res.xml</filename>
+                <vars>
+                    <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
+                    <var ID="chessBoardCSID">${CreateChessBoard.CSID}</var>
+                    <var ID="bagOfWhiteChessPiecesCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
+                    <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                </vars>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+            </response>
         </test>
        
         
