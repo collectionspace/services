@@ -98,8 +98,10 @@ public class RemoteServiceContextImpl<IT, OT>
      */
     protected RemoteServiceContextImpl(String serviceName,
     		IT theInput,
+    		ResourceMap resourceMap,
     		MultivaluedMap<String, String> queryParams) throws UnauthorizedException {
         this(serviceName, theInput);
+        this.setResourceMap(resourceMap);
         this.setQueryParams(queryParams);
     }
 

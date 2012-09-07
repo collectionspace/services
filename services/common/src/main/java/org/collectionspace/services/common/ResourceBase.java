@@ -31,6 +31,8 @@ import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
+import org.collectionspace.services.common.context.JaxRsContext;
+import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -89,21 +91,22 @@ public abstract class ResourceBase
     //======================= CREATE ====================================================
     
     @POST
-    public Response create(@Context ResourceMap resourceMap,
+    public Response create(
+    		@Context ResourceMap resourceMap,
     		@Context UriInfo ui,
             String xmlPayload) {
         return this.create(null, resourceMap, ui, xmlPayload); 
     }
     
     public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 8/13/2012 - Some sub-classes will override this method -e.g., MediaResource does.
-    		@Context ResourceMap resourceMap,
-    		@Context UriInfo ui,
+    		ResourceMap resourceMap,
+    		UriInfo ui,
             String xmlPayload) {
     	Response result = null;
     	
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input, ui.getQueryParameters());
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input, resourceMap, ui);
             ctx.setResourceMap(resourceMap);
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
             	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
@@ -216,13 +219,14 @@ public abstract class ResourceBase
     @GET
     @Path("{csid}")
     public byte[] get(
+            @Context Request request,    		
             @Context UriInfo ui,
             @PathParam("csid") String csid) {
         PoxPayloadOut result = null;
         ensureCSID(csid, READ);
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(queryParams);
             result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
