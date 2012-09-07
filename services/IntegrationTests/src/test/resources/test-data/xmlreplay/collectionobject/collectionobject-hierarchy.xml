@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xmlReplay>
-    <testGroup ID="HierarchicCollectionObject" autoDeletePOSTS="true">
+    <testGroup ID="CreateCollectionObjects" autoDeletePOSTS="true">
         
         <!-- Create a set of CollectionObjects -->
         
@@ -15,10 +15,19 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
+        <!-- Verify the contents of the first CollectionObject record created. -->
+        <!-- Other create requests, below, just check the result code.) -->
         <test ID="ReadChessSetBox" auth="admin@core.collectionspace.org">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}</uri>
             <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="TEXT" />
+                <filename>collectionobject/hierarchy/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="objectNumber">${CreateChessSetBox.objectNumber}</var>
+                </vars>
+            </response>
         </test>
         
         <!-- Chess board -->
@@ -129,9 +138,14 @@
             <expectedCodes>200</expectedCodes>
         </test>
         -->
-        
-        <!-- Create hierarchical relationships -->
+    </testGroup>
+    
+    <testGroup ID="CreateStructuredObjectsWithHierarchicalRelations" autoDeletePOSTS="true">
        
+        <!-- Create a new chess piece, and include in the create payload -->
+        <!-- a list of hierarchical relationships to be created between -->
+        <!-- the various CollectionObjects previously created, in tests above -->
+    
         <!-- This test is currently failing with a 400 status code -->
         <!-- due to one or more Exceptions in RemoteDocumentModelHandlerImpl.updateRelations() -->
         <!-- ADR 2012-09-06 -->
@@ -156,19 +170,20 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
-        <!--
         <test ID="ReadBlackRook" auth="admin@core.collectionspace.org">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRookWithRelations.CSID}</uri>
             <expectedCodes>200</expectedCodes>
         </test>
-        -->
         
-        <!-- Update one of the chess piece records, while including -->
-        <!-- a list of hierarchical relationships to be created between the -->
-        <!-- various CollectionObjects created in tests above -->
+    </testGroup>
+    
+    <testGroup ID="UpdateStructuredObjectsWithHierarchicalRelations" autoDeletePOSTS="true">
         
-        <!--
+        <!-- Update one of the existing chess pieces, and add yet one more -->
+        <!-- hierarchical relationship, between that piece and another -->
+        <!-- existing CollectionObject. -->
+        
         <test ID="UpdateBlackRootWithRelations">
             <method>PUT</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
@@ -180,33 +195,23 @@
             </vars>
             <expectedCodes>200</expectedCodes>
         </test>
-        -->
         
     </testGroup>
     
-    <!-- Additional tests that we can start moving into the test group above, -->
-    <!-- once create and update tests are succeeding. -->
+    <!-- Read hierarchical relations via the various query parameters now -->
+    <!-- supported for structured objects and procedures -->
     
-    <testGroup ID="HierarchicCollectionObjectMore" autoDeletePOSTS="true">
-        
-        <!-- Read hierarchical relationships -->
-        
-        <!-- Read hierarchical relationships via 'showRelations' -->
+    <testGroup ID="ReadRelationsOnStructuredObjects" autoDeletePOSTS="true">
+                
+        <!-- Read hierarchical relationships via 'showRelations', -->
+        <!-- which returns direct parent and child relations. -->
         
         <test ID="ReadHierarchyForTopLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}?showRelations=true</uri>
-            <expectedCodes>200</expectedCodes>
-            <!-- Also need to test response payload here -->
-        </test>
-        
-        <test ID="GetRelationsAsObjectForTopLevelItem">
-            <method>GET</method>
-            <uri>/cspace-services/relations?obj=${CreateChessSetBox.CSID}</uri>
-            <expectedCodes>200</expectedCodes>
             <response>
-                <expected level="TEXT" />
-                <filename>collectionobject/hierarchy/res/read-as-object-top-level.res.xml</filename>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/show-relations-top-level.res.xml</filename>
                 <vars>
                     <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
                     <var ID="chessBoardCSID">${CreateChessBoard.CSID}</var>
@@ -215,23 +220,43 @@
                 </vars>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
+            <expectedCodes>200</expectedCodes>
         </test>
         
         <test ID="ReadHierarchyForMidLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}?showRelations=true</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/show-relations-mid-level.res.xml</filename>
+                <vars>
+                    <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
+                    <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                    <var ID="blackQueenCSID">${CreateBlackQueen.CSID}</var>
+                    <var ID="blackRookCSID">${CreateBlackRookWithRelations.CSID}</var>
+                </vars>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+            </response>
             <expectedCodes>200</expectedCodes>
-            <!-- Also need to test response payload here -->
         </test>
         
         <test ID="ReadHierarchyForBottomLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}?showRelations=true</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/show-relations-bottom-level.res.xml</filename>
+                <vars>
+                    <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                    <var ID="blackRookCSID">${CreateBlackRookWithRelations.CSID}</var>
+                </vars>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+            </response>
             <expectedCodes>200</expectedCodes>
-            <!-- Also need to test response payload here -->
         </test>
         
-        <!-- Read hierarchical relationships via 'showSiblings' -->
+        <!-- Read hierarchical relationships via 'showSiblings', -->
+        <!-- which shows sibling relations. -->
 
         <test ID="ReadSiblingsForTopLevelItem">
             <method>GET</method>
@@ -239,7 +264,7 @@
             <expectedCodes>200</expectedCodes>
             <response>
                 <expected level="ADDOK" />
-                <filename>collectionobject/hierarchy/res/read-siblings-top-level.res.xml</filename>
+                <filename>collectionobject/hierarchy/res/show-siblings-top-level.res.xml</filename>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
         </test>
@@ -250,7 +275,7 @@
             <expectedCodes>200</expectedCodes>
             <response>
                 <expected level="ADDOK" />
-                <filename>collectionobject/hierarchy/res/read-siblings-mid-level.res.xml</filename>
+                <filename>collectionobject/hierarchy/res/show-siblings-mid-level.res.xml</filename>
                 <vars>
                     <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
                     <var ID="chessBoardCSID">${CreateChessBoard.CSID}</var>
@@ -262,14 +287,14 @@
         
         <test ID="ReadSiblingsForBottomLevelItem">
             <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${CreateBlackQueen.CSID}?showSiblings=true</uri>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}?showSiblings=true</uri>
             <expectedCodes>200</expectedCodes>
             <response>
                 <expected level="ADDOK" />
-                <filename>collectionobject/hierarchy/res/read-siblings-bottom-level.res.xml</filename>
+                <filename>collectionobject/hierarchy/res/show-siblings-bottom-level.res.xml</filename>
                 <vars>
                     <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
-                    <var ID="blackRookCSID">${CreateBlackRook.CSID}</var>
+                    <var ID="blackQueenCSID">${CreateBlackQueen.CSID}</var>
                 </vars>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
@@ -283,27 +308,25 @@
             <expectedCodes>200</expectedCodes>
             <response>
                 <expected level="ADDOK" />
-                <filename>collectionobject/hierarchy/res/read-all-relations.res.xml</filename>
+                <filename>collectionobject/hierarchy/res/show-all-relations-top-level.res.xml</filename>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
         </test>
         
-        <!-- Read hierarchical relationships via the relations service -->
+    </testGroup>
+    
+    <!-- Read hierarchical relationships via the relations service. -->
+    <!-- (This can also serve as a cross-check on the additional read mechanisms, above.) -->
+        
+    <testGroup ID="ReadRelations" autoDeletePOSTS="true">
 
-        <test ID="GetRelationsAsSubjectForTopLevelItem">
-            <method>GET</method>
-            <uri>/cspace-services/relations?sbj=${CreateChessSetBox.CSID}</uri>
-            <expectedCodes>200</expectedCodes>
-            <!-- Also need to test response payload here -->
-        </test>
-         
         <test ID="GetRelationsAsObjectForTopLevelItem">
             <method>GET</method>
             <uri>/cspace-services/relations?obj=${CreateChessSetBox.CSID}</uri>
             <expectedCodes>200</expectedCodes>
             <response>
-                <expected level="ADDOK" />
-                <filename>collectionobject/hierarchy/res/read-as-object-top-level.res.xml</filename>
+                <expected level="TEXT" />
+                <filename>collectionobject/hierarchy/res/relations-as-object-top-level.res.xml</filename>
                 <vars>
                     <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
                     <var ID="chessBoardCSID">${CreateChessBoard.CSID}</var>
@@ -313,8 +336,29 @@
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
         </test>
-       
         
+        <!-- Zero (0) total items are expected for the top-level item as a subject, -->
+        <!-- since the tests above created relation records with this top-level -->
+        <!-- solely as an object of those relations. -->
+        <test ID="GetRelationsAsSubjectForTopLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/relations?sbj=${CreateChessSetBox.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="TEXT" />
+                <filename>collectionobject/hierarchy/res/relations-pagination-header.res.xml</filename>
+                <vars>
+                    <var ID="totalItems">0</var>
+                </vars>
+            </response>
+        </test>
+        
+    </testGroup>
+    
+    <!-- Clean up any records that were not automatically deleted by autoDeletePOSTS -->
+       
+    <testGroup ID="Cleanup">
+
         <!-- Cleanup-->
         
         <!--
@@ -359,4 +403,5 @@
         -->
         
     </testGroup>
+    
 </xmlReplay>

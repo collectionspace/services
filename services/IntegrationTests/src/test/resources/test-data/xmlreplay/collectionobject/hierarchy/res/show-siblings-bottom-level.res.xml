@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <document name="collectionobjects">
+    <!-- Contents of the specified CollectionObject record itself are -->
+    <!-- ignored here; we are interested only in the relations list below. -->
+
     <!--
-        Siblings of the black queen:
-        1. black rook
+        Siblings of the black rook
+        1. black queen
     -->
-    <ns2:relations-common-list xmlns:ns2="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
-        <!--
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
         <pageNum>0</pageNum>
         <itemsInPage>1</itemsInPage>
         <totalItems>1</totalItems>
         <relation-list-item>
-            <subjectCsid>${blackRookCSID}</subjectCsid>
+            <subjectCsid>${blackQueenCSID}</subjectCsid>
             <objectCsid>${bagOfBlackChessPiecesCSID}</objectCsid>
             <predicate>hasBroader</predicate>
             <subject>
-                <csid>${blackRookCSID}</csid>
+                <csid>${blackQueenCSID}</csid>
             </subject>
             <object>
                 <csid>${bagOfBlackChessPiecesCSID}</csid>
             </object>
         </relation-list-item>
-        -->
-    </ns2:relations-common-list>
+    </ns3:relations-common-list>
 </document>
 
