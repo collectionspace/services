@@ -376,7 +376,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @GET
     @Path("{csid}")
     @Override
-    public byte[] get( // getAuthority(
+    public byte[] get(
+            @Context Request request,
             @Context UriInfo ui,
             @PathParam("csid") String specifier) {
         PoxPayloadOut result = null;
@@ -607,19 +608,19 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public byte[] getAuthorityItem(
             @Context Request request,
             @Context UriInfo ui,
+    		@Context ResourceMap resourceMap,            
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier) {
         PoxPayloadOut result = null;
         try {
-            JaxRsContext jaxRsContext = new JaxRsContext(request, ui);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             String parentcsid = lookupParentCSID(parentspecifier, "getAuthorityItem(parent)", "GET_ITEM", queryParams);
 
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-            ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), queryParams);
+            ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, ui);
+            
+            JaxRsContext jaxRsContext = new JaxRsContext(request, ui); // REM - Why are we setting this?  Who is using the getter?
             ctx.setJaxRsContext(jaxRsContext);
-
-            ctx.setUriInfo(ui); //ARG!   must pass this or subsequent calls will not have a ui.
 
             // We omit the parentShortId, only needed when doing a create...
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parentcsid, null);

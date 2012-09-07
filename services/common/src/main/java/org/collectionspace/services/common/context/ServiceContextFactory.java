@@ -25,6 +25,8 @@ package org.collectionspace.services.common.context;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.common.ResourceMap;
+
 /**
  *
  * ServiceContextFactory creates a service context
@@ -66,8 +68,10 @@ public interface ServiceContextFactory<IT, OT> {
      * 
      * @throws Exception the exception
      */
-    public ServiceContext<IT, OT> createServiceContext(String serviceName,
+    public ServiceContext<IT, OT> createServiceContext(
+    		String serviceName,
     		IT input,
+    		ResourceMap resourceMap,    		
     		MultivaluedMap<String, String> queryParams) throws Exception;    
         
     /**
@@ -86,6 +90,7 @@ public interface ServiceContextFactory<IT, OT> {
     public ServiceContext<IT, OT> createServiceContext(
     		String serviceName,
     		IT input, 
+    		ResourceMap resourceMap,
     		MultivaluedMap<String, String> queryParams,
     		String documentType,
     		String entityName) throws Exception;
