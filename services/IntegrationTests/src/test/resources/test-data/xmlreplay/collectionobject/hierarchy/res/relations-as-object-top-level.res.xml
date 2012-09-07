@@ -5,7 +5,7 @@
         1. chess board
         2. bag of white chess pieces
     -->
-    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
         <pageNum>0</pageNum>
         <itemsInPage>3</itemsInPage>
         <totalItems>3</totalItems>

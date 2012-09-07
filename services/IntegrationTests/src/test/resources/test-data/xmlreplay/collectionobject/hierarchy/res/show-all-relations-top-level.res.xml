@@ -3,7 +3,7 @@
     <!-- Contents of the specified CollectionObject record itself are -->
     <!-- ignored here; we are interested only in the relations list below. -->
     
-    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
         <!-- Need to add expected pagination header elements, relation list items here -->
     </ns3:relations-common-list>
 </document>

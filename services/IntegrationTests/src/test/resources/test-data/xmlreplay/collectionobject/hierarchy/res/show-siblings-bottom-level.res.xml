@@ -7,7 +7,7 @@
         Siblings of the black rook
         1. black queen
     -->
-    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
         <pageNum>0</pageNum>
         <itemsInPage>1</itemsInPage>
         <totalItems>1</totalItems>
