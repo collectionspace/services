@@ -299,17 +299,6 @@
 		</tenant:serviceBindings>
 
 		<tenant:serviceBindings merge:matcher="id" id="Organizations">
-			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-				<service:params>
-					<service:ListResultsFields>
-						<service:ListResultField merge:matcher="skip" merge:action="insert">
-							<service:element>termType</service:element>
-							<service:xpath>orgTermGroupList/[0]/termType</service:xpath>
-						</service:ListResultField>
-					</service:ListResultsFields>
-				</service:params>
-			</service:DocHandlerParams>
-
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="organizations_anthropology" updated="" order="3">
 					<service:content contentType="application/xml">
@@ -334,21 +323,6 @@
 		</tenant:serviceBindings>
 
 		<tenant:serviceBindings merge:matcher="id" id="Locations">
-			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-				<service:params>
-					<service:ListResultsFields>
-						<service:ListResultField merge:matcher="skip" merge:action="insert">
-							<service:element>termName</service:element>
-							<service:xpath>locTermGroupList/[0]/termName</service:xpath>
-						</service:ListResultField>
-						<service:ListResultField merge:matcher="skip" merge:action="insert">
-							<service:element>termType</service:element>
-							<service:xpath>locTermGroupList/[0]/termType</service:xpath>
-						</service:ListResultField>
-					</service:ListResultsFields>
-				</service:params>
-			</service:DocHandlerParams>
-
 			<service:object xmlns:service="http://collectionspace.org/services/config/service">
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="locations_anthropology" updated="" order="3">
 					<service:content contentType="application/xml">
@@ -356,32 +330,6 @@
 					</service:content>
 				</service:part>
 			</service:object>
-		</tenant:serviceBindings>
-
-		<tenant:serviceBindings merge:matcher="id" id="Taxon">
-			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-				<service:params>
-					<service:ListResultsFields>
-						<service:ListResultField merge:matcher="skip" merge:action="insert">
-							<service:element>termType</service:element>
-							<service:xpath>taxonTermGroupList/[0]/termType</service:xpath>
-						</service:ListResultField>
-					</service:ListResultsFields>
-				</service:params>
-			</service:DocHandlerParams>
-		</tenant:serviceBindings>
-
-		<tenant:serviceBindings merge:matcher="id" id="Concepts">
-			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-				<service:params>
-					<service:ListResultsFields>
-						<service:ListResultField merge:matcher="skip" merge:action="insert">
-							<service:element>termType</service:element>
-							<service:xpath>conceptTermGroupList/[0]/termType</service:xpath>
-						</service:ListResultField>
-					</service:ListResultsFields>
-				</service:params>
-			</service:DocHandlerParams>
 		</tenant:serviceBindings>
 
 		<tenant:serviceBindings merge:matcher="id" id="Acquisitions">
