@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Loan In schema (XSD)
+    
+    Entity  : Propagation 
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/propagation"
+  xmlns="http://collectionspace.org/services/propagation"
+  targetNamespace="http://collectionspace.org/services/propagation"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+In+Schema -->    
+    
+    <!--  Loan In Information Group -->
+    <xs:element name="propagations_common">
+        <xs:complexType>
+            <xs:sequence> 
+                <xs:element name="propagationNumber" type="xs:string"/>
+                <xs:element name="lenderGroupList" type="lenderGroupList"/>
+                <xs:element name="propagationContact" type="xs:string"/>
+                <xs:element name="borrowersContact" type="xs:string"/>
+                <xs:element name="borrowersAuthorizer" type="xs:string"/>
+                <xs:element name="borrowersAuthorizationDate" type="xs:string"/>
+                <xs:element name="propagationConditions" type="xs:string"/>
+                <xs:element name="propagationDate" type="xs:string"/>
+                <xs:element name="loanReturnDate" type="xs:string"/>
+                <xs:element name="loanRenewalApplicationDate" type="xs:string"/>
+                <xs:element name="propagationNote" type="xs:string"/>
+                <xs:element name="loanPurpose" type="xs:string"/>
+                <xs:element name="loanStatusGroupList" type="loanStatusGroupList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="lenderGroupList">
+        <xs:sequence>
+            <xs:element name="lenderGroup" type="lenderGroup" minOccurs="0"
+                   maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="lenderGroup">
+        <xs:sequence>
+            <xs:element name="lender" type="xs:string"/>
+            <xs:element name="lendersAuthorizer" type="xs:string"/>
+            <xs:element name="lendersAuthorizationDate" type="xs:string"/>
+            <xs:element name="lendersContact" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="loanStatusGroupList">
+        <xs:sequence>
+            <xs:element name="loanStatusGroup" type="loanStatusGroup" minOccurs="0"
+                   maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="loanStatusGroup">
+        <xs:sequence>
+            <xs:element name="loanStatus" type="xs:string"/>
+            <xs:element name="loanStatusDate" type="xs:string"/>
+            <xs:element name="loanStatusNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+</xs:schema>
+

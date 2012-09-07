@@ -266,6 +266,125 @@
 
         </tenant:serviceBindings>
 
+        <!-- 2.0 propagations tenant-binding also included this line as a child of tenant:serviceBindings - something comparable is commented out in 2.4 -->
+          <!-- <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/propagations/*/workflow/</service:uriPath> -->
+
+        <!-- begin propagation service meta-data -->
+        <tenant:serviceBindings merge:matcher="skip" merge:action="insert" id="Propagations" name="Propagations" type="procedure" version="0.1">
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /propagations/*/authorityrefs/
+            </service:uriPath>
+            -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.propagation.nuxeo.PropagationDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.propagation.nuxeo.PropagationDocumentModelHandler</service:classname>
+                <service:params>
+                    <service:SchemaName>propagations</service:SchemaName>
+                    <service:DublinCoreTitle>propagations</service:DublinCoreTitle>
+                    <service:SummaryFields>loanInNumber|lenderList|loanReturnDate|uri|csid</service:SummaryFields>
+                    <service:AbstractCommonListClassname />
+                    <service:CommonListItemClassname />
+                    <service:ListResultsItemMethodName>getPropagationListItem</service:ListResultsItemMethodName>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>loanInNumber</service:element>
+                            <service:xpath>loanInNumber</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>lender</service:element>
+                            <service:xpath>lenderGroupList/[0]/lender</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>loanReturnDate</service:element>
+                            <service:xpath>loanReturnDate</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.propagation.nuxeo.PropagationValidatorHandler</service:validatorHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>lenderGroupList/[0]/lender</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>loanInNumber</types:value>
+                </types:item>
+            </service:properties>
+            
+            <!-- MOVEMENT INCLUDED A SERVICE:INITHANDLER SECTION
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>movements_common</service:table>
+                        <service:col>locationdate</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
+            -->
+            
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Propagation" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="propagations-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="propagations_common" updated="" order="1">
+                    <service:properties>
+                        <!-- Fields containing authority term references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>lenderGroupList/*/lender</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>lenderGroupList/*/lendersAuthorizer</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>lenderGroupList/*/lendersContact</types:value>                          
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>borrowersAuthorizer</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>borrowersContact</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>loanInContact</types:value>
+                        </types:item>
+                        <!-- Fields containing term list / controlled vocabulary references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>loanPurpose</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>loanStatusGroupList/*/loanStatus</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/propagation" schemaLocation="http://collectionspace.org/services/propagation http://services.collectionspace.org/propagation/propagations_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end propagation service meta-data -->
+
+
     </tenant:tenantBinding>
 	    	       
 </tenant:TenantBindingConfig>
