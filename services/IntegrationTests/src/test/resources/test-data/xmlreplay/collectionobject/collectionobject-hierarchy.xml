@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xmlReplay>
-    <testGroup ID="HierarchicCollectionObject"> <!-- autoDeletePOSTS="true" -->
+    <testGroup ID="HierarchicCollectionObject" autoDeletePOSTS="true">
         
         <!-- Create a set of CollectionObjects -->
         
-         Chess set box 
-         (parent of chess board, bags of white and black chess pieces 
+        <!-- Chess set box -->
+        <!-- (parent of chess board, bags of white and black chess pieces) -->
         <test ID="CreateChessSetBox" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
@@ -21,8 +21,8 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-         Chess board 
-         (child of chess set box, sibling of bags of white and black chess pieces) 
+        <!-- Chess board -->
+        <!-- (child of chess set box, sibling of bags of white and black chess pieces) --> 
         <test ID="CreateChessBoard" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
@@ -38,8 +38,8 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-         Bags of white and black chess pieces 
-         (child of chess set box, sibling of chess board, parents of chess pieces) 
+        <!-- Bags of white and black chess pieces -->
+        <!-- (child of chess set box, sibling of chess board, parents of chess pieces) --> 
         <test ID="CreateBagOfWhiteChessPieces">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
@@ -69,7 +69,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-         Individual chess pieces in those bags 
+        <!-- Individual chess pieces in those bags -->
         <test ID="CreateWhiteRook">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
@@ -132,6 +132,14 @@
         
         <!-- Create hierarchical relationships -->
        
+        <!-- This test is currently failing with a 400 status code -->
+        <!-- due to one or more Exceptions in RemoteDocumentModelHandlerImpl.updateRelations() -->
+        <!-- ADR 2012-09-06 -->
+       
+        <!-- Note also that it *might* not be necessary to set these variables; the original -->
+        <!-- values of CSIDs saved from previous posts, e.g. {CreateChessSetBox.CSID} -->
+        <!-- might still be available for use in request payloads. -->
+       
         <test ID="CreateBlackRookWithRelations">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
@@ -174,6 +182,9 @@
         -->
         
     </testGroup>
+    
+    <!-- Additional tests that we can start moving into the test group above, -->
+    <!-- once create and update tests are succeeding. -->
     
     <testGroup ID="HierarchicCollectionObjectMore" autoDeletePOSTS="true">
         
