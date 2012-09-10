@@ -284,22 +284,18 @@
                 <service:params>
                     <service:SchemaName>propagations</service:SchemaName>
                     <service:DublinCoreTitle>propagations</service:DublinCoreTitle>
-                    <service:SummaryFields>loanInNumber|lenderList|loanReturnDate|uri|csid</service:SummaryFields>
+                    <service:SummaryFields>propNumber|propDate|uri|csid</service:SummaryFields>
                     <service:AbstractCommonListClassname />
                     <service:CommonListItemClassname />
                     <service:ListResultsItemMethodName>getPropagationListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
-                            <service:element>loanInNumber</service:element>
-                            <service:xpath>loanInNumber</service:xpath>
+                            <service:element>propNumber</service:element>
+                            <service:xpath>propNumber</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>lender</service:element>
-                            <service:xpath>lenderGroupList/[0]/lender</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>loanReturnDate</service:element>
-                            <service:xpath>loanReturnDate</service:xpath>
+                            <service:element>propDate</service:element>
+                            <service:xpath>propDate</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>
                 </service:params>
@@ -308,11 +304,11 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>lenderGroupList/[0]/lender</types:value>
+                    <types:value>propType</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
-                    <types:value>loanInNumber</types:value>
+                    <types:value>propNumber</types:value>
                 </types:item>
             </service:properties>
             
@@ -337,39 +333,7 @@
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="propagations_common" updated="" order="1">
                     <service:properties>
                         <!-- Fields containing authority term references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>lenderGroupList/*/lender</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>lenderGroupList/*/lendersAuthorizer</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>lenderGroupList/*/lendersContact</types:value>                          
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>borrowersAuthorizer</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>borrowersContact</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>loanInContact</types:value>
-                        </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>loanPurpose</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>loanStatusGroupList/*/loanStatus</types:value>
-                        </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/propagation" schemaLocation="http://collectionspace.org/services/propagation http://services.collectionspace.org/propagation/propagations_common.xsd" />

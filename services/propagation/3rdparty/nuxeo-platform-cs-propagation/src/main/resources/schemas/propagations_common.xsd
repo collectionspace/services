@@ -20,50 +20,49 @@
     
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+In+Schema -->
 
-    <!--  Loan In Information Group -->
-    <xs:element name="propagationNumber" type="xs:string"/>
-    <xs:element name="lenderGroupList" type="lenderGroupList"/>
-    <xs:element name="propagationContact" type="xs:string"/>
-    <xs:element name="borrowersContact" type="xs:string"/>
-    <xs:element name="borrowersAuthorizer" type="xs:string"/>
-    <xs:element name="borrowersAuthorizationDate" type="xs:date"/>
-    <xs:element name="propagationConditions" type="xs:string"/>
-    <xs:element name="propagationDate" type="xs:date"/>
-    <xs:element name="loanReturnDate" type="xs:date"/>
-    <xs:element name="loanRenewalApplicationDate" type="xs:date"/>
-    <xs:element name="propagationNote" type="xs:string"/>
-    <xs:element name="loanPurpose" type="xs:string"/>
-    <xs:element name="loanStatusGroupList" type="loanStatusGroupList"/>
+    <!--  Propagation Information -->
+    <xs:element name="propNumber" type="xs:string"/>
+    <xs:element name="propDate" type="xs:date"/>
+    <xs:element name="propReason" type="xs:string"/>
+    <xs:element name="propType" type="xs:string"/>
+    <xs:element name="propComments" type="xs:string"/>
+    
+    <!-- Seed propagation information -->
+    <xs:element name="scarStrat" type="xs:string"/>
+    <xs:element name="extraSeeds" type="xs:boolean"/>
+    
+    <!-- Cutting propagation information -->
+    <xs:element name="cuttingType" type="xs:string"/>
+    <xs:element name="hormone" type="xs:string"/>
+    <xs:element name="concentration" type="xs:string"/>
+    <xs:element name="wounded" type="xs:boolean"/>
 
-    <xs:complexType name="lenderGroupList">
-       <xs:sequence>
-           <xs:element name="lenderGroup" type="lenderGroup" minOccurs="0"
-                   maxOccurs="unbounded"/>
-       </xs:sequence>
+    <xs:element name="propActivityGroupList" type="propActivityGroupList"/>
+
+    <!-- Success of the propagation -->
+    <xs:element name="germinationDate" type="xs:date"/>
+    <xs:element name="successRate" type="xs:string"/>
+    
+    <xs:complexType name="propActivityGroupList">
+        <xs:sequence>
+            <xs:element name="propActivityGroup" type="propActivityGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+        </xs:sequence>
     </xs:complexType>
-
-    <xs:complexType name="lenderGroup">
-       <xs:sequence>
-           <xs:element name="lender" type="xs:string"/>
-           <xs:element name="lendersAuthorizer" type="xs:string"/>
-           <xs:element name="lendersAuthorizationDate" type="xs:date"/>
-           <xs:element name="lendersContact" type="xs:string"/>
-       </xs:sequence>
+    <xs:complexType name="propActivityGroup">
+        <xs:sequence>
+            <xs:element name="order" type="xs:integer"/>
+            <xs:element name="activityDate" type="xs:date"/>
+            <xs:element name="activityType" type="xs:string"/>
+            <xs:element name="propCount" type="xs:integer"/>    
+            <xs:element name="medium" type="xs:string"/>
+            <xs:element name="potSize" type="xs:string"/>
+            <xs:element name="nurseryLocation" type="xs:string"/>
+            <xs:element name="conditions" type="xs:string"/>    
+            <xs:element name="fungicide" type="xs:string"/>
+            <xs:element name="activityComments" type="xs:string"/>
+        </xs:sequence>
     </xs:complexType>
     
-    <xs:complexType name="loanStatusGroupList">
-       <xs:sequence>
-           <xs:element name="loanStatusGroup" type="loanStatusGroup" minOccurs="0"
-                   maxOccurs="unbounded"/>
-       </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="loanStatusGroup">
-       <xs:sequence>
-           <xs:element name="loanStatus" type="xs:string"/>
-           <xs:element name="loanStatusDate" type="xs:date"/>
-           <xs:element name="loanStatusNote" type="xs:string"/>
-       </xs:sequence>
-    </xs:complexType>
-
+    
 </xs:schema>

@@ -41,8 +41,8 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.propagation.LenderGroup;
-import org.collectionspace.services.propagation.LenderGroupList;
+import org.collectionspace.services.propagation.PropActivityGroup;
+import org.collectionspace.services.propagation.PropActivityGroupList;
 import org.collectionspace.services.propagation.PropagationsCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 
@@ -75,11 +75,6 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
     private List<String> propagationIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
-    private String lenderRefName = null;
-    private String lendersAuthorizerRefName = null;
-    private String lendersContactRefName = null;
-    private String propagationContactRefName = null;
-    private String borrowersAuthorizerRefName = null;
     private final int NUM_AUTH_REFS_EXPECTED = 5;
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.currentDateUTC();
@@ -122,12 +117,7 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
         PropagationClient propagationClient = new PropagationClient();
         PoxPayloadOut multipart = createPropagationInstance(
                 "propagationNumber-" + identifier,
-                CURRENT_DATE_UTC,
-		lenderRefName,
-                lendersAuthorizerRefName,
-                lendersContactRefName,
-                propagationContactRefName,
-                borrowersAuthorizerRefName);
+                CURRENT_DATE_UTC);
         ClientResponse<Response> response = propagationClient.create(multipart);
         int statusCode = response.getStatus();
         try {
@@ -178,30 +168,6 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
 
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
         
-        // Create temporary Person resources, and their corresponding refNames
-        // by which they can be identified.
-       	String csid = createPerson("Linus", "Lender", "linusLender", authRefName);
-        personIdsCreated.add(csid);
-        lenderRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-
-       	csid = createPerson("Art", "Lendersauthorizor", "artLendersauthorizor", authRefName);
-        personIdsCreated.add(csid);
-        lendersAuthorizerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-
-        csid = createPerson("Larry", "Lenderscontact", "larryLenderscontact", authRefName);
-        personIdsCreated.add(csid);
-        lendersContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-        
-        csid = createPerson("Carrie", "Propagationcontact", "carriePropagationcontact", authRefName);
-        personIdsCreated.add(csid);
-        propagationContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-
-        csid = createPerson("Bonnie", "Borrowersauthorizer", "bonnieBorrowersauthorizer", authRefName);
-        personIdsCreated.add(csid);
-        borrowersAuthorizerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-
-        // FIXME: Add instance(s) of 'lenders' field when we can work with
-        // repeatable / multivalued authority reference fields.  Be sure to
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
@@ -254,14 +220,6 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
                 res.releaseConnection();
             }
         }
-        //
-        // Check a couple of fields
-        // Assert.assertEquals(propagationCommon.getLender(), lenderRefName);
-        // Assert.assertEquals(propagationCommon.getLendersAuthorizer(), lendersAuthorizerRefName);
-        // Assert.assertEquals(propagationCommon.getLendersContact(), lendersContactRefName);
-        //
-        Assert.assertEquals(propagationCommon.getPropagationContact(), propagationContactRefName);
-        Assert.assertEquals(propagationCommon.getBorrowersAuthorizer(), borrowersAuthorizerRefName);
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = propagationClient.getAuthorityRefs(knownResourceId);
@@ -369,24 +327,14 @@ public class PropagationAuthRefsTest extends BaseServiceTest<AbstractCommonList>
     }
 
     private PoxPayloadOut createPropagationInstance(String propagationNumber,
-    		String returnDate,
-    		String lender,
-    		String lendersAuthorizer,
-    		String lendersContact,
-    		String propagationContact,
-    		String borrowersAuthorizer) {
+    		String returnDate) {
     	PropagationsCommon propagationCommon = new PropagationsCommon();
-    	propagationCommon.setPropagationNumber(propagationNumber);
-    	propagationCommon.setPropagationNumber(returnDate);
-    	LenderGroupList lenderGroupList =  new LenderGroupList();
-    	LenderGroup lenderGroup = new LenderGroup();
-    	lenderGroup.setLender(lender);
-    	lenderGroup.setLendersAuthorizer(lendersAuthorizer);
-    	lenderGroup.setLendersContact(lendersContact);
-    	lenderGroupList.getLenderGroup().add(lenderGroup);
-    	propagationCommon.setLenderGroupList(lenderGroupList);
-    	propagationCommon.setPropagationContact(propagationContact);
-    	propagationCommon.setBorrowersAuthorizer(borrowersAuthorizer);
+    	propagationCommon.setPropNumber(propagationNumber);
+    	propagationCommon.setPropNumber(returnDate);
+    	PropActivityGroupList propActivityGroupList =  new PropActivityGroupList();
+    	PropActivityGroup propActivityGroup = new PropActivityGroup();
+    	propActivityGroupList.getPropActivityGroup().add(propActivityGroup);
+    	propagationCommon.setPropActivityGroupList(propActivityGroupList);
 
     	PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
     	PayloadOutputPart commonPart =

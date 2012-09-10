@@ -26,171 +26,86 @@ $LastChangedDate: $
                 <template mode="any">/layouts/layout_default_template.xhtml</template>
             </templates>
             <rows>
-                <row><widget>propagationNumber</widget></row>
-                <row><widget>lenders</widget></row>
-                <row><widget>lendersAuthorizer</widget></row>
-                <row><widget>lendersAuthorizationDate</widget></row>
-                <row><widget>lendersContact</widget></row>
-                <row><widget>propagationContact</widget></row>
-                <row><widget>propagationConditions</widget></row>
-                <row><widget>propagationDate</widget></row>
-                <row><widget>loanReturnDate</widget></row>
-                <row><widget>loanRenewalApplicationDate</widget></row>
-                <row><widget>propagationNote</widget></row>
-                <row><widget>loanPurpose</widget></row>
+                <row><widget>propNumber</widget></row>
+                <row><widget>propType</widget></row>
+                <row><widget>propDate</widget></row>
+                <row><widget>germinationDate</widget></row>
+                <row><widget>propComments</widget></row>
+                <row><widget>propReason</widget></row>
             </rows>
 
-            <widget name="propagationNumber" type="text">
+            <widget name="propNumber" type="text">
                 <labels>
-                    <label mode="any">propagationNumber</label>
+                    <label mode="any">propNumber</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="propagations_common">propagationNumber</field>
+                    <field schema="propagations_common">propNumber</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
                 </properties>
             </widget>
 
-            <!-- FIXME: determine the correct layout for this repeatable / multivalue field -->
-            <widget name="lenders" type="text">
+            <widget name="propType" type="text">
                 <labels>
-                    <label mode="any">lenders</label>
+                    <label mode="any">propType</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="propagations_common">lenders</field>
+                    <field schema="propagations_common">propType</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
                 </properties>
             </widget>
 
-            <widget name="lendersAuthorizer" type="text">
+            <widget name="propDate" type="text">
                 <labels>
-                    <label mode="any">lendersAuthorizer</label>
+                    <label mode="any">propDate</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="propagations_common">lendersAuthorizer</field>
+                    <field schema="propagations_common">propDate</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
                 </properties>
             </widget>
 
-            <widget name="lendersAuthorizationDate" type="text">
+            <widget name="germinationDate" type="text">
                 <labels>
-                    <label mode="any">lendersAuthorizationDate</label>
+                    <label mode="any">germinationDate</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="propagations_common">lendersAuthorizationDate</field>
+                    <field schema="propagations_common">germinationDate</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
                 </properties>
             </widget>
 
-            <widget name="lendersContact" type="text">
+            <widget name="propComments" type="text">
                 <labels>
-                    <label mode="any">lendersContact</label>
+                    <label mode="any">propComments</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="propagations_common">lendersContact</field>
+                    <field schema="propagations_common">propComments</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
                 </properties>
             </widget>
 
-            <widget name="propagationContact" type="text">
+            <widget name="propReason" type="text">
                 <labels>
-                    <label mode="any">propagationContact</label>
+                    <label mode="any">propReason</label>
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="propagations_common">propagationContact</field>
-                </fields>
-                <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
-                </properties>
-            </widget>
-
-            <widget name="propagationConditions" type="text">
-                <labels>
-                    <label mode="any">propagationConditions</label>
-                </labels>
-                <translated>true</translated>
-                <fields>
-                    <field schema="propagations_common">propagationConditions</field>
-                </fields>
-                <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
-                </properties>
-            </widget>
-
-            <widget name="propagationDate" type="text">
-                <labels>
-                    <label mode="any">propagationDate</label>
-                </labels>
-                <translated>true</translated>
-                <fields>
-                    <field schema="propagations_common">propagationDate</field>
-                </fields>
-                <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
-                </properties>
-            </widget>
-
-            <widget name="loanReturnDate" type="text">
-                <labels>
-                    <label mode="any">loanReturnDate</label>
-                </labels>
-                <translated>true</translated>
-                <fields>
-                    <field schema="propagations_common">loanReturnDate</field>
-                </fields>
-                <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
-                </properties>
-            </widget>
-
-            <widget name="loanRenewalApplicationDate" type="text">
-                <labels>
-                    <label mode="any">loanRenewalApplicationDate</label>
-                </labels>
-                <translated>true</translated>
-                <fields>
-                    <field schema="propagations_common">loanRenewalApplicationDate</field>
-                </fields>
-                <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
-                </properties>
-            </widget>
-
-            <widget name="propagationNote" type="text">
-                <labels>
-                    <label mode="any">propagationNote</label>
-                </labels>
-                <translated>true</translated>
-                <fields>
-                    <field schema="propagations_common">propagationNote</field>
-                </fields>
-                <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
-                </properties>
-            </widget>
-
-            <widget name="loanPurpose" type="text">
-                <labels>
-                    <label mode="any">loanPurpose</label>
-                </labels>
-                <translated>true</translated>
-                <fields>
-                    <field schema="propagations_common">loanPurpose</field>
+                    <field schema="propagations_common">propReason</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>

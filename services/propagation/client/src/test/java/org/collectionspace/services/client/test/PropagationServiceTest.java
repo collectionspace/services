@@ -36,8 +36,8 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.propagation.LenderGroup;
-import org.collectionspace.services.propagation.LenderGroupList;
+import org.collectionspace.services.propagation.PropActivityGroup;
+import org.collectionspace.services.propagation.PropActivityGroupList;
 import org.collectionspace.services.propagation.PropagationsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -62,8 +62,6 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
     /** The service path component. */
     final String SERVICE_NAME = "propagations";
     final String SERVICE_PATH_COMPONENT = "propagations";
-    private String LENDER_REF_NAME =
-            "urn:cspace:org.collectionspace.demo:personauthorities:name(TestPersonAuth):item:name(HarryLender)'Harry Lender'";
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.currentDateUTC();
 
@@ -284,21 +282,19 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         Assert.assertNotNull(propagationCommon);
 
         // Check selected fields.
-        LenderGroupList lenderGroupList = propagationCommon.getLenderGroupList();
-        Assert.assertNotNull(lenderGroupList);
-        List<LenderGroup> lenderGroups = lenderGroupList.getLenderGroup();
-        Assert.assertNotNull(lenderGroups);
-        Assert.assertTrue(lenderGroups.size() > 0);
-        String lender = lenderGroups.get(0).getLender();
-        Assert.assertEquals(lender, LENDER_REF_NAME);
+        PropActivityGroupList propActivityGroupList = propagationCommon.getPropActivityGroupList();
+        Assert.assertNotNull(propActivityGroupList);
+        List<PropActivityGroup> propActivityGroups = propActivityGroupList.getPropActivityGroup();
+        Assert.assertNotNull(propActivityGroups);
+        Assert.assertTrue(propActivityGroups.size() > 0);
 
         if (logger.isDebugEnabled()) {
             logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
-                    + "UTF-8 data received=" + propagationCommon.getPropagationNote());
+                    + "UTF-8 data received=" + propagationCommon.getPropComments());
         }
 
-        Assert.assertEquals(propagationCommon.getPropagationNote(), getUTF8DataFragment(),
-                "UTF-8 data retrieved '" + propagationCommon.getPropagationNote()
+        Assert.assertEquals(propagationCommon.getPropComments(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + propagationCommon.getPropComments()
                 + "' does not match expected data '" + getUTF8DataFragment());
     }
 
@@ -427,8 +423,8 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         Assert.assertNotNull(propagationCommon);
 
         // Update the content of this resource.
-        propagationCommon.setPropagationNumber("updated-" + propagationCommon.getPropagationNumber());
-        propagationCommon.setPropagationNote("updated-" + propagationCommon.getPropagationNote());
+        propagationCommon.setPropNumber("updated-" + propagationCommon.getPropNumber());
+        propagationCommon.setPropComments("updated-" + propagationCommon.getPropComments());
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(propagationCommon, PropagationsCommon.class));
@@ -467,19 +463,19 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
         Assert.assertNotNull(updatedPropagationCommon);
 
         // Check selected fields in the updated common part.
-        Assert.assertEquals(updatedPropagationCommon.getPropagationNumber(),
-                propagationCommon.getPropagationNumber(),
+        Assert.assertEquals(updatedPropagationCommon.getPropNumber(),
+                propagationCommon.getPropNumber(),
                 "Data in updated object did not match submitted data.");
 
         if (logger.isDebugEnabled()) {
-            logger.debug("UTF-8 data sent=" + propagationCommon.getPropagationNote() + "\n"
-                    + "UTF-8 data received=" + updatedPropagationCommon.getPropagationNote());
+            logger.debug("UTF-8 data sent=" + propagationCommon.getPropComments() + "\n"
+                    + "UTF-8 data received=" + updatedPropagationCommon.getPropComments());
         }
-        Assert.assertTrue(updatedPropagationCommon.getPropagationNote().contains(getUTF8DataFragment()),
-                "UTF-8 data retrieved '" + updatedPropagationCommon.getPropagationNote()
+        Assert.assertTrue(updatedPropagationCommon.getPropComments().contains(getUTF8DataFragment()),
+                "UTF-8 data retrieved '" + updatedPropagationCommon.getPropComments()
                 + "' does not contain expected data '" + getUTF8DataFragment());
-        Assert.assertEquals(updatedPropagationCommon.getPropagationNote(),
-                propagationCommon.getPropagationNote(),
+        Assert.assertEquals(updatedPropagationCommon.getPropComments(),
+                propagationCommon.getPropComments(),
                 "Data in updated object did not match submitted data.");
     }
 
@@ -643,30 +639,28 @@ public class PropagationServiceTest extends AbstractPoxServiceTestImpl<AbstractC
      */
     private PoxPayloadOut createPropagationInstance(String identifier) {
         return createPropagationInstance(
-                "propagationNumber-" + identifier,
+                "propNumber-" + identifier,
                 "returnDate-" + identifier);
     }
 
     /**
      * Creates the propagation instance.
      *
-     * @param propagationNumber the propagation number
+     * @param propNumber the propagation number
      * @param returnDate the return date
      * @return the multipart output
      */
-    private PoxPayloadOut createPropagationInstance(String propagationNumber,
+    private PoxPayloadOut createPropagationInstance(String propNumber,
             String returnDate) {
 
         PropagationsCommon propagationCommon = new PropagationsCommon();
-        propagationCommon.setPropagationNumber(propagationNumber);
-        propagationCommon.setLoanReturnDate(CURRENT_DATE_UTC);
-        LenderGroupList lenderGroupList = new LenderGroupList();
-        LenderGroup lenderGroup = new LenderGroup();
-        lenderGroup.setLender(LENDER_REF_NAME);
-        lenderGroupList.getLenderGroup().add(lenderGroup);
-        propagationCommon.setLenderGroupList(lenderGroupList);
-        propagationCommon.setLoanPurpose("For Surfboards of the 1960s exhibition.");
-        propagationCommon.setPropagationNote(getUTF8DataFragment());
+        propagationCommon.setPropNumber(propNumber);
+        PropActivityGroupList propActivityGroupList = new PropActivityGroupList();
+        PropActivityGroup propActivityGroup = new PropActivityGroup();
+        propActivityGroupList.getPropActivityGroup().add(propActivityGroup);
+        propagationCommon.setPropActivityGroupList(propActivityGroupList);
+        propagationCommon.setPropReason("For Surfboards of the 1960s exhibition.");
+        propagationCommon.setPropComments(getUTF8DataFragment());
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
