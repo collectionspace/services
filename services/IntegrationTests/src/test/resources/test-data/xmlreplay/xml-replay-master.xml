@@ -10,7 +10,6 @@
     </auths>
     
     
-    <run controlFile="collectionobject/collectionobject-hierarchy.xml" testGroup="HierarchicCollectionObject" />
     
     
     <run controlFile="./security.xml" testGroup="deleteBug" />
