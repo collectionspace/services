@@ -160,7 +160,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         ServiceContext<IT, OT> ctx = createServiceContext(this.getServiceName(),
         		(IT)null, //inputType
         		null, // The resource map
-        		(MultivaluedMap<String, String>)null, // The query params
+        		(UriInfo)null, // The query params
         		this.getCommonPartClass());
         return ctx;
     }    
@@ -179,7 +179,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         		serviceName,
         		(IT)null, // The input part
         		null, // The resource map
-        		(MultivaluedMap<String, String>)null, // The queryParams
+        		(UriInfo)null, // The queryParams
         		(Class<?>)null  /*input type's Class*/);
         return ctx;
     }
@@ -189,7 +189,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         		serviceName,
         		(IT)null, // The input part
         		null, // The resource map
-        		(MultivaluedMap<String, String>)null, // The queryParams
+        		(UriInfo)null, // The queryParams
         		(Class<?>)null  /*input type's Class*/);
         ctx.setUriInfo(ui);
         return ctx;
@@ -210,35 +210,16 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         ServiceContext<IT, OT> ctx = createServiceContext(serviceName,
         		input,
         		null, // The resource map
-        		(MultivaluedMap<String, String>)null, /*queryParams*/
+        		(UriInfo)null, /*queryParams*/
         		(Class<?>)null  /*input type's Class*/);
         return ctx;
     }
     
-    /**
-     * Creates the service context.
-     * 
-     * @param serviceName the service name
-     * @return the service context< i t, o t>
-     * @throws Exception the exception
-     */
-    protected ServiceContext<IT, OT> createServiceContext(String serviceName,
-    		MultivaluedMap<String, String> queryParams) throws Exception {    	
-        ServiceContext<IT, OT> ctx = createServiceContext(serviceName,
-        		(IT)null,
-        		null, // The resource map
-        		queryParams,
-        		(Class<?>)null  /*input type's Class*/);
-        return ctx;
-    }    
-
-    protected ServiceContext<IT, OT> createServiceContext(UriInfo ui) throws Exception {
-        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+    protected ServiceContext<IT, OT> createServiceContext(UriInfo uriInfo) throws Exception {
         ServiceContext<IT, OT> ctx = createServiceContext(
         		(IT)null, /*input*/
-        		queryParams,
+        		uriInfo,
         		(Class<?>)null  /*input type's Class*/);
-        ctx.setUriInfo(ui);
         return ctx;
     }
 
@@ -271,7 +252,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     protected ServiceContext<IT, OT> createServiceContext(IT input, Class<?> theClass) throws Exception {    	
         ServiceContext<IT, OT> ctx = createServiceContext(
         		input,
-        		(MultivaluedMap<String, String>)null, //queryParams,
+        		(UriInfo)null, //queryParams,
         		theClass);
         return ctx;
     }
@@ -279,41 +260,43 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     protected ServiceContext<IT, OT> createServiceContext(
     		String serviceName,
     		ResourceMap resourceMap,
-    		UriInfo ui) throws Exception {
+    		UriInfo uriInfo) throws Exception {
     	ServiceContext<IT, OT> ctx = createServiceContext(
     			serviceName,
     			null, // The input object
     			resourceMap,
-    			ui.getQueryParameters(),
+    			uriInfo,
     			null /* the class of the input type */);
-    	ctx.setUriInfo(ui);
     	return ctx;
     }
     
     protected ServiceContext<IT, OT> createServiceContext(
     		IT input,
     		ResourceMap resourceMap,
-    		UriInfo ui) throws Exception {
+    		UriInfo uriInfo) throws Exception {
     	ServiceContext<IT, OT> ctx = createServiceContext(
     			this.getServiceName(),
     			input,
     			resourceMap,
-    			ui.getQueryParameters(),
+    			uriInfo,
     			null /* the class of the input type */);
-    	ctx.setUriInfo(ui);
     	return ctx;
     }
-
-    protected ServiceContext<IT, OT> createServiceContext(
-    		IT input,
-    		MultivaluedMap<String, String> queryParams) throws Exception {
-    	return createServiceContext(this.getServiceName(),
-    			input,
-    			null, // The resource map
-    			queryParams,
-    			null); // The class of the input type.
-    }
     
+    protected ServiceContext<IT, OT> createServiceContext(
+    		String serviceName,
+    		IT input,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo) throws Exception {
+    	ServiceContext<IT, OT> ctx = createServiceContext(
+    			serviceName,
+    			input,
+    			resourceMap,
+    			uriInfo,
+    			null /* the class of the input type */);
+    	return ctx;
+    }
+        
     /**
      * Creates the service context.
      * 
@@ -325,14 +308,14 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      * 
      * @throws Exception the exception
      */
-    protected ServiceContext<IT, OT> createServiceContext(
+    private ServiceContext<IT, OT> createServiceContext(
     		IT input,
-    		MultivaluedMap<String, String> queryParams,
+    		UriInfo uriInfo,
     		Class<?> theClass) throws Exception {
     	return createServiceContext(this.getServiceName(),
     			input,
     			null, // The resource map
-    			queryParams,
+    			uriInfo,
     			theClass);
     }
 
@@ -352,13 +335,13 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     		String serviceName,
     		IT input,
     		ResourceMap resourceMap,
-    		MultivaluedMap<String, String> queryParams,
+    		UriInfo uriInfo,
     		Class<?> theClass) throws Exception {
         ServiceContext<IT, OT> ctx = getServiceContextFactory().createServiceContext(
         		serviceName,
         		input,
         		resourceMap,
-        		queryParams,
+        		uriInfo,
         		theClass != null ? theClass.getPackage().getName() : null,
         		theClass != null ? theClass.getName() : null);
         if (theClass != null) {

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -96,9 +97,9 @@ public class MultipartServiceContextImpl
     		String serviceName,
     		PoxPayloadIn theInput,
     		ResourceMap resourceMap,
-    		MultivaluedMap<String, String> queryParams) 
+    		UriInfo uriInfo) 
     			throws DocumentException, UnauthorizedException {
-    	super(serviceName, theInput, resourceMap, queryParams);
+    	super(serviceName, theInput, resourceMap, uriInfo);
     	setOutput(new PoxPayloadOut(serviceName));
     }
 

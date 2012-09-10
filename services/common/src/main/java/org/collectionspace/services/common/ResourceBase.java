@@ -292,7 +292,7 @@ public abstract class ResourceBase
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
             String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
-            list = search(queryParams, orderBy, keywords, advancedSearch, partialTerm);
+            list = search(ui, orderBy, keywords, advancedSearch, partialTerm);
         } else {
             list = getCommonList(ui);
         }

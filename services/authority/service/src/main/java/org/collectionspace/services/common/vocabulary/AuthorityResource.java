@@ -265,13 +265,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         String shortIdentifier;
     }
 
-    protected String lookupParentCSID(String parentspecifier, String method, String op, MultivaluedMap<String, String> queryParams)
-            throws Exception {
-        CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(parentspecifier, method, op, queryParams);
-        return tempResult.CSID;
-    }
+	protected String lookupParentCSID(String parentspecifier, String method,
+			String op, UriInfo uriInfo) throws Exception {
+		CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(
+				parentspecifier, method, op, uriInfo);
+		return tempResult.CSID;
+	}
 
-    private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(String parentspecifier, String method, String op, MultivaluedMap<String, String> queryParams)
+    private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(String parentspecifier,
+    		String method, String op,
+    		UriInfo uriInfo)
             throws Exception {
         CsidAndShortIdentifier result = new CsidAndShortIdentifier();
         Specifier parentSpec = getSpecifier(parentspecifier, method, op);
@@ -287,7 +290,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         } else {
             parentShortIdentifier = parentSpec.value;
             String whereClause = buildWhereForAuthByName(parentSpec.value);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getServiceName(), queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getServiceName(), uriInfo);
             parentcsid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
         }
         result.CSID = parentcsid;
@@ -422,10 +425,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      */
     @GET
     @Produces("application/xml")
-    public AbstractCommonList getAuthorityList(@Context UriInfo ui) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
-        try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+    public AbstractCommonList getAuthorityList(@Context UriInfo uriInfo) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
+    	AbstractCommonList result = null;
+    	
+    	try {
+            MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
+            
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
@@ -441,13 +447,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 myFilter.setWhereClause(authorityCommonSchemaName + ":refName='" + nameQ + "'");
             }
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            return handler.getCommonPartList();
+            result = handler.getCommonPartList();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
+        
+        return result;
     }
     
-
     /**
      * Update authority.
      *
@@ -512,25 +519,30 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      *************************************************************************/
     @POST
     @Path("{csid}/items")
-    public Response createAuthorityItem(@Context ResourceMap resourceMap, @Context UriInfo ui, 
-    		@PathParam("csid") String specifier, String xmlPayload) {
+    public Response createAuthorityItem(
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo uriInfo, 
+    		@PathParam("csid") String specifier,
+    		String xmlPayload) {
+    	Response result = null;
+    	
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input);
-            ctx.setResourceMap(resourceMap);
-            ctx.setUriInfo(ui);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input, resourceMap, uriInfo);
 
             // Note: must have the parentShortId, to do the create.
             CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(specifier, "createAuthorityItem", "CREATE_ITEM", null);
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
+            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = 
+            	createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
             String itemcsid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(resourceClass);
             path.path(parent.CSID + "/items/" + itemcsid);
-            Response response = Response.created(path.build()).build();
-            return response;
+            result = Response.created(path.build()).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
+        
+        return result;
     }
 
     @GET
@@ -607,19 +619,18 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Path("{csid}/items/{itemcsid}")
     public byte[] getAuthorityItem(
             @Context Request request,
-            @Context UriInfo ui,
+            @Context UriInfo uriInfo,
     		@Context ResourceMap resourceMap,            
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier) {
         PoxPayloadOut result = null;
         try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            String parentcsid = lookupParentCSID(parentspecifier, "getAuthorityItem(parent)", "GET_ITEM", queryParams);
+            String parentcsid = lookupParentCSID(parentspecifier, "getAuthorityItem(parent)", "GET_ITEM", uriInfo);
 
-            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-            ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, ui);
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
+            	(RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, uriInfo);
             
-            JaxRsContext jaxRsContext = new JaxRsContext(request, ui); // REM - Why are we setting this?  Who is using the getter?
+            JaxRsContext jaxRsContext = new JaxRsContext(request, uriInfo); // REM - Why are we setting this?  Who is using the getter?
             ctx.setJaxRsContext(jaxRsContext);
 
             // We omit the parentShortId, only needed when doing a create...
@@ -690,22 +701,23 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Path("{csid}/items")
     @Produces("application/xml")
     public AbstractCommonList getAuthorityItemList(@PathParam("csid") String specifier,
-            @Context UriInfo ui) {
+            @Context UriInfo uriInfo) {
     	AbstractCommonList result = null;
     	
         try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+            
             String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
             String termStatus = queryParams.getFirst(SEARCH_TYPE_TERMSTATUS);
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
             String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
 
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), queryParams);
             // For the wildcard case, parentcsid is null, but docHandler will deal with this.
             // We omit the parentShortId, only needed when doing a create...
             String parentcsid = PARENT_WILDCARD.equals(specifier) ? null :
-				lookupParentCSID(specifier, "getAuthorityItemList", "LIST", queryParams);
+				lookupParentCSID(specifier, "getAuthorityItemList", "LIST", uriInfo);
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler =
             	createItemDocumentHandler(ctx, parentcsid, null);
             
@@ -727,7 +739,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 myFilter.appendWhereClause(tsClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
 
-            result = search(ctx, handler, queryParams, orderBy, keywords, advancedSearch, partialTerm);            
+            result = search(ctx, handler, uriInfo, orderBy, keywords, advancedSearch, partialTerm);            
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
@@ -762,14 +774,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public AuthorityRefDocList getReferencingObjects(
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
-            @Context UriInfo ui) {
+            @Context UriInfo uriInfo) {
         AuthorityRefDocList authRefDocList = null;
         try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
 
-            String parentcsid = lookupParentCSID(parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", queryParams);
-
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), queryParams);
+            String parentcsid = lookupParentCSID(parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", uriInfo);
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS", ctx);
 
             List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
@@ -810,19 +821,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public AuthorityRefList getAuthorityItemAuthorityRefs(
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
-            @Context UriInfo ui) {
+            @Context UriInfo uriInfo) {
         AuthorityRefList authRefList = null;
         try {
             // Note that we have to create the service context for the Items, not the main service
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-
-            String parentcsid = lookupParentCSID(parentspecifier, "getAuthorityItemAuthRefs(parent)", "GET_ITEM_AUTH_REFS", queryParams);
-
-            ctx = createServiceContext(getItemServiceName(), queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+            String parentcsid = lookupParentCSID(parentspecifier, "getAuthorityItemAuthRefs(parent)", "GET_ITEM_AUTH_REFS", uriInfo);
             // We omit the parentShortId, only needed when doing a create...
             DocumentModelHandler<?, AbstractCommonList> handler =
-                    (DocumentModelHandler<?, AbstractCommonList>)createItemDocumentHandler(ctx, parentcsid, null);
+                    (DocumentModelHandler<?, AbstractCommonList>)createItemDocumentHandler(ctx, parentcsid, null /*no parent short ID*/);
 
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getAuthorityItemAuthRefs(item)", "GET_ITEM_AUTH_REFS", ctx);
 

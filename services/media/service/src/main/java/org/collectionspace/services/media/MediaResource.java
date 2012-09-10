@@ -120,13 +120,12 @@ public class MediaResource extends ResourceBase {
      * Creates a new media record/resource AND creates a new blob (using a URL pointing to a media file/resource) and associates
      * it with the new media record/resource.
      */
-    protected Response createBlobWithUri(ResourceMap resourceMap, UriInfo ui, String xmlPayload, String blobUri) {
+    protected Response createBlobWithUri(ResourceMap resourceMap, UriInfo uriInfo, String xmlPayload, String blobUri) {
     	Response response = null;
     	
     	try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(BlobClient.SERVICE_NAME,
-	    			queryParams);
+	    			uriInfo);
 	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx); // the blob doc handler will look for this in the context
 	    	blobInput.createBlobFile(blobUri); // The blobUri argument is our payload
 	    	response = this.create((PoxPayloadIn)null, ctx); // By now the binary bits have been created and we just need to create the metadata blob record -this info is in the blobInput var

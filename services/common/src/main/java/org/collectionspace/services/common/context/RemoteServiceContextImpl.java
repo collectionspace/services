@@ -24,11 +24,11 @@
 package org.collectionspace.services.common.context;
 
 import java.lang.reflect.Constructor;
-
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.security.UnauthorizedException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,10 +99,11 @@ public class RemoteServiceContextImpl<IT, OT>
     protected RemoteServiceContextImpl(String serviceName,
     		IT theInput,
     		ResourceMap resourceMap,
-    		MultivaluedMap<String, String> queryParams) throws UnauthorizedException {
+    		UriInfo uriInfo) throws UnauthorizedException {
         this(serviceName, theInput);
         this.setResourceMap(resourceMap);
-        this.setQueryParams(queryParams);
+        this.setUriInfo(uriInfo);
+        this.setQueryParams(uriInfo.getQueryParameters());
     }
 
     /* (non-Javadoc)

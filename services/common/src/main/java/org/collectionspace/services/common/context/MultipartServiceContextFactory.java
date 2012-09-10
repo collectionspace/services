@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.context;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -82,12 +83,12 @@ public class MultipartServiceContextFactory
     		String serviceName,
     		PoxPayloadIn input,
     		ResourceMap resourceMap,
-    		MultivaluedMap<String, String> queryParams)
+    		UriInfo uriInfo)
     			throws Exception {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = new MultipartServiceContextImpl(serviceName,
     			input,
     			resourceMap,
-    			queryParams);
+    			uriInfo);
     	return ctx;
     }
     
@@ -99,9 +100,9 @@ public class MultipartServiceContextFactory
     		String serviceName, 
     		PoxPayloadIn input,
     		ResourceMap resourceMap,
-    		MultivaluedMap<String, String> queryParams,
+    		UriInfo uriInfo,
     		String documentType,
     		String entityName) throws Exception {
-    	return this.createServiceContext(serviceName, input, resourceMap, queryParams);
+    	return this.createServiceContext(serviceName, input, resourceMap, uriInfo);
     }
 }
