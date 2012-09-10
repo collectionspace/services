@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xmlReplay>
     
-    <testGroup ID="CreateCollectionObjects"> <!-- autoDeletePOSTS="true" -->
+    <testGroup ID="CreateUpdateReadStructuredObjects" autoDeletePOSTS="true">
         
         <!-- Create a set of CollectionObjects -->
         
@@ -328,7 +328,7 @@
             <uri>/cspace-services/relations?sbj=${CreateChessSetBox.CSID}</uri>
             <expectedCodes>200</expectedCodes>
             <response>
-                <expected level="TEXT" />
+                <expected level="ADDOK" />
                 <filename>collectionobject/hierarchy/res/relations-pagination-header.res.xml</filename>
                 <vars>
                     <var ID="totalItems">0</var>
@@ -341,7 +341,7 @@
             <uri>/cspace-services/relations?obj=${CreateChessSetBox.CSID}</uri>
             <expectedCodes>200</expectedCodes>
             <response>
-                <expected level="TEXT" />
+                <expected level="ADDOK" />
                 <filename>collectionobject/hierarchy/res/relations-as-object-top-level.res.xml</filename>
                 <vars>
                     <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
