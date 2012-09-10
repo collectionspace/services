@@ -37,6 +37,7 @@
     <run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
     <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
     
+    <run controlFile="collectionobject/collectionobject-hierarchy.xml" testGroup="CreateUpdateReadStructuredObjects" />
     
     <!-- Broken tests -->
     
