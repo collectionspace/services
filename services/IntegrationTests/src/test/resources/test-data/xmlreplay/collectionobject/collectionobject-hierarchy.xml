@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xmlReplay>
     
-    <testGroup ID="CreateUpdateReadStructuredObjects" autoDeletePOSTS="false">
+    <testGroup ID="CreateUpdateReadStructuredObjects" autoDeletePOSTS="true">
         
         <!-- Create a set of CollectionObjects -->
         
@@ -32,13 +32,14 @@
         </test>
         
         <!-- Chess board -->
-        <!-- (child of chess set box, sibling of bags of white and black chess pieces) --> 
+        <!-- (child of chess set box, sibling of bags of white and black chess pieces) -->
         <test ID="CreateChessBoard" auth="admin@core.collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
-            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <filename>collectionobject/hierarchy/2-collectionobjects-with-relations-create.xml</filename>
             <vars>
                 <var ID="objectNumber">CSPACE-5518-ChessBoard</var>
+                <var ID="parentCSID">${CreateChessSetBox.CSID}</var>
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
@@ -50,12 +51,14 @@
         
         <!-- Bags of white and black chess pieces -->
         <!-- (child of chess set box, sibling of chess board, parents of chess pieces) --> 
+        
         <test ID="CreateBagOfWhiteChessPieces">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
-            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <filename>collectionobject/hierarchy/2-collectionobjects-with-relations-create.xml</filename>
             <vars>
                 <var ID="objectNumber">CSPACE-5518-BagOfWhiteChessPieces</var>
+                <var ID="parentCSID">${CreateChessSetBox.CSID}</var>
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
@@ -68,9 +71,10 @@
         <test ID="CreateBagOfBlackChessPieces">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
-            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <filename>collectionobject/hierarchy/2-collectionobjects-with-relations-create.xml</filename>
             <vars>
                 <var ID="objectNumber">CSPACE-5518-BagOfBlackChessPieces</var>
+                <var ID="parentCSID">${CreateChessSetBox.CSID}</var>
             </vars>
         </test>
         <test ID="ReadBagOfBlackChessPieces" auth="admin@core.collectionspace.org">
@@ -80,13 +84,15 @@
         </test>
         
         <!-- Individual chess pieces in those bags -->
+        
         <test ID="CreateWhiteRook">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
-            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <filename>collectionobject/hierarchy/2-collectionobjects-with-relations-create.xml</filename>
             <vars>
                 <var ID="objectNumber">CSPACE-5518-WhiteRook</var>
-            </vars>
+                 <var ID="parentCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
+           </vars>
             <expectedCodes>201</expectedCodes>
         </test>
         <test ID="ReadWhiteRook" auth="admin@core.collectionspace.org">
@@ -94,12 +100,14 @@
             <uri>/cspace-services/collectionobjects/${CreateWhiteRook.CSID}</uri>
             <expectedCodes>200</expectedCodes>
         </test>
+        
         <test ID="CreateWhiteBishop">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
-            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <filename>collectionobject/hierarchy/2-collectionobjects-with-relations-create.xml</filename>
             <vars>
                 <var ID="objectNumber">CSPACE-5518-WhiteBishop</var>
+                <var ID="parentCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
@@ -108,12 +116,14 @@
             <uri>/cspace-services/collectionobjects/${CreateWhiteBishop.CSID}</uri>
             <expectedCodes>200</expectedCodes>
         </test>
+        
         <test ID="CreateBlackQueen">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
-            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
+            <filename>collectionobject/hierarchy/2-collectionobjects-with-relations-create.xml</filename>
             <vars>
                 <var ID="objectNumber">CSPACE-5518-BlackQueen</var>
+                <var ID="parentCSID">${CreateBagOfBlackChessPieces.CSID}</var>
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
@@ -122,51 +132,20 @@
             <uri>/cspace-services/collectionobjects/${CreateBlackQueen.CSID}</uri>
             <expectedCodes>200</expectedCodes>
         </test>
-        
-        <!--
-        <test ID="CreateBlackRookWithRelations">
-            <method>POST</method>
-            <uri>/cspace-services/collectionobjects</uri>
-            <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
-            <vars>
-                <var ID="objectNumber">CSPACE-5518-BlackRook</var>
-            </vars>
-            <expectedCodes>201</expectedCodes>
-        </test>
-        <test ID="ReadBlackRook" auth="admin@core.collectionspace.org">
-            <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${CreateBlackRookWithRelations.CSID}</uri>
-            <expectedCodes>200</expectedCodes>
-        </test>
-        -->
        
-        <!-- Create a new chess piece, and include in the create payload -->
-        <!-- a list of hierarchical relationships to be created between -->
-        <!-- the various CollectionObjects previously created, in tests above -->
-       
-        <!-- Note also that it *might* not be necessary to set these variables; the original -->
-        <!-- values of CSIDs saved from previous posts, e.g. {CreateChessSetBox.CSID} -->
-        <!-- might still be available for use in request payloads. -->
-       
-        <test ID="CreateBlackRookWithRelations">
+        <test ID="CreateBlackRook">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
             <filename>collectionobject/hierarchy/2-collectionobjects-with-relations-create.xml</filename>
             <vars>
                 <var ID="objectNumber">CSPACE-5518-BlackRook</var>
-                <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
-                <var ID="chessBoardCSID">${CreateChessBoard.CSID}</var>
-                <var ID="bagOfWhiteChessPiecesCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
-                <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
-                <var ID="whiteRookCSID">${CreateWhiteRook.CSID}</var>
-                <var ID="whiteBishopCSID">${CreateWhiteBishop.CSID}</var>
-                <var ID="blackQueenCSID">${CreateBlackQueen.CSID}</var>
+                <var ID="parentCSID">${CreateBagOfBlackChessPieces.CSID}</var>
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
         <test ID="ReadBlackRook" auth="admin@core.collectionspace.org">
             <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${CreateBlackRookWithRelations.CSID}</uri>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
             <expectedCodes>200</expectedCodes>
         </test>
         
@@ -193,12 +172,12 @@
         
         <test ID="UpdateBlackRootWithRelations">
             <method>PUT</method>
-            <uri>/cspace-services/collectionobjects/${CreateBlackRookWithRelations.CSID}</uri>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
             <filename>collectionobject/hierarchy/3-collectionobjects-with-relations-update.xml</filename>
             <vars>
                 <var ID="distinguishingFeatures">This rook has two light brown striations on part of its base.</var>
+                <var ID="blackRookCSID">${CreateBlackRook.CSID}</var>
                 <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
-                <var ID="blackRookCSID">${CreateBlackRookWithRelations.CSID}</var>
             </vars>
             <expectedCodes>200</expectedCodes>
         </test>
@@ -237,7 +216,7 @@
                     <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
                     <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
                     <var ID="blackQueenCSID">${CreateBlackQueen.CSID}</var>
-                    <var ID="blackRookCSID">${CreateBlackRookWithRelations.CSID}</var>
+                    <var ID="blackRookCSID">${CreateBlackRook.CSID}</var>
                 </vars>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
@@ -246,13 +225,13 @@
         
         <test ID="ReadHierarchyForBottomLevelItem">
             <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${CreateBlackRookWithRelations.CSID}?showRelations=true</uri>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}?showRelations=true</uri>
             <response>
                 <expected level="ADDOK" />
                 <filename>collectionobject/hierarchy/res/show-relations-bottom-level.res.xml</filename>
                 <vars>
                     <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
-                    <var ID="blackRookCSID">${CreateBlackRookWithRelations.CSID}</var>
+                    <var ID="blackRookCSID">${CreateBlackRook.CSID}</var>
                 </vars>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
@@ -264,7 +243,7 @@
 
         <test ID="ReadSiblingsForTopLevelItem">
             <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}?showSiblings=true</uri>
+            <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}?showSiblings=true</uri>
             <expectedCodes>200</expectedCodes>
             <response>
                 <expected level="ADDOK" />
@@ -291,7 +270,7 @@
         
         <test ID="ReadSiblingsForBottomLevelItem">
             <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${CreateBlackRookWithRelations.CSID}?showSiblings=true</uri>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}?showSiblings=true</uri>
             <expectedCodes>200</expectedCodes>
             <response>
                 <expected level="ADDOK" />
@@ -370,7 +349,7 @@
         <!--
         <test ID="DeleteBlackRook" auth="admin@core.collectionspace.org">
             <method>DELETE</method>
-            <uri>/cspace-services/collectionobjects/${CreateBlackRookWithRelations.CSID}</uri>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
         </test>
         <test ID="DeleteBlackQueen" auth="admin@core.collectionspace.org">
             <method>DELETE</method>
