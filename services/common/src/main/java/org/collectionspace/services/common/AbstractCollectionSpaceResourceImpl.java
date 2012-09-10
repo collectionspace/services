@@ -215,6 +215,17 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         return ctx;
     }
     
+    protected ServiceContext<IT, OT> createServiceContext(String serviceName,
+    		IT input,
+    		UriInfo uriInfo) throws Exception {    	
+        ServiceContext<IT, OT> ctx = createServiceContext(serviceName,
+        		input,
+        		null, // The resource map
+        		uriInfo, /*queryParams*/
+        		(Class<?>)null  /*input type's Class*/);
+        return ctx;
+    }
+    
     protected ServiceContext<IT, OT> createServiceContext(UriInfo uriInfo) throws Exception {
         ServiceContext<IT, OT> ctx = createServiceContext(
         		(IT)null, /*input*/
@@ -239,6 +250,14 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         return ctx;
     }
     
+    protected ServiceContext<IT, OT> createServiceContext(IT input, UriInfo uriInfo) throws Exception {    	
+        ServiceContext<IT, OT> ctx = createServiceContext(
+        		input,
+        		uriInfo,
+        		null ); // The class param/argument
+        return ctx;
+    }    
+    
     /**
      * Creates the service context.
      * 
@@ -253,6 +272,14 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         ServiceContext<IT, OT> ctx = createServiceContext(
         		input,
         		(UriInfo)null, //queryParams,
+        		theClass);
+        return ctx;
+    }
+    
+    protected ServiceContext<IT, OT> createServiceContext(IT input, Class<?> theClass, UriInfo uriInfo) throws Exception {    	
+        ServiceContext<IT, OT> ctx = createServiceContext(
+        		input,
+        		uriInfo,
         		theClass);
         return ctx;
     }

@@ -100,13 +100,13 @@ public abstract class ResourceBase
     
     public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 8/13/2012 - Some sub-classes will override this method -e.g., MediaResource does.
     		ResourceMap resourceMap,
-    		UriInfo ui,
+    		UriInfo uriInfo,
             String xmlPayload) {
     	Response result = null;
     	
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input, resourceMap, ui);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input, resourceMap, uriInfo);
             ctx.setResourceMap(resourceMap);
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
             	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
@@ -144,12 +144,15 @@ public abstract class ResourceBase
     //======================= UPDATE ====================================================
     @PUT
     @Path("{csid}")
-    public byte[] update(@Context ResourceMap resourceMap, @PathParam("csid") String csid, String xmlPayload) {
+    public byte[] update(@Context ResourceMap resourceMap,
+    		@Context UriInfo uriInfo,
+    		@PathParam("csid") String csid,
+    		String xmlPayload) {
         PoxPayloadOut result = null;
         ensureCSID(csid, UPDATE);
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate, uriInfo);
             ctx.setResourceMap(resourceMap);
             result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
@@ -220,12 +223,12 @@ public abstract class ResourceBase
     @Path("{csid}")
     public byte[] get(
             @Context Request request,    		
-            @Context UriInfo ui,
+            @Context UriInfo uriInfo,
             @PathParam("csid") String csid) {
         PoxPayloadOut result = null;
         ensureCSID(csid, READ);
         try {
-            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(ui);
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
             result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
@@ -300,9 +303,9 @@ public abstract class ResourceBase
         return list;
     }
     
-    protected AbstractCommonList getCommonList(UriInfo ui) {
+    protected AbstractCommonList getCommonList(UriInfo uriInfo) {
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             AbstractCommonList list = (AbstractCommonList) handler.getCommonPartList();
@@ -374,7 +377,7 @@ public abstract class ResourceBase
     }
 
     private AbstractCommonList search(
-    		UriInfo ui,
+    		UriInfo uriInfo,
     		String orderBy,
     		String keywords,
     		String advancedSearch,
@@ -383,9 +386,9 @@ public abstract class ResourceBase
 
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx;
     	try {
-    		ctx = createServiceContext(ui);
+    		ctx = createServiceContext(uriInfo);
     		DocumentHandler handler = createDocumentHandler(ctx);
-    		result = search(ctx, handler, ui, orderBy, keywords, advancedSearch, partialTerm);
+    		result = search(ctx, handler, uriInfo, orderBy, keywords, advancedSearch, partialTerm);
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.SEARCH_FAILED);
     	}
@@ -412,10 +415,10 @@ public abstract class ResourceBase
     @Produces("application/xml")
     public AuthorityRefList getAuthorityRefs(
             @PathParam("csid") String csid,
-            @Context UriInfo ui) {
+            @Context UriInfo uriInfo) {
         AuthorityRefList authRefList = null;
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
             DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> handler = (DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>) createDocumentHandler(ctx);
             List<AuthRefConfigInfo> authRefsInfo = RefNameServiceUtils.getConfiguredAuthorityRefs(ctx);
             authRefList = handler.getAuthorityRefs(csid, authRefsInfo);

@@ -33,6 +33,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -141,13 +143,13 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
      */
     @GET
     @Path(WorkflowClient.SERVICE_PATH)
-    public Lifecycle getWorkflow() {
+    public Lifecycle getWorkflow(@Context UriInfo uriInfo) {
     	Lifecycle result;
 
         String documentType = "undefined";
         MultipartServiceContext ctx = null;
         try {
-            ctx = (MultipartServiceContext) createServiceContext();
+            ctx = (MultipartServiceContext) createServiceContext(uriInfo);
             DocumentHandler handler = ctx.getDocumentHandler();
             result = handler.getLifecycle();
         } catch (Exception e) {
@@ -172,14 +174,15 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     @GET
     @Path("{csid}" + WorkflowClient.SERVICE_PATH)
     public byte[] getWorkflow(
+    		@Context UriInfo uriInfo,
             @PathParam("csid") String csid) {
         PoxPayloadOut result = null;
 
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(uriInfo);
             String parentWorkspaceName = parentCtx.getRepositoryWorkspaceName();
 
-            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME);
+            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, uriInfo);
             WorkflowDocumentModelHandler handler = createWorkflowDocumentHandler(ctx);
             ctx.setRespositoryWorkspaceName(parentWorkspaceName); //find the document in the parent's workspace
             getRepositoryClient(ctx).get(ctx, csid, handler);
@@ -238,20 +241,21 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
 
     @PUT
     @Path("{csid}" + WorkflowClient.SERVICE_PATH + "/" + "{transition}")
-    public byte[] updateWorkflowWithTransition(@PathParam("csid") String csid,
+    public byte[] updateWorkflowWithTransition(
+    		@Context UriInfo uriInfo,
+    		@PathParam("csid") String csid,
     		@PathParam("transition") String transition) {
         PoxPayloadOut result = null;
-        
-        
+                
         try {
         	//
         	// Create an empty workflow_commons input part and set it into a new "workflow" sub-resource context
         	PoxPayloadIn input = new PoxPayloadIn(WorkflowClient.SERVICE_PAYLOAD_NAME, new WorkflowCommon(), 
         			WorkflowClient.SERVICE_COMMONPART_NAME);
-            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input);
+            MultipartServiceContext ctx = (MultipartServiceContext) createServiceContext(WorkflowClient.SERVICE_NAME, input, uriInfo);
         	
             // Create a service context and document handler for the parent resource.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx = createServiceContext(uriInfo);
             DocumentHandler parentDocHandler = this.createDocumentHandler(parentCtx);      
             ctx.setProperty(WorkflowClient.PARENT_DOCHANDLER, parentDocHandler); //added as a context param for the workflow document handler -it will call the parent's dochandler "prepareForWorkflowTranstion" method
 

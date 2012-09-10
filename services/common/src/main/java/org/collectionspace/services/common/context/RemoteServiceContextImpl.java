@@ -103,7 +103,9 @@ public class RemoteServiceContextImpl<IT, OT>
         this(serviceName, theInput);
         this.setResourceMap(resourceMap);
         this.setUriInfo(uriInfo);
-        this.setQueryParams(uriInfo.getQueryParameters());
+        if (uriInfo != null) {
+        	this.setQueryParams(uriInfo.getQueryParameters());
+        }
     }
 
     /* (non-Javadoc)
