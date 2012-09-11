@@ -39,6 +39,7 @@ import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,7 @@ public class ServiceMain {
     private String serverRootDir = null;
     private ServicesConfigReaderImpl servicesConfigReader;
     private TenantBindingConfigReaderImpl tenantBindingConfigReader;
+    private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
     
     private static final String SERVER_HOME_PROPERTY = "catalina.home";
     
@@ -393,6 +395,38 @@ public class ServiceMain {
      */
     public TenantBindingConfigReaderImpl getTenantBindingConfigReader() {
         return tenantBindingConfigReader;
+    }
+    
+    /**
+     *  Populate a registry of URI templates by querying each resource
+     *  for its own entries in the registry.
+     * 
+     *  These entries consist of one or more URI templates associated
+     *  with that resource, for building URIs to access that resource.
+     */
+    private synchronized void populateUriTemplateRegistry() {
+       if (uriTemplateRegistry.isEmpty()) {
+            ResourceBase resource = null;
+            ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+            for (Map.Entry<String, ResourceBase> entry : resourceMap.entrySet()) {
+                resource = entry.getValue();
+                Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries =
+                        resource.getUriRegistryEntries();
+                uriTemplateRegistry.putAll(entries);
+            }
+
+            // FIXME: Contacts itself should not have an entry in the URI template registry;
+            // there should be a Contacts entry in that registry only for use in
+            // building URIs for resources that have contacts as a sub-resource
+            // (This may also fall out during implementation of CSPACE-2698.)
+       }
+    }
+
+    public UriTemplateRegistry getUriTemplateRegistry() {
+        if (uriTemplateRegistry.isEmpty()) {
+            populateUriTemplateRegistry();
+        }
+        return uriTemplateRegistry;
     }
 
 
