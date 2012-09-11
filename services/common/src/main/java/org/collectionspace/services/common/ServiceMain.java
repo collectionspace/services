@@ -401,8 +401,8 @@ public class ServiceMain {
      *  Populate a registry of URI templates by querying each resource
      *  for its own entries in the registry.
      * 
-     *  These entries consist of one or more URI templates for
-     *  building URIs for accessing that resource.
+     *  These entries consist of one or more URI templates associated
+     *  with that resource, for building URIs to access that resource.
      */
     private synchronized void populateUriTemplateRegistry() {
        if (uriTemplateRegistry.isEmpty()) {
@@ -419,10 +419,6 @@ public class ServiceMain {
             // there should be a Contacts entry in that registry only for use in
             // building URIs for resources that have contacts as a sub-resource
             // (This may also fall out during implementation of CSPACE-2698.)
-
-            // FIXME: Temporary for debugging in-process work on CSPACE-5271.
-            // Please remove the following statement once that issue is resolved.
-            uriTemplateRegistry.dump();
        }
     }
 
