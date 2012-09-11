@@ -154,17 +154,18 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     public AbstractCommonList getContactList(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
-            @Context UriInfo ui) {
+            @Context UriInfo uriInfo) {
         AbstractCommonList contactObjectList = new AbstractCommonList();
-        try {
-            String parentcsid = lookupParentCSID(parentspecifier, "getContactList(parent)", "GET_CONTACT_LIST", null);
 
+        try {
+            ServiceContext ctx = createServiceContext(getContactServiceName(), uriInfo);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+        	
+            String parentcsid = lookupParentCSID(parentspecifier, "getContactList(parent)", "GET_CONTACT_LIST", null);
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getContactList(item)", "GET_CONTACT_LIST", itemCtx);
 
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext ctx = createServiceContext(getContactServiceName(), queryParams);
-            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, ui);
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, uriInfo);
             DocumentFilter myFilter = handler.getDocumentFilter(); //new DocumentFilter();
             myFilter.appendWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":"
                     + ContactJAXBSchema.IN_AUTHORITY
@@ -182,6 +183,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
                     + parentspecifier + ": and item:" + itemspecifier + ": was not found.",
                     itemspecifier);
         }
+        
         return contactObjectList;
     }
 

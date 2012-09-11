@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.common.profile.Profiler;
+import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;

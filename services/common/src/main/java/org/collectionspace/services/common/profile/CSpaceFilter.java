@@ -26,6 +26,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 //import javax.servlet.ServletContext;
 
+import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.common.ServletTools;
 
 import org.slf4j.Logger;

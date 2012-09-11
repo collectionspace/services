@@ -1,3 +1,8 @@
+dev-master.xml
+.metadata/
+services/collectionobject/sample/sample/.classpath
+services/organization/sample/sample/.classpath
+services/vocabulary/sample/sample/.classpath
 3rdparty/nuxeo/nuxeo-platform-thumbnail/.classpath
 3rdparty/nuxeo/nuxeo-platform-thumbnail/.project
 3rdparty/nuxeo/nuxeo-platform-thumbnail/.settings/

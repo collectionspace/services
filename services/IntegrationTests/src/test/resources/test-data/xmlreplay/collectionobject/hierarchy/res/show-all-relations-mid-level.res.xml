@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">  
+    <!-- Contents of the specified CollectionObject record itself are -->
+    <!-- ignored here; we are interested only in the relations list below. -->
+    
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <pageNum>0</pageNum>
+        <itemsInPage>5</itemsInPage>
+        <totalItems>5</totalItems>
+        
+        <!-- Parent relationships -->
+        
+        <relation-list-item>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${bagOfWhiteChessPiecesCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <object>
+                <csid>${chessSetBoxCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+        <!-- Sibling relationships -->
+        
+        <relation-list-item>
+            <subjectCsid>${chessBoardCSID}</subjectCsid>
+            <objectCsid>${chessSetBoxCSID}</objectCsid>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${chessBoardCSID}</csid>
+            </subject>
+            <object>
+                <csid>${chessSetBoxCSID}</csid>
+            </object>
+        </relation-list-item>
+        
+        <relation-list-item>
+            <subjectCsid>${bagOfBlackChessPiecesCSID}</subjectCsid>
+            <objectCsid>${chessSetBoxCSID}</objectCsid>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${bagOfBlackChessPiecesCSID}</csid>
+            </subject>
+            <object>
+                <csid>${chessSetBoxCSID}</csid>
+            </object>
+        </relation-list-item>
+        
+        <!-- Child relationships -->
+        
+        <relation-list-item>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${whiteBishopCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <object>
+                <csid>${bagOfWhiteChessPiecesCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+        <relation-list-item>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${whiteRookCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <object>
+                <csid>${bagOfWhiteChessPiecesCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+
+        
+    </ns3:relations-common-list>
+</document>

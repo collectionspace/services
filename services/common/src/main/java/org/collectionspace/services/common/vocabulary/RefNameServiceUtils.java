@@ -69,7 +69,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
-
 /**
  * RefNameServiceUtils is a collection of services utilities related to refName
  * usage.

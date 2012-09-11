@@ -274,7 +274,7 @@ public class DocumentFilter {
         }
         // Set the order by clause
         String orderByStr = null;
-        List<String> list = theQueryParams.get(IClientQueryParams.SORT_BY_PARAM);
+        List<String> list = theQueryParams.get(IClientQueryParams.ORDER_BY_PARAM);
         if (list != null) {
             orderByStr = list.get(0);
         }

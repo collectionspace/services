@@ -49,6 +49,13 @@ public abstract class AbstractMultipartDocumentHandlerImpl<T, TL, WT, WTL>
     	//Empty constructor
     }
 
+    /*
+     * By default we won't support object hierarchy
+     */
+    public boolean supportsHierarchy() {
+    	return false;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
      */

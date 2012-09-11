@@ -39,7 +39,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
-import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.jboss.resteasy.client.ClientResponse;

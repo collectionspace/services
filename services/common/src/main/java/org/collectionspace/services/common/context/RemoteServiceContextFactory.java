@@ -27,6 +27,9 @@
 package org.collectionspace.services.common.context;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
+
+import org.collectionspace.services.common.ResourceMap;
 
 
 /**
@@ -78,25 +81,29 @@ public class RemoteServiceContextFactory<IT, OT>
     @Override
     public ServiceContext<IT, OT> createServiceContext(
     		String serviceName,
-    		IT theInput, 
-    		MultivaluedMap<String, String> queryParams) throws Exception {
+    		IT theInput,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo) throws Exception {
     	ServiceContext<IT, OT> ctx = new RemoteServiceContextImpl<IT, OT>(serviceName,
     			theInput,
-    			queryParams);
+    			resourceMap,
+    			uriInfo);
     	
         return ctx;
     }
 
     @Override
     public ServiceContext<IT, OT> createServiceContext(String serviceName,
-    		IT input, 
-    		MultivaluedMap<String, String> queryParams,
+    		IT input,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo,
     		String documentType,
     		String entityName) throws Exception {
     	ServiceContext<IT, OT> ctx = createServiceContext(
     			serviceName,
     			input,
-    			queryParams);
+    			resourceMap,
+    			uriInfo);
         ctx.setDocumentType(documentType); //persistence unit
         ctx.setProperty(ServiceContextProperties.ENTITY_NAME, entityName);
         return ctx;

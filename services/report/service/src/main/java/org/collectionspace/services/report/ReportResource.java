@@ -48,8 +48,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 @Path(ReportClient.SERVICE_PATH)
 @Consumes("application/xml")
@@ -83,9 +85,10 @@ public class ReportResource extends ResourceBase {
     }
     
     @Override
-    protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
+    protected AbstractCommonList getCommonList(UriInfo ui) {
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
             String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
@@ -135,16 +138,18 @@ public class ReportResource extends ResourceBase {
     @Path("{csid}/output")
     @Produces("application/pdf")
     public Response invokeReport(
+    		@Context UriInfo ui,    		
             @PathParam("csid") String csid) {
     	InvocationContext invContext = new InvocationContext();
     	invContext.setMode(Invocable.INVOCATION_MODE_NO_CONTEXT);
-    	return invokeReport(csid, invContext);
+    	return invokeReport(ui, csid, invContext);
     }
     
     @POST
     @Path("{csid}")
     @Produces("application/pdf")
     public Response invokeReport(
+    		@Context UriInfo ui,
     		@PathParam("csid") String csid,
     		InvocationContext invContext) {
         if (csid == null || "".equals(csid)) {

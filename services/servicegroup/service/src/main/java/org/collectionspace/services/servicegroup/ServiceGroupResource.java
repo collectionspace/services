@@ -222,9 +222,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
         ensureCSID(serviceGroupName, ResourceBase.READ);
         AbstractCommonList list = null;
         try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
 	        ServiceGroupDocumentModelHandler handler = (ServiceGroupDocumentModelHandler)
 	        				createDocumentHandler(ctx);
 	        ArrayList<String> groupsList = null;  
@@ -235,6 +233,8 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 	        	groupsList.add(serviceGroupName);
 	        }
 	        // set up a keyword search
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+            String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
 	        if (keywords != null && !keywords.isEmpty()) {
 	            String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
 	            if(Tools.isEmpty(whereClause)) {
