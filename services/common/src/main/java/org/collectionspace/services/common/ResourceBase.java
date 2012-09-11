@@ -535,7 +535,6 @@ public abstract class ResourceBase
             return docType;
         }
         docType = sb.getObject().getName(); // Reads the Nuxeo Document Type from tenant bindings configuration
-        System.out.println(tenantId + " : " + serviceName + " : " + docType); // FIXME: for debugging
         return docType;
     }
     
