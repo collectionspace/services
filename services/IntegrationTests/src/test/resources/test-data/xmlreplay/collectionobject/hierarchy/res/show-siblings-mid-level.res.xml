@@ -12,6 +12,7 @@
         <pageNum>0</pageNum>
         <itemsInPage>2</itemsInPage>
         <totalItems>2</totalItems>
+        
         <relation-list-item>
             <subjectCsid>${chessBoardCSID}</subjectCsid>
             <objectCsid>${chessSetBoxCSID}</objectCsid>
@@ -23,6 +24,7 @@
                 <csid>${chessSetBoxCSID}</csid>
             </object>
         </relation-list-item>
+        
         <relation-list-item>
             <subjectCsid>${bagOfWhiteChessPiecesCSID}</subjectCsid>
             <objectCsid>${chessSetBoxCSID}</objectCsid>
@@ -34,6 +36,7 @@
                 <csid>${chessSetBoxCSID}</csid>
             </object>
         </relation-list-item>
+        
     </ns3:relations-common-list>
 </document>
 

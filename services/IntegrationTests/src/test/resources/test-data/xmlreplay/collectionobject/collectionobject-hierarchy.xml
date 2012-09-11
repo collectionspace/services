@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xmlReplay>
     
-    <testGroup ID="CreateUpdateReadStructuredObjects" autoDeletePOSTS="true">
+    <testGroup ID="CreateUpdateReadStructuredObjects" autoDeletePOSTS="false">
         
         <!-- Create a set of CollectionObjects -->
         
@@ -183,13 +183,20 @@
         </test>
         
     
-        <!-- Read hierarchical relations via the various query parameters now -->
-        <!-- supported for structured objects and procedures -->
+        <!--
+            Read hierarchical relations via three query parameters now
+            supported for structured objects and procedures, as well as
+            for authority terms:
+            
+            * showRelations
+            * showSiblings
+            * showAllRelations
+        -->
                     
         <!-- Read hierarchical relationships via 'showRelations', -->
         <!-- which returns direct parent and child relations. -->
         
-        <test ID="ReadHierarchyForTopLevelItem">
+        <test ID="ShowRelationsForTopLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}?showRelations=true</uri>
             <response>
@@ -206,7 +213,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-        <test ID="ReadHierarchyForMidLevelItem">
+        <test ID="ShowRelationsForMidLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}?showRelations=true</uri>
             <response>
@@ -223,7 +230,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-        <test ID="ReadHierarchyForBottomLevelItem">
+        <test ID="ShowRelationsForBottomLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}?showRelations=true</uri>
             <response>
@@ -239,9 +246,9 @@
         </test>
         
         <!-- Read hierarchical relationships via 'showSiblings', -->
-        <!-- which shows sibling relations. -->
+        <!-- which returns sibling relations. -->
 
-        <test ID="ReadSiblingsForTopLevelItem">
+        <test ID="ShowSiblingsForTopLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}?showSiblings=true</uri>
             <expectedCodes>200</expectedCodes>
@@ -252,7 +259,7 @@
             </response>
         </test>
         
-        <test ID="ReadSiblingsForMidLevelItem">
+        <test ID="ShowSiblingsForMidLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}?showSiblings=true</uri>
             <expectedCodes>200</expectedCodes>
@@ -268,7 +275,7 @@
             </response>
         </test>
         
-        <test ID="ReadSiblingsForBottomLevelItem">
+        <test ID="ShowSiblingsForBottomLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}?showSiblings=true</uri>
             <expectedCodes>200</expectedCodes>
@@ -283,9 +290,10 @@
             </response>
         </test>
         
-        <!-- Read hierarchical relationships via 'showAllRelations' -->
+        <!-- Read hierarchical relationships via 'showAllRelations', -->
+        <!-- which returns parent, child, and sibling relationships. -->
 
-        <test ID="ReadAllRelationsForTopLevelItem">
+        <test ID="ShowAllRelationsForTopLevelItem">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}?showAllRelations=true</uri>
             <expectedCodes>200</expectedCodes>
@@ -295,6 +303,47 @@
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
         </test>
+        
+        <!-- Currently returns only three relations (parent, two children), -->
+        <!-- rather than five (parent, two children, two siblings). - ADR 2012-09-10 -->
+        <!--
+        <test ID="ShowAllRelationsForMidLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBagOfWhiteChessPieces.CSID}?showAllRelations=true</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/show-all-relations-mid-level.res.xml</filename>
+                <vars>
+                    <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                    <var ID="bagOfWhiteChessPiecesCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
+                    <var ID="whiteRookCSID">${CreateWhiteRook.CSID}</var>
+                    <var ID="whiteBishopCSID">${CreateWhiteBishop.CSID}</var>
+                </vars>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+            </response>
+        </test>
+        -->
+        
+        <!-- Currently returns only one relation (parent), rather than -->
+        <!-- two (parent, sibling). - ADR 2012-09-10 -->
+        <!--
+        <test ID="ShowAllRelationsForBottomLevelItem">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateWhiteBishop.CSID}?showAllRelations=true</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/show-all-relations-bottom-level.res.xml</filename>
+                <vars>
+                    <var ID="bagOfWhiteChessPiecesCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
+                    <var ID="whiteRookCSID">${CreateWhiteRook.CSID}</var>
+                    <var ID="whiteBishopCSID">${CreateWhiteBishop.CSID}</var>
+                </vars>
+                <startElement>/document/*[local-name()='relations-common-list']</startElement>
+            </response>
+        </test>
+        -->
             
         <!-- Read hierarchical relationships via the relations service. -->
         <!-- (This can also serve as a cross-check on the additional read mechanisms, above.) -->
