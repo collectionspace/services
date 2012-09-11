@@ -23,6 +23,23 @@
  */
 package org.collectionspace.services.common.vocabulary;
 
+import java.util.List;
+import java.util.Map;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -32,6 +49,10 @@ import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriTemplateFactory;
+import org.collectionspace.services.common.UriTemplateRegistry;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
@@ -48,7 +69,6 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
@@ -57,6 +77,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -64,25 +85,6 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-
-import java.util.List;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 /**
  * The Class AuthorityResource.
@@ -774,6 +776,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public AuthorityRefDocList getReferencingObjects(
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
+            @Context UriTemplateRegistry uriTemplateRegistry,
             @Context UriInfo uriInfo) {
         AuthorityRefDocList authRefDocList = null;
         try {
@@ -793,7 +796,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             AuthorityItemDocumentModelHandler<?> handler = (AuthorityItemDocumentModelHandler<?>)
             											createItemDocumentHandler(ctx, parentcsid, null);
 
-            authRefDocList = handler.getReferencingObjects(ctx, serviceTypes, getRefPropName(), itemcsid);
+            authRefDocList = handler.getReferencingObjects(ctx, uriTemplateRegistry, serviceTypes, getRefPropName(), itemcsid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
@@ -939,4 +942,26 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             throw bigReThrow(e, "Error showing hierarchy", itemcsid);
         }
     }
+    
+    protected String getItemDocType(String tenantId) {
+        return getDocType(tenantId, getItemServiceName());
+    }
+        
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for all tenants
+     * 
+     * @return a map of URI templates for the current resource, for all tenants
+     */
+    @Override
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                super.getUriRegistryEntries();
+        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
+        for (String tenantId : tenantIds) {
+                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getItemDocType(tenantId), UriTemplateFactory.ITEM));
+        }
+        return uriRegistryEntriesMap;
+    }
+  
 }

@@ -34,15 +34,15 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.collectionspace.services.common.IFragmentHandler;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriTemplateFactory;
+import org.collectionspace.services.common.UriTemplateRegistry;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.XmlSaxFragmenter;
 import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.config.URIUtils;
-import org.collectionspace.services.common.context.ServiceBindingUtils;
-import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -207,33 +207,38 @@ public class TemplateExpander {
     // document type name
     private static String getDocUri(String tenantId, String docType, String docID,
             String partTmpl) throws Exception {
-
-
-        TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        // We may have been supplied with the tenant-qualified name
-        // of an extension to a document type, and thus need to
-        // get the base document type name.
-        docType = ServiceBindingUtils.getUnqualifiedTenantDocType(docType);
-        ServiceBindingType sb =
-            tReader.getServiceBindingForDocType(tenantId, docType);        
-
-        String serviceCategory = sb.getType();
         String uri = "";
-        if (serviceCategory.equalsIgnoreCase(URIUtils.AUTHORITY_SERVICE_CATEGORY)) {
-            String authoritySvcName = URIUtils.getAuthoritySvcName(docType);
-            if (authoritySvcName == null) {
-                return uri;
+        UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
+        UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, docType);
+        StoredValuesUriTemplate template = registry.get(key);
+        if (template != null) {
+            Map<String, String> additionalValues = new HashMap<String, String>();
+            if (template.getUriTemplateType() == UriTemplateFactory.RESOURCE) {
+                additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, docID);
+                uri = template.buildUri(additionalValues);
+            } else if (template.getUriTemplateType() == UriTemplateFactory.ITEM) {
+                try {
+                    String inAuthorityCsid = getInAuthorityValue(partTmpl);
+                    additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
+                    additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, docID);
+                    uri = template.buildUri(additionalValues);
+                } catch (Exception e) {
+                    logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
+                    // Returns the default (empty string) value for uri
+                }
+            } else if (template.getUriTemplateType() == UriTemplateFactory.CONTACT) {
+                // FIXME: Generating contact sub-resource URIs requires additional work,
+                // as a follow-on to CSPACE-5271 - ADR 2012-08-16
+                // Returns the default (empty string) value for uri, for now
+            } else {
+                logger.warn("Unrecognized URI template type = " + template.getUriTemplateType());
+                // Returns the default (empty string) value for uri
             }
-            String inAuthorityID = getInAuthorityValue(partTmpl);
-            uri = URIUtils.getAuthorityItemUri(authoritySvcName, inAuthorityID, docID);
-       } else if (serviceCategory.equalsIgnoreCase(URIUtils.OBJECT_SERVICE_CATEGORY) ||
-               serviceCategory.equalsIgnoreCase(URIUtils.PROCEDURE_SERVICE_CATEGORY) ) {
-            String serviceName = sb.getName();
-            uri = URIUtils.getUri(serviceName, docID);
-       } else {
-           // Currently returns a blank URI for any other cases,
-           // including sub-resources like contacts
-         }
+        } else { // (if template == null)
+            logger.warn("Could not retrieve URI template from registry via tenant ID "
+                    + tenantId + " and docType " + docType);
+            // Returns the default (empty string) value for uri
+        }
         return uri;
     }
     

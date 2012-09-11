@@ -28,6 +28,8 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 
+import org.collectionspace.services.common.UriTemplateRegistry;
+import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
@@ -426,6 +428,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     public AuthorityRefDocList getReferencingObjects(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+                UriTemplateRegistry uriTemplateRegistry, 
     		List<String> serviceTypes,
     		String propertyName,
             String itemcsid) throws Exception {
@@ -447,7 +450,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     			DocumentModel docModel = wrapper.getWrappedObject();
     			String refName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME);
                 authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(
-                		repoSession, ctx, repoClient,
+                		repoSession, ctx, uriTemplateRegistry, repoClient,
                         serviceTypes,
                         refName,
                         propertyName,
