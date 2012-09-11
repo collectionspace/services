@@ -1482,10 +1482,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -1617,10 +1613,6 @@
                         <service:ListResultField>
                             <service:element>displayName</service:element>
                             <service:xpath>displayName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
@@ -1795,10 +1787,6 @@
                         <service:ListResultField>
                             <service:element>displayName</service:element>
                             <service:xpath>displayName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
@@ -2000,10 +1988,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -2144,10 +2128,6 @@
                         <service:ListResultField>
                             <service:element>displayName</service:element>
                             <service:xpath>displayName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
@@ -2328,10 +2308,6 @@
                         <service:ListResultField>
                             <service:element>displayName</service:element>
                             <service:xpath>displayName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
@@ -2515,10 +2491,6 @@
                         <service:ListResultField>
                             <service:element>displayName</service:element>
                             <service:xpath>displayName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>shortIdentifier</service:element>

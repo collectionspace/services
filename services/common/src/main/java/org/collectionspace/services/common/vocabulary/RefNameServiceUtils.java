@@ -547,7 +547,7 @@ public class RefNameServiceUtils {
             DocumentModel docModel = iter.next();
             AuthorityRefDocList.AuthorityRefDocItem ilistItem;
 
-            String docType = docModel.getDocumentType().getName();
+            String docType = docModel.getDocumentType().getName(); // REM - This will be a tentant qualified document type
             docType = ServiceBindingUtils.getUnqualifiedTenantDocType(docType);
             ServiceBindingType sb = queriedServiceBindings.get(docType);
             if (sb == null) {

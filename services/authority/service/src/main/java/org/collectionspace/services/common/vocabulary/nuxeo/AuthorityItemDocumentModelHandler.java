@@ -24,12 +24,10 @@
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import org.collectionspace.services.client.AuthorityClient;
-import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 
-import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
@@ -38,7 +36,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
@@ -249,7 +246,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	        // for general logic.
         	        boolean hasDisplayName = false;
         	        boolean hasShortId = false;
-        	        boolean hasRefName = false;
         	        boolean hasTermStatus = false;
         	        for (int i = 0; i < nFields; i++) {
         	            ListResultField field = list.get(i);
@@ -258,8 +254,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	                hasDisplayName = true;
         	            } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
         	                hasShortId = true;
-        	            } else if (AuthorityItemJAXBSchema.REF_NAME.equals(elName)) {
-        	                hasRefName = true;
         	            } else if (AuthorityItemJAXBSchema.TERM_STATUS.equals(elName)) {
         	                hasTermStatus = true;
         	            }
@@ -274,12 +268,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	            field = new ListResultField();
         	            field.setElement(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         	            field.setXpath(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-        	            list.add(field);
-        	        }
-        	        if (!hasRefName) {
-        	            field = new ListResultField();
-        	            field.setElement(AuthorityItemJAXBSchema.REF_NAME);
-        	            field.setXpath(AuthorityItemJAXBSchema.REF_NAME);
         	            list.add(field);
         	        }
         	        if (!hasTermStatus) {

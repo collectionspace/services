@@ -164,7 +164,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 			}
 		} catch (DocumentException e) {
 			// TODO Auto-generated catch block
-			logger.error(String.format("Could not get document handler params for class %s", this.getClass().getName()), e);
+			String errMsg = String.format("Could not get document handler params from config bindings for class %s", this.getClass().getName());
+			if (logger.isWarnEnabled() == true) {
+				logger.warn(errMsg);
+			}
 		}
     	
     	return result;
@@ -1149,7 +1152,6 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         List<RelationsCommonList.RelationListItem> childList = null;
         List<RelationsCommonList.RelationListItem> parentList = null;
         DocumentModel docModel = wrapDoc.getWrappedObject();
-//		String itemRefName = (String) docModel.getPropertyValue(AuthorityItemJAXBSchema.REF_NAME); cow;
 		String itemRefName = (String) docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
         		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
 

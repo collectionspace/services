@@ -39,7 +39,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
     public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
     public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
     public final static String COLLECTIONSPACE_CORE_URI = "uri";
-    public final static String COLLECTIONSPACE_CORE_REFNAME = "refname";
+    public final static String COLLECTIONSPACE_CORE_REFNAME = "refName";
     public final static String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
     public final static String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
     public final static String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
