@@ -28,7 +28,8 @@
     <xs:element name="propComments" type="xs:string"/>
     
     <!-- Seed propagation information -->
-    <xs:element name="scarStrat" type="xs:string"/>
+    <xs:element name="scarStratList" type="scarStratList"/>
+    
     <xs:element name="extraSeeds" type="xs:boolean"/>
     
     <!-- Cutting propagation information -->
@@ -42,6 +43,12 @@
     <!-- Success of the propagation -->
     <xs:element name="germinationDate" type="xs:date"/>
     <xs:element name="successRate" type="xs:string"/>
+
+    <xs:complexType name="scarStratList">
+        <xs:sequence>
+            <xs:element name="scarStrat" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>    
     
     <xs:complexType name="propActivityGroupList">
         <xs:sequence>
