@@ -323,7 +323,7 @@ public abstract class DocumentModelHandler<T, TL>
     	String csid = docWrapper.getWrappedObject().getName();
     	String refnameDisplayName = getRefnameDisplayName(docWrapper);
     	RefName.RefNameInterface refname = RefName.Authority.buildAuthority(tenantName, serviceName,
-        		csid, refnameDisplayName);
+        		csid, null, refnameDisplayName);
     	return refname;
 	}
 
