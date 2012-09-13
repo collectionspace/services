@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xmlReplay>
     
-    <testGroup ID="CreateUpdateReadStructuredObjects" autoDeletePOSTS="false">
+    <testGroup ID="CreateUpdateReadStructuredObjects" autoDeletePOSTS="true">
         
         <!-- Create a set of CollectionObjects -->
         
         <!-- Chess set box -->
         <!-- (parent of chess board, bags of white and black chess pieces) -->
-        <test ID="CreateChessSetBox" auth="admin@core.collectionspace.org">
+        <test ID="CreateChessSetBox">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
             <filename>collectionobject/hierarchy/1-collectionobject.xml</filename>
@@ -18,7 +18,7 @@
         </test>
         <!-- Verify the contents of the first CollectionObject record created. -->
         <!-- Other create requests, below, just check the result code.) -->
-        <test ID="ReadChessSetBox" auth="admin@core.collectionspace.org">
+        <test ID="ReadChessSetBox">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}</uri>
             <expectedCodes>200</expectedCodes>
@@ -33,7 +33,7 @@
         
         <!-- Chess board -->
         <!-- (child of chess set box, sibling of bags of white and black chess pieces) -->
-        <test ID="CreateChessBoard" auth="admin@core.collectionspace.org">
+        <test ID="CreateChessBoard">
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
             <filename>collectionobject/hierarchy/2-collectionobjects-with-relations-create.xml</filename>
@@ -43,7 +43,7 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
-        <test ID="ReadChessBoard" auth="admin@core.collectionspace.org">
+        <test ID="ReadChessBoard">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateChessBoard.CSID}</uri>
             <expectedCodes>200</expectedCodes>
@@ -62,7 +62,7 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
-        <test ID="ReadBagOfWhiteChessPieces" auth="admin@core.collectionspace.org">
+        <test ID="ReadBagOfWhiteChessPieces">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBagOfWhiteChessPieces.CSID}</uri>
             <expectedCodes>200</expectedCodes>
@@ -77,7 +77,7 @@
                 <var ID="parentCSID">${CreateChessSetBox.CSID}</var>
             </vars>
         </test>
-        <test ID="ReadBagOfBlackChessPieces" auth="admin@core.collectionspace.org">
+        <test ID="ReadBagOfBlackChessPieces">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}</uri>
             <expectedCodes>200</expectedCodes>
@@ -95,7 +95,7 @@
            </vars>
             <expectedCodes>201</expectedCodes>
         </test>
-        <test ID="ReadWhiteRook" auth="admin@core.collectionspace.org">
+        <test ID="ReadWhiteRook">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateWhiteRook.CSID}</uri>
             <expectedCodes>200</expectedCodes>
@@ -111,7 +111,7 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
-        <test ID="ReadWhiteBishop" auth="admin@core.collectionspace.org">
+        <test ID="ReadWhiteBishop">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateWhiteBishop.CSID}</uri>
             <expectedCodes>200</expectedCodes>
@@ -127,7 +127,7 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
-        <test ID="ReadBlackQueen" auth="admin@core.collectionspace.org">
+        <test ID="ReadBlackQueen">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackQueen.CSID}</uri>
             <expectedCodes>200</expectedCodes>
@@ -143,28 +143,12 @@
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
-        <test ID="ReadBlackRook" auth="admin@core.collectionspace.org">
+        <test ID="ReadBlackRook">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
             <expectedCodes>200</expectedCodes>
         </test>
-        
-        <test ID="ReadHierarchyForTopLevelItem">
-            <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}?showRelations=true</uri>
-            <response>
-                <expected level="ADDOK" />
-                <filename>collectionobject/hierarchy/res/show-relations-top-level.res.xml</filename>
-                <vars>
-                    <var ID="chessSetBoxCSID">${CreateChessSetBox.CSID}</var>
-                    <var ID="chessBoardCSID">${CreateChessBoard.CSID}</var>
-                    <var ID="bagOfWhiteChessPiecesCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
-                    <var ID="bagOfBlackChessPiecesCSID">${CreateBagOfBlackChessPieces.CSID}</var>
-                </vars>
-                <startElement>/document/*[local-name()='relations-common-list']</startElement>
-            </response>
-            <expectedCodes>200</expectedCodes>
-        </test>
+
 
         <!-- Update one of the existing chess pieces, and add yet one more -->
         <!-- hierarchical relationship, between that piece and another -->
@@ -304,6 +288,8 @@
             </response>
         </test>
         
+        <!-- The following tests -->
+        
         <!-- Currently returns only three relations (parent, two children), -->
         <!-- rather than five (parent, two children, two siblings). - ADR 2012-09-10 -->
         <!--
@@ -379,56 +365,61 @@
                 </vars>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
-        </test>
-        
-    </testGroup>
+        </test>     
     
-    <!-- Clean up any records that were not automatically deleted by autoDeletePOSTS -->
-       
-    <testGroup ID="Cleanup">
-
-        <!-- Cleanup-->
+        <!-- Clean up any remaining records that were NOT automatically deleted by autoDeletePOSTS -->
         
-        <!--
-        <test ID="DeleteHierarchy">
+        <!-- Delete the records of relations to ChessSetBox, from its three children -->
+               
+        <test ID="GetRelationsAsObjectForChessSetBox">
+            <method>GET</method>
+            <uri>/cspace-services/relations?obj=${CreateChessSetBox.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
         </test>
-        -->
+        <test ID="DeleteChildRelation1ToChessSetBox">
+            <method>DELETE</method>
+            <uri>/cspace-services/relations/${GetRelationsAsObjectForChessSetBox.got("//relation-list-item[1]/csid")}</uri>
+        </test>
+        <test ID="DeleteChildRelation2ToChessSetBox">
+            <method>DELETE</method>
+            <uri>/cspace-services/relations/${GetRelationsAsObjectForChessSetBox.got("//relation-list-item[2]/csid")}</uri>
+        </test>
+        <test ID="DeleteChildRelation3ToChessSetBox">
+            <method>DELETE</method>
+            <uri>/cspace-services/relations/${GetRelationsAsObjectForChessSetBox.got("//relation-list-item[3]/csid")}</uri>
+        </test>
         
-        <!-- The following is likely unnecessary with 'autoDeletePOSTS="true"' -->
-        <!--
-        <test ID="DeleteBlackRook" auth="admin@core.collectionspace.org">
-            <method>DELETE</method>
-            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
+        <!-- Delete the records of relations to BagOfWhiteChessPieces, from its two children -->
+        
+        <test ID="GetRelationsAsObjectForBagOfWhiteChessPieces">
+            <method>GET</method>
+            <uri>/cspace-services/relations?obj=${CreateBagOfWhiteChessPieces.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
         </test>
-        <test ID="DeleteBlackQueen" auth="admin@core.collectionspace.org">
+        <test ID="DeleteChildRelation1ToBagOfWhiteChessPieces">
             <method>DELETE</method>
-            <uri>/cspace-services/collectionobjects/${CreateBlackQueen.CSID}</uri>
+            <uri>/cspace-services/relations/${GetRelationsAsObjectForBagOfWhiteChessPieces.got("//relation-list-item[1]/csid")}</uri>
         </test>
-        <test ID="DeleteWhiteBishop" auth="admin@core.collectionspace.org">
+        <test ID="DeleteChildRelation2ToBagOfWhiteChessPieces">
             <method>DELETE</method>
-            <uri>/cspace-services/collectionobjects/${CreateWhiteBishop.CSID}</uri>
+            <uri>/cspace-services/relations/${GetRelationsAsObjectForBagOfWhiteChessPieces.got("//relation-list-item[2]/csid")}</uri>
         </test>
-        <test ID="DeleteWhiteRook" auth="admin@core.collectionspace.org">
+        
+        <!-- Delete the records of relations to BagOfBlackChessPieces, from its two children -->
+        
+        <test ID="GetRelationsAsObjectForBagOfBlackChessPieces">
+            <method>GET</method>
+            <uri>/cspace-services/relations?obj=${CreateBagOfBlackChessPieces.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <test ID="DeleteChildRelation1ToBagOfBlackChessPieces">
             <method>DELETE</method>
-            <uri>/cspace-services/collectionobjects/${CreateWhiteRook.CSID}</uri>
+            <uri>/cspace-services/relations/${GetRelationsAsObjectForBagOfBlackChessPieces.got("//relation-list-item[1]/csid")}</uri>
         </test>
-        <test ID="DeleteBagOfBlackChessPieces" auth="admin@core.collectionspace.org">
+        <test ID="DeleteChildRelation2ToBagOfBlackChessPieces">
             <method>DELETE</method>
-            <uri>/cspace-services/collectionobjects/${CreateBagOfBlackChessPieces.CSID}</uri>
+            <uri>/cspace-services/relations/${GetRelationsAsObjectForBagOfBlackChessPieces.got("//relation-list-item[2]/csid")}</uri>
         </test>
-        <test ID="DeleteBagOfWhiteChessPieces" auth="admin@core.collectionspace.org">
-            <method>DELETE</method>
-            <uri>/cspace-services/collectionobjects/${CreateBagOfWhiteChessPieces.CSID}</uri>
-        </test>
-        <test ID="DeleteChessBoard" auth="admin@core.collectionspace.org">
-            <method>DELETE</method>
-            <uri>/cspace-services/collectionobjects/${CreateChessBoard.CSID}</uri>
-        </test>
-        <test ID="DeleteChessSetBox" auth="admin@core.collectionspace.org">
-            <method>DELETE</method>
-            <uri>/cspace-services/collectionobjects/${CreateChessSetBox.CSID}</uri>
-        </test>
-        -->
         
     </testGroup>
     
