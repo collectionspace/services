@@ -60,7 +60,6 @@
         <module>loanin</module>
         <module>loanout</module>
         <module>objectexit</module>
-        <module>claim</module>
         <module>propagation</module>
         <module>batch</module>
         <module>imports</module>
