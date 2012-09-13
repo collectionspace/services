@@ -11,8 +11,9 @@
                                xmlns:ns2="http://collectionspace.org/services/jaxb">
         
         <!--
-            Create a hierarchical relationships between the bag of 
-            black chess pieces, and the remaining piece it contains.
+            Create a hierarchical relationship between an item
+            and its parent, via an update that also adds a new field
+            value to the item itself.
         -->
        
         <relation-list-item>
