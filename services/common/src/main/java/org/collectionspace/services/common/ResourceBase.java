@@ -42,6 +42,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
@@ -51,6 +52,8 @@ import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -490,13 +493,23 @@ public abstract class ResourceBase
      */
     public static DocumentModel getDocModelForRefName(RepositoryInstance repoSession, String refName, ResourceMap resourceMap) 
    			throws Exception, DocumentNotFoundException {
-    	// TODO - we need to generalize the idea of a refName to more than Authorities and Items. 
     	RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
-    	if(item == null) {
-    		return null;
+    	if(item != null) {
+        	ResourceBase resource = resourceMap.get(item.inAuthority.resource);
+        	return resource.getDocModelForAuthorityItem(repoSession, item);
     	}
-    	ResourceBase resource = resourceMap.get(item.inAuthority.resource);
-    	return resource.getDocModelForAuthorityItem(repoSession, item);
+    	RefName.Authority authority = RefName.Authority.parse(refName);
+    	// Handle case of objects refNames, which must be csid based.
+    	if(authority != null && !Tools.isEmpty(authority.csid)) {
+        	ResourceBase resource = resourceMap.get(authority.resource);
+            // Ensure we have the right context.
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
+            		resource.createServiceContext(authority.resource);
+            // HACK - this really must be moved to the doc handler, not here. No Nuxeo specific stuff here!
+            DocumentModel docModel = NuxeoUtils.getDocFromCsid(ctx, repoSession, authority.csid);
+            return docModel;
+    	}
+    	return null;
     }
 
     // THis is ugly, but prevents us parsing the refName twice. Once we make refName a little more

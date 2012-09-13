@@ -131,6 +131,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
 	        String displayName = (String) docModel.getProperty(authorityCommonSchemaName, AuthorityJAXBSchema.DISPLAY_NAME);
 	        RefName.Authority authority = RefName.Authority.buildAuthority(ctx.getTenantName(),
 	                ctx.getServiceName(),
+	                null,	// Only use shortId form!!!
 	                shortIdentifier,
 	                displayName);
 	        refname = authority;

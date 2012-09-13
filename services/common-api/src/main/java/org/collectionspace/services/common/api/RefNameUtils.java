@@ -45,6 +45,9 @@ public class RefNameUtils {
     public static final int URN_PREFIX_LEN = 11;
     public static final String URN_NAME_PREFIX = "urn:cspace:name(";
     public static final int URN_NAME_PREFIX_LEN = 16;
+    public static final String NAME_SPECIFIER = "name";
+    public static final String ID_SPECIFIER = "id";
+    
 	// FIXME Should not be hard-coded
     private static final String ITEMS_REGEX = "item|person|organization";
     // In a list of tokens, these are indices for each part
@@ -83,14 +86,15 @@ public class RefNameUtils {
 	        	if(idTokens.length<INSTANCE_TOKENS_MIN) {
 	        		throw new IllegalArgumentException("Missing/malformed identifier");
 	        	}
-	        	if(idTokens[INSTANCE_SPEC_TYPE_TOKEN].equals("name")) {
+	        	if(idTokens[INSTANCE_SPEC_TYPE_TOKEN].equals(NAME_SPECIFIER)) {
 	        		this.name = idTokens[INSTANCE_SPEC_TOKEN];
 	        		this.csid = null;
-	        	} else if(idTokens[INSTANCE_SPEC_TYPE_TOKEN].startsWith("id")) {
+	        	} else if(idTokens[INSTANCE_SPEC_TYPE_TOKEN].startsWith(ID_SPECIFIER)) {
 	        		this.csid = idTokens[INSTANCE_SPEC_TOKEN];
 	        		this.name = null;
 	        	} else {
-	        		throw new IllegalArgumentException("Identifier type must be 'name' or 'id'");
+	        		throw new IllegalArgumentException("Identifier type must be '"
+	        						+NAME_SPECIFIER+"' or '"+ID_SPECIFIER+"'");
 	        	}
 	        	// displayName is always in quotes, so must have at least 3 chars
 	    		this.displayName = 
@@ -156,10 +160,10 @@ public class RefNameUtils {
 	        	if(idTokens.length<INSTANCE_TOKENS_MIN) {
 	        		throw new IllegalArgumentException("Missing/malformed identifier");
 	        	}
-	        	if(idTokens[INSTANCE_SPEC_TYPE_TOKEN].equals("name")) {
+	        	if(idTokens[INSTANCE_SPEC_TYPE_TOKEN].equals(NAME_SPECIFIER)) {
 	        		this.name = idTokens[INSTANCE_SPEC_TOKEN];
 	        		this.csid = null;
-	        	} else if(idTokens[INSTANCE_SPEC_TYPE_TOKEN].startsWith("id")) {
+	        	} else if(idTokens[INSTANCE_SPEC_TYPE_TOKEN].startsWith(ID_SPECIFIER)) {
 	        		this.csid = idTokens[INSTANCE_SPEC_TOKEN];
 	        		this.name = null;
 	        	} else {
