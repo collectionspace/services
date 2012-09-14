@@ -231,7 +231,7 @@
         <test ID="UpdateBlackRookWithRelations">
             <method>PUT</method>
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
-            <filename>collectionobject/hierarchy/7-collectionobject-update-with-parent-child-refNames.xml</filename>
+            <filename>collectionobject/hierarchy/7-collectionobject-update-with-parent-child-refnames.xml</filename>
             <vars>
                 <var ID="distinguishingFeatures">This black rook is nearly intact, save for two tiny fragments.</var>
                 <var ID="currentItemCSID">${CreateBlackRook.CSID}</var>
