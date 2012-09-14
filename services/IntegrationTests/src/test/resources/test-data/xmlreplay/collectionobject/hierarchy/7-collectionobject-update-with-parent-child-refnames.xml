@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">
+
+    <ns2:collectionobjects_common
+        xmlns:ns2="http://collectionspace.org/services/collectionobject">
+        <objectNumber>${objectNumber}</objectNumber>
+        <distinguishingFeatures>${distinguishingFeatures}</distinguishingFeatures>
+    </ns2:collectionobjects_common>
+
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation"
+                               xmlns:ns2="http://collectionspace.org/services/jaxb">
+        
+        <!--
+            Create a hierarchical relationship between an item,
+            its parent, and two children, via an update that also
+            adds a new field value to the item itself.
+        -->
+        
+        <!-- Create a relationship between this item and its parent -->
+        <!-- Both subject and object are identified by refNames -->
+        <relation-list-item>
+            <!-- The current item being updated above ... -->
+            <subject>
+                <refName>urn:cspace:core.collectionspace.org:collectionobjects:id(${currentItemCSID})'${currentItemObjectNumber}'</refName>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item -->
+            <object>
+                <refName>urn:cspace:core.collectionspace.org:collectionobjects:id(${parentCSID})'${parentObjectNumber}'</refName>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+        <!-- Create a relationship between this item and a child -->
+        <!-- Subject ia identified by a CSID and object by a refName -->
+        <relation-list-item>
+            <!-- A child item ... -->
+            <subject>
+                <csid>${child1CSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item: the current item being updated above -->
+            <object>
+                <refName>urn:cspace:core.collectionspace.org:collectionobjects:id(${currentItemCSID})'${currentItemObjectNumber}'</refName>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+        <!-- And to a second child -->
+        <!-- Subject is identified by a refName and object by a CSID -->
+        <relation-list-item>
+            <!-- A child item ... -->
+            <subject>
+                <refName>urn:cspace:core.collectionspace.org:collectionobjects:id(${child2CSID})'${child2ObjectNumber}'</refName>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item: the current item being updated above -->
+            <object>
+                <csid>${currentItemCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+    </ns3:relations-common-list>
+</document>
+
+

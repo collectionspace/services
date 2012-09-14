@@ -17,11 +17,11 @@
         <relation-list-item>
             <predicate>hasBroader</predicate>
             <subject>
-                <csid>${blackRookCSID}</csid>
+                <csid>${blackRookFragment1CSID}</csid>
                 <documentType>CollectionObject</documentType>
             </subject>
             <object>
-                <csid>${bagOfBlackChessPiecesCSID}</csid>
+                <csid>${blackRookCSID}</csid>
                 <documentType>CollectionObject</documentType>
             </object>
         </relation-list-item>
