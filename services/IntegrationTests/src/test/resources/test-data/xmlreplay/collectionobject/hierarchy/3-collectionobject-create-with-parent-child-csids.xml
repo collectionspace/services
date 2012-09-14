@@ -9,9 +9,8 @@
     <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation"
                                xmlns:ns2="http://collectionspace.org/services/jaxb">
         
-        <!-- Create hierarchical relationships between the chess set box -->
-        <!-- and its three children: the chess board, and the bags of white -->
-        <!-- and black chess pieces -->
+        <!-- Create a hierarchical relationship between an item, -->
+        <!-- its parent, and one child -->
         
         <!-- 
              ${itemCSID} is a convention understood by the Relations service,
@@ -22,14 +21,35 @@
              As such, ${itemCSID} does NOT get expanded by XmlReplay. 
              It passes through, and then the service deals with it.
         -->
+        
+        <!-- Create a relationship between this item and its parent -->
         <relation-list-item>
-            <predicate>hasBroader</predicate>
+            <!-- The item being created, above ... -->
             <subject>
                 <csid>${itemCSID}</csid>
                 <documentType>CollectionObject</documentType>
             </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item -->
             <object>
                 <csid>${parentCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+        <!-- Create a relationship between this item and a child -->
+        <relation-list-item>
+            <!-- A child item ... -->
+            <subject>
+                <csid>${childCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item: the item being created above -->
+            <object>
+                <csid>${itemCSID}</csid>
                 <documentType>CollectionObject</documentType>
             </object>
         </relation-list-item>
