@@ -144,3 +144,28 @@ loaned out of the institution.',
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
+
+-- PROP_NUMBER
+
+INSERT INTO id_generators
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  VALUES 
+    ('81cf5a56-d43d-49e9-ac11-61cf4b0923d4',
+     'Propagation Number',
+     'Identifies activities in which accessions are
+propagated.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>UCBG</initialValue>
+      <currentValue>UCBG</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>9</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>');
