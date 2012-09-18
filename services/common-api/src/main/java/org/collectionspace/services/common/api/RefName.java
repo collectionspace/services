@@ -51,12 +51,17 @@ public class RefName {
     public static final String URN_PREFIX = "urn:cspace:";
     public static final String URN_NAME_PREFIX = "urn:cspace:name";
     public static final String REFNAME = "refName";
+    
+    public static interface RefNameInterface {
+    	public String toString();
+    }
 
-    public static class Authority {
+    public static class Authority implements RefNameInterface {
 
         public String tenantName = "";
         public String resource = "";
-        public String shortIdentifier = "";
+        public String csid = null;
+        public String shortIdentifier = null;
         public String displayName = "";
 
         public static Authority parse(String urn) {
@@ -71,8 +76,16 @@ public class RefName {
             return authority;
         }
 
+        public String getDisplayName() {
+        	return this.getDisplayName();
+        }
+        
         public String getShortIdentifier() {
             return this.shortIdentifier;
+        }
+
+        public String getCSID() {
+            return this.csid;
         }
 
         public boolean equals(Object other) {
@@ -83,23 +96,78 @@ public class RefName {
                 Authority ao = (Authority) other;
                 return (this.tenantName.equals(ao.tenantName)
                         && this.resource.equals(ao.resource)
-                        && this.shortIdentifier.equals(ao.shortIdentifier));
+                        && ((this.shortIdentifier != null &&
+                        	this.shortIdentifier.equals(ao.shortIdentifier))
+                        || (this.csid != null && this.csid.equals(ao.csid))));
             } else {
                 return false;
             }
         }
 
         public String getRelativeUri() {
-            return "/" + resource + "/" + URN_NAME_PREFIX + "(" + shortIdentifier + ")";
+        	StringBuilder sb = new StringBuilder();
+        	sb.append("/");
+        	sb.append(resource);
+        	sb.append("/");
+        	if(csid!=null) {
+            	sb.append(csid);
+        	} else if(shortIdentifier!= null) {
+            	sb.append(URN_NAME_PREFIX);
+            	sb.append("(");
+            	sb.append(shortIdentifier);
+            	sb.append(")");
+        	} else {
+        		throw new NullPointerException("Authority has neither CSID nor shortID!");
+        	}
+            return sb.toString();
         }
 
         public String toString() {
             String displaySuffix = (displayName != null && (!displayName.isEmpty())) ? '\'' + displayName + '\'' : "";
-            return URN_PREFIX + tenantName + ':' + resource + ":" + "name" + "(" + shortIdentifier + ")" + displaySuffix;
+            //return URN_PREFIX + tenantName + ':' + resource + ":" + "name" + "(" + shortIdentifier + ")" + displaySuffix;
+        	StringBuilder sb = new StringBuilder();
+        	sb.append(URN_PREFIX);
+        	sb.append(tenantName);
+        	sb.append(RefNameUtils.SEPARATOR);
+        	sb.append(resource);
+        	sb.append(RefNameUtils.SEPARATOR);
+        	if(csid!=null) {
+            	sb.append(RefNameUtils.ID_SPECIFIER);
+            	sb.append("(");
+            	sb.append(csid);
+            	sb.append(")");
+        	} else if(shortIdentifier!= null) {
+            	sb.append(RefNameUtils.NAME_SPECIFIER);
+            	sb.append("(");
+            	sb.append(shortIdentifier);
+            	sb.append(")");
+        	} else {
+        		throw new NullPointerException("Authority has neither CSID nor shortID!");
+        	}
+        	sb.append(displaySuffix);
+            return sb.toString();
+        }
+
+        public static Authority buildAuthority(
+        		String tenantName, 
+        		String serviceName, 
+        		String csid, 
+        		String authorityShortIdentifier, 
+        		String authorityDisplayName) {
+            Authority authority = new Authority();
+            authority.tenantName = tenantName;
+            authority.resource = serviceName;
+            if (Tools.notEmpty(authority.resource)) {
+                authority.resource = authority.resource.toLowerCase();
+            }
+            authority.csid = csid;
+            authority.shortIdentifier = authorityShortIdentifier;
+            authority.displayName = authorityDisplayName;
+            return authority;
         }
     }
 
-    public static class AuthorityItem {
+    public static class AuthorityItem implements RefNameInterface {
 
         public Authority inAuthority;
         public String shortIdentifier = "";
@@ -117,6 +185,10 @@ public class RefName {
             return authorityItem;
         }
 
+        public String getDisplayName() {
+        	return this.displayName;
+        }
+        
         public String getParentShortIdentifier() {
             return this.inAuthority.shortIdentifier;
         }
@@ -159,22 +231,10 @@ public class RefName {
         }
     }
 
-    public static Authority buildAuthority(String tenantName, String serviceName, String authorityShortIdentifier, String authorityDisplayName) {
-        Authority authority = new Authority();
-        authority.tenantName = tenantName;
-        authority.resource = serviceName;
-        if (Tools.notEmpty(authority.resource)) {
-            authority.resource = authority.resource.toLowerCase();
-        }
-        authority.shortIdentifier = authorityShortIdentifier;
-        authority.displayName = authorityDisplayName;
-        return authority;
-    }
-
-    public static AuthorityItem buildAuthorityItem(String tenantName, String serviceName, String authorityShortIdentifier,
-            String itemShortIdentifier, String itemDisplayName) {
-        Authority authority = buildAuthority(tenantName, serviceName, authorityShortIdentifier, "");
-        return buildAuthorityItem(authority, itemShortIdentifier, itemDisplayName);
+    public static AuthorityItem buildAuthorityItem(String tenantName, String serviceName, String authorityShortID,
+            String itemShortID, String itemDisplayName) {
+        Authority authority = Authority.buildAuthority(tenantName, serviceName, null, authorityShortID, "");
+        return buildAuthorityItem(authority, itemShortID, itemDisplayName);
     }
 
     public static AuthorityItem buildAuthorityItem(String authorityRefName, String itemShortID, String itemDisplayName) {
@@ -183,10 +243,10 @@ public class RefName {
         return item;
     }
 
-    public static AuthorityItem buildAuthorityItem(Authority authority, String itemShortIdentifier, String itemDisplayName) {
+    public static AuthorityItem buildAuthorityItem(Authority authority, String itemShortID, String itemDisplayName) {
         AuthorityItem item = new AuthorityItem();
         item.inAuthority = authority;
-        item.shortIdentifier = itemShortIdentifier;
+        item.shortIdentifier = itemShortID;
         item.displayName = itemDisplayName;
         return item;
     }
@@ -247,8 +307,10 @@ public class RefName {
         if (authorityInfo.name != null
                 && !authorityInfo.name.trim().isEmpty()) {
             authority.shortIdentifier = authorityInfo.name;
-        } else {
-            authority.shortIdentifier = authorityInfo.csid;
+        }
+        if (authorityInfo.csid != null
+                && !authorityInfo.csid.trim().isEmpty()) {
+            authority.csid = authorityInfo.csid;
         }
         if (includeDisplayName) {
             authority.displayName = authorityInfo.displayName;

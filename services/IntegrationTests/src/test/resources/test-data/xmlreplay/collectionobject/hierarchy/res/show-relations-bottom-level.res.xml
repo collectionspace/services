@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">
+    <!-- Contents of the specified CollectionObject record itself are -->
+    <!-- ignored here; we are interested only in the relations list below. -->
+
+    <!--
+        Parent and child relations of the black rook:
+        * bag of black chess pieces (parent)
+    -->
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <pageNum>0</pageNum>
+        <itemsInPage>1</itemsInPage>
+        <totalItems>1</totalItems>
+        
+        <!-- Parent relationships -->
+        
+        <relation-list-item>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${blackRookFragment1CSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <object>
+                <csid>${blackRookCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+    </ns3:relations-common-list>
+
+</document>
+

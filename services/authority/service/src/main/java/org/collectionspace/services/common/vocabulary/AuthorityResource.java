@@ -23,47 +23,8 @@
  */
 package org.collectionspace.services.common.vocabulary;
 
-import org.collectionspace.services.client.IClientQueryParams;
-import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.api.RefName;
-import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.context.JaxRsContext;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.RemoteServiceContext;
-import org.collectionspace.services.common.context.ServiceBindingUtils;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
-import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
-import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
-import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
-import org.collectionspace.services.config.ClientType;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.lifecycle.TransitionDef;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
-import org.collectionspace.services.workflow.WorkflowCommon;
-import org.jboss.resteasy.util.HttpResponseCodes;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.List;
+import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -79,9 +40,51 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-
-import java.util.List;
+import org.collectionspace.services.client.IClientQueryParams;
+import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriTemplateFactory;
+import org.collectionspace.services.common.UriTemplateRegistry;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
+import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.context.JaxRsContext;
+import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.RemoteServiceContext;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.Hierarchy;
+import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
+import org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler;
+import org.collectionspace.services.config.ClientType;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.lifecycle.TransitionDef;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.workflow.WorkflowCommon;
+import org.jboss.resteasy.util.HttpResponseCodes;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Class AuthorityResource.
@@ -253,8 +256,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 
     protected String buildAuthorityRefNameBase(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String shortIdentifier) {
-        RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
-                ctx.getServiceName(), shortIdentifier, null);
+        RefName.Authority authority = RefName.Authority.buildAuthority(ctx.getTenantName(),
+                ctx.getServiceName(), 
+                null,	// Only use shortId form!!!
+                shortIdentifier, null);
         return authority.toString();
     }
 
@@ -264,13 +269,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         String shortIdentifier;
     }
 
-    protected String lookupParentCSID(String parentspecifier, String method, String op, MultivaluedMap<String, String> queryParams)
-            throws Exception {
-        CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(parentspecifier, method, op, queryParams);
-        return tempResult.CSID;
-    }
+	protected String lookupParentCSID(String parentspecifier, String method,
+			String op, UriInfo uriInfo) throws Exception {
+		CsidAndShortIdentifier tempResult = lookupParentCSIDAndShortIdentifer(
+				parentspecifier, method, op, uriInfo);
+		return tempResult.CSID;
+	}
 
-    private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(String parentspecifier, String method, String op, MultivaluedMap<String, String> queryParams)
+    private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(String parentspecifier,
+    		String method, String op,
+    		UriInfo uriInfo)
             throws Exception {
         CsidAndShortIdentifier result = new CsidAndShortIdentifier();
         Specifier parentSpec = getSpecifier(parentspecifier, method, op);
@@ -286,7 +294,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         } else {
             parentShortIdentifier = parentSpec.value;
             String whereClause = buildWhereForAuthByName(parentSpec.value);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getServiceName(), queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getServiceName(), uriInfo);
             parentcsid = getRepositoryClient(ctx).findDocCSID(null, ctx, whereClause); //FIXME: REM - If the parent has been soft-deleted, should we be looking for the item?
         }
         result.CSID = parentcsid;
@@ -375,7 +383,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @GET
     @Path("{csid}")
     @Override
-    public byte[] get( // getAuthority(
+    public byte[] get(
+            @Context Request request,
             @Context UriInfo ui,
             @PathParam("csid") String specifier) {
         PoxPayloadOut result = null;
@@ -420,15 +429,18 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      */
     @GET
     @Produces("application/xml")
-    public AbstractCommonList getAuthorityList(@Context UriInfo ui) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
-        try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+    public AbstractCommonList getAuthorityList(@Context UriInfo uriInfo) { //FIXME - REM 5/3/2012 - This is not reachable from the JAX-RS dispatcher.  Instead the equivalent method in ResourceBase is getting called.
+    	AbstractCommonList result = null;
+    	
+    	try {
+            MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(uriInfo);
+            
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = handler.getDocumentFilter();
             // Need to make the default sort order for authority items
             // be on the displayName field
-            String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
+            String sortBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
             if (sortBy == null || sortBy.isEmpty()) {
                 String qualifiedDisplayNameField = authorityCommonSchemaName + ":"
                         + AuthorityItemJAXBSchema.DISPLAY_NAME;
@@ -439,13 +451,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 myFilter.setWhereClause(authorityCommonSchemaName + ":refName='" + nameQ + "'");
             }
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            return handler.getCommonPartList();
+            result = handler.getCommonPartList();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
+        
+        return result;
     }
     
-
     /**
      * Update authority.
      *
@@ -510,25 +523,30 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      *************************************************************************/
     @POST
     @Path("{csid}/items")
-    public Response createAuthorityItem(@Context ResourceMap resourceMap, @Context UriInfo ui, 
-    		@PathParam("csid") String specifier, String xmlPayload) {
+    public Response createAuthorityItem(
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo uriInfo, 
+    		@PathParam("csid") String specifier,
+    		String xmlPayload) {
+    	Response result = null;
+    	
         try {
             PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input);
-            ctx.setResourceMap(resourceMap);
-            ctx.setUriInfo(ui);    //Laramie
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input, resourceMap, uriInfo);
 
             // Note: must have the parentShortId, to do the create.
             CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(specifier, "createAuthorityItem", "CREATE_ITEM", null);
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
+            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = 
+            	createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
             String itemcsid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(resourceClass);
             path.path(parent.CSID + "/items/" + itemcsid);
-            Response response = Response.created(path.build()).build();
-            return response;
+            result = Response.created(path.build()).build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
+        
+        return result;
     }
 
     @GET
@@ -605,20 +623,19 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Path("{csid}/items/{itemcsid}")
     public byte[] getAuthorityItem(
             @Context Request request,
-            @Context UriInfo ui,
+            @Context UriInfo uriInfo,
+    		@Context ResourceMap resourceMap,            
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier) {
         PoxPayloadOut result = null;
         try {
-            JaxRsContext jaxRsContext = new JaxRsContext(request, ui);
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            String parentcsid = lookupParentCSID(parentspecifier, "getAuthorityItem(parent)", "GET_ITEM", queryParams);
+            String parentcsid = lookupParentCSID(parentspecifier, "getAuthorityItem(parent)", "GET_ITEM", uriInfo);
 
-            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-            ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), queryParams);
+            RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = 
+            	(RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(getItemServiceName(), resourceMap, uriInfo);
+            
+            JaxRsContext jaxRsContext = new JaxRsContext(request, uriInfo); // REM - Why are we setting this?  Who is using the getter?
             ctx.setJaxRsContext(jaxRsContext);
-
-            ctx.setUriInfo(ui); //ARG!   must pass this or subsequent calls will not have a ui.
 
             // We omit the parentShortId, only needed when doing a create...
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parentcsid, null);
@@ -651,7 +668,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
      * Most of the authority child classes will/should use this implementation.  However, the Vocabulary service's item schema is
      * different enough that it will have to override this method in it's resource class.
      */
-	protected String getOrderByField() {
+    @Override
+	protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		String result = null;
 
 		result = NuxeoUtils.getPrimaryElPathPropertyName(
@@ -661,7 +679,8 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 		return result;
 	}
 	
-	protected String getPartialTermMatchField() {
+    @Override
+	protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		String result = null;
 		
 		result = NuxeoUtils.getMultiElPathPropertyName(
@@ -686,37 +705,29 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Path("{csid}/items")
     @Produces("application/xml")
     public AbstractCommonList getAuthorityItemList(@PathParam("csid") String specifier,
-            @Context UriInfo ui) {
+            @Context UriInfo uriInfo) {
+    	AbstractCommonList result = null;
+    	
         try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+            
+            String orderBy = queryParams.getFirst(IClientQueryParams.ORDER_BY_PARAM);
             String termStatus = queryParams.getFirst(SEARCH_TYPE_TERMSTATUS);
             String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             String advancedSearch = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_AS);
-
-            // Note that docType defaults to the ServiceName, so we're fine with that.
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-
-            String parentcsid = PARENT_WILDCARD.equals(specifier)?null:
-            					lookupParentCSID(specifier, "getAuthorityItemList", "LIST", queryParams);
-
-            ctx = createServiceContext(getItemServiceName(), queryParams);
+            String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
 
             // For the wildcard case, parentcsid is null, but docHandler will deal with this.
             // We omit the parentShortId, only needed when doing a create...
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parentcsid, null);
+            String parentcsid = PARENT_WILDCARD.equals(specifier) ? null :
+				lookupParentCSID(specifier, "getAuthorityItemList", "LIST", uriInfo);
+            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler =
+            	createItemDocumentHandler(ctx, parentcsid, null);
             
             DocumentFilter myFilter = handler.getDocumentFilter();
-            // Need to make the default sort order for authority items
-            // be on the displayName field
-            String sortBy = queryParams.getFirst(IClientQueryParams.SORT_BY_PARAM);
-            if (sortBy == null || sortBy.isEmpty()) {
-                String orderByField = getOrderByField();
-                myFilter.setOrderByClause(orderByField);
-            }
-
             // If we are not wildcarding the parent, add a restriction
-            if(parentcsid!=null) {
+            if (parentcsid != null) {
 	            myFilter.appendWhereClause(authorityItemCommonSchemaName + ":"
 	                    + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
 	                    + "'" + parentcsid + "'",
@@ -731,30 +742,13 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             	String tsClause = QueryManager.createWhereClauseToFilterFromStringList(qualifiedTermStatusField, filterTerms, IQueryManager.FILTER_EXCLUDE);
                 myFilter.appendWhereClause(tsClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
-                
-            // AND vocabularyitems_common:displayName LIKE '%partialTerm%'
-            // NOTE: Partial terms searches are mutually exclusive to keyword and advanced-search, but
-            // the PT query param trumps the KW and AS query params.
-            if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String partialTermMatchField = getPartialTermMatchField();
-                String ptClause = QueryManager.createWhereClauseForPartialMatch(
-                		partialTermMatchField, partialTerm);
-                myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
-            } else if (keywords != null || advancedSearch != null) {
-//				String kwdClause = QueryManager.createWhereClauseFromKeywords(keywords);
-//				myFilter.appendWhereClause(kwdClause, IQueryManager.SEARCH_QUALIFIER_AND);
-                return search(ctx, handler, queryParams, keywords, advancedSearch);
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("getAuthorityItemList filtered WHERE clause: "
-                        + myFilter.getWhereClause() 
-                        + " and ORDER BY clause: " + myFilter.getOrderByClause());
-            }
-            getRepositoryClient(ctx).getFiltered(ctx, handler);
-            return handler.getCommonPartList();
+
+            result = search(ctx, handler, uriInfo, orderBy, keywords, advancedSearch, partialTerm);            
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
+        
+        return result;
     }
 
     /**
@@ -784,14 +778,14 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public AuthorityRefDocList getReferencingObjects(
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
-            @Context UriInfo ui) {
+            @Context UriTemplateRegistry uriTemplateRegistry,
+            @Context UriInfo uriInfo) {
         AuthorityRefDocList authRefDocList = null;
         try {
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
 
-            String parentcsid = lookupParentCSID(parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", queryParams);
-
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), queryParams);
+            String parentcsid = lookupParentCSID(parentspecifier, "getReferencingObjects(parent)", "GET_ITEM_REF_OBJS", uriInfo);
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getReferencingObjects(item)", "GET_ITEM_REF_OBJS", ctx);
 
             List<String> serviceTypes = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
@@ -804,7 +798,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             AuthorityItemDocumentModelHandler<?> handler = (AuthorityItemDocumentModelHandler<?>)
             											createItemDocumentHandler(ctx, parentcsid, null);
 
-            authRefDocList = handler.getReferencingObjects(ctx, serviceTypes, getRefPropName(), itemcsid);
+            authRefDocList = handler.getReferencingObjects(ctx, uriTemplateRegistry, serviceTypes, getRefPropName(), itemcsid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.GET_FAILED);
         }
@@ -832,19 +826,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public AuthorityRefList getAuthorityItemAuthorityRefs(
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
-            @Context UriInfo ui) {
+            @Context UriInfo uriInfo) {
         AuthorityRefList authRefList = null;
         try {
             // Note that we have to create the service context for the Items, not the main service
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
-
-            String parentcsid = lookupParentCSID(parentspecifier, "getAuthorityItemAuthRefs(parent)", "GET_ITEM_AUTH_REFS", queryParams);
-
-            ctx = createServiceContext(getItemServiceName(), queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+            String parentcsid = lookupParentCSID(parentspecifier, "getAuthorityItemAuthRefs(parent)", "GET_ITEM_AUTH_REFS", uriInfo);
             // We omit the parentShortId, only needed when doing a create...
             DocumentModelHandler<?, AbstractCommonList> handler =
-                    (DocumentModelHandler<?, AbstractCommonList>)createItemDocumentHandler(ctx, parentcsid, null);
+                    (DocumentModelHandler<?, AbstractCommonList>)createItemDocumentHandler(ctx, parentcsid, null /*no parent short ID*/);
 
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getAuthorityItemAuthRefs(item)", "GET_ITEM_AUTH_REFS", ctx);
 
@@ -941,7 +932,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             // All items in dive can look at their child uri's to get uri.  So we calculate the very first one.  We could also do a GET and look at the common part uri field, but why...?
             String calledUri = ui.getPath();
             String uri = "/" + calledUri.substring(0, (calledUri.length() - ("/" + hierarchy).length()));
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName());
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), ui);
             ctx.setUriInfo(ui);
             String direction = ui.getQueryParameters().getFirst(Hierarchy.directionQP);
             if (Tools.notBlank(direction) && Hierarchy.direction_parents.equals(direction)) {
@@ -953,4 +944,26 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             throw bigReThrow(e, "Error showing hierarchy", itemcsid);
         }
     }
+    
+    protected String getItemDocType(String tenantId) {
+        return getDocType(tenantId, getItemServiceName());
+    }
+        
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for all tenants
+     * 
+     * @return a map of URI templates for the current resource, for all tenants
+     */
+    @Override
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                super.getUriRegistryEntries();
+        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
+        for (String tenantId : tenantIds) {
+                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getItemDocType(tenantId), UriTemplateFactory.ITEM));
+        }
+        return uriRegistryEntriesMap;
+    }
+  
 }

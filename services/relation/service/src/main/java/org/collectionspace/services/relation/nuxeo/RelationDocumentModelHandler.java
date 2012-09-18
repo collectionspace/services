@@ -408,7 +408,7 @@ public class RelationDocumentModelHandler
             }
         }
         if(docModel==null) {
-           	throw new DocumentNotFoundException("Relation.getSubjectOrObjectDocModel could not find doc with CSID: "
+           	throw new DocumentNotFoundException("RelationDMH.getSubjectOrObjectDocModel could not find doc with CSID: "
            				+csid+" and/or refName: "+refName );
         }
         return docModel;
@@ -436,6 +436,7 @@ public class RelationDocumentModelHandler
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_URI:RelationJAXBSchema.OBJECT_URI),
 	        					uri);
 	        
+	    	/*
 	    	String common_schema = getCommonSchemaNameForDocType(doctype);
 	    	
 	    	if(common_schema!=null) {
@@ -444,6 +445,15 @@ public class RelationDocumentModelHandler
 	            properties.put((fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME),
 	            		refname);
 	    	}
+	    	*/
+	        String refname = (String) 
+	        		subjectOrObjectDocModel.getProperty(
+	        				CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+	        				CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
+            properties.put((fSubject?
+            					RelationJAXBSchema.SUBJECT_REFNAME
+            					:RelationJAXBSchema.OBJECT_REFNAME),
+            				refname);
         } catch (ClientException ce) {
             throw new RuntimeException(
                     "populateSubjectOrObjectValues: Problem fetching field " + ce.getLocalizedMessage());
@@ -459,6 +469,7 @@ public class RelationDocumentModelHandler
         }
     }
     
+    /*
     private String getCommonSchemaNameForDocType(String docType) {
     	String common_schema = null;
     	if(docType!=null) {
@@ -479,5 +490,6 @@ public class RelationDocumentModelHandler
     	}
     	return common_schema;
     }
+    */
 
 }

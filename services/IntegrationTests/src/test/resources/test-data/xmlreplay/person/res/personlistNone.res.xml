@@ -3,6 +3,6 @@
     <pageNum>0</pageNum>
     <pageSize>40</pageSize>
 		<itemsInPage>0</itemsInPage>
-    <fieldsReturned>csid|uri|updatedAt|displayName|shortIdentifier|refName|termStatus</fieldsReturned>
+    <fieldsReturned>csid|uri|refName|updatedAt|displayName|shortIdentifier|termStatus</fieldsReturned>
 </ns2:abstract-common-list>
 

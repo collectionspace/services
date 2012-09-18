@@ -24,11 +24,11 @@
 package org.collectionspace.services.common.context;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.collectionspace.services.common.ResourceMap;
 
 /**
  *
@@ -79,13 +79,16 @@ public class MultipartServiceContextFactory
      * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String, java.lang.Object, javax.ws.rs.core.MultivaluedMap)
      */
     @Override
-    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(String serviceName,
-    		PoxPayloadIn input, 
-    		MultivaluedMap<String, String> queryParams)
+    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(
+    		String serviceName,
+    		PoxPayloadIn input,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo)
     			throws Exception {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = new MultipartServiceContextImpl(serviceName,
     			input,
-    			queryParams);
+    			resourceMap,
+    			uriInfo);
     	return ctx;
     }
     
@@ -93,11 +96,13 @@ public class MultipartServiceContextFactory
      * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String, java.lang.Object, javax.ws.rs.core.MultivaluedMap, java.lang.String, java.lang.String)
      */
     @Override
-    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(String serviceName, 
+    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(
+    		String serviceName, 
     		PoxPayloadIn input,
-    		MultivaluedMap<String, String> queryParams,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo,
     		String documentType,
     		String entityName) throws Exception {
-    	return this.createServiceContext(serviceName, input, queryParams);
+    	return this.createServiceContext(serviceName, input, resourceMap, uriInfo);
     }
 }

@@ -26,6 +26,7 @@
             	<xs:element name="csid" type="xs:string" />            
                 <!-- type of relationship between two entities -->
                 <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
+                <xs:element name="relationshipMetaType" type="xs:string" minOccurs="0"/>
                 <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
                 <!--- New Names -->
                 <xs:element name="subjectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentId1 -->

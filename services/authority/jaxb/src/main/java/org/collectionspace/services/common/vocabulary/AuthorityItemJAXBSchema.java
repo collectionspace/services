@@ -28,7 +28,7 @@ package org.collectionspace.services.common.vocabulary;
  */
 public interface AuthorityItemJAXBSchema {
 
-    final static String IN_AUTHORITY = "inAuthority";
+    final static String IN_AUTHORITY = "inAuthority"; // REM - Is this a CSID? Or a refname? Either?
     final static String REF_NAME = "refName";
     final static String ORDER = "order";
     final static String SHORT_IDENTIFIER = "shortIdentifier";

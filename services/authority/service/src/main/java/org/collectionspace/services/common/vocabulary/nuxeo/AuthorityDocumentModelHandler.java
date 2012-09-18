@@ -28,6 +28,7 @@ import java.util.Map;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.RefName.Authority;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -40,6 +41,8 @@ import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AuthorityDocumentModelHandler
@@ -50,6 +53,7 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 public abstract class AuthorityDocumentModelHandler<AuthCommon>
         extends DocHandlerBase<AuthCommon> {
 
+    private final Logger logger = LoggerFactory.getLogger(AuthorityDocumentModelHandler.class);	
     private String authorityCommonSchemaName;
 
     public AuthorityDocumentModelHandler(String authorityCommonSchemaName) {
@@ -112,17 +116,44 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
      */
     protected void updateRefnameForAuthority(DocumentWrapper<DocumentModel> wrapDoc, String schemaName) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        String shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
-        String displayName = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.DISPLAY_NAME);
-        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-        RefName.Authority authority = RefName.buildAuthority(ctx.getTenantName(),
-                ctx.getServiceName(),
-                shortIdentifier,
-                displayName);
+        RefName.Authority authority = (Authority) getRefName(getServiceContext(), docModel);
         String refName = authority.toString();
         docModel.setProperty(schemaName, AuthorityJAXBSchema.REF_NAME, refName);
     }
+    
+    @Override
+    public RefName.RefNameInterface getRefName(ServiceContext ctx,
+    		DocumentModel docModel) {
+    	RefName.RefNameInterface refname = null;
 
+    	try {
+	        String shortIdentifier = (String) docModel.getProperty(authorityCommonSchemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
+	        String displayName = (String) docModel.getProperty(authorityCommonSchemaName, AuthorityJAXBSchema.DISPLAY_NAME);
+	        RefName.Authority authority = RefName.Authority.buildAuthority(ctx.getTenantName(),
+	                ctx.getServiceName(),
+	                null,	// Only use shortId form!!!
+	                shortIdentifier,
+	                displayName);
+	        refname = authority;
+    	} catch (Exception e) {
+    		logger.error(e.getMessage(), e);
+    	}
+    	
+    	return refname;
+    }
+    
+    @Override
+    protected String getRefnameDisplayName(DocumentWrapper<DocumentModel> docWrapper) {
+    	String result = null;
+    	
+    	DocumentModel docModel = docWrapper.getWrappedObject();
+    	ServiceContext ctx = this.getServiceContext();
+    	RefName.Authority refname = (RefName.Authority)getRefName(ctx, docModel);
+    	result = refname.getDisplayName();
+    	
+    	return result;
+    }    
+    
     public String getShortIdentifier(String authCSID, String schemaName) throws Exception {
         String shortIdentifier = null;
         RepositoryInstance repoSession = null;

@@ -87,6 +87,11 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                	<service:SupportsHierarchy>true</service:SupportsHierarchy>
+                	<service:RefnameDisplayNameField> <!-- The field used as the display name in an object's refname -->
+	                    <service:element>objectNumber</service:element>
+	                    <service:xpath>objectNumber</service:xpath>
+                	</service:RefnameDisplayNameField>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>objectNumber</service:element>
@@ -1477,10 +1482,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -1542,6 +1543,13 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                	<service:SupportsHierarchy>true</service:SupportsHierarchy>
+                	<service:RefnameDisplayNameField>
+                        <service:ListResultField>
+                            <service:element>order</service:element>
+                            <service:xpath>order</service:xpath>
+                        </service:ListResultField>
+                	</service:RefnameDisplayNameField>
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <service:ListResultField>
@@ -1607,10 +1615,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -1673,6 +1677,7 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
@@ -1784,10 +1789,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -1847,6 +1848,7 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                	<service:SupportsHierarchy>true</service:SupportsHierarchy>
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <service:ListResultField>
@@ -1986,10 +1988,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -2042,6 +2040,7 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.location.nuxeo.LocationDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
@@ -2131,10 +2130,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -2187,6 +2182,7 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.place.nuxeo.PlaceDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
@@ -2314,10 +2310,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -2370,6 +2362,7 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.taxonomy.nuxeo.TaxonDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <!-- Uncomment when bug in returning list result values from complex types,
@@ -2500,10 +2493,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -2565,6 +2554,7 @@
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
                 <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:field>
                         <service:table>concepts_common</service:table>
                         <service:col>inauthority</service:col>
