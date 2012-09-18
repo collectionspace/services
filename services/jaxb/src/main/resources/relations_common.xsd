@@ -23,21 +23,23 @@
     <xs:element name="relations_common">
         <xs:complexType>
             <xs:sequence>
-            	<xs:element name="csid" type="xs:string" />            
+            	<xs:element name="csid" type="xs:string" />
+                        
+                <xs:element name="subjectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentId1 -->
+                <xs:element name="subjectDocumentType" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentType1 -->
+                <xs:element name="subjectUri" type="xs:string" minOccurs="1"/>
+                <xs:element name="subjectRefName" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+
                 <!-- type of relationship between two entities -->
                 <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
                 <xs:element name="relationshipMetaType" type="xs:string" minOccurs="0"/>
-                <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
-                <!--- New Names -->
-                <xs:element name="subjectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentId1 -->
-                <xs:element name="objectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentId2 -->
-                <xs:element name="subjectDocumentType" type="xs:string"  minOccurs="1" maxOccurs="1"/>     <!-- new name for documentType1 -->
-                <xs:element name="objectDocumentType" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentType2 -->
-                <xs:element name="subjectRefName" type="xs:string"  minOccurs="1" maxOccurs="1"/>
-                <xs:element name="objectRefName" type="xs:string"  minOccurs="1" maxOccurs="1"/>
                 <xs:element name="predicate" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>   <!-- new name for relationshipType -->
-                <xs:element name="subjectUri" type="xs:string" minOccurs="1"/>
+                <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
+                
+                <xs:element name="objectCsid" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentId2 -->
+                <xs:element name="objectDocumentType" type="xs:string"  minOccurs="1" maxOccurs="1"/>        <!-- new name for documentType2 -->
                 <xs:element name="objectUri" type="xs:string" minOccurs="1"/>
+                <xs:element name="objectRefName" type="xs:string"  minOccurs="1" maxOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
