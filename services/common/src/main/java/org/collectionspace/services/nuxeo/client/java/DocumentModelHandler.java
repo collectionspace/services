@@ -345,15 +345,6 @@ public abstract class DocumentModelHandler<T, TL>
             //
             documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
             		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI, getUri(documentModel));
-            //
-            // Add the resource's refname
-            //
-            RefNameInterface refname = getRefName(ctx, documentModel); // Sub-classes may override the getRefName() method called here.
-            if (refname != null) {
-            	String refnameStr = refname.toString();
-	            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
-	            		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME, refnameStr);
-            }
         	//
         	// Add the CSID to the DublinCore title so we can see the CSID in the default
         	// Nuxeo webapp.
@@ -367,6 +358,9 @@ public abstract class DocumentModelHandler<T, TL>
         					documentModel.getName());
         		}
         	}
+        	//
+        	// Add createdAt timestamp and createdBy user
+        	//
             documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
             		CollectionSpaceClient.COLLECTIONSPACE_CORE_CREATED_AT, now);
             documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
@@ -374,13 +368,25 @@ public abstract class DocumentModelHandler<T, TL>
     	}
     	
 		if (action == Action.CREATE || action == Action.UPDATE) {
+            //
+            // Add the resource's refname
+            //
+            RefNameInterface refname = getRefName(ctx, documentModel); // Sub-classes may override the getRefName() method called here.
+            if (refname != null) {
+            	String refnameStr = refname.toString();
+	            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+	            		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME, refnameStr);
+            }
+            //
+            // Add updatedAt timestamp and updateBy user
+            //
 			documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
 					CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT, now);
 			documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
 					CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_BY, userId);
-		}
+		}		
     }
-    
+        
     /*
      * If we see the "rtSbj" query param then we need to perform a CMIS query.  Currently, we have only one
      * CMIS query, but we could add more.  If we do, this method should look at the incoming request and corresponding

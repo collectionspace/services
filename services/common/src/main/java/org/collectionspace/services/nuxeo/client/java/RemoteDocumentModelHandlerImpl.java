@@ -225,8 +225,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
         
         if (supportsHierarchy() == true) {
-            handleRelationsPayload(wrapDoc, true);
-            handleItemRefNameReferenceUpdate();
+            handleRelationsPayload(wrapDoc, true); // refNames in relations payload should refer to pre-updated record refName value
+            handleItemRefNameReferenceUpdate(); // if our record's refName changed, we need to update all the references -including relations.
         }
     }
 
@@ -1391,7 +1391,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @throws Exception 
      */
     protected void handleItemRefNameReferenceUpdate() throws Exception {
-        if (newRefNameOnUpdate != null && oldRefNameOnUpdate != null) {
+        if (hasRefNameUpdate() == true) {
             // We have work to do.
             if (logger.isDebugEnabled()) {
                 String eol = System.getProperty("line.separator");
@@ -1409,6 +1409,24 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                 logger.debug("Updated " + nUpdated + " instances of oldRefName to newRefName");
             }
         }
+    }
+    
+    protected boolean hasRefNameUpdate() {
+    	return (newRefNameOnUpdate != null && oldRefNameOnUpdate != null);
+    }
+
+    protected String getRefNameUpdate() {
+    	String result = null;
+    	
+    	if (hasRefNameUpdate() == true) {
+    		result = newRefNameOnUpdate;
+    		if (logger.isDebugEnabled() == true) {
+    			logger.debug(String.format("There was a refName update.  New: %s Old: %s" ,
+    					newRefNameOnUpdate, oldRefNameOnUpdate));
+    		}
+    	}
+    	
+    	return result;
     }
     
     /*

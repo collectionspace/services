@@ -353,7 +353,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         }
         authItem.displayName = newDisplayName;
         String updatedRefName = authItem.toString();
-        docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, updatedRefName);
+        docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, updatedRefName); // Maybe set collectionspace_core schema here?
         return updatedRefName;
     }
     
