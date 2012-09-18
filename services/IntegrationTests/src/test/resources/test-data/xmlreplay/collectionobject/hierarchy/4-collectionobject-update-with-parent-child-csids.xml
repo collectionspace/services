@@ -27,7 +27,8 @@
                 <csid>${parentCSID}</csid>
                 <documentType>CollectionObject</documentType>
             </object>
-        </relation-list-item>
+            <relationshipMetaType>${relationshipMetaType}</relationshipMetaType>
+       </relation-list-item>
         
         <!-- Create a relationship between this item and a child -->
         <relation-list-item>

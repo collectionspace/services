@@ -94,7 +94,7 @@
             <vars>
                 <var ID="objectNumber">CSPACE-5518-WhiteRook</var>
                 <var ID="parentCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
-           </vars>
+            </vars>
             <expectedCodes>201</expectedCodes>
         </test>
         <test ID="ReadWhiteRook">
@@ -200,6 +200,7 @@
                 <var ID="objectNumber">CSPACE-5518-BagOfBlackChessPieces</var>
                 <var ID="parentCSID">${CreateChessSetBox.CSID}</var>
                 <var ID="childCSID">${CreateBlackQueen.CSID}</var>
+                <var ID="relationshipMetaType">Item in a set</var>
             </vars>
         </test>
         <test ID="ReadBagOfBlackChessPieces">
@@ -228,6 +229,7 @@
                 <var ID="parentCSID">${CreateBagOfBlackChessPieces.CSID}</var>
                 <var ID="child1CSID">${CreateBlackRookFragment1.CSID}</var>
                 <var ID="child2CSID">${CreateBlackRookFragment2.CSID}</var>
+                <var ID="relationshipMetaType">set</var>
             </vars>
             <expectedCodes>200</expectedCodes>
         </test>
@@ -431,7 +433,25 @@
                 </vars>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
-        </test>     
+        </test>
+        
+          
+        <!-- Verify that the value of the relationshipMetaType field was set -->
+        <!-- correctly and can be successfully retrieved -->
+        <test ID="GetRelationshipMetaType">
+            <method>GET</method>
+            <uri>/cspace-services/relations?sbj=${CreateBlackQueen.CSID}&amp;obj=${CreateBagOfBlackChessPieces.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/relationship-metatype.res.xml</filename>
+                <vars>
+                    <var ID="relationshipMetaType">${CreateBagOfBlackChessPieces.relationshipMetaType}</var>
+                    <var ID="parentCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                    <var ID="childCSID">${CreateBlackQueen.CSID}</var>
+                </vars>
+            </response>
+        </test>
     
         <!-- Clean up any remaining records that were NOT automatically deleted by autoDeletePOSTS -->
         
