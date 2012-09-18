@@ -103,6 +103,7 @@
                                     <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
                                     <xs:element name="predicate" type="xs:string" minOccurs="1"/>
                                     <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="relationshipMetaType" type="xs:string" minOccurs="1"/>
                                     <xs:element name="objectCsid" type="xs:string" minOccurs="1"/>
                                     <xs:element name="subject" type="relationsDocListItem" minOccurs="1"/>
                                     <xs:element name="object" type="relationsDocListItem" minOccurs="1"/>

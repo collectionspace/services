@@ -1048,6 +1048,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             rc.setObjectRefName(itemObject.getRefName());
 
             rc.setRelationshipType(item.getPredicate());
+            rc.setRelationshipMetaType(item.getRelationshipMetaType());
             //RelationshipType  foo = (RelationshipType.valueOf(item.getPredicate())) ;
             //rc.setPredicate(foo);     //this must be one of the type found in the enum in  services/jaxb/src/main/resources/relations_common.xsd
 

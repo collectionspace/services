@@ -46,6 +46,8 @@ public interface RelationJAXBSchema {
 	
 	/** The Constant RELATIONSHIP_TYPE_DISPLAYNAME. */
 	final static String RELATIONSHIP_TYPE_DISPLAYNAME = "predicateDisplayName";
+        
+        final static String RELATIONSHIP_META_TYPE = "relationshipMetaType";
 
     final static String SUBJECT_URI =		"subjectUri";
     final static String SUBJECT_CSID =		IRelationsManager.SUBJECT;
