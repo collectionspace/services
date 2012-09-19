@@ -52,6 +52,7 @@
                 <csid>${itemCSID}</csid>
                 <documentType>CollectionObject</documentType>
             </object>
+            <relationshipMetaType>${relationshipMetaType}</relationshipMetaType>
         </relation-list-item>
         
     </ns3:relations-common-list>

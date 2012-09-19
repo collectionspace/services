@@ -227,7 +227,7 @@ public class RelationDocumentModelHandler
     @Override
     public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc);
-        relList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object");
+        relList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|relationshipMetaType|objectCsid|uri|csid|subject|object");
         ServiceContext ctx = getServiceContext();
         String serviceContextPath = getServiceContextPath();
 
@@ -273,6 +273,8 @@ public class RelationDocumentModelHandler
         relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(), 
         												RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
 
+        relationListItem.setRelationshipMetaType((String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.RELATIONSHIP_META_TYPE));
         relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), 
         												RelationJAXBSchema.OBJECT_CSID));
 
