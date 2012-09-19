@@ -39,6 +39,7 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
@@ -204,9 +205,29 @@ public class RefNameServiceUtils {
             this.property = prop;
         }
     }
+    
     private static final Logger logger = LoggerFactory.getLogger(RefNameServiceUtils.class);
     private static ArrayList<String> refNameServiceTypes = null;
 
+    
+    public static void updateRefNamesInRelations(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
+            RepositoryInstance repoSession,
+            String oldRefName,
+            String newRefName) {
+    	//
+    	// First, look for and update all the places where the refName is the "subject" of the relationship
+    	//
+    	updateRefNamesInRelations(ctx, repoClient, repoSession, IRelationsManager.SUBJECT_REFNAME, oldRefName, newRefName);
+    	
+    	//
+    	// Next, look for and update all the places where the refName is the "object" of the relationship
+    	//
+    	updateRefNamesInRelations(ctx, repoClient, repoSession, IRelationsManager.OBJECT_REFNAME, oldRefName, newRefName);
+    	
+    }
+    
     public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
         List<String> authRefFields =
                 ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
@@ -355,6 +376,7 @@ public class RefNameServiceUtils {
         }
         return refNameServiceTypes;
     }
+    
     // Seems like a good value - no real data to set this well.
     // Note: can set this value lower during debugging; e.g. to 3 - ADR 2012-07-10
     private static final int N_OBJS_TO_UPDATE_PER_LOOP = 100;
@@ -379,7 +401,7 @@ public class RefNameServiceUtils {
         if (!(repoClient instanceof RepositoryJavaClientImpl)) {
             throw new InternalError("updateAuthorityRefDocs() called with unknown repoClient type!");
         }
-        try { // REM - How can we deal with transaction and timeout issues here.
+        try { // REM - How can we deal with transaction and timeout issues here?
             final int pageSize = N_OBJS_TO_UPDATE_PER_LOOP;
             DocumentModelList docList;
             boolean morePages = true;

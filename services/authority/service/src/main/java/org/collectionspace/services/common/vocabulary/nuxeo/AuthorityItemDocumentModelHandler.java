@@ -140,7 +140,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 	        refname = RefName.buildAuthorityItem(parentsRefName, shortIdentifier, displayName);
 	        // Now update the document model with the refname value
 	        String refNameStr = refname.toString();
-	        docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, refNameStr);
+	        docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, refNameStr); // REM - This field is deprecated now that the refName is part of the collection_space core schema
 
     	} catch (Exception e) {
     		logger.error(e.getMessage(), e);

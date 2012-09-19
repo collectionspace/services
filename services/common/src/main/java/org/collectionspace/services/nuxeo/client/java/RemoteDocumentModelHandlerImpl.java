@@ -1394,17 +1394,22 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         if (hasRefNameUpdate() == true) {
             // We have work to do.
             if (logger.isDebugEnabled()) {
-                String eol = System.getProperty("line.separator");
-                logger.debug("Need to find and update references to Item." + eol
-                        + "   Old refName" + oldRefNameOnUpdate + eol
+                final String EOL = System.getProperty("line.separator");
+                logger.debug("Need to find and update references to Item." + EOL
+                        + "   Old refName" + oldRefNameOnUpdate + EOL
                         + "   New refName" + newRefNameOnUpdate);
             }
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
-            RepositoryClient repoClient = getRepositoryClient(ctx);
-            String refNameProp = getRefPropName();
-
-            int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient, this.getRepositorySession(),
-                    oldRefNameOnUpdate, newRefNameOnUpdate, refNameProp);
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = getRepositoryClient(ctx);
+            
+            RepositoryInstance repoSession = this.getRepositorySession();
+            RefNameServiceUtils.updateRefNamesInRelations(ctx, repoClient, repoSession,
+                    oldRefNameOnUpdate, newRefNameOnUpdate);
+            
+            int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient, repoSession,
+                    oldRefNameOnUpdate, newRefNameOnUpdate, getRefPropName());
+            
+            // Finished so log a message.
             if (logger.isDebugEnabled()) {
                 logger.debug("Updated " + nUpdated + " instances of oldRefName to newRefName");
             }
