@@ -533,7 +533,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     @SuppressWarnings("unchecked")
 	private List<String> getPartialTermDisplayNameMatches(DocumentModel docModel, // REM - CSPACE-5133
 			String schema, ListResultField field, String partialTerm) {
-    	List<String> result = null;
+    	List<String> result = new ArrayList<String>();
     	  
     	String xpath = field.getXpath(); // results in something like "persons_common:personTermGroupList/[0]/termDisplayName"
     	int endOfTermGroup = xpath.lastIndexOf("/[0]/");
@@ -558,7 +558,9 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 					displayNameList.add(i - 1, termDisplayName);
 				}
 				
-				result = getPartialTermDisplayNameMatches(displayNameList, partialTerm);
+				// Commented out per CSPACE-5544 - ADR 2012-09-19
+				// result = getPartialTermDisplayNameMatches(displayNameList, partialTerm);
+                                result.addAll(displayNameList);
 			}
 		}
 

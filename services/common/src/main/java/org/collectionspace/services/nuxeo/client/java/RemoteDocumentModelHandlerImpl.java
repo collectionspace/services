@@ -825,17 +825,29 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 		
 		return result;
 	}
+        
+        protected String getStringValue(DocumentModel docModel,
+			String schema, ListResultField field) {
+		return(getStringValue(docModel, schema, field, null /* list delimiter */));
+	}
 	
 	protected String getStringValue(DocumentModel docModel,
-			String schema, ListResultField field) {
+			String schema, ListResultField field, String delimiter) {
 		String result = null;
 		
 		Object value = getListResultValue(docModel, schema, field);
-		if (value != null && value instanceof String) {
+		if (value != null) {
+                    if (value instanceof String) {
 			String strValue = (String) value;
 			if (strValue.trim().isEmpty() == false) {
 				result = strValue;
 			}
+                    } else if (value instanceof List) {
+                        List listValue = (List) value;
+                        if (listValue.isEmpty() == false) {
+                            result = Tools.join(listValue, delimiter);
+                        }
+                    }
 		}
 		
 		return result;

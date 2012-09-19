@@ -81,6 +81,8 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     protected static final String STANDARD_LIST_UPDATED_AT_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
     protected static final String STANDARD_LIST_WORKFLOW_FIELD = CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE;
     protected static final String STANDARD_LIST_MARK_RT_FIELD = "related";
+    
+    protected static final String LIST_ITEM_JOIN_DELIMITER = "__|__";
 
     @Override
     public AbstractCommonList getCommonPartList() {
@@ -252,7 +254,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 					if (schema == null || schema.trim().isEmpty()) {
 						schema = commonSchema;
 					}
-					Object value = getStringValue(docModel, schema, field);
+					Object value = getStringValue(docModel, schema, field, LIST_ITEM_JOIN_DELIMITER);
 					if (value != null) {
 						item.put(field.getElement(), value);
 					}
