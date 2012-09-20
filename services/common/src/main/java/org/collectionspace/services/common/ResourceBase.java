@@ -326,7 +326,7 @@ public abstract class ResourceBase
 
     protected AbstractCommonList finish_getList(ServiceContext ctx, DocumentHandler handler) {
         try {
-            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            getRepositoryClient(ctx).getFiltered(ctx, handler); // REM - Side effect of this call sets the handler's common part list value
             return (AbstractCommonList) handler.getCommonPartList();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);

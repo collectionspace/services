@@ -820,7 +820,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
-            repoSession = getRepositorySession(ctx); //Need a refcount here for the repository session?
+            repoSession = getRepositorySession(ctx); //Keeps a refcount here for the repository session so you need to release this when finished
             
             DocumentModelList docList = null;
             String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);

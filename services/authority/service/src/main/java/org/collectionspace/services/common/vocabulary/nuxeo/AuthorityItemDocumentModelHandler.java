@@ -37,6 +37,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
@@ -296,6 +297,43 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
 
     /*
+     * This method gets called after the primary update to an authority item has happened.  If the authority item's refName
+     * has changed, then we need to updated all the records that use that refname with the new/updated version
+     * 
+     * (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#completeUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// Must call our super class' version first
+    	super.completeUpdate(wrapDoc);
+    	
+    	//
+    	// Look for and update authority references with the updated refName
+    	//
+        if (hasRefNameUpdate() == true) {
+            // We have work to do.
+            if (logger.isDebugEnabled()) {
+                final String EOL = System.getProperty("line.separator");
+                logger.debug("Need to find and update references to authority item." + EOL
+                        + "   Old refName" + oldRefNameOnUpdate + EOL
+                        + "   New refName" + newRefNameOnUpdate);
+            }
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = getRepositoryClient(ctx);
+            RepositoryInstance repoSession = this.getRepositorySession();
+            
+            // Update all the existing records that have a field with the old refName in it
+            int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient, repoSession,
+                    oldRefNameOnUpdate, newRefNameOnUpdate, getRefPropName());
+            
+            // Finished so log a message.
+            if (logger.isDebugEnabled()) {
+                logger.debug("Updated " + nUpdated + " instances of oldRefName to newRefName");
+            }
+        }
+    }
+    
+    /*
      * Note that the Vocabulary service's document-model for items overrides this method.
      */
 	protected String getPrimaryDisplayName(DocumentModel docModel, String schema,
@@ -311,50 +349,15 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
+    // FIXME: Once we remove the refName field from the authority item schemas, we can remove this override method since our super does everthing for us now.
+    @Deprecated
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        // First, get a copy of the old displayName
-        // oldDisplayNameOnUpdate = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
-        //        AuthorityItemJAXBSchema.DISPLAY_NAME);
-        oldDisplayNameOnUpdate = getPrimaryDisplayName(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
-                getItemTermInfoGroupXPathBase(), AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-        oldRefNameOnUpdate = (String) wrapDoc.getWrappedObject().getProperty(authorityItemCommonSchemaName,
-                AuthorityItemJAXBSchema.REF_NAME);
+    	// Must call our super's version first, this updates the core schema and the relationship records to deal with possible refName changes/update
         super.handleUpdate(wrapDoc);
-
-        // Now, check the new display and handle the refname update.
-        String newDisplayName = (String) getPrimaryDisplayName(wrapDoc.getWrappedObject(), authorityItemCommonSchemaName,
-                authorityItemTermGroupXPathBase,
-                AuthorityItemJAXBSchema.TERM_DISPLAY_NAME);
-        if (newDisplayName != null && !newDisplayName.equals(oldDisplayNameOnUpdate)) {
-            // Need to update the refName, and then fix all references.
-            newRefNameOnUpdate = handleItemRefNameUpdateForDisplayName(wrapDoc.getWrappedObject(), newDisplayName);
-        } else {
-            // Mark as not needing attention in completeUpdate phase.
-            newRefNameOnUpdate = null;
-            oldRefNameOnUpdate = null;
+        if (this.hasRefNameUpdate() == true) {
+        	DocumentModel docModel = wrapDoc.getWrappedObject();
+            docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, this.newRefNameOnUpdate); // This field is deprecated since it is now a duplicate of what is in the collectionspace_core:refName field        	
         }
-    }
-
-    /**
-     * Handle refName updates for changes to display name.
-     * Assumes refName is already correct. Just ensures it is right.
-     *
-     * @param docModel the doc model
-     * @param newDisplayName the new display name
-     * @throws Exception the exception
-     */
-    protected String handleItemRefNameUpdateForDisplayName(DocumentModel docModel,
-            String newDisplayName) throws Exception {
-        RefName.AuthorityItem authItem = RefName.AuthorityItem.parse(oldRefNameOnUpdate);
-        if (authItem == null) {
-            String err = "Authority Item has illegal refName: " + oldRefNameOnUpdate;
-            logger.debug(err);
-            throw new IllegalArgumentException(err);
-        }
-        authItem.displayName = newDisplayName;
-        String updatedRefName = authItem.toString();
-        docModel.setProperty(authorityItemCommonSchemaName, AuthorityItemJAXBSchema.REF_NAME, updatedRefName); // Maybe set collectionspace_core schema here?
-        return updatedRefName;
     }
     
     /**

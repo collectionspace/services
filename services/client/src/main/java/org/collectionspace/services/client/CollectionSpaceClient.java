@@ -37,14 +37,30 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P extends CollectionSpaceProxy<CLT>> {
 
     public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
+    
     public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
+    public final static String CORE_TENANTID = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_TENANTID;
+    
     public final static String COLLECTIONSPACE_CORE_URI = "uri";
+    public final static String CORE_URI = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_URI;    
+    
     public final static String COLLECTIONSPACE_CORE_REFNAME = "refName";
+    public final static String CORE_REFNAME = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_REFNAME;
+    
     public final static String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
+    public final static String CORE_CREATED_AT = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_CREATED_AT;
+    
     public final static String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
+    public final static String CORE_UPDATED_AT = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_UPDATED_AT;
+    
     public final static String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
+    public final static String CORE_CREATED_BY = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_CREATED_BY;
+
     public final static String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
+    public final static String CORE_UPDATED_BY = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_UPDATED_BY;
+
     public final static String COLLECTIONSPACE_CORE_WORKFLOWSTATE = "workflowState";
+    public final static String CORE_WORKFLOWSTATE = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_WORKFLOWSTATE;
     
     public static final String AUTH_PROPERTY = "cspace.auth";
     public static final String PASSWORD_PROPERTY = "cspace.password";
