@@ -24,14 +24,19 @@
 package org.collectionspace.services.common.api;
 
 import java.io.File;
-import  java.util.regex.Pattern;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** General utility methods.
  *   @author Laramie Crocker
  * v.1.4
  */
 public class Tools {
+    
+    public final static String DEFAULT_LIST_ITEM_DELIMITER = ",";
+    
     /** @return first glued to second with the separator string, at most one time - useful for appending paths.
      */
     public static String glue(String first, String separator, String second){
@@ -152,6 +157,24 @@ public class Tools {
             file = file.substring(1);
         }
         return dir + file;
+    }
+    
+    public static String join(List list, String delimiter){
+        String result = "";
+        if (list == null || list.isEmpty()) {
+            return result;
+        }
+        if (isEmpty(delimiter)) {
+            delimiter = DEFAULT_LIST_ITEM_DELIMITER;
+        }
+        Iterator it = list.iterator();
+        StringBuilder sb = new StringBuilder();
+        sb.append(it.next());
+        while (it.hasNext()) {
+            sb.append(delimiter);
+            sb.append(it.next());
+        }
+        return sb.toString();
     }
 
     public static String getStackTrace(Throwable e){
