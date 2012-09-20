@@ -233,6 +233,7 @@
             <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
             <filename>collectionobject/hierarchy/7-collectionobject-update-with-parent-child-refnames.xml</filename>
             <vars>
+                <var ID="objectNumber">CSPACE-5518-BlackRook</var>
                 <var ID="distinguishingFeatures">This black rook is nearly intact, save for two tiny fragments.</var>
                 <var ID="currentItemCSID">${CreateBlackRook.CSID}</var>
                 <var ID="currentItemObjectNumber">${CreateBlackRook.objectNumber}</var>

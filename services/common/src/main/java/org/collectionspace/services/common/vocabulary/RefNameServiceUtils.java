@@ -39,6 +39,8 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
@@ -60,6 +62,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.relation.RelationUtils;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
@@ -67,7 +70,6 @@ import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * RefNameServiceUtils is a collection of services utilities related to refName
@@ -204,9 +206,27 @@ public class RefNameServiceUtils {
             this.property = prop;
         }
     }
+    
     private static final Logger logger = LoggerFactory.getLogger(RefNameServiceUtils.class);
     private static ArrayList<String> refNameServiceTypes = null;
 
+    public static void updateRefNamesInRelations(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
+            RepositoryInstance repoSession,
+            String oldRefName,
+            String newRefName) {
+    	//
+    	// First, look for and update all the places where the refName is the "subject" of the relationship
+    	//
+    	RelationUtils.updateRefNamesInRelations(ctx, repoClient, repoSession, IRelationsManager.SUBJECT_REFNAME, oldRefName, newRefName);
+    	
+    	//
+    	// Next, look for and update all the places where the refName is the "object" of the relationship
+    	//
+    	RelationUtils.updateRefNamesInRelations(ctx, repoClient, repoSession, IRelationsManager.OBJECT_REFNAME, oldRefName, newRefName);
+    }
+    
     public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
         List<String> authRefFields =
                 ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
@@ -355,6 +375,7 @@ public class RefNameServiceUtils {
         }
         return refNameServiceTypes;
     }
+    
     // Seems like a good value - no real data to set this well.
     // Note: can set this value lower during debugging; e.g. to 3 - ADR 2012-07-10
     private static final int N_OBJS_TO_UPDATE_PER_LOOP = 100;
@@ -374,12 +395,13 @@ public class RefNameServiceUtils {
         int currentPage = 0;
         int docsInCurrentPage = 0;
         final String WHERE_CLAUSE_ADDITIONS_VALUE = null;
-        final String ORDER_BY_VALUE = "collectionspace_core:createdAt";
+        final String ORDER_BY_VALUE = CollectionSpaceClient.CORE_CREATED_AT; // "collectionspace_core:createdAt";
 
-        if (!(repoClient instanceof RepositoryJavaClientImpl)) {
+        if (repoClient instanceof RepositoryJavaClientImpl == false) {
             throw new InternalError("updateAuthorityRefDocs() called with unknown repoClient type!");
         }
-        try { // REM - How can we deal with transaction and timeout issues here.
+        
+        try { // REM - How can we deal with transaction and timeout issues here?
             final int pageSize = N_OBJS_TO_UPDATE_PER_LOOP;
             DocumentModelList docList;
             boolean morePages = true;
@@ -404,10 +426,10 @@ public class RefNameServiceUtils {
                     morePages = false;
                 }
 
-                int nRefsFoundThisPage = processRefObjsDocList(docList, ctx.getTenantId(), oldRefName, queriedServiceBindings, authRefFieldsByService,
+                int nRefsFoundThisPage = processRefObjsDocList(docList, ctx.getTenantId(), oldRefName, queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
                         null, newRefName);
                 if (nRefsFoundThisPage > 0) {
-                    ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true);
+                    ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true); // Flush the document model list out to Nuxeo storage
                     nRefsFound += nRefsFoundThisPage;
                 }
 
@@ -456,7 +478,7 @@ public class RefNameServiceUtils {
 
         ArrayList<String> docTypes = new ArrayList<String>();
 
-        String query = computeWhereClauseForAuthorityRefDocs(refName, refPropName, docTypes, servicebindings,
+        String query = computeWhereClauseForAuthorityRefDocs(refName, refPropName, docTypes, servicebindings, // REM - Side effect that docTypes array gets set.  Any others?
                 queriedServiceBindings, authRefFieldsByService);
         if (query == null) { // found no authRef fields - nothing to query
             return null;
@@ -534,7 +556,7 @@ public class RefNameServiceUtils {
      * Runs through the list of found docs, processing them. If list is
      * non-null, then processing means gather the info for items. If list is
      * null, and newRefName is non-null, then processing means replacing and
-     * updating. If processing/updating, this must be called in teh context of
+     * updating. If processing/updating, this must be called in the context of
      * an open session, and caller must release Session after calling this.
      *
      */
@@ -630,7 +652,7 @@ public class RefNameServiceUtils {
 
             ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps = new ArrayList<RefNameServiceUtils.AuthRefInfo>();
             try {
-                findAuthRefPropertiesInDoc(docModel, matchingAuthRefFields, refName, foundProps);
+                findAuthRefPropertiesInDoc(docModel, matchingAuthRefFields, refName, foundProps); // REM - side effect that foundProps is set
                 for (RefNameServiceUtils.AuthRefInfo ari : foundProps) {
                     if (ilistItem != null) {
                         if (nRefsFoundInDoc == 0) {    // First one?

@@ -37,6 +37,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefName.RefNameInterface;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
@@ -79,6 +80,9 @@ public abstract class DocumentModelHandler<T, TL>
     private final Logger logger = LoggerFactory.getLogger(DocumentModelHandler.class);
     private RepositoryInstance repositorySession;
 
+    protected String oldRefNameOnUpdate = null;
+    protected String newRefNameOnUpdate = null;
+    
     /*
      * Map Nuxeo's life cycle object to our JAX-B based life cycle object
      */
@@ -369,14 +373,9 @@ public abstract class DocumentModelHandler<T, TL>
     	
 		if (action == Action.CREATE || action == Action.UPDATE) {
             //
-            // Add the resource's refname
+            // Add/update the resource's refname
             //
-            RefNameInterface refname = getRefName(ctx, documentModel); // Sub-classes may override the getRefName() method called here.
-            if (refname != null) {
-            	String refnameStr = refname.toString();
-	            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
-	            		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME, refnameStr);
-            }
+			handleRefNameChanges(ctx, documentModel);
             //
             // Add updatedAt timestamp and updateBy user
             //
@@ -385,6 +384,38 @@ public abstract class DocumentModelHandler<T, TL>
 			documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
 					CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_BY, userId);
 		}		
+    }
+    
+    protected boolean hasRefNameUpdate() {
+    	boolean result = false;
+    	
+    	if (Tools.notBlank(newRefNameOnUpdate) && Tools.notBlank(oldRefNameOnUpdate)) {
+    		if (newRefNameOnUpdate.equalsIgnoreCase(oldRefNameOnUpdate) == false) {
+    			result = true; // refNames are different so updates are needed
+    		}
+    	}
+    	
+    	return result;
+    }
+    
+    private void handleRefNameChanges(ServiceContext ctx, DocumentModel docModel) throws ClientException {
+    	// First get the old refName
+    	this.oldRefNameOnUpdate = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+            		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
+    	// Next, get the new refName
+        RefNameInterface refName = getRefName(ctx, docModel); // Sub-classes may override the getRefName() method called here.
+        if (refName != null) {
+        	this.newRefNameOnUpdate = refName.toString();
+        } else {
+        	logger.error(String.format("refName for document is missing.  Document CSID=%s", docModel.getName()));
+        }
+        //
+        // Set the refName if it is an update or if the old refName was empty or null
+        //
+        if (hasRefNameUpdate() == true || this.oldRefNameOnUpdate == null) {
+	        docModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+	        		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME, this.newRefNameOnUpdate);
+        }
     }
         
     /*

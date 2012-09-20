@@ -26,6 +26,8 @@
  */
 package org.collectionspace.services.common.relation;
 
+import org.collectionspace.services.client.IRelationsManager;
+
 /**
  * The Interface RelationJAXBSchema.
  */
@@ -48,13 +50,13 @@ public interface RelationJAXBSchema {
         final static String RELATIONSHIP_META_TYPE = "relationshipMetaType";
 
     final static String SUBJECT_URI =		"subjectUri";
-    final static String SUBJECT_CSID =		"subjectCsid";
-    final static String SUBJECT_REFNAME =	"subjectRefName";
+    final static String SUBJECT_CSID =		IRelationsManager.SUBJECT;
+    final static String SUBJECT_REFNAME =	IRelationsManager.SUBJECT_REFNAME;
     final static String SUBJECT_DOCTYPE =	"subjectDocumentType";
 
     final static String OBJECT_URI =		"objectUri";
-    final static String OBJECT_CSID =		"objectCsid";
-    final static String OBJECT_REFNAME =	"objectRefName";
+    final static String OBJECT_CSID =		IRelationsManager.OBJECT;
+    final static String OBJECT_REFNAME =	IRelationsManager.OBJECT_REFNAME;
     final static String OBJECT_DOCTYPE =	"objectDocumentType";
 
 }

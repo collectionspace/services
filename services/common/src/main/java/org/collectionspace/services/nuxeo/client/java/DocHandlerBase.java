@@ -228,17 +228,23 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 				DocumentModel docModel = iter.next();
 				String id = NuxeoUtils.getCsid(docModel);
 				item.put(STANDARD_LIST_CSID_FIELD, id);
-		        if(markRtSbj!=null) {
-		            String relationClause = RelationsUtils.buildWhereClause(markRtSbj, null, null, id, null);
-		            String whereClause = relationClause + IQueryManager.SEARCH_QUALIFIER_AND + 
-		            						NuxeoUtils.buildWorkflowNotDeletedWhereClause();
-		            QueryContext queryContext = new QueryContext(sc, whereClause);
-		            queryContext.setDocType(IRelationsManager.DOC_TYPE);
-		            String query = NuxeoUtils.buildNXQLQuery(sc, queryContext);
-		            // Search for 1 relation that matches. 1 is enough to fail the filter
-		            DocumentModelList docList = repoSession.query(query, null, 1, 0, false);
-	            	item.put(STANDARD_LIST_MARK_RT_FIELD, docList.isEmpty()?"false":"true");
-		        }
+				if (markRtSbj != null) {
+					String relationClause = RelationsUtils.buildWhereClause(
+							markRtSbj, null, null, id, null);
+					String whereClause = relationClause
+							+ IQueryManager.SEARCH_QUALIFIER_AND
+							+ NuxeoUtils.buildWorkflowNotDeletedWhereClause();
+					QueryContext queryContext = new QueryContext(sc,
+							whereClause);
+					queryContext.setDocType(IRelationsManager.DOC_TYPE);
+					String query = NuxeoUtils.buildNXQLQuery(sc, queryContext);
+					// Search for 1 relation that matches. 1 is enough to fail
+					// the filter
+					DocumentModelList docList = repoSession.query(query, null,
+							1, 0, false);
+					item.put(STANDARD_LIST_MARK_RT_FIELD,
+							docList.isEmpty() ? "false" : "true");
+				}
 				String uri = getUri(docModel);
 				item.put(STANDARD_LIST_URI_FIELD, uri);
 				item.put(STANDARD_LIST_REFNAME_FIELD, getRefname(docModel));
@@ -246,13 +252,19 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
 						getUpdatedAtAsString(docModel));
 				item.put(STANDARD_LIST_WORKFLOW_FIELD,
 						docModel.getCurrentLifeCycleState());
-	
+
 				for (ListResultField field : resultsFields) {
 					String schema = field.getSchema();
 					if (schema == null || schema.trim().isEmpty()) {
 						schema = commonSchema;
 					}
-					Object value = getStringValue(docModel, schema, field);
+					Object value = getListResultValue(docModel, schema, field);
+					if (value != null && value instanceof String) { // If it is String that is either null or empty, we set our value to null
+						String strValue = (String) value;
+						if (strValue.trim().isEmpty() == true) {
+							value = null; // We found an "empty" string value, so just set the value to null so we don't return anything.
+						}
+					}
 					if (value != null) {
 						item.put(field.getElement(), value);
 					}

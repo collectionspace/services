@@ -104,9 +104,6 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RemoteDocumentModelHandlerImpl.class);
     private final static String CR = "\r\n";
-
-    protected String oldRefNameOnUpdate = null;
-    protected String newRefNameOnUpdate = null;
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#setServiceContext(org.collectionspace.services.common.context.ServiceContext)
@@ -187,13 +184,15 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         }
     }
 	
-    /* (non-Javadoc)
+    /* NOTE: The authority item doc handler overrides (after calling) this method.  It performs refName updates.  In this
+     * method we just update any and all relationship records that use refNames that have changed.
+     * (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#completeUpdate(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
     public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        //return at least those document part(s) that were received
+        // We need to return at least those document part(s) and corresponding payloads that were received
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         PoxPayloadIn input = ctx.getInput();
@@ -223,10 +222,12 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         				docModel.getName());
         	}
         }
-        
+        //
+        //  If the resource's service supports hierarchy then we need to perform a little more work
+        //
         if (supportsHierarchy() == true) {
             handleRelationsPayload(wrapDoc, true); // refNames in relations payload should refer to pre-updated record refName value
-            handleItemRefNameReferenceUpdate(); // if our record's refName changed, we need to update all the references -including relations.
+            handleRefNameReferencesUpdate(); // if our refName changed, we need to update any and all relationship records that used the old one
         }
     }
 
@@ -1388,34 +1389,21 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 
     /**
      * Checks to see if the refName has changed, and if so, 
-     * uses utilities to find all references and update them.
+     * uses utilities to find all references and update them to use the new refName.
      * @throws Exception 
      */
-    protected void handleItemRefNameReferenceUpdate() throws Exception {
+    protected void handleRefNameReferencesUpdate() throws Exception {
         if (hasRefNameUpdate() == true) {
-            // We have work to do.
-            if (logger.isDebugEnabled()) {
-                String eol = System.getProperty("line.separator");
-                logger.debug("Need to find and update references to Item." + eol
-                        + "   Old refName" + oldRefNameOnUpdate + eol
-                        + "   New refName" + newRefNameOnUpdate);
-            }
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
-            RepositoryClient repoClient = getRepositoryClient(ctx);
-            String refNameProp = getRefPropName();
-
-            int nUpdated = RefNameServiceUtils.updateAuthorityRefDocs(ctx, repoClient, this.getRepositorySession(),
-                    oldRefNameOnUpdate, newRefNameOnUpdate, refNameProp);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Updated " + nUpdated + " instances of oldRefName to newRefName");
-            }
+            RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = getRepositoryClient(ctx);
+            RepositoryInstance repoSession = this.getRepositorySession();
+            
+            // Update all the relationship records that referred to the old refName
+            RefNameServiceUtils.updateRefNamesInRelations(ctx, repoClient, repoSession,
+                    oldRefNameOnUpdate, newRefNameOnUpdate);
         }
     }
     
-    protected boolean hasRefNameUpdate() {
-    	return (newRefNameOnUpdate != null && oldRefNameOnUpdate != null);
-    }
-
     protected String getRefNameUpdate() {
     	String result = null;
     	
