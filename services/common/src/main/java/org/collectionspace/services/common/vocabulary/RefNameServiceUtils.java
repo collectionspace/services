@@ -426,10 +426,10 @@ public class RefNameServiceUtils {
                     morePages = false;
                 }
 
-                int nRefsFoundThisPage = processRefObjsDocList(docList, ctx.getTenantId(), oldRefName, queriedServiceBindings, authRefFieldsByService,
+                int nRefsFoundThisPage = processRefObjsDocList(docList, ctx.getTenantId(), oldRefName, queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
                         null, newRefName);
                 if (nRefsFoundThisPage > 0) {
-                    ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true);
+                    ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true); // Flush the document model list out to Nuxeo storage
                     nRefsFound += nRefsFoundThisPage;
                 }
 
@@ -556,7 +556,7 @@ public class RefNameServiceUtils {
      * Runs through the list of found docs, processing them. If list is
      * non-null, then processing means gather the info for items. If list is
      * null, and newRefName is non-null, then processing means replacing and
-     * updating. If processing/updating, this must be called in teh context of
+     * updating. If processing/updating, this must be called in the context of
      * an open session, and caller must release Session after calling this.
      *
      */

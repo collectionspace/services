@@ -1057,7 +1057,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             boolean fSaveSession)
             throws ClientException, DocumentException {
         try {
-            repoSession = getRepositorySession(ctx);
             DocumentModel[] docModelArray = new DocumentModel[docList.size()];
             repoSession.saveDocuments(docList.toArray(docModelArray));
             if (fSaveSession) {

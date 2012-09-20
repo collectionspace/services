@@ -121,6 +121,7 @@ public class CommonList extends AbstractCommonList {
 				el.setTextContent((String)value);
 				anyList.add(el);
 			} else if (value instanceof List<?>) {
+				@SuppressWarnings("unchecked") // We expect and assume String values only here
 				List<String> valueList = (List<String>)value;
 				for (String val : valueList) {
 					addItem(anyList, key, val);
