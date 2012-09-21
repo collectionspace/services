@@ -2545,6 +2545,7 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.concept.nuxeo.ConceptDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
@@ -2554,7 +2555,6 @@
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
                 <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
                 <service:params>
-                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:field>
                         <service:table>concepts_common</service:table>
                         <service:col>inauthority</service:col>
