@@ -1225,8 +1225,11 @@ public class DocumentUtils {
 				Object value = getElementData(element, field.getType(), ctx);
 				data.put(name, value);
 			} else	{
-				if (logger.isDebugEnabled() == true) {
-					logger.debug("Invalid input document. No such property was found [" +
+                            // FIXME: substitute an appropriate constant for "csid" below.
+                            // One potential class to which to add that constant, if it is not already
+                            // declared, might be AbstractCollectionSpaceResourceImpl - ADR 2012-09-24
+                            if (! name.equals("csid")) { // 'csid' elements in input payloads can be safely ignored. 
+                                logger.warn("Invalid input document. No such property was found [" +
 							name + "] in schema " + schemaName);
 				}
 			}
