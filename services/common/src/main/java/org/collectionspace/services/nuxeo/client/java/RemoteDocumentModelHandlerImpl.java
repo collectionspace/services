@@ -104,6 +104,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RemoteDocumentModelHandlerImpl.class);
     private final static String CR = "\r\n";
+    private final static String EMPTYSTR = "";
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#setServiceContext(org.collectionspace.services.common.context.ServiceContext)
@@ -1082,6 +1083,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         RelationsDocListItem subj2 = item2.getSubject();
         RelationsDocListItem obj1 = item1.getObject();
         RelationsDocListItem obj2 = item2.getObject();
+        
         String subj1Csid = subj1.getCsid();
         String subj2Csid = subj2.getCsid();
         String subj1RefName = subj1.getRefName();
@@ -1091,16 +1093,22 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         String obj2Csid = obj2.getCsid();
         String obj1RefName = obj1.getRefName();
         String obj2RefName = obj2.getRefName();
-
-        boolean isEqual = 
-        		   (subj1Csid.equals(subj2Csid) || ((subj2Csid==null)  && subj1RefName.equals(subj2RefName)))
+        
+        String item1Metatype = item1.getRelationshipMetaType();
+        item1Metatype = item1Metatype != null ? item1Metatype : EMPTYSTR;
+        
+        String item2Metatype = item2.getRelationshipMetaType();
+        item2Metatype = item2Metatype != null ? item2Metatype : EMPTYSTR;
+        
+        boolean isEqual = (subj1Csid.equals(subj2Csid) || ((subj2Csid==null)  && subj1RefName.equals(subj2RefName)))
                 && (obj1Csid.equals(obj1Csid)   || ((obj2Csid==null)   && obj1RefName.equals(obj2RefName)))
                 // predicate is proper, but still allow relationshipType
                 && (item1.getPredicate().equals(item2.getPredicate())
                 	||  ((item2.getPredicate()==null)  && item1.getRelationshipType().equals(item2.getRelationshipType())))
                 // Allow missing docTypes, so long as they do not conflict
                 && (obj1.getDocumentType().equals(obj2.getDocumentType()) || obj2.getDocumentType()==null)
-                && (subj1.getDocumentType().equals(subj2.getDocumentType()) || subj2.getDocumentType()==null);
+                && (subj1.getDocumentType().equals(subj2.getDocumentType()) || subj2.getDocumentType()==null)
+                && (item1Metatype.equalsIgnoreCase(item2Metatype));
         return isEqual;
     }
     
