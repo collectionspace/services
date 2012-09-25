@@ -7,8 +7,8 @@
             Tests that updates of the display name field for CollectionObject
             records are reflected
             
-            By default in the current demo tenants, the the objectNumber field
-            is configured in services tenant bindings as the display name field:
+            By default in the current demo tenants, the objectNumber field is
+            configured in services tenant bindings as the display name field:
             
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
