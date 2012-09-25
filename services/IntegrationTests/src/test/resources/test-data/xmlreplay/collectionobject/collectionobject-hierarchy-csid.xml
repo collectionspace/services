@@ -94,7 +94,7 @@
             <vars>
                 <var ID="objectNumber">CSPACE-5518-WhiteRook</var>
                 <var ID="parentCSID">${CreateBagOfWhiteChessPieces.CSID}</var>
-           </vars>
+            </vars>
             <expectedCodes>201</expectedCodes>
         </test>
         <test ID="ReadWhiteRook">
@@ -200,6 +200,7 @@
                 <var ID="objectNumber">CSPACE-5518-BagOfBlackChessPieces</var>
                 <var ID="parentCSID">${CreateChessSetBox.CSID}</var>
                 <var ID="childCSID">${CreateBlackQueen.CSID}</var>
+                <var ID="relationshipMetaType">Item in a set</var>
             </vars>
         </test>
         <test ID="ReadBagOfBlackChessPieces">
@@ -228,10 +229,60 @@
                 <var ID="parentCSID">${CreateBagOfBlackChessPieces.CSID}</var>
                 <var ID="child1CSID">${CreateBlackRookFragment1.CSID}</var>
                 <var ID="child2CSID">${CreateBlackRookFragment2.CSID}</var>
+                <var ID="relationshipMetaType">set</var>
             </vars>
             <expectedCodes>200</expectedCodes>
         </test>
         
+        <!-- Verify that the value of the relationshipMetaType field was set -->
+        <!-- correctly and can be successfully retrieved -->
+        <test ID="GetRelationshipMetaTypeWithSetValue">
+            <method>GET</method>
+            <uri>/cspace-services/relations?sbj=${CreateBlackRook.CSID}&amp;obj=${CreateBagOfBlackChessPieces.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/relationship-metatype.res.xml</filename>
+                <vars>
+                    <var ID="relationshipMetaType">${UpdateBlackRookWithRelations.relationshipMetaType}</var>
+                    <var ID="parentCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                    <var ID="childCSID">${CreateBlackRook.CSID}</var>
+                </vars>
+            </response>
+        </test>
+        
+        <!-- Update the relationship metatype with a different value, but keep the relationships the same -->
+        <test ID="UpdateBlackRooksRelationsWithDiffMetatype">
+            <method>PUT</method>
+            <uri>/cspace-services/collectionobjects/${CreateBlackRook.CSID}</uri>
+            <filename>collectionobject/hierarchy/4-collectionobject-update-with-parent-child-csids.xml</filename>
+            <vars>
+                <var ID="distinguishingFeatures">This black rook is nearly intact, save for two tiny fragments.</var>
+                <var ID="currentItemCSID">${CreateBlackRook.CSID}</var>
+                <var ID="parentCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                <var ID="child1CSID">${CreateBlackRookFragment1.CSID}</var>
+                <var ID="child2CSID">${CreateBlackRookFragment2.CSID}</var>
+                <var ID="relationshipMetaType">derivative</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!-- Verify that the value of the relationshipMetaType field was set -->
+        <!-- correctly and can be successfully retrieved -->
+        <test ID="GetRelationshipMetaTypeWithDerivativeValue">
+            <method>GET</method>
+            <uri>/cspace-services/relations?sbj=${CreateBlackRook.CSID}&amp;obj=${CreateBagOfBlackChessPieces.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="ADDOK" />
+                <filename>collectionobject/hierarchy/res/relationship-metatype.res.xml</filename>
+                <vars>
+                    <var ID="relationshipMetaType">${UpdateBlackRooksRelationsWithDiffMetatype.relationshipMetaType}</var>
+                    <var ID="parentCSID">${CreateBagOfBlackChessPieces.CSID}</var>
+                    <var ID="childCSID">${CreateBlackRook.CSID}</var>
+                </vars>
+            </response>
+        </test>
     
         <!--
             Read hierarchical relations via three query parameters now
@@ -431,7 +482,9 @@
                 </vars>
                 <startElement>/document/*[local-name()='relations-common-list']</startElement>
             </response>
-        </test>     
+        </test>
+        
+          
     
         <!-- Clean up any remaining records that were NOT automatically deleted by autoDeletePOSTS -->
         

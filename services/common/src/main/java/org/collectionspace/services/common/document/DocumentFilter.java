@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.common.context.ServiceContext;
 
@@ -43,7 +44,8 @@ public class DocumentFilter {
     /** The order by clause. */
     protected String orderByClause;	// Filtering clause. Omit the "ORDER BY".
     public static final String EMPTY_ORDER_BY_CLAUSE = "";
-    public static final String ORDER_BY_LAST_UPDATED = "collectionspace_core:updatedAt DESC";
+    public static final String ORDER_BY_LAST_UPDATED = CollectionSpaceClient.CORE_UPDATED_AT + " DESC";
+    public static final String ORDER_BY_CREATED_AT = CollectionSpaceClient.CORE_CREATED_AT + " DESC";
     /** The start page. */
     protected int startPage;		// Pagination offset for list results
     /** The page size. */

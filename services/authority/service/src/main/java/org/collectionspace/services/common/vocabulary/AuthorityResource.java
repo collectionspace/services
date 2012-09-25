@@ -276,8 +276,10 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
 		return tempResult.CSID;
 	}
 
-    private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(String parentspecifier,
-    		String method, String op,
+    private CsidAndShortIdentifier lookupParentCSIDAndShortIdentifer(
+    		String parentspecifier,
+    		String method,
+    		String op,
     		UriInfo uriInfo)
             throws Exception {
         CsidAndShortIdentifier result = new CsidAndShortIdentifier();
@@ -526,7 +528,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     public Response createAuthorityItem(
     		@Context ResourceMap resourceMap,
     		@Context UriInfo uriInfo, 
-    		@PathParam("csid") String specifier,
+    		@PathParam("csid") String parentspecifier,
     		String xmlPayload) {
     	Response result = null;
     	
@@ -535,7 +537,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input, resourceMap, uriInfo);
 
             // Note: must have the parentShortId, to do the create.
-            CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(specifier, "createAuthorityItem", "CREATE_ITEM", null);
+            CsidAndShortIdentifier parent = lookupParentCSIDAndShortIdentifer(parentspecifier, "createAuthorityItem", "CREATE_ITEM", null);
             DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = 
             	createItemDocumentHandler(ctx, parent.CSID, parent.shortIdentifier);
             String itemcsid = getRepositoryClient(ctx).create(ctx, handler);
@@ -859,7 +861,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     @Path("{csid}/items/{itemcsid}")
     public byte[] updateAuthorityItem(
     		@Context ResourceMap resourceMap, 
-            @Context UriInfo ui,
+            @Context UriInfo uriInfo,
             @PathParam("csid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
             String xmlPayload) {
@@ -867,16 +869,16 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
             // Note that we have to create the service context for the Items, not the main service
-            //Laramie CSPACE-3175.  passing null for queryParams, because prior to this refactor, the code moved to lookupParentCSID in this instance called the version of getServiceContext() that passes null
-            String parentcsid = lookupParentCSID(parentspecifier, "updateAuthorityItem(parent)", "UPDATE_ITEM", null);
+            // Laramie CSPACE-3175.  passing null for queryParams, because prior to this refactor, the code moved to lookupParentCSID in this instance called the version of getServiceContext() that passes null
+            CsidAndShortIdentifier csidAndShortId = lookupParentCSIDAndShortIdentifer(parentspecifier, "updateAuthorityItem(parent)", "UPDATE_ITEM", null);
+            String parentcsid = csidAndShortId.CSID;
+            String parentShortId = csidAndShortId.shortIdentifier;
 
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), theUpdate);
-            ctx.setResourceMap(resourceMap);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "updateAuthorityItem(item)", "UPDATE_ITEM", ctx);
 
             // We omit the parentShortId, only needed when doing a create...
-            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parentcsid, null);
-            ctx.setUriInfo(ui);
+            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createItemDocumentHandler(ctx, parentcsid, parentShortId);
             getRepositoryClient(ctx).update(ctx, itemcsid, handler);
             result = ctx.getOutput();
 

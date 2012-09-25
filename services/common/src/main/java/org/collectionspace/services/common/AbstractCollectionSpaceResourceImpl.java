@@ -296,7 +296,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     			null /* the class of the input type */);
     	return ctx;
     }
-    
+        
     protected ServiceContext<IT, OT> createServiceContext(
     		IT input,
     		ResourceMap resourceMap,

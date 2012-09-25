@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <pageNum>0</pageNum>
+    <itemsInPage>1</itemsInPage>
+    <totalItems>1</totalItems>
+                
+    <relation-list-item>
+        <relationshipMetaType>${relationshipMetaType}</relationshipMetaType>
+        <predicate>hasBroader</predicate>
+        <subject>
+            <csid>${childCSID}</csid>
+            <documentType>CollectionObject</documentType>
+        </subject>
+        <object>
+            <csid>${parentCSID}</csid>
+            <documentType>CollectionObject</documentType>
+        </object>
+    </relation-list-item>
+        
+</ns3:relations-common-list>
