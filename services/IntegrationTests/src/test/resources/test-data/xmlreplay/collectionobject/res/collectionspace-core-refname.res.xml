@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">
+
+    <ns2:collectionspace_core xmlns:ns2="http://collectionspace.org/collectionspace_core/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <refName>urn:cspace:core.collectionspace.org:collectionobjects:id(${itemCSID})'${updatedDisplayName}'</refName>
+    </ns2:collectionspace_core>
+
+</document>
