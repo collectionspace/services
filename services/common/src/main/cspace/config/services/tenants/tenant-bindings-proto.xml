@@ -2943,10 +2943,11 @@
                             <types:value>addressGroupList/*/addressStateOrProvince</types:value>
                         </types:item>
                         <!-- Per CSPACE-5080: This field is configured as a term list, rather than being tied to Place authority as described in wiki schema -->
-<!--                       <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!--<types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>addressGroupList/*/addressCountry</types:value>
                         </types:item>                        -->
+                        <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>emailGroupList/*/emailType</types:value>
