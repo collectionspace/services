@@ -2946,7 +2946,7 @@
                         <!--<types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>addressGroupList/*/addressCountry</types:value>
-                        </types:item>                        -->
+                        </types:item> -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
