@@ -39,6 +39,7 @@
     
     <run controlFile="collectionobject/collectionobject-hierarchy-csid.xml" testGroup="CreateUpdateReadStructuredObjects" />
     <run controlFile="collectionobject/collectionobject-hierarchy-refname.xml" testGroup="CreateUpdateReadStructuredObjects" />
+    <run controlFile="collectionobject/collectionobject-displayname-update.xml" testGroup="DisplayNameChangesReflectedInRefNames" />
     
     <!-- Broken tests -->
     

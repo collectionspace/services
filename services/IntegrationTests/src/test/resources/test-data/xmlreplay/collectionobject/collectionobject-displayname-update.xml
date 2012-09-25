@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xmlReplay>
+    
+    <testGroup ID="DisplayNameChangesReflectedInRefNames" autoDeletePOSTS="true">
+        
+        <!--
+            Tests that updates of the display name field for CollectionObject
+            records are reflected
+            
+            By default in the current demo tenants, the objectNumber field is
+            configured in services tenant bindings as the display name field:
+            
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                	<service:SupportsHierarchy>true</service:SupportsHierarchy>
+                	<service:RefnameDisplayNameField>
+                        <service:element>objectNumber</service:element>
+                        
+            This test reuses some payloads from one or more existing tests.
+        -->
+        
+        <!-- Create two CollectionObject records, and a parent/child relation between them -->
+        
+        <test ID="CreateMotherElephant">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/1-collectionobject-create.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5504-MotherElephant</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        <test ID="ReadMotherElephant">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateMotherElephant.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="TEXT" />
+                <filename>collectionobject/hierarchy/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="objectNumber">${CreateMotherElephant.objectNumber}</var>
+                </vars>
+            </response>
+        </test>
+        
+        <test ID="CreateBabyElephant">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>collectionobject/hierarchy/2-collectionobject-create-with-parent-csid.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5504-BabyElephant</var>
+                <var ID="parentCSID">${CreateMotherElephant.CSID}</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        <test ID="ReadBabyElephant">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBabyElephant.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="TEXT" />
+                <filename>collectionobject/hierarchy/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="objectNumber">${CreateBabyElephant.objectNumber}</var>
+                </vars>
+            </response>
+        </test>
+        
+        <!-- Update one of the records' display names -->
+        <test ID="UpdateBabyElephantDisplayName">
+            <method>PUT</method>
+            <uri>/cspace-services/collectionobjects/${CreateBabyElephant.CSID}</uri>
+            <!-- This 'create' payload is also suitable for use with an update request -->
+            <filename>collectionobject/hierarchy/1-collectionobject-create.xml</filename>
+            <vars>
+                <var ID="objectNumber">CSPACE-5504-BabyElephant-With-Ears</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <test ID="ReadUpdatedBabyElephantDisplayName">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBabyElephant.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="TEXT" />
+                <filename>collectionobject/hierarchy/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="objectNumber">${UpdateBabyElephantDisplayName.objectNumber}</var>
+                </vars>
+            </response>
+        </test>
+        
+        <!-- Verify that the updated display name is present in the refName -->
+        <!-- in the collectionspace_core metadata for this record. -->
+        <test ID="VerifyUpdatedDisplayNameInCollectionSpaceCore">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${CreateBabyElephant.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="TEXT" />
+                <filename>collectionobject/res/collectionspace-core-refname.res.xml</filename>
+                <vars>
+                    <var ID="itemCSID">${CreateBabyElephant.CSID}</var>
+                    <var ID="updatedDisplayName">${UpdateBabyElephantDisplayName.objectNumber}</var>
+                </vars>
+                <startElement>/document/*[local-name()='collectionspace_core']</startElement>
+            </response>
+        </test>
+        
+        <!-- Verify that the updated display name is present in the relevant -->
+        <!-- refName in the relations record linking these two records. -->
+        <test ID="VerifyUpdatedDisplayNameInRelation">
+            <method>GET</method>
+            <uri>/cspace-services/relations?sbj=${CreateBabyElephant.CSID}&amp;obj=${CreateMotherElephant.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+            <response>
+                <expected level="TEXT" />
+                <filename>collectionobject/res/relationship-refname.res.xml</filename>
+                <vars>
+                    <var ID="childCSID">${CreateBabyElephant.CSID}</var>
+                    <var ID="parentCSID">${CreateMotherElephant.CSID}</var>
+                    <var ID="updatedDisplayName">${UpdateBabyElephantDisplayName.objectNumber}</var>
+                </vars>
+            </response>
+        </test>
+        
+       <!-- Clean up any remaining records that were NOT automatically deleted by autoDeletePOSTS -->
+                       
+        <test ID="GetRelationsToMotherElephantAsObject">
+            <method>GET</method>
+            <uri>/cspace-services/relations?obj=${CreateMotherElephant.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        <test ID="DeleteChildRelationToMotherElephant">
+            <method>DELETE</method>
+            <uri>/cspace-services/relations/${GetRelationsToMotherElephantAsObject.got("//relation-list-item[1]/csid")}</uri>
+        </test>
+                       
+    </testGroup>
+    
+</xmlReplay>
