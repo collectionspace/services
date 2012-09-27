@@ -66,6 +66,10 @@
             <xs:element name="reference" type="xs:string"/>
             <xs:element name="refPage" type="xs:string"/>
             <xs:element name="notes" type="xs:string"/>
+			<xs:element name="taxonomicIdentHybridParentGroupList" type="taxonomicIdentHybridParentGroupList"/>
+			<xs:element name="taxonomicIdentHybridName" type="xs:string"/>
+			<xs:element name="affinityTaxon" type="xs:string"/>
+			<xs:element name="hybridFlag" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -81,6 +85,19 @@
             <xs:element name="localNameLanguage" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
+
+	<xs:complexType name="taxonomicIdentHybridParentGroupList">
+	    <xs:sequence>
+	        <xs:element name="taxonomicIdentHybridParentGroup" type="taxonomicIdentHybridParentGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+	    </xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="taxonomicIdentHybridParentGroup">
+	    <xs:sequence>
+	        <xs:element name="taxonomicIdentHybridParent" type="xs:string"/>
+	        <xs:element name="taxonomicIdentHybridParentQualifier" type="xs:string"/>
+	    </xs:sequence>
+	</xs:complexType>
 
     <xs:complexType name="hybridParentGroupList">
         <xs:sequence>
