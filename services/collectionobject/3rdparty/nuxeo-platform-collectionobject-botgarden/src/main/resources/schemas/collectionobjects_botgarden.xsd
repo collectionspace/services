@@ -19,6 +19,7 @@
 	<xs:element name="deadFlag" type="xs:boolean"/>
 	<xs:element name="deadDate" type="xs:date"/>
 	<xs:element name="requestedBy" type="xs:string"/>
+	<xs:element name="source" type="xs:string"/>
 	<xs:element name="vegetationType" type="xs:string"/>
 	<xs:element name="cbdRestriction" type="xs:boolean"/>
 	<xs:element name="rare" type="xs:boolean"/>
