@@ -47,6 +47,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -164,7 +165,25 @@ public class MediaResource extends ResourceBase {
         return result;
     }
     
-    
+    @Override
+    public byte[] update(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo ui,
+    		@PathParam("csid") String csid,
+    		String xmlPayload) {
+    	//
+    	// If we find a "blobUri" query param, then we need to create a blob resource/record first and then the media resource/record
+    	//
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        String blobUri = queryParams.getFirst(BlobClient.BLOB_URI_PARAM);
+        if (blobUri != null && blobUri.isEmpty() == false) {
+        	Response blobresult = createBlobWithUri(resourceMap, ui, xmlPayload, blobUri); // uses the blob resource and doc handler to create the blob
+        	String blobCsid = CollectionSpaceClientUtils.extractId(blobresult);
+        	queryParams.add(BlobClient.BLOB_CSID_PARAM, blobCsid); // Add the new blob's csid as an artificial query param -the media doc handler will look for this
+        }
+       	return super.update(parentCtx, resourceMap, ui, csid, xmlPayload); // Now call the parent to finish the media resource POST request
+    }
+
     /*
      * Creates a new blob (using a URL pointing to a media file/resource) and associates it with an existing media record/resource.
      */
