@@ -157,12 +157,23 @@ public abstract class ResourceBase
     		@Context UriInfo uriInfo,
     		@PathParam("csid") String csid,
     		String xmlPayload) {
+        return this.update(null, resourceMap, uriInfo, csid, xmlPayload); 
+    }
+
+    public byte[] update(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, // REM: 8/13/2012 - Some sub-classes will override this method -e.g., MediaResource does.
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo uriInfo,
+    		@PathParam("csid") String csid,
+    		String xmlPayload) {
         PoxPayloadOut result = null;
         ensureCSID(csid, UPDATE);
         try {
             PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate, uriInfo);
             ctx.setResourceMap(resourceMap);
+            if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) {
+            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession()); // Reuse the current repo session if one exists
+            }            
             result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
