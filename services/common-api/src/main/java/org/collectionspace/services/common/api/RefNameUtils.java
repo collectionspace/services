@@ -211,6 +211,16 @@ public class RefNameUtils {
     	return new AuthorityTermInfo(refNameTokens);
     }
 
+    public static String stripAuthorityTermDisplayName(String refName)
+            throws IllegalArgumentException {
+    	if(refName==null || !refName.startsWith(URN_PREFIX))
+    		throw new IllegalArgumentException( "Null or invalid refName syntax");
+    	String[] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR, AUTH_ITEM_REFNAME_TOKENS);
+    	int rightParen = refNameTokens[ITEM_INSTANCE_TOKEN].indexOf(')');
+    	refNameTokens[ITEM_INSTANCE_TOKEN] = refNameTokens[ITEM_INSTANCE_TOKEN].substring(0, rightParen+1);
+    	return URN_PREFIX + implodeStringArray(refNameTokens, SEPARATOR);
+    }
+
     public static String implodeStringArray(String tokens[], String separator) {
     	if (tokens.length==0) {
     		return "";

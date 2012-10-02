@@ -246,7 +246,7 @@ public class RefNameServiceUtils {
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             List<String> serviceTypes,
             String refName,
-            String refPropName,
+            String refPropName, // authRef or termRef, authorities or vocab terms.
             DocumentFilter filter, boolean computeTotal)
             throws DocumentException, DocumentNotFoundException {
         AuthorityRefDocList wrapperList = new AuthorityRefDocList();
@@ -298,7 +298,11 @@ public class RefNameServiceUtils {
             // item within any individual document scanned, so the number of
             // authority references may potentially exceed the total number
             // of documents scanned.
-            int nRefsFound = processRefObjsDocList(docList, ctx.getTenantId(), refName, queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
+
+            // Strip off displayName and only match the base, so we get references to all 
+            // the NPTs as well as the PT.
+    		String strippedRefName = RefNameUtils.stripAuthorityTermDisplayName(refName);
+            int nRefsFound = processRefObjsDocList(docList, ctx.getTenantId(), strippedRefName, true, queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
                     list, null);
 
             commonList.setPageSize(pageSize);
@@ -426,7 +430,9 @@ public class RefNameServiceUtils {
                     morePages = false;
                 }
 
-                int nRefsFoundThisPage = processRefObjsDocList(docList, ctx.getTenantId(), oldRefName, queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
+                // Only match complete refNames - unless and until we decide how to resolve changes
+                // to NPTs we will defer that and only change PTs or refNames as passed in.
+                int nRefsFoundThisPage = processRefObjsDocList(docList, ctx.getTenantId(), oldRefName, false, queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
                         null, newRefName);
                 if (nRefsFoundThisPage > 0) {
                     ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true); // Flush the document model list out to Nuxeo storage
@@ -564,6 +570,7 @@ public class RefNameServiceUtils {
             DocumentModelList docList,
             String tenantId,
             String refName,
+            boolean matchBaseOnly,
             Map<String, ServiceBindingType> queriedServiceBindings,
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
             List<AuthorityRefDocList.AuthorityRefDocItem> list,
@@ -652,7 +659,7 @@ public class RefNameServiceUtils {
 
             ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps = new ArrayList<RefNameServiceUtils.AuthRefInfo>();
             try {
-                findAuthRefPropertiesInDoc(docModel, matchingAuthRefFields, refName, foundProps); // REM - side effect that foundProps is set
+                findAuthRefPropertiesInDoc(docModel, matchingAuthRefFields, refName, matchBaseOnly, foundProps); // REM - side effect that foundProps is set
                 for (RefNameServiceUtils.AuthRefInfo ari : foundProps) {
                     if (ilistItem != null) {
                         if (nRefsFoundInDoc == 0) {    // First one?
@@ -700,6 +707,16 @@ public class RefNameServiceUtils {
             List<AuthRefConfigInfo> authRefFieldInfo,
             String refNameToMatch,
             List<AuthRefInfo> foundProps) {
+    	return findAuthRefPropertiesInDoc(docModel, authRefFieldInfo, 
+    									refNameToMatch, false, foundProps);
+    }
+    
+    public static List<AuthRefInfo> findAuthRefPropertiesInDoc(
+            DocumentModel docModel,
+            List<AuthRefConfigInfo> authRefFieldInfo,
+            String refNameToMatch,
+            boolean matchBaseOnly,
+            List<AuthRefInfo> foundProps) {
         // Assume that authRefFieldInfo is keyed by the field name (possibly mapped for UI)
         // and the values are elPaths to the field, where intervening group structures in
         // lists of complex structures are replaced with "*". Thus, valid paths include
@@ -716,7 +733,7 @@ public class RefNameServiceUtils {
             try {
                 // Get first property and work down as needed.
                 Property prop = docModel.getProperty(arci.pathEls[0]);
-                findAuthRefPropertiesInProperty(foundProps, prop, arci, 0, refNameToMatch);
+                findAuthRefPropertiesInProperty(foundProps, prop, arci, 0, refNameToMatch, matchBaseOnly);
             } catch (Exception e) {
                 logger.error("Problem fetching property: " + arci.pathEls[0]);
             }
@@ -724,12 +741,13 @@ public class RefNameServiceUtils {
         return foundProps;
     }
 
-    public static List<AuthRefInfo> findAuthRefPropertiesInProperty(
+    private static List<AuthRefInfo> findAuthRefPropertiesInProperty(
             List<AuthRefInfo> foundProps,
             Property prop,
             AuthRefConfigInfo arci,
             int pathStartIndex, // Supports recursion and we work down the path
-            String refNameToMatch) {
+            String refNameToMatch,
+            boolean matchBaseOnly ) {
         if (pathStartIndex >= arci.pathEls.length) {
             throw new ArrayIndexOutOfBoundsException("Index = " + pathStartIndex + " for path: "
                     + arci.pathEls.toString());
@@ -740,7 +758,7 @@ public class RefNameServiceUtils {
         }
 
         if (prop instanceof StringProperty) {    // scalar string
-            addARIifMatches(refNameToMatch, arci, prop, foundProps);
+            addARIifMatches(refNameToMatch, matchBaseOnly, arci, prop, foundProps);
         } else if (prop instanceof List) {
             List<Property> propList = (List<Property>) prop;
             // run through list. Must either be list of Strings, or Complex
@@ -751,13 +769,13 @@ public class RefNameServiceUtils {
                                 + arci.pathEls.toString());
                         break;
                     } else {
-                        addARIifMatches(refNameToMatch, arci, listItemProp, foundProps);
+                        addARIifMatches(refNameToMatch, matchBaseOnly, arci, listItemProp, foundProps);
                     }
                 } else if (listItemProp.isComplex()) {
                     // Just recurse to handle this. Note that since this is a list of complex, 
                     // which should look like listName/*/... we add 2 to the path start index 
                     findAuthRefPropertiesInProperty(foundProps, listItemProp, arci,
-                            pathStartIndex + 2, refNameToMatch);
+                            pathStartIndex + 2, refNameToMatch, matchBaseOnly);
                 } else {
                     logger.error("Configuration for authRefs does not match schema structure: "
                             + arci.pathEls.toString());
@@ -770,7 +788,7 @@ public class RefNameServiceUtils {
                 Property localProp = prop.get(localPropName);
                 // Now just recurse, pushing down the path 1 step
                 findAuthRefPropertiesInProperty(foundProps, localProp, arci,
-                        pathStartIndex, refNameToMatch);
+                        pathStartIndex, refNameToMatch, matchBaseOnly);
             } catch (PropertyNotFoundException pnfe) {
                 logger.error("Could not find property: [" + localPropName + "] in path: "
                         + arci.getFullPath());
@@ -790,6 +808,7 @@ public class RefNameServiceUtils {
 
     private static void addARIifMatches(
             String refNameToMatch,
+            boolean matchBaseOnly,
             AuthRefConfigInfo arci,
             Property prop,
             List<AuthRefInfo> foundProps) {
@@ -797,7 +816,10 @@ public class RefNameServiceUtils {
         // OR have no refName to match but be non-empty
         try {
             String value = (String) prop.getValue();
-            if (((refNameToMatch != null) && refNameToMatch.equals(value))
+            if (((refNameToMatch != null) && 
+	            		(matchBaseOnly?
+	            			(value!=null && value.startsWith(refNameToMatch))
+	            			:refNameToMatch.equals(value)))
                     || ((refNameToMatch == null) && Tools.notBlank(value))) {
                 // Found a match
                 logger.debug("Found a match on property: " + prop.getPath() + " with value: [" + value + "]");
