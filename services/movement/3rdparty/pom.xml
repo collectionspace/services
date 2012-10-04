@@ -18,7 +18,18 @@
         3rd party build for movement service
     </description>
 
+
+    <properties>
+        <ServiceName>movement</ServiceName>
+        <NuxeoDocTypeName>Movement</NuxeoDocTypeName>   
+        <CommonSchemaName>movements_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+        <Lifecycle>cs_locking</Lifecycle>
+    </properties>
+    
     <modules>
         <module>nuxeo-platform-cs-movement</module>
+        <module>nuxeo-platform-movement-naturalhistory</module>
+        <module>nuxeo-platform-movement-botgarden</module>
     </modules>
 </project>

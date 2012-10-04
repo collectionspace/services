@@ -214,6 +214,27 @@
             </service:object>
         </tenant:serviceBindings>
 
+        <tenant:serviceBindings merge:matcher="id" id="Movements">
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>reasonForMove</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>currentLocation</types:value>
+                </types:item>
+            </service:properties>
+
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" >
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="movements_naturalhistory" updated="" order="3">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/movement/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/movement/domain/naturalhistory http://collectionspace.org/services/movement/domain/movements_naturalhistory.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+    
         <tenant:serviceBindings merge:matcher="id" id="Organizations">
             <service:object xmlns:service="http://collectionspace.org/services/config/service" >
                 <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="organizations_naturalhistory" updated="" order="3">
