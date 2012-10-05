@@ -24,7 +24,7 @@
   <xs:element name="fieldLocPlace" type="xs:string"/>
   <xs:element name="catalogDate" type="xs:string"/>
   -->
-
+  
     <xs:element name="hybridName" type="xs:string"/>
     <xs:element name="labelHeader" type="xs:string"/>
     <xs:element name="labelFooter" type="xs:string"/>
@@ -41,6 +41,49 @@
     <xs:element name="donorDateGroup" type="structuredDateGroup"/>
     <xs:element name="donorNote" type="xs:string"/>
 
+	<xs:element name="accessionDate" type="xs:date"/>
+	<xs:element name="deadFlag" type="xs:boolean"/>
+	<xs:element name="deadDate" type="xs:date"/>
+	<xs:element name="requestedBy" type="xs:string"/>
+	<xs:element name="source" type="xs:string"/>
+	<xs:element name="vegetationType" type="xs:string"/>
+	<xs:element name="cbdRestriction" type="xs:boolean"/>
+	<xs:element name="rare" type="xs:boolean"/>
+	
+    <xs:element name="flowerColor" type="xs:string"/>
+    <xs:element name="fruitColor" type="xs:string"/>
+    <xs:element name="provenanceType" type="xs:string"/>
+    <xs:element name="propagationHistory" type="xs:string"/>
+    <xs:element name="classUse" type="xs:boolean"/>
+    <xs:element name="researchUse" type="xs:boolean"/>
+    <xs:element name="distribution" type="xs:boolean"/>
+    <xs:element name="ignoreRedDot" type="xs:boolean"/>
+    <xs:element name="securityRisk" type="xs:string"/>
+    <xs:element name="flowersJan" type="xs:string"/>
+    <xs:element name="flowersFeb" type="xs:string"/>
+    <xs:element name="flowersMar" type="xs:string"/>
+    <xs:element name="flowersApr" type="xs:string"/>
+    <xs:element name="flowersMay" type="xs:string"/>
+    <xs:element name="flowersJun" type="xs:string"/>
+    <xs:element name="flowersJul" type="xs:string"/>
+    <xs:element name="flowersAug" type="xs:string"/>
+    <xs:element name="flowersSep" type="xs:string"/>
+    <xs:element name="flowersOct" type="xs:string"/>
+    <xs:element name="flowersNov" type="xs:string"/>
+    <xs:element name="flowersDec" type="xs:string"/>
+    <xs:element name="fruitsJan" type="xs:boolean"/>
+    <xs:element name="fruitsFeb" type="xs:boolean"/>
+    <xs:element name="fruitsMar" type="xs:boolean"/>
+    <xs:element name="fruitsApr" type="xs:boolean"/>
+    <xs:element name="fruitsMay" type="xs:boolean"/>
+    <xs:element name="fruitsJun" type="xs:boolean"/>
+    <xs:element name="fruitsJul" type="xs:boolean"/>
+    <xs:element name="fruitsAug" type="xs:boolean"/>
+    <xs:element name="fruitsSep" type="xs:boolean"/>
+    <xs:element name="fruitsOct" type="xs:boolean"/>
+    <xs:element name="fruitsNov" type="xs:boolean"/>
+    <xs:element name="fruitsDec" type="xs:boolean"/>
+
     <xs:element name="taxonomicIdentGroupList" type="taxonomicIdentGroupList"/>
     <xs:element name="localNameGroupList" type="localNameGroupList"/>
     <xs:element name="hybridParentGroupList" type="hybridParentGroupList"/>
@@ -48,6 +91,7 @@
     <xs:element name="associatedTaxaGroupList" type="associatedTaxaGroupList"/>
     <xs:element name="annotationGroupList" type="annotationGroupList"/>
     <xs:element name="localityGroupList" type="localityGroupList"/>
+	<xs:element name="accessionUseGroupList" type="accessionUseGroupList"/>
 
     <xs:complexType name="taxonomicIdentGroupList">
         <xs:sequence>
@@ -172,6 +216,7 @@
             <xs:element name="fieldLocCountry" type="xs:string"/>
             <xs:element name="fieldLocHigherGeography" type="xs:string"/>
             <xs:element name="fieldLocPlace" type="xs:string"/>
+			<xs:element name="taxonomicRange" type="xs:string"/>
 
             <xs:element name="vCoordinates" type="xs:string"/>
             <xs:element name="vLatitude" type="xs:string"/>
@@ -212,6 +257,23 @@
             <xs:element name="geoRefVerificationStatus" type="xs:string"/>
             <xs:element name="geoRefRemarks" type="xs:string"/>
             <xs:element name="geoRefPlaceName" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="accessionUseGroupList">
+        <xs:sequence>
+            <xs:element name="accessionUseGroup" type="accessionUseGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="accessionUseGroup">
+        <xs:sequence>
+            <xs:element name="useType" type="xs:string"/>
+            <xs:element name="usedIn" type="xs:string"/>
+            <xs:element name="materialType" type="xs:string"/>
+            <xs:element name="requestDate" type="xs:date"/>
+            <xs:element name="filledDate" type="xs:date"/>
+            <xs:element name="useNotes" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
