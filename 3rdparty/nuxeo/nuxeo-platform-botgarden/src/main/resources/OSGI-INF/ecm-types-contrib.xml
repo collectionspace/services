@@ -2,8 +2,20 @@
 <component name="org.collectionspace.nuxeo.botgarden.ecm.types">	
 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updatelocationlistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateLocationListener" priority="999">
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateLocationListener" priority="100">
 			<event>beforeDocumentModification</event>
 		</listener>
 	</extension>
+<!-- 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="deletedeadlocationlistener" async="false" postCommit="false"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.DeleteDeadLocationListener" priority="100">
+			<event>documentModified</event>
+		</listener>
+	</extension> -->
+<!-- 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updatedeadflaglistener" async="true" postCommit="true"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateDeadFlagListener" priority="999">
+			<event>documentModified</event>
+		</listener>
+	</extension> -->
 </component>

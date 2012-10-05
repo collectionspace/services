@@ -1,5 +1,15 @@
 package org.collectionspace.services.nuxeo.extension.botgarden;
 
+import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.ACTION_CODE_FIELD_NAME;
+import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.ACTION_CODE_SCHEMA_NAME;
+import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.CURRENT_LOCATION_FIELD_NAME;
+import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.CURRENT_LOCATION_SCHEMA_NAME;
+import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.DEAD_ACTION_CODE;
+import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.MOVEMENT_DOCTYPE;
+import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.NONE_LOCATION;
+import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.PREVIOUS_LOCATION_FIELD_NAME;
+import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.PREVIOUS_LOCATION_SCHEMA_NAME;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -11,20 +21,6 @@ import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 public class UpdateLocationListener implements EventListener {
-	public static final String BASE_DOCTYPE = "Movement";
-	
-	public static final String ACTION_CODE_SCHEMA_NAME = "movements_common";
-	public static final String ACTION_CODE_FIELD_NAME = "reasonForMove";
-	
-	public static final String CURRENT_LOCATION_SCHEMA_NAME = "movements_common";
-	public static final String CURRENT_LOCATION_FIELD_NAME = "currentLocation";
-	
-	public static final String PREVIOUS_LOCATION_SCHEMA_NAME = "movements_naturalhistory";
-	public static final String PREVIOUS_LOCATION_FIELD_NAME = "previousLocation";
-	
-	public static final String DEAD_ACTION_CODE = "Dead";
-	public static final String NONE_LOCATION = null;
-
 	final Log logger = LogFactory.getLog(UpdateLocationListener.class);
 	 
     /* 
@@ -41,7 +37,7 @@ public class UpdateLocationListener implements EventListener {
             DocumentEventContext context = (DocumentEventContext) ec;
             DocumentModel doc = context.getSourceDocument();
 
-            if (doc.getType().startsWith(BASE_DOCTYPE)) {
+            if (doc.getType().startsWith(MOVEMENT_DOCTYPE)) {
             	String actionCode = (String) doc.getProperty(ACTION_CODE_SCHEMA_NAME, ACTION_CODE_FIELD_NAME);
             	
             	logger.debug("actionCode=" + actionCode);
