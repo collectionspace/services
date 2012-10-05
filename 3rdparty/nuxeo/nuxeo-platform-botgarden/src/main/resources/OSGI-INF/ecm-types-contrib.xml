@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.nuxeo.botgarden.ecm.types">	
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updatelocationlistener" async="false" postCommit="false"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateLocationListener" priority="999">
+			<event>beforeDocumentModification</event>
+		</listener>
+	</extension>
+</component>
