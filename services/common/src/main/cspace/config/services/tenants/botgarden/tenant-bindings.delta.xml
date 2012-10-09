@@ -175,6 +175,16 @@
             </service:object>
         </tenant:serviceBindings>
 
+        <tenant:serviceBindings merge:matcher="id" id="ObjectExit">
+            <service:object xmlns:service="http://collectionspace.org/services/config/service">
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="objectexit_naturalhistory" updated="" order="3">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/objectexit/domain/naturalhistory" schemaLocation="http://collectionspace.org/objectexit/domain/naturalhistory http://collectionspace.org/objectexit/domain/objectexit_naturalhistory.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+
         <tenant:serviceBindings merge:matcher="id" id="Media">
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
