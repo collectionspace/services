@@ -3,8 +3,8 @@
 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updatelocationlistener" async="false" postCommit="false"
 			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateLocationListener" priority="100">
-			<event>beforeDocumentModification</event>
 			<event>documentCreated</event>
+			<event>beforeDocumentModification</event>
 		</listener>
 	</extension>
 	<!--
@@ -14,15 +14,26 @@
 	-->
 	<!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="deletedeadlocationlistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.DeleteDeadLocationListener" priority="100">
+			class="org.collectionspace.services.nuxeo.extension.botgarden.DeleteDeadLocationListener" priority="150">
 			<event>documentModified</event>
 		</listener>
 	</extension> -->
 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updatedeadflaglistener" async="true" postCommit="true"
 			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateDeadFlagListener" priority="200">
-			<event>documentModified</event>
 			<event>documentCreated</event>
+			<event>documentModified</event>
+		</listener>
+	</extension>
+	<!-- 
+		Temporarily create accession history versions using an event handler, until versioning is 
+		fully baked into cspace.
+	-->
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="createversionlistener" async="false" postCommit="false"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.CreateVersionListener" priority="999">
+			<event>documentCreated</event>
+			<event>documentModified</event>
 		</listener>
 	</extension>
 </component>
