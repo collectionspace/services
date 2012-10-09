@@ -1,10 +1,6 @@
 package org.collectionspace.services.nuxeo.extension.botgarden;
 
-import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.ACTION_CODE_FIELD_NAME;
-import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.ACTION_CODE_SCHEMA_NAME;
-import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.DEAD_ACTION_CODE;
-import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.MOVEMENT_DOCTYPE;
-import static org.collectionspace.services.nuxeo.extension.botgarden.BotGardenConstants.DELETE_TRANSITION;
+import static org.collectionspace.services.movement.nuxeo.MovementConstants.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +25,10 @@ public class DeleteDeadLocationListener implements EventListener {
             DocumentEventContext context = (DocumentEventContext) ec;
             DocumentModel doc = context.getSourceDocument();
 
-            if (doc.getType().startsWith(MOVEMENT_DOCTYPE)) {
+            if (doc.getType().startsWith(NUXEO_DOCTYPE) &&
+            		!doc.isVersion() && 
+            		!doc.isProxy() && 
+            		!doc.getCurrentLifeCycleState().equals(DELETED_STATE)) {
             	String actionCode = (String) doc.getProperty(ACTION_CODE_SCHEMA_NAME, ACTION_CODE_FIELD_NAME);
             	
             	logger.debug("actionCode=" + actionCode);

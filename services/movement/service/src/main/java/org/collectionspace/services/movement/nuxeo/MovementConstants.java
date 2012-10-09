@@ -32,4 +32,31 @@ public class MovementConstants {
     public final static String NUXEO_DOCTYPE = "Movement";
     public final static String NUXEO_SCHEMA_NAME = "movement";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Movement";
+    
+    public final static String CORE_SCHEMA_NAME = "collectionspace_core";
+	public static final String COMMON_SCHEMA_NAME = "movements_common";
+	public static final String NATURALHISTORY_SCHEMA_NAME = "movements_naturalhistory";
+	
+	public static final String ACTION_CODE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+	public static final String ACTION_CODE_FIELD_NAME = "reasonForMove";
+
+	public static final String ACTION_DATE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+	public static final String ACTION_DATE_FIELD_NAME = "locationDate";
+	
+	public static final String CURRENT_LOCATION_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+	public static final String CURRENT_LOCATION_FIELD_NAME = "currentLocation";
+	
+	public static final String PREVIOUS_LOCATION_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+	public static final String PREVIOUS_LOCATION_FIELD_NAME = "previousLocation";
+	
+	public static final String WORKFLOW_STATE_SCHEMA_NAME = CORE_SCHEMA_NAME;
+	public static final String WORKFLOW_STATE_FIELD_NAME = "workflowState";
+	
+	public static final String DEAD_ACTION_CODE = "Dead";
+	public static final String REVIVED_ACTION_CODE = "Revived";
+
+	public static final String NONE_LOCATION = null;
+	
+	public static final String DELETE_TRANSITION = "delete";
+	public static final String DELETED_STATE = "deleted";
 }
