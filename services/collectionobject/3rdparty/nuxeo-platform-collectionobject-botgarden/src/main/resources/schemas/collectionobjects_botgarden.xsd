@@ -14,4 +14,39 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns="http://collectionspace.org/services/collectionobject/local/botgarden" xmlns="http://collectionspace.org/services/collectionobject/local/botgarden" targetNamespace="http://collectionspace.org/services/collectionobject/local/botgarden" version="0.1">
 	<xs:element name="handwritten" type="xs:string"/>
 	<xs:element name="postToPublic" type="xs:string"/>
+	
+	<xs:element name="deadFlag" type="xs:boolean"/>
+	<xs:element name="deadDate" type="xs:date"/>
+	<xs:element name="cbdRestriction" type="xs:boolean"/>
+	
+    <xs:element name="flowerColor" type="xs:string"/>
+    <xs:element name="fruitColor" type="xs:string"/>
+    <xs:element name="propagationHistory" type="xs:string"/>
+    <xs:element name="classUse" type="xs:boolean"/>
+    <xs:element name="researchUse" type="xs:boolean"/>
+    <xs:element name="ignoreRedDot" type="xs:boolean"/>
+    <xs:element name="flowersJan" type="xs:string"/>
+    <xs:element name="flowersFeb" type="xs:string"/>
+    <xs:element name="flowersMar" type="xs:string"/>
+    <xs:element name="flowersApr" type="xs:string"/>
+    <xs:element name="flowersMay" type="xs:string"/>
+    <xs:element name="flowersJun" type="xs:string"/>
+    <xs:element name="flowersJul" type="xs:string"/>
+    <xs:element name="flowersAug" type="xs:string"/>
+    <xs:element name="flowersSep" type="xs:string"/>
+    <xs:element name="flowersOct" type="xs:string"/>
+    <xs:element name="flowersNov" type="xs:string"/>
+    <xs:element name="flowersDec" type="xs:string"/>
+    <xs:element name="fruitsJan" type="xs:boolean"/>
+    <xs:element name="fruitsFeb" type="xs:boolean"/>
+    <xs:element name="fruitsMar" type="xs:boolean"/>
+    <xs:element name="fruitsApr" type="xs:boolean"/>
+    <xs:element name="fruitsMay" type="xs:boolean"/>
+    <xs:element name="fruitsJun" type="xs:boolean"/>
+    <xs:element name="fruitsJul" type="xs:boolean"/>
+    <xs:element name="fruitsAug" type="xs:boolean"/>
+    <xs:element name="fruitsSep" type="xs:boolean"/>
+    <xs:element name="fruitsOct" type="xs:boolean"/>
+    <xs:element name="fruitsNov" type="xs:boolean"/>
+    <xs:element name="fruitsDec" type="xs:boolean"/>
 </xs:schema>
