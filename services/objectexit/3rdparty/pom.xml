@@ -18,7 +18,16 @@
         3rd party build for objectexit service
     </description>
 
+    <properties>
+        <ServiceName>objectexit</ServiceName>
+        <NuxeoDocTypeName>ObjectExit</NuxeoDocTypeName>
+        <CommonSchemaName>objectexit_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+    </properties>
+
     <modules>
         <module>nuxeo-platform-cs-objectexit</module>
+		<module>nuxeo-platform-objectexit-naturalhistory</module>
+		<module>nuxeo-platform-objectexit-botgarden</module>
     </modules>
 </project>
