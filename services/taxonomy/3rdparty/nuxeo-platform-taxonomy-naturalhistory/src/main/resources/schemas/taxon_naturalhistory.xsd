@@ -62,6 +62,9 @@
 		<xs:sequence>
 			<xs:element name="attributeDate" type="xs:date"/>
 			<xs:element name="recordedBy" type="xs:string"/>
+			<xs:element name="height" type="xs:string"/>
+			<xs:element name="width" type="xs:string"/>
+			<xs:element name="diameterBreastHeight" type="xs:string"/>
 			<xs:element name="habitat" type="xs:string"/>
 			<xs:element name="climateRating" type="xs:string"/>
 			<xs:element name="conservationCategory" type="xs:string"/>
