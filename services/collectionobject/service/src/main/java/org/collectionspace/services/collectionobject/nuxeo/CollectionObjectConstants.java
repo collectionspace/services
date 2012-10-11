@@ -40,10 +40,10 @@ public class CollectionObjectConstants {
     public final static String WORKFLOW_STATE_SCHEMA_NAME = CORE_SCHEMA_NAME;
     public final static String WORKFLOW_STATE_FIELD_NAME = "workflowState";
 
-    public final static String DEAD_FLAG_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String DEAD_FLAG_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
     public final static String DEAD_FLAG_FIELD_NAME = "deadFlag";
 
-    public final static String DEAD_DATE_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String DEAD_DATE_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
     public final static String DEAD_DATE_FIELD_NAME = "deadDate";
    
 	public static final String DELETED_STATE = "deleted";
