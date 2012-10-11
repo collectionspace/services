@@ -137,9 +137,7 @@ public class ClearLocationLabelRequestBatchJob implements BatchInvocable {
 					"<labelCount></labelCount>" +
 				"</ns2:movements_naturalhistory>" +
 			"</document>";
-		
-		logger.debug(updatePayload);
-		
+				
 		ResourceBase resource = resourceMap.get(MovementClient.SERVICE_NAME);
 		resource.update(resourceMap, movementCsid, updatePayload);
 	}
