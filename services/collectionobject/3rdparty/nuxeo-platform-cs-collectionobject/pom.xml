@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.collectionobject.3rdparty</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.6-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -31,7 +31,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <manifestFile>target/classes/META-INF/MANIFEST.MF </manifestFile>
+                        <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
                         <manifestEntries>
                             <Bundle-Version>${eclipseVersion}</Bundle-Version>
                             <Bundle-ManifestVersion>2</Bundle-ManifestVersion>

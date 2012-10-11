@@ -4,8 +4,9 @@ import java.io.InputStream;
 import org.collectionspace.services.blob.BlobsCommon;
 
 public class BlobOutput {
-	BlobsCommon blobsCommon;
-	InputStream blobInputStream;
+	private String mimeType;
+	private BlobsCommon blobsCommon;
+	private InputStream blobInputStream;
 
 	public BlobsCommon getBlobsCommon() {
 		return blobsCommon;
@@ -18,5 +19,11 @@ public class BlobOutput {
 	}
 	public void setBlobInputStream(InputStream blobInputStream) {
 		this.blobInputStream = blobInputStream;
+	}
+	public String getMimeType() {
+		return mimeType;
+	}
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
 	}
 }

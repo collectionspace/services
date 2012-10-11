@@ -19,6 +19,7 @@ package org.collectionspace.services.common.document;
 
 import java.util.Map;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -329,4 +330,12 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @return unqualified property
      */
     public String getUnQProperty(String qProp);
+    
+    /**
+     * Creates the CMIS query from the service context.  Each document handler is responsible for returning a valid CMIS query using the
+     * information in the current service context -which includes things like the query parameters, etc.
+     */
+    public String getCMISQuery(QueryContext queryContext);
+    
+    public boolean isCMISQuery();
 }

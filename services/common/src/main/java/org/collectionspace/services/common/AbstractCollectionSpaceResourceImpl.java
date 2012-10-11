@@ -279,6 +279,15 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         return ctx;
     }
     
+    protected ServiceContext<IT, OT> createServiceContext(
+    		IT input,
+    		MultivaluedMap<String, String> queryParams) throws Exception {
+    	return createServiceContext(this.getServiceName(),
+    			input,
+    			queryParams,
+    			null /* the class of the input type */);
+    }
+    
     /**
      * Creates the service context.
      * 

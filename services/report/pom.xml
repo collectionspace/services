@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.main</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.6-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -13,23 +13,25 @@
     <name>services.report</name>
     <packaging>pom</packaging>
 
-		<dependencies>
-			<dependency>
-					<groupId>net.sf.jasperreports</groupId>
-					<artifactId>jasperreports</artifactId>
-					<version>4.0.1</version>
-			</dependency>
-			<dependency>
-					<groupId>net.sf.jasperreports</groupId>
-					<artifactId>jasperreports-fonts</artifactId>
-					<version>4.0.0</version>
-			</dependency>
-		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-			<version>1.7.5</version>
-		</dependency>
-		</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>4.5.1</version>
+        </dependency>
+        <!-- Jasper Reports fonts are still at 4.0.0, but are compatible with later software releases - ADR 2012-06-05 -->
+        <!-- http://jasperforge.org/plugins/espforum/view.php?group_id=102&forumid=103&topicid=97145 -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+    </dependencies>
 		
 
     <modules>

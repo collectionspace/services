@@ -55,9 +55,11 @@ public class MediaClient extends AbstractCommonListPoxServiceClientImpl<MediaPro
     /**
      * @param media
      * @return
+     * 
+     * Creates a new blob resource from the form data and associates it with an existing media resource
      *
      */
-    public ClientResponse<Response> createBlobFromFormData(String csid,
+    public ClientResponse<Response> createBlobFromFormData(String csid, // this is the Media resource CSID
     		MultipartFormDataOutput formDataOutput) {
         return getProxy().createBlobFromFormData(csid, formDataOutput);
     }    
@@ -65,11 +67,20 @@ public class MediaClient extends AbstractCommonListPoxServiceClientImpl<MediaPro
     /**
      * @param media
      * @return
+     * 
+     * Creates a new blob
      *
      */
     public ClientResponse<Response> createBlobFromUri(String csid, String blobUri) {
         return getProxy().createBlobFromUri(csid, blobUri, blobUri); //send the URI as both a query param and as content
-    }    
+    }
+    
+    /*
+     * Create both a new media record
+     */
+    public ClientResponse<Response> createMediaAndBlobWithUri(PoxPayloadOut xmlPayload, String blobUri, boolean purgeOriginal) {
+    	return getProxy().createMediaAndBlobWithUri(xmlPayload.getBytes(), blobUri, purgeOriginal);
+    }
         
     /**
      * @param csid

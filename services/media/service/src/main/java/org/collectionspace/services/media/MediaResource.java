@@ -25,12 +25,14 @@ package org.collectionspace.services.media;
 
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.client.BlobClient;
+import org.collectionspace.services.client.CollectionSpaceClientUtils;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
@@ -50,8 +52,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
+import javax.ws.rs.core.UriInfo;
 
 @Path(MediaClient.SERVICE_PATH)
 @Consumes("application/xml")
@@ -102,9 +105,6 @@ public class MediaResource extends ResourceBase {
         return result;
 	}	
 	
-    //FIXME retrieve client type from configuration
-//    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
-
     @Override
     protected String getVersionString() {
     	final String lastChangeRevision = "$LastChangedRevision: 2108 $";
@@ -116,11 +116,64 @@ public class MediaResource extends ResourceBase {
     	return MediaCommon.class;
     }
     
+    /*
+     * Creates a new media record/resource AND creates a new blob (using a URL pointing to a media file/resource) and associates
+     * it with the new media record/resource.
+     */
+    protected Response createBlobWithUri(ResourceMap resourceMap, UriInfo ui, String xmlPayload, String blobUri) {
+    	Response response = null;
+    	
+    	try {
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(BlobClient.SERVICE_NAME,
+	    			queryParams);
+	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx); // the blob doc handler will look for this in the context
+	    	blobInput.createBlobFile(blobUri); // The blobUri argument is our payload
+	    	response = this.create((PoxPayloadIn)null, ctx); // By now the binary bits have been created and we just need to create the metadata blob record -this info is in the blobInput var
+    	} catch (Exception e) {
+    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+    	}
+
+		return response;
+    }
+    
+    /*
+     * Looks for a blobUri query param from a POST.  If it finds one then it creates a blob AND a media resource and associates them.
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.ResourceBase#create(org.collectionspace.services.common.context.ServiceContext, org.collectionspace.services.common.ResourceMap, javax.ws.rs.core.UriInfo, java.lang.String)
+     */
+    @Override
+    public Response create(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo ui,
+            String xmlPayload) {
+    	Response result = null;
+    	
+    	//
+    	// If we find a "blobUri" query param, then we need to create a blob resource/record first and then the media resource/record
+    	//
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        String blobUri = queryParams.getFirst(BlobClient.BLOB_URI_PARAM);
+        if (blobUri != null && blobUri.isEmpty() == false) {
+        	result = createBlobWithUri(resourceMap, ui, xmlPayload, blobUri); // uses the blob resource and doc handler to create the blob
+        	String blobCsid = CollectionSpaceClientUtils.extractId(result);
+        	queryParams.add(BlobClient.BLOB_CSID_PARAM, blobCsid); // Add the new blob's csid as an artificial query param -the media doc handler will look for this
+        }
+        
+       	result = super.create(parentCtx, resourceMap, ui, xmlPayload); // Now call the parent to finish the media resource POST request
+        
+        return result;
+    }
+    
+    
+    /*
+     * Creates a new blob (using a URL pointing to a media file/resource) and associates it with an existing media record/resource.
+     */
     @POST
     @Path("{csid}")
     @Consumes("application/xml")
     @Produces("application/xml")    
-    public Response createBlobWithUri(@PathParam("csid") String csid,
+    public Response createBlobWithUriAndUpdateMedia(@PathParam("csid") String csid,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri) {
     	Response response = null;
     	PoxPayloadIn input = null;
@@ -129,7 +182,7 @@ public class MediaResource extends ResourceBase {
 	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(BlobClient.SERVICE_NAME, input);
 	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 	    	blobInput.createBlobFile(blobUri);
-	    	response = this.create(input, ctx);
+	    	response = this.create(input, ctx); // calls the blob resource/doc-handler to create the blob
 	    	//
 	    	// Next, update the Media record to be linked to the blob
 	    	//
@@ -143,6 +196,10 @@ public class MediaResource extends ResourceBase {
 		return response;
     }    
         
+    /*
+     * Creates a new blob (using the incoming multipart form data) and associates it with an existing media record/resource.
+     * If a URL query param is passed in as well, we use the URL to create the new blob instead of the multipart form data.
+     */
     @POST
     @Path("{csid}")
     @Consumes("multipart/form-data")
@@ -157,7 +214,7 @@ public class MediaResource extends ResourceBase {
 	    		//
 	    		// First, create the blob
 	    		//
-		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME, input);
+		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobClient.SERVICE_NAME, input);
 		    	BlobInput blobInput = BlobUtil.getBlobInput(blobContext);
 		    	blobInput.createBlobFile(req, null);
 		    	response = this.create(input, blobContext);
@@ -169,7 +226,7 @@ public class MediaResource extends ResourceBase {
 		    	this.update(csid, input, mediaContext);
     		} else {
     			//A URI query param overrides the incoming multipart/form-data payload in the request
-    			response = createBlobWithUri(csid, blobUri);
+    			response = createBlobWithUriAndUpdateMedia(csid, blobUri);
     		}
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
@@ -185,7 +242,7 @@ public class MediaResource extends ResourceBase {
     	
 	    try {
 	        String blobCsid = this.getBlobCsid(csid);
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME);
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobClient.SERVICE_NAME);
 	    	result = this.get(blobCsid, blobContext);	        
 	    } catch (Exception e) {
 	        throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
@@ -196,10 +253,9 @@ public class MediaResource extends ResourceBase {
     
     @GET
     @Path("{csid}/blob/content")
-    @Produces({"image/jpeg", "image/png", "image/tiff"})
-    public InputStream getBlobContent(
+    public Response getBlobContent(
     		@PathParam("csid") String csid) {
-    	InputStream result = null;
+    	Response result = null;
     	
 	    try {
 	    	ensureCSID(csid, READ);
@@ -214,11 +270,10 @@ public class MediaResource extends ResourceBase {
     
     @GET
     @Path("{csid}/blob/derivatives/{derivativeTerm}/content")
-    @Produces({"image/jpeg", "image/png", "image/tiff"})
-    public InputStream getDerivativeContent(
+    public Response getDerivativeContent(
     		@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
-    	InputStream result = null;
+    	Response result = null;
     	
 	    try {
 	    	ensureCSID(csid, READ);
@@ -240,7 +295,7 @@ public class MediaResource extends ResourceBase {
 	    try {
 	    	ensureCSID(csid, READ);
 	        String blobCsid = this.getBlobCsid(csid);
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME);
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobClient.SERVICE_NAME);
 	    	String xmlPayload = getBlobResource().getDerivative(blobCsid, derivativeTerm);
 	    	result = new PoxPayloadOut(xmlPayload.getBytes());
 	    } catch (Exception e) {
@@ -260,7 +315,7 @@ public class MediaResource extends ResourceBase {
 	    try {
 	    	ensureCSID(csid, READ);
 	        String blobCsid = this.getBlobCsid(csid);
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME);
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobClient.SERVICE_NAME);
 	    	result = getBlobResource().getDerivatives(blobCsid);	        
 	    } catch (Exception e) {
 	        throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
@@ -299,7 +354,7 @@ public class MediaResource extends ResourceBase {
         	//
         	// Now that we've handled the related Blob record, delete the Media record
         	//
-            return super.delete(csid, ctx);
+            return super.delete(ctx, csid);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
         }

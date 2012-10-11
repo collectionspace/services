@@ -26,6 +26,11 @@ package org.collectionspace.services.nuxeo.client.java;
 import java.util.Collection;
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -36,6 +41,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
+import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
@@ -69,16 +75,6 @@ public abstract class DocumentModelHandler<T, TL>
 
     private final Logger logger = LoggerFactory.getLogger(DocumentModelHandler.class);
     private RepositoryInstance repositorySession;
-    //key=schema, value=documentpart
-
-    public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
-    public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
-    public final static String COLLECTIONSPACE_CORE_URI = "uri";
-    public final static String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
-    public final static String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
-    public final static String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
-    public final static String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
-    public final static String COLLECTIONSPACE_CORE_WORKFLOWSTATE = "workflowState";
 
     /*
      * Map Nuxeo's life cycle object to our JAX-B based life cycle object
@@ -314,13 +310,13 @@ public abstract class DocumentModelHandler<T, TL>
             // Add the tenant ID value to the new entity
             //
         	String tenantId = ctx.getTenantId();
-            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
-                    COLLECTIONSPACE_CORE_TENANTID, tenantId);
+            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+            		CollectionSpaceClient.COLLECTIONSPACE_CORE_TENANTID, tenantId);
             //
             // Add the uri value to the new entity
             //
-            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
-                    COLLECTIONSPACE_CORE_URI, getUri(documentModel));
+            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+            		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI, getUri(documentModel));
         	//
         	// Add the CSID to the DublinCore title so we can see the CSID in the default
         	// Nuxeo webapp.
@@ -334,16 +330,147 @@ public abstract class DocumentModelHandler<T, TL>
         					documentModel.getName());
         		}
         	}
-            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
-                    COLLECTIONSPACE_CORE_CREATED_AT, now);
-            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
-                    COLLECTIONSPACE_CORE_CREATED_BY, userId);
+            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+            		CollectionSpaceClient.COLLECTIONSPACE_CORE_CREATED_AT, now);
+            documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+            		CollectionSpaceClient.COLLECTIONSPACE_CORE_CREATED_BY, userId);
     	}
-    	if(action==Action.CREATE || action==Action.UPDATE) {
-            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
-                    COLLECTIONSPACE_CORE_UPDATED_AT, now);
-            documentModel.setProperty(COLLECTIONSPACE_CORE_SCHEMA,
-                    COLLECTIONSPACE_CORE_UPDATED_BY, userId);
-    	}
+    	
+		if (action == Action.CREATE || action == Action.UPDATE) {
+			documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+					CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT, now);
+			documentModel.setProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+					CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_BY, userId);
+		}
     }
+    
+    /*
+     * If we see the "rtSbj" query param then we need to perform a CMIS query.  Currently, we have only one
+     * CMIS query, but we could add more.  If we do, this method should look at the incoming request and corresponding
+     * query params to determine if we need to do a CMIS query
+     * (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#isCMISQuery()
+     */
+    public boolean isCMISQuery() {
+    	boolean result = false;
+    	
+    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
+    	//
+    	// Look the query params to see if we need to make a CMSIS query.
+    	//
+    	String asSubjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);    	
+    	String asOjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);    	
+    	String asEither = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);    	
+    	if (asSubjectCsid != null || asOjectCsid != null || asEither != null) {
+    		result = true;
+    	}
+    	
+    	return result;
+    }
+    
+	/**
+	 * Creates the CMIS query from the service context. Each document handler is
+	 * responsible for returning (can override) a valid CMIS query using the information in the
+	 * current service context -which includes things like the query parameters,
+	 * etc.
+	 * 
+	 * This method implementation supports three mutually exclusive cases. We will build a query
+	 * that can find a document(s) 'A' in a relationship with another document
+	 * 'B' where document 'B' has a CSID equal to the query param passed in and:
+	 * 		1. Document 'B' is the subject of the relationship
+	 * 		2. Document 'B' is the object of the relationship
+	 * 		3. Document 'B' is either the object or the subject of the relationship
+	 */
+    @Override
+    public String getCMISQuery(QueryContext queryContext) {
+    	String result = null;
+    	
+    	if (isCMISQuery() == true) {
+	    	//
+	    	// Build up the query arguments
+	    	//
+	    	String theOnClause = "";
+	    	String theWhereClause = "";
+	    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
+	    	String asSubjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
+	    	String asObjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
+	    	String asEitherCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
+	    	String matchObjDocTypes = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES);
+	    	String selectDocType = (String)queryParams.getFirst(IQueryManager.SELECT_DOC_TYPE_FIELD);
+
+	    	String docType = this.getServiceContext().getDocumentType();
+	    	if (selectDocType != null && !selectDocType.isEmpty()) {  
+	    		docType = selectDocType;
+	    	}
+	    	String selectFields = IQueryManager.CMIS_TARGET_CSID + ", "
+	    			+ IQueryManager.CMIS_TARGET_TITLE + ", "
+	    			+ IRelationsManager.CMIS_CSPACE_RELATIONS_TITLE + ", "
+	    			+ IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_ID + ", "
+	    			+ IRelationsManager.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
+	    	String targetTable = docType + " " + IQueryManager.CMIS_TARGET_PREFIX;
+	    	String relTable = IRelationsManager.DOC_TYPE + " " + IQueryManager.CMIS_RELATIONS_PREFIX;
+	    	String relObjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_ID;
+	    	String relSubjectCsidCol = IRelationsManager.CMIS_CSPACE_RELATIONS_SUBJECT_ID;
+	    	String targetCsidCol = IQueryManager.CMIS_TARGET_CSID;
+
+	    	//
+	    	// Create the "ON" and "WHERE" query clauses based on the params passed into the HTTP request.  
+	    	//
+	    	// First come, first serve -the first match determines the "ON" and "WHERE" query clauses.
+	    	//
+	    	if (asSubjectCsid != null && !asSubjectCsid.isEmpty()) {  
+	    		// Since our query param is the "subject" value, join the tables where the CSID of the document is the other side (the "object") of the relationship.
+	    		theOnClause = relObjectCsidCol + " = " + targetCsidCol;
+	    		theWhereClause = relSubjectCsidCol + " = " + "'" + asSubjectCsid + "'";
+	    	} else if (asObjectCsid != null && !asObjectCsid.isEmpty()) {
+	    		// Since our query param is the "object" value, join the tables where the CSID of the document is the other side (the "subject") of the relationship.
+	    		theOnClause = relSubjectCsidCol + " = " + targetCsidCol; 
+	    		theWhereClause = relObjectCsidCol + " = " + "'" + asObjectCsid + "'";
+	    	} else if (asEitherCsid != null && !asEitherCsid.isEmpty()) {
+	    		theOnClause = relObjectCsidCol + " = " + targetCsidCol
+	    				+ " OR " + relSubjectCsidCol + " = " + targetCsidCol;
+	    		theWhereClause = relSubjectCsidCol + " = " + "'" + asEitherCsid + "'"
+	    				+ " OR " + relObjectCsidCol + " = " + "'" + asEitherCsid + "'";
+	    	} else {
+	    		//Since the call to isCMISQuery() return true, we should never get here.
+	    		logger.error("Attempt to make CMIS query failed because the HTTP request was missing valid query parameters.");
+	    	}
+	    	
+	    	// Now consider a constraint on the object doc types (for search by service group)
+	    	if (matchObjDocTypes != null && !matchObjDocTypes.isEmpty()) {  
+	    		// Since our query param is the "subject" value, join the tables where the CSID of the document is the other side (the "object") of the relationship.
+	    		theWhereClause += " AND (" + IRelationsManager.CMIS_CSPACE_RELATIONS_OBJECT_TYPE 
+	    							+ " IN " + matchObjDocTypes + ")";
+	    	}
+	    	
+	    	StringBuilder query = new StringBuilder();
+	    	// assemble the query from the string arguments
+	    	query.append("SELECT ");
+	    	query.append(selectFields);
+	    	query.append(" FROM " + targetTable + " JOIN " + relTable);
+	    	query.append(" ON " + theOnClause);
+	    	query.append(" WHERE " + theWhereClause);
+	    	
+	        try {
+				NuxeoUtils.appendCMISOrderBy(query, queryContext);
+			} catch (Exception e) {
+				logger.error("Could not append ORDER BY clause to CMIS query", e);
+			}
+	        
+	    	// An example:
+	        // SELECT D.cmis:name, D.dc:title, R.dc:title, R.relations_common:subjectCsid
+	        // FROM Dimension D JOIN Relation R
+	        // ON R.relations_common:objectCsid = D.cmis:name
+	        // WHERE R.relations_common:subjectCsid = '737527ec-a560-4776-99de'
+	        // ORDER BY D.collectionspace_core:updatedAt DESC
+	        
+	        result = query.toString();
+	        if (logger.isDebugEnabled() == true && result != null) {
+	        	logger.debug("The CMIS query is: " + result);
+	        }
+    	}
+        
+        return result;
+    }
+    
 }

@@ -470,6 +470,6 @@ public class TenantBindingConfigReaderImpl
     }
 
     public String getResourcesDir(){
-        return getConfigRootDir() + File.separator + "resources";
+        return getConfigRootDir() + File.separator + RESOURCES_DIR_NAME;
     }
 }

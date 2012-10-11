@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.6-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -144,11 +144,6 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.loanout.service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.conditioncheck.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -443,8 +438,9 @@
         <dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-jtajca</artifactId>
-			<version>5.5-NXP-8140</version>
+			<version>${nuxeo.core.version}</version>  
 			<!-- Until issue http://issues.collectionspace.org/browse/CSPACE-4639 is resolved, we
+				<version>5.5-NXP-8140</version>
 				need to use this patched Nuxeo artifact that is only available on our public Maven
 				repository -see http://source.collectionspace.org:8081/artifactory
 				

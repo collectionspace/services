@@ -80,8 +80,9 @@ import org.slf4j.LoggerFactory;
 public class AddIndices extends InitHandler implements IInitHandler {
 
     final Logger logger = LoggerFactory.getLogger(AddIndices.class);
-    private final static String INDEX_SUFFIX = "_idx";
     private final static String INDEX_SEP = "_";
+    private final static String INDEX_SUFFIX = INDEX_SEP + "idx";
+
 
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */
@@ -93,8 +94,10 @@ public class AddIndices extends InitHandler implements IInitHandler {
         //todo: all post-init tasks for services, or delegate to services that override.
         int rows = 0;
         String sql = "";
-        logger.info("Creating indicies, as needed, for designated fields in " + sbt.getName()
-                + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
+        if (logger.isInfoEnabled() && sbt != null) {
+            logger.info("Creating indicies, as needed, for designated fields in " + sbt.getName()
+                    + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
+        }
 
         for (Field field : fields) {
             String tableName = field.getTable();

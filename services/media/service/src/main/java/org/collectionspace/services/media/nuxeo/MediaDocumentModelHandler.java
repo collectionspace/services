@@ -25,6 +25,7 @@ package org.collectionspace.services.media.nuxeo;
 
 import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -35,6 +36,8 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * The Class MediaDocumentModelHandler.
@@ -73,16 +76,22 @@ public class MediaDocumentModelHandler
 	@Override
 	public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
 		ServiceContext ctx = this.getServiceContext();
+		String blobCsid = null;
+		
 		BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 		if (blobInput != null && blobInput.getBlobCsid() != null) {
-			String blobCsid = blobInput.getBlobCsid();
-			//
-			// If getBlobCsid has a value then we just received a multipart/form-data file post
-			//
+			blobCsid = blobInput.getBlobCsid(); // If getBlobCsid has a value then we just finishing a multipart/form-data file post, created a blob, and now associating it with an existing media resource 
+		} else {
+			MultivaluedMap<String, String> queryParams = this.getServiceContext().getQueryParams();
+			blobCsid = queryParams.getFirst(BlobClient.BLOB_CSID_PARAM); // if the blobUri query param is set, it's probably set from the MediaResource.create method -we're creating a blob from a URI and creating a new media resource as well
+			// extract all the other fields from the input payload
+			super.fillAllParts(wrapDoc, action);
+		}
+		
+		//
+		if (blobCsid != null) {
 			DocumentModel documentModel = wrapDoc.getWrappedObject();
 			documentModel.setProperty(ctx.getCommonPartLabel(), MediaJAXBSchema.blobCsid, blobCsid);
-		} else {
-			super.fillAllParts(wrapDoc, action);
 		}
 	}    
     

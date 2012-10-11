@@ -130,7 +130,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
     	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
         try {
-        	repoSession = nuxeoRepoClient.getRepositorySession();
+        	repoSession = nuxeoRepoClient.getRepositorySession(ctx);
             DocumentWrapper<DocumentModel> wrapDoc = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, authCSID);
             DocumentModel docModel = wrapDoc.getWrappedObject();
             shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
@@ -138,7 +138,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
             throw new RuntimeException("AuthorityDocHandler Internal Error: cannot get shortId!", ce);
         } finally {
         	if (repoSession != null) {
-        		nuxeoRepoClient.releaseRepositorySession(repoSession);
+        		nuxeoRepoClient.releaseRepositorySession(ctx, repoSession);
         	}
         }
         

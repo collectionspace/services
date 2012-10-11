@@ -54,6 +54,7 @@ import javax.ws.rs.core.UriInfo;
 public class RelationResource extends ResourceBase {
 	public final static String serviceName = "relations";
 	final Logger logger = LoggerFactory.getLogger(RelationResource.class);
+	
 	@Override
 	protected String getVersionString() {
 		final String lastChangeRevision = "$LastChangedRevision$";
@@ -67,12 +68,23 @@ public class RelationResource extends ResourceBase {
     public Class<RelationsCommon> getCommonPartClass() {
     	return RelationsCommon.class;
     }
-
+	
 	@Override
 	@GET
 	@Produces("application/xml")
-	public RelationsCommonList getList(@Context UriInfo ui) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+	public RelationsCommonList getList(@Context UriInfo uriInfo) {
+		return this.getList(null, uriInfo);
+	}
+
+	public RelationsCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx) {
+		return this.getList(parentCtx, parentCtx.getUriInfo());
+	}
+	
+	private RelationsCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
+		if (parentCtx != null) {
+			uriInfo = parentCtx.getUriInfo(); //Override the input param and use the parent context's UriInfo
+		}
+		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 
 		String subjectCsid = queryParams.getFirst(IRelationsManager.SUBJECT_QP);
 		String subjectType = queryParams.getFirst(IRelationsManager.SUBJECT_TYPE_QP);
@@ -80,14 +92,21 @@ public class RelationResource extends ResourceBase {
 		String objectCsid = queryParams.getFirst(IRelationsManager.OBJECT_QP);
 		String objectType = queryParams.getFirst(IRelationsManager.OBJECT_TYPE_QP);
 
-		return this.getRelationList(queryParams, subjectCsid, subjectType, predicate, objectCsid, objectType);
+		return this.getRelationList(parentCtx, queryParams, subjectCsid, subjectType, predicate, objectCsid, objectType);
 	}
 
-    //this is called by collectionobjectresource...so it is still public.
-    public RelationsCommonList getRelationList(MultivaluedMap<String, String> queryParams, String subjectCsid, String subjectType,
-                                                                         String predicate, String objectCsid, String objectType) throws WebApplicationException {
+    private RelationsCommonList getRelationList(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
+    		MultivaluedMap<String, String> queryParams,
+    		String subjectCsid, String subjectType,
+    		String predicate,
+    		String objectCsid,
+    		String objectType) throws WebApplicationException {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            if (parentCtx != null) { // If the parent context has an open repository session then use it
+            	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession());
+            }
             DocumentHandler handler = createDocumentHandler(ctx);
 
             String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType);

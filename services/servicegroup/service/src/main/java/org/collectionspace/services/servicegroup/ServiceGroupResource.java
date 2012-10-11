@@ -82,6 +82,9 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     
+    private final static boolean EXCLUDE_AUTHORITIES = false;
+    private final static boolean INCLUDE_AUTHORITIES = true;
+    
     @Override
     public String getServiceName(){
         return ServiceGroupClient.SERVICE_NAME;
@@ -170,7 +173,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
             // We need to get all the procedures, authorities, and objects.
 	        ArrayList<String> groupsList = null;  
 	        if("common".equalsIgnoreCase(groupname)) {
-	        	groupsList = ServiceBindingUtils.getCommonServiceTypes();
+	        	groupsList = ServiceBindingUtils.getCommonServiceTypes(EXCLUDE_AUTHORITIES); // CSPACE-5359: Excluding Authority type to stay backward compat with v2.4
 	        } else {
 	        	groupsList = new ArrayList<String>();
 	        	groupsList.add(groupname);
@@ -226,12 +229,27 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl {
 	        				createDocumentHandler(ctx);
 	        ArrayList<String> groupsList = null;  
 	        if("common".equalsIgnoreCase(serviceGroupName)) {
-	        	groupsList = ServiceBindingUtils.getCommonServiceTypes();
+	        	groupsList = ServiceBindingUtils.getCommonServiceTypes(EXCLUDE_AUTHORITIES); //CSPACE-5359: Exclude authorities to remain backward compat with v2.4
 	        } else {
 	        	groupsList = new ArrayList<String>();
 	        	groupsList.add(serviceGroupName);
 	        }
-            list = handler.getItemsForGroup(ctx, groupsList, keywords);
+	        // set up a keyword search
+	        if (keywords != null && !keywords.isEmpty()) {
+	            String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+	            if(Tools.isEmpty(whereClause)) {
+	                if (logger.isDebugEnabled()) {
+	                	logger.debug("The WHERE clause is empty for keywords: ["+keywords+"]");
+	                }
+	            } else {
+		            DocumentFilter documentFilter = handler.getDocumentFilter();
+		            documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+		            if (logger.isDebugEnabled()) {
+		                logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+		            }
+	            }
+	        }
+            list = handler.getItemsForGroup(ctx, groupsList);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, serviceGroupName);
         }

@@ -41,6 +41,12 @@ import java.util.UUID;
 //import javax.servlet.ServletException;
 //import javax.servlet.http.HttpServlet;
 
+import net.sf.jmimemagic.Magic;
+import net.sf.jmimemagic.MagicException;
+import net.sf.jmimemagic.MagicMatch;
+import net.sf.jmimemagic.MagicMatchNotFoundException;
+import net.sf.jmimemagic.MagicParseException;
+
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -91,6 +97,33 @@ public class FileUtils {
 	        streamOut.close();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
+		}
+		
+		return result;
+	}
+	
+	static public String getMimeType(File file) {
+		String result = null;
+		
+		Magic parser = new Magic() ;
+		// getMagicMatch accepts Files or byte[],
+		// which is nice if you want to test streams
+		MagicMatch match = null;
+		try {
+			match = parser.getMagicMatch(file, true);
+		} catch (MagicParseException e) {
+			logger.debug("MagicParseException encountered trying to get MIME type for "
+					+ file.getAbsolutePath(), e);
+		} catch (MagicMatchNotFoundException e) {
+			logger.debug("MagicMatchNotFoundException encountered trying to get MIME type for "
+					+ file.getAbsolutePath(), e);
+		} catch (MagicException e) {
+			logger.debug("MagicException encountered trying to get MIME type for "
+					+ file.getAbsolutePath(), e);
+		}
+		
+		if (match != null) {
+			result = match.getMimeType();
 		}
 		
 		return result;

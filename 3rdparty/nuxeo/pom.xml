@@ -4,11 +4,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.3rdparty</artifactId>
-        <version>2.4-SNAPSHOT</version>
+        <version>2.6-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.3rdparty.nuxeo</artifactId>
     <packaging>pom</packaging>
     <name>services.3rdparty.nuxeo</name>
@@ -17,7 +16,8 @@
         <module>nuxeo-platform-collectionspace</module>
 		<module>nuxeo-platform-quote-api</module>
 		<module>nuxeo-platform-quote</module>
-    </modules>
+		<module>nuxeo-platform-thumbnail</module>
+	</modules>
 
     <dependencies>
         <dependency>

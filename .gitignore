@@ -1,3 +1,7 @@
+3rdparty/nuxeo/nuxeo-platform-thumbnail/.classpath
+3rdparty/nuxeo/nuxeo-platform-thumbnail/.project
+3rdparty/nuxeo/nuxeo-platform-thumbnail/.settings/
+logo.miff
 target/
 *tenant-bindings.merged.xml
 .settings/org.eclipse.core.resources.prefs

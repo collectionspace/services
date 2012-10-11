@@ -91,7 +91,7 @@ public class BatchDocumentModelHandler
 		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
-			repoSession = repoClient.getRepositorySession();
+			repoSession = repoClient.getRepositorySession(ctx);
 			releaseRepoSession = true;
 		}
 
@@ -133,7 +133,7 @@ public class BatchDocumentModelHandler
 			throw new DocumentException(e);
 		} finally {
 			if (releaseRepoSession && repoSession != null) {
-				repoClient.releaseRepositorySession(repoSession);
+				repoClient.releaseRepositorySession(ctx, repoSession);
 			}
 		}
 		className = className.trim();
