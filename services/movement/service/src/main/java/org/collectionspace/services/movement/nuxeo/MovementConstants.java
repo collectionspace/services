@@ -54,9 +54,15 @@ public class MovementConstants {
 	
 	public static final String DEAD_ACTION_CODE = "Dead";
 	public static final String REVIVED_ACTION_CODE = "Revived";
+	public static final String OTHER_ACTION_CODE = "Other";
 
 	public static final String NONE_LOCATION = null;
 	
 	public static final String DELETE_TRANSITION = "delete";
 	public static final String DELETED_STATE = "deleted";
+	
+	public static final String LABEL_REQUESTED_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+	public static final String LABEL_REQUESTED_FIELD_NAME = "labelRequested";
+	public static final String LABEL_REQUESTED_YES_VALUE = "Yes";
+	public static final String LABEL_REQUESTED_NO_VALUE = "No";
 }
