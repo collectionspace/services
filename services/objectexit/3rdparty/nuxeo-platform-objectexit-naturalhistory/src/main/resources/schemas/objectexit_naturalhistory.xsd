@@ -13,9 +13,9 @@
 
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:ns="http://collectionspace.org/objectexit/domain/naturalhistory"
-    xmlns="http://collectionspace.org/objectexit/domain/naturalhistory"
-    targetNamespace="http://collectionspace.org/objectexit/domain/naturalhistory"
+    xmlns:ns="http://collectionspace.org/services/objectexit/domain/naturalhistory"
+    xmlns="http://collectionspace.org/services/objectexit/domain/naturalhistory"
+    targetNamespace="http://collectionspace.org/services/objectexit/domain/naturalhistory"
     version="0.1">
     
     <xs:element name="count" type="xs:integer"/>
