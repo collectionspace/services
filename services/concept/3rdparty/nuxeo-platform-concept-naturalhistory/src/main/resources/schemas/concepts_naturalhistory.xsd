@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+ 
+<!--
+    Concept schema (XSD)
+     
+    Entity  : Concept
+    Part    : Domain extension schema for naturalhistory
+    Used for: Nuxeo EP core document type
+ 
+-->
+ 
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/concept/domain/naturalhistory"
+  xmlns="http://collectionspace.org/services/concept/domain/naturalhistory"
+  targetNamespace="http://collectionspace.org/services/concept/domain/naturalhistory"
+  version="0.1"
+>
+ 
+    <xs:element name="associatedPerson" type="xs:string" />
+    <xs:element name="associatedOrganization" type="xs:string" />
+ 
+</xs:schema>
