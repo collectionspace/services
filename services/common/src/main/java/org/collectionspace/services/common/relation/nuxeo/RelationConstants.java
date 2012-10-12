@@ -33,4 +33,18 @@ public class RelationConstants {
     public final static String NUXEO_SCHEMA_NAME = "relations_common";
     /** The Constant REL_NUXEO_SCHEMA_ROOT_ELEMENT. */
     final public static String NUXEO_SCHEMA_ROOT_ELEMENT = "relationtype";
+    
+    public final static String COMMON_SCHEMA_NAME = "relations_common";
+
+    public final static String SUBJECT_CSID_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String SUBJECT_CSID_FIELD_NAME = "subjectCsid";
+
+    public final static String SUBJECT_DOCTYPE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String SUBJECT_DOCTYPE_FIELD_NAME = "subjectDocumentType";
+
+    public final static String OBJECT_CSID_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String OBJECT_CSID_FIELD_NAME = "objectCsid";
+
+    public final static String OBJECT_DOCTYPE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String OBJECT_DOCTYPE_FIELD_NAME = "objectDocumentType";
 }

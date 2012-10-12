@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.nuxeo.botgarden.ecm.types">	
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updatelocationlistener" async="false" postCommit="false"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateLocationListener" priority="100">
+			<event>documentCreated</event>
+			<event>beforeDocumentModification</event>
+		</listener>
+	</extension>
+	<!--
+		Deleting dead locations in a Nuxeo event handler causes problems in the app and ui layers,
+		since they're not expecting a save of a record to cause the record to be deleted. Instead,
+		deletion will be invoked from the ui layer.
+	-->
+	<!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="deletedeadlocationlistener" async="false" postCommit="false"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.DeleteDeadLocationListener" priority="150">
+			<event>documentModified</event>
+		</listener>
+	</extension> -->
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updatedeadflaglistener" async="true" postCommit="true"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateDeadFlagListener" priority="200">
+			<event>documentCreated</event>
+			<event>documentModified</event>
+		</listener>
+	</extension>
+	<!-- 
+		Temporarily create accession history versions using an event handler, until versioning is 
+		fully baked into cspace.
+	-->
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="createversionlistener" async="false" postCommit="false"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.CreateVersionListener" priority="999">
+			<event>documentCreated</event>
+			<event>documentModified</event>
+		</listener>
+	</extension>
+</component>

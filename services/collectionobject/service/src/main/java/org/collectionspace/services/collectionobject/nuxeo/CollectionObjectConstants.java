@@ -33,4 +33,18 @@ public class CollectionObjectConstants {
     public final static String NUXEO_SCHEMA_NAME = "collectionobject";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-CollectionObject";
     
+    public final static String CORE_SCHEMA_NAME = "collectionspace_core";
+    public final static String NATURALHISTORY_SCHEMA_NAME = "collectionobjects_naturalhistory";
+    public final static String BOTGARDEN_SCHEMA_NAME = "collectionobjects_botgarden";
+
+    public final static String WORKFLOW_STATE_SCHEMA_NAME = CORE_SCHEMA_NAME;
+    public final static String WORKFLOW_STATE_FIELD_NAME = "workflowState";
+
+    public final static String DEAD_FLAG_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
+    public final static String DEAD_FLAG_FIELD_NAME = "deadFlag";
+
+    public final static String DEAD_DATE_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
+    public final static String DEAD_DATE_FIELD_NAME = "deadDate";
+   
+	public static final String DELETED_STATE = "deleted";
 }
