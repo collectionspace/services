@@ -54,6 +54,7 @@
                 <xs:element name="handlingRecommendations" type="xs:string"/>
                 <xs:element name="packingRecommendations" type="xs:string"/>
                 <xs:element name="securityRecommendations" type="xs:string"/>
+                <xs:element name="specialRecommendations" type="xs:string"/>
                 <xs:element name="storageRequirements" type="xs:string"/>
                 <xs:element name="salvagePriorityCode" type="xs:string"/>
                 <xs:element name="salvagePriorityCodeDate" type="xs:string"/>
@@ -174,6 +175,7 @@
 
     <xs:complexType name="hazardGroup">
         <xs:sequence>
+            <xs:element name="hazard" type="xs:string"/>
             <xs:element name="hazardDate" type="xs:string"/>
             <xs:element name="hazardNote" type="xs:string"/>
         </xs:sequence>
