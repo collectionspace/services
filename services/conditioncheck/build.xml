@@ -1,9 +1,8 @@
-
 <project name="conditioncheck" default="package" basedir=".">
     <description>
         conditioncheck service
     </description>
-  <!-- set global properties for this build -->
+    <!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
@@ -19,7 +18,7 @@
     </condition>
 
     <target name="package" depends="package-unix,package-windows"
-  description="Package CollectionSpace Services" />
+        description="Package CollectionSpace Services" />
   
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
@@ -47,7 +46,7 @@
 
 
     <target name="install" depends="install-unix,install-windows"
-  description="Install" />
+        description="Install" />
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="install" />
@@ -72,7 +71,7 @@
     </target>
 
     <target name="clean" depends="clean-unix,clean-windows"
-  description="Delete target directories" >
+        description="Delete target directories" >
         <delete dir="${build}"/>
     </target>
     <target name="clean-unix" if="osfamily-unix">
@@ -107,17 +106,17 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy conditioncheck service">
+        description="deploy conditioncheck service">
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy conditioncheck service">
+        description="undeploy conditioncheck service">
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist" depends="package"
-    description="distribute conditioncheck service">
+        description="distribute conditioncheck service">
         <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
     </target>
 

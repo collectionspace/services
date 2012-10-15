@@ -957,10 +957,10 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end loanout service meta-data -->
+        <!-- end loanout service meta-data -->
     
         <!-- begin conditioncheck service meta-data -->
-        <!--<tenant:serviceBindings id="Conditionchecks" name="Conditionchecks" type="procedure" version="0.1">
+        <tenant:serviceBindings id="Conditionchecks" name="Conditionchecks" type="procedure" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.conditioncheck.nuxeo.ConditioncheckDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
@@ -1014,10 +1014,10 @@
                     </service:content>
                 </service:part>
             </service:object>
-        </tenant:serviceBindings>-->
+        </tenant:serviceBindings>
         <!-- end conditioncheck service meta-data -->
 
-    <!-- begin objectexit service meta-data -->
+        <!-- begin objectexit service meta-data -->
         <tenant:serviceBindings id="ObjectExit" name="ObjectExit" type="procedure" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:documentHandler>
@@ -2024,9 +2024,9 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end person service meta-data -->
+        <!-- end person service meta-data -->
         
-    <!-- begin locationauthority service meta-data -->
+        <!-- begin locationauthority service meta-data -->
         <tenant:serviceBindings id="Locationauthorities" name="Locationauthorities" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <!--
@@ -2802,9 +2802,9 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end acquisition service meta-data -->
+        <!-- end acquisition service meta-data -->
     
-    <!-- begin relation service meta-data -->
+        <!-- begin relation service meta-data -->
         <tenant:serviceBindings id="Relations" name="Relations" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
@@ -3071,7 +3071,7 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end note service meta-data -->
+        <!-- end note service meta-data -->
     
         <!-- begin role service meta-data -->
         <tenant:serviceBindings id="authorization/roles" name="authorization/roles" type="security" version="0.1">

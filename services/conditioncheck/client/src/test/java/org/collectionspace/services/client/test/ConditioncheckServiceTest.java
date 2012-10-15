@@ -22,12 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -37,21 +32,9 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ConditioncheckClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
-import org.collectionspace.services.conditioncheck.ConditionCheckMethodsList;
-import org.collectionspace.services.conditioncheck.ConditionCheckReasonsList;
 import org.collectionspace.services.conditioncheck.ConditionCheckersList;
-import org.collectionspace.services.conditioncheck.CompletenessGroupList;
-import org.collectionspace.services.conditioncheck.CompletenessGroup;
-import org.collectionspace.services.conditioncheck.ConditionGroupList;
-import org.collectionspace.services.conditioncheck.ConditionGroup;
-import org.collectionspace.services.conditioncheck.EnvConditionGroupList;
-import org.collectionspace.services.conditioncheck.EnvConditionGroup;
-import org.collectionspace.services.conditioncheck.TechAssessmentGroupList;
-import org.collectionspace.services.conditioncheck.TechAssessmentGroup;
 import org.collectionspace.services.conditioncheck.HazardGroupList;
 import org.collectionspace.services.conditioncheck.HazardGroup;
-import org.collectionspace.services.conditioncheck.LegalReqsHeldGroupList;
-import org.collectionspace.services.conditioncheck.LegalReqsHeldGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -80,10 +63,15 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
 
     final String SERVICE_NAME = "conditionchecks";
     final String SERVICE_PATH_COMPONENT = "conditionchecks";
+    private String CONDITIONCHECKER_REF_NAME = "urn:cspace:org.collectionspace.demo:personauthorities:name(TestPersonAuth):item:name(JimChecker)'Jim Checker'";
 
     // Instance variables specific to this test.
     private String knownResourceId = null;
     private final static String TIMESTAMP_UTC =
+            GregorianCalendarDateTimeUtils.timestampUTC();
+
+    // Instance variables specific to this test.
+    private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.timestampUTC();
     
     /* (non-Javadoc)
@@ -122,22 +110,31 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         ConditioncheckClient client = new ConditioncheckClient();
         String identifier = createIdentifier();
         PoxPayloadOut multipart = createConditioncheckInstance(identifier);
+        String newID = null;
         ClientResponse<Response> res = client.create(multipart);
 
-        int statusCode = res.getStatus();
+        try {
+            int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            //
+            // Specifically:
+            // Does it fall within the set of valid status codes?
+            // Does it exactly match the expected status code?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+
+            newID = extractId(res);
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
@@ -156,14 +153,14 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
      */
-    @Override
+    /*@Override
     //@Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
     //    dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
         for(int i = 0; i < 3; i++){
             create(testName);
         }
-    }
+    }*/
 
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
@@ -171,26 +168,26 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
      */
-    @Override
+    /*@Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
         //Should this really be empty?
-    }
+    }*/
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
      */
-    @Override
+    /*@Override
     public void createWithMalformedXml(String testName) throws Exception {
         //Should this really be empty?
-    }
+    }*/
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
      */
-    @Override
+    /*@Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
         //Should this really be empty?
-    }
+    }*/
 
     /*
     @Override
@@ -298,19 +295,18 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         // Submit the request to the service and store the response.
         ConditioncheckClient client = new ConditioncheckClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        PoxPayloadIn input = null;
+        try {
+            assertStatusCode(res, testName);
+            input = new PoxPayloadIn(res.getEntity());
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Get the common part of the response and verify that it is not null.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         ConditionchecksCommon conditioncheckCommon = null;
         if (payloadInputPart != null) {
@@ -321,13 +317,30 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         // Check selected fields.
 
         // Check the values of one or more date/time fields.
-        String conditionCheckDate = conditioncheckCommon.getConditionCheckDate();
+        /*String conditionCheckDate = conditioncheckCommon.getConditionCheckDate();
 
         if (logger.isDebugEnabled()) {
             logger.debug("conditionCheckDate=" + conditionCheckDate);
             logger.debug("TIMESTAMP_UTC=" + TIMESTAMP_UTC);
         }
         Assert.assertTrue(conditionCheckDate.equals(TIMESTAMP_UTC));
+        */
+
+        // Repeatable group
+        HazardGroupList hazardGroupList = conditioncheckCommon.getHazardGroupList();
+        Assert.assertNotNull(hazardGroupList);
+        List<HazardGroup> hazardGroups = hazardGroupList.getHazardGroup();
+        Assert.assertNotNull(hazardGroups);
+        Assert.assertTrue(hazardGroups.size() > 0);
+        String hazardNote = hazardGroups.get(0).getHazardNote();
+        Assert.assertNotNull(hazardNote);
+
+        // Repeatable field
+        List<String> conditionCheckers =
+                conditioncheckCommon.getConditionCheckers().getConditionChecker();
+        Assert.assertTrue(conditionCheckers.size() > 0);
+        Assert.assertEquals(conditionCheckers.get(0), CONDITIONCHECKER_REF_NAME);
+
         
         // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
         String conditionCheckNote = conditioncheckCommon.getConditionCheckNote();
@@ -356,16 +369,23 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         // Submit the request to the service and store the response.
         ConditioncheckClient client = new ConditioncheckClient();
         ClientResponse<String> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+            int statusCode = res.getStatus();
+
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -383,22 +403,32 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         setupReadList();
 
         // Submit the request to the service and store the response.
+        AbstractCommonList list = null;
         ConditioncheckClient client = new ConditioncheckClient();
         ClientResponse<AbstractCommonList> res = client.readList();
-        AbstractCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
+        assertStatusCode(res, testName);
+        try {
+            int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+
+            list = res.getEntity();
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
         // Optionally output additional data about list members for debugging.
-        if(logger.isTraceEnabled()){
+        boolean iterateThroughList = true;
+        if(iterateThroughList && logger.isDebugEnabled()){
             AbstractCommonListUtils.ListItemsInAbstractCommonList(list, logger, testName);
         }
     }
@@ -422,16 +452,20 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         // Retrieve the contents of a resource to update.
         ConditioncheckClient client = new ConditioncheckClient();
         ClientResponse<String> res = client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
-        if(logger.isDebugEnabled()){
-            logger.debug("got object to update with ID: " + knownResourceId);
+        PoxPayloadIn input = null;
+        try {
+            assertStatusCode(res, testName);
+            input = new PoxPayloadIn(res.getEntity());
+            if (logger.isDebugEnabled()) {
+                logger.debug("got object to update with ID: " + knownResourceId);
+            }
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
         }
 
         // Extract the common part from the response.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
         ConditionchecksCommon conditioncheckCommon = null;
         if (payloadInputPart != null) {
@@ -439,16 +473,16 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         }
         Assert.assertNotNull(conditioncheckCommon);
 
-        // Update its content.
-        conditioncheckCommon.setConditionCheckRefNumber(""); // Test deletion of existing string value
+        // Update the content of this resource.
+        conditioncheckCommon.setConditionCheckRefNumber("updated-" + conditioncheckCommon.getConditionCheckRefNumber());
 
-        String conditionCheckNote = conditioncheckCommon.getConditionCheckNote();
-        conditioncheckCommon.setConditionCheckNote("updated condition check note-" + conditionCheckNote);
+        //String conditionCheckNote = conditioncheckCommon.getConditionCheckNote();
+        conditioncheckCommon.setConditionCheckNote("updated-" + conditioncheckCommon.getConditionCheckNote());
 
-        conditioncheckCommon.getConditionCheckReasons().getConditionCheckReason().remove(0); // Test removing a value from a list
+        //conditioncheckCommon.getConditionCheckReasons().getConditionCheckReason().remove(0); // Test removing a value from a list
 
-        String currentTimestamp = GregorianCalendarDateTimeUtils.timestampUTC();
-        conditioncheckCommon.setConditionCheckDate(currentTimestamp);
+        //String currentTimestamp = GregorianCalendarDateTimeUtils.timestampUTC();
+        //conditioncheckCommon.setConditionCheckDate(currentTimestamp);
 
         conditioncheckCommon.getConditionCheckers().getConditionChecker().remove(0);
 
@@ -457,60 +491,44 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
             logger.debug(objectAsXmlString(conditioncheckCommon, ConditionchecksCommon.class));
         }
 
-        // Submit the request to the service and store the response.
+        // Submit the updated common part in an update request to the service
+        // and store the response.
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart = output.addPart(conditioncheckCommon, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(client.getCommonPartName());
+        PayloadOutputPart commonPart = output.addPart(client.getCommonPartName(), conditioncheckCommon);
         res = client.update(knownResourceId, output);
-
-        // Check the status code of the response: does it match the expected response(s)?
-        int statusCode = res.getStatus();
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+            assertStatusCode(res, testName);
+            int statusCode = res.getStatus();
+            // Check the status code of the response: does it match the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+            input = new PoxPayloadIn(res.getEntity());
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-       // Extract the updated common part from the response.
-        input = new PoxPayloadIn(res.getEntity());
+        // Extract the updated common part from the response.
         payloadInputPart = input.getPart(client.getCommonPartName());
         ConditionchecksCommon updatedConditioncheckCommon = null;
         if (payloadInputPart != null) {
             updatedConditioncheckCommon = (ConditionchecksCommon) payloadInputPart.getBody();
         }
-        Assert.assertNotNull(conditioncheckCommon);
-        if(logger.isDebugEnabled()){
-            logger.debug("updated object");
-            logger.debug(objectAsXmlString(updatedConditioncheckCommon, ConditionchecksCommon.class));
-        }
+        Assert.assertNotNull(updatedConditioncheckCommon);
 
         // Check selected fields in the updated common part.
-        // By submitting an empty string in the update payload, the value of this field
-        // in the object created from the response payload will be null.
-        Assert.assertNull(updatedConditioncheckCommon.getConditionCheckRefNumber(), "Data in updated object did not match submitted data.");
-        if(logger.isDebugEnabled()){
-            logger.debug("Received conditioncheck number after update=|" + updatedConditioncheckCommon.getConditionCheckRefNumber() + "|");
-        }
+        Assert.assertEquals(updatedConditioncheckCommon.getConditionCheckRefNumber(), conditioncheckCommon.getConditionCheckRefNumber(),
+                "Data in updated object did not match submitted data.");
 
         String originalConditionCheckNote = conditioncheckCommon.getConditionCheckNote();
         String updatedConditionCheckNote = updatedConditioncheckCommon.getConditionCheckNote();
 
-        Assert.assertEquals(updatedConditionCheckNote,
-            originalConditionCheckNote,
-            "Data in updated object did not match submitted data.");
-
-        List<String> updatedConditionCheckReasonsList = updatedConditioncheckCommon.getConditionCheckReasons().getConditionCheckReason();
-        Assert.assertEquals(1,
-            updatedConditionCheckReasonsList.size(),
-            "Data in updated object did not match submitted data.");
-
-        Assert.assertEquals(updatedConditionCheckReasonsList.get(0),
-            conditioncheckCommon.getConditionCheckReasons().getConditionCheckReason().get(0),
-            "Data in updated object did not match submitted data.");
-
-        Assert.assertEquals(updatedConditioncheckCommon.getConditionCheckDate(),
-            currentTimestamp,
+        Assert.assertEquals(updatedConditionCheckNote, originalConditionCheckNote,
             "Data in updated object did not match submitted data.");
 
         if(logger.isDebugEnabled()){
@@ -523,6 +541,8 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         Assert.assertEquals(updatedConditionCheckNote,
                 originalConditionCheckNote,
                 "Data in updated object did not match submitted data.");
+
+        Assert.assertNull(updatedConditioncheckCommon.getConditionCheckers().getConditionChecker(), "Data in updated object did not match submitted data.");
     }
 
     // Failure outcomes
@@ -657,16 +677,22 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         ConditioncheckClient client = new ConditioncheckClient();
         PoxPayloadOut multipart = createConditioncheckInstance(NON_EXISTENT_ID);
         ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
+        try {
+            int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -681,25 +707,28 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
     //@Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
     //    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
-        /*
         // Perform setup.
         setupDelete();
 
         // Submit the request to the service and store the response.
         ConditioncheckClient client = new ConditioncheckClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
+        try {
+            int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-     *
-     */
     }
 
 
@@ -717,16 +746,22 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         // Submit the request to the service and store the response.
         ConditioncheckClient client = new ConditioncheckClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
+        try {
+            int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
         }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
     }
 
     // ---------------------------------------------------------------
@@ -794,27 +829,18 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
     @Override
     public PoxPayloadOut createInstance(String conditionCheckRefNumber) {
         ConditionchecksCommon conditioncheckCommon = new ConditionchecksCommon();
-
-        ConditionCheckReasonsList conditionCheckReasonsList = new ConditionCheckReasonsList();
-        List<String> conditionCheckReasons = conditionCheckReasonsList.getConditionCheckReason();
-        String identifier = createIdentifier();
-        conditionCheckReasons.add("First Conditioncheck Reason-" + identifier);
-        conditionCheckReasons.add("Second Conditioncheck Reason-" + identifier);
+        conditioncheckCommon.setConditionCheckRefNumber(conditionCheckRefNumber);
 
         ConditionCheckersList conditionCheckersList = new ConditionCheckersList();
         List<String> conditionCheckers = conditionCheckersList.getConditionChecker();
-        conditionCheckers.add("urn:cspace:core.collectionspace.org:personauthorities:name(TestPersonAuth):item:name(carrieConditionChecker)'Carrie ConditionChecker'");
-
-        conditioncheckCommon.setConditionCheckReasons(conditionCheckReasonsList);
+        conditionCheckers.add(CONDITIONCHECKER_REF_NAME);
         conditioncheckCommon.setConditionCheckers(conditionCheckersList);
-        conditioncheckCommon.setConditionCheckNote(getUTF8DataFragment());
-        conditioncheckCommon.setConditionCheckDate(TIMESTAMP_UTC);
-        conditioncheckCommon.setConditionCheckRefNumber(conditionCheckRefNumber);
 
+        conditioncheckCommon.setConditionCheckNote(getUTF8DataFragment());
+        
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
-            multipart.addPart(conditioncheckCommon, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new ConditioncheckClient().getCommonPartName());
+                multipart.addPart(new ConditioncheckClient().getCommonPartName(), conditioncheckCommon);
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, conditioncheck common");

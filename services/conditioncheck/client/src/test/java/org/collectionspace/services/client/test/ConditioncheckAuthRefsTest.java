@@ -44,8 +44,6 @@ import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUti
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
 import org.collectionspace.services.conditioncheck.ConditionCheckersList;
-//import org.collectionspace.services.conditioncheck.ConditioncheckantGroupList;
-//import org.collectionspace.services.conditioncheck.ConditioncheckantGroup;
 import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -68,19 +66,19 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
 
     private final String CLASS_NAME = ConditioncheckAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
+    // Instance variables specific to this test.
     final String SERVICE_NAME = "conditionchecks";
     final String SERVICE_PATH_COMPONENT = "conditionchecks";
-
-    // Instance variables specific to this test.
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
     private List<String> conditioncheckIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
-    private String conditionChecker = null;
-    //private String conditioncheckOnBehalfOfRefName = null;
+    //private String conditionCheckerRefName = null;
+    private List<String> conditionCheckersRefNames = new ArrayList<String>();
 
-    private final int NUM_AUTH_REFS_EXPECTED = 2;
+    private final int NUM_AUTH_REFS_EXPECTED = 1;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -120,7 +118,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         ConditioncheckClient conditioncheckClient = new ConditioncheckClient();
         PoxPayloadOut multipart = createConditioncheckInstance(
                 "conditionCheckRefNumber-" + identifier,
-                "conditionChecker-" + conditionChecker);
+                conditionCheckersRefNames);
         ClientResponse<Response> res = conditioncheckClient.create(multipart);
         int statusCode = res.getStatus();
 
@@ -170,9 +168,13 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-        String csid = createPerson("Carrie", "ConditionChecker", "carrieConditionChecker", authRefName);
+        String csid = createPerson("Carrie", "ConditionChecker1", "carrieConditionChecker", authRefName);
         personIdsCreated.add(csid);
-        conditionChecker = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        conditionCheckersRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
+
+        csid = createPerson("Sammy", "ConditionChecker2", "sammyConditionChecker", authRefName);
+        conditionCheckersRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
+        personIdsCreated.add(csid);
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
@@ -209,35 +211,37 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         // Submit the request to the service and store the response.
         ConditioncheckClient conditioncheckClient = new ConditioncheckClient();
         ClientResponse<String> res = conditioncheckClient.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".read: status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-
-        // Extract and return the common part of the record.
-        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        PayloadInputPart payloadInputPart = input.getPart(conditioncheckClient.getCommonPartName());
         ConditionchecksCommon conditioncheckCommon = null;
-        if (payloadInputPart != null) {
-            conditioncheckCommon = (ConditionchecksCommon) payloadInputPart.getBody();
-        }
-        Assert.assertNotNull(conditioncheckCommon);
-        if(logger.isDebugEnabled()){
-            logger.debug(objectAsXmlString(conditioncheckCommon, ConditionchecksCommon.class));
-        }
-        // Check a couple of fields
-        //Assert.assertEquals(conditioncheckCommon.getConditionChecker(), conditionChecker);
-        Assert.assertEquals(conditioncheckCommon.getConditionCheckers().getConditionChecker(), conditionChecker);
-        //Assert.assertEquals(conditioncheckCommon.getConditioncheckantGroupList().getConditioncheckantGroup().get(0).getFiledOnBehalfOf(), conditioncheckOnBehalfOfRefName);
         
+        try {
+            assertStatusCode(res, testName);
+            // Extract the common part from the response.
+            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+            conditioncheckCommon = (ConditionchecksCommon) extractPart(input,
+                conditioncheckClient.getCommonPartName(), ConditionchecksCommon.class);
+            Assert.assertNotNull(conditioncheckCommon);
+
+            if(logger.isDebugEnabled()){
+                logger.debug(objectAsXmlString(conditioncheckCommon, ConditionchecksCommon.class));
+            }
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
+        }
+
+        // Check a couple of fields
+        //Assert.assertEquals(conditioncheckCommon.getConditionCheckers().getConditionChecker(), conditionCheckersRefNames);
+
+        // In scalar repeatable fields
+        ConditionCheckersList conditionCheckers = conditioncheckCommon.getConditionCheckers();
+        List<String> checkers = conditionCheckers.getConditionChecker();
+        for (String refName : checkers) {
+            Assert.assertTrue(conditionCheckersRefNames.contains(refName));
+        }
+
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 =
+        /*ClientResponse<AuthorityRefList> res2 =
            conditioncheckClient.getAuthorityRefs(knownResourceId);
         statusCode = res2.getStatus();
         if(logger.isDebugEnabled()){
@@ -257,6 +261,34 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
             "Did not find all expected authority references! " +
             "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
+        */
+
+        //
+        // Get the auth refs and check them
+        //
+        ClientResponse<AuthorityRefList> res2 = 
+            conditioncheckClient.getAuthorityRefs(knownResourceId);
+        AuthorityRefList list = null;
+        try {
+            assertStatusCode(res2, testName);
+            list = res2.getEntity();
+            Assert.assertNotNull(list);
+        } finally {
+            if (res2 != null) {
+                res2.releaseConnection();
+            }
+        }
+
+        List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
+        int numAuthRefsFound = items.size();
+        if (logger.isDebugEnabled()){
+            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
+                    " authority references, found " + numAuthRefsFound);
+        }
+        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
+                "Did not find all expected authority references! " +
+                "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
+
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
@@ -335,33 +367,32 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     }
 
    private PoxPayloadOut createConditioncheckInstance(String conditionCheckRefNumber,
-            String conditionChecker) {
+            List<String> conditionCheckers) {
         ConditionchecksCommon conditioncheckCommon = new ConditionchecksCommon();
+
         conditioncheckCommon.setConditionCheckRefNumber(conditionCheckRefNumber);
 
-
         ConditionCheckersList conditionCheckersList = new ConditionCheckersList();
-        List<String> conditionCheckers = conditionCheckersList.getConditionChecker();
-        conditionCheckers.add(conditionChecker);
+        List<String> condCheckers = conditionCheckersList.getConditionChecker();
+        for (String conditionChecker: conditionCheckers){
+            condCheckers.add(conditionChecker);
+        }
         conditioncheckCommon.setConditionCheckers(conditionCheckersList);
-
-
-        /*ConditionCheckersList conditionCheckersList = new ConditionCheckersList();
-        conditionCheckersList.setConditionChecker(conditionChecker);
-        conditioncheckCommon.setConditionCheckersList(conditionCheckersList);*/
-        //conditioncheckCommon.setConditionChecker(conditionChecker);
-
-        /*ConditioncheckantGroupList ConditioncheckantGroupList = new ConditioncheckantGroupList();
-        ConditioncheckantGroup ConditioncheckantGroup = new ConditioncheckantGroup();
-        ConditioncheckantGroup.setFiledBy(conditioncheckFiler);
-        ConditioncheckantGroup.setFiledOnBehalfOf(conditioncheckFiledOnBehalfOf);
-        ConditioncheckantGroupList.getConditioncheckantGroup().add(ConditioncheckantGroup);
-        conditioncheckCommon.setConditioncheckantGroupList(ConditioncheckantGroupList);*/
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
-            multipart.addPart(conditioncheckCommon, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new ConditioncheckClient().getCommonPartName());
+            multipart.addPart(new ConditioncheckClient().getCommonPartName(), conditioncheckCommon);
+
+
+        /*PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
+                multipart.addPart(new LoaninClient().getCommonPartName(), loaninCommon);
+
+
+        AcquisitionClient acquisitionClient = new AcquisitionClient();
+        PoxPayloadOut multipart = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart =
+            multipart.addPart(acquisitionClient.getCommonPartName(), acquisition);*/
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, conditioncheck common");

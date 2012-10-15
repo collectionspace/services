@@ -36,7 +36,7 @@
                 <xs:element name="conditionGroupList" type="conditionGroupList"/>
                 <xs:element name="conservationTreatmentPriority" type="xs:string"/>
                 <xs:element name="envConditionGroupList" type="envConditionGroupList"/>
-                <xs:element name="newConditionCheckDate" type="xs:string"/>
+                <xs:element name="nextConditionCheckDate" type="xs:string"/>
                 <xs:element name="techAssessmentGroupList" type="techAssessmentGroupList"/>
                 <xs:element name="hazardGroupList" type="hazardGroupList"/>
 

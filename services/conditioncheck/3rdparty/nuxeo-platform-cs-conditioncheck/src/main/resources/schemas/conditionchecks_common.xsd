@@ -25,7 +25,7 @@
     <xs:element name="conditionGroupList" type="conditionGroupList"/>
     <xs:element name="conservationTreatmentPriority" type="xs:string"/>
     <xs:element name="envConditionGroupList" type="envConditionGroupList"/>
-    <xs:element name="newConditionCheckDate" type="xs:date"/>
+    <xs:element name="nextConditionCheckDate" type="xs:date"/>
     <xs:element name="techAssessmentGroupList" type="techAssessmentGroupList"/>
     <xs:element name="hazardGroupList" type="hazardGroupList"/>
 
@@ -61,6 +61,7 @@
     <xs:element name="handlingRecommendations" type="xs:string"/>
     <xs:element name="packingRecommendations" type="xs:string"/>
     <xs:element name="securityRecommendations" type="xs:string"/>
+    <xs:element name="specialRecommendations" type="xs:string"/>
     <xs:element name="storageRequirements" type="xs:string"/>
     <xs:element name="salvagePriorityCode" type="xs:string"/>
     <xs:element name="salvagePriorityCodeDate" type="xs:date"/>
@@ -151,6 +152,7 @@
 
     <xs:complexType name="hazardGroup">
         <xs:sequence>
+            <xs:element name="hazard" type="xs:string"/>
             <xs:element name="hazardDate" type="xs:date"/>
             <xs:element name="hazardNote" type="xs:string"/>
         </xs:sequence>
