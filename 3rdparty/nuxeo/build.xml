@@ -129,6 +129,7 @@
             </filterset>
         </copy>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-botgarden/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
@@ -139,6 +140,7 @@
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-botgarden/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
