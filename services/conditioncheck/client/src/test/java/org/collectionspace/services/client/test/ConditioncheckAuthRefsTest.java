@@ -240,29 +240,6 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
             Assert.assertTrue(conditionCheckersRefNames.contains(refName));
         }
 
-        // Get the auth refs and check them
-        /*ClientResponse<AuthorityRefList> res2 =
-           conditioncheckClient.getAuthorityRefs(knownResourceId);
-        statusCode = res2.getStatus();
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
-        }
-        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(testRequestType, statusCode));
-        Assert.assertEquals(statusCode, testExpectedStatusCode);
-        AuthorityRefList list = res2.getEntity();
-        
-        List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
-        int numAuthRefsFound = items.size();
-        if(logger.isDebugEnabled()){
-            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
-                " authority references, found " + numAuthRefsFound);
-        }
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
-        */
-
         //
         // Get the auth refs and check them
         //
@@ -382,17 +359,6 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
             multipart.addPart(new ConditioncheckClient().getCommonPartName(), conditioncheckCommon);
-
-
-        /*PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart =
-                multipart.addPart(new LoaninClient().getCommonPartName(), loaninCommon);
-
-
-        AcquisitionClient acquisitionClient = new AcquisitionClient();
-        PoxPayloadOut multipart = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart =
-            multipart.addPart(acquisitionClient.getCommonPartName(), acquisition);*/
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, conditioncheck common");

@@ -964,22 +964,11 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.conditioncheck.nuxeo.ConditioncheckDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.conditioncheck.nuxeo.ConditioncheckDocumentModelHandler</service:classname>
                 <service:params>
-                    <service:SchemaName>conditionchecks</service:SchemaName>
-                    <service:DublinCoreTitle>conditionchecks</service:DublinCoreTitle>
-                    <service:SummaryFields>conditionCheckRefNumber|conditionCheckDate|uri|csid</service:SummaryFields>
-                    <service:AbstractCommonListClassname />
-                    <service:CommonListItemClassname />
-                    <service:ListResultsItemMethodName>getConditioncheckListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>conditionCheckRefNumber</service:element>
                             <service:xpath>conditionCheckRefNumber</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>conditionCheckDate</service:element>
-                            <service:xpath>conditionCheckDate</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>
                 </service:params>
@@ -988,7 +977,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>conditionCheckers/[0]/conditionChecker</types:value>
+                    <types:value>conditionCheckers|conditionChecker</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
@@ -1003,6 +992,36 @@
                 </service:part>
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="conditionchecks_common" updated="" order="1">
                     <service:properties>
+                        <!-- Fields containing authority term references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>conditionCheckers|conditionChecker</types:value>
+                        </types:item>
+                        <!-- Fields containing term list / controlled vocabulary references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>objectAuditCategory</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conditionGroupList/*/condition</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>hazardGroupList/*/hazard</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conditionCheckMethods|conditionCheckMethod</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conditionCheckReasons|conditionCheckReason</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>salvagePriorityCode</types:value>
+                        </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/conditioncheck" schemaLocation="http://collectionspace.org/services/conditioncheck http://services.collectionspace.org/conditioncheck/conditionchecks_common.xsd" />
