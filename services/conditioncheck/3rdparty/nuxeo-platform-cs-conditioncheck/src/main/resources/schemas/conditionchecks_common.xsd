@@ -13,9 +13,9 @@
 
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:ns="http://collectionspace.org/services/conditioncheck/"
-    xmlns="http://collectionspace.org/services/conditioncheck/"
-    targetNamespace="http://collectionspace.org/services/conditioncheck/"
+    xmlns:ns="http://collectionspace.org/conditioncheck/"
+    xmlns="http://collectionspace.org/conditioncheck/"
+    targetNamespace="http://collectionspace.org/conditioncheck/"
     version="0.1">
     
 
@@ -177,40 +177,4 @@
             <xs:element name="legalReqsHeldRenewDate" type="xs:date"/>
         </xs:sequence>
     </xs:complexType>
-
-
-    <!-- SINGLE REPEATABLE FIELD EXAMPLE
-
-    <xs:element name="briefDescriptions">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="briefDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    -->
-
-
-
-    <!-- REPEATABLE GROUP EXAMPLE
-
-    <xs:element name="GroupList" type="GroupList"/>
-    
-    <xs:complexType name="GroupList">
-        <xs:sequence>
-            <xs:element name="Group" type="Group" minOccurs="0"
-                        maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="Group">
-        <xs:sequence>
-            <xs:element name="termDisplayName" type="xs:string"/>
-            <xs:element name="termName" type="xs:string"/>
-            <xs:element name="termPrefForLang" type="xs:boolean"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    -->
 </xs:schema>
