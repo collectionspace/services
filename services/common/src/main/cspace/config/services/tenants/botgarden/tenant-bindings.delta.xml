@@ -151,6 +151,8 @@
                             <types:key>authRef</types:key>
                             <types:value>taxonomyList|taxonomy</types:value>
                         </types:item>
+                        <!-- These naturalhistory fields are unused in botgarden. -->
+                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>transferGroupList/*/transferOrg</types:value>
@@ -167,9 +169,25 @@
                             <types:key>authRef</types:key>
                             <types:value>returnGroupList/*/returnDetermination</types:value>
                         </types:item>
+                        -->
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/loanout/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/loanout/domain/naturalhistory http://collectionspace.org/services/loanout/domain/loansout_naturalhistory.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansout_botgarden" updated="" order="4">
+                    <service:properties>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>collectorList|collector</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>gardenLocation</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/loanout/local/botgarden" schemaLocation="http://collectionspace.org/services/loanout/local/botgarden http://collectionspace.org/services/loanout/local/loansout_botgarden.xsd" />
                     </service:content>
                 </service:part>
             </service:object>

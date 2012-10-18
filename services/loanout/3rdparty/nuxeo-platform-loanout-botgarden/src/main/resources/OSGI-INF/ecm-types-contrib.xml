@@ -11,7 +11,7 @@
         <layout>collectionspace_core</layout>
         <layout>loanout</layout>
         <layout>loansout_naturalhistory</layout>
-		<!-- <layout>${CustomSchemaName}</layout> -->
+		<layout>${CustomSchemaName}</layout>
       </layouts>
     </type>
 

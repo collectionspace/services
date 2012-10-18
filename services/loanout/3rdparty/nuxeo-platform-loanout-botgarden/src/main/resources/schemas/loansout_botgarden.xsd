@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+	Loan Out schema (XSD)
+	
+	Entity	: Loanout
+	Part	: botgarden
+	Used for: Nuxeo EP core document type
+
+	$LastChangedRevision$
+	$LastChangedDate$
+-->
+
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ns="http://collectionspace.org/services/loanout/local/botgarden"
+	xmlns="http://collectionspace.org/services/loanout/local/botgarden"
+	targetNamespace="http://collectionspace.org/services/loanout/local/botgarden"
+	version="0.1">
+	
+	<xs:element name="collectorList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="collector" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="collectionNote" type="xs:string"/>
+	<xs:element name="gardenLocation" type="xs:string"/>
+	<xs:element name="sheetAccessionNumber" type="xs:string"/>
+	<xs:element name="reviewComplete" type="xs:boolean"/>
+
+	<xs:element name="sterile" type="xs:boolean"/>
+	<xs:element name="fertile" type="xs:boolean"/>
+	<xs:element name="flowering" type="xs:boolean"/>
+	<xs:element name="fruiting" type="xs:boolean"/>
+	<xs:element name="inSpore" type="xs:boolean"/>
+</xs:schema>
