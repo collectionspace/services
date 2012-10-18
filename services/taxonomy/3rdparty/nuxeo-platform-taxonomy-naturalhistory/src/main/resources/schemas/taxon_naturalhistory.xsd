@@ -19,8 +19,11 @@
   version="0.1"
 >
 	<xs:element name="taxonBasionym" type="xs:string"/>
+	<xs:element name="accessRestrictions" type="xs:string"/>
+	<xs:element name="family" type="xs:string"/>
 	<xs:element name="commonNameGroupList" type="commonNameGroupList"/>
 	<xs:element name="relatedTermGroupList" type="relatedTermGroupList"/>
+	<xs:element name="plantAttributesGroupList" type="plantAttributesGroupList"/>
 	
 	<xs:complexType name="commonNameGroupList">
 		<xs:sequence>
@@ -47,6 +50,27 @@
 			<xs:element name="relatedTermType" type="xs:string"/>
 			<xs:element name="relatedTermSource" type="xs:string"/>
 			<xs:element name="relatedTermSourceDetail" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="plantAttributesGroupList">
+		<xs:sequence>
+			<xs:element name="plantAttributesGroup" type="plantAttributesGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="plantAttributesGroup">
+		<xs:sequence>
+			<xs:element name="attributeDate" type="xs:date"/>
+			<xs:element name="recordedBy" type="xs:string"/>
+			<xs:element name="height" type="xs:string"/>
+			<xs:element name="width" type="xs:string"/>
+			<xs:element name="diameterBreastHeight" type="xs:string"/>
+			<xs:element name="habitat" type="xs:string"/>
+			<xs:element name="climateRating" type="xs:string"/>
+			<xs:element name="conservationCategory" type="xs:string"/>
+			<xs:element name="frostSensitive" type="xs:boolean"/>
+			<xs:element name="medicinalUse" type="xs:boolean"/>
+			<xs:element name="economicUse" type="xs:boolean"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

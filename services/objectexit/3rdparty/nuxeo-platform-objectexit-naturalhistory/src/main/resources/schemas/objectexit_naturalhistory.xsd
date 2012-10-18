@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Object Exit schema (XSD)
+    
+    Entity  : ObjectExit
+    Part    : naturalhistory
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/objectexit/domain/naturalhistory"
+    xmlns="http://collectionspace.org/objectexit/domain/naturalhistory"
+    targetNamespace="http://collectionspace.org/objectexit/domain/naturalhistory"
+    version="0.1">
+    
+    <xs:element name="count" type="xs:integer"/>
+
+</xs:schema>
