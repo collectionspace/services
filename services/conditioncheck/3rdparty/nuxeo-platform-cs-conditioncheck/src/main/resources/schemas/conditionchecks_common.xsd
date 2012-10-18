@@ -22,7 +22,7 @@
     <!--  Object Condition and Technical Assessment Information Group -->
     <xs:element name="objectAuditCategory" type="xs:string"/>
     <xs:element name="completenessGroupList" type="completenessGroupList"/>
-    <xs:element name="conditionGroupList" type="conditionGroupList"/>
+    <xs:element name="conditioncheckGroupList" type="conditioncheckGroupList"/>
     <xs:element name="conservationTreatmentPriority" type="xs:string"/>
     <xs:element name="envConditionGroupList" type="envConditionGroupList"/>
     <xs:element name="nextConditionCheckDate" type="xs:date"/>
@@ -91,14 +91,14 @@
     <!-- =================================================================
          Condition Group repeating structure
          ================================================================= -->
-    <xs:complexType name="conditionGroupList">
+    <xs:complexType name="conditioncheckGroupList">
         <xs:sequence>
-            <xs:element name="conditionGroup" type="conditionGroup" minOccurs="0"
+            <xs:element name="conditioncheckGroup" type="conditioncheckGroup" minOccurs="0"
                         maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="conditionGroup">
+    <xs:complexType name="conditioncheckGroup">
         <xs:sequence>
             <xs:element name="condition" type="xs:string"/>
             <xs:element name="conditionDate" type="xs:date"/>

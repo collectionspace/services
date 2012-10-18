@@ -63,16 +63,15 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
 
     final String SERVICE_NAME = "conditionchecks";
     final String SERVICE_PATH_COMPONENT = "conditionchecks";
-    private String CONDITIONCHECKER_REF_NAME = "urn:cspace:org.collectionspace.demo:personauthorities:name(TestPersonAuth):item:name(JimChecker)'Jim Checker'";
-
+    
     // Instance variables specific to this test.
     private String knownResourceId = null;
-    private final static String TIMESTAMP_UTC =
-            GregorianCalendarDateTimeUtils.timestampUTC();
-
-    // Instance variables specific to this test.
     private final static String CURRENT_DATE_UTC =
             GregorianCalendarDateTimeUtils.timestampUTC();
+    private String CONDITIONCHECKER_REF_NAME = 
+            "urn:cspace:org.collectionspace.demo:personauthorities:name(TestPersonAuth):item:name(JimChecker)'Jim Checker'";
+    private String CONDITIONCHECK_HAZARD = "urn:cspace:core.collectionspace.org:vocabularies:name(TestTermList):item:name(hazard1)'multi-dimensional'";
+    private String CONDITIONCHECK_HAZARD_NOTE = "Object needs to be extinguished occasionally.";
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -314,26 +313,23 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         }
         Assert.assertNotNull(conditioncheckCommon);
 
-        // Check selected fields.
-
-        // Check the values of one or more date/time fields.
-        /*String conditionCheckDate = conditioncheckCommon.getConditionCheckDate();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("conditionCheckDate=" + conditionCheckDate);
-            logger.debug("TIMESTAMP_UTC=" + TIMESTAMP_UTC);
+        if(logger.isDebugEnabled()){
+            logger.debug("read, conditioncheck common");
+            logger.debug(objectAsXmlString(conditioncheckCommon, ConditionchecksCommon.class));
         }
-        Assert.assertTrue(conditionCheckDate.equals(TIMESTAMP_UTC));
-        */
 
+        // Check selected fields.
         // Repeatable group
         HazardGroupList hazardGroupList = conditioncheckCommon.getHazardGroupList();
         Assert.assertNotNull(hazardGroupList);
         List<HazardGroup> hazardGroups = hazardGroupList.getHazardGroup();
         Assert.assertNotNull(hazardGroups);
-        Assert.assertTrue(hazardGroups.size() > 0);
+        String hazard = hazardGroups.get(0).getHazard();
+        Assert.assertEquals(hazard, CONDITIONCHECK_HAZARD);
         String hazardNote = hazardGroups.get(0).getHazardNote();
-        Assert.assertNotNull(hazardNote);
+        Assert.assertEquals(hazardNote, CONDITIONCHECK_HAZARD_NOTE);
+        String hazardDate = hazardGroups.get(0).getHazardDate();
+        Assert.assertEquals(hazardDate, CURRENT_DATE_UTC);
 
         // Repeatable field
         List<String> conditionCheckers =
@@ -475,16 +471,7 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
 
         // Update the content of this resource.
         conditioncheckCommon.setConditionCheckRefNumber("updated-" + conditioncheckCommon.getConditionCheckRefNumber());
-
-        //String conditionCheckNote = conditioncheckCommon.getConditionCheckNote();
-        conditioncheckCommon.setConditionCheckNote("updated-" + conditioncheckCommon.getConditionCheckNote());
-
-        //conditioncheckCommon.getConditionCheckReasons().getConditionCheckReason().remove(0); // Test removing a value from a list
-
-        //String currentTimestamp = GregorianCalendarDateTimeUtils.timestampUTC();
-        //conditioncheckCommon.setConditionCheckDate(currentTimestamp);
-
-        conditioncheckCommon.getConditionCheckers().getConditionChecker().remove(0);
+        conditioncheckCommon.setConditionCheckNote("updated-conditionCheckNote");
 
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
@@ -525,24 +512,8 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         Assert.assertEquals(updatedConditioncheckCommon.getConditionCheckRefNumber(), conditioncheckCommon.getConditionCheckRefNumber(),
                 "Data in updated object did not match submitted data.");
 
-        String originalConditionCheckNote = conditioncheckCommon.getConditionCheckNote();
-        String updatedConditionCheckNote = updatedConditioncheckCommon.getConditionCheckNote();
-
-        Assert.assertEquals(updatedConditionCheckNote, originalConditionCheckNote,
-            "Data in updated object did not match submitted data.");
-
-        if(logger.isDebugEnabled()){
-            logger.debug("UTF-8 data sent=" + originalConditionCheckNote + "\n"
-                    + "UTF-8 data received=" + updatedConditionCheckNote);
-        }
-        Assert.assertTrue(updatedConditionCheckNote.contains(getUTF8DataFragment()),
-                "UTF-8 data retrieved '" + updatedConditionCheckNote
-                + "' does not contain expected data '" + getUTF8DataFragment());
-        Assert.assertEquals(updatedConditionCheckNote,
-                originalConditionCheckNote,
+        Assert.assertEquals(conditioncheckCommon.getConditionCheckNote(), updatedConditioncheckCommon.getConditionCheckNote(),
                 "Data in updated object did not match submitted data.");
-
-        Assert.assertNull(updatedConditioncheckCommon.getConditionCheckers().getConditionChecker(), "Data in updated object did not match submitted data.");
     }
 
     // Failure outcomes
@@ -837,6 +808,15 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         conditioncheckCommon.setConditionCheckers(conditionCheckersList);
 
         conditioncheckCommon.setConditionCheckNote(getUTF8DataFragment());
+
+        HazardGroupList hazardGroupList = new HazardGroupList();
+        List<HazardGroup> hazardGroups = hazardGroupList.getHazardGroup();
+        HazardGroup hazardGroup = new HazardGroup();
+        hazardGroup.setHazard(CONDITIONCHECK_HAZARD);
+        hazardGroup.setHazardDate(CURRENT_DATE_UTC);
+        hazardGroup.setHazardNote(CONDITIONCHECK_HAZARD_NOTE);
+        hazardGroups.add(hazardGroup);
+        conditioncheckCommon.setHazardGroupList(hazardGroupList);
         
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =

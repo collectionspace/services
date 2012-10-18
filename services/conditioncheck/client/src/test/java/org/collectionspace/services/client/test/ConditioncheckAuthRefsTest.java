@@ -78,7 +78,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     //private String conditionCheckerRefName = null;
     private List<String> conditionCheckersRefNames = new ArrayList<String>();
 
-    private final int NUM_AUTH_REFS_EXPECTED = 1;
+    private final int NUM_AUTH_REFS_EXPECTED = 2; //conditionChecker has two instances
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
