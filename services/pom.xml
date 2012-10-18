@@ -17,7 +17,7 @@
 		<maven-jaxb2-plugin.version>0.8.0</maven-jaxb2-plugin.version>
 		<jaxb.version>2.2.4-1</jaxb.version>
 		<mysql.driver.version>5.1.8</mysql.driver.version>
-		<postgres.driver.version>8.4-702.jdbc4</postgres.driver.version>
+		<postgres.driver.version>9.1-901.jdbc4</postgres.driver.version>
 		<!-- The default life cycle policy for Nuxeo document types -->
 		<Lifecycle>cs_default</Lifecycle>
 	</properties>
