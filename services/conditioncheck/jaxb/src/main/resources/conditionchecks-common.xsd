@@ -41,7 +41,7 @@
                 <xs:element name="hazardGroupList" type="hazardGroupList"/>
 
                 <!--  Condition Check and Technical Assessment Information Group -->
-                <xs:element name="conditionCheckDate" type="xs:string"/>
+                <xs:element name="conditionCheckAssessmentDate" type="xs:string"/>
                 <xs:element name="conditionCheckMethods" type="conditionCheckMethodsList"/>
                 <xs:element name="conditionCheckNote" type="xs:string"/>
                 <xs:element name="conditionCheckReasons" type="conditionCheckReasonsList"/>
