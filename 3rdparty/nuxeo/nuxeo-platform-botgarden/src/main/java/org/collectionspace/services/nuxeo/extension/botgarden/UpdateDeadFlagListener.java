@@ -75,7 +75,7 @@ public class UpdateDeadFlagListener implements EventListener {
 	            
 	            	logger.debug("actionCode=" + actionCode);
 	            	
-	            	if (actionCode.equals(MovementConstants.DEAD_ACTION_CODE) || actionCode.equals(MovementConstants.REVIVED_ACTION_CODE)) {
+	            	if (actionCode != null && (actionCode.equals(MovementConstants.DEAD_ACTION_CODE) || actionCode.equals(MovementConstants.REVIVED_ACTION_CODE))) {
 	            		String movementCsid = doc.getName();
 	            				
 	            		try {

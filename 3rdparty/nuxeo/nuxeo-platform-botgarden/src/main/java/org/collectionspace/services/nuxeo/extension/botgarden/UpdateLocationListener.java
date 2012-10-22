@@ -49,12 +49,12 @@ public class UpdateLocationListener implements EventListener {
             		 * event to fire, taking us into the other branch of this code, with the current document
             		 * becoming the previous document.
             		 */
-	            	if (actionCode.equals(DEAD_ACTION_CODE)) {
+	            	if (actionCode != null && actionCode.equals(DEAD_ACTION_CODE)) {
 	             		context.getCoreSession().saveDocument(doc);
 	            	}            		
             	}
             	else {	            	
-	            	if (actionCode.equals(DEAD_ACTION_CODE)) {
+	            	if (actionCode != null && actionCode.equals(DEAD_ACTION_CODE)) {
 	             		doc.setProperty(CURRENT_LOCATION_SCHEMA_NAME, CURRENT_LOCATION_FIELD_NAME, NONE_LOCATION);
 	            	}
 	            	            	
