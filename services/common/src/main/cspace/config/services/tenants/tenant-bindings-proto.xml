@@ -1000,11 +1000,11 @@
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>objectAuditCategory</types:value>
+                            <types:value>objectAuditCategories|objectAuditCategory</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>conditionGroupList/*/condition</types:value>
+                            <types:value>conditionCheckGroupList/*/condition</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>

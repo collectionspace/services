@@ -31,11 +31,11 @@
         <xs:complexType>
             <xs:sequence> 
                 <!--  Object Condition and Technical Assessment Information Group -->
-                <xs:element name="objectAuditCategory" type="xs:string"/>
+                <xs:element name="objectAuditCategories" type="objectAuditCategoriesList"/>
                 <xs:element name="completenessGroupList" type="completenessGroupList"/>
-                <xs:element name="conditioncheckGroupList" type="conditioncheckGroupList"/>
+                <xs:element name="conditionCheckGroupList" type="conditionCheckGroupList"/>
                 <xs:element name="conservationTreatmentPriority" type="xs:string"/>
-                <xs:element name="envConditionGroupList" type="envConditionGroupList"/>
+                <xs:element name="envConditionNoteGroupList" type="envConditionNoteGroupList"/>
                 <xs:element name="nextConditionCheckDate" type="xs:string"/>
                 <xs:element name="techAssessmentGroupList" type="techAssessmentGroupList"/>
                 <xs:element name="hazardGroupList" type="hazardGroupList"/>
@@ -66,6 +66,15 @@
     </xs:element>
 
     <!-- Repeating Groups -->
+    <!-- =================================================================
+        Object Audit Categories List repeating field
+        ================================================================= -->
+    <xs:complexType name="objectAuditCategoriesList">
+        <xs:sequence>
+            <xs:element name="objectAuditCategory" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <!-- =================================================================
         Methods List repeating field
         ================================================================= -->
@@ -114,14 +123,14 @@
     <!-- =================================================================
          Condition Group repeating structure
          ================================================================= -->
-    <xs:complexType name="conditioncheckGroupList">
+    <xs:complexType name="conditionCheckGroupList">
         <xs:sequence>
-            <xs:element name="conditioncheckGroup" type="conditioncheckGroup" minOccurs="0"
+            <xs:element name="conditionCheckGroup" type="conditionCheckGroup" minOccurs="0"
                         maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="conditioncheckGroup">
+    <xs:complexType name="conditionCheckGroup">
         <xs:sequence>
             <xs:element name="condition" type="xs:string"/>
             <xs:element name="conditionDate" type="xs:string"/>
@@ -132,17 +141,17 @@
     <!-- =================================================================
          Environmental Condition Group repeating structure
          ================================================================= -->
-    <xs:complexType name="envConditionGroupList">
+    <xs:complexType name="envConditionNoteGroupList">
         <xs:sequence>
-            <xs:element name="envConditionGroup" type="envConditionGroup" minOccurs="0"
+            <xs:element name="envConditionNoteGroup" type="envConditionNoteGroup" minOccurs="0"
                         maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="envConditionGroup">
+    <xs:complexType name="envConditionNoteGroup">
         <xs:sequence>
-            <xs:element name="envCondition" type="xs:string"/>
-            <xs:element name="envConditionDate" type="xs:string"/>
+            <xs:element name="envConditionNote" type="xs:string"/>
+            <xs:element name="envConditionNoteDate" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
