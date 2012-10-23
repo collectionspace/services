@@ -130,12 +130,12 @@ public class ClearLocationLabelRequestBatchJob implements BatchInvocable {
 				"<ns2:movements_common xmlns:ns2=\"http://collectionspace.org/services/movement\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
 					"<reasonForMove>" + MovementConstants.OTHER_ACTION_CODE + "</reasonForMove>" +
 				"</ns2:movements_common>" +
-				"<ns2:movements_naturalhistory xmlns:ns2=\"http://collectionspace.org/services/movement/domain/naturalhistory\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+				"<ns2:movements_botgarden xmlns:ns2=\"http://collectionspace.org/services/movement/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
 					"<labelRequested>" + MovementConstants.LABEL_REQUESTED_NO_VALUE + "</labelRequested>" +
 					"<labelSize></labelSize>" +
 					"<labelStandType></labelStandType>" +
 					"<labelCount></labelCount>" +
-				"</ns2:movements_naturalhistory>" +
+				"</ns2:movements_botgarden>" +
 			"</document>";
 				
 		ResourceBase resource = resourceMap.get(MovementClient.SERVICE_NAME);
