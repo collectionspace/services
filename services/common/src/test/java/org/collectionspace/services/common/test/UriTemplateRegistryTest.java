@@ -90,14 +90,10 @@ public class UriTemplateRegistryTest {
             if (template != null && template.getUriTemplateType() != null && Tools.notBlank(template.toString())) {
                 hasValidTemplate = true;
             }
-            if (hasValidKey && hasValidTemplate) {
-                break;
-            }
             Assert.assertTrue(hasValidKey && hasValidTemplate);
             StoredValuesUriTemplate retrievedTemplate = registry.get(key);
             Assert.assertNotNull(retrievedTemplate);
             Assert.assertEquals(template.toString(), retrievedTemplate.toString());
-
         }
     }
 }
