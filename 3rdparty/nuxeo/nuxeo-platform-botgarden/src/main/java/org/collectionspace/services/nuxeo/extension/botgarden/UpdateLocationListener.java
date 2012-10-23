@@ -51,7 +51,13 @@ public class UpdateLocationListener implements EventListener {
             		 */
 	            	if (actionCode != null && actionCode.equals(DEAD_ACTION_CODE)) {
 	             		context.getCoreSession().saveDocument(doc);
-	            	}            		
+	             		
+	             		/*
+	             		 *  The saveDocument call will have caused the document to be versioned via documentModified,
+	             		 *  so we can skip the versioning that would normally happen on documentCreated.
+	             		 */
+	            		ec.setProperty(CreateVersionListener.SKIP_PROPERTY, true);
+	            	}
             	}
             	else {	            	
 	            	if (actionCode != null && actionCode.equals(DEAD_ACTION_CODE)) {
