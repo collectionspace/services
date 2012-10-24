@@ -970,6 +970,10 @@
                             <service:element>conditionCheckRefNumber</service:element>
                             <service:xpath>conditionCheckRefNumber</service:xpath>
                         </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>condition</service:element>
+                            <service:xpath>conditionCheckGroupList/[0]/condition</service:xpath>
+                        </service:ListResultField>
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -977,7 +981,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>conditionCheckers|conditionChecker</types:value>
+                    <types:value>conditionCheckGroupList/[0]/condition</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
@@ -995,12 +999,16 @@
                         <!-- Fields containing authority term references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>conditionCheckers|conditionChecker</types:value>
+                            <types:value>conditionChecker</types:value>
                         </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>objectAuditCategories|objectAuditCategory</types:value>
+                            <types:value>objectAuditCategory</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>completenessGroupList/*/completeness</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -1008,19 +1016,23 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
+                            <types:value>conservationTreatmentPriority</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
                             <types:value>hazardGroupList/*/hazard</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>conditionCheckMethods|conditionCheckMethod</types:value>
+                            <types:value>conditionCheckMethod</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>conditionCheckReasons|conditionCheckReason</types:value>
+                            <types:value>conditionCheckReason</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>salvagePriorityCode</types:value>
+                            <types:value>salvagePriorityCodeGroupList/*/salvagePriorityCode</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">

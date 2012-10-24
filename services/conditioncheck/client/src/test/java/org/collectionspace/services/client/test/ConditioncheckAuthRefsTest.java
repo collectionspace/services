@@ -43,7 +43,6 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
-import org.collectionspace.services.conditioncheck.ConditionCheckersList;
 import org.collectionspace.services.person.PersonTermGroup;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -75,10 +74,9 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     private List<String> conditioncheckIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
-    //private String conditionCheckerRefName = null;
-    private List<String> conditionCheckersRefNames = new ArrayList<String>();
+    private String conditionCheckerRefName = null;
 
-    private final int NUM_AUTH_REFS_EXPECTED = 2; //conditionChecker has two instances
+    private final int NUM_AUTH_REFS_EXPECTED = 1;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -118,7 +116,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         ConditioncheckClient conditioncheckClient = new ConditioncheckClient();
         PoxPayloadOut multipart = createConditioncheckInstance(
                 "conditionCheckRefNumber-" + identifier,
-                conditionCheckersRefNames);
+                conditionCheckerRefName);
         ClientResponse<Response> res = conditioncheckClient.create(multipart);
         int statusCode = res.getStatus();
 
@@ -170,11 +168,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         // by which they can be identified.
         String csid = createPerson("Carrie", "ConditionChecker1", "carrieConditionChecker", authRefName);
         personIdsCreated.add(csid);
-        conditionCheckersRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
-
-        csid = createPerson("Sammy", "ConditionChecker2", "sammyConditionChecker", authRefName);
-        conditionCheckersRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
-        personIdsCreated.add(csid);
+        conditionCheckerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
@@ -231,14 +225,7 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
         }
 
         // Check a couple of fields
-        //Assert.assertEquals(conditioncheckCommon.getConditionCheckers().getConditionChecker(), conditionCheckersRefNames);
-
-        // In scalar repeatable fields
-        ConditionCheckersList conditionCheckers = conditioncheckCommon.getConditionCheckers();
-        List<String> checkers = conditionCheckers.getConditionChecker();
-        for (String refName : checkers) {
-            Assert.assertTrue(conditionCheckersRefNames.contains(refName));
-        }
+        Assert.assertEquals(conditioncheckCommon.getConditionChecker(), conditionCheckerRefName);
 
         //
         // Get the auth refs and check them
@@ -344,17 +331,11 @@ public class ConditioncheckAuthRefsTest extends BaseServiceTest<AbstractCommonLi
     }
 
    private PoxPayloadOut createConditioncheckInstance(String conditionCheckRefNumber,
-            List<String> conditionCheckers) {
+            String conditionChecker) {
         ConditionchecksCommon conditioncheckCommon = new ConditionchecksCommon();
 
         conditioncheckCommon.setConditionCheckRefNumber(conditionCheckRefNumber);
-
-        ConditionCheckersList conditionCheckersList = new ConditionCheckersList();
-        List<String> condCheckers = conditionCheckersList.getConditionChecker();
-        for (String conditionChecker: conditionCheckers){
-            condCheckers.add(conditionChecker);
-        }
-        conditioncheckCommon.setConditionCheckers(conditionCheckersList);
+        conditioncheckCommon.setConditionChecker(conditionChecker);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =

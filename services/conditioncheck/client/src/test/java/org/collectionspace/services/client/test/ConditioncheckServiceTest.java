@@ -32,7 +32,6 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ConditioncheckClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.conditioncheck.ConditionchecksCommon;
-import org.collectionspace.services.conditioncheck.ConditionCheckersList;
 import org.collectionspace.services.conditioncheck.HazardGroupList;
 import org.collectionspace.services.conditioncheck.HazardGroup;
 
@@ -330,12 +329,8 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
         Assert.assertEquals(hazardNote, CONDITIONCHECK_HAZARD_NOTE);
         String hazardDate = hazardGroups.get(0).getHazardDate();
         Assert.assertEquals(hazardDate, CURRENT_DATE_UTC);
-
-        // Repeatable field
-        List<String> conditionCheckers =
-                conditioncheckCommon.getConditionCheckers().getConditionChecker();
-        Assert.assertTrue(conditionCheckers.size() > 0);
-        Assert.assertEquals(conditionCheckers.get(0), CONDITIONCHECKER_REF_NAME);
+        String conditionChecker = conditioncheckCommon.getConditionChecker();
+        Assert.assertEquals(conditionChecker, CONDITIONCHECKER_REF_NAME);
 
         
         // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
@@ -801,12 +796,7 @@ public class ConditioncheckServiceTest extends AbstractPoxServiceTestImpl<Abstra
     public PoxPayloadOut createInstance(String conditionCheckRefNumber) {
         ConditionchecksCommon conditioncheckCommon = new ConditionchecksCommon();
         conditioncheckCommon.setConditionCheckRefNumber(conditionCheckRefNumber);
-
-        ConditionCheckersList conditionCheckersList = new ConditionCheckersList();
-        List<String> conditionCheckers = conditionCheckersList.getConditionChecker();
-        conditionCheckers.add(CONDITIONCHECKER_REF_NAME);
-        conditioncheckCommon.setConditionCheckers(conditionCheckersList);
-
+        conditioncheckCommon.setConditionChecker(CONDITIONCHECKER_REF_NAME);
         conditioncheckCommon.setConditionCheckNote(getUTF8DataFragment());
 
         HazardGroupList hazardGroupList = new HazardGroupList();

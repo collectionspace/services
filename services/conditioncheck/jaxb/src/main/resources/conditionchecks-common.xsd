@@ -31,7 +31,7 @@
         <xs:complexType>
             <xs:sequence> 
                 <!--  Object Condition and Technical Assessment Information Group -->
-                <xs:element name="objectAuditCategories" type="objectAuditCategoriesList"/>
+                <xs:element name="objectAuditCategory" type="xs:string"/>
                 <xs:element name="completenessGroupList" type="completenessGroupList"/>
                 <xs:element name="conditionCheckGroupList" type="conditionCheckGroupList"/>
                 <xs:element name="conservationTreatmentPriority" type="xs:string"/>
@@ -41,12 +41,12 @@
                 <xs:element name="hazardGroupList" type="hazardGroupList"/>
 
                 <!--  Condition Check and Technical Assessment Information Group -->
-                <xs:element name="conditionCheckAssessmentDate" type="xs:string"/>
-                <xs:element name="conditionCheckMethods" type="conditionCheckMethodsList"/>
+                <xs:element name="conditionCheckAssessmentDatesList" type="conditionCheckAssessmentDatesList"/>
+                <xs:element name="conditionCheckMethod" type="xs:string"/>
                 <xs:element name="conditionCheckNote" type="xs:string"/>
-                <xs:element name="conditionCheckReasons" type="conditionCheckReasonsList"/>
+                <xs:element name="conditionCheckReason" type="xs:string"/>
                 <xs:element name="conditionCheckRefNumber" type="xs:string"/>
-                <xs:element name="conditionCheckers" type="conditionCheckersList"/>
+                <xs:element name="conditionChecker" type="xs:string"/>
 
                 <!--  Object Requirement Information Group -->
                 <xs:element name="displayRecommendations" type="xs:string"/>
@@ -56,6 +56,7 @@
                 <xs:element name="securityRecommendations" type="xs:string"/>
                 <xs:element name="specialRecommendations" type="xs:string"/>
                 <xs:element name="storageRequirements" type="xs:string"/>
+                <xs:element name="salvagePriorityCodeGroupList" type="salvagePriorityCodeGroupList"/>
                 <xs:element name="salvagePriorityCode" type="xs:string"/>
                 <xs:element name="salvagePriorityCodeDate" type="xs:string"/>
                 <xs:element name="legalRequirements" type="xs:string"/>
@@ -66,39 +67,13 @@
     </xs:element>
 
     <!-- Repeating Groups -->
-    <!-- =================================================================
-        Object Audit Categories List repeating field
-        ================================================================= -->
-    <xs:complexType name="objectAuditCategoriesList">
-        <xs:sequence>
-            <xs:element name="objectAuditCategory" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
 
     <!-- =================================================================
-        Methods List repeating field
+        Condition Check Assessment Dates List repeating field
         ================================================================= -->
-    <xs:complexType name="conditionCheckMethodsList">
+    <xs:complexType name="conditionCheckAssessmentDatesList">
         <xs:sequence>
-            <xs:element name="conditionCheckMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <!-- =================================================================
-        Reasons List repeating field
-        ================================================================= -->
-    <xs:complexType name="conditionCheckReasonsList">
-        <xs:sequence>
-            <xs:element name="conditionCheckReason" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <!-- =================================================================
-        Checkers List repeating field
-        ================================================================= -->
-    <xs:complexType name="conditionCheckersList">
-        <xs:sequence>
-            <xs:element name="conditionChecker" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="conditionCheckAssessmentDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -121,7 +96,7 @@
     </xs:complexType>
 
     <!-- =================================================================
-         Condition Group repeating structure
+         Condition Check Group repeating structure
          ================================================================= -->
     <xs:complexType name="conditionCheckGroupList">
         <xs:sequence>
@@ -187,6 +162,23 @@
             <xs:element name="hazard" type="xs:string"/>
             <xs:element name="hazardDate" type="xs:string"/>
             <xs:element name="hazardNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =================================================================
+         Salvage Priority Group repeating structure
+         ================================================================= -->
+    <xs:complexType name="salvagePriorityCodeGroupList">
+        <xs:sequence>
+            <xs:element name="salvagePriorityCodeGroup" type="salvagePriorityCodeGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="salvagePriorityCodeGroup">
+        <xs:sequence>
+            <xs:element name="salvagePriorityCode" type="xs:string"/>
+            <xs:element name="salvagePriorityCodeDate" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
