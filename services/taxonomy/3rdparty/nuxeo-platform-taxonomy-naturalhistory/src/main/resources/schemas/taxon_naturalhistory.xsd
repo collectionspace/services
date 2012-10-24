@@ -68,6 +68,7 @@
 			<xs:element name="habitat" type="xs:string"/>
 			<xs:element name="climateRating" type="xs:string"/>
 			<xs:element name="conservationCategory" type="xs:string"/>
+			<xs:element name="conservationOrganization" type="xs:string"/>
 			<xs:element name="frostSensitive" type="xs:boolean"/>
 			<xs:element name="medicinalUse" type="xs:boolean"/>
 			<xs:element name="economicUse" type="xs:boolean"/>
