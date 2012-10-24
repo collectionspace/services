@@ -35,7 +35,7 @@ public class MovementConstants {
     
     public final static String CORE_SCHEMA_NAME = "collectionspace_core";
 	public static final String COMMON_SCHEMA_NAME = "movements_common";
-	public static final String NATURALHISTORY_SCHEMA_NAME = "movements_naturalhistory";
+	public static final String BOTGARDEN_SCHEMA_NAME = "movements_botgarden";
 	
 	public static final String ACTION_CODE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
 	public static final String ACTION_CODE_FIELD_NAME = "reasonForMove";
@@ -46,7 +46,7 @@ public class MovementConstants {
 	public static final String CURRENT_LOCATION_SCHEMA_NAME = COMMON_SCHEMA_NAME;
 	public static final String CURRENT_LOCATION_FIELD_NAME = "currentLocation";
 	
-	public static final String PREVIOUS_LOCATION_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+	public static final String PREVIOUS_LOCATION_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
 	public static final String PREVIOUS_LOCATION_FIELD_NAME = "previousLocation";
 	
 	public static final String WORKFLOW_STATE_SCHEMA_NAME = CORE_SCHEMA_NAME;
@@ -61,7 +61,7 @@ public class MovementConstants {
 	public static final String DELETE_TRANSITION = "delete";
 	public static final String DELETED_STATE = "deleted";
 	
-	public static final String LABEL_REQUESTED_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+	public static final String LABEL_REQUESTED_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
 	public static final String LABEL_REQUESTED_FIELD_NAME = "labelRequested";
 	public static final String LABEL_REQUESTED_YES_VALUE = "Yes";
 	public static final String LABEL_REQUESTED_NO_VALUE = "No";

@@ -255,9 +255,9 @@
             </service:properties>
 
             <service:object xmlns:service="http://collectionspace.org/services/config/service" >
-                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="movements_naturalhistory" updated="" order="3">
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="movements_botgarden" updated="" order="3">
                     <service:content contentType="application/xml">
-                        <service:xmlContent namespaceURI="http://collectionspace.org/services/movement/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/movement/domain/naturalhistory http://collectionspace.org/services/movement/domain/movements_naturalhistory.xsd" />
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/movement/local/botgarden" schemaLocation="http://collectionspace.org/services/movement/local/botgarden http://collectionspace.org/services/movement/local/movements_botgarden.xsd" />
                     </service:content>
                 </service:part>
             </service:object>

@@ -29,7 +29,6 @@
     
     <modules>
         <module>nuxeo-platform-cs-movement</module>
-        <module>nuxeo-platform-movement-naturalhistory</module>
         <module>nuxeo-platform-movement-botgarden</module>
     </modules>
 </project>

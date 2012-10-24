@@ -33,7 +33,7 @@ public class DeleteDeadLocationListener implements EventListener {
             	
             	logger.debug("actionCode=" + actionCode);
             	
-            	if (actionCode.equals(DEAD_ACTION_CODE)) {
+            	if (actionCode != null && actionCode.equals(DEAD_ACTION_CODE)) {
             		CoreSession session = context.getCoreSession();
             		
             		if (session.getAllowedStateTransitions(doc.getRef()).contains(DELETE_TRANSITION)) {
