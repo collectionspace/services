@@ -22,9 +22,11 @@
     <xs:element name="flowerColor" type="xs:string"/>
     <xs:element name="fruitColor" type="xs:string"/>
     <xs:element name="propagationHistory" type="xs:string"/>
+    <xs:element name="breedingSystem" type="xs:string"/>
     <xs:element name="classUse" type="xs:boolean"/>
     <xs:element name="researchUse" type="xs:boolean"/>
     <xs:element name="ignoreRedDot" type="xs:boolean"/>
+    <xs:element name="fragrance" type="xs:boolean"/>
     <xs:element name="flowersJan" type="xs:string"/>
     <xs:element name="flowersFeb" type="xs:string"/>
     <xs:element name="flowersMar" type="xs:string"/>
