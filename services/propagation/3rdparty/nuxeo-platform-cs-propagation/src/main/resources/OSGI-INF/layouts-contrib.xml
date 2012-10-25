@@ -28,7 +28,7 @@ $LastChangedDate: $
             <rows>
                 <row><widget>propNumber</widget></row>
                 <row><widget>propType</widget></row>
-                <row><widget>propDate</widget></row>
+                <!-- <row><widget>propDate</widget></row> -->
                 <row><widget>germinationDate</widget></row>
                 <row><widget>propComments</widget></row>
                 <row><widget>propReason</widget></row>
@@ -60,7 +60,7 @@ $LastChangedDate: $
                 </properties>
             </widget>
 
-            <widget name="propDate" type="text">
+            <!-- <widget name="propDate" type="text">
                 <labels>
                     <label mode="any">propDate</label>
                 </labels>
@@ -71,7 +71,7 @@ $LastChangedDate: $
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
                 </properties>
-            </widget>
+            </widget> -->
 
             <widget name="germinationDate" type="text">
                 <labels>
