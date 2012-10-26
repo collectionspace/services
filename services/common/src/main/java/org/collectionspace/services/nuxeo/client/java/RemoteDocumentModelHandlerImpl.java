@@ -170,6 +170,30 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	
     	return result;
     }
+    
+    @Override
+    public boolean supportsVersioning() {
+    	boolean result = false;
+    	
+    	DocHandlerParams.Params params = null;
+    	try {
+        	ServiceContext ctx = this.getServiceContext();
+			params = ServiceConfigUtils.getDocHandlerParams(ctx);
+			Boolean bool = params.isSupportsVersioning();
+			if (bool != null) {
+				result = bool.booleanValue();
+			}
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			String errMsg = String.format("Could not get document handler params from config bindings for class %s", this.getClass().getName());
+			if (logger.isWarnEnabled() == true) {
+				logger.warn(errMsg);
+			}
+		}
+    	
+    	return result;
+    }
+    
 
 	@Override
 	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)

@@ -517,6 +517,10 @@ public abstract class DocumentModelHandler<T, TL>
 	    							+ " IN " + matchObjDocTypes + ")";
 	    	}
 	    	
+	    	// This could later be in control of a queryParam, to omit if we want to see versions, or to
+	    	// only see old versions.
+    		theWhereClause += IQueryManager.SEARCH_QUALIFIER_AND + IQueryManager.CMIS_JOIN_NUXEO_IS_VERSION_FILTER;
+	    	
 	    	StringBuilder query = new StringBuilder();
 	    	// assemble the query from the string arguments
 	    	query.append("SELECT ");

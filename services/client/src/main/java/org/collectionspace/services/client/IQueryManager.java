@@ -42,6 +42,18 @@ public interface IQueryManager {
     final static String SEARCH_TYPE_INVOCATION = "inv";
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
+
+	//
+	// Nuxeo pseudo-values (and filters) for special document properties.
+	//
+	final static String NUXEO_IS_PROXY = "ecm:isProxy";
+	final static String NUXEO_IS_PROXY_FILTER = NUXEO_IS_PROXY + " = 0";
+	final static String NUXEO_IS_VERSION = "ecm:isCheckedInVersion";
+	final static String NUXEO_IS_VERSION_FILTER = NUXEO_IS_VERSION + " = 0";
+	// In the CMIS context, the prefix is nuxeo, not ecm
+	final static String NUXEO_CMIS_IS_VERSION = "nuxeo:isVersion";
+	final static String NUXEO_CMIS_IS_VERSION_FILTER = NUXEO_CMIS_IS_VERSION + " = false";
+	
 	//
 	// Query params for CMIS queries on the relationship (Relation) table.
 	//
@@ -69,6 +81,10 @@ public interface IQueryManager {
 	final static String CMIS_CORESCHEMA_PREFIX = "CORE";
 	// Relations CMIS property mapping constants
 	final static String CMIS_RELATIONS_PREFIX = "REL";
+	
+	final static String CMIS_JOIN_NUXEO_IS_VERSION_FILTER = 
+			IQueryManager.CMIS_TARGET_PREFIX + "." + IQueryManager.NUXEO_CMIS_IS_VERSION_FILTER;
+
 	
 	final static String CMIS_TARGET_NUXEO_ID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_ID;
 	final static String CMIS_TARGET_CSID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;

@@ -53,6 +53,7 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
+import org.nuxeo.ecm.core.api.VersioningOption;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
@@ -163,6 +164,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             String id = IdUtils.generateId(UUID.randomUUID().toString());
             // create document model
             DocumentModel doc = repoSession.createDocumentModel(wspacePath, id, docType);
+            /* Check for a versioned document, and check In and Out before we proceed.
+             * This does not work as we do not have the uid schema on our docs.
+            if(((DocumentModelHandler) handler).supportsVersioning()) {
+	            doc.setProperty("uid","major_version",1);
+	            doc.setProperty("uid","minor_version",0);
+            }
+            */
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.CREATE, wrapDoc);
@@ -985,6 +993,27 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             	String msg = logException(ce, "Could not find document to update with CSID=" + csid);
                 throw new DocumentNotFoundException(msg, ce);
             }
+            // Check for a versioned document, and check In and Out before we proceed.
+            if(((DocumentModelHandler) handler).supportsVersioning()) {
+            	/* Once we advance to 5.5 or later, we can add this. 
+            	 * See also https://jira.nuxeo.com/browse/NXP-8506
+            	if(!doc.isVersionable()) {
+            		throw new DocumentException("Configuration for: "
+            				+handler.getServiceContextPath()+" supports versioning, but Nuxeo config does not!");
+            	}
+            	 */
+            	/* Force a version number - Not working. Apparently we need to configure the uid schema??
+	            if(doc.getProperty("uid","major_version") == null) {
+		            doc.setProperty("uid","major_version",1);
+	            }
+	            if(doc.getProperty("uid","minor_version") == null) {
+		            doc.setProperty("uid","minor_version",0);
+	            }
+	            */
+            	doc.checkIn(VersioningOption.MINOR, null); 
+            	doc.checkOut();
+            }
+            
             //
             // Set reposession to handle the document
             //
