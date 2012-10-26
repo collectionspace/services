@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+  <!-- Authenticate into the lifesci tenant for extension testing -->
+  <auths default="admin@lifesci.collectionspace.org">
+    <auth ID="admin@lifesci.collectionspace.org"
+      >YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+  </auths>
+
+  <testGroup ID="Versioning" autoDeletePOSTS="true">
+  
+    <test ID="CreateMovement" auth="admin@lifesci.collectionspace.org">
+      <method>POST</method>
+      <uri>/cspace-services/movements/</uri>
+      <filename>versioning/movement.xml</filename>
+      <vars>
+        <!-- The currentLocation value should properly be a Storage Location or Organization -->
+        <!-- refName, but for the test-only function served by this temporary record, this -->
+        <!-- value is instead an arbitrary string.  (That string must also be unique among all -->
+        <!-- Movement records for this test to succeed. -->
+        <var ID="currentLocationValue">jlmbsoqtqbfjotldjlmbsoq</var>
+        <var ID="currentLocationNoteValue">old current location note</var>
+      </vars>
+      <expectedCodes>201</expectedCodes>
+    </test>
+    
+    <test ID="UpdateMovement" auth="admin@lifesci.collectionspace.org">
+      <method>PUT</method>
+      <uri>/cspace-services/movements/${CreateMovement.CSID}</uri>
+      <filename>versioning/movement.xml</filename>
+      <vars>
+        <var ID="currentLocationValue">${CreateMovement.currentLocationValue}</var>
+        <var ID="currentLocationNoteValue">new current location note</var>
+      </vars>
+      <expectedCodes>200</expectedCodes>
+    </test>
+    
+    <!-- A keyword search on the current location value should retrieve only one -->
+    <!-- document, even though there are now two documents extant: the current -->
+    <!-- version and one past version, which was created as a result of the update. -->
+    <test ID="SearchReturnsOnlyCurrentVersion">
+      <method>GET</method>
+      <uri>/cspace-services/movements?kw=${CreateMovement.currentLocationValue}</uri>
+      <response>
+        <expected level="ADDOK"/>
+        <filename>versioning/res/movement-list.res.xml</filename>
+      </response>
+    </test>
+    
+    <!-- Retrieving the document via a read (GET) request should also verify that only the -->
+    <!-- current version, containing the most recently updated value(s), is returned. -->
+    <test ID="ReadReturnsOnlyCurrentVersion">
+      <method>GET</method>
+      <uri>/cspace-services/movements/${CreateMovement.CSID}</uri>
+      <vars>
+        <var ID="currentLocationNoteValue">${UpdateMovement.currentLocationNoteValue}</var>
+      </vars>
+      <response>
+        <expected level="ADDOK"/>
+        <filename>versioning/res/movement.res.xml</filename>
+      </response>
+    </test>
+
+  </testGroup>
+
+</xmlReplay>
+
