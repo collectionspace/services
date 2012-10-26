@@ -15,8 +15,9 @@
       <vars>
         <!-- The currentLocation value should properly be a Storage Location or Organization -->
         <!-- refName, but for the test-only function served by this temporary record, this -->
-        <!-- value is instead an arbitrary string.  (That string must also be unique among all -->
-        <!-- Movement records for this test to succeed. -->
+        <!-- value is instead an arbitrary string. -->
+        <!-- (Note: that arbitrary string must also be present in one and only one -->
+        <!-- Movement record for the search test below to succeed.) -->
         <var ID="currentLocationValue">jlmbsoqtqbfjotldjlmbsoq</var>
         <var ID="currentLocationNoteValue">old current location note</var>
       </vars>
