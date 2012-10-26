@@ -26,11 +26,12 @@
     <xs:element name="propReason" type="xs:string"/>
     <xs:element name="propType" type="xs:string"/>
     <xs:element name="propComments" type="xs:string"/>
+    <xs:element name="numStarted" type="xs:integer"/>
     
     <!-- Seed propagation information -->
-    <xs:element name="scarStratList" type="scarStratList"/>
-    
+    <xs:element name="scarStratGroupList" type="scarStratGroupList"/>
     <xs:element name="extraSeeds" type="xs:boolean"/>
+    <xs:element name="spores" type="xs:boolean"/>
     
     <!-- Cutting propagation information -->
     <xs:element name="cuttingType" type="xs:string"/>
@@ -38,15 +39,25 @@
     <xs:element name="concentration" type="xs:string"/>
     <xs:element name="wounded" type="xs:boolean"/>
 
+    <!-- Living plant material information -->
+    <xs:element name="plantType" type="xs:string"/>
+
     <xs:element name="propActivityGroupList" type="propActivityGroupList"/>
 
     <!-- Success of the propagation -->
     <xs:element name="germinationDate" type="xs:date"/>
     <xs:element name="successRate" type="xs:string"/>
 
-    <xs:complexType name="scarStratList">
+    <xs:complexType name="scarStratGroupList">
         <xs:sequence>
-            <xs:element name="scarStrat" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="scarStratGroup" type="scarStratGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="scarStratGroup">
+        <xs:sequence>
+            <xs:element name="scarStrat" type="xs:string"/>
+            <xs:element name="duration" type="xs:integer"/>
+            <xs:element name="durationUnit" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>    
     
@@ -66,7 +77,8 @@
             <xs:element name="potSize" type="xs:string"/>
             <xs:element name="nurseryLocation" type="xs:string"/>
             <xs:element name="conditions" type="xs:string"/>    
-            <xs:element name="fungicide" type="xs:string"/>
+            <xs:element name="chemicalApplied" type="xs:string"/>
+            <xs:element name="activityConcentration" type="xs:string"/>
             <xs:element name="activityComments" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
