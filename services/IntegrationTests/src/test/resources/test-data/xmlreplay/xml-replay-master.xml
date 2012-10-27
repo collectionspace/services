@@ -41,7 +41,7 @@
     <run controlFile="collectionobject/collectionobject-hierarchy-refname.xml" testGroup="CreateUpdateReadStructuredObjects" />
     <run controlFile="collectionobject/collectionobject-displayname-update.xml" testGroup="DisplayNameChangesReflectedInRefNames" />
     
-    <run controlFile="versioning/versioning.xml" testGroup="Versioning" />
+    <run controlFile="versioning/versioning.xml" testGroup="VersionedRecordFiltering" />
 
     
     <!-- Broken tests -->

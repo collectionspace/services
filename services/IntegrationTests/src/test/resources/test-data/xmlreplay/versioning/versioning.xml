@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplay>
-  <!-- Authenticate into the lifesci tenant for extension testing -->
+  <!-- Authenticate into the lifesci tenant. By default, versioning -->
+  <!-- support is exposed in the Location/Movement/Inventory service -->
+  <!-- in that tenant. -->
   <auths default="admin@lifesci.collectionspace.org">
     <auth ID="admin@lifesci.collectionspace.org"
       >YWRtaW5AbGlmZXNjaS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
   </auths>
 
-  <testGroup ID="Versioning" autoDeletePOSTS="true">
+  <!-- Verifies that, by default: -->
+  <!--   * Versioned records are excluded (filtered out) from list results. -->
+  <!--   * Only the current version of a record is retrieved on a read request. -->
+  <testGroup ID="VersionedRecordFiltering" autoDeletePOSTS="true">
   
     <test ID="CreateMovement" auth="admin@lifesci.collectionspace.org">
       <method>POST</method>
@@ -41,8 +46,8 @@
     </test>
     
     <!-- The total number of Movement records reported should not change following -->
-    <!-- the update, even though a new version of one Movement document was created -->
-    <!-- as a result of that update. -->
+    <!-- the update, even though a past version of one Movement document was created -->
+    <!-- automatically as a result of that update. -->
     <test ID="ListAllMovementRecordsFollowingUpdate">
       <method>GET</method>
       <uri>/cspace-services/movements</uri>
@@ -58,7 +63,7 @@
     <!-- A keyword search on the (intended to be unique) currentLocation value -->
     <!-- should retrieve only one document record, even though there are now two -->
     <!-- documents extant containing that value: the current version and one past -->
-    <!-- version, which was created as a result of the update. -->
+    <!-- version, the latter created automatically as a result of the update. -->
     <test ID="SearchReturnsOnlyCurrentVersion">
       <method>GET</method>
       <uri>/cspace-services/movements?kw=${CreateMovement.currentLocationValue}</uri>
@@ -71,9 +76,8 @@
       </response>
     </test>
     
-    <!-- Retrieving the document via a read (GET) request should also verify -->
-    <!-- that only the current version, containing the most recently updated -->
-    <!-- value(s), is returned. -->
+    <!-- Retrieving the document via a read request should return only -->
+    <!-- the current version, containing the most recently updated value(s). -->
     <test ID="ReadReturnsOnlyCurrentVersion">
       <method>GET</method>
       <uri>/cspace-services/movements/${CreateMovement.CSID}</uri>
