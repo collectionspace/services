@@ -55,6 +55,15 @@
 
 	</tenant:serviceBindings>
 
+  	<tenant:serviceBindings merge:matcher="id" id="Movements">
+  		<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+  			<service:params>
+  				<service:SupportsVersioning>true</service:SupportsVersioning>
+					<service:ListResultsFields merge:action="preserve" />
+  			</service:params>
+  		</service:DocHandlerParams>
+  	</tenant:serviceBindings>
+
 	<tenant:serviceBindings merge:matcher="id" id="Persons">
     <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
 			<service:params>
