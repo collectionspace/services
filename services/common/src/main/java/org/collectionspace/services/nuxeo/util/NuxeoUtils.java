@@ -274,6 +274,14 @@ public class NuxeoUtils {
      * @param queryContext  The query context, which provides the WHERE clause to append.
      */
     static private final void appendNXQLWhere(StringBuilder query, QueryContext queryContext) {
+
+    	// Filter documents that are proxies (speeds up the query) and filter checked in versions
+    	// for services that are using versioning.
+    	// TODO This should really be handled as a default query param so it can be overridden, 
+    	// allowing clients to find versions, just as they can find soft-deleted items.
+    	final String PROXY_AND_VERSION_FILTER = 
+    			  IQueryManager.SEARCH_QUALIFIER_AND + IQueryManager.NUXEO_IS_PROXY_FILTER
+    			+ IQueryManager.SEARCH_QUALIFIER_AND + IQueryManager.NUXEO_IS_VERSION_FILTER;
         //
         // Restrict search to a specific Nuxeo domain
         // TODO This is a slow method for tenant-filter
@@ -297,9 +305,9 @@ public class NuxeoUtils {
             query.append(IQueryManager.SEARCH_QUALIFIER_AND + "(" + whereClause + ")");
         }
         //
-        // Please lookup this use in Nuxeo support and document here
+        // See "Special NXQL Properties" at http://doc.nuxeo.com/display/NXDOC/NXQL
         //
-        query.append(IQueryManager.SEARCH_QUALIFIER_AND + "ecm:isProxy = 0");
+        query.append(PROXY_AND_VERSION_FILTER);
     }
 
     /**
