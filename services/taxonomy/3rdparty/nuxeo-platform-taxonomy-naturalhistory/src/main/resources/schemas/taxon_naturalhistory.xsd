@@ -21,21 +21,22 @@
 	<xs:element name="taxonBasionym" type="xs:string"/>
 	<xs:element name="accessRestrictions" type="xs:string"/>
 	<xs:element name="family" type="xs:string"/>
-	<xs:element name="commonNameGroupList" type="commonNameGroupList"/>
+	<xs:element name="naturalHistoryCommonNameGroupList" type="naturalHistoryCommonNameGroupList"/>
 	<xs:element name="relatedTermGroupList" type="relatedTermGroupList"/>
 	<xs:element name="plantAttributesGroupList" type="plantAttributesGroupList"/>
 	
-	<xs:complexType name="commonNameGroupList">
+	<xs:complexType name="naturalHistoryCommonNameGroupList">
 		<xs:sequence>
-			<xs:element name="commonNameGroup" type="commonNameGroup" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="naturalHistoryCommonNameGroup" type="naturalHistoryCommonNameGroup" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="commonNameGroup">
+	<xs:complexType name="naturalHistoryCommonNameGroup">
 		<xs:sequence>
-			<xs:element name="commonName" type="xs:string"/>
-			<xs:element name="commonNameLanguage" type="xs:string"/>
-			<xs:element name="commonNameSource" type="xs:string"/>
-			<xs:element name="commonNameSourceDetail" type="xs:string"/>
+			<xs:element name="naturalHistoryCommonName" type="xs:string"/>
+			<xs:element name="naturalHistoryCommonNameLanguage" type="xs:string"/>
+			<xs:element name="naturalHistoryCommonNameSource" type="xs:string"/>
+			<xs:element name="naturalHistoryCommonNameSourceDetail" type="xs:string"/>
+			<xs:element name="naturalHistoryCommonNameType" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 
