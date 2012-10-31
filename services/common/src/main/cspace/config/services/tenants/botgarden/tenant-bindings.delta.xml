@@ -144,6 +144,28 @@
         </tenant:serviceBindings>
 
         <tenant:serviceBindings merge:matcher="id" id="Loansout">
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                            <service:element>loanPurpose</service:element>
+                            <service:xpath>loanPurpose</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>loanPurpose</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>borrower</types:value>
+                </types:item>
+            </service:properties>
+    
             <service:object xmlns:service="http://collectionspace.org/services/config/service">
                 <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansout_naturalhistory" updated="" order="3">
                     <service:properties>
@@ -243,6 +265,17 @@
         </tenant:serviceBindings>
 
         <tenant:serviceBindings merge:matcher="id" id="Movements">
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                            <service:element>reasonForMove</service:element>
+                            <service:xpath>reasonForMove</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+
             <service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
