@@ -5,12 +5,15 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.batch.BatchInvocable;
 import org.collectionspace.services.client.CollectionObjectClient;
@@ -23,7 +26,6 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
@@ -119,10 +121,26 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		}
 	}
 
-	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid) throws ResourceException {
+	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid) throws ResourceException, URISyntaxException, DocumentException {
+		return createVoucherFromCataloging(collectionObjectCsid, null);
+	}
+	
+	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid, String movementCsid) throws ResourceException, URISyntaxException, DocumentException {
 		InvocationResults results = new InvocationResults();
+		Map<String, String> fields = new HashMap<String, String>();
+		
+		if (movementCsid == null) {
+			movementCsid = findSingleRelatedMovement(collectionObjectCsid);
+		}
 
-		String voucherCsid = createVoucher();
+		if (movementCsid != null) {
+			PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
+			String gardenLocation = getFieldValue(movementPayload, MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME);
+	
+			fields.put("gardenLocation", gardenLocation);
+		}
+		
+		String voucherCsid = createVoucher(fields);
 		logger.debug("voucher created: voucherCsid=" + voucherCsid);
 		
 		String forwardRelationCsid = createRelation(voucherCsid, LoanoutConstants.NUXEO_DOCTYPE, collectionObjectCsid, CollectionObjectConstants.NUXEO_DOCTYPE, RelationConstants.AFFECTS_TYPE);
@@ -135,17 +153,17 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 
 		return results;
 	}
-
-	public InvocationResults createVoucherFromCurrentLocation(String movementCsid) throws ResourceException, URISyntaxException {
+	
+	public InvocationResults createVoucherFromCurrentLocation(String movementCsid) throws ResourceException, URISyntaxException, DocumentException {
 		long numAffected = 0;
 		String primaryUriCreated = null;
 		
 		List<String> collectionObjectCsids = findRelatedCollectionObjects(movementCsid);
-		
+
 		// There should only be one, but just in case...
 			
 		for (String collectionObjectCsid : collectionObjectCsids) {
-			InvocationResults innerResults = createVoucherFromCataloging(collectionObjectCsid);
+			InvocationResults innerResults = createVoucherFromCataloging(collectionObjectCsid, movementCsid);
 				
 			numAffected = numAffected + innerResults.getNumAffected();
 				
@@ -159,7 +177,7 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		results.setPrimaryURICreated(primaryUriCreated);
 		
 		if (collectionObjectCsids.size() == 0) {
-			results.setUserNote("No related cataloging record was found");
+			results.setUserNote("No related cataloging record found");
 		}
 		else {
 			results.setUserNote("Voucher created for " + numAffected + " cataloging " + (numAffected == 1 ? "record" : "records"));
@@ -168,21 +186,21 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		return results;
 	}
 
-	private String createVoucher() throws ResourceException {
+	private String createVoucher(Map<String, String> fields) throws ResourceException {
 		String voucherCsid = null;
-		String voucherNumber = GregorianCalendarDateTimeUtils.timestampUTC();
+		String gardenLocation = fields.get("gardenLocation");
+//		String voucherNumber = GregorianCalendarDateTimeUtils.timestampUTC();
 
 		String createVoucherPayload = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"loansout\">" +
 				"<ns2:loansout_botgarden xmlns:ns2=\"http://collectionspace.org/services/loanout/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					"<collectorList>" +
-						"<collector/>" +
-					"</collectorList>" +
+					"<gardenLocation>" + (gardenLocation == null ? "" : StringEscapeUtils.escapeXml(gardenLocation)) + "</gardenLocation>" +
+					"<labelRequested>No</labelRequested>" +
 				"</ns2:loansout_botgarden>" +
-				"<ns2:loansout_common xmlns:ns2=\"http://collectionspace.org/services/loanout\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					"<loanOutNumber>" + voucherNumber + "</loanOutNumber>" +
-				"</ns2:loansout_common>" +
+//				"<ns2:loansout_common xmlns:ns2=\"http://collectionspace.org/services/loanout\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+//					"<loanOutNumber>" + voucherNumber + "</loanOutNumber>" +
+//				"</ns2:loansout_common>" +
 			"</document>";
 
 		ResourceBase resource = resourceMap.get(LoanoutClient.SERVICE_NAME);
@@ -205,11 +223,11 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"relations\">" +
 				"<ns2:relations_common xmlns:ns2=\"http://collectionspace.org/services/relation\" xmlns:ns3=\"http://collectionspace.org/services/jaxb\">" +
-					"<subjectCsid>" + subjectCsid + "</subjectCsid>" +
-					"<subjectDocumentType>" + subjectDocType + "</subjectDocumentType>" +
-					"<objectCsid>" + objectCsid + "</objectCsid>" +
-					"<objectDocumentType>" + objectDocType + "</objectDocumentType>" +
-					"<relationshipType>" + relationshipType + "</relationshipType>" +
+					"<subjectCsid>" + StringEscapeUtils.escapeXml(subjectCsid) + "</subjectCsid>" +
+					"<subjectDocumentType>" + StringEscapeUtils.escapeXml(subjectDocType) + "</subjectDocumentType>" +
+					"<objectCsid>" + StringEscapeUtils.escapeXml(objectCsid) + "</objectCsid>" +
+					"<objectDocumentType>" + StringEscapeUtils.escapeXml(objectDocType) + "</objectDocumentType>" +
+					"<relationshipType>" + StringEscapeUtils.escapeXml(relationshipType) + "</relationshipType>" +
 				"</ns2:relations_common>" +
 			"</document>";
 
@@ -253,6 +271,26 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 
 	private List<String> findRelatedMovements(String subjectCsid) throws URISyntaxException {
 		return findRelated(subjectCsid, MovementConstants.NUXEO_DOCTYPE);
+	}
+
+	private String findSingleRelatedMovement(String subjectCsid) throws URISyntaxException, DocumentException {
+		String foundMovementCsid = null;
+		List<String> movementCsids = findRelatedMovements(subjectCsid);
+		
+		for (String movementCsid : movementCsids) {
+			PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
+			String movementWorkflowState = getFieldValue(movementPayload, MovementConstants.WORKFLOW_STATE_SCHEMA_NAME, MovementConstants.WORKFLOW_STATE_FIELD_NAME);
+		
+			if (!movementWorkflowState.equals(MovementConstants.DELETED_STATE)) {
+				if (foundMovementCsid != null) {
+					return null;
+				}
+				
+				foundMovementCsid = movementCsid;
+			}
+		}
+
+		return foundMovementCsid;
 	}
 
 	private PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
