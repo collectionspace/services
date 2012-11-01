@@ -11,6 +11,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.batch.BatchInvocable;
 import org.collectionspace.services.client.CollectionObjectClient;
@@ -268,7 +269,7 @@ public class UpdateDeadFlagBatchJob implements BatchInvocable {
 			"<document name=\"collectionobjects\">" +
 				"<ns2:collectionobjects_botgarden xmlns:ns2=\"http://collectionspace.org/services/collectionobject/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
 					"<deadFlag>" + (deadFlag ? "true" : "false") + "</deadFlag>" +
-					"<deadDate>" + (deadDate == null ? "" : deadDate) + "</deadDate>" +
+					"<deadDate>" + (deadDate == null ? "" : StringEscapeUtils.escapeXml(deadDate)) + "</deadDate>" +
 				"</ns2:collectionobjects_botgarden>" +
 				"<ns2:collectionobjects_common xmlns:ns2=\"http://collectionspace.org/services/collectionobject\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
 				"</ns2:collectionobjects_common>" +					
