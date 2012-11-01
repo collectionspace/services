@@ -142,10 +142,9 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 			}
 		}
 		
-		PoxPayloadOut collectionObejctPayload = findCollectionObjectByCsid(collectionObjectCsid);
+		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 		
-		fields.put("fieldCollectionNote", ""); // TODO
-		fields.put("fieldCollectionPlaceNote", getFieldCollectionPlaceNote(collectionObejctPayload));
+		fields.put("fieldCollectionNote", getFieldCollectionNote(collectionObjectPayload));
 		fields.put("annotation", ""); // TODO
 		fields.put("labelRequested", "No");
 		
@@ -163,48 +162,26 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		return results;
 	}
 	
-	private String getFieldCollectionPlaceNote(PoxPayloadOut collectionObjectPayload) {
-		List<String> placeNotes = new ArrayList<String>();
-		List<String> fieldCollectionPlaces = this.getFieldValues(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);
-		List<String> placeDisplayNames = new ArrayList<String>();
+	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) {
+		String fieldCollectionPlace = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);
+
+		RefName.AuthorityItem item = RefName.AuthorityItem.parse(fieldCollectionPlace);	
+		String placeDisplayName = (item == null ? "" : item.displayName);
 		
-		for (String fieldCollectionPlace : fieldCollectionPlaces) {
-			RefName.AuthorityItem item = RefName.AuthorityItem.parse(fieldCollectionPlace);	
-			placeDisplayNames.add(item == null ? "" : item.displayName);
+		String comment = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.COMMENT_SCHEMA_NAME, CollectionObjectConstants.COMMENT_FIELD_NAME);
+		String collectionNote;
+		
+		if (StringUtils.isNotEmpty(placeDisplayName) && StringUtils.isNotEmpty(comment)) {
+			collectionNote = placeDisplayName + ": " + comment;
 		}
-		
-		List<String> comments = this.getFieldValues(collectionObjectPayload, CollectionObjectConstants.COMMENT_SCHEMA_NAME, CollectionObjectConstants.COMMENT_FIELD_NAME);
-		
-		if (placeDisplayNames.size() > comments.size()) {
-			for (int i = 0; i < placeDisplayNames.size() - comments.size(); i ++) {
-				comments.add("");
-			}
+		else if (StringUtils.isNotEmpty(placeDisplayName)) {
+			collectionNote = placeDisplayName;
 		}
-		else if (comments.size() > placeDisplayNames.size()) {
-			for (int i = 0; i < comments.size() - placeDisplayNames.size(); i ++) {
-				placeDisplayNames.add("");
-			}
-		}
+		else {
+			collectionNote = comment;
+		}			
 		
-		for (int i = 0; i < placeDisplayNames.size(); i++) {
-			String placeDisplayName = placeDisplayNames.get(i);
-			String comment = comments.get(i);
-			String placeNote;
-			
-			if (StringUtils.isNotEmpty(placeDisplayName) && StringUtils.isNotEmpty(comment)) {
-				placeNote = placeDisplayName + ": " + comment;
-			}
-			else if (StringUtils.isNotEmpty(placeDisplayName)) {
-				placeNote = placeDisplayName;
-			}
-			else {
-				placeNote = comment;
-			}
-			
-			placeNotes.add(placeNote);
-		}
-		
-		return StringUtils.join(placeNotes, "\n");
+		return collectionNote;
 	}
 	
 	public InvocationResults createVoucherFromCurrentLocation(String movementCsid) throws ResourceException, URISyntaxException, DocumentException {
