@@ -146,7 +146,7 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		
 		fields.put("fieldCollectionNote", getFieldCollectionNote(collectionObjectPayload));
 		fields.put("annotation", ""); // TODO
-		fields.put("labelRequested", "No");
+		fields.put("labelRequested", LoanoutConstants.LABEL_REQUESTED_NO_VALUE);
 		
 		String voucherCsid = createVoucher(fields);
 		logger.debug("voucher created: voucherCsid=" + voucherCsid);
