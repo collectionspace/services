@@ -26,6 +26,7 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
@@ -135,10 +136,18 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 
 		if (movementCsid != null) {
 			PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
-			String gardenLocation = getFieldValue(movementPayload, MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME);
-	
-			fields.put("gardenLocation", gardenLocation);
+			
+			if (movementPayload != null) {
+				fields.put("gardenLocation", getFieldValue(movementPayload, MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME));
+			}
 		}
+		
+		PoxPayloadOut collectionObejctPayload = findCollectionObjectByCsid(collectionObjectCsid);
+		
+		fields.put("fieldCollectionNote", ""); // TODO
+		fields.put("fieldCollectionPlaceNote", getFieldCollectionPlaceNote(collectionObejctPayload));
+		fields.put("annotation", ""); // TODO
+		fields.put("labelRequested", "No");
 		
 		String voucherCsid = createVoucher(fields);
 		logger.debug("voucher created: voucherCsid=" + voucherCsid);
@@ -152,6 +161,50 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		results.setUserNote("Voucher created");
 
 		return results;
+	}
+	
+	private String getFieldCollectionPlaceNote(PoxPayloadOut collectionObjectPayload) {
+		List<String> placeNotes = new ArrayList<String>();
+		List<String> fieldCollectionPlaces = this.getFieldValues(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);
+		List<String> placeDisplayNames = new ArrayList<String>();
+		
+		for (String fieldCollectionPlace : fieldCollectionPlaces) {
+			RefName.AuthorityItem item = RefName.AuthorityItem.parse(fieldCollectionPlace);	
+			placeDisplayNames.add(item == null ? "" : item.displayName);
+		}
+		
+		List<String> comments = this.getFieldValues(collectionObjectPayload, CollectionObjectConstants.COMMENT_SCHEMA_NAME, CollectionObjectConstants.COMMENT_FIELD_NAME);
+		
+		if (placeDisplayNames.size() > comments.size()) {
+			for (int i = 0; i < placeDisplayNames.size() - comments.size(); i ++) {
+				comments.add("");
+			}
+		}
+		else if (comments.size() > placeDisplayNames.size()) {
+			for (int i = 0; i < comments.size() - placeDisplayNames.size(); i ++) {
+				placeDisplayNames.add("");
+			}
+		}
+		
+		for (int i = 0; i < placeDisplayNames.size(); i++) {
+			String placeDisplayName = placeDisplayNames.get(i);
+			String comment = comments.get(i);
+			String placeNote;
+			
+			if (StringUtils.isNotEmpty(placeDisplayName) && StringUtils.isNotEmpty(comment)) {
+				placeNote = placeDisplayName + ": " + comment;
+			}
+			else if (StringUtils.isNotEmpty(placeDisplayName)) {
+				placeNote = placeDisplayName;
+			}
+			else {
+				placeNote = comment;
+			}
+			
+			placeNotes.add(placeNote);
+		}
+		
+		return StringUtils.join(placeNotes, "\n");
 	}
 	
 	public InvocationResults createVoucherFromCurrentLocation(String movementCsid) throws ResourceException, URISyntaxException, DocumentException {
@@ -188,19 +241,17 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 
 	private String createVoucher(Map<String, String> fields) throws ResourceException {
 		String voucherCsid = null;
-		String gardenLocation = fields.get("gardenLocation");
-//		String voucherNumber = GregorianCalendarDateTimeUtils.timestampUTC();
 
 		String createVoucherPayload = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"loansout\">" +
 				"<ns2:loansout_botgarden xmlns:ns2=\"http://collectionspace.org/services/loanout/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					"<gardenLocation>" + (gardenLocation == null ? "" : StringEscapeUtils.escapeXml(gardenLocation)) + "</gardenLocation>" +
-					"<labelRequested>No</labelRequested>" +
+					getFieldXml(fields, "gardenLocation") +
+					getFieldXml(fields, "fieldCollectionNote") +
+					getFieldXml(fields, "fieldCollectionPlaceNote") +
+					getFieldXml(fields, "annotation") +
+					getFieldXml(fields, "labelRequested") +
 				"</ns2:loansout_botgarden>" +
-//				"<ns2:loansout_common xmlns:ns2=\"http://collectionspace.org/services/loanout\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-//					"<loanOutNumber>" + voucherNumber + "</loanOutNumber>" +
-//				"</ns2:loansout_common>" +
 			"</document>";
 
 		ResourceBase resource = resourceMap.get(LoanoutClient.SERVICE_NAME);
@@ -216,6 +267,13 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		return voucherCsid;
 	}
 
+	private String getFieldXml(Map<String, String> fields, String fieldName) {
+		String value = fields.get(fieldName);
+		String xml = "<" + fieldName + ">" + (value == null ? "" : StringEscapeUtils.escapeXml(value)) + "</" + fieldName + ">";
+		
+		return xml;
+	}
+	
 	private String createRelation(String subjectCsid, String subjectDocType, String objectCsid, String objectDocType, String relationshipType) throws ResourceException {
 		String relationCsid = null;
 
@@ -350,6 +408,24 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		}
 
 		return value;
+	}
+	
+	private List<String> getFieldValues(PoxPayloadOut payload, String partLabel, String fieldPath) {
+		List<String> values = new ArrayList<String>();
+		PayloadOutputPart part = payload.getPart(partLabel);
+
+		if (part != null) {
+			Element element = part.asElement();
+			List<Node> nodes = element.selectNodes(fieldPath);
+
+			if (nodes != null) {
+				for (Node node : nodes) {
+					values.add(node.getText());
+				}
+			}
+		}
+
+		return values;
 	}
 	
 	private class ResourceException extends Exception {
