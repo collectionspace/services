@@ -43,6 +43,14 @@ public interface IQueryManager {
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
 
+	//
+	// Nuxeo pseudo-values (and filters) for special document properties.
+	//
+	final static String NUXEO_IS_PROXY = "ecm:isProxy";
+	final static String NUXEO_IS_PROXY_FILTER = NUXEO_IS_PROXY + " = 0";
+	final static String NUXEO_IS_VERSION = "ecm:isCheckedInVersion";
+	final static String NUXEO_IS_VERSION_FILTER = NUXEO_IS_VERSION + " = 0";
+
 	public void execQuery(String queryString);
 	
 	/**

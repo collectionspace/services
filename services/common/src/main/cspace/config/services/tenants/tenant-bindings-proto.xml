@@ -1079,6 +1079,10 @@
                             <service:xpath>name</service:xpath>
                             <service:setter>setName</service:setter>
                         </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>createsNewFocus</service:element>
+                            <service:xpath>createsNewFocus</service:xpath>
+                        </service:ListResultField>
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -1437,6 +1441,62 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end movement service meta-data -->
+
+        <!-- begin claim service meta-data -->
+        <tenant:serviceBindings id="Claims" name="Claims" type="procedure" version="0.1">
+          <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/claims/*/workflow/</service:uriPath>
+          <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+          <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.claim.nuxeo.ClaimDocumentModelHandler</service:documentHandler>
+          <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+            <service:params>
+              <service:ListResultsFields>
+                <service:ListResultField>
+                  <service:element>claimNumber</service:element>
+                  <service:xpath>claimNumber</service:xpath>
+                </service:ListResultField>
+              </service:ListResultsFields>
+            </service:params>
+          </service:DocHandlerParams>
+          <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.claim.nuxeo.ClaimValidatorHandler</service:validatorHandler>
+          <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+            <types:item xmlns:types="http://collectionspace.org/services/config/types">
+              <types:key>objectNameProperty</types:key>
+              <types:value>claimClaimantGroupList/[0]/filedOnBehalfOf</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/config/types">
+              <types:key>objectNumberProperty</types:key>
+              <types:value>claimNumber</types:value>
+            </types:item>
+          </service:properties>
+          <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Claim" version="0.1">
+            <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="claims-system" updated="" order="0">
+              <service:content contentType="application/xml">
+                <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+              </service:content>
+            </service:part>
+            <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="claims_common" updated="" order="1">
+              <service:properties>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                  <types:key>authRef</types:key>
+                  <types:value>claimClaimantGroupList/*/filedBy</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                  <types:key>authRef</types:key>
+                  <types:value>claimClaimantGroupList/*/filedOnBehalfOf</types:value>
+                </types:item>
+              </service:properties>
+              <service:content contentType="application/xml">
+                <service:xmlContent namespaceURI="http://collectionspace.org/services/claim" schemaLocation="http://collectionspace.org/services/claim http://services.collectionspace.org/claim/claims_common.xsd" />
+              </service:content>
+            </service:part>
+            <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+              <service:content contentType="application/xml">
+                <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+              </service:content>
+            </service:part>
+          </service:object>
+        </tenant:serviceBindings>
+        <!-- end claim service meta-data -->
     
         <!-- begin Workflow service meta-data -->
         <tenant:serviceBindings id="Workflow" name="Workflow" type="utility" version="0.1">

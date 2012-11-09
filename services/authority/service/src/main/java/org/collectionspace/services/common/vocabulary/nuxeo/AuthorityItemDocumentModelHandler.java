@@ -184,52 +184,70 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	return AuthorityItemJAXBSchema.TERM_DISPLAY_NAME.equals(elName) || VocabularyItemJAXBSchema.DISPLAY_NAME.equals(elName);
     }
     
+    /*
+     * (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocHandlerBase#getListItemsArray()
+     * 
+     * Note: We're updating the "global" service and tenant bindings instance here -the list instance here is
+     * a reference to the tenant bindings instance in the singleton ServiceMain.
+     */
     @Override
     public List<ListResultField> getListItemsArray() throws DocumentException {
         List<ListResultField> list = super.getListItemsArray();
-        int nFields = list.size();
-        // Ensure that each item in a list of Authority items includes
-        // a set of common fields, so we do not depend upon configuration
-        // for general logic.
-        boolean hasDisplayName = false;
-        boolean hasShortId = false;
-        boolean hasRefName = false;
-        boolean hasTermStatus = false;
-        for (int i = 0; i < nFields; i++) {
-            ListResultField field = list.get(i);
-            String elName = field.getElement();
-            if (isTermDisplayName(elName) == true) {
-                hasDisplayName = true;
-            } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
-                hasShortId = true;
-            } else if (AuthorityItemJAXBSchema.REF_NAME.equals(elName)) {
-                hasRefName = true;
-            } else if (AuthorityItemJAXBSchema.TERM_STATUS.equals(elName)) {
-                hasTermStatus = true;
-            }
+        
+        // One-time initialization for each authority item service.
+        if (isListItemArrayExtended() == false) {
+        	synchronized(AuthorityItemDocumentModelHandler.class) {
+        		if (isListItemArrayExtended() == false) {        			
+        	        int nFields = list.size();
+        	        // Ensure that each item in a list of Authority items includes
+        	        // a set of common fields, so we do not depend upon configuration
+        	        // for general logic.
+        	        boolean hasDisplayName = false;
+        	        boolean hasShortId = false;
+        	        boolean hasRefName = false;
+        	        boolean hasTermStatus = false;
+        	        for (int i = 0; i < nFields; i++) {
+        	            ListResultField field = list.get(i);
+        	            String elName = field.getElement();
+        	            if (isTermDisplayName(elName) == true) {
+        	                hasDisplayName = true;
+        	            } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
+        	                hasShortId = true;
+        	            } else if (AuthorityItemJAXBSchema.REF_NAME.equals(elName)) {
+        	                hasRefName = true;
+        	            } else if (AuthorityItemJAXBSchema.TERM_STATUS.equals(elName)) {
+        	                hasTermStatus = true;
+        	            }
+        	        }
+        			
+        	        ListResultField field;
+        	        if (!hasDisplayName) {
+        	        	field = getListResultsDisplayNameField();
+        	            list.add(field);
+        	        }
+        	        if (!hasShortId) {
+        	            field = new ListResultField();
+        	            field.setElement(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+        	            field.setXpath(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+        	            list.add(field);
+        	        }
+        	        if (!hasRefName) {
+        	            field = new ListResultField();
+        	            field.setElement(AuthorityItemJAXBSchema.REF_NAME);
+        	            field.setXpath(AuthorityItemJAXBSchema.REF_NAME);
+        	            list.add(field);
+        	        }
+        	        if (!hasTermStatus) {
+        	            field = getListResultsTermStatusField();
+        	            list.add(field);
+        	        }
+        		}
+        		
+        		setListItemArrayExtended(true);
+        	} // end of synchronized block
         }
-        ListResultField field;
-        if (!hasDisplayName) {
-        	field = getListResultsDisplayNameField();
-            list.add(field);  //Note: We're updating the "global" service and tenant bindings instance here -the list instance here is a reference to the tenant bindings instance in the singleton ServiceMain.
-        }
-        if (!hasShortId) {
-            field = new ListResultField();
-            field.setElement(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-            field.setXpath(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
-            list.add(field);
-        }
-        if (!hasRefName) {
-            field = new ListResultField();
-            field.setElement(AuthorityItemJAXBSchema.REF_NAME);
-            field.setXpath(AuthorityItemJAXBSchema.REF_NAME);
-            list.add(field);
-        }
-        if (!hasTermStatus) {
-            field = getListResultsTermStatusField();
-            list.add(field);
-        }
-                
+
         return list;
     }
     
@@ -459,7 +477,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                         serviceTypes,
                         refName,
                         propertyName,
-                        myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/);
+                        myFilter, true /*computeTotal*/);
     		} catch (PropertyException pe) {
     			throw pe;
     		} catch (DocumentException de) {

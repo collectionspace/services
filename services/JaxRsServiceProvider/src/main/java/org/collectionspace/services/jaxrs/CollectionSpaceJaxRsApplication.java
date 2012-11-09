@@ -49,6 +49,7 @@ import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
 import org.collectionspace.services.person.PersonAuthorityResource;
+import org.collectionspace.services.claim.ClaimResource;
 import org.collectionspace.services.workflow.WorkflowResource;
 
 //import org.collectionspace.services.query.QueryResource;
@@ -126,6 +127,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new MediaResource());
         addResourceToMapAndSingletons(new BlobResource());
         addResourceToMapAndSingletons(new MovementResource());
+        addResourceToMapAndSingletons(new ClaimResource());
         addResourceToMapAndSingletons(new ReportResource());
 
         singletons.add(new IDResource());

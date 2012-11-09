@@ -131,6 +131,14 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
         return getDocHandlerParams().getSummaryFields();
     }
 
+    public void setListItemArrayExtended(boolean isExtended) throws DocumentException {
+    	getDocHandlerParams().getListResultsFields().setExtended(isExtended);
+    }
+    
+    public boolean isListItemArrayExtended() throws DocumentException {
+		return getDocHandlerParams().getListResultsFields().isExtended();
+    }
+    
     public List<ListResultField> getListItemsArray() throws DocumentException {
         return getDocHandlerParams().getListResultsFields().getListResultField();
     }

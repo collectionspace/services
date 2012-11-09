@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+	Loan Out schema (XSD)
+	
+	Entity	: Loanout
+	Part	: naturalhistory
+	Used for: Nuxeo EP core document type
+
+	$LastChangedRevision$
+	$LastChangedDate$
+-->
+
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ns="http://collectionspace.org/loanout/domain/naturalhistory"
+	xmlns="http://collectionspace.org/loanout/domain/naturalhistory"
+	targetNamespace="http://collectionspace.org/loanout/domain/naturalhistory"
+	version="0.1">
+	
+	<xs:element name="collection" type="xs:string"/>
+	<xs:element name="majorGroup" type="xs:string"/>	
+	
+	<xs:element name="geographyList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="geography" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="taxonomyList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="taxonomy" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="shipDate" type="xs:date"/>
+	<xs:element name="transportMethod" type="xs:string"/>
+	<xs:element name="acknowledgeDate" type="xs:date"/>
+	<xs:element name="objKindList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="objKind" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>		
+	</xs:element>
+	<xs:element name="numPackages" type="xs:integer"/>
+	<xs:element name="numLent" type="xs:integer"/>
+	<xs:element name="numReturned" type="xs:integer"/>
+	<xs:element name="balance" type="xs:integer"/>
+	<xs:element name="discrepancy" type="xs:integer"/>
+	
+	<xs:element name="transferGroupList" type="transferGroupList"/>
+	<xs:element name="objectGroupList" type="objectGroupList"/>
+	<xs:element name="returnGroupList" type="returnGroupList"/>
+	
+    <xs:element name="loanoutItems" type="xs:string"/>
+
+	<xs:complexType name="transferGroupList">
+		<xs:sequence>
+			<xs:element name="transferGroup" type="transferGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="transferGroup">
+		<xs:sequence>	
+			<xs:element name="transferDate" type="xs:date"/>
+			<xs:element name="transferOrg" type="xs:string"/>
+			<xs:element name="transferPerson" type="xs:string"/>
+			<xs:element name="transferDirector" type="xs:string"/>
+			<xs:element name="transferQuantity" type="xs:integer"/>
+			<xs:element name="transferNotes" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="objectGroupList">
+		<xs:sequence>
+			<xs:element name="objectGroup" type="objectGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="objectGroup">
+		<xs:sequence>
+			<xs:element name="objectNumbers" type="xs:string"/>
+			<xs:element name="objectQuantity" type="xs:integer"/>
+			<xs:element name="objectConditions" type="xs:string"/>
+			<xs:element name="objectNotes" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="returnGroupList">
+		<xs:sequence>
+			<xs:element name="returnGroup" type="returnGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="returnGroup">
+		<xs:sequence>
+			<xs:element name="returnObjectNumbers" type="xs:string"/>
+			<xs:element name="returnQuantity" type="xs:integer"/>
+			<xs:element name="returnDate" type="xs:date"/>
+			<xs:element name="returnNotes" type="xs:string"/>
+			<xs:element name="returnDetermination" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

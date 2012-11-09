@@ -38,6 +38,7 @@ import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
@@ -273,6 +274,14 @@ public class NuxeoUtils {
      * @param queryContext  The query context, which provides the WHERE clause to append.
      */
     static private final void appendNXQLWhere(StringBuilder query, QueryContext queryContext) {
+
+    	// Filter documents that are proxies (speeds up the query) and filter checked in versions
+    	// for services that are using versioning.
+    	// TODO This should really be handled as a default query param so it can be overridden, 
+    	// allowing clients to find versions, just as they can find soft-deleted items.
+    	final String PROXY_AND_VERSION_FILTER = 
+    			  IQueryManager.SEARCH_QUALIFIER_AND + IQueryManager.NUXEO_IS_PROXY_FILTER
+    			+ IQueryManager.SEARCH_QUALIFIER_AND + IQueryManager.NUXEO_IS_VERSION_FILTER;
         //
         // Restrict search to a specific Nuxeo domain
         // TODO This is a slow method for tenant-filter
@@ -296,9 +305,31 @@ public class NuxeoUtils {
             query.append(IQueryManager.SEARCH_QUALIFIER_AND + "(" + whereClause + ")");
         }
         //
-        // Please lookup this use in Nuxeo support and document here
+        // See "Special NXQL Properties" at http://doc.nuxeo.com/display/NXDOC/NXQL
         //
-        query.append(IQueryManager.SEARCH_QUALIFIER_AND + "ecm:isProxy = 0");
+        query.append(PROXY_AND_VERSION_FILTER);
+    }
+
+    /**
+     * Append an ORDER BY clause to the NXQL query.
+     *
+     * @param query         the NXQL query to which the ORDER BY clause will be appended.
+     * @param queryContext  the query context, which provides the ORDER BY clause to append.
+     *
+     * @throws DocumentException  if the supplied value of the orderBy clause is not valid.
+     *
+     */
+    static private final void appendNXQLOrderBy(StringBuilder query, String orderByClause)
+            throws Exception {
+        if (orderByClause != null && ! orderByClause.trim().isEmpty()) {
+            if (isValidOrderByClause(orderByClause)) {
+                query.append(" ORDER BY ");
+                query.append(orderByClause);
+            } else {
+                throw new DocumentException("Invalid format in sort request '" + orderByClause
+                        + "': must be schema_name:fieldName followed by optional sort order (' ASC' or ' DESC').");
+            }
+        }
     }
 
     /**
@@ -313,15 +344,7 @@ public class NuxeoUtils {
     static private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext)
             throws Exception {
         String orderByClause = queryContext.getOrderByClause();
-        if (orderByClause != null && ! orderByClause.trim().isEmpty()) {
-            if (isValidOrderByClause(orderByClause)) {
-                query.append(" ORDER BY ");
-                query.append(orderByClause);
-            } else {
-                throw new DocumentException("Invalid format in sort request '" + orderByClause
-                        + "': must be schema_name:fieldName followed by optional sort order (' ASC' or ' DESC').");
-            }
-        }
+        appendNXQLOrderBy(query, orderByClause);
     }
 
     /**
@@ -390,6 +413,12 @@ public class NuxeoUtils {
             query.append(docType);
         }
         appendNXQLWhere(query, queryContext);
+        if (Tools.notBlank(queryContext.getOrderByClause())) {
+            appendNXQLOrderBy(query, queryContext.getOrderByClause());
+        } else {
+            // Across a set of mixed DocTypes, updatedAt is the most sensible default ordering
+            appendNXQLOrderBy(query, DocumentFilter.ORDER_BY_LAST_UPDATED);
+        }
         // FIXME add 'order by' clause here, if appropriate
         return query.toString();
     }

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<!--
+layouts-contrib.xml
+
+Layout file for configuring screen layouts in the
+user interface of Nuxeo EP's web application, for
+viewing or editing CollectionSpace records stored
+in the Nuxeo repository,
+
+See the "Nuxeo Book" for an introductory description
+of how to edit this file.  For instance, for Nuxeo EP 5.3:
+http://doc.nuxeo.org/5.3/books/nuxeo-book/html/
+
+$LastChangedRevision: $
+$LastChangedDate: $
+-->
+
+<component name="org.collectionspace.claim.layouts.webapp">
+
+    <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+               point="layouts">
+
+        <layout name="claims_common">
+            <templates>
+                <template mode="any">/layouts/layout_default_template.xhtml</template>
+            </templates>
+
+            <rows>
+                <row><widget>claimNumber</widget></row>
+            </rows>
+
+            <widget name="claimNumber" type="text">
+                <labels>
+                    <label mode="any">claimNumber</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="claims_common">claimNumber</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+        </layout>
+    </extension>
+</component>

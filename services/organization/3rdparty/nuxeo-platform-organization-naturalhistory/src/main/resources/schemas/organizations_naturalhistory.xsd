@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Organization schema (XSD)
+
+    Entity  : Organization
+    Part    : naturalhistory
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/services/organization/domain/naturalhistory"
+    xmlns="http://collectionspace.org/services/organization/domain/naturalhistory"
+    targetNamespace="http://collectionspace.org/services/organization/domain/naturalhistory"
+    version="0.1"
+    >
+
+	<xs:element name="termSource" type="xs:string"/>
+	<xs:element name="associatedPersonGroupList" type="associatedPersonGroupList"/>
+	
+	<xs:complexType name="associatedPersonGroupList">
+		<xs:sequence>
+			<xs:element name="associatedPersonGroup" type="associatedPersonGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="associatedPersonGroup">
+		<xs:sequence>
+			<xs:element name="associatedPerson" type="xs:string"/>
+			<xs:element name="associatedPersonRole" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>	
+</xs:schema>

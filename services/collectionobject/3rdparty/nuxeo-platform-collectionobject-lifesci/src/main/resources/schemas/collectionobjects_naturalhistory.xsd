@@ -4,7 +4,7 @@
   CollectionObject schema (XSD)
   
   Entity  : CollectionObject
-  Part    : Domain - Natural History (example)
+  Part    : UC Berkeley Natural History
   Used for: Nuxeo EP core document type
   
   $LastChangedRevision: 4929 $
@@ -24,47 +24,41 @@
   <xs:element name="fieldLocPlace" type="xs:string"/>
   <xs:element name="catalogDate" type="xs:string"/>
   -->
-
+  
+    <xs:element name="hybridName" type="xs:string"/>
     <xs:element name="labelHeader" type="xs:string"/>
     <xs:element name="labelFooter" type="xs:string"/>
+    <xs:element name="cultivated" type="xs:boolean"/>
+    <xs:element name="basicStorageLocation" type="xs:string"/>
 
-    <xs:element name="fieldLocVerbatim" type="xs:string"/>
-    <xs:element name="fieldCollectionDateEarliest" type="xs:string"/>
-    <xs:element name="fieldCollectionDateLatest" type="xs:string"/>
-    <xs:element name="fieldLocLatDecimal" type="xs:string"/>
-    <xs:element name="fieldLocLongDecimal" type="xs:string"/>
-    <xs:element name="fieldLocElevation" type="xs:string"/>
+    <!-- This is intended to complement numberOfObjects from the common schema. -->
+    <!-- It indicates that this is object {objectCountNumber} out of a total {numberOfObjects}. -->
+    <xs:element name="objectCountNumber" type="xs:integer"/>
 
+    <xs:element name="fieldCollectionNumberAssignor" type="xs:string"/>
 
-		<!-- Add in an extension field for the common title group -->
-		<xs:element name="nh_titleGroupList">
-			<xs:complexType>
-				<xs:sequence>
-					<xs:element name="nh_titleGroup">
-						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="titleNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-							</xs:sequence>
-						</xs:complexType>
-					</xs:element>
-				</xs:sequence>
-			</xs:complexType>
-    </xs:element>
+    <xs:element name="donor" type="xs:string"/>
+    <xs:element name="donorDateGroup" type="structuredDateGroup"/>
+    <xs:element name="donorNote" type="xs:string"/>
 
-
-  <!-- These will become contolled lists -->
-    <xs:element name="fieldLocGeodeticDatum" type="xs:string"/>
-    <xs:element name="fieldLocCoordinateSystem" type="xs:string"/>
-    <xs:element name="fieldLocCounty" type="xs:string"/>
-    <xs:element name="fieldLocState" type="xs:string"/>
-    <xs:element name="fieldLocCountry" type="xs:string"/>
-    <xs:element name="fieldLocHigherGeography" type="xs:string"/>
+	<xs:element name="accessionDate" type="xs:date"/>
+	<xs:element name="requestedBy" type="xs:string"/>
+	<xs:element name="source" type="xs:string"/>
+	<xs:element name="vegetationType" type="xs:string"/>
+	<xs:element name="rare" type="xs:boolean"/>
+	
+    <xs:element name="provenanceType" type="xs:string"/>
+    <xs:element name="distribution" type="xs:boolean"/>
+    <xs:element name="securityRisk" type="xs:string"/>
 
     <xs:element name="taxonomicIdentGroupList" type="taxonomicIdentGroupList"/>
+    <xs:element name="localNameGroupList" type="localNameGroupList"/>
+    <xs:element name="hybridParentGroupList" type="hybridParentGroupList"/>
     <xs:element name="typeSpecimenGroupList" type="typeSpecimenGroupList"/>
-    <xs:element name="fieldCollElevationGroupList" type="fieldCollElevationGroupList"/>
-    <xs:element name="fieldCollDepthGroupList" type="fieldCollDepthGroupList"/>
     <xs:element name="associatedTaxaGroupList" type="associatedTaxaGroupList"/>
+    <xs:element name="annotationGroupList" type="annotationGroupList"/>
+    <xs:element name="localityGroupList" type="localityGroupList"/>
+	<xs:element name="accessionUseGroupList" type="accessionUseGroupList"/>
 
     <xs:complexType name="taxonomicIdentGroupList">
         <xs:sequence>
@@ -77,61 +71,55 @@
             <xs:element name="taxon" type="xs:string"/>
             <xs:element name="qualifier" type="xs:string"/>
             <xs:element name="identBy" type="xs:string"/>
-            <xs:element name="identDate" type="xs:string"/>
+            <xs:element name="identDateGroup" type="structuredDateGroup"/>
             <xs:element name="institution" type="xs:string"/>
             <xs:element name="identKind" type="xs:string"/>
             <xs:element name="reference" type="xs:string"/>
             <xs:element name="refPage" type="xs:string"/>
             <xs:element name="notes" type="xs:string"/>
+			<xs:element name="taxonomicIdentHybridParentGroupList" type="taxonomicIdentHybridParentGroupList"/>
+			<xs:element name="taxonomicIdentHybridName" type="xs:string"/>
+			<xs:element name="affinityTaxon" type="xs:string"/>
+			<xs:element name="hybridFlag" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="typeSpecimenGroupList">
+    <xs:complexType name="localNameGroupList">
         <xs:sequence>
-            <xs:element name="typeSpecimenGroup" type="typeSpecimenGroup" minOccurs="0"
+            <xs:element name="localNameGroup" type="localNameGroup" minOccurs="0"
 							maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="typeSpecimenGroup">
+    <xs:complexType name="localNameGroup">
         <xs:sequence>
-            <xs:element name="kindOfType" type="xs:string"/>
-            <xs:element name="reference" type="xs:string"/>
-            <xs:element name="refPage" type="xs:string"/>
-            <xs:element name="institution" type="xs:string"/>
-            <xs:element name="institutionType" type="xs:string"/>
-            <xs:element name="notes" type="xs:string"/>
+            <xs:element name="localName" type="xs:string"/>
+            <xs:element name="localNameLanguage" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="fieldCollElevationGroupList">
-        <xs:sequence>
-            <xs:element name="fieldCollElevationGroup" type="fieldCollElevationGroup" minOccurs="0"
+	<xs:complexType name="taxonomicIdentHybridParentGroupList">
+	    <xs:sequence>
+	        <xs:element name="taxonomicIdentHybridParentGroup" type="taxonomicIdentHybridParentGroup" minOccurs="0"
 							maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="fieldCollElevationGroup">
-        <xs:sequence>
-            <xs:element name="minElevation" type="xs:integer"/>
-            <xs:element name="maxElevation" type="xs:integer"/>
-            <xs:element name="units" type="xs:string"/>
-            <xs:element name="qualifier" type="xs:string"/>
-            <xs:element name="notes" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
+	    </xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="taxonomicIdentHybridParentGroup">
+	    <xs:sequence>
+	        <xs:element name="taxonomicIdentHybridParent" type="xs:string"/>
+	        <xs:element name="taxonomicIdentHybridParentQualifier" type="xs:string"/>
+	    </xs:sequence>
+	</xs:complexType>
 
-    <xs:complexType name="fieldCollDepthGroupList">
+    <xs:complexType name="hybridParentGroupList">
         <xs:sequence>
-            <xs:element name="fieldCollDepthGroup" type="fieldCollDepthGroup" minOccurs="0"
+            <xs:element name="hybridParentGroup" type="hybridParentGroup" minOccurs="0"
 							maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="fieldCollDepthGroup">
+    <xs:complexType name="hybridParentGroup">
         <xs:sequence>
-            <xs:element name="minDepth" type="xs:integer"/>
-            <xs:element name="maxDepth" type="xs:integer"/>
-            <xs:element name="units" type="xs:string"/>
-            <xs:element name="qualifier" type="xs:string"/>
-            <xs:element name="notes" type="xs:string"/>
+            <xs:element name="hybridParent" type="xs:string"/>
+            <xs:element name="hybridParentQualifier" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -143,10 +131,147 @@
     </xs:complexType>
     <xs:complexType name="associatedTaxaGroup">
         <xs:sequence>
-            <xs:element name="taxon" type="xs:string"/>
-            <xs:element name="commonName" type="xs:integer"/>
-            <xs:element name="interaction" type="xs:integer"/>
+            <xs:element name="associatedTaxon" type="xs:string"/>
+            <xs:element name="commonName" type="xs:string"/>
+            <xs:element name="interaction" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="annotationGroupList">
+        <xs:sequence>
+            <xs:element name="annotationGroup" type="annotationGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="annotationGroup">
+        <xs:sequence>
+            <xs:element name="annotationType" type="xs:string"/>
+            <xs:element name="annotationNote" type="xs:string"/>
+            <xs:element name="annotationDate" type="xs:string"/>
+            <xs:element name="annotationAuthor" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="typeSpecimenGroupList">
+        <xs:sequence>
+            <xs:element name="typeSpecimenGroup" type="typeSpecimenGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="typeSpecimenGroup">
+        <xs:sequence>
+            <xs:element name="typeSpecimenKind" type="xs:string"/>
+            <xs:element name="typeSpecimenAssertionBy" type="xs:string"/>
+            <xs:element name="typeSpecimenReference" type="xs:string"/>
+            <xs:element name="typeSpecimenRefPage" type="xs:string"/>
+            <xs:element name="typeSpecimenBasionym" type="xs:string"/>
+            <xs:element name="typeSpecimenNotes" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="localityGroupList">
+        <xs:sequence>
+            <xs:element name="localityGroup" type="localityGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="localityGroup">
+        <xs:sequence>
+            <xs:element name="fieldLocVerbatim" type="xs:string"/>
+            <xs:element name="fieldLocCounty" type="xs:string"/>
+            <xs:element name="fieldLocState" type="xs:string"/>
+            <xs:element name="fieldLocCountry" type="xs:string"/>
+            <xs:element name="fieldLocHigherGeography" type="xs:string"/>
+            <xs:element name="fieldLocPlace" type="xs:string"/>
+			<xs:element name="taxonomicRange" type="xs:string"/>
+
+            <xs:element name="vCoordinates" type="xs:string"/>
+            <xs:element name="vLatitude" type="xs:string"/>
+            <xs:element name="vLongitude" type="xs:string"/>
+            <xs:element name="vCoordSys" type="xs:string"/>
+            <xs:element name="vSpatialReferenceSystem" type="xs:string"/>
+
+            <xs:element name="decimalLatitude" type="xs:decimal"/>
+            <xs:element name="decimalLongitude" type="xs:decimal"/>
+            <xs:element name="geodeticDatum" type="xs:string"/>
+            <xs:element name="coordUncertainty" type="xs:decimal"/>
+            <xs:element name="coordUncertaintyUnit" type="xs:string"/>
+            <xs:element name="vDepth" type="xs:string"/>
+            <xs:element name="minDepth" type="xs:decimal"/>
+            <xs:element name="maxDepth" type="xs:decimal"/>
+            <xs:element name="depthUnit" type="xs:string"/>
+            <xs:element name="vElevation" type="xs:string"/>
+            <xs:element name="minElevation" type="xs:decimal"/>
+            <xs:element name="maxElevation" type="xs:decimal"/>
+            <xs:element name="elevationUnit" type="xs:string"/>
+            <xs:element name="vDistanceAboveSurface" type="xs:string"/>
+            <xs:element name="minDistanceAboveSurface" type="xs:decimal"/>
+            <xs:element name="maxDistanceAboveSurface" type="xs:decimal"/>
+            <xs:element name="distanceAboveSurfaceUnit" type="xs:string"/>
+            <xs:element name="localityNote" type="xs:string"/>
+            <xs:element name="localitySource" type="xs:string"/>
+            <xs:element name="localitySourceDetail" type="xs:string"/>
+
+            <xs:element name="pointRadiusSpatialFit" type="xs:string"/>
+            <xs:element name="footprintWKT" type="xs:string"/>
+            <xs:element name="footprintSRS" type="xs:string"/>
+            <xs:element name="footprintSpatialFit" type="xs:string"/>
+            <xs:element name="coordPrecision" type="xs:string"/>
+            <xs:element name="geoRefencedBy" type="xs:string"/>
+            <xs:element name="geoRefDateGroup" type="structuredDateGroup"/>
+            <xs:element name="geoRefProtocol" type="xs:string"/>
+            <xs:element name="geoRefSource" type="xs:string"/>
+            <xs:element name="geoRefVerificationStatus" type="xs:string"/>
+            <xs:element name="geoRefRemarks" type="xs:string"/>
+            <xs:element name="geoRefPlaceName" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="accessionUseGroupList">
+        <xs:sequence>
+            <xs:element name="accessionUseGroup" type="accessionUseGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="accessionUseGroup">
+        <xs:sequence>
+            <xs:element name="useType" type="xs:string"/>
+            <xs:element name="usedIn" type="xs:string"/>
+            <xs:element name="materialType" type="xs:string"/>
+            <xs:element name="requestDate" type="xs:date"/>
+            <xs:element name="filledDate" type="xs:date"/>
+            <xs:element name="useNotes" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="structuredDateGroup">
+        <xs:sequence>
+            <xs:element name="dateDisplayDate" type="xs:string"/>
+            <xs:element name="dateAssociation" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+            <xs:element name="dateLatestYear" type="xs:integer"/>
+            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="dateLatestDay" type="xs:integer"/>
+            <xs:element name="dateLatestEra" type="xs:string"/>
+            <xs:element name="dateLatestCertainty" type="xs:string"/>
+            <xs:element name="dateLatestQualifier" type="xs:string"/>
+            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+            <xs:element name="datePeriod" type="xs:string"/>
+            <xs:element name="dateNote" type="xs:string"/>
+            <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+            <xs:element name="dateLatestScalarValue" type="xs:date"/>
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
+
+
+
