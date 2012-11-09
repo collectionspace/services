@@ -479,7 +479,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (logger.isDebugEnabled()) {
                 logger.debug("findDocs() NXQL: "+query);
             }
-            docList = repoSession.query(query, null, pageSize, pageNum, computeTotal);
+            docList = repoSession.query(query, null, pageSize, pageSize*pageNum, computeTotal);
             wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
         } catch (IllegalArgumentException iae) {
             throw iae;
