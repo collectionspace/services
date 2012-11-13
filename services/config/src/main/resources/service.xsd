@@ -239,6 +239,7 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="SchemaName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="SupportsVersioning" type="xs:boolean" minOccurs="0" maxOccurs="1" default="false"/>
                         <xs:element name="DublinCoreTitle" type="xs:string" minOccurs="0" maxOccurs="1"/>
                         <xs:element name="SummaryFields" type="xs:string" minOccurs="0" maxOccurs="1"/>
                         <xs:element name="AbstractCommonListClassname" type="xs:string" minOccurs="0" maxOccurs="1"/>
