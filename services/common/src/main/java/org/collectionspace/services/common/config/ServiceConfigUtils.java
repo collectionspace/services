@@ -26,9 +26,12 @@ package org.collectionspace.services.common.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.config.RepositoryClientConfigType;
 import org.collectionspace.services.config.ServiceConfig;
+import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.types.PropertyItemType;
@@ -44,6 +47,20 @@ public class ServiceConfigUtils {
 
     final static Logger logger = LoggerFactory.getLogger(ServiceConfigUtils.class);
 
+    /*
+     * Returns the document handler parameters that were loaded at startup from the
+     * tenant bindings config file.
+     */
+	public static DocHandlerParams.Params getDocHandlerParams(ServiceContext ctx) throws DocumentException {
+		ServiceBindingType sb = ctx.getServiceBinding();
+		DocHandlerParams dhb = sb.getDocHandlerParams();
+		if (dhb != null && dhb.getParams() != null) {
+			return dhb.getParams();
+		}
+		throw new DocumentException("No DocHandlerParams configured for: "
+				+ sb.getName());
+	}
+	
     /**
      * Creates the document handler instance.
      * 

@@ -45,11 +45,13 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -59,6 +61,7 @@ import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
+import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
@@ -102,6 +105,30 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                     + MultipartServiceContext.class.getName());
         }
     }
+
+    @Override
+    public boolean supportsVersioning() {
+    	boolean result = false;
+    	
+    	DocHandlerParams.Params params = null;
+    	try {
+        	ServiceContext ctx = this.getServiceContext();
+			params = ServiceConfigUtils.getDocHandlerParams(ctx);
+			Boolean bool = params.isSupportsVersioning();
+			if (bool != null) {
+				result = bool.booleanValue();
+			}
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			String errMsg = String.format("Could not get document handler params from config bindings for class %s", this.getClass().getName());
+			if (logger.isWarnEnabled() == true) {
+				logger.warn(errMsg);
+			}
+		}
+    	
+    	return result;
+    }
+    
 
 	@Override
 	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
