@@ -145,7 +145,7 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 		
 		fields.put("fieldCollectionNote", getFieldCollectionNote(collectionObjectPayload));
-		fields.put("annotation", ""); // TODO
+		fields.put("annotation", getAnnotation(collectionObjectPayload));
 		fields.put("labelRequested", LoanoutConstants.LABEL_REQUESTED_NO_VALUE);
 		
 		String voucherCsid = createVoucher(fields);
@@ -163,25 +163,43 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 	}
 	
 	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) {
-		String fieldCollectionPlace = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);
-
-		RefName.AuthorityItem item = RefName.AuthorityItem.parse(fieldCollectionPlace);	
-		String placeDisplayName = (item == null ? "" : item.displayName);
-		
+		String fieldCollectionPlace = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME));		
 		String comment = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.COMMENT_SCHEMA_NAME, CollectionObjectConstants.COMMENT_FIELD_NAME);
 		String collectionNote;
 		
-		if (StringUtils.isNotEmpty(placeDisplayName) && StringUtils.isNotEmpty(comment)) {
-			collectionNote = placeDisplayName + ": " + comment;
+		if (StringUtils.isNotBlank(fieldCollectionPlace) && StringUtils.isNotBlank(comment)) {
+			collectionNote = fieldCollectionPlace + ": " + comment;
 		}
-		else if (StringUtils.isNotEmpty(placeDisplayName)) {
-			collectionNote = placeDisplayName;
+		else if (StringUtils.isNotBlank(fieldCollectionPlace)) {
+			collectionNote = fieldCollectionPlace;
 		}
 		else {
 			collectionNote = comment;
 		}			
 		
 		return collectionNote;
+	}
+	
+	private String getAnnotation(PoxPayloadOut collectionObjectPayload) {
+		String determinationBy = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_BY_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_BY_FIELD_NAME));
+		String determinationInstitution = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_INSTITUTION_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_INSTITUTION_FIELD_NAME));
+		String determinationDate = getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_DATE_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_DATE_FIELD_NAME);
+
+		String annotation = "";
+		
+		if (StringUtils.isNotBlank(determinationBy)) {
+			annotation += "det. by " + determinationBy;
+			
+			if (StringUtils.isNotBlank(determinationInstitution)) {
+				annotation += ", " + determinationInstitution;
+			}
+			
+			if (StringUtils.isNotBlank(determinationDate)) {
+				annotation += ", " + determinationDate;
+			}
+		}
+		
+		return annotation;
 	}
 	
 	public InvocationResults createVoucherFromCurrentLocation(String movementCsid) throws ResourceException, URISyntaxException, DocumentException {
@@ -403,6 +421,12 @@ public class CreateVoucherBatchJob implements BatchInvocable {
 		}
 
 		return values;
+	}
+	
+	private String getDisplayNameFromRefName(String refName) {
+		RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
+
+		return (item == null ? refName : item.displayName);
 	}
 	
 	private class ResourceException extends Exception {

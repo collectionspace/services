@@ -52,6 +52,15 @@ public class CollectionObjectConstants {
 
     public final static String DEAD_DATE_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
     public final static String DEAD_DATE_FIELD_NAME = "deadDate";
-   
+
+    public final static String DETERMINATION_BY_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String DETERMINATION_BY_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/identBy";
+
+    public final static String DETERMINATION_DATE_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String DETERMINATION_DATE_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/identDateGroup/dateDisplayDate";
+
+    public final static String DETERMINATION_INSTITUTION_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String DETERMINATION_INSTITUTION_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/institution";
+
 	public static final String DELETED_STATE = "deleted";
 }
