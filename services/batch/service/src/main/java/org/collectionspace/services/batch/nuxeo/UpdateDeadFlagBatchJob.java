@@ -1,106 +1,50 @@
 package org.collectionspace.services.batch.nuxeo;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.collectionspace.services.batch.BatchInvocable;
 import org.collectionspace.services.client.CollectionObjectClient;
-import org.collectionspace.services.client.MovementClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.collectionspace.services.relation.RelationResource;
-import org.collectionspace.services.relation.RelationsCommonList;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UpdateDeadFlagBatchJob implements BatchInvocable {
-	private static List<String> invocationModes = Arrays.asList(INVOCATION_MODE_SINGLE);
-
-	protected final int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
-	protected final int INT_ERROR_STATUS = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
-
-	private ResourceMap resourceMap;
-	private InvocationContext context;
-	private int completionStatus;
-	private InvocationResults results;	
-	private InvocationError errorInfo;	
-
+public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(UpdateDeadFlagBatchJob.class);
 
 	public UpdateDeadFlagBatchJob() {
-		this.completionStatus = STATUS_UNSTARTED;
-		this.results = new InvocationResults();
+		this.setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE));
 	}
 
-	public List<String> getSupportedInvocationModes() {
-		return invocationModes;
-	}
-
-	public void setResourceMap(ResourceMap resourceMap) {
-		this.resourceMap = resourceMap;
-	}
-
-	public void setInvocationContext(InvocationContext context) {
-		this.context = context;
-	}
-
-	public int getCompletionStatus() {
-		return completionStatus;
-	}
-
-	public InvocationResults getResults() {
-		return (STATUS_COMPLETE == completionStatus) ? results : null;
-	}
-
-	public InvocationError getErrorInfo() {
-		return errorInfo;
-	}
-	
 	public void run() {
-		completionStatus = STATUS_MIN_PROGRESS;
+		setCompletionStatus(STATUS_MIN_PROGRESS);
 		
 		try {
-			String mode = context.getMode();
+			String mode = getInvocationContext().getMode();
 			
 			if (!mode.equalsIgnoreCase(INVOCATION_MODE_SINGLE)) {
 				throw new Exception("Unsupported invocation mode: " + mode);
 			}
 			
-			String movementCsid = context.getSingleCSID();
+			String movementCsid = getInvocationContext().getSingleCSID();
 			
 			if (StringUtils.isEmpty(movementCsid)) {
 				throw new Exception("Missing context csid");
 			}
 			
-			results = updateRelatedDeadFlags(movementCsid);
-			completionStatus = STATUS_COMPLETE;
+			setResults(updateRelatedDeadFlags(movementCsid));
+			setCompletionStatus(STATUS_COMPLETE);
 		}
 		catch(Exception e) {
-			completionStatus = STATUS_ERROR;
-			errorInfo = new InvocationError(INT_ERROR_STATUS, e.getMessage());
-			results.setUserNote(e.getLocalizedMessage());
+			setCompletionStatus(STATUS_ERROR);
+			setErrorInfo(new InvocationError(INT_ERROR_STATUS, e.getMessage()));
 		}
 	}
 	
@@ -268,104 +212,14 @@ public class UpdateDeadFlagBatchJob implements BatchInvocable {
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"collectionobjects\">" +
 				"<ns2:collectionobjects_botgarden xmlns:ns2=\"http://collectionspace.org/services/collectionobject/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					"<deadFlag>" + (deadFlag ? "true" : "false") + "</deadFlag>" +
-					"<deadDate>" + (deadDate == null ? "" : StringEscapeUtils.escapeXml(deadDate)) + "</deadDate>" +
+					getFieldXml("deadFlag", (deadFlag ? "true" : "false")) +
+					getFieldXml("deadDate", deadDate) +
 				"</ns2:collectionobjects_botgarden>" +
 				"<ns2:collectionobjects_common xmlns:ns2=\"http://collectionspace.org/services/collectionobject\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
 				"</ns2:collectionobjects_common>" +					
 			"</document>";
 		
-		logger.debug(updatePayload);
-		
-		ResourceBase resource = resourceMap.get(CollectionObjectClient.SERVICE_NAME);
-		resource.update(resourceMap, collectionObjectCsid, updatePayload);
-	}
-			
-	/**
-	 * Return a list of csids that are related to the subjectCsid, and have doctype objectDocType.
-	 * Deleted objects are not filtered from the list.
-	 * 
-	 * @param subjectCsid
-	 * @param objectDocType
-	 * @return
-	 * @throws URISyntaxException
-	 */
-	private List<String> findRelated(String subjectCsid, String objectDocType) throws URISyntaxException {
-		List<String> csids = new ArrayList<String>();
-		RelationResource relationResource = (RelationResource) resourceMap.get(RelationClient.SERVICE_NAME);
-		RelationsCommonList relationList = relationResource.getList(createRelationSearchUriInfo(subjectCsid, objectDocType));
-
-		for (RelationsCommonList.RelationListItem item : relationList.getRelationListItem()) {
-			csids.add(item.getObjectCsid());
-		}
-
-		return csids;
-	}
-	
-	private List<String> findRelatedCollectionObjects(String subjectCsid) throws URISyntaxException {
-		return findRelated(subjectCsid, CollectionObjectConstants.NUXEO_DOCTYPE);
-	}
-	
-	private List<String> findRelatedMovements(String subjectCsid) throws URISyntaxException {
-		return findRelated(subjectCsid, MovementConstants.NUXEO_DOCTYPE);
-	}
-	
-	private PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
-		ResourceBase resource = resourceMap.get(serviceName);
-		byte[] response = resource.get(createUriInfo(), csid);
-
-		PoxPayloadOut payload = new PoxPayloadOut(response);
-		
-		return payload;
-	}
-
-	private PoxPayloadOut findCollectionObjectByCsid(String csid) throws URISyntaxException, DocumentException {
-		return findByCsid(CollectionObjectClient.SERVICE_NAME, csid);
-	}
-
-	private PoxPayloadOut findMovementByCsid(String csid) throws URISyntaxException, DocumentException {
-		return findByCsid(MovementClient.SERVICE_NAME, csid);
-	}
-
-	/**
-	 * Create a stub UriInfo
-	 * 
-	 * @throws URISyntaxException 
-	 */
-	private UriInfo createUriInfo() throws URISyntaxException {
-		return createUriInfo("");
-	}
-
-	private UriInfo createUriInfo(String queryString) throws URISyntaxException {
-		URI	absolutePath = new URI("");
-		URI	baseUri = new URI("");
-
-		return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.<PathSegment> emptyList());
-	}
-	
-	private UriInfo createRelationSearchUriInfo(String subjectCsid, String objType) throws URISyntaxException {
-		String queryString = "sbj=" + subjectCsid + "&objType=" + objType;
-		URI uri =  new URI(null, null, null, queryString, null);
-
-		return createUriInfo(uri.getRawQuery());		
-	}
-	
-	/**
-	 * Get a field value from a PoxPayloadOut, given a part name and xpath expression.
-	 */
-	private String getFieldValue(PoxPayloadOut payload, String partLabel, String fieldPath) {
-		String value = null;
-		PayloadOutputPart part = payload.getPart(partLabel);
-
-		if (part != null) {
-			Element element = part.asElement();
-			Node node = element.selectSingleNode(fieldPath);
-
-			if (node != null) {
-				value = node.getText();
-			}
-		}
-
-		return value;
+		ResourceBase resource = getResourceMap().get(CollectionObjectClient.SERVICE_NAME);
+		resource.update(getResourceMap(), collectionObjectCsid, updatePayload);
 	}
 }

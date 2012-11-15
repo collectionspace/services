@@ -1,89 +1,42 @@
 package org.collectionspace.services.batch.nuxeo;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.collectionspace.services.batch.BatchInvocable;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementResource;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ClearLocationLabelRequestBatchJob implements BatchInvocable {
-	private static List<String> invocationModes = Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT);
-
-	protected final int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-	protected final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
-	protected final int INT_ERROR_STATUS = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
-
-	private ResourceMap resourceMap;
-	private InvocationContext context;
-	private int completionStatus;
-	private InvocationResults results;	
-	private InvocationError errorInfo;	
-
+public class ClearLocationLabelRequestBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(ClearLocationLabelRequestBatchJob.class);
 
 	public ClearLocationLabelRequestBatchJob() {
-		this.completionStatus = STATUS_UNSTARTED;
-		this.results = new InvocationResults();
-	}
-
-	public List<String> getSupportedInvocationModes() {
-		return invocationModes;
-	}
-
-	public void setResourceMap(ResourceMap resourceMap) {
-		this.resourceMap = resourceMap;
-	}
-
-	public void setInvocationContext(InvocationContext context) {
-		this.context = context;
-	}
-
-	public int getCompletionStatus() {
-		return completionStatus;
-	}
-
-	public InvocationResults getResults() {
-		return (STATUS_COMPLETE == completionStatus) ? results : null;
-	}
-
-	public InvocationError getErrorInfo() {
-		return errorInfo;
+		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
 	}
 	
 	public void run() {
-		completionStatus = STATUS_MIN_PROGRESS;
+		setCompletionStatus(STATUS_MIN_PROGRESS);
 		
 		try {
 			/*
 			 * For now, treat any mode as if it were no context.
 			 */
 			
-			results = clearLabelRequests();
-			completionStatus = STATUS_COMPLETE;
+			setResults(clearLabelRequests());
+			setCompletionStatus(STATUS_COMPLETE);
 		}
 		catch(Exception e) {
-			completionStatus = STATUS_ERROR;
-			errorInfo = new InvocationError(INT_ERROR_STATUS, e.getMessage());
-			results.setUserNote(e.getLocalizedMessage());
+			setCompletionStatus(STATUS_ERROR);
+			setErrorInfo(new InvocationError(INT_ERROR_STATUS, e.getMessage()));
 		}
 	}
 
@@ -128,23 +81,23 @@ public class ClearLocationLabelRequestBatchJob implements BatchInvocable {
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"movements\">" +
 				"<ns2:movements_common xmlns:ns2=\"http://collectionspace.org/services/movement\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					"<reasonForMove>" + StringEscapeUtils.escapeXml(MovementConstants.OTHER_ACTION_CODE) + "</reasonForMove>" +
+					getFieldXml("reasonForMove", MovementConstants.OTHER_ACTION_CODE) +
 				"</ns2:movements_common>" +
 				"<ns2:movements_botgarden xmlns:ns2=\"http://collectionspace.org/services/movement/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					"<labelRequested>" + StringEscapeUtils.escapeXml(MovementConstants.LABEL_REQUESTED_NO_VALUE) + "</labelRequested>" +
-					"<labelSize></labelSize>" +
-					"<labelStandType></labelStandType>" +
-					"<labelCount></labelCount>" +
+					getFieldXml("labelRequested", MovementConstants.LABEL_REQUESTED_NO_VALUE) +
+					getFieldXml("labelSize", "") +
+					getFieldXml("labelStandType>", "") +
+					getFieldXml("labelCount", "") +
 				"</ns2:movements_botgarden>" +
 			"</document>";
 				
-		ResourceBase resource = resourceMap.get(MovementClient.SERVICE_NAME);
-		resource.update(resourceMap, movementCsid, updatePayload);
+		ResourceBase resource = getResourceMap().get(MovementClient.SERVICE_NAME);
+		resource.update(getResourceMap(), movementCsid, updatePayload);
 	}
 	
 	private List<String> findLabelRequests() throws URISyntaxException {
 		List<String> csids = new ArrayList<String>();
-		MovementResource movementResource = (MovementResource) resourceMap.get(MovementClient.SERVICE_NAME);
+		MovementResource movementResource = (MovementResource) getResourceMap().get(MovementClient.SERVICE_NAME);
 		AbstractCommonList movementList = movementResource.getList(createLabelRequestSearchUriInfo());
 
 		for (AbstractCommonList.ListItem item : movementList.getListItem()) {
@@ -157,20 +110,6 @@ public class ClearLocationLabelRequestBatchJob implements BatchInvocable {
 		}
 
 		return csids;
-	}
-
-	private UriInfo createUriInfo(String queryString) throws URISyntaxException {
-		URI	absolutePath = new URI("");
-		URI	baseUri = new URI("");
-
-		return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.<PathSegment> emptyList());
-	}
-	
-	private UriInfo createKeywordSearchUriInfo(String schemaName, String fieldName, String value) throws URISyntaxException {
-		String queryString = "kw=&as=( (" +schemaName + ":" + fieldName + " ILIKE \"" + value + "\") )&wf_deleted=false";
-		URI uri =  new URI(null, null, null, queryString, null);
-
-		return createUriInfo(uri.getRawQuery());		
 	}
 
 	private UriInfo createLabelRequestSearchUriInfo() throws URISyntaxException {
