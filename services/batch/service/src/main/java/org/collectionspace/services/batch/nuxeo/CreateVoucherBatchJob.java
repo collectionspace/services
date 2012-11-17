@@ -14,10 +14,12 @@ import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.loanout.nuxeo.LoanoutConstants;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
+import org.collectionspace.services.place.nuxeo.PlaceAuthorityConstants;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,8 +107,9 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
-	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) {
-		String fieldCollectionPlace = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME));		
+	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
+		//String fieldCollectionPlace = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME));		
+		String fieldCollectionPlace = getReverseFieldCollectionPlace(collectionObjectPayload);		
 		String comment = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.COMMENT_SCHEMA_NAME, CollectionObjectConstants.COMMENT_FIELD_NAME);
 		String collectionNote;
 		
@@ -121,6 +124,41 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		}			
 		
 		return collectionNote;
+	}
+	
+	private String getReverseFieldCollectionPlace(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
+		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
+		RefName.AuthorityItem item = RefName.AuthorityItem.parse(fieldCollectionPlaceRefName);
+		
+		String vocabularyShortId = item.getParentShortIdentifier();
+		String itemShortId = item.getShortIdentifier();
+		
+		logger.debug("finding place: vocabularyShortId=" + vocabularyShortId + " itemShortId=" + itemShortId);
+		
+		PoxPayloadOut placePayload = this.findPlaceByShortId(vocabularyShortId, itemShortId);
+		
+		List<String> termTypes = this.getFieldValues(placePayload, PlaceAuthorityConstants.TERM_TYPE_SCHEMA_NAME, PlaceAuthorityConstants.TERM_TYPE_FIELD_NAME);
+		List<String> displayNames = this.getFieldValues(placePayload, PlaceAuthorityConstants.DISPLAY_NAME_SCHEMA_NAME, PlaceAuthorityConstants.DISPLAY_NAME_FIELD_NAME);
+		
+		int index = termTypes.indexOf(PlaceAuthorityConstants.REVERSE_TERM_TYPE);
+		String reverseDisplayName = null;
+		
+		if (index < 0) {
+			// There's no reverse term. Just use the primary.
+			
+			if (displayNames.size() > 0) {
+				reverseDisplayName = displayNames.get(0);
+			}
+		}
+		else {
+			reverseDisplayName = displayNames.get(index);
+		}
+		
+		if (reverseDisplayName == null) {
+			reverseDisplayName = "";
+		}
+		
+		return reverseDisplayName;
 	}
 	
 	private String getAnnotation(PoxPayloadOut collectionObjectPayload) {

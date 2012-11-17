@@ -17,6 +17,7 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PlaceAuthorityClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
@@ -25,7 +26,9 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
+import org.collectionspace.services.place.nuxeo.PlaceAuthorityConstants;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.dom4j.DocumentException;
@@ -207,7 +210,20 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	protected PoxPayloadOut findMovementByCsid(String csid) throws URISyntaxException, DocumentException {
 		return findByCsid(MovementClient.SERVICE_NAME, csid);
 	}
+	
+	protected PoxPayloadOut findAuthorityItemByShortId(String serviceName, String vocabularyShortId, String itemShortId) throws URISyntaxException, DocumentException {
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
+		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), "urn:cspace:name(" + vocabularyShortId + ")", "urn:cspace:name(" + itemShortId + ")");
 
+		PoxPayloadOut payload = new PoxPayloadOut(response);
+
+		return payload;
+	}
+
+	protected PoxPayloadOut findPlaceByShortId(String vocabularyShortId, String itemShortId) throws URISyntaxException, DocumentException {
+		return findAuthorityItemByShortId(PlaceAuthorityClient.SERVICE_NAME, vocabularyShortId, itemShortId);
+	}
+	
 	/**
 	 * Create a stub UriInfo
 	 * 
@@ -222,6 +238,10 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 		URI	baseUri = new URI("");
 
 		return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.<PathSegment> emptyList());
+	}
+	
+	protected UriInfo createDeleteFilterUriInfo() throws URISyntaxException {
+		return createUriInfo("wf_deleted=false");
 	}
 
 	protected UriInfo createKeywordSearchUriInfo(String schemaName, String fieldName, String value) throws URISyntaxException {
