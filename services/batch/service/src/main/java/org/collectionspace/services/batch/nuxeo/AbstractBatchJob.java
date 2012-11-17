@@ -28,7 +28,6 @@ import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.collectionspace.services.place.nuxeo.PlaceAuthorityConstants;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.dom4j.DocumentException;

@@ -108,7 +108,6 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 	}
 	
 	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
-		//String fieldCollectionPlace = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME));		
 		String fieldCollectionPlace = getReverseFieldCollectionPlace(collectionObjectPayload);		
 		String comment = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.COMMENT_SCHEMA_NAME, CollectionObjectConstants.COMMENT_FIELD_NAME);
 		String collectionNote;
@@ -135,10 +134,10 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		
 		logger.debug("finding place: vocabularyShortId=" + vocabularyShortId + " itemShortId=" + itemShortId);
 		
-		PoxPayloadOut placePayload = this.findPlaceByShortId(vocabularyShortId, itemShortId);
+		PoxPayloadOut placePayload = findPlaceByShortId(vocabularyShortId, itemShortId);
 		
-		List<String> termTypes = this.getFieldValues(placePayload, PlaceAuthorityConstants.TERM_TYPE_SCHEMA_NAME, PlaceAuthorityConstants.TERM_TYPE_FIELD_NAME);
-		List<String> displayNames = this.getFieldValues(placePayload, PlaceAuthorityConstants.DISPLAY_NAME_SCHEMA_NAME, PlaceAuthorityConstants.DISPLAY_NAME_FIELD_NAME);
+		List<String> termTypes = getFieldValues(placePayload, PlaceAuthorityConstants.TERM_TYPE_SCHEMA_NAME, PlaceAuthorityConstants.TERM_TYPE_FIELD_NAME);
+		List<String> displayNames = getFieldValues(placePayload, PlaceAuthorityConstants.DISPLAY_NAME_SCHEMA_NAME, PlaceAuthorityConstants.DISPLAY_NAME_FIELD_NAME);
 		
 		int index = termTypes.indexOf(PlaceAuthorityConstants.REVERSE_TERM_TYPE);
 		String reverseDisplayName = null;
