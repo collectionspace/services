@@ -1,4 +1,4 @@
-package org.collectionspace.services.nuxeo.extension.listener.relation;
+package org.collectionspace.services.nuxeo.listener.relation;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +16,6 @@ public class RelationSubOrObjDeletionListener implements EventListener {
     final Log logger = LogFactory.getLog(RelationSubOrObjDeletionListener.class);
 
     public void handleEvent(Event event) throws ClientException {
-        logger.debug("In handleEvent in RelationSubOrObjDeletionListener ...");
+        logger.info("In handleEvent in RelationSubOrObjDeletionListener ...");
     }
 }

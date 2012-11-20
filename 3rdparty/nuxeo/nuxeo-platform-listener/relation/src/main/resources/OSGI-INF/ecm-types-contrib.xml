@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <component name="org.collectionspace.nuxeo.listener.relation.ecm.types">
-	
-	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
-		<listener name="relationsuborobjdeletionlistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.listener.relation.RelationSubOrObjDeletionListener" priority="999">
+    
+    <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+        <listener name="relationsuborobjdeletionlistener" async="false" postCommit="false"
+                          class="org.collectionspace.services.nuxeo.listener.relation.RelationSubOrObjDeletionListener" priority="999">
             <event>lifecycle_transition_event</event>
-		</listener>
-	</extension>
-	
+        </listener>
+    </extension>
+    
 </component>

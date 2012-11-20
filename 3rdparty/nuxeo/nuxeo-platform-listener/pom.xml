@@ -13,8 +13,8 @@
     <name>services.3rdparty.nuxeo.listener</name>
 
     <modules>
-		<module>relation</module>
-	</modules>
+        <module>relation</module>
+    </modules>
 
     <dependencies>
         <dependency>
@@ -22,21 +22,21 @@
             <artifactId>org.osgi.core</artifactId>
             <version>4.1.0</version>
         </dependency>
-                <dependency>
+        <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-storage-sql</artifactId>
             <version>${nuxeo.core.version}</version>
         </dependency>
-<dependency>
-<groupId>org.nuxeo.ecm.platform</groupId>
-<artifactId>nuxeo-platform-filemanager-api</artifactId>
-<version>${nuxeo.platform.version}</version>	
-</dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-filemanager-api</artifactId>
+            <version>${nuxeo.platform.version}</version>    
+        </dependency>
         <!-- jboss -->
         <!--
         <dependency>
-		    <groupId>org.jboss.remoting</groupId>
-		    <artifactId>jboss-remoting</artifactId>
+            <groupId>org.jboss.remoting</groupId>
+            <artifactId>jboss-remoting</artifactId>
             <scope>provided</scope>
         </dependency>
         -->
