@@ -8,7 +8,6 @@ import java.util.List;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang.StringUtils;
-import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
@@ -18,6 +17,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoanoutResource;
 import org.collectionspace.services.loanout.nuxeo.LoanoutConstants;
 import org.dom4j.DocumentException;
+import org.gbif.api.model.checklistbank.ParsedName;
+import org.gbif.nameparser.NameParser;
+import org.gbif.nameparser.UnparsableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +28,11 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 
 	final Logger logger = LoggerFactory.getLogger(FormatVoucherNameBatchJob.class);
 
+	private NameParser nameParser;
+	
 	public FormatVoucherNameBatchJob() {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
+		this.nameParser = new NameParser();
 	}
 
 	public void run() {
@@ -144,27 +149,60 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 		return name;
 	}
 		
-	public String formatVoucherName(VoucherName name) {
+	public String formatVoucherName(VoucherName name) {		
 		String formattedName = "";
 		
 		if (name.isHybrid()) {
 			if (name.getFemaleParentName() != null) {
-				formattedName += name.getFemaleParentName();
+				formattedName += applyStyles(name.getFemaleParentName());
 			}
 			
 			formattedName += HYBRID_SEPARATOR;
 			
 			if (name.getMaleParentName() != null) {
-				formattedName += name.getMaleParentName();
+				formattedName += applyStyles(name.getMaleParentName());
 			}
 		}
 		else {
 			if (name.getName() != null) {
-				formattedName = name.getName();
+				formattedName = applyStyles(name.getName());
 			}
 		}
 		
 		return formattedName;
+	}
+	
+	private String applyStyles(String name) {
+		try {
+			ParsedName parsedName = nameParser.parse(name);
+			
+			String genusOrAbove = parsedName.getGenusOrAbove();
+			String specificEpithet = parsedName.getSpecificEpithet();
+			String infraSpecificEpithet = parsedName.getInfraSpecificEpithet();
+			
+			logger.debug("parsed name: genusOrAbove=" + genusOrAbove + " specificEpithet=" + specificEpithet + " infraSpecificEpithet=" + infraSpecificEpithet);
+			
+			if (StringUtils.isNotBlank(genusOrAbove)) {
+				name = italicize(name, genusOrAbove);
+			}
+			
+			if (StringUtils.isNotBlank(specificEpithet)) {
+				name = italicize(name, specificEpithet);
+			}
+			
+			if (StringUtils.isNotBlank(infraSpecificEpithet)) {
+				name = italicize(name, infraSpecificEpithet);
+			}			
+		}
+		catch (UnparsableException e) {
+			logger.error("error parsing name: name=" + name + " message=" + e.getMessage());
+		}
+
+		return name;
+	}
+	
+	private String italicize(String string, String substring) {
+		return string.replaceAll(substring, "<span style=\"font-style: italic\">" + substring + "</span>");
 	}
 	
 	private void setStyledName(String loanoutCsid, String styledName) {
