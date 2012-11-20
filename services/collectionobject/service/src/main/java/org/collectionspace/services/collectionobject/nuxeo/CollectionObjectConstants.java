@@ -53,6 +53,9 @@ public class CollectionObjectConstants {
     public final static String DEAD_DATE_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
     public final static String DEAD_DATE_FIELD_NAME = "deadDate";
 
+    public final static String TAXON_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String TAXON_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/taxon";
+
     public final static String DETERMINATION_BY_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String DETERMINATION_BY_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/identBy";
 
@@ -62,5 +65,17 @@ public class CollectionObjectConstants {
     public final static String DETERMINATION_INSTITUTION_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String DETERMINATION_INSTITUTION_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/institution";
 
+    public final static String HYBRID_FLAG_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String HYBRID_FLAG_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/hybridFlag";
+
+    public final static String HYBRID_PARENT_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String HYBRID_PARENT_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/taxonomicIdentHybridParentGroupList/taxonomicIdentHybridParentGroup/taxonomicIdentHybridParent";
+
+    public final static String HYBRID_QUALIFIER_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String HYBRID_QUALIFIER_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/taxonomicIdentHybridParentGroupList/taxonomicIdentHybridParentGroup/taxonomicIdentHybridParentQualifier";
+
+    public final static String HYBRID_QUALIFIER_FEMALE_VALUE = "female";
+    public final static String HYBRID_QUALIFIER_MALE_VALUE = "male";
+    
 	public static final String DELETED_STATE = "deleted";
 }

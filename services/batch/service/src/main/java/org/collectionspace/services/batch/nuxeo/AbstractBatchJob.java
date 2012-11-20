@@ -275,6 +275,12 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 
 		return value;
 	}
+
+	protected boolean getBooleanFieldValue(PoxPayloadOut payload, String partLabel, String fieldPath) {
+		String value = getFieldValue(payload, partLabel, fieldPath);
+		
+		return (value != null && value.equals("true"));
+	}
 	
 	protected List<String> getFieldValues(PoxPayloadOut payload, String partLabel, String fieldPath) {
 		List<String> values = new ArrayList<String>();

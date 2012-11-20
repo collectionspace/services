@@ -39,4 +39,6 @@ public class LoanoutConstants {
 	public static final String LABEL_REQUESTED_FIELD_NAME = "labelRequested";
 	public static final String LABEL_REQUESTED_YES_VALUE = "Yes";
 	public static final String LABEL_REQUESTED_NO_VALUE = "No";
+	
+	public static final String DELETED_STATE = "deleted";
 }

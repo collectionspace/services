@@ -26,8 +26,9 @@
 		</listener>
 	</extension>
 	<!-- 
-		Temporarily create accession history versions using an event handler, until versioning is 
-		fully baked into cspace.
+		We should be able to use the versioning support that's now built into cspace, but need to make
+		sure it doesn't create versions on import, and we possibly need to refactor UpdateLocationListener 
+		so that two versions don't get created in the case of a document that is created with an action code of dead.
 	-->
 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="createversionlistener" async="false" postCommit="false"
