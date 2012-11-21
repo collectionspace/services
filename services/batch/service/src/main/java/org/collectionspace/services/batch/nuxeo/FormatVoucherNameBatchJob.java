@@ -152,20 +152,22 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 	public String formatVoucherName(VoucherName name) {		
 		String formattedName = "";
 		
-		if (name.isHybrid()) {
-			if (name.getFemaleParentName() != null) {
-				formattedName += applyStyles(name.getFemaleParentName());
+		if (name != null) {
+			if (name.isHybrid()) {
+				if (name.getFemaleParentName() != null) {
+					formattedName += applyStyles(name.getFemaleParentName());
+				}
+				
+				formattedName += HYBRID_SEPARATOR;
+				
+				if (name.getMaleParentName() != null) {
+					formattedName += applyStyles(name.getMaleParentName());
+				}
 			}
-			
-			formattedName += HYBRID_SEPARATOR;
-			
-			if (name.getMaleParentName() != null) {
-				formattedName += applyStyles(name.getMaleParentName());
-			}
-		}
-		else {
-			if (name.getName() != null) {
-				formattedName = applyStyles(name.getName());
+			else {
+				if (name.getName() != null) {
+					formattedName = applyStyles(name.getName());
+				}
 			}
 		}
 		

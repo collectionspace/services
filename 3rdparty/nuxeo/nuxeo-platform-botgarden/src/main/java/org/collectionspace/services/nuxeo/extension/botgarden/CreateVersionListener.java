@@ -1,7 +1,5 @@
 package org.collectionspace.services.nuxeo.extension.botgarden;
 
-import java.util.UUID;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
