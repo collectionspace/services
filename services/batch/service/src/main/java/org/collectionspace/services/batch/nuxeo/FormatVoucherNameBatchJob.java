@@ -68,15 +68,15 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 		}
 	}
 	
-	private InvocationResults formatQueuedVoucherNames() throws URISyntaxException, DocumentException {
+	public InvocationResults formatQueuedVoucherNames() throws URISyntaxException, DocumentException {
 		return formatVoucherNames(findLabelRequests());
 	}	
 	
-	private InvocationResults formatVoucherName(String voucherCsid) throws URISyntaxException, DocumentException {
+	public InvocationResults formatVoucherName(String voucherCsid) throws URISyntaxException, DocumentException {
 		return formatVoucherNames(Arrays.asList(voucherCsid));
 	}
 	
-	private InvocationResults formatVoucherNames(List<String> voucherCsids) throws URISyntaxException, DocumentException {
+	public InvocationResults formatVoucherNames(List<String> voucherCsids) throws URISyntaxException, DocumentException {
 		InvocationResults results = new InvocationResults();
 		int numAffected = 0;
 		List<String> formattedNames = new ArrayList<String>();

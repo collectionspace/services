@@ -40,5 +40,8 @@ public class LoanoutConstants {
 	public static final String LABEL_REQUESTED_YES_VALUE = "Yes";
 	public static final String LABEL_REQUESTED_NO_VALUE = "No";
 	
+	public static final String STYLED_NAME_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
+	public static final String STYLED_NAME_FIELD_NAME = "styledName";
+	
 	public static final String DELETED_STATE = "deleted";
 }

@@ -25,6 +25,14 @@
 			<event>documentModified</event>
 		</listener>
 	</extension>
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updatestylednamelistener" async="false" postCommit="true"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateStyledNameListener" priority="200">
+			<event>documentCreated</event>
+			<event>beforeDocumentModification</event>
+			<event>documentModified</event>
+		</listener>
+	</extension>
 	<!-- 
 		We should be able to use the versioning support that's now built into cspace, but need to make
 		sure it doesn't create versions on import, and we possibly need to refactor UpdateLocationListener 
