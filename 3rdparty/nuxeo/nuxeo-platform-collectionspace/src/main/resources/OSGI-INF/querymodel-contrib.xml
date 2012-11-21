@@ -15,7 +15,6 @@
         defaultSortAscending="false" />
       <max>50</max>
     </queryModel>
-		
 </extension>
 </component>
 

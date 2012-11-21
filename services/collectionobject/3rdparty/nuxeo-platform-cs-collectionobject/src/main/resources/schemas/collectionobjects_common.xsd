@@ -1,29 +1,58 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
-<!--
-    CollectionObject schema (XSD)
-    
-    Entity  : CollectionObject
-    Part    : Common
-    Used for: Nuxeo EP core document type
-
-    $LastChangedRevision: 4736 $
-    $LastChangedDate: 2011-05-12 17:36:23 -0700 (Thu, 12 May 2011) $
--->
-
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ns="http://collectionspace.org/collectionobject/"
     xmlns="http://collectionspace.org/collectionobject/"
     targetNamespace="http://collectionspace.org/collectionobject/" version="0.1">
-
-    <!-- Object identification information -->
+    <xs:element name="objectHistoryNote" type="xs:string"/>
+    <xs:element name="viewersPersonalResponse" type="xs:string"/>
+    <xs:element name="fieldCollectionMethods">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="fieldCollectionMethod" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
+    <xs:element name="assocEventPeoples">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="assocEventPeople" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="assocEventNote" type="xs:string"/>
+    <xs:element name="responsibleDepartments">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="responsibleDepartment" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ownershipAccess" type="xs:string"/>
+    <xs:element name="contentPositions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="contentPosition" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- 
+    Tail
+    Tail
+    Tail
+    -->
 
     <xs:element name="objectNumber" type="xs:string"/>
     <xs:element name="otherNumberList" type="ns:otherNumberList"/>
     <xs:element name="briefDescriptions">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="briefDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="briefDescription" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -37,14 +66,7 @@
     <xs:element name="distinguishingFeatures" type="xs:string"/>
     <xs:element name="numberOfObjects" type="xs:integer"/>
     <xs:element name="objectNameList" type="ns:objectNameList"/>
-    <xs:element name="responsibleDepartments">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="responsibleDepartment" type="xs:string"
-                    minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    
     <xs:element name="collection" type="xs:string"/>
     <xs:element name="titleGroupList" type="titleGroupList"/>
     <xs:element name="recordStatus" type="xs:string"/>
@@ -64,14 +86,16 @@
     <xs:element name="contentActivities">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="contentActivity" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="contentActivity" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="contentConcepts">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="contentConcept" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="contentConcept" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -82,7 +106,8 @@
     <xs:element name="contentLanguages">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="contentLanguage" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="contentLanguage" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -90,7 +115,8 @@
     <xs:element name="contentOrganizations">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="contentOrganization" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="contentOrganization" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -98,35 +124,33 @@
     <xs:element name="contentPeoples">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="contentPeople" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="contentPeople" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="contentPersons">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="contentPerson" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="contentPerson" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="contentPlaces">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="contentPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="contentPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"
+                />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="contentPositions">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="contentPosition" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    
     <xs:element name="contentScripts">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="contentScript" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="contentScript" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -173,8 +197,8 @@
     <xs:element name="nonTextualInscriptionGroupList" type="nonTextualInscriptionGroupList"/>
     <xs:complexType name="nonTextualInscriptionGroupList">
         <xs:sequence>
-            <xs:element name="nonTextualInscriptionGroup" type="nonTextualInscriptionGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="nonTextualInscriptionGroup" type="nonTextualInscriptionGroup"
+                minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -197,7 +221,7 @@
 
     <!-- Misc Object Description Information -->
 
-    <xs:element name="objectStatusList" type="objectStatusList" />	
+    <xs:element name="objectStatusList" type="objectStatusList"/>
     <xs:element name="phase" type="xs:string"/>
     <xs:element name="physicalDescription" type="xs:string"/>
     <xs:element name="sex" type="xs:string"/>
@@ -214,14 +238,16 @@
     <!-- Object Production Information -->
     <xs:element name="objectProductionDateGroupList" type="objectProductionDateGroupList"/>
     <xs:element name="objectProductionNote" type="xs:string"/>
-    <xs:element name="objectProductionOrganizationGroupList" type="objectProductionOrganizationGroupList"/>
+    <xs:element name="objectProductionOrganizationGroupList"
+        type="objectProductionOrganizationGroupList"/>
     <xs:element name="objectProductionPeopleGroupList" type="objectProductionPeopleGroupList"/>
     <xs:element name="objectProductionPersonGroupList" type="objectProductionPersonGroupList"/>
     <xs:element name="objectProductionPlaceGroupList" type="objectProductionPlaceGroupList"/>
     <xs:element name="objectProductionReasons">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="objectProductionReason" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="objectProductionReason" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -243,32 +269,29 @@
     <!-- not be implemented as part of CSPACE-3229 in Release 1.2 -->
     <xs:element name="assocEventName" type="xs:string"/>
     <xs:element name="assocEventNameType" type="xs:string"/>
-    <xs:element name="assocEventNote" type="xs:string"/>
+    
     <xs:element name="assocEventOrganizations">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="assocEventOrganization" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="assocEventOrganization" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="assocEventPeoples">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="assocEventPeople" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    
     <xs:element name="assocEventPersons">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="assocEventPerson" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="assocEventPerson" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="assocEventPlaces">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="assocEventPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="assocEventPlace" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -277,10 +300,6 @@
     <xs:element name="assocPeopleGroupList" type="assocPeopleGroupList"/>
     <xs:element name="assocPersonGroupList" type="assocPersonGroupList"/>
     <xs:element name="assocPlaceGroupList" type="assocPlaceGroupList"/>
-
-    <!-- Object History and Association Information - History -->
-
-    <xs:element name="objectHistoryNote" type="xs:string"/>
     <!-- FIXME Start of owner repeatable group -->
     <!-- Note: this group has repeatable sub-fields, and thus will -->
     <!-- not be implemented as part of CSPACE-3229 in Release 1.2 -->
@@ -291,7 +310,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="ownershipAccess" type="xs:string"/>
+    
     <xs:element name="ownershipCategory" type="xs:string"/>
     <xs:element name="ownershipDateGroupList" type="ownershipDateGroupList"/>
     <xs:element name="ownershipExchangeMethod" type="xs:string"/>
@@ -309,7 +328,8 @@
     <xs:element name="ownersReferences">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="ownersReference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="ownersReference" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -319,59 +339,57 @@
 
     <xs:element name="viewersRole" type="xs:string"/>
     <xs:element name="viewersPersonalExperience" type="xs:string"/>
-    <xs:element name="viewersPersonalResponse" type="xs:string"/>
+    
     <xs:element name="viewersReferences">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="viewersReference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="viewersReference" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="viewersContributionNote" type="xs:string"/>
 
     <!-- Reference Information -->
-    
+
     <xs:element name="referenceGroupList" type="referenceGroupList"/>
 
     <!--  Object Collection Information Group -->
 
     <xs:element name="fieldCollectionDateGroup" type="structuredDateGroup"/>
-    <xs:element name="fieldCollectionMethods">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="fieldCollectionMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    
     <xs:element name="fieldCollectionNote" type="xs:string"/>
     <xs:element name="fieldCollectionNumber" type="xs:string"/>
     <xs:element name="fieldCollectionPlace" type="xs:string"/>
     <xs:element name="fieldCollectionSources">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="fieldCollectionSource" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="fieldCollectionSource" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="fieldCollectors">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="fieldCollector" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="fieldCollector" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="fieldColEventNames">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="fieldColEventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="fieldColEventName" type="xs:string" minOccurs="0"
+                    maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
     <xs:complexType name="otherNumberList">
         <xs:sequence>
-            <xs:element name="otherNumber" type="ns:otherNumber" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="otherNumber" type="ns:otherNumber" minOccurs="0" maxOccurs="unbounded"
+            />
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="otherNumber">
@@ -401,8 +419,7 @@
 
     <xs:complexType name="titleGroupList">
         <xs:sequence>
-            <xs:element name="titleGroup" type="titleGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="titleGroup" type="titleGroup" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -417,8 +434,8 @@
 
     <xs:complexType name="titleTranslationSubGroupList">
         <xs:sequence>
-            <xs:element name="titleTranslationSubGroup" type="titleTranslationSubGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="titleTranslationSubGroup" type="titleTranslationSubGroup"
+                minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -478,14 +495,15 @@
     <xs:complexType name="measuredPartGroup">
         <xs:sequence>
             <xs:element name="measuredPart" type="xs:string"/>
-            <xs:element name="dimensionSummary" type="xs:string" />
+            <xs:element name="dimensionSummary" type="xs:string"/>
             <xs:element name="dimensionSubGroupList" type="dimensionSubGroupList"/>
         </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="dimensionSubGroupList">
         <xs:sequence>
-            <xs:element name="dimensionSubGroup" type="dimensionSubGroup" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="dimensionSubGroup" type="dimensionSubGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -501,7 +519,7 @@
             <xs:element name="dimensionNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="materialGroupList">
         <xs:sequence>
             <xs:element name="materialGroup" type="materialGroup" minOccurs="0"
@@ -517,10 +535,10 @@
             <xs:element name="materialSource" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="objectStatusList">
         <xs:sequence>
-            <xs:element name="objectStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="objectStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -560,8 +578,8 @@
 
     <xs:complexType name="objectProductionOrganizationGroupList">
         <xs:sequence>
-            <xs:element name="objectProductionOrganizationGroup" type="objectProductionOrganizationGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="objectProductionOrganizationGroup"
+                type="objectProductionOrganizationGroup" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="objectProductionOrganizationGroup">
@@ -573,8 +591,8 @@
 
     <xs:complexType name="objectProductionPeopleGroupList">
         <xs:sequence>
-            <xs:element name="objectProductionPeopleGroup" type="objectProductionPeopleGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="objectProductionPeopleGroup" type="objectProductionPeopleGroup"
+                minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="objectProductionPeopleGroup">
@@ -586,8 +604,8 @@
 
     <xs:complexType name="objectProductionPersonGroupList">
         <xs:sequence>
-            <xs:element name="objectProductionPersonGroup" type="objectProductionPersonGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="objectProductionPersonGroup" type="objectProductionPersonGroup"
+                minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="objectProductionPersonGroup">
@@ -599,8 +617,8 @@
 
     <xs:complexType name="objectProductionPlaceGroupList">
         <xs:sequence>
-            <xs:element name="objectProductionPlaceGroup" type="objectProductionPlaceGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="objectProductionPlaceGroup" type="objectProductionPlaceGroup"
+                minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="objectProductionPlaceGroup">
@@ -655,8 +673,8 @@
     <!-- to assocCulturalAffinity -->
     <xs:complexType name="assocCulturalContextGroupList">
         <xs:sequence>
-            <xs:element name="assocCulturalContextGroup" type="assocCulturalContextGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="assocCulturalContextGroup" type="assocCulturalContextGroup"
+                minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <!-- FIXME rename fields, if not over CSPACE-2501 length limit, -->
@@ -756,7 +774,7 @@
             <xs:element name="assocPlaceNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="ownershipDateGroupList">
         <xs:sequence>
             <xs:element name="ownershipDateGroup" type="structuredDateGroup" minOccurs="0"
@@ -766,8 +784,7 @@
 
     <xs:complexType name="usageGroupList">
         <xs:sequence>
-            <xs:element name="usageGroup" type="usageGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
+            <xs:element name="usageGroup" type="usageGroup" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     <xs:complexType name="usageGroup">
@@ -776,13 +793,14 @@
             <xs:element name="usageNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
-    
+
     <xs:complexType name="referenceGroupList">
         <xs:sequence>
-            <xs:element name="referenceGroup" type="referenceGroup" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="referenceGroup" type="referenceGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-	 
+
     <xs:complexType name="referenceGroup">
         <xs:sequence>
             <xs:element name="reference" type="xs:string"/>
@@ -795,29 +813,29 @@
     <!-- that correctly in its table creation/row linking. -->
     <xs:complexType name="structuredDateGroup">
         <xs:sequence>
-            <xs:element name="dateDisplayDate" type="xs:string"/>
-            <xs:element name="dateAssociation" type="xs:string"/>
-            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
-            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
             <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
-            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
-            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
-            <xs:element name="dateLatestYear" type="xs:integer"/>
-            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
             <xs:element name="dateLatestDay" type="xs:integer"/>
+            <xs:element name="dateLatestYear" type="xs:integer"/>
+            <xs:element name="dateAssociation" type="xs:string"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+            <xs:element name="dateDisplayDate" type="xs:string"/>
+            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
             <xs:element name="dateLatestEra" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
             <xs:element name="dateLatestCertainty" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
             <xs:element name="dateLatestQualifier" type="xs:string"/>
             <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
-            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
             <xs:element name="datePeriod" type="xs:string"/>
-            <xs:element name="dateNote" type="xs:string"/>
             <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="dateNote" type="xs:string"/>
             <xs:element name="dateLatestScalarValue" type="xs:date"/>
-            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
         </xs:sequence>
     </xs:complexType>
 
