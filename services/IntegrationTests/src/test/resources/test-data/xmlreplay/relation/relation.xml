@@ -162,6 +162,9 @@
              <!-- If not present, throws "java.io.FileNotFoundException: File '' does not exist" -->
              <!-- The contents of that file, sent in the PUT payload, will be ignored by the services. -->
              <filename>relation/res/workflowState.res.xml</filename>
+             <vars>
+                 <var ID="workflowState">deleted</var>
+             </vars>
          </test>
          <test ID="verifySubjectIsSoftDeleted">
              <method>GET</method>
@@ -292,6 +295,9 @@
              <!-- If not present, throws "java.io.FileNotFoundException: File '' does not exist" -->
              <!-- The contents of that file, sent in the PUT payload, will be ignored by the services. -->
              <filename>relation/res/workflowState.res.xml</filename>
+             <vars>
+                 <var ID="workflowState">deleted</var>
+             </vars>
          </test>
          <test ID="verifyObjectIsSoftDeleted">
              <method>GET</method>
