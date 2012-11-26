@@ -90,7 +90,7 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 			setStyledName(voucherCsid, formattedName);
 			
 			formattedNames.add(formattedName);
-			numAffected += numAffected + 1;
+			numAffected = numAffected + 1;
 		}
 		
 		results.setNumAffected(numAffected);
