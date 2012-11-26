@@ -32,14 +32,4 @@ public class PlaceAuthorityConstants {
     public final static String NUXEO_DOCTYPE = "PlaceAuthority";
     public final static String NUXEO_SCHEMA_NAME = "placeauthority";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-PlaceAuthority";
-    
-    public final static String COMMON_SCHEMA_NAME = "places_common";
-    
-    public final static String DISPLAY_NAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
-    public final static String DISPLAY_NAME_FIELD_NAME = "placeTermGroupList/placeTermGroup/termDisplayName";
-
-    public final static String TERM_TYPE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
-    public final static String TERM_TYPE_FIELD_NAME = "placeTermGroupList/placeTermGroup/termType";
-    
-    public final static String REVERSE_TERM_TYPE = "reverse";
 }

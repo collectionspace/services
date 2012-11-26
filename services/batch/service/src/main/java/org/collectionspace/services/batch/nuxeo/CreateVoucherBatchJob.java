@@ -19,7 +19,7 @@ import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.loanout.nuxeo.LoanoutConstants;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.collectionspace.services.place.nuxeo.PlaceAuthorityConstants;
+import org.collectionspace.services.place.nuxeo.PlaceConstants;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,10 +136,10 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		
 		PoxPayloadOut placePayload = findPlaceByShortId(vocabularyShortId, itemShortId);
 		
-		List<String> termTypes = getFieldValues(placePayload, PlaceAuthorityConstants.TERM_TYPE_SCHEMA_NAME, PlaceAuthorityConstants.TERM_TYPE_FIELD_NAME);
-		List<String> displayNames = getFieldValues(placePayload, PlaceAuthorityConstants.DISPLAY_NAME_SCHEMA_NAME, PlaceAuthorityConstants.DISPLAY_NAME_FIELD_NAME);
+		List<String> termTypes = getFieldValues(placePayload, PlaceConstants.TERM_TYPE_SCHEMA_NAME, PlaceConstants.TERM_TYPE_FIELD_NAME);
+		List<String> displayNames = getFieldValues(placePayload, PlaceConstants.DISPLAY_NAME_SCHEMA_NAME, PlaceConstants.DISPLAY_NAME_FIELD_NAME);
 		
-		int index = termTypes.indexOf(PlaceAuthorityConstants.REVERSE_TERM_TYPE);
+		int index = termTypes.indexOf(PlaceConstants.REVERSE_TERM_TYPE);
 		String reverseDisplayName = null;
 		
 		if (index < 0) {
