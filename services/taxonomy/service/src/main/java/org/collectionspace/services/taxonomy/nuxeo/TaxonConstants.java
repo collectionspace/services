@@ -32,4 +32,15 @@ public class TaxonConstants {
     public final static String NUXEO_DOCTYPE = "Taxon";
     public final static String NUXEO_SCHEMA_NAME = "taxon";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Taxon";
+    
+    public final static String COMMON_SCHEMA_NAME = "taxon_common";
+
+    public final static String IN_AUTHORITY_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String IN_AUTHORITY_FIELD_NAME = "inAuthority";
+
+    public final static String DISPLAY_NAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String DISPLAY_NAME_FIELD_NAME = "taxonTermGroupList/taxonTermGroup/termDisplayName";
+    
+    public final static String FORMATTED_DISPLAY_NAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String FORMATTED_DISPLAY_NAME_FIELD_NAME = "taxonTermGroupList/taxonTermGroup/termName";    
 }

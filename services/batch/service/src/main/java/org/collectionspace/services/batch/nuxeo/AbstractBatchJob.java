@@ -20,6 +20,7 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PlaceAuthorityClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
+import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
@@ -27,6 +28,7 @@ import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
@@ -210,10 +212,57 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 		return findByCsid(MovementClient.SERVICE_NAME, csid);
 	}
 	
+	protected List<String> getVocabularyCsids(String serviceName) throws URISyntaxException {
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
+		AbstractCommonList vocabularyList = resource.getAuthorityList(createDeleteFilterUriInfo());
+		List<String> csids = new ArrayList<String>();
+		
+		for (AbstractCommonList.ListItem item : vocabularyList.getListItem()) {
+			for (org.w3c.dom.Element element : item.getAny()) {
+				if (element.getTagName().equals("csid")) {
+					csids.add(element.getTextContent());
+					break;
+				}
+			}
+		}
+
+		return csids;
+	}
+	
+	protected PoxPayloadOut findAuthorityItemByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
+		List<String> vocabularyCsids = getVocabularyCsids(serviceName);
+		PoxPayloadOut itemPayload = null;
+		
+		for (String vocabularyCsid : vocabularyCsids) {
+			logger.debug("vocabularyCsid=" + vocabularyCsid);
+			
+			itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+			
+			if (itemPayload != null) {
+				break;
+			}
+		}
+		
+		return itemPayload;
+	}
+	
+	protected PoxPayloadOut findAuthorityItemByCsid(String serviceName, String vocabularyCsid, String csid) throws URISyntaxException, DocumentException {
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
+		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), vocabularyCsid, csid);
+		 
+		PoxPayloadOut payload = new PoxPayloadOut(response);
+
+		return payload;
+	}
+	
+	protected PoxPayloadOut findTaxonByCsid(String csid) throws URISyntaxException, DocumentException {
+		return findAuthorityItemByCsid(TaxonomyAuthorityClient.SERVICE_NAME, csid);
+	}
+	
 	protected PoxPayloadOut findAuthorityItemByShortId(String serviceName, String vocabularyShortId, String itemShortId) throws URISyntaxException, DocumentException {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
 		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), "urn:cspace:name(" + vocabularyShortId + ")", "urn:cspace:name(" + itemShortId + ")");
-
+ 
 		PoxPayloadOut payload = new PoxPayloadOut(response);
 
 		return payload;
