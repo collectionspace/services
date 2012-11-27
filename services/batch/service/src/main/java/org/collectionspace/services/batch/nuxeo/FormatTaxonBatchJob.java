@@ -140,7 +140,7 @@ public class FormatTaxonBatchJob extends AbstractBatchJob {
 		return formattedDisplayNames;
 	}
 	
-	private String applyStyles(String name) {
+	public String applyStyles(String name) {
 		try {
 			ParsedName parsedName = nameParser.parse(name);
 			

@@ -25,12 +25,18 @@
 			<event>documentModified</event>
 		</listener>
 	</extension>
-	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+	<!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updatestylednamelistener" async="false" postCommit="true"
 			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateStyledNameListener" priority="200">
 			<event>documentCreated</event>
 			<event>beforeDocumentModification</event>
 			<event>documentModified</event>
+		</listener>
+	</extension> -->
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updateformatteddisplaynamelistener" async="false" postCommit="true"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateFormattedDisplayNameListener" priority="200">
+			<event>beforeDocumentModification</event>
 		</listener>
 	</extension>
 	<!-- 
