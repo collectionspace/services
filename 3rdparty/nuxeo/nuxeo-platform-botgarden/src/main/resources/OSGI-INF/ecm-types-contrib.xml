@@ -37,6 +37,7 @@
 		<listener name="updateformatteddisplaynamelistener" async="false" postCommit="true"
 			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateFormattedDisplayNameListener" priority="200">
 			<event>beforeDocumentModification</event>
+			<event>documentCreated</event>
 		</listener>
 	</extension>
 	<!-- 

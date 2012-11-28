@@ -51,7 +51,11 @@ public class UpdateFormattedDisplayNameListener implements EventListener {
 					!doc.isProxy() && 
 					!doc.getCurrentLifeCycleState().equals(LoanoutConstants.DELETED_STATE)) {
 				
-				if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
+				if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
+					// Save the document, to get the BEFORE_DOC_UPDATE branch to run.
+					doc.getCoreSession().saveDocument(doc);
+				}
+				else if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
 					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);	            	
 
 					updateFormattedDisplayNames(doc, previousDoc);
