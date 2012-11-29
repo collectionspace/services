@@ -409,9 +409,10 @@ public class TenantBindingConfigReaderImpl
     	return getServiceBindingsByType(tenantId, serviceTypes);
     }
     /**
-     * getServiceBinding gets service binding for given tenant for a given service
+     * getServiceBindingsByType gets service bindings for a given tenant
+     * for the services that fall within a supplied set of service type(s)
      * @param tenantId
-     * @param serviceName
+     * @param serviceTypes
      * @return
      */
     public List<ServiceBindingType> getServiceBindingsByType(
