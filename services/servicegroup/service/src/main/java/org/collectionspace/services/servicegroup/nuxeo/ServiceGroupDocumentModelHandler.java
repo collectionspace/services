@@ -195,9 +195,10 @@ public class ServiceGroupDocumentModelHandler
         fields[1] = STANDARD_LIST_URI_FIELD;
         fields[2] = STANDARD_LIST_UPDATED_AT_FIELD;
         fields[3] = STANDARD_LIST_WORKFLOW_FIELD;
-        fields[4] = DOC_NAME_FIELD;
-        fields[5] = DOC_NUMBER_FIELD;
-        fields[6] = DOC_TYPE_FIELD;
+        fields[4] = STANDARD_LIST_REFNAME_FIELD;
+        fields[5] = DOC_NAME_FIELD;
+        fields[6] = DOC_NUMBER_FIELD;
+        fields[7] = DOC_TYPE_FIELD;
         list.setFieldsReturned(fields);
         Iterator<DocumentModel> iter = docList.iterator();
 		HashMap<String, Object> item = new HashMap<String, Object>();
