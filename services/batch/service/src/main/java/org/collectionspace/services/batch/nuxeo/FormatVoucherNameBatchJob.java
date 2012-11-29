@@ -12,14 +12,12 @@ import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.api.TaxonFormatter;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoanoutResource;
 import org.collectionspace.services.loanout.nuxeo.LoanoutConstants;
 import org.dom4j.DocumentException;
-import org.gbif.api.model.checklistbank.ParsedName;
-import org.gbif.nameparser.NameParser;
-import org.gbif.nameparser.UnparsableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +26,11 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 
 	final Logger logger = LoggerFactory.getLogger(FormatVoucherNameBatchJob.class);
 
-	private NameParser nameParser;
+	private TaxonFormatter taxonFormatter;
 	
 	public FormatVoucherNameBatchJob() {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
-		this.nameParser = new NameParser();
+		this.taxonFormatter = new TaxonFormatter();
 	}
 
 	public void run() {
@@ -155,58 +153,25 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 		if (name != null) {
 			if (name.isHybrid()) {
 				if (name.getFemaleParentName() != null) {
-					formattedName += applyStyles(name.getFemaleParentName());
+					formattedName += taxonFormatter.format(name.getFemaleParentName());
 				}
 				
 				formattedName += HYBRID_SEPARATOR;
 				
 				if (name.getMaleParentName() != null) {
-					formattedName += applyStyles(name.getMaleParentName());
+					formattedName += taxonFormatter.format(name.getMaleParentName());
 				}
 			}
 			else {
 				if (name.getName() != null) {
-					formattedName = applyStyles(name.getName());
+					formattedName = taxonFormatter.format(name.getName());
 				}
 			}
 		}
 		
 		return formattedName;
 	}
-	
-	private String applyStyles(String name) {
-		try {
-			ParsedName parsedName = nameParser.parse(name);
-			
-			String genusOrAbove = parsedName.getGenusOrAbove();
-			String specificEpithet = parsedName.getSpecificEpithet();
-			String infraSpecificEpithet = parsedName.getInfraSpecificEpithet();
-			
-			logger.debug("parsed name: genusOrAbove=" + genusOrAbove + " specificEpithet=" + specificEpithet + " infraSpecificEpithet=" + infraSpecificEpithet);
-			
-			if (StringUtils.isNotBlank(genusOrAbove)) {
-				name = italicize(name, genusOrAbove);
-			}
-			
-			if (StringUtils.isNotBlank(specificEpithet)) {
-				name = italicize(name, specificEpithet);
-			}
-			
-			if (StringUtils.isNotBlank(infraSpecificEpithet)) {
-				name = italicize(name, infraSpecificEpithet);
-			}			
-		}
-		catch (UnparsableException e) {
-			logger.error("error parsing name: name=" + name + " message=" + e.getMessage());
-		}
 
-		return name;
-	}
-	
-	private String italicize(String string, String substring) {
-		return string.replaceAll(substring, "<span style=\"font-style: italic\">" + substring + "</span>");
-	}
-	
 	private void setStyledName(String loanoutCsid, String styledName) {
 		final String updatePayload = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

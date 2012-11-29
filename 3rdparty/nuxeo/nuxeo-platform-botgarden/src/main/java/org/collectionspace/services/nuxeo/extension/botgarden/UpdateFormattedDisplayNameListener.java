@@ -1,15 +1,13 @@
 package org.collectionspace.services.nuxeo.extension.botgarden;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.collectionspace.services.batch.nuxeo.FormatTaxonBatchJob;
+import org.collectionspace.services.common.api.TaxonFormatter;
 import org.collectionspace.services.loanout.nuxeo.LoanoutConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -26,7 +24,7 @@ public class UpdateFormattedDisplayNameListener implements EventListener {
 
 	private static final String[] DISPLAY_NAME_PATH_ELEMENTS = TaxonConstants.DISPLAY_NAME_FIELD_NAME.split("/");
 	private static final String TERM_GROUP_LIST_FIELD_NAME = DISPLAY_NAME_PATH_ELEMENTS[0];
-	private static final String TERM_GROUP_FIELD_NAME = DISPLAY_NAME_PATH_ELEMENTS[1];
+	//private static final String TERM_GROUP_FIELD_NAME = DISPLAY_NAME_PATH_ELEMENTS[1];
 	private static final String DISPLAY_NAME_FIELD_NAME = DISPLAY_NAME_PATH_ELEMENTS[2];
 	
 	private static final String[] FORMATTED_DISPLAY_NAME_PATH_ELEMENTS = TaxonConstants.FORMATTED_DISPLAY_NAME_FIELD_NAME.split("/");
@@ -63,7 +61,7 @@ public class UpdateFormattedDisplayNameListener implements EventListener {
 	
 	private void updateFormattedDisplayNames(DocumentModel doc, DocumentModel previousDoc) throws ClientException {
 		//Set<String> previousDisplayNames = getDisplayNames(previousDoc);
-		FormatTaxonBatchJob formatter = createFormatter();
+		TaxonFormatter formatter = new TaxonFormatter();
 		List<Map<String, Object>> termGroupList = (List<Map<String, Object>>) doc.getProperty(TaxonConstants.DISPLAY_NAME_SCHEMA_NAME, TERM_GROUP_LIST_FIELD_NAME);
 
 		for (Map<String, Object> termGroup : termGroupList) {
@@ -74,7 +72,7 @@ public class UpdateFormattedDisplayNameListener implements EventListener {
 				formattedDisplayName = "";
 				
 				if (StringUtils.isNotBlank(displayName)) {
-					formattedDisplayName = formatter.applyStyles(displayName);
+					formattedDisplayName = formatter.format(displayName);
 				}
 	
 				termGroup.put(FORMATTED_DISPLAY_NAME_FIELD_NAME, formattedDisplayName);
@@ -87,6 +85,7 @@ public class UpdateFormattedDisplayNameListener implements EventListener {
 		doc.setProperties(TaxonConstants.DISPLAY_NAME_SCHEMA_NAME, updateMap);
 	}
 	
+	/*
 	private Set<String> getDisplayNames(DocumentModel doc) throws ClientException {
 		Set<String> displayNames = new HashSet<String>();
 		List<Map<String, Object>> termGroupList = (List<Map<String, Object>>) doc.getProperty(TaxonConstants.DISPLAY_NAME_SCHEMA_NAME, TERM_GROUP_LIST_FIELD_NAME);
@@ -101,10 +100,5 @@ public class UpdateFormattedDisplayNameListener implements EventListener {
 		
 		return displayNames;
 	}
-	
-	private FormatTaxonBatchJob createFormatter() {
-		FormatTaxonBatchJob formatter = new FormatTaxonBatchJob();
-
-		return formatter;
-	}
+	*/
 }

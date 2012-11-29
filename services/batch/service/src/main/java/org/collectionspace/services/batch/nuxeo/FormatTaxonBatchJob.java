@@ -10,26 +10,24 @@ import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
+import org.collectionspace.services.common.api.TaxonFormatter;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.gbif.api.model.checklistbank.ParsedName;
-import org.gbif.nameparser.NameParser;
-import org.gbif.nameparser.UnparsableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FormatTaxonBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(FormatTaxonBatchJob.class);
 
-	private NameParser nameParser;
-
+	private TaxonFormatter taxonFormatter;
+	
 	public FormatTaxonBatchJob() {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
-		this.nameParser = new NameParser();
+		this.taxonFormatter = new TaxonFormatter();
 	}
 
 	public void run() {
@@ -113,7 +111,7 @@ public class FormatTaxonBatchJob extends AbstractBatchJob {
 			for (Element termGroupElement : termGroupElements) {
 				Node displayNameNode = termGroupElement.selectSingleNode(displayNameFieldName);
 				String displayName = (displayNameNode == null) ? "" : displayNameNode.getText();
-				String formattedDisplayName = applyStyles(displayName);
+				String formattedDisplayName = taxonFormatter.format(displayName);
 
 				Element formattedDisplayNameElement = (Element) termGroupElement.selectSingleNode(formattedDisplayNameFieldName);
 				
@@ -138,39 +136,6 @@ public class FormatTaxonBatchJob extends AbstractBatchJob {
 		}		
 		
 		return formattedDisplayNames;
-	}
-	
-	public String applyStyles(String name) {
-		try {
-			ParsedName parsedName = nameParser.parse(name);
-			
-			String genusOrAbove = parsedName.getGenusOrAbove();
-			String specificEpithet = parsedName.getSpecificEpithet();
-			String infraSpecificEpithet = parsedName.getInfraSpecificEpithet();
-			
-			logger.debug("parsed name: genusOrAbove=" + genusOrAbove + " specificEpithet=" + specificEpithet + " infraSpecificEpithet=" + infraSpecificEpithet);
-			
-			if (StringUtils.isNotBlank(genusOrAbove)) {
-				name = italicize(name, genusOrAbove);
-			}
-			
-			if (StringUtils.isNotBlank(specificEpithet)) {
-				name = italicize(name, specificEpithet);
-			}
-			
-			if (StringUtils.isNotBlank(infraSpecificEpithet)) {
-				name = italicize(name, infraSpecificEpithet);
-			}			
-		}
-		catch (UnparsableException e) {
-			logger.error("error parsing name: name=" + name + " message=" + e.getMessage());
-		}
-
-		return name;
-	}
-	
-	private String italicize(String string, String substring) {
-		return string.replaceAll(substring, "<span style=\"font-style: italic\">" + substring + "</span>");
 	}
 	
 	private List<String> findAllTaxonRecords() {
