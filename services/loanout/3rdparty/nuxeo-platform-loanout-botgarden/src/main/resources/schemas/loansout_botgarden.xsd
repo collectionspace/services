@@ -40,5 +40,4 @@
 	<xs:element name="inSpore" type="xs:boolean"/>
 
     <xs:element name="labelRequested" type="xs:string"/>
-    <xs:element name="styledName" type="xs:string"/>
 </xs:schema>
