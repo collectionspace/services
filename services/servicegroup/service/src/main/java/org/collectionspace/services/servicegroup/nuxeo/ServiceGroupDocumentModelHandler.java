@@ -43,6 +43,10 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriTemplateFactory;
+import org.collectionspace.services.common.UriTemplateRegistry;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -137,7 +141,7 @@ public class ServiceGroupDocumentModelHandler
     	        if (docList == null) { // found no authRef fields - nothing to process
     	            return list;
     	        }
-    	        processDocList(docList, queriedServiceBindings, commonList);
+    	        processDocList(ctx.getTenantId(), docList, queriedServiceBindings, commonList);
     	        list.setItemsInPage(docList.size());
     	        list.setTotalItems(docList.totalSize());
     		} catch (DocumentException de) {
@@ -180,7 +184,8 @@ public class ServiceGroupDocumentModelHandler
         return "/" + sb.getName().toLowerCase() + "/" + csid;
     }
     
-    private void processDocList(	
+    private void processDocList(
+                String tenantId,
 		DocumentModelList docList,
 		Map<String, ServiceBindingType> queriedServiceBindings,
 		CommonList list ) {
@@ -207,8 +212,26 @@ public class ServiceGroupDocumentModelHandler
             }
             String csid = NuxeoUtils.getCsid(docModel);
             item.put(STANDARD_LIST_CSID_FIELD, csid);
+                        
+            UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();            
+            StoredValuesUriTemplate storedValuesResourceTemplate = uriTemplateRegistry.get(new UriTemplateRegistryKey(tenantId, docType));
+ 	    Map<String, String> additionalValues = new HashMap<String, String>();
+ 	    if (storedValuesResourceTemplate.getUriTemplateType() == UriTemplateFactory.ITEM) {
+                try {
+                    String inAuthorityCsid = (String) docModel.getPropertyValue("inAuthority"); // AuthorityItemJAXBSchema.IN_AUTHORITY
+                    additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, inAuthorityCsid);
+                    additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, csid);
+                } catch (Exception e) {
+                    logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
+                }
+ 	    } else {
+                additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, csid);
+            }
+            String uriStr = storedValuesResourceTemplate.buildUri(additionalValues);
             // Need to get the URI for the document, by it's type.
-            item.put(STANDARD_LIST_URI_FIELD, getUriFromServiceBinding(sb, csid));
+            // item.put(STANDARD_LIST_URI_FIELD, getUriFromServiceBinding(sb, csid));
+            item.put(STANDARD_LIST_URI_FIELD, uriStr);
+            
             try {
             	item.put(STANDARD_LIST_UPDATED_AT_FIELD, getUpdatedAtAsString(docModel));
                 item.put(STANDARD_LIST_WORKFLOW_FIELD, docModel.getCurrentLifeCycleState());
