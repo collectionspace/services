@@ -43,9 +43,11 @@ public class UriTemplateRegistry extends HashMap<UriTemplateRegistryKey, StoredV
     
     /**
      * Dumps all registry settings for debugging purposes.
+     * @return a String representation of the URI Template Registry settings
      */
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer("");
+        StringBuilder sb = new StringBuilder("");
         for (Map.Entry<UriTemplateRegistryKey, StoredValuesUriTemplate> uriTemplateEntry : this.entrySet()) {
             sb.append("Tenant : DocType = ");
             sb.append(uriTemplateEntry.getKey().getTenantId());
@@ -53,7 +55,8 @@ public class UriTemplateRegistry extends HashMap<UriTemplateRegistryKey, StoredV
             sb.append(uriTemplateEntry.getKey().getDocType());
             sb.append('\n');
             sb.append(" Value of Template = ");
-            sb.append("  " + uriTemplateEntry.getValue().toString());
+            sb.append("  ");
+            sb.append(uriTemplateEntry.getValue().toString());
             sb.append('\n');
         }
         return sb.toString();

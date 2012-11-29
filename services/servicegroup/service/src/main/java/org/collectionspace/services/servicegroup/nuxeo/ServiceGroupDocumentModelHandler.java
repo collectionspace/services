@@ -229,8 +229,6 @@ public class ServiceGroupDocumentModelHandler
                 additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, csid);
             }
             String uriStr = storedValuesResourceTemplate.buildUri(additionalValues);
-            // Need to get the URI for the document, by it's type.
-            // item.put(STANDARD_LIST_URI_FIELD, getUriFromServiceBinding(sb, csid));
             item.put(STANDARD_LIST_URI_FIELD, uriStr);
             
             try {
