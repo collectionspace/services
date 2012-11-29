@@ -235,6 +235,7 @@ public class ServiceGroupDocumentModelHandler
             try {
             	item.put(STANDARD_LIST_UPDATED_AT_FIELD, getUpdatedAtAsString(docModel));
                 item.put(STANDARD_LIST_WORKFLOW_FIELD, docModel.getCurrentLifeCycleState());
+                item.put(STANDARD_LIST_REFNAME_FIELD, getRefname(docModel));
             } catch(Exception e) {
             	logger.error("Error getting core values for doc ["+csid+"]: "+e.getLocalizedMessage());
             }
