@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
@@ -126,31 +127,43 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 	}
 	
 	private String getReverseFieldCollectionPlace(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
-		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
-		RefName.AuthorityItem item = RefName.AuthorityItem.parse(fieldCollectionPlaceRefName);
-		
-		String vocabularyShortId = item.getParentShortIdentifier();
-		String itemShortId = item.getShortIdentifier();
-		
-		logger.debug("finding place: vocabularyShortId=" + vocabularyShortId + " itemShortId=" + itemShortId);
-		
-		PoxPayloadOut placePayload = findPlaceByShortId(vocabularyShortId, itemShortId);
-		
-		List<String> termTypes = getFieldValues(placePayload, PlaceConstants.TERM_TYPE_SCHEMA_NAME, PlaceConstants.TERM_TYPE_FIELD_NAME);
-		List<String> displayNames = getFieldValues(placePayload, PlaceConstants.DISPLAY_NAME_SCHEMA_NAME, PlaceConstants.DISPLAY_NAME_FIELD_NAME);
-		
-		int index = termTypes.indexOf(PlaceConstants.REVERSE_TERM_TYPE);
 		String reverseDisplayName = null;
-		
-		if (index < 0) {
-			// There's no reverse term. Just use the primary.
+		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
+
+		if (StringUtils.isNotBlank(fieldCollectionPlaceRefName)) {		
+			RefName.AuthorityItem item = RefName.AuthorityItem.parse(fieldCollectionPlaceRefName);
 			
-			if (displayNames.size() > 0) {
-				reverseDisplayName = displayNames.get(0);
+			String vocabularyShortId = item.getParentShortIdentifier();
+			String itemShortId = item.getShortIdentifier();
+			
+			logger.debug("finding place: vocabularyShortId=" + vocabularyShortId + " itemShortId=" + itemShortId);
+			
+			PoxPayloadOut placePayload = null;
+			
+			try {
+				placePayload = findPlaceByShortId(vocabularyShortId, itemShortId);
 			}
-		}
-		else {
-			reverseDisplayName = displayNames.get(index);
+			catch (WebApplicationException e) {
+				logger.error("Error finding place: vocabularyShortId=" + vocabularyShortId + " itemShortId=" + itemShortId, e);
+			}
+	
+			if (placePayload != null) {
+				List<String> termTypes = getFieldValues(placePayload, PlaceConstants.TERM_TYPE_SCHEMA_NAME, PlaceConstants.TERM_TYPE_FIELD_NAME);
+				List<String> displayNames = getFieldValues(placePayload, PlaceConstants.DISPLAY_NAME_SCHEMA_NAME, PlaceConstants.DISPLAY_NAME_FIELD_NAME);
+				
+				int index = termTypes.indexOf(PlaceConstants.REVERSE_TERM_TYPE);
+				
+				if (index < 0) {
+					// There's no reverse term. Just use the primary.
+					
+					if (displayNames.size() > 0) {
+						reverseDisplayName = displayNames.get(0);
+					}
+				}
+				else {
+					reverseDisplayName = displayNames.get(index);
+				}
+			}
 		}
 		
 		if (reverseDisplayName == null) {
