@@ -54,7 +54,7 @@
                 <xs:element name="handlingRecommendations" type="xs:string"/>
                 <xs:element name="packingRecommendations" type="xs:string"/>
                 <xs:element name="securityRecommendations" type="xs:string"/>
-                <xs:element name="specialRecommendations" type="xs:string"/>
+                <xs:element name="specialRequirements" type="xs:string"/>
                 <xs:element name="storageRequirements" type="xs:string"/>
                 <xs:element name="salvagePriorityCodeGroupList" type="salvagePriorityCodeGroupList"/>
                 <xs:element name="salvagePriorityCode" type="xs:string"/>
