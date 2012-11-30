@@ -592,7 +592,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     @Override
     public AuthorityRefList getAuthorityRefs(
             String csid,
-            List<AuthRefConfigInfo> authRefsInfo) throws PropertyException {
+            List<AuthRefConfigInfo> authRefsInfo) throws PropertyException, Exception {
 
         AuthorityRefList authRefList = new AuthorityRefList();
         AbstractCommonList commonList = (AbstractCommonList) authRefList;

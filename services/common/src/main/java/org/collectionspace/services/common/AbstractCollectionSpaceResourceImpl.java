@@ -40,6 +40,7 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
@@ -447,6 +448,11 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         	//
         	logException = false;
             response = Response.status(Response.Status.NOT_FOUND).entity(serviceMsg + " on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
+            result = new WebApplicationException(response);
+            
+        } else if (e instanceof TransactionException) {
+            int code = ((TransactionException) e).getErrorCode();
+            response = Response.status(code).entity(e.getMessage()).type("text/plain").build();
             result = new WebApplicationException(response);
 
         } else if (e instanceof BadRequestException) {
