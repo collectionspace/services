@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 
+import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.config.RepositoryClientConfigType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -23,8 +24,8 @@ public class NuxeoConnectorEmbedded {
  */
 	private Logger logger = LoggerFactory.getLogger(NuxeoConnectorEmbedded.class);
 
-	public final static String NUXEO_CLIENT_DIR = "nuxeo-client";
-	public final static String NUXEO_SERVER_DIR = "nuxeo-server";
+	public final static String NUXEO_CLIENT_DIR = JEEServerDeployment.NUXEO_CLIENT_DIR;
+	public final static String NUXEO_SERVER_DIR = JEEServerDeployment.NUXEO_SERVER_DIR;
 	private final static String ERROR_CONNECTOR_NOT_INITIALIZED = "NuxeoConnector is not initialized!";
 
 
