@@ -47,6 +47,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
+import org.collectionspace.services.common.document.TransactionException;
 
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -59,6 +60,7 @@ import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 
 //
 // CSPACE-5036 - How to make CMISQL queries from Nuxeo
@@ -129,12 +131,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      *            should be used by the caller to provide and transform the
      *            document
      * @return id in repository of the newly created document
+     * @throws BadRequestException
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public String create(ServiceContext ctx,
             DocumentHandler handler) throws BadRequestException,
-            DocumentException {
+            TransactionException, DocumentException {
 
     	String docType = NuxeoUtils.getTenantQualifiedDocType(ctx); //ctx.getDocumentType();
         if (docType == null) {
@@ -202,11 +206,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @param handler
      *            should be used by the caller to provide and transform the
      *            document
+     * @throws DocumentNotFoundException if the document cannot be found in the repository
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
 
         if (handler == null) {
             throw new IllegalArgumentException(
@@ -250,16 +256,18 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     }
 
     /**
-     * get document from the Nuxeo repository, using the docFilter params.
+     * get a document from the Nuxeo repository, using the docFilter params.
      * @param ctx service context under which this method is invoked
      * @param handler
      *            should be used by the caller to provide and transform the
      *            document. Handler must have a docFilter set to return a single item.
+     * @throws DocumentNotFoundException if the document cannot be found in the repository
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public void get(ServiceContext ctx, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         QueryContext queryContext = new QueryContext(ctx, handler);
         RepositoryInstance repoSession = null;
 
@@ -331,14 +339,17 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * of the current context.
      * 
      * @param ctx service context under which this method is invoked
-     * @param id
+     * @param csid
      *            of the document to retrieve
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
      * @throws DocumentException
+     * @return a wrapped documentModel
      */
     @Override
     public DocumentWrapper<DocumentModel> getDoc(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            String csid) throws DocumentNotFoundException, DocumentException {
+            String csid) throws DocumentNotFoundException, TransactionException, DocumentException {
         RepositoryInstance repoSession = null;
         DocumentWrapper<DocumentModel> wrapDoc = null;
 
@@ -411,13 +422,16 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * find wrapped documentModel from the Nuxeo repository
      * @param ctx service context under which this method is invoked
      * @param whereClause where NXQL where clause to get the document
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
      * @throws DocumentException
+     * @return a wrapped documentModel retrieved by the repository query
      */
     @Override
     public DocumentWrapper<DocumentModel> findDoc(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             String whereClause)
-            		throws DocumentNotFoundException, DocumentException {
+            		throws DocumentNotFoundException, TransactionException, DocumentException {
         RepositoryInstance repoSession = null;
         DocumentWrapper<DocumentModel> wrapDoc = null;
 
@@ -441,14 +455,18 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
     /**
      * find doc and return CSID from the Nuxeo repository
+     * @param repoSession
      * @param ctx service context under which this method is invoked
      * @param whereClause where NXQL where clause to get the document
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
      * @throws DocumentException
+     * @return the CollectionSpace ID (CSID) of the requested document
      */
     @Override
     public String findDocCSID(RepositoryInstance repoSession, 
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String whereClause)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         String csid = null;
         boolean releaseSession = false;
         try {
@@ -584,7 +602,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * Find a list of documentModels from the Nuxeo repository
      * @param docTypes a list of DocType names to match
      * @param  whereClause where the clause to qualify on
-     * @return
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
+     * @throws DocumentException
+     * @return a list of documentModels
      */
     @Override
     public DocumentWrapper<DocumentModelList> findDocs(
@@ -592,7 +613,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             List<String> docTypes,
             String whereClause,
             int pageSize, int pageNum, boolean computeTotal)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         RepositoryInstance repoSession = null;
         DocumentWrapper<DocumentModelList> wrapDoc = null;
 
@@ -625,7 +646,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      */
     @Override
     public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
                     "RepositoryJavaClient.getAll: handler is missing");
@@ -670,11 +691,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @param handler
      *            should be used by the caller to provide and transform the
      *            document
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public void getAll(ServiceContext ctx, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
                     "RepositoryJavaClient.getAll: handler is missing");
@@ -762,10 +785,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     }
 
     /**
-     * find doc and return CSID from the Nuxeo repository
-     * @param ctx service context under which this method is invoked
-     * @param whereClause where NXQL where clause to get the document
-     * @throws DocumentException
+     * Returns a URI value for a document in the Nuxeo repository
+     * @param wrappedDoc a wrapped documentModel
+     * @throws ClientException
+     * @return a document URI
      */
     @Override
     public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws ClientException {
@@ -812,11 +835,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @param ctx service context under which this method is invoked
      * @param handler should be used by the caller to provide and transform the document
      * @throws DocumentNotFoundException if workspace not found
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
 
         DocumentFilter filter = handler.getDocumentFilter();
         String oldOrderBy = filter.getOrderByClause();
@@ -965,16 +989,19 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * update given document in the Nuxeo repository
      *
      * @param ctx service context under which this method is invoked
-     * @param id
+     * @param csid
      *            of the document
      * @param handler
      *            should be used by the caller to provide and transform the
      *            document
+     * @throws BadRequestException
+     * @throws DocumentNotFoundException
+     * @throws TransactionException if the transaction times out or otherwise cannot be successfully completed
      * @throws DocumentException
      */
     @Override
     public void update(ServiceContext ctx, String csid, DocumentHandler handler)
-            throws BadRequestException, DocumentNotFoundException,
+            throws BadRequestException, DocumentNotFoundException, TransactionException,
             DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
@@ -1044,8 +1071,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     /**
      * Save a documentModel to the Nuxeo repository.
      * @param ctx service context under which this method is invoked
+     * @param repoSession
      * @param docModel the document to save
      * @param fSaveSession if TRUE, will call CoreSession.save() to save accumulated changes.
+     * @throws ClientException
      * @throws DocumentException
      */
     public void saveDocWithoutHandlerProcessing(
@@ -1075,8 +1104,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * Save a list of documentModels to the Nuxeo repository.
      * 
      * @param ctx service context under which this method is invoked
-     * @param docModel the document to save
+     * @param repoSession a repository session
+     * @param docModelList a list of document models
      * @param fSaveSession if TRUE, will call CoreSession.save() to save accumulated changes.
+     * @throws ClientException
      * @throws DocumentException
      */
     public void saveDocListWithoutHandlerProcessing(
@@ -1108,7 +1139,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      */
     @Override
     public void delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException,
-            DocumentException {
+            DocumentException, TransactionException {
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "delete(ctx, ix, handler): ctx is missing");
@@ -1397,7 +1428,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      *
      * @param repoSession the repo session
      */
-    public void releaseRepositorySession(ServiceContext ctx, RepositoryInstance repoSession) {
+    public void releaseRepositorySession(ServiceContext ctx, RepositoryInstance repoSession) throws TransactionException {
         try {
             NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
             // release session
@@ -1409,6 +1440,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             } else {
                 client.releaseRepository(repoSession); //repo session was acquired without a service context
             }
+        } catch (TransactionRuntimeException tre) {
+            TransactionException te = new TransactionException(tre);
+            logger.error(te.getMessage(), tre); // Log the standard transaction exception message, plus an exception-specific stack trace
+            throw te;
         } catch (Exception e) {
             logger.error("Could not close the repository session", e);
             // no need to throw this service specific exception
@@ -1422,5 +1457,5 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 			DocumentException {
 		// This is a placeholder for when we change the StorageClient interface to treat workflow transitions as 1st class operations like 'get', 'create', 'update, 'delete', etc
 	}
-
+                
 }
