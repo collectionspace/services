@@ -423,6 +423,10 @@
                         <!-- Object Description Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
+                            <types:value>ageQualifier</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
                             <types:value>ageUnit</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
