@@ -58,6 +58,7 @@
         <module>intake</module>
         <module>loanin</module>
         <module>loanout</module>
+        <module>work</module>
         <module>objectexit</module>
         <module>batch</module>
         <module>imports</module>
