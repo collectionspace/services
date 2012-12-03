@@ -38,6 +38,7 @@ import org.collectionspace.services.imports.ImportsResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
 import org.collectionspace.services.place.PlaceAuthorityResource;
 import org.collectionspace.services.concept.ConceptAuthorityResource;
+import org.collectionspace.services.work.WorkAuthorityResource;
 import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
 import org.collectionspace.services.relation.RelationResource;
@@ -84,17 +85,17 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * $LastChangedDate$
  */
 public class CollectionSpaceJaxRsApplication extends Application
-					implements ResourceMapHolder {
+                    implements ResourceMapHolder {
 
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
     private ResourceMap resourceMap = new ResourceMapImpl();
     private ServletContext servletContext = null;
 
-    public CollectionSpaceJaxRsApplication() {    	
-    	//
-    	// Instantiate all our JaxRS resources
-    	//
+    public CollectionSpaceJaxRsApplication() {      
+        //
+        // Instantiate all our JaxRS resources
+        //
         singletons.add(new SecurityInterceptor());
         
         singletons.add(new AccountResource());
@@ -109,6 +110,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new OrgAuthorityResource());
         addResourceToMapAndSingletons(new LocationAuthorityResource());
         addResourceToMapAndSingletons(new ConceptAuthorityResource());
+        addResourceToMapAndSingletons(new WorkAuthorityResource());
         addResourceToMapAndSingletons(new TaxonomyAuthorityResource());
         addResourceToMapAndSingletons(new PlaceAuthorityResource());
         addResourceToMapAndSingletons(new AcquisitionResource());
@@ -157,11 +159,10 @@ public class CollectionSpaceJaxRsApplication extends Application
     }
     
     public void setServletContext(ServletContext servletContext) {
-    	this.servletContext = servletContext;
+        this.servletContext = servletContext;
     }
     
     public ServletContext getServletContext() {
-    	return this.servletContext;
+        return this.servletContext;
     }
 }
-

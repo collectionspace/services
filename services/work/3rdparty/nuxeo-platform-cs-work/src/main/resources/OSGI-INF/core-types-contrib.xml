@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.work.coreTypes">
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
+    <schema name="workauthorities_common" prefix="workauthorities_common" src="schemas/workauthorities_common.xsd"/>
+  </extension>
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
+    <schema name="works_common" prefix="works_common" src="schemas/works_common.xsd"/>
+  </extension>
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
+    <doctype name="Workauthority" extends="Document">
+      <schema name="common"/>
+      <schema name="collectionspace_core"/>
+      <schema name="dublincore"/>
+      <schema name="workauthorities_common"/>
+    </doctype>
+  </extension>
+  <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
+    <doctype name="Workitem" extends="Document">
+      <schema name="common"/>
+      <schema name="collectionspace_core"/>
+      <schema name="dublincore"/>
+      <schema name="works_common"/>
+      <prefetch>
+          works_common:workTermGroupList/0/termDisplayName
+          works_common:refName
+          works_common:shortIdentifier
+      </prefetch>
+    </doctype>
+  </extension>
+</component>

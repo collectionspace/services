@@ -57,6 +57,7 @@ import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.PlaceAuthorityClient;
 import org.collectionspace.services.client.ConceptAuthorityClient;
+import org.collectionspace.services.client.WorkAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -95,62 +96,62 @@ public class RelationDocumentModelHandler
 
     
     private boolean subjectOrObjectInWorkflowState(DocumentWrapper<DocumentModel> wrapDoc, String workflowState) throws ServiceException {
-    	boolean result = false;
-    	DocumentModel relationDocModel = wrapDoc.getWrappedObject();
-    	String errMsg = ERROR_TERMS_IN_WORKFLOWSTATE + workflowState;
-    			
+        boolean result = false;
+        DocumentModel relationDocModel = wrapDoc.getWrappedObject();
+        String errMsg = ERROR_TERMS_IN_WORKFLOWSTATE + workflowState;
+                
         RepositoryInstance repoSession = this.getRepositorySession();
         try {
-			DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
-			DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
-			if (subjectDocModel.getCurrentLifeCycleState().equalsIgnoreCase(workflowState) ||
-					objectDocModel.getCurrentLifeCycleState().equalsIgnoreCase(workflowState)) {
-				result = true;
-			}
-		} catch (Exception e) {
-			if (logger.isInfoEnabled() == true) {
-				logger.info(errMsg, e);
-			}
-		}
-    	        
-    	return result;
+            DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
+            DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
+            if (subjectDocModel.getCurrentLifeCycleState().equalsIgnoreCase(workflowState) ||
+                    objectDocModel.getCurrentLifeCycleState().equalsIgnoreCase(workflowState)) {
+                result = true;
+            }
+        } catch (Exception e) {
+            if (logger.isInfoEnabled() == true) {
+                logger.info(errMsg, e);
+            }
+        }
+                
+        return result;
     }
     
-	@Override
-	/*
-	 * Until we rework the RepositoryClient to handle the workflow transition (just like it does for 'create', 'get', 'update', and 'delete', this method will only check to see if the transition is allowed.  Until then,
-	 * the WorkflowDocumentModelHandler class does the actual workflow transition.
-	 * 
-	 * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
-	 */
-	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
-			throws Exception {
-		String workflowState = transitionDef.getDestinationState();
-		if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
-    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+    @Override
+    /*
+     * Until we rework the RepositoryClient to handle the workflow transition (just like it does for 'create', 'get', 'update', and 'delete', this method will only check to see if the transition is allowed.  Until then,
+     * the WorkflowDocumentModelHandler class does the actual workflow transition.
+     * 
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
+     */
+    public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+            throws Exception {
+        String workflowState = transitionDef.getDestinationState();
+        if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
+            throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
                     "Cannot change a relationship if either end of it is in the workflow state: " + workflowState);
-		}
-	}
+        }
+    }
 
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	// Merge in the data from the payload
+        // Merge in the data from the payload
         super.handleCreate(wrapDoc);
 
         // And take care of ensuring all the values for the relation info are correct 
         populateSubjectAndObjectValues(wrapDoc);
-    	
+        
         // both subject and object cannot be locked
-    	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
-    	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
-    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+        String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
+        if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
+            throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
                     "Cannot create a relationship if either end is in the workflow state: " + workflowState);
-    	}
+        }
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	// Merge in the data from the payload
+        // Merge in the data from the payload
         super.handleUpdate(wrapDoc);
         
         // And take care of ensuring all the values for the relation info are correct 
@@ -159,14 +160,14 @@ public class RelationDocumentModelHandler
     
     @Override
     public void handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
-    	// both subject and object cannot be locked
-    	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == false) {
-    		super.handleDelete(wrapDoc);
-    	} else {
-    		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+        String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
+        // both subject and object cannot be locked
+        if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == false) {
+            super.handleDelete(wrapDoc);
+        } else {
+            throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
                     "Cannot delete a relationship if either end is in the workflow state: " + workflowState);
-    	}
+        }
     }
     
     private void populateSubjectAndObjectValues(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
@@ -264,44 +265,44 @@ public class RelationDocumentModelHandler
         relationListItem.setCsid(id);
 
         relationListItem.setSubjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.SUBJECT_CSID));
+                                                        RelationJAXBSchema.SUBJECT_CSID));
 
         String predicate = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.RELATIONSHIP_TYPE);
+                                                        RelationJAXBSchema.RELATIONSHIP_TYPE);
         relationListItem.setRelationshipType(predicate);
         relationListItem.setPredicate(predicate); //predicate is new name for relationshipType.
         relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
+                                                        RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
 
         relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.OBJECT_CSID));
+                                                        RelationJAXBSchema.OBJECT_CSID));
 
         relationListItem.setUri(serviceContextPath + id);
 
         //Now fill in summary info for the related docs: subject and object.
         String subjectCsid = relationListItem.getSubjectCsid();
         String subjectDocumentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.SUBJECT_DOCTYPE);
+                                                        RelationJAXBSchema.SUBJECT_DOCTYPE);
         RelationsDocListItem subject = createRelationsDocListItem(ctx, sbt, subjectCsid, tReader, subjectDocumentType);
 
         String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.SUBJECT_URI);
+                                                        RelationJAXBSchema.SUBJECT_URI);
         subject.setUri(subjectUri);
         String subjectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.SUBJECT_REFNAME);
+                                                        RelationJAXBSchema.SUBJECT_REFNAME);
         subject.setRefName(subjectRefName);
         relationListItem.setSubject(subject);
 
         String objectCsid = relationListItem.getObjectCsid();
         String objectDocumentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.OBJECT_DOCTYPE);
+                                                        RelationJAXBSchema.OBJECT_DOCTYPE);
         RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, objectDocumentType);
 
         String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.OBJECT_URI);
+                                                        RelationJAXBSchema.OBJECT_URI);
         object.setUri(objectUri);
         String objectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
-        												RelationJAXBSchema.OBJECT_REFNAME);
+                                                        RelationJAXBSchema.OBJECT_REFNAME);
         object.setRefName(objectRefName);
         relationListItem.setObject(object);
 
@@ -310,7 +311,7 @@ public class RelationDocumentModelHandler
 
     // DocumentModel itemDocModel = docModelFromCSID(ctx, itemCsid);
     protected RelationsDocListItem createRelationsDocListItem(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             ServiceBindingType sbt,
             String itemCsid,
             TenantBindingConfigReaderImpl tReader,
@@ -339,7 +340,7 @@ public class RelationDocumentModelHandler
                     item.setName(itemDocname);
                 }
             } catch (Throwable t) {
-            	logger.error("====Error finding objectNameProperty: " + itemDocModel + " field " + ServiceBindingUtils.OBJ_NAME_PROP + "=" + propName
+                logger.error("====Error finding objectNameProperty: " + itemDocModel + " field " + ServiceBindingUtils.OBJ_NAME_PROP + "=" + propName
                         + " not found in itemDocType: " + itemDocType + " inner: " + t.getMessage());
             }
             propName = "ERROR-FINDING-PROP-VALUE";
@@ -372,13 +373,13 @@ public class RelationDocumentModelHandler
     private final boolean OBJ_DOC_MODEL = false;
     
     private DocumentModel getSubjectOrObjectDocModel(
-    		RepositoryInstance repoSession,
-    		DocumentModel relationDocModel,
-    		boolean fSubject) throws Exception {
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-    	
+            RepositoryInstance repoSession,
+            DocumentModel relationDocModel,
+            boolean fSubject) throws Exception {
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+        
         // Get the document model for the object of the relation.
-    	String commonPartLabel = ctx.getCommonPartLabel();
+        String commonPartLabel = ctx.getCommonPartLabel();
         String csid = "";
         String refName = "";
         DocumentModel docModel = null;
@@ -386,7 +387,7 @@ public class RelationDocumentModelHandler
         // in the incoming payload.
         try {
             csid = (String) relationDocModel.getProperty(commonPartLabel, 
-            		(fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID));
+                    (fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID));
         } catch (PropertyException pe) {
             // Per CSPACE-4468, ignore any property exception here.
             // The objectCsid and/or subjectCsid field in a relation record
@@ -394,56 +395,56 @@ public class RelationDocumentModelHandler
             // provided as an alternate identifier.
         }
         if (Tools.notBlank(csid)) {
-        	RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)getRepositoryClient(ctx);
+            RepositoryJavaClientImpl nuxeoRepoClient = (RepositoryJavaClientImpl)getRepositoryClient(ctx);
             DocumentWrapper<DocumentModel> docWrapper = nuxeoRepoClient.getDocFromCsid(ctx, repoSession, csid);
             docModel = docWrapper.getWrappedObject();
         } else { //  if (Tools.isBlank(objectCsid)) {
             try {
-            	refName = (String) relationDocModel.getProperty(commonPartLabel, 
-            			(fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
-            	docModel = ResourceBase.getDocModelForRefName(repoSession, refName, ctx.getResourceMap());
+                refName = (String) relationDocModel.getProperty(commonPartLabel, 
+                        (fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
+                docModel = ResourceBase.getDocModelForRefName(repoSession, refName, ctx.getResourceMap());
             } catch (Exception e) {
                 throw new InvalidDocumentException(
                         "Relation record must have a CSID or refName to identify the object of the relation.", e);
             }
         }
         if(docModel==null) {
-           	throw new DocumentNotFoundException("Relation.getSubjectOrObjectDocModel could not find doc with CSID: "
-           				+csid+" and/or refName: "+refName );
+            throw new DocumentNotFoundException("Relation.getSubjectOrObjectDocModel could not find doc with CSID: "
+                        +csid+" and/or refName: "+refName );
         }
         return docModel;
     }
     
     private void populateSubjectOrObjectValues(
-    		DocumentModel relationDocModel, 
-    		DocumentModel subjectOrObjectDocModel,
-    		boolean fSubject ) {
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-    	
+            DocumentModel relationDocModel, 
+            DocumentModel subjectOrObjectDocModel,
+            boolean fSubject ) {
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+        
         HashMap<String,Object> properties = new HashMap<String,Object>();
         try {
-	        String doctype = subjectOrObjectDocModel.getDocumentType().getName();
+            String doctype = subjectOrObjectDocModel.getDocumentType().getName();
             doctype = ServiceBindingUtils.getUnqualifiedTenantDocType(doctype);
-	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_DOCTYPE:RelationJAXBSchema.OBJECT_DOCTYPE),
-	        					doctype);
-	
-	        String csid = (String) subjectOrObjectDocModel.getName();
-	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID),
-	        					csid);
-	
-	        String uri = (String) subjectOrObjectDocModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
-	        		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
-	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_URI:RelationJAXBSchema.OBJECT_URI),
-	        					uri);
-	        
-	    	String common_schema = getCommonSchemaNameForDocType(doctype);
-	    	
-	    	if(common_schema!=null) {
-	    		String refname = (String)subjectOrObjectDocModel.getProperty(common_schema, 
-	    														RefName.REFNAME );
-	            properties.put((fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME),
-	            		refname);
-	    	}
+            properties.put((fSubject?RelationJAXBSchema.SUBJECT_DOCTYPE:RelationJAXBSchema.OBJECT_DOCTYPE),
+                                doctype);
+    
+            String csid = (String) subjectOrObjectDocModel.getName();
+            properties.put((fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID),
+                                csid);
+    
+            String uri = (String) subjectOrObjectDocModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+                    CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
+            properties.put((fSubject?RelationJAXBSchema.SUBJECT_URI:RelationJAXBSchema.OBJECT_URI),
+                                uri);
+            
+            String common_schema = getCommonSchemaNameForDocType(doctype);
+            
+            if(common_schema!=null) {
+                String refname = (String)subjectOrObjectDocModel.getProperty(common_schema, 
+                                                                RefName.REFNAME );
+                properties.put((fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME),
+                        refname);
+            }
         } catch (ClientException ce) {
             throw new RuntimeException(
                     "populateSubjectOrObjectValues: Problem fetching field " + ce.getLocalizedMessage());
@@ -452,7 +453,7 @@ public class RelationDocumentModelHandler
         // FIXME: Call below is based solely on Nuxeo API docs; have not yet verified that it correctly updates existing
         // property values in the target document model.
         try {
-        	relationDocModel.setProperties(ctx.getCommonPartLabel(), properties);
+            relationDocModel.setProperties(ctx.getCommonPartLabel(), properties);
         } catch (ClientException ce) {
             throw new RuntimeException(
                     "populateSubjectValues: Problem setting fields " + ce.getLocalizedMessage());
@@ -460,24 +461,26 @@ public class RelationDocumentModelHandler
     }
     
     private String getCommonSchemaNameForDocType(String docType) {
-    	String common_schema = null;
-    	if(docType!=null) {
-    		// HACK - Use startsWith to allow for extension of schemas.
-	    	if(docType.startsWith("Person"))
-	    		common_schema = PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	else if(docType.startsWith("Organization"))
-	    		common_schema = OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	else if(docType.startsWith("Locationitem"))
-	    		common_schema = LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	else if(docType.startsWith("Taxon"))
-	    		common_schema = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-    		else if(docType.startsWith("Placeitem"))
-    			common_schema = PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	else if(docType.startsWith("Conceptitem"))
-	    		common_schema = ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
-	    	//else leave it null.
-    	}
-    	return common_schema;
+        String common_schema = null;
+        if(docType!=null) {
+            // HACK - Use startsWith to allow for extension of schemas.
+            if(docType.startsWith("Person"))
+                common_schema = PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+            else if(docType.startsWith("Organization"))
+                common_schema = OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+            else if(docType.startsWith("Locationitem"))
+                common_schema = LocationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+            else if(docType.startsWith("Taxon"))
+                common_schema = TaxonomyAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+            else if(docType.startsWith("Placeitem"))
+                common_schema = PlaceAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+            else if(docType.startsWith("Conceptitem"))
+                common_schema = ConceptAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+            else if(docType.startsWith("Workitem"))
+                common_schema = WorkAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+            //else leave it null.
+        }
+        return common_schema;
     }
 
 }

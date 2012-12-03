@@ -22,12 +22,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-			<scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-			<scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -54,14 +54,14 @@
             <artifactId>org.collectionspace.services.authority.service</artifactId>
             <version>${project.version}</version>
             <exclusions>
-            	<exclusion>
-            		<artifactId>nuxeo-core-facade</artifactId>
-            		<groupId>org.nuxeo.ecm.core</groupId>
-            	</exclusion>
-            	<exclusion>
-            		<artifactId>servlet-api-2.5</artifactId>
-            		<groupId>org.mortbay.jetty</groupId>
-            	</exclusion>
+                <exclusion>
+                    <artifactId>nuxeo-core-facade</artifactId>
+                    <groupId>org.nuxeo.ecm.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api-2.5</artifactId>
+                    <groupId>org.mortbay.jetty</groupId>
+                </exclusion>
             </exclusions>
         </dependency>        
         <dependency>
@@ -69,10 +69,10 @@
             <artifactId>org.collectionspace.services.authorization.service</artifactId>
             <version>${project.version}</version>
             <exclusions>
-            	<exclusion>
-            		<artifactId>jboss-logging-log4j</artifactId>
-            		<groupId>org.jboss.logging</groupId>
-            	</exclusion>
+                <exclusion>
+                    <artifactId>jboss-logging-log4j</artifactId>
+                    <groupId>org.jboss.logging</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -80,10 +80,10 @@
             <artifactId>org.collectionspace.services.common</artifactId>
             <version>${project.version}</version>
             <exclusions>
-            	<exclusion>
-            		<artifactId>servlet-api-2.5</artifactId>
-            		<groupId>org.mortbay.jetty</groupId>
-            	</exclusion>
+                <exclusion>
+                    <artifactId>servlet-api-2.5</artifactId>
+                    <groupId>org.mortbay.jetty</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -95,11 +95,11 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization-mgt.service</artifactId>
             <version>${project.version}</version>
-			<exclusions>
-            	<exclusion>
-            		<artifactId>jboss-logging-log4j</artifactId>
-            		<groupId>org.jboss.logging</groupId>
-            	</exclusion>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jboss-logging-log4j</artifactId>
+                    <groupId>org.jboss.logging</groupId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.collectionspace.services</groupId>
                     <artifactId>org.collectionspace.services.authorization-mgt.import</artifactId>
@@ -179,6 +179,11 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.concept.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.work.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -346,10 +351,10 @@
 
         <!-- javax -->
         <dependency>
-			<artifactId>servlet-api</artifactId>
-			<groupId>javax.servlet</groupId>
-			<version>2.5</version>
-			<scope>provided</scope>
+            <artifactId>servlet-api</artifactId>
+            <groupId>javax.servlet</groupId>
+            <version>2.5</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- jboss -->
@@ -369,13 +374,13 @@
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime</artifactId>
-			<version>${nuxeo.core.version}</version>            
+            <version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core</artifactId>
-			<version>${nuxeo.core.version}</version>
-			<exclusions>
+            <version>${nuxeo.core.version}</version>
+            <exclusions>
                 <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xercesImpl</artifactId>
@@ -385,27 +390,27 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
-			<version>${nuxeo.core.version}</version>            
+            <version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-convert</artifactId>
-			<version>${nuxeo.core.version}</version>            
+            <version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-storage-sql-extensions</artifactId>
-			<version>${nuxeo.core.version}</version>            
+            <version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-storage-sql-ra</artifactId>
-			<version>${nuxeo.core.version}</version>            
+            <version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-client</artifactId>
-			<version>${nuxeo.core.version}</version>
+            <version>${nuxeo.core.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.jbossas</groupId>
@@ -416,136 +421,136 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-query</artifactId>
-						<version>${nuxeo.core.version}</version>            
+                        <version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-schema</artifactId>
-						<version>${nuxeo.core.version}</version>            
+                        <version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-io</artifactId>
-			<version>${nuxeo.core.version}</version>            
+            <version>${nuxeo.core.version}</version>            
         </dependency>
 <!--         
         <dependency>
-		  <groupId>org.nuxeo.runtime</groupId>
-		  <artifactId>nuxeo-runtime-scripting</artifactId>
-		  <version>${nuxeo.core.version}</version>		  
+          <groupId>org.nuxeo.runtime</groupId>
+          <artifactId>nuxeo-runtime-scripting</artifactId>
+          <version>${nuxeo.core.version}</version>        
         </dependency>
  -->        
         <dependency>
-			<groupId>org.nuxeo.runtime</groupId>
-			<artifactId>nuxeo-runtime-jtajca</artifactId>
-			<version>${nuxeo.core.version}</version>  
-			<!-- Until issue http://issues.collectionspace.org/browse/CSPACE-4639 is resolved, we
-				<version>5.5-NXP-8140</version>
-				need to use this patched Nuxeo artifact that is only available on our public Maven
-				repository -see http://source.collectionspace.org:8081/artifactory
-				
-				Once the issue is resolved and a public version of the artifact becomes available, we
-				should revert this dependency's version to be the following:
-			<version>${nuxeo.core.version}</version>
-			-->
-			<exclusions>
-				<exclusion>
-					<artifactId>geronimo-transaction</artifactId>
-					<groupId>org.apache.geronimo.components</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>geronimo-connector</artifactId>
-					<groupId>org.apache.geronimo.components</groupId>
-				</exclusion>
-			</exclusions>
+            <groupId>org.nuxeo.runtime</groupId>
+            <artifactId>nuxeo-runtime-jtajca</artifactId>
+            <version>${nuxeo.core.version}</version>  
+            <!-- Until issue http://issues.collectionspace.org/browse/CSPACE-4639 is resolved, we
+                <version>5.5-NXP-8140</version>
+                need to use this patched Nuxeo artifact that is only available on our public Maven
+                repository -see http://source.collectionspace.org:8081/artifactory
+                
+                Once the issue is resolved and a public version of the artifact becomes available, we
+                should revert this dependency's version to be the following:
+            <version>${nuxeo.core.version}</version>
+            -->
+            <exclusions>
+                <exclusion>
+                    <artifactId>geronimo-transaction</artifactId>
+                    <groupId>org.apache.geronimo.components</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-connector</artifactId>
+                    <groupId>org.apache.geronimo.components</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-			<groupId>org.nuxeo.runtime</groupId>
-			<artifactId>nuxeo-runtime-datasource</artifactId>
-			<version>${nuxeo.core.version}</version>
+            <groupId>org.nuxeo.runtime</groupId>
+            <artifactId>nuxeo-runtime-datasource</artifactId>
+            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-usermanager-api</artifactId>
-			<version>${nuxeo.core.version}</version>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-usermanager-api</artifactId>
+            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
-    		<groupId>org.nuxeo.ecm.platform</groupId>
-          	<artifactId>nuxeo-platform-commandline-executor</artifactId>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-commandline-executor</artifactId>
             <version>${nuxeo.core.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-api</artifactId>
-			<version>${nuxeo.core.version}</version>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-api</artifactId>
+            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-login</artifactId>
-			<version>${nuxeo.core.version}</version>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-login</artifactId>
+            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-imaging-core</artifactId>
-			<version>${nuxeo.core.version}</version>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-imaging-core</artifactId>
+            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-imaging-preview</artifactId>
-			<version>${nuxeo.core.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jboss-seam-pdf</artifactId>
-					<groupId>org.jboss.seam</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jboss-seam-rss</artifactId>
-					<groupId>org.jboss.seam</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jboss-seam-excel</artifactId>
-					<groupId>org.jboss.seam</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-platform-ui-web</artifactId>
-					<groupId>org.nuxeo.ecm.platform</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>xercesImpl</artifactId>
-					<groupId>xerces</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>servlet-api</artifactId>
-					<groupId>javax.servlet</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>oauth-httpclient3</artifactId>
-					<groupId>net.oauth.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>oauth-consumer</artifactId>
-					<groupId>net.oauth.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>oauth-provider</artifactId>
-					<groupId>net.oauth.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>oauth</artifactId>
-					<groupId>net.oauth.core</groupId>
-				</exclusion>
-			</exclusions>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-imaging-preview</artifactId>
+            <version>${nuxeo.core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jboss-seam-pdf</artifactId>
+                    <groupId>org.jboss.seam</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jboss-seam-rss</artifactId>
+                    <groupId>org.jboss.seam</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jboss-seam-excel</artifactId>
+                    <groupId>org.jboss.seam</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>nuxeo-platform-ui-web</artifactId>
+                    <groupId>org.nuxeo.ecm.platform</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xercesImpl</artifactId>
+                    <groupId>xerces</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>oauth-httpclient3</artifactId>
+                    <groupId>net.oauth.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>oauth-consumer</artifactId>
+                    <groupId>net.oauth.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>oauth-provider</artifactId>
+                    <groupId>net.oauth.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>oauth</artifactId>
+                    <groupId>net.oauth.core</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-audit-api</artifactId>
-			<version>${nuxeo.core.version}</version>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-audit-api</artifactId>
+            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime-osgi</artifactId>
-			<version>${nuxeo.core.version}</version>            
+            <version>${nuxeo.core.version}</version>            
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -559,49 +564,49 @@
         </dependency>
         <!-- Possibly not needed.  Please experiment and remove unnecessary artifacts -->
         <dependency>
-			<groupId>javax.security</groupId>
-			<artifactId>jaas</artifactId>
-			<version>1.0.01</version>
+            <groupId>javax.security</groupId>
+            <artifactId>jaas</artifactId>
+            <version>1.0.01</version>
         </dependency>
         <dependency>
-			<groupId>wutka-dtdparser</groupId>
-			<artifactId>dtdparser121</artifactId>
-			<version>1.2.1</version>
+            <groupId>wutka-dtdparser</groupId>
+            <artifactId>dtdparser121</artifactId>
+            <version>1.2.1</version>
         </dependency>
         <dependency>
-			<groupId>oswego-concurrent</groupId>
-			<artifactId>concurrent</artifactId>
-			<version>1.3.4-jboss-update1</version>
+            <groupId>oswego-concurrent</groupId>
+            <artifactId>concurrent</artifactId>
+            <version>1.3.4-jboss-update1</version>
         </dependency>
         <dependency>
-		  <groupId>trove</groupId>
-		  <artifactId>trove</artifactId>
-		  <version>2.1.1</version>
+          <groupId>trove</groupId>
+          <artifactId>trove</artifactId>
+          <version>2.1.1</version>
         </dependency>
         <dependency>
-		  <groupId>qdox</groupId>
-		  <artifactId>qdox</artifactId>
-		  <version>1.6.1</version>
-		</dependency>
-        <dependency>
-		  <groupId>apache-xerces</groupId>
-		  <artifactId>xml-apis</artifactId>
-		  <version>2.9.1</version>
+          <groupId>qdox</groupId>
+          <artifactId>qdox</artifactId>
+          <version>1.6.1</version>
         </dependency>
         <dependency>
-		  <groupId>org.apache</groupId>
-		  <artifactId>xmlsec</artifactId>
-		  <version>1.4.2</version>
+          <groupId>apache-xerces</groupId>
+          <artifactId>xml-apis</artifactId>
+          <version>2.9.1</version>
         </dependency>
         <dependency>
-			<groupId>org.apache.bcel</groupId>
-			<artifactId>bcel</artifactId>
-			<version>5.1</version>
+          <groupId>org.apache</groupId>
+          <artifactId>xmlsec</artifactId>
+          <version>1.4.2</version>
         </dependency>
         <dependency>
-			<groupId>org.apache.ant</groupId>
-			<artifactId>ant</artifactId>
-			<version>1.7.0</version>
+            <groupId>org.apache.bcel</groupId>
+            <artifactId>bcel</artifactId>
+            <version>5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.7.0</version>
         </dependency>
     </dependencies>
 
@@ -713,42 +718,41 @@
 
         </plugins>
         <pluginManagement>
-        	<plugins>
-        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        		<plugin>
-        			<groupId>org.eclipse.m2e</groupId>
-        			<artifactId>lifecycle-mapping</artifactId>
-        			<version>1.0.0</version>
-        			<configuration>
-        				<lifecycleMappingMetadata>
-        					<pluginExecutions>
-        						<pluginExecution>
-        							<pluginExecutionFilter>
-        								<groupId>
-        									org.codehaus.mojo
-        								</groupId>
-        								<artifactId>
-        									properties-maven-plugin
-        								</artifactId>
-        								<versionRange>
-        									[1.0-alpha-2,)
-        								</versionRange>
-        								<goals>
-        									<goal>
-        										read-project-properties
-        									</goal>
-        								</goals>
-        							</pluginExecutionFilter>
-        							<action>
-        								<ignore></ignore>
-        							</action>
-        						</pluginExecution>
-        					</pluginExecutions>
-        				</lifecycleMappingMetadata>
-        			</configuration>
-        		</plugin>
-        	</plugins>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.codehaus.mojo
+                                        </groupId>
+                                        <artifactId>
+                                            properties-maven-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [1.0-alpha-2,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>
+                                                read-project-properties
+                                            </goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
         </pluginManagement>
     </build>
 </project>
-

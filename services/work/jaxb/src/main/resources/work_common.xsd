@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
+    xmlns:ns="http://collectionspace.org/services/work"
+    xmlns="http://collectionspace.org/services/work"
+    targetNamespace="http://collectionspace.org/services/work"
+    version="0.1"
+    >
+
+    <!-- avoid XmlRootElement nightmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+
+    <!-- Work -->
+    <xs:element name="works_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Common identifier -->
+                <xs:element name="csid" type="xs:string" />
+
+                <!--  Common Authority Information Group -->
+                <!--  inAuthority is the csid of the owning WorkAuthority -->
+                <xs:element name="inAuthority" type="xs:string"/>
+                <xs:element name="shortIdentifier" type="xs:string"/>
+                <xs:element name="refName" type="xs:string"/>
+
+                <xs:element name="historyNote" type="xs:string"/>
+                <xs:element name="workAuthType" type="xs:string"/>
+
+                <!-- List of workTerms -->
+                <xs:element name="workTermGroupList" type="workTermGroupList"/>
+    
+                <!--  List of Creators -->
+                <xs:element name="creatorGroupList" type="creatorGroupList"/>
+
+                <!--  List of additional Work Term sources -->
+                <xs:element name="publisherGroupList" type="publisherGroupList"/>
+
+                <!-- Structured Date group -->
+                <xs:element name="workDateGroupList" type="workDateGroupList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+<!-- =================================================================
+     Work Term Group repeating structure
+     ================================================================= -->
+
+    <xs:complexType name="workTermGroupList">
+        <xs:sequence>
+            <xs:element name="workTermGroup" type="workTermGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="workTermGroup">
+        <xs:sequence>
+            <xs:element name="termDisplayName" type="xs:string"/>
+            <xs:element name="termName" type="xs:string"/>
+            <xs:element name="termType" type="xs:string"/>
+            <xs:element name="termStatus" type="xs:string"/>
+            <xs:element name="termQualifier" type="xs:string"/>
+            <xs:element name="termLanguage" type="xs:string"/>
+            <xs:element name="termPrefForLang" type="xs:boolean"/>
+            <xs:element name="termSource" type="xs:string"/>
+            <xs:element name="termSourceDetail" type="xs:string"/>
+            <xs:element name="termSourceID" type="xs:string"/>
+            <xs:element name="termSourceNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+<!-- =================================================================
+     Creator Group repeating structure
+     ================================================================= -->
+
+    <xs:complexType name="creatorGroupList">
+        <xs:sequence>
+            <xs:element name="creatorGroup" type="creatorGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="creatorGroup">
+        <xs:sequence>
+            <xs:element name="creator" type="xs:string"/>
+            <xs:element name="creatorType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+<!-- =================================================================
+     Publisher Group repeating structure
+     ================================================================= -->
+
+    <xs:complexType name="publisherGroupList">
+        <xs:sequence>
+            <xs:element name="publisherGroup" 
+                        type="publisherGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="publisherGroup">
+        <xs:sequence>
+            <xs:element name="publisher" type="xs:string"/>
+            <xs:element name="publisherType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+<!-- =================================================================
+     Structured Date repeating structure
+     ================================================================= -->
+
+    <xs:complexType name="workDateGroupList">
+        <xs:sequence>
+            <xs:element name="workDateGroup" type="structuredDateGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+
+        <!-- Before (re)using this generic complex type in any record type -->
+        <!-- other than CollectionObject, be sure to verify that Nuxeo handles -->
+        <!-- that correctly in its table creation/row linking. -->
+        <xs:complexType name="structuredDateGroup">
+            <xs:sequence>
+                <xs:element name="dateDisplayDate" type="xs:string"/>
+                <xs:element name="dateAssociation" type="xs:string"/>
+                <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+                <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+                <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+                <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+                <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+                <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+                <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+                <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+                <xs:element name="dateLatestYear" type="xs:integer"/>
+                <xs:element name="dateLatestMonth" type="xs:integer"/>
+                <xs:element name="dateLatestDay" type="xs:integer"/>
+                <xs:element name="dateLatestEra" type="xs:string"/>
+                <xs:element name="dateLatestCertainty" type="xs:string"/>
+                <xs:element name="dateLatestQualifier" type="xs:string"/>
+                <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+                <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+                <xs:element name="datePeriod" type="xs:string"/>
+                <xs:element name="dateNote" type="xs:string"/>
+                <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+                <xs:element name="dateLatestScalarValue" type="xs:date"/>
+                <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+
+</xs:schema>
