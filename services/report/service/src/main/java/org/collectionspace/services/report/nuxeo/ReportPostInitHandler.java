@@ -82,23 +82,10 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
             } else if(databaseProductType != DatabaseProductType.POSTGRESQL) {
                 throw new Exception("Unrecognized database system " + databaseProductType);
             } else {
-                boolean hasRights = false;
-            	// Check for rights on report_common, and infer rights from that
-            	sql = "SELECT has_table_privilege('"+readerRoleName
-            		+"', '"+ReportConstants.DB_COMMON_PART_TABLE_NAME+"', 'SELECT')";
-                conn = JDBCTools.getConnection(dataSource);
-                stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql);
-                if(rs.next()) {
-                	hasRights = rs.getBoolean(1);
-                }
-                rs.close();
-                if(!hasRights) {
-                	sql = "REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM "+readerRoleName;
+                sql = "REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM "+readerRoleName;
                     stmt.execute(sql);
-                	sql = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO "+readerRoleName;
+                sql = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO "+readerRoleName;
                     stmt.execute(sql);
-                }
             }
             
         } catch (SQLException sqle) {
