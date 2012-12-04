@@ -5,7 +5,7 @@
         Nuxeo Event Listeners.
     </description>
     <!-- set global properties for this build -->
-    <property name="services.trunk" value="../.."/>
+    <property name="services.trunk" value="../../.."/>
     <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
