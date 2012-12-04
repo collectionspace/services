@@ -15,7 +15,7 @@
   <property name="build" location="build"/>
   <property name="dist"  location="dist"/>
 
-  <!-- module.name variable is set in the local properties file -->
+  <!-- The listener.module.name variable is set in a local properties file -->
   <property name="jar.name"
     value="org.collectionspace.services.listener.${listener.module.name}-${cspace.release}.jar"/>
 
