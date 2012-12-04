@@ -13,7 +13,7 @@
     <name>services.3rdparty.nuxeo.listener</name>
 
     <modules>
-        <module>relation</module>
+        <module>updaterelationsondelete</module>
     </modules>
 
     <dependencies>

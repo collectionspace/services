@@ -1,11 +1,9 @@
-package org.collectionspace.services.nuxeo.listener.relation;
+package org.collectionspace.services.listener;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.collectionspace.services.common.document.DocumentFilter;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -16,7 +14,7 @@ import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
-public class RelationSubOrObjDeletionListener implements EventListener {
+public class UpdateRelationsOnDelete implements EventListener {
 
     // FIXME: Consider adding the following constant to
     // org.collectionspace.services.common.workflow.jaxb.WorkflowJAXBSchema
@@ -31,10 +29,11 @@ public class RelationSubOrObjDeletionListener implements EventListener {
 
     // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
     // am using the latter to follow Ray's pattern for now
-    final Log logger = LogFactory.getLog(RelationSubOrObjDeletionListener.class);
+    final Log logger = LogFactory.getLog(UpdateRelationsOnDelete.class);
 
+    @Override
     public void handleEvent(Event event) throws ClientException {
-        logger.info("In handleEvent in RelationSubOrObjDeletionListener ...");
+        logger.info("In handleEvent in UpdateRelationsOnDelete ...");
 
         EventContext eventContext = event.getContext();
 

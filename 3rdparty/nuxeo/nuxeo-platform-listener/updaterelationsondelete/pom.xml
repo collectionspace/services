@@ -8,12 +8,13 @@
         <groupId>org.collectionspace.services</groupId>
         <version>3.2-SNAPSHOT</version>
     </parent>
-    <artifactId>org.collectionspace.services.3rdparty.nuxeo.listener.relations</artifactId>
-    <name>org.collectionspace.services.3rdparty.nuxeo.listener.relations</name>
-    <url>http://maven.apache.org</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <artifactId>org.collectionspace.services.listener.updaterelationsondelete</artifactId>
+    <name>org.collectionspace.services.listener.updaterelationsondelete</name>
+    <url>http://maven.apache.org</url>
+
 	
     <dependencies>
         <dependency>
