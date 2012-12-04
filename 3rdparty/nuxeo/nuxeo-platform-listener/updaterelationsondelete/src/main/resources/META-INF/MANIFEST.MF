@@ -1,7 +1,7 @@
 Manifest-Version: 1.0 
 Bundle-ManifestVersion: 1 
-Bundle-Name: org.collectionspace.nuxeo.listener.relation
-Bundle-SymbolicName: org.collectionspace.nuxeo.listener.relation;singleton:=true 
+Bundle-Name: org.collectionspace.services.listener.updaterelationsondelete
+Bundle-SymbolicName: org.collectionspace.services.listener.updaterelationsondelete;singleton:=true 
 Bundle-Version: 1.0.0
 Bundle-Localization: plugin
 Bundle-Vendor: Nuxeo
@@ -9,7 +9,7 @@ Require-Bundle: org.nuxeo.runtime,
  org.nuxeo.ecm.core.api,
  org.nuxeo.ecm.core,
  org.nuxeo.ecm.webapp.core
-Provide-Package: org.collectionspace.nuxeo.listener.relation
+Provide-Package: org.collectionspace.services.listener.updaterelationsondelete
 Nuxeo-Component: OSGI-INF/core-types-contrib.xml,
  OSGI-INF/default-life-cycle-contrib.xml,
  OSGI-INF/ecm-types-contrib.xml,

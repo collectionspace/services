@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<component name="org.collectionspace.nuxeo.listener.relation.core.types">
+<component name="org.collectionspace.services.listener.updaterelationsondelete.core.types">
     <!-- This page intentionally left blank -->
 </component>

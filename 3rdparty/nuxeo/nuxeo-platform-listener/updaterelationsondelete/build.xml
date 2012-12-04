@@ -87,13 +87,13 @@
   </target>
   
   <target name="deploy" depends="install"
-    description="deploy collectionspace core doctype in ${jee.server.nuxeo}">
+    description="deploy doctype in ${jee.server.nuxeo}">
     <copy file="${basedir}/target/${jar.name}"
       todir="${jee.deploy.nuxeo.plugins}"/>
   </target>
   
   <target name="undeploy"
-    description="undeploy collectionspace Thumbnail service from ${jee.server.nuxeo}">
+    description="undeploy doctype from ${jee.server.nuxeo}">
     <delete>
       <fileset dir="${jee.deploy.nuxeo.plugins}">
         <include name="${jar.all}"/>
