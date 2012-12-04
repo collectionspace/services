@@ -32,14 +32,6 @@
             <artifactId>nuxeo-platform-filemanager-api</artifactId>
             <version>${nuxeo.platform.version}</version>    
         </dependency>
-        <!-- jboss -->
-        <!--
-        <dependency>
-            <groupId>org.jboss.remoting</groupId>
-            <artifactId>jboss-remoting</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        -->
     </dependencies>
 
 </project>

@@ -1,9 +1,11 @@
 <project name="nuxeo-listener" default="package" basedir=".">
     <description>
-        collectionspace nuxeo listener
+        CollectionSpace Nuxeo Listener buildfile.  This Ant buildfile
+        builds modules containing services source code that relies on
+        Nuxeo Event Listeners.
     </description>
     <!-- set global properties for this build -->
-    <property name="services.trunk" value="../.."/>
+    <property name="services.trunk" value="../../.."/>
     <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
