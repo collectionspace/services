@@ -1,8 +1,8 @@
 package org.collectionspace.services.listener;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.IllegalFormatException;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -28,11 +28,13 @@ public class UpdateRelationsOnDelete implements EventListener {
 
     @Override
     public void handleEvent(Event event) throws ClientException {
-        logger.info("In handleEvent in UpdateRelationsOnDelete ...");
+        logger.trace("In handleEvent in UpdateRelationsOnDelete ...");
         
         EventContext eventContext = event.getContext();
 
         if (isDocumentSoftDeletedEvent(eventContext)) {
+            
+            logger.trace("A soft deletion event was received by UpdateRelationsOnDelete ...");
             
             DocumentEventContext docContext = (DocumentEventContext) eventContext;
             DocumentModel docModel = docContext.getSourceDocument();
@@ -52,6 +54,7 @@ public class UpdateRelationsOnDelete implements EventListener {
                 logger.trace("Query string=" + queryString);
             } catch (IllegalFormatException ife) {
                 logger.warn("Construction of formatted query string failed: ", ife);
+                logger.warn("Actions in this event listener will NOT be performed, as a result of a previous Exception.");
                 return;
             }
             
@@ -75,7 +78,7 @@ public class UpdateRelationsOnDelete implements EventListener {
             }
 
             // Cycle through the list results, soft deleting each matching relation record
-            logger.trace("Attempting to soft delete " + matchingDocuments.size() + " relation records.");
+            logger.info("Attempting to soft delete " + matchingDocuments.size() + " relation records pertaining to a soft deleted record.");
             for (DocumentModel doc : matchingDocuments) {
                 doc.followTransition(WorkflowClient.WORKFLOWTRANSITION_DELETE);
             }
@@ -83,6 +86,9 @@ public class UpdateRelationsOnDelete implements EventListener {
         }
 
     }
+    
+    // FIXME: Generic methods like the following might be split off
+    // into an event utilities class. - ADR 2012-12-05
 
     /**
      * Identifies whether a supplied event concerns a document that has
@@ -103,4 +109,5 @@ public class UpdateRelationsOnDelete implements EventListener {
         }
         return isSoftDeletedEvent;
     }
+    
 }
