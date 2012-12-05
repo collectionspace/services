@@ -15,11 +15,16 @@
     <name>org.collectionspace.services.listener.updateobjectlocationonmove</name>
     <url>http://maven.apache.org</url>
 
-	
-    <dependencies>
+	 
+   <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.movement.service</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
