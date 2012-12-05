@@ -47,6 +47,8 @@ public class WorkflowClient extends AbstractCommonListPoxServiceClientImpl<Workf
 	
 	public static final String WORKFLOWTRANSITION_LOCK = "lock";
 	public static final String WORKFLOWSTATE_LOCKED = "locked";
+        
+        public static final String WORKFLOWTRANSITION_TO = "to";
 	//
 	// DocumentHandler passed properties
 	//
