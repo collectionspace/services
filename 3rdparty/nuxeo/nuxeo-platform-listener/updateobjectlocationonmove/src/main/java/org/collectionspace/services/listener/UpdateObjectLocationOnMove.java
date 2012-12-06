@@ -30,6 +30,11 @@ public class UpdateObjectLocationOnMove implements EventListener {
     // FIXME: Currently hard-coded; get this from JDBC utilities or equivalent
     private final String DATABASE_SYSTEM_NAME = "postgresql";
     private final String STORED_FUNCTION_NAME = "computecurrentlocation";
+    private final String SQL_FILENAME_EXTENSION = ".sql";
+    private final String SQL_RESOURCE_PATH =
+            DATABASE_RESOURCE_DIRECTORY_NAME + "/"
+            + DATABASE_SYSTEM_NAME + "/"
+            + STORED_FUNCTION_NAME + SQL_FILENAME_EXTENSION;
 
     // ####################################################################
     // FIXME: Per Rick, what happens if a relation record is updated,
@@ -61,84 +66,95 @@ public class UpdateObjectLocationOnMove implements EventListener {
 
             // Test whether a SQL function exists to supply the computed
             // current location of a CollectionObject.
-            if (storedFunctionExists(STORED_FUNCTION_NAME)) {
-                logger.debug("Stored function " + STORED_FUNCTION_NAME + "exists.");
-            } else {
-                logger.debug("Stored function " + STORED_FUNCTION_NAME + "does NOT exist.");
-
-                // If the function does not exist in the database, load the
-                // SQL command to create that function from a resource
-                // available to this class, and run a JDBC command to create
-                // that function in the database.
-                //
-                // For now, assume this function will be created in the
-                // 'nuxeo' database.
-                //
-                // FIXME: Future work to create per-tenant repositories will
-                // likely require that our JDBC statements connect to the
-                // appropriate tenant-specific database.
-                //
-                // It doesn't appear we can reliably create this function via
-                // 'ant create_nuxeo db' during the build process, because
-                // there's a substantial likelihood at that point that
-                // tables referred to by the function (e.g. movements_common
-                // and collectionobjects_common) will not yet exist.
-                // (PostgreSQL will not permit the function to be created if
-                // any of its referred-to tables do not exist.)
-                String sqlResourcePath =
-                        DATABASE_RESOURCE_DIRECTORY_NAME + "/"
-                        + DATABASE_SYSTEM_NAME + "/"
-                        + STORED_FUNCTION_NAME + ".sql";
-                String sql = getStringFromResource(sqlResourcePath);
+            //
+            // If the function does not exist in the database, load the
+            // SQL command to create that function from a resource
+            // available to this class, and run a JDBC command to create
+            // that function in the database.
+            //
+            // For now, assume this function will be created in the
+            // 'nuxeo' database.
+            //
+            // FIXME: Future work to create per-tenant repositories will
+            // likely require that our JDBC statements connect to the
+            // appropriate tenant-specific database.
+            //
+            // It doesn't appear we can reliably create this function via
+            // 'ant create_nuxeo db' during the build process, because
+            // there's a substantial likelihood at that point that
+            // tables referred to by the function (e.g. movements_common
+            // and collectionobjects_common) will not yet exist.
+            // (PostgreSQL will not permit the function to be created if
+            // any of its referred-to tables do not exist.)
+            if (!storedFunctionExists(STORED_FUNCTION_NAME)) {
+                logger.debug("Stored function " + STORED_FUNCTION_NAME + " does NOT exist.");
+                String sql = getStringFromResource(SQL_RESOURCE_PATH);
                 if (Tools.isBlank(sql)) {
-                    logger.warn("Could not create stored function to update computed current location.");
+                    logger.warn("Could not obtain SQL command to create stored function.");
                     logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
                     return;
                 }
 
+                // FIXME: Remove these temporary log statements after debugging
                 logger.debug("After reading stored function command from resource path.");
                 logger.debug("sql=" + sql);
 
-                // FIXME: Execute SQL command here to create stored function.
-
-                // Pseudocode:
-
-                // Get this Movement record's CSID via the document model.
-
-                // Find every CollectionObject record related to this Movement record:
-                //
-                // Via an NXQL query, get a list of (non-deleted) relation records where:
-                // * This movement record's CSID is the subject CSID of the relation.
-                // * The object document type is a CollectionObject doctype.
-
-                // Iterate through that list of Relation records and build a list of
-                // CollectionObject CSIDs, by extracting the object CSIDs of those records.
-
-                // For each such CollectionObject:
-
-                // Verify that the CollectionObject record is active (use isActiveDocument(), below).
-
-                // Via a JDBC call, invoke the SQL function to supply the last
-                // identified location of that CollectionObject, giving it the CSID
-                // of the CollectionObject record as an argument.
-
-                // Check that the SQL function's returned value, which is expected
-                // to be a reference (refName) to a storage location authority term,
-                // is at a minimum:
-                // * Non-null
-                // * Capable of being successfully parsed by an authority item parser,
-                //   returning a non-null parse result.
-
-                // Compare that returned value to the value in the
-                // lastIdentifiedLocation field of that CollectionObject
-
-                // If the two values differ, update the CollectionObject record,
-                // setting the value of the lastIdentifiedLocation field of that
-                // CollectionObject record to the value returned from the SQL function.
-
+                int result;
+                try {
+                    result = JDBCTools.executeUpdate(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME), sql);
+                    logger.debug("Result of executeUpdate=" + result);
+                    if (result < 0) {
+                        logger.warn("Could not create stored function.");
+                        logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
+                        return;
+                    } else {
+                        logger.debug("Stored function " + STORED_FUNCTION_NAME + " was successfully created.");
+                    }
+                } catch (Exception e) {
+                    logger.warn("Could not create stored function: ", e);
+                    logger.warn("Actions in this event listener will NOT be performed, as a result of a previous Exception.");
+                    return;
+                }
+            } else {
+                logger.debug("Stored function " + STORED_FUNCTION_NAME + " exists.");
             }
-        }
 
+            // Pseudocode:
+
+            // Get this Movement record's CSID via the document model.
+
+            // Find every CollectionObject record related to this Movement record:
+            //
+            // Via an NXQL query, get a list of (non-deleted) relation records where:
+            // * This movement record's CSID is the subject CSID of the relation.
+            // * The object document type is a CollectionObject doctype.
+
+            // Iterate through that list of Relation records and build a list of
+            // CollectionObject CSIDs, by extracting the object CSIDs of those records.
+
+            // For each such CollectionObject:
+
+            // Verify that the CollectionObject record is active (use isActiveDocument(), below).
+
+            // Via a JDBC call, invoke the SQL function to supply the last
+            // identified location of that CollectionObject, giving it the CSID
+            // of the CollectionObject record as an argument.
+
+            // Check that the SQL function's returned value, which is expected
+            // to be a reference (refName) to a storage location authority term,
+            // is at a minimum:
+            // * Non-null
+            // * Capable of being successfully parsed by an authority item parser,
+            //   returning a non-null parse result.
+
+            // Compare that returned value to the value in the
+            // lastIdentifiedLocation field of that CollectionObject
+
+            // If the two values differ, update the CollectionObject record,
+            // setting the value of the lastIdentifiedLocation field of that
+            // CollectionObject record to the value returned from the SQL function.
+
+        }
     }
 
     /**

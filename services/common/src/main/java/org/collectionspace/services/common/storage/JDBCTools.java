@@ -40,7 +40,7 @@ import java.util.HashMap;
  * $LastChangedDate:  $
  */
 public class JDBCTools {
-	public static HashMap<String, DataSource> cachedDataSources = new HashMap<String, DataSource>();
+    public static HashMap<String, DataSource> cachedDataSources = new HashMap<String, DataSource>();
     public static String CSPACE_REPOSITORY_NAME = "CspaceDS";
     public static String NUXEO_REPOSITORY_NAME = "NuxeoDS";
     //
