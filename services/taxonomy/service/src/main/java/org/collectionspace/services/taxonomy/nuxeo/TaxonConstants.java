@@ -43,4 +43,9 @@ public class TaxonConstants {
     
     public final static String FORMATTED_DISPLAY_NAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
     public final static String FORMATTED_DISPLAY_NAME_FIELD_NAME = "taxonTermGroupList/taxonTermGroup/termFormattedDisplayName";
+    
+    public final static String REFNAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String REFNAME_FIELD_NAME = "refName";    
+
+    public final static String COMMON_VOCABULARY_SHORTID = "common";
 }
