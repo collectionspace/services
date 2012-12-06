@@ -59,8 +59,6 @@ public class UpdateObjectLocationOnMove implements EventListener {
         if (isMovementDocument(docModel) && isActiveDocument(docModel)) {
             logger.debug("A create or update event for an active Movement document was received by UpdateObjectLocationOnMove ...");
 
-            // Pseudocode:
-
             // Test whether a SQL function exists to supply the computed
             // current location of a CollectionObject.
             if (storedFunctionExists(STORED_FUNCTION_NAME)) {
@@ -68,51 +66,76 @@ public class UpdateObjectLocationOnMove implements EventListener {
             } else {
                 logger.debug("Stored function " + STORED_FUNCTION_NAME + "does NOT exist.");
 
-                // FIXME: For incremental debugging, as we work through implementing
-                // this pseudocode.
-
-                // If it does not, load the function from the resources available
-                // to this class, and run a JDBC command to create that function.
-
-                // At the moment, that function is named computeCurrentLocation(),
-                // and resides in the resources of the current module.
+                // If the function does not exist in the database, load the
+                // SQL command to create that function from a resource
+                // available to this class, and run a JDBC command to create
+                // that function in the database.
                 //
-                // For now, assume this function will exist in the 'nuxeo' database;
-                // future work to create per-tenant repositories will likely require that
-                // our JDBC statements connect to the appropriate tenant-specific database.
-
-                // It doesn't appear we can create this function via 'ant create_nuxeo db'
-                // during the build process, because there's a substantial likelihood at
-                // that point that tables referred to by the function (movements_common
-                // and collectionobjects_common) will not exist, and PostgreSQL will not
-                // permit the function to be created if that is the case.
-
-                ClassLoader classLoader = getClass().getClassLoader();
-                String functionResourcePath =
+                // For now, assume this function will be created in the
+                // 'nuxeo' database.
+                //
+                // FIXME: Future work to create per-tenant repositories will
+                // likely require that our JDBC statements connect to the
+                // appropriate tenant-specific database.
+                //
+                // It doesn't appear we can reliably create this function via
+                // 'ant create_nuxeo db' during the build process, because
+                // there's a substantial likelihood at that point that
+                // tables referred to by the function (e.g. movements_common
+                // and collectionobjects_common) will not yet exist.
+                // (PostgreSQL will not permit the function to be created if
+                // any of its referred-to tables do not exist.)
+                String sqlResourcePath =
                         DATABASE_RESOURCE_DIRECTORY_NAME + "/"
                         + DATABASE_SYSTEM_NAME + "/"
                         + STORED_FUNCTION_NAME + ".sql";
-                InputStream instream = classLoader.getResourceAsStream(functionResourcePath);
-                if (instream == null ) {
-                    logger.warn("Could not read stored function command from resource path " + functionResourcePath);
-                }
-                String sql = "";
-                try {
-                    sql = stringFromInputStream(instream);
-                } catch (IOException ioe) {
-                    logger.warn("Could not create string from stream: ", ioe);
-                }
+                String sql = getStringFromResource(sqlResourcePath);
                 if (Tools.isBlank(sql)) {
                     logger.warn("Could not create stored function to update computed current location.");
-                    logger.warn("This .");
+                    logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
                     return;
                 }
-                
+
                 logger.debug("After reading stored function command from resource path.");
-                logger.debug("sql="+sql);
-                
+                logger.debug("sql=" + sql);
+
                 // FIXME: Execute SQL command here to create stored function.
-                
+
+                // Pseudocode:
+
+                // Get this Movement record's CSID via the document model.
+
+                // Find every CollectionObject record related to this Movement record:
+                //
+                // Via an NXQL query, get a list of (non-deleted) relation records where:
+                // * This movement record's CSID is the subject CSID of the relation.
+                // * The object document type is a CollectionObject doctype.
+
+                // Iterate through that list of Relation records and build a list of
+                // CollectionObject CSIDs, by extracting the object CSIDs of those records.
+
+                // For each such CollectionObject:
+
+                // Verify that the CollectionObject record is active (use isActiveDocument(), below).
+
+                // Via a JDBC call, invoke the SQL function to supply the last
+                // identified location of that CollectionObject, giving it the CSID
+                // of the CollectionObject record as an argument.
+
+                // Check that the SQL function's returned value, which is expected
+                // to be a reference (refName) to a storage location authority term,
+                // is at a minimum:
+                // * Non-null
+                // * Capable of being successfully parsed by an authority item parser,
+                //   returning a non-null parse result.
+
+                // Compare that returned value to the value in the
+                // lastIdentifiedLocation field of that CollectionObject
+
+                // If the two values differ, update the CollectionObject record,
+                // setting the value of the lastIdentifiedLocation field of that
+                // CollectionObject record to the value returned from the SQL function.
+
             }
         }
 
@@ -128,10 +151,12 @@ public class UpdateObjectLocationOnMove implements EventListener {
         return documentMatchesType(docModel, MovementConstants.NUXEO_DOCTYPE);
     }
 
-    // FIXME: Generic methods like the following might be split off
-    // into an event utilities class. - ADR 2012-12-05
-    // FIXME: Identify whether the equivalent of this utility method is
-    // already implemented and substitute a call to the latter if so.
+    // FIXME: Generic methods like many of those below might be split off,
+    // into an event utilities class, base classes, or otherwise. - ADR 2012-12-05
+    //
+    // FIXME: Identify whether the equivalent of the documentMatchesType utility
+    // method is already implemented and substitute a call to the latter if so.
+    // This may well already exist.
     /**
      * Identifies whether a document matches a supplied document type.
      *
@@ -180,17 +205,28 @@ public class UpdateObjectLocationOnMove implements EventListener {
         return isActiveDocument;
     }
 
+    // FIXME: The following method is specific to PostgreSQL, because of
+    // the SQL command executed; it may need to be generalized.
+    // Note: It may be necessary in some cases to provide additional
+    // parameters beyond a function name (such as a function signature)
+    // to uniquely identify a function. So far, however, this need
+    // hasn't arisen in our specific use case here.
+    /**
+     * Identifies whether a stored function exists in a database.
+     *
+     * @param functionname the name of the function.
+     * @return true if the function exists in the database; false if it does
+     * not.
+     */
     private boolean storedFunctionExists(String functionname) {
         if (Tools.isBlank(functionname)) {
             return false;
         }
-
         boolean storedFunctionExists = false;
         String sql = "SELECT proname FROM pg_proc WHERE proname='" + functionname + "'";
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
-
         try {
             conn = JDBCTools.getConnection(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME));
             stmt = conn.createStatement();
@@ -215,12 +251,21 @@ public class UpdateObjectLocationOnMove implements EventListener {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                logger.debug("SQL Exception closing statement/connection in UpdateObjectLocationOnMove.storedFunctionExists: " + sqle.getLocalizedMessage());
+                logger.debug("SQL Exception closing statement/connection in "
+                        + "UpdateObjectLocationOnMove.storedFunctionExists: "
+                        + sqle.getLocalizedMessage());
             }
         }
         return storedFunctionExists;
     }
 
+    /**
+     * Returns a string representation of the contents of an input stream.
+     *
+     * @param instream an input stream.
+     * @return a string representation of the contents of the input stream.
+     * @throws an IOException if an error occurs when reading the input stream.
+     */
     private String stringFromInputStream(InputStream instream) throws IOException {
         if (instream == null) {
         }
@@ -233,5 +278,31 @@ public class UpdateObjectLocationOnMove implements EventListener {
             sb.append("\n"); // FIXME: Get appropriate EOL separator rather than hard-coding
         }
         return sb.toString();
+    }
+
+    /**
+     * Returns a string representation of a resource available to the current
+     * class.
+     *
+     * @param resourcePath a path to the resource.
+     * @return a string representation of the resource. Returns null if the
+     * resource cannot be read, or if it cannot be successfully represented as a
+     * string.
+     */
+    private String getStringFromResource(String resourcePath) {
+        String str = "";
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream instream = classLoader.getResourceAsStream(resourcePath);
+        if (instream == null) {
+            logger.warn("Could not read from resource from path " + resourcePath);
+            return null;
+        }
+        try {
+            str = stringFromInputStream(instream);
+        } catch (IOException ioe) {
+            logger.warn("Could not create string from stream: ", ioe);
+            return null;
+        }
+        return str;
     }
 }
