@@ -423,6 +423,10 @@
                         <!-- Object Description Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
+                            <types:value>ageQualifier</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
                             <types:value>ageUnit</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
@@ -1529,7 +1533,7 @@
             Note there is no Vocabularyitem service, but there is a
             Repository workspace so we have to configure that.
         -->
-        <tenant:serviceBindings id="Vocabularyitems" name="Vocabularyitems" type="authority" version="0.1">
+        <tenant:serviceBindings id="Vocabularyitems" name="Vocabularyitems" type="vocabulary" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -1577,6 +1581,16 @@
                     </service:field>
                 </service:params>
             </service:initHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>displayName</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>shortIdentifier</types:value>
+                </types:item>
+            </service:properties>
             <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Vocabularyitem" version="0.1">
                 <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="vocabularyitems-system" updated="" order="0">
                     <service:content contentType="application/xml">

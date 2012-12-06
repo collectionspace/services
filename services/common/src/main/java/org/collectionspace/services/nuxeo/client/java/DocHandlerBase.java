@@ -278,7 +278,7 @@ public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T
     		}
     		throw new DocumentException(e);
 		} finally {
-			// If we got/aquired a new seesion then we're responsible for releasing it.
+			// If we got/aquired a new session then we're responsible for releasing it.
 			if (releaseRepoSession && repoSession != null) {
 				repoClient.releaseRepositorySession(sc, repoSession);
 			}
