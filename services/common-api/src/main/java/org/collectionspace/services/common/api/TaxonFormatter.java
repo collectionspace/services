@@ -1,5 +1,6 @@
 package org.collectionspace.services.common.api;
 
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +17,9 @@ public class TaxonFormatter {
     private static final Pattern BROKEN_HYBRID_FORMULA_PATTERN = Pattern.compile("^×\\s*|\\s*×$");
     private static final Pattern ADJACENT_ITALIC_TAG_PATTERN = Pattern.compile("</i>(\\s*)<i>");
     private static final Pattern STARTS_WITH_INFRASPECIFIC_RANK_PATTERN = Pattern.compile("^\\s*(var|subsp|cv|aff)\\.");
-    private static final Pattern SUBSPECIES_WITH_QUALIFIER_PATTERN = Pattern.compile("(\\s|^)(subsp\\.\\s+)(section|subsection|ser\\.|sser\\.)(\\s|$)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private static final String SUBSPECIES_QUALIFIER_MARKER_REGEXP = "(section|subsection|ser\\.|sser\\.)";
+    private static final Pattern SUBSPECIES_WITH_QUALIFIER_PATTERN = Pattern.compile("(\\s|^)(subsp\\.\\s+)" + SUBSPECIES_QUALIFIER_MARKER_REGEXP + "(\\s)(.*?)(\\s|$)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private static final Pattern PARENTHESIZED_SUBSPECIES_WITH_QUALIFIER_PATTERN = Pattern.compile("(\\s|^)(subsp\\.\\s+)\\(" + SUBSPECIES_QUALIFIER_MARKER_REGEXP + "(.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     
     private NameParser nameParser;
     
@@ -36,7 +39,7 @@ public class TaxonFormatter {
 			String separator = hybridMatcher.group(2);
 			String parentName2 = hybridMatcher.group(3);
 			
-			logger.debug("hybrid formula: parentName1=" + parentName1 + " parentName2=" + parentName2);
+			logger.info("hybrid formula: parentName1=" + parentName1 + " parentName2=" + parentName2);
 			
 			return (format(parentName1) + separator + format(parentName2));
 		}
@@ -47,12 +50,28 @@ public class TaxonFormatter {
 			logger.info("broken hybrid: name=" + name + " normalizedName=" + normalizedName);
 			
 			normalizedName = BROKEN_HYBRID_FORMULA_PATTERN.matcher(normalizedName).replaceAll("");			
+			logger.info("normalized to:" + normalizedName);
+		}
+		
+		if (PARENTHESIZED_SUBSPECIES_WITH_QUALIFIER_PATTERN.matcher(normalizedName).find()) {
+			logger.info("parenthesized qualified subspecies: name=" + name + " normalizedName=" + normalizedName);
+			
+			normalizedName = PARENTHESIZED_SUBSPECIES_WITH_QUALIFIER_PATTERN.matcher(normalizedName).replaceFirst("$1$2$3$4");
+			logger.info("normalized to:" + normalizedName);
 		}
 
-		if (SUBSPECIES_WITH_QUALIFIER_PATTERN.matcher(normalizedName).find()) {
+		Matcher subspeciesWithQualifierMatcher = SUBSPECIES_WITH_QUALIFIER_PATTERN.matcher(normalizedName);
+		
+		if (subspeciesWithQualifierMatcher.find()) {
 			logger.info("qualified subspecies: name=" + name + " normalizedName=" + normalizedName);
 			
-			normalizedName = SUBSPECIES_WITH_QUALIFIER_PATTERN.matcher(normalizedName).replaceAll("$1$2$4");			
+			MatchResult matchResult = subspeciesWithQualifierMatcher.toMatchResult();
+			
+			// Remove the qualifier (e.g. section, ser., sser.). In some data from SAGE, the latin name
+			// following the qualifier is capitalized, which the GBIF parser won't handle, so lowercase it.
+			String replacement = matchResult.group(1) + matchResult.group(2) + matchResult.group(5).toLowerCase() + matchResult.group(6);
+			normalizedName = normalizedName.substring(0, matchResult.start()) + replacement + normalizedName.substring(matchResult.end());
+			logger.info("normalized to:" + normalizedName);
 		}
 
 		if (STARTS_WITH_INFRASPECIFIC_RANK_PATTERN.matcher(normalizedName).find()) {
@@ -65,6 +84,7 @@ public class TaxonFormatter {
 			logger.info("name starts with infraspecific rank: name=" + name + " normalizedName=" + normalizedName);
 			
 			normalizedName = "Tempgenus tempspecies " + normalizedName;
+			logger.info("normalized to:" + normalizedName);
 		}
 		
 		ParsedName parsedName = null;
@@ -112,7 +132,7 @@ public class TaxonFormatter {
 	
 	private String italicize(String string, String substring) {
 		//return Pattern.compile(substring, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.LITERAL).matcher(string).replaceAll("<span style=\"font-style: italic\">$0</span>");
-		return Pattern.compile("(\\s|^)(" + Pattern.quote(substring) + ")(\\s|$)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE).matcher(string).replaceAll("$1<i>$2</i>$3");
+		return Pattern.compile("(\\s|\\(|^)(" + Pattern.quote(substring) + ")(\\s|\\)|$)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE).matcher(string).replaceAll("$1<i>$2</i>$3");
 	}
 	
 	private String compressTags(String html) {
