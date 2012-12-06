@@ -168,7 +168,10 @@
                     <service:properties>
                         <!-- Fields containing authority term references -->
                         <!-- Object Identification Information group -->
-                        <!-- There are currently no authority term references in this group -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>computedCurrentLocation</types:value>
+                        </types:item>
                         <!-- Object Description Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
