@@ -1,22 +1,19 @@
 package org.collectionspace.services.listener;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
-
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.event.Event;
@@ -70,71 +67,53 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 logger.debug("Stored function " + STORED_FUNCTION_NAME + "exists.");
             } else {
                 logger.debug("Stored function " + STORED_FUNCTION_NAME + "does NOT exist.");
+
+                // FIXME: For incremental debugging, as we work through implementing
+                // this pseudocode.
+
+                // If it does not, load the function from the resources available
+                // to this class, and run a JDBC command to create that function.
+
+                // At the moment, that function is named computeCurrentLocation(),
+                // and resides in the resources of the current module.
+                //
+                // For now, assume this function will exist in the 'nuxeo' database;
+                // future work to create per-tenant repositories will likely require that
+                // our JDBC statements connect to the appropriate tenant-specific database.
+
+                // It doesn't appear we can create this function via 'ant create_nuxeo db'
+                // during the build process, because there's a substantial likelihood at
+                // that point that tables referred to by the function (movements_common
+                // and collectionobjects_common) will not exist, and PostgreSQL will not
+                // permit the function to be created if that is the case.
+
+                ClassLoader classLoader = getClass().getClassLoader();
+                String functionResourcePath =
+                        DATABASE_RESOURCE_DIRECTORY_NAME + "/"
+                        + DATABASE_SYSTEM_NAME + "/"
+                        + STORED_FUNCTION_NAME + ".sql";
+                InputStream instream = classLoader.getResourceAsStream(functionResourcePath);
+                if (instream == null ) {
+                    logger.warn("Could not read stored function command from resource path " + functionResourcePath);
+                }
+                String sql = "";
+                try {
+                    sql = stringFromInputStream(instream);
+                } catch (IOException ioe) {
+                    logger.warn("Could not create string from stream: ", ioe);
+                }
+                if (Tools.isBlank(sql)) {
+                    logger.warn("Could not create stored function to update computed current location.");
+                    logger.warn("This .");
+                    return;
+                }
+                
+                logger.debug("After reading stored function command from resource path.");
+                logger.debug("sql="+sql);
+                
+                // FIXME: Execute SQL command here to create stored function.
+                
             }
-            
-            // FIXME: For incremental debugging, as we work through implementing
-            // this pseudocode.
-            return;
-
-            // If it does not, load the function from the resources available
-            // to this class, and run a JDBC command to create that function.
-
-            // At the moment, that function is named computeCurrentLocation(),
-            // and resides in the resources of the current module.
-            //
-            // For now, assume this function will exist in the 'nuxeo' database;
-            // future work to create per-tenant repositories will likely require that
-            // our JDBC statements connect to the appropriate tenant-specific database.
-
-            // It doesn't appear we can create this function via 'ant create_nuxeo db'
-            // during the build process, because there's a substantial likelihood at
-            // that point that tables referred to by the function (movements_common
-            // and collectionobjects_common) will not exist, and PostgreSQL will not
-            // permit the function to be created if that is the case.
-
-            /*
-            ClassLoader classLoader = getClass().getClassLoader();
-            String functionResourcePath =
-                    DATABASE_RESOURCE_DIRECTORY_NAME + "/"
-                    + DATABASE_SYSTEM_NAME + "/"
-                    + STORED_FUNCTION_NAME + ".sql";
-            classLoader.getResourceAsStream(functionResourcePath);
-            */
-
-            // If the create attempt fails, bail (return) from this method.
-
-            // Get this Movement record's CSID via the document model.
-
-            // Find every CollectionObject record related to this Movement record:
-            //
-            // Via an NXQL query, get a list of (non-deleted) relation records where:
-            // * This movement record's CSID is the subject CSID of the relation.
-            // * The object document type is a CollectionObject doctype.
-
-            // Iterate through that list of Relation records and build a list of
-            // CollectionObject CSIDs, by extracting the object CSIDs of those records.
-
-            // For each such CollectionObject:
-
-            // Verify that the CollectionObject record is active (use isActiveDocument(), below).
-
-            // Via a JDBC call, invoke the SQL function to supply the last
-            // identified location of that CollectionObject, giving it the CSID
-            // of the CollectionObject record as an argument.
-
-            // Check that the SQL function's returned value, which is expected
-            // to be a reference (refName) to a storage location authority term,
-            // is at a minimum:
-            // * Non-null
-            // * Capable of being successfully parsed by an authority item parser,
-            //   returning a non-null parse result.
-
-            // Compare that returned value to the value in the
-            // lastIdentifiedLocation field of that CollectionObject
-
-            // If the two values differ, update the CollectionObject record,
-            // setting the value of the lastIdentifiedLocation field of that
-            // CollectionObject record to the value returned from the SQL function.
         }
 
     }
@@ -240,5 +219,19 @@ public class UpdateObjectLocationOnMove implements EventListener {
             }
         }
         return storedFunctionExists;
+    }
+
+    private String stringFromInputStream(InputStream instream) throws IOException {
+        if (instream == null) {
+        }
+        BufferedReader bufreader = new BufferedReader(new InputStreamReader(instream));
+        StringBuilder sb = new StringBuilder();
+        String line = "";
+        while (line != null) {
+            sb.append(line);
+            line = bufreader.readLine();
+            sb.append("\n"); // FIXME: Get appropriate EOL separator rather than hard-coding
+        }
+        return sb.toString();
     }
 }
