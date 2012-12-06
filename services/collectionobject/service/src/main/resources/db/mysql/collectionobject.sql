@@ -1,3 +1,0 @@
--- File intentionally empty
--- Can add SQL commands for CollectionObject-related database setup
--- in MySQL below.
