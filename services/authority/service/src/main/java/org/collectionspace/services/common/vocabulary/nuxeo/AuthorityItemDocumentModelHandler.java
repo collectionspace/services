@@ -617,38 +617,6 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return result;
     }
 
-    // Note that item2 may be sparse (only refName, no CSID for subject or object)
-    // But item1 must not be sparse 
-    private boolean itemsEqual(RelationsCommonList.RelationListItem item1, RelationsCommonList.RelationListItem item2) {
-        if (item1 == null || item2 == null) {
-            return false;
-        }
-        RelationsDocListItem subj1 = item1.getSubject();
-        RelationsDocListItem subj2 = item2.getSubject();
-        RelationsDocListItem obj1 = item1.getObject();
-        RelationsDocListItem obj2 = item2.getObject();
-        String subj1Csid = subj1.getCsid();
-        String subj2Csid = subj2.getCsid();
-        String subj1RefName = subj1.getRefName();
-        String subj2RefName = subj2.getRefName();
-
-        String obj1Csid = obj1.getCsid();
-        String obj2Csid = obj2.getCsid();
-        String obj1RefName = obj1.getRefName();
-        String obj2RefName = obj2.getRefName();
-
-        boolean isEqual = 
-        		   (subj1Csid.equals(subj2Csid) || ((subj2Csid==null)  && subj1RefName.equals(subj2RefName)))
-                && (obj1Csid.equals(obj1Csid)   || ((obj2Csid==null)   && obj1RefName.equals(obj2RefName)))
-                // predicate is proper, but still allow relationshipType
-                && (item1.getPredicate().equals(item2.getPredicate())
-                	||  ((item2.getPredicate()==null)  && item1.getRelationshipType().equals(item2.getRelationshipType())))
-                // Allow missing docTypes, so long as they do not conflict
-                && (obj1.getDocumentType().equals(obj2.getDocumentType()) || obj2.getDocumentType()==null)
-                && (subj1.getDocumentType().equals(subj2.getDocumentType()) || subj2.getDocumentType()==null);
-        return isEqual;
-    }
-
 
     /* don't even THINK of re-using this method.
      * String example_uri = "/locationauthorities/7ec60f01-84ab-4908-9a6a/items/a5466530-713f-43b4-bc05";
