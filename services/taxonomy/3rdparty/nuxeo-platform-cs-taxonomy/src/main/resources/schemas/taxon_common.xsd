@@ -95,6 +95,8 @@
             <xs:element name="termSourceNote" type="xs:string"/>
             <!-- Specific to Taxon terms -->
             <xs:element name="taxonomicStatus" type="xs:string"/>
+            <!-- Adding termFormattedDisplayName to the UCB branch until it (hopefully) gets approved for master -->
+            <xs:element name="termFormattedDisplayName" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
     
