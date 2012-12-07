@@ -31,7 +31,11 @@ public class UpdateObjectLocationOnMove implements EventListener {
 
     // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
     // am using the latter to follow Ray's pattern for now
-    final Log logger = LogFactory.getLog(UpdateObjectLocationOnMove.class);
+    private final Log logger = LogFactory.getLog(UpdateObjectLocationOnMove.class);
+    // FIXME: Make the following message, or its equivalent, a constant usable by all event listeners
+    private final String NO_FURTHER_PROCESSING_MESSAGE =
+            "This event listener will not continue processing this event ...";
+    private final List<String> relevantDocTypesList = new ArrayList<String>();
     private final String DATABASE_RESOURCE_DIRECTORY_NAME = "db";
     // FIXME: Currently hard-coded; get this database name value from JDBC utilities or equivalent
     private final String DATABASE_SYSTEM_NAME = "postgresql";
@@ -63,6 +67,9 @@ public class UpdateObjectLocationOnMove implements EventListener {
     // The following code is currently only handling create and
     // update events affecting Movement records.
     // ####################################################################
+    // FIXME: We'll likely also need to handle workflow state transition and
+    // deletion events, where the soft or hard deletion of a Movement or
+    // Relation record effectively changes the current location for a CollectionObject.
     @Override
     public void handleEvent(Event event) throws ClientException {
 
@@ -76,16 +83,40 @@ public class UpdateObjectLocationOnMove implements EventListener {
         if (eventContext == null) {
             return;
         }
+
+        if (!(eventContext instanceof DocumentEventContext)) {
+            logger.debug("This event does not involve a document ...");
+            logger.debug(NO_FURTHER_PROCESSING_MESSAGE);
+            return;
+        }
         DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
         DocumentModel docModel = docEventContext.getSourceDocument();
 
-        // If this event does not involve an active Movement Document,
+        // If this event does not involve one of our relevant doctypes,
         // return without further handling the event.
-        if (!(isMovementDocument(docModel) && isActiveDocument(docModel))) {
+        boolean involvesRelevantDocType = false;
+        relevantDocTypesList.add(MovementConstants.NUXEO_DOCTYPE);
+        // FIXME: We will likely need to add the Relation doctype here,
+        // along with additional code to handle such changes.
+        for (String docType : relevantDocTypesList) {
+            if (documentMatchesType(docModel, docType)) {
+                involvesRelevantDocType = true;
+                break;
+            }
+        }
+        logger.debug("This event involves a document of type " + docModel.getDocumentType().getName());
+        if (!involvesRelevantDocType) {
+            logger.debug("This event does not involve a document of a relevant type ...");
+            logger.debug(NO_FURTHER_PROCESSING_MESSAGE);
+            return;
+        }
+        if (!isActiveDocument(docModel)) {
+            logger.debug("This event does not involve an active document ...");
+            logger.debug(NO_FURTHER_PROCESSING_MESSAGE);
             return;
         }
 
-        logger.debug("A create or update event for an active Movement document was received by UpdateObjectLocationOnMove ...");
+        logger.debug("An event involving an active document of the relevant type(s) was received by UpdateObjectLocationOnMove ...");
 
         // Test whether a SQL function exists to supply the computed
         // current location of a CollectionObject.
@@ -114,7 +145,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
             String sql = getStringFromResource(SQL_RESOURCE_PATH);
             if (Tools.isBlank(sql)) {
                 logger.warn("Could not obtain SQL command to create stored function.");
-                logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
+                logger.debug(NO_FURTHER_PROCESSING_MESSAGE);
                 return;
             }
 
@@ -128,7 +159,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
             logger.trace("Result of executeUpdate=" + result);
             if (result < 0) {
                 logger.warn("Could not create stored function in the database.");
-                logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
+                logger.debug(NO_FURTHER_PROCESSING_MESSAGE);
                 return;
             } else {
                 logger.info("Stored function " + STORED_FUNCTION_NAME + " was successfully created in the database.");
@@ -184,6 +215,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
         }
         if (collectionObjectCsids == null || collectionObjectCsids.isEmpty()) {
             logger.warn("Could not obtain any CSIDs of related CollectionObject records.");
+            logger.debug(NO_FURTHER_PROCESSING_MESSAGE);
             return;
         } else {
             logger.debug("Found " + collectionObjectCsids.size() + " CSIDs of related CollectionObject records.");
@@ -221,20 +253,22 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 // field of that CollectionObject
                 //
                 // If the CollectionObject does not already have a
-                // computedCurrentLocation value, or if the two values differ,
-                // update the CollectionObject record's computedCurrentLocation
-                // field with the value returned from the SQL function.
+                // computedCurrentLocation value, or if the two values differ ...
                 String existingComputedCurrentLocationRefName =
                         (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
                 if (Tools.isBlank(existingComputedCurrentLocationRefName)
                         || !computedCurrentLocationRefName.equals(existingComputedCurrentLocationRefName)) {
                     logger.debug("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
                     logger.debug("computedCurrentLocation refName requires updating.");
+                    // ... update the CollectionObject record's computedCurrentLocation
+                    // field with the value returned from the SQL function.
                     collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY, computedCurrentLocationRefName);
                     coreSession.saveDocument(collectionObjectDocModel);
-                    String afterUpdateComputedCurrentLocationRefName =
-                        (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
-                    logger.debug("Following update, new computedCurrentLocation refName value=" + afterUpdateComputedCurrentLocationRefName);
+                    if (logger.isDebugEnabled()) {
+                        String afterUpdateComputedCurrentLocationRefName =
+                                (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
+                        logger.debug("Following update, new computedCurrentLocation refName value=" + afterUpdateComputedCurrentLocationRefName);
+                    }
                 } else {
                     logger.debug("computedCurrentLocation refName does NOT require updating.");
                 }
@@ -242,17 +276,6 @@ public class UpdateObjectLocationOnMove implements EventListener {
             }
 
         }
-
-    }
-
-    /**
-     * Identifies whether a document is a Movement document
-     *
-     * @param docModel a document model
-     * @return true if the document is a Movement document; false if it is not.
-     */
-    private boolean isMovementDocument(DocumentModel docModel) {
-        return documentMatchesType(docModel, MovementConstants.NUXEO_DOCTYPE);
     }
 
     // FIXME: Generic methods like many of those below might be split off,
