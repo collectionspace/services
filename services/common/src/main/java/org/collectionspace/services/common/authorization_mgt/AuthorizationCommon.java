@@ -401,7 +401,7 @@ public class AuthorizationCommon {
 			rs.close();
 
         	String insertTenantSQL = 
-        		"INSERT INTO tenants (id,name,created_at) VALUES (?,?, now())";
+        		"INSERT INTO tenants (id,name,disabled,created_at) VALUES (?,?,FALSE,now())";
         	pstmt = conn.prepareStatement(insertTenantSQL); // create a statement
         	for(String tId : tenantInfo.keySet()) {
         		if(existingTenants.contains(tId)) {

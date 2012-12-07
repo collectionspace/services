@@ -88,7 +88,8 @@ public class CSpaceDbRealm implements CSpaceRealm {
     private String datasourceName;
     private String principalsQuery;
     private String rolesQuery;
-    private String tenantsQuery;
+    private String tenantsQueryNoDisabled;
+    private String tenantsQueryWithDisabled;
     private boolean suspendResume;
 
     /**
@@ -108,9 +109,13 @@ public class CSpaceDbRealm implements CSpaceRealm {
         if (tmp != null) {
             rolesQuery = tmp.toString();
         }
-        tmp = options.get("tenantsQuery");
+        tmp = options.get("tenantsQueryNoDisabled");
         if (tmp != null) {
-            tenantsQuery = tmp.toString();
+            tenantsQueryNoDisabled = tmp.toString();
+        }
+        tmp = options.get("tenantsQueryWithDisabled");
+        if (tmp != null) {
+        	tenantsQueryWithDisabled = tmp.toString();
         }
         tmp = options.get("suspendResume");
         if (tmp != null) {
@@ -288,15 +293,21 @@ public class CSpaceDbRealm implements CSpaceRealm {
         return groupsMap.values();
 
     }
-
+    @Override
+    public Collection<Group> getTenants(String username, String groupClassName) throws LoginException {
+    	return getTenants(username, groupClassName, false);
+    }
+    
     /**
      * Execute the tenantsQuery against the datasourceName to obtain the tenants for
      * the authenticated user.
      * @return collection containing the roles
      */
     @Override
-    public Collection<Group> getTenants(String username, String groupClassName) throws LoginException {
+    public Collection<Group> getTenants(String username, String groupClassName, boolean includeDisabledTenants) throws LoginException {
 
+    	String tenantsQuery = getTenantQuery(includeDisabledTenants);
+    	
         if (logger.isDebugEnabled()) {
             logger.debug("getTenants using tenantsQuery: " + tenantsQuery + ", username: " + username);
         }
@@ -308,10 +319,6 @@ public class CSpaceDbRealm implements CSpaceRealm {
 
         try {
             conn = getConnection();
-            // Get the user role names
-            if (logger.isDebugEnabled()) {
-                logger.debug("Executing query: " + tenantsQuery + ", with username: " + username);
-            }
 
             ps = conn.prepareStatement(tenantsQuery);
             try {
@@ -510,14 +517,14 @@ public class CSpaceDbRealm implements CSpaceRealm {
     /**
      * @return the tenantQuery
      */
-    public String getTenantQuery() {
-        return tenantsQuery;
+    public String getTenantQuery(boolean includeDisabledTenants) {
+        return includeDisabledTenants?tenantsQueryWithDisabled:tenantsQueryNoDisabled;
     }
 
     /**
      * @param tenantQuery the tenantQuery to set
-     */
     public void setTenantQuery(String tenantQuery) {
-        this.tenantsQuery = tenantQuery;
+        this.tenantsQueryNoDisabled = tenantQuery;
     }
+     */
 }

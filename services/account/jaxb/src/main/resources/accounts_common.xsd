@@ -312,6 +312,15 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="disabled" type="xs:boolean">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="disabled" nullable="false"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="createdAt" type="xs:dateTime">
                 <xs:annotation>
                     <xs:appinfo>
