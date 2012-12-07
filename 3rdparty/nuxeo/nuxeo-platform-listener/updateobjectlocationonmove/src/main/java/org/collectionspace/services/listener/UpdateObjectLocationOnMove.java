@@ -6,20 +6,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
@@ -138,53 +141,88 @@ public class UpdateObjectLocationOnMove implements EventListener {
             // relations with Movement-as-subject and CollectionObject-as-object;
             // that may NOT always be the case.
 
-            // buildNXQLQuery(List<String> docTypes, QueryContext queryContext);
+            // The following is boilerplate and may be incorrect:
 
-            // Iterate through that list of Relation records and build a list of
-            // CollectionObject CSIDs, by extracting the object CSIDs of those records.
+            CoreSession coreSession = docEventContext.getCoreSession();
+            final String RELATION_DOCTYPE = "Relation"; // FIXME: Get from external constant
+            final String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
+            String query = String.format(
+                    "SELECT * FROM %1$s WHERE " // collectionspace_core:tenantId = 1 "
+                    + "(relations_common:subjectCsid = '%2$s' "
+                    + "AND relations_common:objectDocumentType = '%3$s') "
+                    + "AND (ecm:currentLifeCycleState <> 'deleted') "
+                    + "AND ecm:isProxy = 0 "
+                    + "AND ecm:isCheckedInVersion = 0", RELATION_DOCTYPE, movementCsid, COLLECTIONOBJECT_DOCTYPE);
+            DocumentModelList relatedDocModels = coreSession.query(query);
+            if (relatedDocModels == null || relatedDocModels.isEmpty()) {
+                return;
+            } else {
+                logger.debug("Found " + relatedDocModels.size() + " related documents.");
+            }
 
-            // For each such CollectionObject:
+            // Iterate through the list of Relation records found and build
+            // a list of CollectionObject CSIDs, by extracting the object CSIDs
+            // from those Relation records.
+            String csid = "";
+            final String RELATIONS_COMMON_SCHEMA = "relations_common"; // FIXME: Get from external constant
+            final String OBJECT_CSID_PROPERTY = "objectCsid"; // FIXME: Get from external constant
+            List<String> collectionObjectCsids = new ArrayList<String>();
+            for (DocumentModel relatedDocModel : relatedDocModels) {
+                csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+                if (Tools.notBlank(csid)) {
+                    collectionObjectCsids.add(csid);
+                }
+            }
+            if (collectionObjectCsids == null || collectionObjectCsids.isEmpty()) {
+                return;
+            } else {
+                logger.debug("Found " + collectionObjectCsids.size() + " CollectionObject CSIDs.");
+            }
 
-            ArrayList<String> collectionObjectCsids = new ArrayList<String>();
-            collectionObjectCsids.add("5b4c617e-53a0-484b-804e"); // FIXME: Hard-coded for testing
-
+            // Iterate through the list of CollectionObject CSIDs found.
             DocumentModel collectionObjectDocModel = null;
             String computedCurrentLocationRefName = "";
-            for (String csid : collectionObjectCsids) {
+            for (String collectionObjectCsid : collectionObjectCsids) {
 
-                // Verify that the CollectionObject record is active (use isActiveDocument(), below).
-
+                // Verify that the CollectionObject record is active.
+                // Code below untried; likely needs work.
                 /*
                  try {
                  collectionObjectDocModel = NuxeoUtils.getDocFromCsid(null, null, csid);
                  } catch (Exception e) {
                  logger.warn("Exception in getDocFromCsid: ", e);
                  }
+                 if (!isActiveDocument(collectionObjectDocModel)) {
+                 continue;
+                 }
+                 *
                  */
 
                 // Via a JDBC call, invoke the SQL function to obtain the computed
                 // current location of that CollectionObject.
-                computedCurrentLocationRefName = computeCurrentLocation(csid);
+                computedCurrentLocationRefName = computeCurrentLocation(collectionObjectCsid);
                 logger.debug("computedCurrentLocationRefName=" + computedCurrentLocationRefName);
 
-                // Check that the SQL function's returned value, which is expected
-                // to be a reference (refName) to a storage location authority term,
-                // is, at a minimum:
-                // * Non-null and non-blank (need to verify this assumption; can a
+                // Check that the value returned from this SQL function, which
+                // is expected to be a reference (refName) to a storage location
+                // authority term, is, at a minimum:
+                // * Non-null and non-blank. (We need to verify this assumption; can a
                 //   CollectionObject's computed current location meaningfully be 'un-set'?)
-                // * Capable of being successfully parsed by an authority item parser,
-                //   returning a non-null parse result.
+                // * Capable of being successfully parsed by an authority item parser;
+                //   that is, returning a non-null parse result.
                 if ((Tools.notBlank(computedCurrentLocationRefName)
                         && (RefNameUtils.parseAuthorityTermInfo(computedCurrentLocationRefName) != null))) {
                     logger.debug("refName passes basic validation tests.");
+
+                    // If the value returned from the function passes validation,
+                    // compare that value to the value in the computedCurrentLocation
+                    // field of that CollectionObject
+                    //
+                    // If the two values differ, update the CollectionObject record,
+                    // setting the value of the computedCurrentLocation field of that
+                    // CollectionObject record to the value returned from the SQL function.
+
                 }
-
-                // Compare that returned value to the value in the
-                // computedCurrentLocation field of that CollectionObject
-
-                // If the two values differ, update the CollectionObject record,
-                // setting the value of the computedCurrentLocation field of that
-                // CollectionObject record to the value returned from the SQL function.
 
             }
 
@@ -314,7 +352,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
      * Cataloging) record.
      *
      * @param csid the CSID of a CollectionObject record.
-     * @return
+     * @return the computed current location of the CollectionObject record.
      */
     private String computeCurrentLocation(String csid) {
         String computedCurrentLocation = "";
@@ -402,14 +440,5 @@ public class UpdateObjectLocationOnMove implements EventListener {
             return null;
         }
         return str;
-    }
-
-    public void printResultSet(ResultSet rs) throws SQLException {
-        ResultSetMetaData metadata = rs.getMetaData();
-        int numberOfColumns = metadata.getColumnCount();
-        for (int i = 1; i <= numberOfColumns; i++) {
-            logger.debug(metadata.getColumnName(i));
-            logger.debug(metadata.getColumnType(i));
-        }
     }
 }
