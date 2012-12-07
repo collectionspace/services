@@ -6,14 +6,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.event.Event;
@@ -27,7 +31,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
     // am using the latter to follow Ray's pattern for now
     final Log logger = LogFactory.getLog(UpdateObjectLocationOnMove.class);
     private final String DATABASE_RESOURCE_DIRECTORY_NAME = "db";
-    // FIXME: Currently hard-coded; get this from JDBC utilities or equivalent
+    // FIXME: Currently hard-coded; get this database name value from JDBC utilities or equivalent
     private final String DATABASE_SYSTEM_NAME = "postgresql";
     private final String STORED_FUNCTION_NAME = "computecurrentlocation";
     private final String SQL_FILENAME_EXTENSION = ".sql";
@@ -35,6 +39,11 @@ public class UpdateObjectLocationOnMove implements EventListener {
             DATABASE_RESOURCE_DIRECTORY_NAME + "/"
             + DATABASE_SYSTEM_NAME + "/"
             + STORED_FUNCTION_NAME + SQL_FILENAME_EXTENSION;
+    // The name of the relevant column in the JDBC ResultSet is currently identical
+    // to the function name, regardless of the 'SELECT ... AS' clause in the SQL query.
+    private final String COMPUTED_CURRENT_LOCATION_COLUMN = STORED_FUNCTION_NAME;
+    // FIXME: Get this line separator value from already-declared constant elsewhere, if available
+    private final String LINE_SEPARATOR = System.getProperty("line.separator");
 
     // ####################################################################
     // FIXME: Per Rick, what happens if a relation record is updated,
@@ -95,64 +104,89 @@ public class UpdateObjectLocationOnMove implements EventListener {
                     return;
                 }
 
-                // FIXME: Remove these temporary log statements after debugging
-                logger.debug("After reading stored function command from resource path.");
-                logger.debug("sql=" + sql);
-
-                int result;
+                int result = -1;
                 try {
                     result = JDBCTools.executeUpdate(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME), sql);
-                    logger.debug("Result of executeUpdate=" + result);
-                    if (result < 0) {
-                        logger.warn("Could not create stored function.");
-                        logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
-                        return;
-                    } else {
-                        logger.debug("Stored function " + STORED_FUNCTION_NAME + " was successfully created.");
-                    }
                 } catch (Exception e) {
-                    logger.warn("Could not create stored function: ", e);
-                    logger.warn("Actions in this event listener will NOT be performed, as a result of a previous Exception.");
+                    // Do nothing here
+                    // FIXME: Need to verify that the original '-1' value is preserved if an Exception is caught here.
+                }
+                logger.debug("Result of executeUpdate=" + result);
+                if (result < 0) {
+                    logger.warn("Could not create stored function.");
+                    logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
                     return;
+                } else {
+                    logger.debug("Stored function " + STORED_FUNCTION_NAME + " was successfully created.");
                 }
             } else {
                 logger.debug("Stored function " + STORED_FUNCTION_NAME + " exists.");
             }
 
+            String movementCsid = NuxeoUtils.getCsid(docModel);
+            logger.debug("Movement record CSID=" + movementCsid);
+
             // Pseudocode:
 
-            // Get this Movement record's CSID via the document model.
-
-            // Find every CollectionObject record related to this Movement record:
+            // Find CollectionObject records that are related to this Movement record:
             //
             // Via an NXQL query, get a list of (non-deleted) relation records where:
             // * This movement record's CSID is the subject CSID of the relation.
             // * The object document type is a CollectionObject doctype.
+            //
+            // Note: this assumes that every such relation is captured by
+            // relations with Movement-as-subject and CollectionObject-as-object;
+            // that may NOT always be the case.
+
+            // buildNXQLQuery(List<String> docTypes, QueryContext queryContext);
 
             // Iterate through that list of Relation records and build a list of
             // CollectionObject CSIDs, by extracting the object CSIDs of those records.
 
             // For each such CollectionObject:
 
-            // Verify that the CollectionObject record is active (use isActiveDocument(), below).
+            ArrayList<String> collectionObjectCsids = new ArrayList<String>();
+            collectionObjectCsids.add("5b4c617e-53a0-484b-804e"); // FIXME: Hard-coded for testing
 
-            // Via a JDBC call, invoke the SQL function to supply the last
-            // identified location of that CollectionObject, giving it the CSID
-            // of the CollectionObject record as an argument.
+            DocumentModel collectionObjectDocModel = null;
+            String computedCurrentLocationRefName = "";
+            for (String csid : collectionObjectCsids) {
 
-            // Check that the SQL function's returned value, which is expected
-            // to be a reference (refName) to a storage location authority term,
-            // is at a minimum:
-            // * Non-null
-            // * Capable of being successfully parsed by an authority item parser,
-            //   returning a non-null parse result.
+                // Verify that the CollectionObject record is active (use isActiveDocument(), below).
 
-            // Compare that returned value to the value in the
-            // lastIdentifiedLocation field of that CollectionObject
+                /*
+                 try {
+                 collectionObjectDocModel = NuxeoUtils.getDocFromCsid(null, null, csid);
+                 } catch (Exception e) {
+                 logger.warn("Exception in getDocFromCsid: ", e);
+                 }
+                 */
 
-            // If the two values differ, update the CollectionObject record,
-            // setting the value of the lastIdentifiedLocation field of that
-            // CollectionObject record to the value returned from the SQL function.
+                // Via a JDBC call, invoke the SQL function to obtain the computed
+                // current location of that CollectionObject.
+                computedCurrentLocationRefName = computeCurrentLocation(csid);
+                logger.debug("computedCurrentLocationRefName=" + computedCurrentLocationRefName);
+
+                // Check that the SQL function's returned value, which is expected
+                // to be a reference (refName) to a storage location authority term,
+                // is, at a minimum:
+                // * Non-null and non-blank (need to verify this assumption; can a
+                //   CollectionObject's computed current location meaningfully be 'un-set'?)
+                // * Capable of being successfully parsed by an authority item parser,
+                //   returning a non-null parse result.
+                if ((Tools.notBlank(computedCurrentLocationRefName)
+                        && (RefNameUtils.parseAuthorityTermInfo(computedCurrentLocationRefName) != null))) {
+                    logger.debug("refName passes basic validation tests.");
+                }
+
+                // Compare that returned value to the value in the
+                // computedCurrentLocation field of that CollectionObject
+
+                // If the two values differ, update the CollectionObject record,
+                // setting the value of the computedCurrentLocation field of that
+                // CollectionObject record to the value returned from the SQL function.
+
+            }
 
         }
     }
@@ -276,6 +310,54 @@ public class UpdateObjectLocationOnMove implements EventListener {
     }
 
     /**
+     * Returns the computed current location of a CollectionObject (aka
+     * Cataloging) record.
+     *
+     * @param csid the CSID of a CollectionObject record.
+     * @return
+     */
+    private String computeCurrentLocation(String csid) {
+        String computedCurrentLocation = "";
+        if (Tools.isBlank(csid)) {
+            return computedCurrentLocation;
+        }
+        String sql = String.format("SELECT %1$s('%2$s')", STORED_FUNCTION_NAME, csid);
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        try {
+            conn = JDBCTools.getConnection(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME));
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                computedCurrentLocation = rs.getString(COMPUTED_CURRENT_LOCATION_COLUMN);
+            }
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            logger.debug("Error when attempting to obtain the computed current location of an object :", e);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                logger.debug("SQL Exception closing statement/connection in "
+                        + "UpdateObjectLocationOnMove.computeCurrentLocation: "
+                        + sqle.getLocalizedMessage());
+            }
+        }
+        return computedCurrentLocation;
+    }
+
+    /**
      * Returns a string representation of the contents of an input stream.
      *
      * @param instream an input stream.
@@ -291,7 +373,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
         while (line != null) {
             sb.append(line);
             line = bufreader.readLine();
-            sb.append("\n"); // FIXME: Get appropriate EOL separator rather than hard-coding
+            sb.append(LINE_SEPARATOR);
         }
         return sb.toString();
     }
@@ -320,5 +402,14 @@ public class UpdateObjectLocationOnMove implements EventListener {
             return null;
         }
         return str;
+    }
+
+    public void printResultSet(ResultSet rs) throws SQLException {
+        ResultSetMetaData metadata = rs.getMetaData();
+        int numberOfColumns = metadata.getColumnCount();
+        for (int i = 1; i <= numberOfColumns; i++) {
+            logger.debug(metadata.getColumnName(i));
+            logger.debug(metadata.getColumnType(i));
+        }
     }
 }
