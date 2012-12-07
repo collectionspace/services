@@ -15,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -36,17 +35,23 @@ public class UpdateObjectLocationOnMove implements EventListener {
     private final String DATABASE_RESOURCE_DIRECTORY_NAME = "db";
     // FIXME: Currently hard-coded; get this database name value from JDBC utilities or equivalent
     private final String DATABASE_SYSTEM_NAME = "postgresql";
-    private final String STORED_FUNCTION_NAME = "computecurrentlocation";
-    private final String SQL_FILENAME_EXTENSION = ".sql";
+    private final static String STORED_FUNCTION_NAME = "computecurrentlocation";
+    private final static String SQL_FILENAME_EXTENSION = ".sql";
     private final String SQL_RESOURCE_PATH =
             DATABASE_RESOURCE_DIRECTORY_NAME + "/"
             + DATABASE_SYSTEM_NAME + "/"
             + STORED_FUNCTION_NAME + SQL_FILENAME_EXTENSION;
     // The name of the relevant column in the JDBC ResultSet is currently identical
     // to the function name, regardless of the 'SELECT ... AS' clause in the SQL query.
-    private final String COMPUTED_CURRENT_LOCATION_COLUMN = STORED_FUNCTION_NAME;
+    private final static String COMPUTED_CURRENT_LOCATION_COLUMN = STORED_FUNCTION_NAME;
     // FIXME: Get this line separator value from already-declared constant elsewhere, if available
     private final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private final static String RELATIONS_COMMON_SCHEMA = "relations_common"; // FIXME: Get from external constant
+    final String RELATION_DOCTYPE = "Relation"; // FIXME: Get from external constant
+    private final static String OBJECT_CSID_PROPERTY = "objectCsid"; // FIXME: Get from external constant
+    private final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
+    final String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
+    final String COMPUTED_CURRENT_LOCATION_PROPERTY = "computedCurrentLocation"; // FIXME: Create and then get from external constant
 
     // ####################################################################
     // FIXME: Per Rick, what happens if a relation record is updated,
@@ -144,8 +149,6 @@ public class UpdateObjectLocationOnMove implements EventListener {
             // The following is boilerplate and may be incorrect:
 
             CoreSession coreSession = docEventContext.getCoreSession();
-            final String RELATION_DOCTYPE = "Relation"; // FIXME: Get from external constant
-            final String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
             String query = String.format(
                     "SELECT * FROM %1$s WHERE " // collectionspace_core:tenantId = 1 "
                     + "(relations_common:subjectCsid = '%2$s' "
@@ -164,8 +167,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
             // a list of CollectionObject CSIDs, by extracting the object CSIDs
             // from those Relation records.
             String csid = "";
-            final String RELATIONS_COMMON_SCHEMA = "relations_common"; // FIXME: Get from external constant
-            final String OBJECT_CSID_PROPERTY = "objectCsid"; // FIXME: Get from external constant
+
             List<String> collectionObjectCsids = new ArrayList<String>();
             for (DocumentModel relatedDocModel : relatedDocModels) {
                 csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
@@ -180,28 +182,40 @@ public class UpdateObjectLocationOnMove implements EventListener {
             }
 
             // Iterate through the list of CollectionObject CSIDs found.
+            DocumentModelList collectionObjectDocModels = null;
             DocumentModel collectionObjectDocModel = null;
             String computedCurrentLocationRefName = "";
             for (String collectionObjectCsid : collectionObjectCsids) {
 
                 // Verify that the CollectionObject record is active.
-                // Code below untried; likely needs work.
-                /*
-                 try {
-                 collectionObjectDocModel = NuxeoUtils.getDocFromCsid(null, null, csid);
-                 } catch (Exception e) {
-                 logger.warn("Exception in getDocFromCsid: ", e);
-                 }
-                 if (!isActiveDocument(collectionObjectDocModel)) {
-                 continue;
-                 }
-                 *
-                 */
+                try {
+                    query = "SELECT * FROM "
+                            + NuxeoUtils.BASE_DOCUMENT_TYPE
+                            + " WHERE "
+                            + NuxeoUtils.getByNameWhereClause(collectionObjectCsid);
+                    collectionObjectDocModels = coreSession.query(query);
+                } catch (Exception e) {
+                    logger.warn("Exception in query to get document model for CollectionObject: ", e);
+                }
+                if (collectionObjectDocModels == null || collectionObjectDocModels.isEmpty()) {
+                    logger.warn("Could not get document models for CollectionObject(s).");
+                    continue;
+                } else if (collectionObjectDocModels.size() != 1) {
+                    logger.debug("Found more than 1 document with CSID=" + collectionObjectCsid);
+                    continue;
+                }
+                collectionObjectDocModel = collectionObjectDocModels.get(0);
+                if (collectionObjectDocModel == null) {
+                    continue;
+                }
+                if (!isActiveDocument(collectionObjectDocModel)) {
+                    continue;
+                }
 
                 // Via a JDBC call, invoke the SQL function to obtain the computed
                 // current location of that CollectionObject.
                 computedCurrentLocationRefName = computeCurrentLocation(collectionObjectCsid);
-                logger.debug("computedCurrentLocationRefName=" + computedCurrentLocationRefName);
+                logger.debug("computedCurrentLocation refName=" + computedCurrentLocationRefName);
 
                 // Check that the value returned from this SQL function, which
                 // is expected to be a reference (refName) to a storage location
@@ -217,10 +231,26 @@ public class UpdateObjectLocationOnMove implements EventListener {
                     // If the value returned from the function passes validation,
                     // compare that value to the value in the computedCurrentLocation
                     // field of that CollectionObject
-                    //
+                    
+                    String existingComputedCurrentLocationRefName =
+                            (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
+                    
+                    // FIXME: Need to check for null existing refName here ...
+
+                    /*
+                    if (!existingComputedCurrentLocationRefName.equals(computedCurrentLocationRefName)) {
+                        logger.debug("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
+                        logger.debug("computedCurrentLocation refName does NOT require updating.");
+                        continue;
+                    }
+                    */
+
                     // If the two values differ, update the CollectionObject record,
                     // setting the value of the computedCurrentLocation field of that
                     // CollectionObject record to the value returned from the SQL function.
+                    logger.debug("computedCurrentLocation refName requires updating.");
+                    
+                    // FIXME: Add update code here
 
                 }
 
