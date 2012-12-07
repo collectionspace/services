@@ -48,6 +48,7 @@
     <xs:element name="collection" type="xs:string"/>
     <xs:element name="titleGroupList" type="titleGroupList"/>
     <xs:element name="recordStatus" type="xs:string"/>
+    <xs:element name="computedCurrentLocation" type="xs:string"/>
 
     <!-- Object Description Information -->
 
