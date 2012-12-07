@@ -110,7 +110,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
         // (PostgreSQL will not permit the function to be created if
         // any of its referred-to tables do not exist.)
         if (!storedFunctionExists(STORED_FUNCTION_NAME)) {
-            logger.debug("Stored function " + STORED_FUNCTION_NAME + " does NOT exist.");
+            logger.trace("Stored function " + STORED_FUNCTION_NAME + " does NOT exist in the database.");
             String sql = getStringFromResource(SQL_RESOURCE_PATH);
             if (Tools.isBlank(sql)) {
                 logger.warn("Could not obtain SQL command to create stored function.");
@@ -125,16 +125,16 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 // Do nothing here
                 // FIXME: Need to verify that the original '-1' value is preserved if an Exception is caught here.
             }
-            logger.debug("Result of executeUpdate=" + result);
+            logger.trace("Result of executeUpdate=" + result);
             if (result < 0) {
-                logger.warn("Could not create stored function.");
+                logger.warn("Could not create stored function in the database.");
                 logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
                 return;
             } else {
-                logger.debug("Stored function " + STORED_FUNCTION_NAME + " was successfully created.");
+                logger.info("Stored function " + STORED_FUNCTION_NAME + " was successfully created in the database.");
             }
         } else {
-            logger.debug("Stored function " + STORED_FUNCTION_NAME + " exists.");
+            logger.trace("Stored function " + STORED_FUNCTION_NAME + " already exists in the database.");
         }
 
         String movementCsid = NuxeoUtils.getCsid(docModel);
@@ -165,7 +165,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
         if (relatedDocModels == null || relatedDocModels.isEmpty()) {
             return;
         } else {
-            logger.debug("Found " + relatedDocModels.size() + " related documents.");
+            logger.trace("Found " + relatedDocModels.size() + " related documents.");
         }
 
         // Iterate through the list of Relation records found and build
@@ -183,9 +183,10 @@ public class UpdateObjectLocationOnMove implements EventListener {
             }
         }
         if (collectionObjectCsids == null || collectionObjectCsids.isEmpty()) {
+            logger.warn("Could not obtain any CSIDs of related CollectionObject records.");
             return;
         } else {
-            logger.debug("Found " + collectionObjectCsids.size() + " CollectionObject CSIDs.");
+            logger.debug("Found " + collectionObjectCsids.size() + " CSIDs of related CollectionObject records.");
         }
 
         // Iterate through the list of CollectionObject CSIDs found.
@@ -229,7 +230,11 @@ public class UpdateObjectLocationOnMove implements EventListener {
                         || !computedCurrentLocationRefName.equals(existingComputedCurrentLocationRefName)) {
                     logger.debug("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
                     logger.debug("computedCurrentLocation refName requires updating.");
-                    // FIXME: Add update code here
+                    collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY, computedCurrentLocationRefName);
+                    coreSession.saveDocument(collectionObjectDocModel);
+                    String afterUpdateComputedCurrentLocationRefName =
+                        (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
+                    logger.debug("Following update, new computedCurrentLocation refName value=" + afterUpdateComputedCurrentLocationRefName);
                 } else {
                     logger.debug("computedCurrentLocation refName does NOT require updating.");
                 }
