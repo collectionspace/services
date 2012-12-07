@@ -283,11 +283,12 @@ public class RefNameServiceUtils {
              * <xs:element name="docName" type="xs:string" minOccurs="0" />
              * <xs:element name="sourceField" type="xs:string" minOccurs="1" />
              * <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+             * <xs:element name="refName" type="xs:String" minOccurs="1" />
              * <xs:element name="updatedAt" type="xs:string" minOccurs="1" />
              * <xs:element name="workflowState" type="xs:string" minOccurs="1"
              * />
              */
-            String fieldList = "docType|docId|docNumber|docName|sourceField|uri|updatedAt|workflowState";
+            String fieldList = "docType|docId|docNumber|docName|sourceField|uri|refName|updatedAt|workflowState";
             commonList.setFieldsReturned(fieldList);
 
             // As a side-effect, the method called below modifies the value of
@@ -557,6 +558,14 @@ public class RefNameServiceUtils {
 
         return whereClauseStr;
     }
+    
+    // TODO there are multiple copies of this that should be put somewhere common.
+	protected static String getRefname(DocumentModel docModel) throws ClientException {
+		String result = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+				CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
+		return result;
+	}
+
 
     /*
      * Runs through the list of found docs, processing them. If list is
@@ -600,6 +609,14 @@ public class RefNameServiceUtils {
                 }
                 ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
                 String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+                try {
+                	String itemRefName = getRefname(docModel);
+                	ilistItem.setRefName(itemRefName);
+                } catch (ClientException ce) {
+                    throw new RuntimeException(
+                            "processRefObjsDocList: Problem fetching refName from item Object: " 
+                            		+ ce.getLocalizedMessage());
+                }
                 ilistItem.setDocId(csid);
                 String uri = "";
                 UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();

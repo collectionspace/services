@@ -1125,7 +1125,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         item2Metatype = item2Metatype != null ? item2Metatype : EMPTYSTR;
         
         boolean isEqual = (subj1Csid.equals(subj2Csid) || ((subj2Csid==null)  && subj1RefName.equals(subj2RefName)))
-                && (obj1Csid.equals(obj1Csid)   || ((obj2Csid==null)   && obj1RefName.equals(obj2RefName)))
+                && (obj1Csid.equals(obj2Csid)   || ((obj2Csid==null)   && obj1RefName.equals(obj2RefName)))
                 // predicate is proper, but still allow relationshipType
                 && (item1.getPredicate().equals(item2.getPredicate())
                 	||  ((item2.getPredicate()==null)  && item1.getRelationshipType().equals(item2.getRelationshipType())))
