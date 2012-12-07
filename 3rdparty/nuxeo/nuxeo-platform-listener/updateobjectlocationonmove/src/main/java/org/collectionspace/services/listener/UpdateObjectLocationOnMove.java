@@ -60,8 +60,8 @@ public class UpdateObjectLocationOnMove implements EventListener {
     // for that event as well and update the CollectionObject record's
     // computedCurrentLocation accordingly?
     //
-    // The following code is currently checking only for creates or
-    // updates to Movement records.
+    // The following code is currently only handling create and
+    // update events affecting Movement records.
     // ####################################################################
     @Override
     public void handleEvent(Event event) throws ClientException {
@@ -78,185 +78,166 @@ public class UpdateObjectLocationOnMove implements EventListener {
         }
         DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
         DocumentModel docModel = docEventContext.getSourceDocument();
-        if (isMovementDocument(docModel) && isActiveDocument(docModel)) {
-            logger.debug("A create or update event for an active Movement document was received by UpdateObjectLocationOnMove ...");
 
-            // Test whether a SQL function exists to supply the computed
-            // current location of a CollectionObject.
-            //
-            // If the function does not exist in the database, load the
-            // SQL command to create that function from a resource
-            // available to this class, and run a JDBC command to create
-            // that function in the database.
-            //
-            // For now, assume this function will be created in the
-            // 'nuxeo' database.
-            //
-            // FIXME: Future work to create per-tenant repositories will
-            // likely require that our JDBC statements connect to the
-            // appropriate tenant-specific database.
-            //
-            // It doesn't appear we can reliably create this function via
-            // 'ant create_nuxeo db' during the build process, because
-            // there's a substantial likelihood at that point that
-            // tables referred to by the function (e.g. movements_common
-            // and collectionobjects_common) will not yet exist.
-            // (PostgreSQL will not permit the function to be created if
-            // any of its referred-to tables do not exist.)
-            if (!storedFunctionExists(STORED_FUNCTION_NAME)) {
-                logger.debug("Stored function " + STORED_FUNCTION_NAME + " does NOT exist.");
-                String sql = getStringFromResource(SQL_RESOURCE_PATH);
-                if (Tools.isBlank(sql)) {
-                    logger.warn("Could not obtain SQL command to create stored function.");
-                    logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
-                    return;
-                }
+        // If this event does not involve an active Movement Document,
+        // return without further handling the event.
+        if (!(isMovementDocument(docModel) && isActiveDocument(docModel))) {
+            return;
+        }
 
-                int result = -1;
-                try {
-                    result = JDBCTools.executeUpdate(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME), sql);
-                } catch (Exception e) {
-                    // Do nothing here
-                    // FIXME: Need to verify that the original '-1' value is preserved if an Exception is caught here.
-                }
-                logger.debug("Result of executeUpdate=" + result);
-                if (result < 0) {
-                    logger.warn("Could not create stored function.");
-                    logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
-                    return;
-                } else {
-                    logger.debug("Stored function " + STORED_FUNCTION_NAME + " was successfully created.");
-                }
-            } else {
-                logger.debug("Stored function " + STORED_FUNCTION_NAME + " exists.");
+        logger.debug("A create or update event for an active Movement document was received by UpdateObjectLocationOnMove ...");
+
+        // Test whether a SQL function exists to supply the computed
+        // current location of a CollectionObject.
+        //
+        // If the function does not exist in the database, load the
+        // SQL command to create that function from a resource
+        // available to this class, and run a JDBC command to create
+        // that function in the database.
+        //
+        // For now, assume this function will be created in the
+        // 'nuxeo' database.
+        //
+        // FIXME: Future work to create per-tenant repositories will
+        // likely require that our JDBC statements connect to the
+        // appropriate tenant-specific database.
+        //
+        // It doesn't appear we can reliably create this function via
+        // 'ant create_nuxeo db' during the build process, because
+        // there's a substantial likelihood at that point that
+        // tables referred to by the function (e.g. movements_common
+        // and collectionobjects_common) will not yet exist.
+        // (PostgreSQL will not permit the function to be created if
+        // any of its referred-to tables do not exist.)
+        if (!storedFunctionExists(STORED_FUNCTION_NAME)) {
+            logger.debug("Stored function " + STORED_FUNCTION_NAME + " does NOT exist.");
+            String sql = getStringFromResource(SQL_RESOURCE_PATH);
+            if (Tools.isBlank(sql)) {
+                logger.warn("Could not obtain SQL command to create stored function.");
+                logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
+                return;
             }
 
-            String movementCsid = NuxeoUtils.getCsid(docModel);
-            logger.debug("Movement record CSID=" + movementCsid);
-
-            // Pseudocode:
-
-            // Find CollectionObject records that are related to this Movement record:
-            //
-            // Via an NXQL query, get a list of (non-deleted) relation records where:
-            // * This movement record's CSID is the subject CSID of the relation.
-            // * The object document type is a CollectionObject doctype.
-            //
-            // Note: this assumes that every such relation is captured by
-            // relations with Movement-as-subject and CollectionObject-as-object;
-            // that may NOT always be the case.
-
-            // The following is boilerplate and may be incorrect:
-
-            CoreSession coreSession = docEventContext.getCoreSession();
-            String query = String.format(
-                    "SELECT * FROM %1$s WHERE " // collectionspace_core:tenantId = 1 "
-                    + "(relations_common:subjectCsid = '%2$s' "
-                    + "AND relations_common:objectDocumentType = '%3$s') "
-                    + "AND (ecm:currentLifeCycleState <> 'deleted') "
-                    + "AND ecm:isProxy = 0 "
-                    + "AND ecm:isCheckedInVersion = 0", RELATION_DOCTYPE, movementCsid, COLLECTIONOBJECT_DOCTYPE);
-            DocumentModelList relatedDocModels = coreSession.query(query);
-            if (relatedDocModels == null || relatedDocModels.isEmpty()) {
+            int result = -1;
+            try {
+                result = JDBCTools.executeUpdate(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME), sql);
+            } catch (Exception e) {
+                // Do nothing here
+                // FIXME: Need to verify that the original '-1' value is preserved if an Exception is caught here.
+            }
+            logger.debug("Result of executeUpdate=" + result);
+            if (result < 0) {
+                logger.warn("Could not create stored function.");
+                logger.warn("Actions in this event listener will NOT be performed, as a result of a previous error.");
                 return;
             } else {
-                logger.debug("Found " + relatedDocModels.size() + " related documents.");
+                logger.debug("Stored function " + STORED_FUNCTION_NAME + " was successfully created.");
+            }
+        } else {
+            logger.debug("Stored function " + STORED_FUNCTION_NAME + " exists.");
+        }
+
+        String movementCsid = NuxeoUtils.getCsid(docModel);
+        logger.debug("Movement record CSID=" + movementCsid);
+
+        // Find CollectionObject records that are related to this Movement record:
+        //
+        // Via an NXQL query, get a list of (non-deleted) relation records where:
+        // * This movement record's CSID is the subject CSID of the relation.
+        // * The object document type is a CollectionObject doctype.
+        //
+        // Note: this assumes that every such relation is captured by
+        // relations with Movement-as-subject and CollectionObject-as-object,
+        // logic that matches that of the SQL function to obtain the computed
+        // current location of the CollectionObject.
+        //
+        // That may NOT always be the case; it's possible some such relations may
+        // exist only with CollectionObject-as-subject and Movement-as-object.
+        CoreSession coreSession = docEventContext.getCoreSession();
+        String query = String.format(
+                "SELECT * FROM %1$s WHERE " // collectionspace_core:tenantId = 1 "
+                + "(relations_common:subjectCsid = '%2$s' "
+                + "AND relations_common:objectDocumentType = '%3$s') "
+                + "AND (ecm:currentLifeCycleState <> 'deleted') "
+                + "AND ecm:isProxy = 0 "
+                + "AND ecm:isCheckedInVersion = 0", RELATION_DOCTYPE, movementCsid, COLLECTIONOBJECT_DOCTYPE);
+        DocumentModelList relatedDocModels = coreSession.query(query);
+        if (relatedDocModels == null || relatedDocModels.isEmpty()) {
+            return;
+        } else {
+            logger.debug("Found " + relatedDocModels.size() + " related documents.");
+        }
+
+        // Iterate through the list of Relation records found and build
+        // a list of CollectionObject CSIDs, by extracting the object CSIDs
+        // from those Relation records.
+
+        // FIXME: The following code might be refactored into a generic 'get property
+        // values from a list of document models' method, if this doesn't already exist.
+        String csid = "";
+        List<String> collectionObjectCsids = new ArrayList<String>();
+        for (DocumentModel relatedDocModel : relatedDocModels) {
+            csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+            if (Tools.notBlank(csid)) {
+                collectionObjectCsids.add(csid);
+            }
+        }
+        if (collectionObjectCsids == null || collectionObjectCsids.isEmpty()) {
+            return;
+        } else {
+            logger.debug("Found " + collectionObjectCsids.size() + " CollectionObject CSIDs.");
+        }
+
+        // Iterate through the list of CollectionObject CSIDs found.
+        DocumentModel collectionObjectDocModel = null;
+        String computedCurrentLocationRefName = "";
+        for (String collectionObjectCsid : collectionObjectCsids) {
+
+            // Verify that the CollectionObject record is active.
+            collectionObjectDocModel = getDocModelFromCsid(coreSession, collectionObjectCsid);
+            if (!isActiveDocument(collectionObjectDocModel)) {
+                continue;
             }
 
-            // Iterate through the list of Relation records found and build
-            // a list of CollectionObject CSIDs, by extracting the object CSIDs
-            // from those Relation records.
-            String csid = "";
+            // Via a JDBC call, invoke the SQL function to obtain the computed
+            // current location of that CollectionObject.
+            computedCurrentLocationRefName = computeCurrentLocation(collectionObjectCsid);
+            logger.debug("computedCurrentLocation refName=" + computedCurrentLocationRefName);
 
-            List<String> collectionObjectCsids = new ArrayList<String>();
-            for (DocumentModel relatedDocModel : relatedDocModels) {
-                csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
-                if (Tools.notBlank(csid)) {
-                    collectionObjectCsids.add(csid);
-                }
-            }
-            if (collectionObjectCsids == null || collectionObjectCsids.isEmpty()) {
-                return;
-            } else {
-                logger.debug("Found " + collectionObjectCsids.size() + " CollectionObject CSIDs.");
-            }
+            // Check that the value returned from the SQL function, which
+            // is expected to be a reference (refName) to a storage location
+            // authority term, is, at a minimum:
+            // * Non-null and non-blank. (We need to verify this assumption; can a
+            //   CollectionObject's computed current location meaningfully be 'un-set'?)
+            // * Capable of being successfully parsed by an authority item parser;
+            //   that is, returning a non-null parse result.
+            if ((Tools.notBlank(computedCurrentLocationRefName)
+                    && (RefNameUtils.parseAuthorityTermInfo(computedCurrentLocationRefName) != null))) {
+                logger.debug("refName passes basic validation tests.");
 
-            // Iterate through the list of CollectionObject CSIDs found.
-            DocumentModelList collectionObjectDocModels = null;
-            DocumentModel collectionObjectDocModel = null;
-            String computedCurrentLocationRefName = "";
-            for (String collectionObjectCsid : collectionObjectCsids) {
-
-                // Verify that the CollectionObject record is active.
-                try {
-                    query = "SELECT * FROM "
-                            + NuxeoUtils.BASE_DOCUMENT_TYPE
-                            + " WHERE "
-                            + NuxeoUtils.getByNameWhereClause(collectionObjectCsid);
-                    collectionObjectDocModels = coreSession.query(query);
-                } catch (Exception e) {
-                    logger.warn("Exception in query to get document model for CollectionObject: ", e);
-                }
-                if (collectionObjectDocModels == null || collectionObjectDocModels.isEmpty()) {
-                    logger.warn("Could not get document models for CollectionObject(s).");
-                    continue;
-                } else if (collectionObjectDocModels.size() != 1) {
-                    logger.debug("Found more than 1 document with CSID=" + collectionObjectCsid);
-                    continue;
-                }
-                collectionObjectDocModel = collectionObjectDocModels.get(0);
-                if (collectionObjectDocModel == null) {
-                    continue;
-                }
-                if (!isActiveDocument(collectionObjectDocModel)) {
-                    continue;
-                }
-
-                // Via a JDBC call, invoke the SQL function to obtain the computed
-                // current location of that CollectionObject.
-                computedCurrentLocationRefName = computeCurrentLocation(collectionObjectCsid);
-                logger.debug("computedCurrentLocation refName=" + computedCurrentLocationRefName);
-
-                // Check that the value returned from this SQL function, which
-                // is expected to be a reference (refName) to a storage location
-                // authority term, is, at a minimum:
-                // * Non-null and non-blank. (We need to verify this assumption; can a
-                //   CollectionObject's computed current location meaningfully be 'un-set'?)
-                // * Capable of being successfully parsed by an authority item parser;
-                //   that is, returning a non-null parse result.
-                if ((Tools.notBlank(computedCurrentLocationRefName)
-                        && (RefNameUtils.parseAuthorityTermInfo(computedCurrentLocationRefName) != null))) {
-                    logger.debug("refName passes basic validation tests.");
-
-                    // If the value returned from the function passes validation,
-                    // compare that value to the value in the computedCurrentLocation
-                    // field of that CollectionObject
-                    
-                    String existingComputedCurrentLocationRefName =
-                            (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
-                    
-                    // FIXME: Need to check for null existing refName here ...
-
-                    /*
-                    if (!existingComputedCurrentLocationRefName.equals(computedCurrentLocationRefName)) {
-                        logger.debug("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
-                        logger.debug("computedCurrentLocation refName does NOT require updating.");
-                        continue;
-                    }
-                    */
-
-                    // If the two values differ, update the CollectionObject record,
-                    // setting the value of the computedCurrentLocation field of that
-                    // CollectionObject record to the value returned from the SQL function.
+                // If the value returned from the function passes validation,
+                // compare that value to the value in the computedCurrentLocation
+                // field of that CollectionObject
+                //
+                // If the CollectionObject does not already have a
+                // computedCurrentLocation value, or if the two values differ,
+                // update the CollectionObject record's computedCurrentLocation
+                // field with the value returned from the SQL function.
+                String existingComputedCurrentLocationRefName =
+                        (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
+                if (Tools.isBlank(existingComputedCurrentLocationRefName)
+                        || !computedCurrentLocationRefName.equals(existingComputedCurrentLocationRefName)) {
+                    logger.debug("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
                     logger.debug("computedCurrentLocation refName requires updating.");
-                    
                     // FIXME: Add update code here
-
+                } else {
+                    logger.debug("computedCurrentLocation refName does NOT require updating.");
                 }
 
             }
 
         }
+
     }
 
     /**
@@ -470,5 +451,24 @@ public class UpdateObjectLocationOnMove implements EventListener {
             return null;
         }
         return str;
+    }
+
+    private DocumentModel getDocModelFromCsid(CoreSession coreSession, String collectionObjectCsid) {
+        DocumentModelList collectionObjectDocModels = null;
+        try {
+            final String query = "SELECT * FROM "
+                    + NuxeoUtils.BASE_DOCUMENT_TYPE
+                    + " WHERE "
+                    + NuxeoUtils.getByNameWhereClause(collectionObjectCsid);
+            collectionObjectDocModels = coreSession.query(query);
+        } catch (Exception e) {
+            logger.warn("Exception in query to get document model for CollectionObject: ", e);
+        }
+        if (collectionObjectDocModels == null || collectionObjectDocModels.isEmpty()) {
+            logger.warn("Could not get document models for CollectionObject(s).");
+        } else if (collectionObjectDocModels.size() != 1) {
+            logger.debug("Found more than 1 document with CSID=" + collectionObjectCsid);
+        }
+        return collectionObjectDocModels.get(0);
     }
 }
