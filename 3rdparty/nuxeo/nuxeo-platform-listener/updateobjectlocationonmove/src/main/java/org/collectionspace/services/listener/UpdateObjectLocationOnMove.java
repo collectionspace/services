@@ -9,10 +9,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.storage.JDBCTools;
@@ -56,6 +61,8 @@ public class UpdateObjectLocationOnMove implements EventListener {
     private final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
     final String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
     final String COMPUTED_CURRENT_LOCATION_PROPERTY = "computedCurrentLocation"; // FIXME: Create and then get from external constant
+    final String MOVEMENTS_COMMON_SCHEMA = "movements_common"; // FIXME: Get from external constant
+    final String LOCATION_DATE_PROPERTY = "locationDate"; // FIXME: Get from external constant
 
     // ####################################################################
     // FIXME: Per Rick, what happens if a relation record is updated,
@@ -171,6 +178,11 @@ public class UpdateObjectLocationOnMove implements EventListener {
         String movementCsid = NuxeoUtils.getCsid(docModel);
         logger.debug("Movement record CSID=" + movementCsid);
 
+        // FIXME: Temporary, for debugging: check whether the movement record's
+        // location date field value is stale in Nuxeo at this point
+        GregorianCalendar cal = (GregorianCalendar) docModel.getProperty(MOVEMENTS_COMMON_SCHEMA, LOCATION_DATE_PROPERTY);
+        logger.debug("location date=" + GregorianCalendarDateTimeUtils.formatAsISO8601Date(cal));
+        
         // Find CollectionObject records that are related to this Movement record:
         //
         // Via an NXQL query, get a list of (non-deleted) relation records where:
@@ -184,7 +196,17 @@ public class UpdateObjectLocationOnMove implements EventListener {
         //
         // That may NOT always be the case; it's possible some such relations may
         // exist only with CollectionObject-as-subject and Movement-as-object.
-        CoreSession coreSession = docEventContext.getCoreSession();
+        CoreSession coreSession1 = docEventContext.getCoreSession();
+        CoreSession coreSession = docModel.getCoreSession();
+        if (coreSession1 == coreSession || coreSession1.equals(coreSession)) {
+            logger.debug("Core sessions are equal.");
+        } else {
+            logger.debug("Core sessions are NOT equal.");
+        }
+        
+        // Check whether closing and opening a transaction here might
+        // flush any hypothetical caching that Nuxeo is doing at this point
+
         String query = String.format(
                 "SELECT * FROM %1$s WHERE " // collectionspace_core:tenantId = 1 "
                 + "(relations_common:subjectCsid = '%2$s' "
@@ -224,6 +246,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
         // Iterate through the list of CollectionObject CSIDs found.
         DocumentModel collectionObjectDocModel = null;
         String computedCurrentLocationRefName = "";
+        Map<DocumentModel, String> docModelsToUpdate = new HashMap<DocumentModel, String>();
         for (String collectionObjectCsid : collectionObjectCsids) {
 
             // Verify that the CollectionObject record is active.
@@ -260,30 +283,38 @@ public class UpdateObjectLocationOnMove implements EventListener {
                         || !computedCurrentLocationRefName.equals(existingComputedCurrentLocationRefName)) {
                     logger.debug("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
                     logger.debug("computedCurrentLocation refName requires updating.");
-                    // ... update the CollectionObject record's computedCurrentLocation
-                    // field with the value returned from the SQL function.
-                    collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY, computedCurrentLocationRefName);
-                    coreSession.saveDocument(collectionObjectDocModel);
-                    if (logger.isDebugEnabled()) {
-                        String afterUpdateComputedCurrentLocationRefName =
-                                (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
-                        logger.debug("Following update, new computedCurrentLocation refName value=" + afterUpdateComputedCurrentLocationRefName);
-                    }
-                } else {
-                    logger.debug("computedCurrentLocation refName does NOT require updating.");
+                    // ... store this CollectionObject's docModel and new field value for subsequent updating
+                    docModelsToUpdate.put(collectionObjectDocModel, computedCurrentLocationRefName);
                 }
-
+            } else {
+                logger.debug("computedCurrentLocation refName does NOT require updating.");
             }
 
+        }
+
+        // For each CollectionObject record that has been stored for updating,
+        // update its computedCurrentLocation field with its computed current
+        // location value returned from the SQL function.
+        for (Map.Entry<DocumentModel, String> entry : docModelsToUpdate.entrySet()) {
+            DocumentModel dmodel = entry.getKey();
+            String newValue = entry.getValue();
+            dmodel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY, newValue);
+            coreSession.saveDocument(dmodel);
+            if (logger.isDebugEnabled()) {
+                String afterUpdateComputedCurrentLocationRefName =
+                        (String) dmodel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
+                logger.debug("Following update, new computedCurrentLocation refName value=" + afterUpdateComputedCurrentLocationRefName);
+
+            }
         }
     }
 
     // FIXME: Generic methods like many of those below might be split off,
-    // into an event utilities class, base classes, or otherwise. - ADR 2012-12-05
-    //
-    // FIXME: Identify whether the equivalent of the documentMatchesType utility
-    // method is already implemented and substitute a call to the latter if so.
-    // This may well already exist.
+// into an event utilities class, base classes, or otherwise. - ADR 2012-12-05
+//
+// FIXME: Identify whether the equivalent of the documentMatchesType utility
+// method is already implemented and substitute a call to the latter if so.
+// This may well already exist.
     /**
      * Identifies whether a document matches a supplied document type.
      *
