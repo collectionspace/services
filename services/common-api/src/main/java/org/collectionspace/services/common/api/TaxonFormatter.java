@@ -20,6 +20,7 @@ public class TaxonFormatter {
     private static final String SUBSPECIES_QUALIFIER_MARKER_REGEXP = "(section|subsection|ser\\.|sser\\.)";
     private static final Pattern SUBSPECIES_WITH_QUALIFIER_PATTERN = Pattern.compile("(\\s|^)(subsp\\.\\s+)" + SUBSPECIES_QUALIFIER_MARKER_REGEXP + "(\\s)(.*?)(\\s|$)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Pattern PARENTHESIZED_SUBSPECIES_WITH_QUALIFIER_PATTERN = Pattern.compile("(\\s|^)(subsp\\.\\s+)\\(" + SUBSPECIES_QUALIFIER_MARKER_REGEXP + "(.*?)\\)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private static final Pattern FAMILY_NAME_PATTERN = Pattern.compile("^[A-Z]+$");
     
     private NameParser nameParser;
     
@@ -29,6 +30,11 @@ public class TaxonFormatter {
     
 	public String format(String name) {
 		if (StringUtils.isBlank(name)) {
+			return name;
+		}
+		
+		if (FAMILY_NAME_PATTERN.matcher(name).matches()) {
+			// Per Barbara Keller, family names are never italicized. 
 			return name;
 		}
 
@@ -79,7 +85,7 @@ public class TaxonFormatter {
 			 * There are some non-standard taxon names in SAGE data, where there is an infraspecific rank/epithet, but no genus/species, e.g.
 			 *     subsp. occidentalis (J.T. Howell) C.B. Wolf 
 			 * 
-			 * Since the GBIF parser can't handle this, we'll temporarily prefix an arbitrary genus and species for parsing purposes.
+			 * Since the GBIF parser can't handle this, we'll temporarily prepend an arbitrary genus and species for parsing purposes.
 			 */
 			logger.info("name starts with infraspecific rank: name=" + name + " normalizedName=" + normalizedName);
 			
@@ -93,6 +99,11 @@ public class TaxonFormatter {
 			parsedName = nameParser.parse(normalizedName);
 		}
 		catch (UnparsableException e) {
+			/*
+			 *  Some non-standard taxon names in SAGE data have a species, but no genus. Try to account for these by
+			 *  temporarily prepending an arbitrary genus.
+			 */
+			
 			logger.info("Unparsable name, trying with a temp genus: name=" + name + " normalizedName=" + normalizedName);
 			
 			normalizedName = "Tempgenus " + normalizedName;
@@ -131,7 +142,6 @@ public class TaxonFormatter {
 	}
 	
 	private String italicize(String string, String substring) {
-		//return Pattern.compile(substring, Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.LITERAL).matcher(string).replaceAll("<span style=\"font-style: italic\">$0</span>");
 		return Pattern.compile("(\\s|\\(|^)(" + Pattern.quote(substring) + ")(\\s|\\)|$)", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE).matcher(string).replaceAll("$1<i>$2</i>$3");
 	}
 	
