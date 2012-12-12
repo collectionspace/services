@@ -20,6 +20,7 @@
         <CustomSchemaName>movements_botgarden</CustomSchemaName>
         <TenantId>35</TenantId>
         <TenantLabel>botgarden</TenantLabel>
+        <Lifecycle>cs_default</Lifecycle>
     </properties>
 
     <build>
