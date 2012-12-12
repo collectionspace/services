@@ -110,10 +110,16 @@ public class UpdateObjectLocationOnMove implements EventListener {
         // Note: currently, all Document lifecycle transitions on
         // the relevant doctype(s) are handled by this event handler,
         // not just transitions between 'soft deleted' and active states.
+        //
         // We are assuming that we'll want to re-compute current locations
-        // for related CollectionObjects on any such transitions.
+        // for related CollectionObjects on any such transitions, as the
+        // semantics of such transitions are opaque to this event handler,
+        // since arbitrary workflows can be bound to those doctype(s).
         //
         // If we need to filter out some of those lifecycle transitions,
+        // such as excluding transitions to the 'locked' workflow state; or,
+        // alternately, if we want to restrict this event handler's
+        // scope to handle only transitions into the 'soft deleted' state,
         // we can add additional checks for doing so at this point.
 
 
