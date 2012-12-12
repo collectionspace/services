@@ -371,6 +371,12 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
             }
             movementDocModel = getDocModelFromCsid(session, csid);
+            // Verify that the Movement record is active. This will also exclude
+            // versioned Movement records from the computation of the current
+            // location, for tenants that are versioning such records.
+            if (!isActiveDocument(movementDocModel)) {
+                continue;
+            }
             GregorianCalendar locationDate =
                     (GregorianCalendar) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, LOCATION_DATE_PROPERTY);
             if (locationDate == null) {
