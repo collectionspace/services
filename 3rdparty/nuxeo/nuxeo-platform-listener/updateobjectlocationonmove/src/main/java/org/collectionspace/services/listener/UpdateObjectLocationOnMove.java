@@ -39,7 +39,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
     private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
     private final static String COMPUTED_CURRENT_LOCATION_PROPERTY = "computedCurrentLocation"; // FIXME: Create and then get from external constant
     private final static String MOVEMENTS_COMMON_SCHEMA = "movements_common"; // FIXME: Get from external constant
-    private final static String MOVEMENT_DOCTYPE = "Movement"; // FIXME: Get from external constant
+    private final static String MOVEMENT_DOCTYPE = MovementConstants.NUXEO_DOCTYPE;
     private final static String LOCATION_DATE_PROPERTY = "locationDate"; // FIXME: Get from external constant
     private final static String CURRENT_LOCATION_PROPERTY = "currentLocation"; // FIXME: Get from external constant
     private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
@@ -103,25 +103,26 @@ public class UpdateObjectLocationOnMove implements EventListener {
         // Find CollectionObject records that are related to this Movement record:
         //
         // Via an NXQL query, get a list of (non-deleted) relation records where:
-        // * This movement record's CSID is the subject CSID of the relation.
-        // * The object document type is a CollectionObject doctype.
-        //
-        // Note: this assumes that every such relation is captured by
-        // relations with Movement-as-subject and CollectionObject-as-object,
-        // logic that matches that of the SQL function to obtain the computed
-        // current location of the CollectionObject.
-        //
-        // That may NOT always be the case; it's possible some such relations may
-        // exist only with CollectionObject-as-subject and Movement-as-object.
+        // * This movement record's CSID is the subject CSID of the relation,
+        //   and its object document type is a CollectionObject doctype;
+        // or
+        // * This movement record's CSID is the object CSID of the relation,
+        //   and its subject document type is a CollectionObject doctype.
         String movementCsid = NuxeoUtils.getCsid(docModel);
-        // CoreSession coreSession = docEventContext.getCoreSession();
-        CoreSession coreSession = docModel.getCoreSession();
+        CoreSession coreSession = docEventContext.getCoreSession();
+        // Some values below are hard-coded for readability, rather than
+        // being obtained from constants.
         String query = String.format(
                 "SELECT * FROM %1$s WHERE " // collectionspace_core:tenantId = 1 "
-                + "(relations_common:subjectCsid = '%2$s' "
-                + "AND relations_common:objectDocumentType = '%3$s') "
+                + "("
+                + "  (%2$s:subjectCsid = '%3$s' "
+                + "  AND %2$s:objectDocumentType = '%4$s') "
+                + " OR "
+                + "  (%2$s:objectCsid = '%3$s' "
+                + "  AND %2$s:subjectDocumentType = '%4$s') "
+                + ")"
                 + ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT,
-                RELATION_DOCTYPE, movementCsid, COLLECTIONOBJECT_DOCTYPE);
+                RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, movementCsid, COLLECTIONOBJECT_DOCTYPE);
         DocumentModelList relatedDocModels = coreSession.query(query);
         if (relatedDocModels == null || relatedDocModels.isEmpty()) {
             return;
@@ -333,13 +334,21 @@ public class UpdateObjectLocationOnMove implements EventListener {
     private String computeCurrentLocation(CoreSession session, String collectionObjectCsid)
             throws ClientException {
         String computedCurrentLocation = "";
-        // Get Relation records for Movements related to this CollectionObject
+        // Get Relation records for Movements related to this CollectionObject.
+        //
+        // Some values below are hard-coded for readability, rather than
+        // being obtained from constants.
         String query = String.format(
                 "SELECT * FROM %1$s WHERE " // collectionspace_core:tenantId = 1 "
-                + "(relations_common:subjectCsid = '%2$s' "
-                + "AND relations_common:objectDocumentType = '%3$s') "
+                + "("
+                + "  (%2$s:subjectCsid = '%3$s' "
+                + "  AND %2$s:objectDocumentType = '%4$s') "
+                + " OR "
+                + "  (%2$s:objectCsid = '%3$s' "
+                + "  AND %2$s:subjectDocumentType = '%4$s') "
+                + ")"
                 + ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT,
-                RELATION_DOCTYPE, collectionObjectCsid, MOVEMENT_DOCTYPE);
+                RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, collectionObjectCsid, MOVEMENT_DOCTYPE);
         DocumentModelList relatedDocModels = session.query(query);
         if (relatedDocModels == null || relatedDocModels.isEmpty()) {
             return computedCurrentLocation;
@@ -353,8 +362,14 @@ public class UpdateObjectLocationOnMove implements EventListener {
         String csid = "";
         String location = "";
         for (DocumentModel relatedDocModel : relatedDocModels) {
-            // The object CSID in the relation is the related Movement record's CSID
-            csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+            // Due to the 'OR' operator in the query above, related Movement
+            // record CSIDs may reside in either the subject or object CSID fields
+            // of the relation record. Whichever CSID value doesn't match the
+            // CollectionObject's CSID is inferred to be the related Movement record's CSID.
+            csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
+            if (csid.equals(collectionObjectCsid)) {
+                csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+            }
             movementDocModel = getDocModelFromCsid(session, csid);
             GregorianCalendar locationDate =
                     (GregorianCalendar) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, LOCATION_DATE_PROPERTY);
