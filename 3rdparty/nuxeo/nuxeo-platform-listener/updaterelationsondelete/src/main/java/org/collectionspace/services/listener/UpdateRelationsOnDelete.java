@@ -17,14 +17,15 @@ import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 public class UpdateRelationsOnDelete implements EventListener {
-    
-    // FIXME: Get these constant values from external sources rather than redeclaring here
-    final static String RELATIONS_COMMON_SUBJECT_CSID_FIELD = "relations_common:subjectCsid";
-    final static String RELATIONS_COMMON_OBJECT_CSID_FIELD = "relations_common:objectCsid";
 
     // FIXME: We might experiment here with using log4j instead of Apache Commons Logging;
     // am using the latter to follow Ray's pattern for now
     final Log logger = LogFactory.getLog(UpdateRelationsOnDelete.class);
+    
+    // FIXME: Get these constant values from external sources rather than redeclaring here
+    final static String RELATION_DOCTYPE = "Relation";
+    final static String RELATIONS_COMMON_SUBJECT_CSID_FIELD = "relations_common:subjectCsid";
+    final static String RELATIONS_COMMON_OBJECT_CSID_FIELD = "relations_common:objectCsid";
 
     @Override
     public void handleEvent(Event event) throws ClientException {
@@ -39,6 +40,12 @@ public class UpdateRelationsOnDelete implements EventListener {
             DocumentEventContext docContext = (DocumentEventContext) eventContext;
             DocumentModel docModel = docContext.getSourceDocument();
             
+            // Exclude soft deletion events involving Relation records themselves
+            // from handling by this event handler.
+            if (docModel != null && docModel.getType().startsWith(RELATION_DOCTYPE)) {
+                return;
+            }
+  
             // Retrieve a list of relation records, where the soft deleted
             // document provided in the context of the current event is
             // either the subject or object of any relation
