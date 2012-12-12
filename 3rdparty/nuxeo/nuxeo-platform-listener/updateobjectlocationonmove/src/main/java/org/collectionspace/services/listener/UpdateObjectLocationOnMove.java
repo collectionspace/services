@@ -114,7 +114,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
         boolean eventPertainsToRelevantRelationship = false;
         if (documentMatchesType(docModel, RELATION_DOCTYPE)) {
             String subjectDocType = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
-            String objectDocType = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
+            String objectDocType = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
             if (subjectDocType.startsWith(MOVEMENT_DOCTYPE) && objectDocType.startsWith(COLLECTIONOBJECT_DOCTYPE)) {
                 eventPertainsToRelevantRelationship = true;
                 movementCsid = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
