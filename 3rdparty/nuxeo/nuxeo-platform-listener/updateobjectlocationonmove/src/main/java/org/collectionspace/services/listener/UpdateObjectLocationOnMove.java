@@ -35,6 +35,8 @@ public class UpdateObjectLocationOnMove implements EventListener {
     private final static String RELATION_DOCTYPE = "Relation"; // FIXME: Get from external constant
     private final static String SUBJECT_CSID_PROPERTY = "subjectCsid"; // FIXME: Get from external constant
     private final static String OBJECT_CSID_PROPERTY = "objectCsid"; // FIXME: Get from external constant
+    private final static String SUBJECT_DOCTYPE_PROPERTY = "subjectDocumentType"; // FIXME: Get from external constant
+    private final static String OBJECT_DOCTYPE_PROPERTY = "objectDocumentType"; // FIXME: Get from external constant
     private final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
     private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
     private final static String COMPUTED_CURRENT_LOCATION_PROPERTY = "computedCurrentLocation"; // FIXME: Create and then get from external constant
@@ -47,23 +49,6 @@ public class UpdateObjectLocationOnMove implements EventListener {
             + "AND ecm:isProxy = 0 "
             + "AND ecm:isCheckedInVersion = 0";
 
-    // FIXME: Per Rick, what happens if a relation record is created,
-    // updated, deleted, or transitioned to a different workflow state,
-    // that effectively either adds or removes a relation between a Movement
-    // record and a CollectionObject record?  Do we need to listen
-    // for that event as well and update the CollectionObject record's
-    // computedCurrentLocation accordingly?
-    //
-    // The following code is currently only handling events affecting
-    // Movement records.  One possible approach is to add a companion
-    // event handler for Relation records, also registered as an event listener
-    // via configuration in the same document bundle as this event handler.
-    
-    // FIXME: The following code handles the computation of current locations
-    // for CollectionObject records on creation, update, and soft deletion
-    // (workflow transition to 'deleted' state) of related Movement records.
-    // It does not yet been configured or tested to also handle outright
-    // deletion of related Movement records.
     @Override
     public void handleEvent(Event event) throws ClientException {
 
@@ -81,18 +66,11 @@ public class UpdateObjectLocationOnMove implements EventListener {
         DocumentModel docModel = docEventContext.getSourceDocument();
 
         // If this event does not involve one of the relevant doctypes
-        // designated as being handled by this event listener, return
+        // designated as being handled by this event handler, return
         // without further handling the event.
-        //
-        // FIXME: We will likely need to add the Relation doctype here,
-        // along with additional code to handle such changes. (See comment above.)
-        // As an alternative, we could create a second event handler for
-        // doing so, also registered as an event listener via configuration
-        // in the same document bundle as this event handler. If so, the
-        // code below could be simplified to be a single check, rather than
-        // iterating through a list.
         boolean involvesRelevantDocType = false;
         relevantDocTypesList.add(MovementConstants.NUXEO_DOCTYPE);
+        relevantDocTypesList.add(RELATION_DOCTYPE);
         for (String docType : relevantDocTypesList) {
             if (documentMatchesType(docModel, docType)) {
                 involvesRelevantDocType = true;
@@ -102,11 +80,11 @@ public class UpdateObjectLocationOnMove implements EventListener {
         if (!involvesRelevantDocType) {
             return;
         }
-        
+
         if (logger.isTraceEnabled()) {
             logger.trace("An event involving a document of the relevant type(s) was received by UpdateObjectLocationOnMove ...");
         }
-        
+
         // Note: currently, all Document lifecycle transitions on
         // the relevant doctype(s) are handled by this event handler,
         // not just transitions between 'soft deleted' and active states.
@@ -122,6 +100,45 @@ public class UpdateObjectLocationOnMove implements EventListener {
         // scope to handle only transitions into the 'soft deleted' state,
         // we can add additional checks for doing so at this point.
 
+        // If this document event involves a Relation record, does this pertain to
+        // a relationship between a Movement record and a CollectionObject record?
+        //
+        // If not, we're not interested in processing this document event
+        // in this event handler, as it will have no bearing on updating a
+        // computed current location for a CollectionObject.
+        //
+        // If so, get the Movement CSID from the relation record.
+        // (The rest of the code flow below is then identical to that which
+        // is followed when this document event involves a Movement record.)
+        String movementCsid = "";
+        boolean eventPertainsToRelevantRelationship = false;
+        if (documentMatchesType(docModel, RELATION_DOCTYPE)) {
+            String subjectDocType = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
+            String objectDocType = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
+            if (subjectDocType.startsWith(MOVEMENT_DOCTYPE) && objectDocType.startsWith(COLLECTIONOBJECT_DOCTYPE)) {
+                eventPertainsToRelevantRelationship = true;
+                movementCsid = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
+            } else if (subjectDocType.startsWith(COLLECTIONOBJECT_DOCTYPE) && objectDocType.startsWith(MOVEMENT_DOCTYPE)) {
+                eventPertainsToRelevantRelationship = true;
+                movementCsid = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+            }
+            if (!eventPertainsToRelevantRelationship) {
+                return;
+            }
+        }
+
+        // If we haven't obtained the Movement CSID from a Relation record,
+        // then we can infer this is a Movement record (the only other type
+        // of document handled by this event handler), and obtain the CSID
+        // directly from that record.
+        if (Tools.isBlank(movementCsid)) {
+            movementCsid = NuxeoUtils.getCsid(docModel);
+        }
+        if (Tools.isBlank(movementCsid)) {
+            logger.warn("Could not obtain CSID for Movement record from document event.");
+            logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
+            return;
+        }
 
         // Find CollectionObject records that are related to this Movement record:
         //
@@ -131,7 +148,6 @@ public class UpdateObjectLocationOnMove implements EventListener {
         // or
         // * This movement record's CSID is the object CSID of the relation,
         //   and its subject document type is a CollectionObject doctype.
-        String movementCsid = NuxeoUtils.getCsid(docModel);
         CoreSession coreSession = docEventContext.getCoreSession();
         // Some values below are hard-coded for readability, rather than
         // being obtained from constants.
