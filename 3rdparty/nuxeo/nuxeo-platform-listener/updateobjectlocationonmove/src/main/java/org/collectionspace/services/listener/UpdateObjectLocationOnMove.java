@@ -3,8 +3,10 @@ package org.collectionspace.services.listener;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -65,24 +67,45 @@ public class UpdateObjectLocationOnMove implements EventListener {
         DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
         DocumentModel docModel = docEventContext.getSourceDocument();
 
-        // If this event does not involve one of the relevant doctypes
-        // designated as being handled by this event handler, return
-        // without further handling the event.
-        boolean involvesRelevantDocType = false;
-        relevantDocTypesList.add(MovementConstants.NUXEO_DOCTYPE);
-        relevantDocTypesList.add(RELATION_DOCTYPE);
-        for (String docType : relevantDocTypesList) {
-            if (documentMatchesType(docModel, docType)) {
-                involvesRelevantDocType = true;
-                break;
-            }
-        }
-        if (!involvesRelevantDocType) {
-            return;
-        }
+        // If this document event involves a Relation record, does this pertain to
+        // a relationship between a Movement record and a CollectionObject record?
+        //
+        // If not, we're not interested in processing this document event
+        // in this event handler, as it will have no bearing on updating a
+        // computed current location for a CollectionObject.
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("An event involving a document of the relevant type(s) was received by UpdateObjectLocationOnMove ...");
+        //
+        // (The rest of the code flow below is then identical to that which
+        // is followed when this document event involves a Movement record.)
+        String movementCsid = "";
+        if (documentMatchesType(docModel, RELATION_DOCTYPE)) {
+            if (logger.isTraceEnabled()) {
+                logger.trace("An event involving a Relation document was received by UpdateObjectLocationOnMove ...");
+            }
+            // Get a Movement CSID from the Relation record. (If we can't
+            // get it, then we don't have a pertinent relation record.)
+            movementCsid = getCsidForDesiredDocType(docModel, MOVEMENT_DOCTYPE, COLLECTIONOBJECT_DOCTYPE);
+            if (Tools.isBlank(movementCsid)) {
+                logger.warn("Could not obtain CSID for Movement record from document event.");
+                logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
+                return;
+            }
+        } else if (documentMatchesType(docModel, MOVEMENT_DOCTYPE)) {
+            if (logger.isTraceEnabled()) {
+                logger.trace("An event involving a Movement document was received by UpdateObjectLocationOnMove ...");
+            }
+            // Otherwise, get a Movement CSID directly from the Movement record.
+            movementCsid = NuxeoUtils.getCsid(docModel);
+            if (Tools.isBlank(movementCsid)) {
+                logger.warn("Could not obtain CSID for Movement record from document event.");
+                logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
+                return;
+            }
+        } else {
+            if (logger.isTraceEnabled()) {
+                logger.trace("This event did not involve a document relevant to UpdateObjectLocationOnMove ...");
+            }
+            return;
         }
 
         // Note: currently, all Document lifecycle transitions on
@@ -90,54 +113,18 @@ public class UpdateObjectLocationOnMove implements EventListener {
         // not just transitions between 'soft deleted' and active states.
         //
         // We are assuming that we'll want to re-compute current locations
-        // for related CollectionObjects on any such transitions, as the
+        // for related CollectionObjects on all such transitions, as the
         // semantics of such transitions are opaque to this event handler,
-        // since arbitrary workflows can be bound to those doctype(s).
+        // because arbitrary workflows can be bound to those doctype(s).
         //
         // If we need to filter out some of those lifecycle transitions,
         // such as excluding transitions to the 'locked' workflow state; or,
         // alternately, if we want to restrict this event handler's
         // scope to handle only transitions into the 'soft deleted' state,
-        // we can add additional checks for doing so at this point.
+        // we can add additional checks for doing so at this point in the code.
 
-        // If this document event involves a Relation record, does this pertain to
-        // a relationship between a Movement record and a CollectionObject record?
-        //
-        // If not, we're not interested in processing this document event
-        // in this event handler, as it will have no bearing on updating a
-        // computed current location for a CollectionObject.
-        //
-        // If so, get the Movement CSID from the relation record.
-        // (The rest of the code flow below is then identical to that which
-        // is followed when this document event involves a Movement record.)
-        String movementCsid = "";
-        boolean eventPertainsToRelevantRelationship = false;
-        if (documentMatchesType(docModel, RELATION_DOCTYPE)) {
-            String subjectDocType = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
-            String objectDocType = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
-            if (subjectDocType.startsWith(MOVEMENT_DOCTYPE) && objectDocType.startsWith(COLLECTIONOBJECT_DOCTYPE)) {
-                eventPertainsToRelevantRelationship = true;
-                movementCsid = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
-            } else if (subjectDocType.startsWith(COLLECTIONOBJECT_DOCTYPE) && objectDocType.startsWith(MOVEMENT_DOCTYPE)) {
-                eventPertainsToRelevantRelationship = true;
-                movementCsid = (String) docModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
-            }
-            if (!eventPertainsToRelevantRelationship) {
-                return;
-            }
-        }
-
-        // If we haven't obtained the Movement CSID from a Relation record,
-        // then we can infer this is a Movement record (the only other type
-        // of document handled by this event handler), and obtain the CSID
-        // directly from that record.
-        if (Tools.isBlank(movementCsid)) {
-            movementCsid = NuxeoUtils.getCsid(docModel);
-        }
-        if (Tools.isBlank(movementCsid)) {
-            logger.warn("Could not obtain CSID for Movement record from document event.");
-            logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
-            return;
+        if (logger.isTraceEnabled()) {
+            logger.trace("Movement CSID=" + movementCsid);
         }
 
         // Find CollectionObject records that are related to this Movement record:
@@ -162,8 +149,8 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 + ")"
                 + ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT,
                 RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, movementCsid, COLLECTIONOBJECT_DOCTYPE);
-        DocumentModelList relatedDocModels = coreSession.query(query);
-        if (relatedDocModels == null || relatedDocModels.isEmpty()) {
+        DocumentModelList relationDocModels = coreSession.query(query);
+        if (relationDocModels == null || relationDocModels.isEmpty()) {
             // Encountering a Movement record that is not related to any
             // CollectionObject is potentially a normal occurrence, so no
             // error messages are logged here when we stop handling this event.
@@ -171,16 +158,16 @@ public class UpdateObjectLocationOnMove implements EventListener {
         }
 
         // Iterate through the list of Relation records found and build
-        // a list of CollectionObject CSIDs, by extracting the object CSIDs
+        // a list of CollectionObject CSIDs, by extracting the relevant CSIDs
         // from those Relation records.
 
         // FIXME: The following code might be refactored into a generic 'get
         // values of a single property from a list of document models' method,
         // if this doesn't already exist.
         String csid = "";
-        List<String> collectionObjectCsids = new ArrayList<String>();
-        for (DocumentModel relatedDocModel : relatedDocModels) {
-            csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+        Set<String> collectionObjectCsids = new HashSet<String>(); // Prevents/removes duplicates on add
+        for (DocumentModel relationDocModel : relationDocModels) {
+            csid = getCsidForDesiredDocType(relationDocModel, COLLECTIONOBJECT_DOCTYPE, MOVEMENT_DOCTYPE);
             if (Tools.notBlank(csid)) {
                 collectionObjectCsids.add(csid);
             }
@@ -201,7 +188,13 @@ public class UpdateObjectLocationOnMove implements EventListener {
         Map<DocumentModel, String> docModelsToUpdate = new HashMap<DocumentModel, String>();
         for (String collectionObjectCsid : collectionObjectCsids) {
 
+            if (logger.isTraceEnabled()) {
+                logger.trace("CollectionObject CSID=" + collectionObjectCsids);
+            }
             collectionObjectDocModel = getDocModelFromCsid(coreSession, collectionObjectCsid);
+            if (collectionObjectDocModel == null) {
+                continue;
+            }
             // Verify that the CollectionObject record is active.
             if (!isActiveDocument(collectionObjectDocModel)) {
                 continue;
@@ -222,6 +215,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
             if ((Tools.isBlank(computedCurrentLocationRefName)
                     || (RefNameUtils.parseAuthorityTermInfo(computedCurrentLocationRefName) == null))) {
                 logger.warn("Could not parse computed current location refName '" + computedCurrentLocationRefName + "'");
+                continue;
             } else {
                 if (logger.isTraceEnabled()) {
                     logger.trace("refName passes basic validation tests.");
@@ -230,15 +224,16 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 // If the value returned from the function passes validation,
                 // compare it to the value in the computedCurrentLocation
                 // field of that CollectionObject.
-                //
-                // If the CollectionObject does not already have a
-                // computedCurrentLocation value, or if the two values differ ...
                 String existingComputedCurrentLocationRefName =
                         (String) collectionObjectDocModel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
+                }
+                // If the CollectionObject lacks a computed current location value,
+                // or if the new computed value differs from its existing value ...
                 if (Tools.isBlank(existingComputedCurrentLocationRefName)
-                        || !computedCurrentLocationRefName.equals(existingComputedCurrentLocationRefName)) {
+                        || (!computedCurrentLocationRefName.equals(existingComputedCurrentLocationRefName))) {
                     if (logger.isTraceEnabled()) {
-                        logger.trace("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
                         logger.trace("computedCurrentLocation refName requires updating.");
                     }
                     // ... set aside this CollectionObject's docModel and its new
@@ -248,7 +243,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
                     if (logger.isTraceEnabled()) {
                         logger.trace("computedCurrentLocation refName does NOT require updating.");
                     }
-                }                
+                }
             }
         }
 
@@ -346,8 +341,10 @@ public class UpdateObjectLocationOnMove implements EventListener {
         }
         if (collectionObjectDocModels == null || collectionObjectDocModels.isEmpty()) {
             logger.warn("Could not get document models for CollectionObject(s).");
+            return null;
         } else if (collectionObjectDocModels.size() != 1) {
             logger.debug("Found more than 1 document with CSID=" + collectionObjectCsid);
+            return null;
         }
         return collectionObjectDocModels.get(0);
     }
@@ -395,10 +392,17 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 + ")"
                 + ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT,
                 RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, collectionObjectCsid, MOVEMENT_DOCTYPE);
+        if (logger.isTraceEnabled()) {
+            logger.trace("query=" + query);
+        }
         DocumentModelList relatedDocModels = session.query(query);
         if (relatedDocModels == null || relatedDocModels.isEmpty()) {
+            logger.warn("Unexpectedly found no Movement records related to this CollectionObject record.");
             return computedCurrentLocation;
         } else {
+            if (logger.isTraceEnabled()) {
+                logger.trace("Found " + relatedDocModels.size() + " Movement record(s) related to this CollectionObject record.");
+            }
         }
         // Iterate through related movement records, to get the CollectionObject's
         // computed current location from the related Movement record with the
@@ -417,10 +421,19 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
             }
             movementDocModel = getDocModelFromCsid(session, csid);
+            if (movementDocModel == null) {
+                continue;
+            }
+            if (logger.isTraceEnabled()) {
+                logger.trace("Movement CSID=" + NuxeoUtils.getCsid(movementDocModel));
+            }
             // Verify that the Movement record is active. This will also exclude
             // versioned Movement records from the computation of the current
             // location, for tenants that are versioning such records.
             if (!isActiveDocument(movementDocModel)) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Skipping this inactive Movement record ...");
+                }
                 continue;
             }
             GregorianCalendar locationDate =
@@ -437,5 +450,34 @@ public class UpdateObjectLocationOnMove implements EventListener {
             }
         }
         return computedCurrentLocation;
+    }
+
+    /**
+     * Returns the CSID for a desired document type from a Relation record,
+     * where the relationship involves two specified, different document types.
+     *
+     * @param relationDocModel a document model for a Relation record.
+     * @param desiredDocType a desired document type.
+     * @param relatedDocType a related document type.
+     * @throws ClientException
+     * @return the CSID from the desired document type in the relation. Returns
+     * an empty string if the Relation record does not involve both the desired
+     * and related document types, or if the desired document type is at both
+     * ends of the relation.
+     */
+    private String getCsidForDesiredDocType(DocumentModel relationDocModel,
+            String desiredDocType, String relatedDocType) throws ClientException {
+        String csid = "";
+        String subjectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
+        String objectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
+        if (subjectDocType.startsWith(desiredDocType) && objectDocType.startsWith(desiredDocType)) {
+            return csid;
+        }
+        if (subjectDocType.startsWith(desiredDocType) && objectDocType.startsWith(relatedDocType)) {
+            csid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
+        } else if (subjectDocType.startsWith(relatedDocType) && objectDocType.startsWith(desiredDocType)) {
+            csid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+        }
+        return csid;
     }
 }
