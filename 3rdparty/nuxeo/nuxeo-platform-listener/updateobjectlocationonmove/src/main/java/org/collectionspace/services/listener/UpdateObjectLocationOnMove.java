@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +40,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
     private final String NO_FURTHER_PROCESSING_MESSAGE =
             "This event listener will not continue processing this event ...";
     private final List<String> relevantDocTypesList = new ArrayList<String>();
+    GregorianCalendar EARLIEST_COMPARISON_DATE = new GregorianCalendar(1600, 1, 1);
     private final String DATABASE_RESOURCE_DIRECTORY_NAME = "db";
     // FIXME: Currently hard-coded; get this database name value from JDBC utilities or equivalent
     private final String DATABASE_SYSTEM_NAME = "postgresql";
@@ -57,12 +57,15 @@ public class UpdateObjectLocationOnMove implements EventListener {
     private final String LINE_SEPARATOR = System.getProperty("line.separator");
     private final static String RELATIONS_COMMON_SCHEMA = "relations_common"; // FIXME: Get from external constant
     final String RELATION_DOCTYPE = "Relation"; // FIXME: Get from external constant
+    private final static String SUBJECT_CSID_PROPERTY = "subjectCsid"; // FIXME: Get from external constant
     private final static String OBJECT_CSID_PROPERTY = "objectCsid"; // FIXME: Get from external constant
     private final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
     final String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
     final String COMPUTED_CURRENT_LOCATION_PROPERTY = "computedCurrentLocation"; // FIXME: Create and then get from external constant
     final String MOVEMENTS_COMMON_SCHEMA = "movements_common"; // FIXME: Get from external constant
+    private final static String MOVEMENT_DOCTYPE = "Movement"; // FIXME: Get from external constant
     final String LOCATION_DATE_PROPERTY = "locationDate"; // FIXME: Get from external constant
+    final String CURRENT_LOCATION_PROPERTY = "currentLocation"; // FIXME: Get from external constant
 
     // ####################################################################
     // FIXME: Per Rick, what happens if a relation record is updated,
@@ -182,7 +185,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
         // location date field value is stale in Nuxeo at this point
         GregorianCalendar cal = (GregorianCalendar) docModel.getProperty(MOVEMENTS_COMMON_SCHEMA, LOCATION_DATE_PROPERTY);
         logger.debug("location date=" + GregorianCalendarDateTimeUtils.formatAsISO8601Date(cal));
-        
+
         // Find CollectionObject records that are related to this Movement record:
         //
         // Via an NXQL query, get a list of (non-deleted) relation records where:
@@ -203,7 +206,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
         } else {
             logger.debug("Core sessions are NOT equal.");
         }
-        
+
         // Check whether closing and opening a transaction here might
         // flush any hypothetical caching that Nuxeo is doing at this point
 
@@ -255,9 +258,14 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 continue;
             }
 
-            // Via a JDBC call, invoke the SQL function to obtain the computed
-            // current location of that CollectionObject.
-            computedCurrentLocationRefName = computeCurrentLocation(collectionObjectCsid);
+            // Obtain the computed current location of that CollectionObject.
+            //
+            // JDBC/SQL query method:
+            // computedCurrentLocationRefName = computeCurrentLocation(collectionObjectCsid);
+            //
+            // Nuxeo (NXQL or CMIS) query method, currently with some
+            // non-performant procedural augmentation:
+            computedCurrentLocationRefName = computeCurrentLocation(coreSession, collectionObjectCsid, movementCsid);
             logger.debug("computedCurrentLocation refName=" + computedCurrentLocationRefName);
 
             // Check that the value returned from the SQL function, which
@@ -283,7 +291,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
                         || !computedCurrentLocationRefName.equals(existingComputedCurrentLocationRefName)) {
                     logger.debug("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
                     logger.debug("computedCurrentLocation refName requires updating.");
-                    // ... store this CollectionObject's docModel and new field value for subsequent updating
+                    // ... identify this CollectionObject's docModel and new field value for subsequent updating
                     docModelsToUpdate.put(collectionObjectDocModel, computedCurrentLocationRefName);
                 }
             } else {
@@ -292,29 +300,29 @@ public class UpdateObjectLocationOnMove implements EventListener {
 
         }
 
-        // For each CollectionObject record that has been stored for updating,
+        // For each CollectionObject record that has been identified for updating,
         // update its computedCurrentLocation field with its computed current
         // location value returned from the SQL function.
         for (Map.Entry<DocumentModel, String> entry : docModelsToUpdate.entrySet()) {
             DocumentModel dmodel = entry.getKey();
-            String newValue = entry.getValue();
-            dmodel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY, newValue);
+            String newCurrentLocationValue = entry.getValue();
+            dmodel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY, newCurrentLocationValue);
             coreSession.saveDocument(dmodel);
-            if (logger.isDebugEnabled()) {
+            if (logger.isTraceEnabled()) {
                 String afterUpdateComputedCurrentLocationRefName =
                         (String) dmodel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
-                logger.debug("Following update, new computedCurrentLocation refName value=" + afterUpdateComputedCurrentLocationRefName);
+                logger.trace("Following update, new computedCurrentLocation refName value=" + afterUpdateComputedCurrentLocationRefName);
 
             }
         }
     }
 
     // FIXME: Generic methods like many of those below might be split off,
-// into an event utilities class, base classes, or otherwise. - ADR 2012-12-05
-//
-// FIXME: Identify whether the equivalent of the documentMatchesType utility
-// method is already implemented and substitute a call to the latter if so.
-// This may well already exist.
+    // into an event utilities class, base classes, or otherwise. - ADR 2012-12-05
+    //
+    // FIXME: Identify whether the equivalent of the documentMatchesType utility
+    // method is already implemented and substitute a call to the latter if so.
+    // This may well already exist.
     /**
      * Identifies whether a document matches a supplied document type.
      *
@@ -385,15 +393,19 @@ public class UpdateObjectLocationOnMove implements EventListener {
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
+        boolean storedAutoCommitState = true;
         try {
             conn = JDBCTools.getConnection(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME));
-            stmt = conn.createStatement();
+            stmt = conn.createStatement(ResultSet.CONCUR_UPDATABLE, ResultSet.CLOSE_CURSORS_AT_COMMIT);
+            storedAutoCommitState = conn.getAutoCommit();
+            conn.setAutoCommit(true);
             rs = stmt.executeQuery(sql);
             if (rs.next()) {
                 storedFunctionExists = true;
             }
             rs.close();
             stmt.close();
+            conn.setAutoCommit(storedAutoCommitState);
             conn.close();
         } catch (Exception e) {
             logger.debug("Error when identifying whether stored function " + functionname + "exists :", e);
@@ -406,6 +418,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
                     stmt.close();
                 }
                 if (conn != null) {
+                    conn.setAutoCommit(storedAutoCommitState);
                     conn.close();
                 }
             } catch (SQLException sqle) {
@@ -435,10 +448,30 @@ public class UpdateObjectLocationOnMove implements EventListener {
         ResultSet rs = null;
         try {
             conn = JDBCTools.getConnection(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME));
+            stmt = conn.createStatement(ResultSet.CONCUR_UPDATABLE, ResultSet.CLOSE_CURSORS_AT_COMMIT);
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                computedCurrentLocation = rs.getString(COMPUTED_CURRENT_LOCATION_COLUMN);
+                logger.debug("computedCurrentLocation first=" + computedCurrentLocation);
+            }
+            // Experiment with performing an update before the query
+            // as a possible means of refreshing data.
+            String updateSql = getStringFromResource(SQL_RESOURCE_PATH);
+            int result = -1;
+            try {
+                result = JDBCTools.executeUpdate(JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME), updateSql);
+            } catch (Exception e) {
+            }
+            logger.trace("Result of executeUpdate=" + result);
+            // String randomSql = String.format("SELECT now()");
+            // rs = stmt.executeQuery(randomSql);
+            // rs.close();
+            stmt.close();
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if (rs.next()) {
                 computedCurrentLocation = rs.getString(COMPUTED_CURRENT_LOCATION_COLUMN);
+                logger.debug("computedCurrentLocation second=" + computedCurrentLocation);
             }
             rs.close();
             stmt.close();
@@ -460,6 +493,67 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 logger.debug("SQL Exception closing statement/connection in "
                         + "UpdateObjectLocationOnMove.computeCurrentLocation: "
                         + sqle.getLocalizedMessage());
+            }
+        }
+        return computedCurrentLocation;
+    }
+
+    // FIXME: A quick first pass, using an only partly query-based technique for
+    // getting the current location, augmented by procedural code.
+    //
+    // Should be replaced by a more performant method, based entirely, or nearly so,
+    // on a query.
+    //
+    // E.g. a sample CMIS query for retrieving Movement records related to a CollectionObject;
+    // we can see if the ORDER BY clause can refer to a Movement locationDate field.
+    /*
+     "SELECT DOC.nuxeo:pathSegment, DOC.dc:title, REL.dc:title,"
+     + "REL.relations_common:objectCsid, REL.relations_common:subjectCsid FROM Movement DOC "
+     + "JOIN Relation REL ON REL.relations_common:objectCsid = DOC.nuxeo:pathSegment "
+     + "WHERE REL.relations_common:subjectCsid = '5b4c617e-53a0-484b-804e' "
+     + "AND DOC.nuxeo:isVersion = false "
+     + "ORDER BY DOC.collectionspace_core:updatedAt DESC";
+     */
+    private String computeCurrentLocation(CoreSession session, String collectionObjectCsid,
+            String movementCsid) throws ClientException {
+        String computedCurrentLocation = "";
+        // Get Relation records for Movments related to this CollectionObject
+        String query = String.format(
+                "SELECT * FROM %1$s WHERE " // collectionspace_core:tenantId = 1 "
+                + "(relations_common:subjectCsid = '%2$s' "
+                + "AND relations_common:objectDocumentType = '%3$s') "
+                + "AND (ecm:currentLifeCycleState <> 'deleted') "
+                + "AND ecm:isProxy = 0 "
+                + "AND ecm:isCheckedInVersion = 0 ",
+                RELATION_DOCTYPE, collectionObjectCsid, MOVEMENT_DOCTYPE, movementCsid, COLLECTIONOBJECT_DOCTYPE);
+        logger.debug("query=" + query);
+        DocumentModelList relatedDocModels = session.query(query);
+        if (relatedDocModels == null || relatedDocModels.isEmpty()) {
+            logger.trace("Found " + relatedDocModels.size() + " related documents.");
+            return "";
+        } else {
+            logger.trace("Found " + relatedDocModels.size() + " related documents.");
+        }
+        // Get the CollectionObject's current location from the related Movement
+        // record with the most recent location date.
+        GregorianCalendar mostRecentLocationDate = EARLIEST_COMPARISON_DATE;
+        DocumentModel movementDocModel = null;
+        String csid = "";
+        String location = "";
+        for (DocumentModel relatedDocModel : relatedDocModels) {
+            // The object CSID in the relation is the related Movement record's CSID
+            csid = (String) relatedDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+            movementDocModel = getDocModelFromCsid(session, csid);
+            GregorianCalendar locationDate = (GregorianCalendar) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, LOCATION_DATE_PROPERTY);
+            if (locationDate == null) {
+                continue;
+            }
+            if (locationDate.after(mostRecentLocationDate)) {
+                mostRecentLocationDate = locationDate;
+                location = (String) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_PROPERTY);
+            }
+            if (Tools.notBlank(location)) {
+                computedCurrentLocation = location;
             }
         }
         return computedCurrentLocation;
