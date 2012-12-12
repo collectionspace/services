@@ -47,19 +47,23 @@ public class UpdateObjectLocationOnMove implements EventListener {
             + "AND ecm:isProxy = 0 "
             + "AND ecm:isCheckedInVersion = 0";
 
-    // ####################################################################
-    // FIXME: Per Rick, what happens if a relation record is updated,
-    // that either adds or removes a relation between a Movement
+    // FIXME: Per Rick, what happens if a relation record is created,
+    // updated, deleted, or transitioned to a different workflow state,
+    // that effectively either adds or removes a relation between a Movement
     // record and a CollectionObject record?  Do we need to listen
     // for that event as well and update the CollectionObject record's
     // computedCurrentLocation accordingly?
     //
-    // The following code is currently only handling create and
-    // update events affecting Movement records.
-    // ####################################################################
-    // FIXME: We'll likely also need to handle workflow state transition and
-    // deletion events, where the soft or hard deletion of a Movement or
-    // Relation record effectively changes the current location for a CollectionObject.
+    // The following code is currently only handling events affecting
+    // Movement records.  One possible approach is to add a companion
+    // event handler for Relation records, also registered as an event listener
+    // via configuration in the same document bundle as this event handler.
+    
+    // FIXME: The following code handles the computation of current locations
+    // for CollectionObject records on creation, update, and soft deletion
+    // (workflow transition to 'deleted' state) of related Movement records.
+    // It does not yet been configured or tested to also handle outright
+    // deletion of related Movement records.
     @Override
     public void handleEvent(Event event) throws ClientException {
 
@@ -98,13 +102,20 @@ public class UpdateObjectLocationOnMove implements EventListener {
         if (!involvesRelevantDocType) {
             return;
         }
-        if (!isActiveDocument(docModel)) {
-            return;
+        
+        if (logger.isTraceEnabled()) {
+            logger.trace("An event involving a document of the relevant type(s) was received by UpdateObjectLocationOnMove ...");
         }
+        
+        // Note: currently, all Document lifecycle transitions on
+        // the relevant doctype(s) are handled by this event handler,
+        // not just transitions between 'soft deleted' and active states.
+        // We are assuming that we'll want to re-compute current locations
+        // for related CollectionObjects on any such transitions.
+        //
+        // If we need to filter out some of those lifecycle transitions,
+        // we can add additional checks for doing so at this point.
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("An event involving an active document of the relevant type(s) was received by UpdateObjectLocationOnMove ...");
-        }
 
         // Find CollectionObject records that are related to this Movement record:
         //
@@ -232,7 +243,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
 
             }
         }
-        logger.info("Updated " + collectionObjectsUpdated + " CollectionObject record(s) with a new computed current location.");
+        logger.info("Updated " + collectionObjectsUpdated + " CollectionObject record(s) with new computed current location(s).");
     }
 
     // FIXME: Generic methods like many of those below might be split off,
