@@ -164,6 +164,9 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, movementCsid, COLLECTIONOBJECT_DOCTYPE);
         DocumentModelList relatedDocModels = coreSession.query(query);
         if (relatedDocModels == null || relatedDocModels.isEmpty()) {
+            // Encountering a Movement record that is not related to any
+            // CollectionObject is potentially a normal occurrence, so no
+            // error messages are logged here when we stop handling this event.
             return;
         }
 
@@ -216,8 +219,10 @@ public class UpdateObjectLocationOnMove implements EventListener {
             //   CollectionObject's computed current location meaningfully be 'un-set'?)
             // * Capable of being successfully parsed by an authority item parser;
             //   that is, returning a non-null parse result.
-            if ((Tools.notBlank(computedCurrentLocationRefName)
-                    && (RefNameUtils.parseAuthorityTermInfo(computedCurrentLocationRefName) != null))) {
+            if ((Tools.isBlank(computedCurrentLocationRefName)
+                    || (RefNameUtils.parseAuthorityTermInfo(computedCurrentLocationRefName) == null))) {
+                logger.warn("Could not parse computed current location refName '" + computedCurrentLocationRefName + "'");
+            } else {
                 if (logger.isTraceEnabled()) {
                     logger.trace("refName passes basic validation tests.");
                 }
@@ -239,13 +244,12 @@ public class UpdateObjectLocationOnMove implements EventListener {
                     // ... set aside this CollectionObject's docModel and its new
                     // computed current location value for subsequent updating
                     docModelsToUpdate.put(collectionObjectDocModel, computedCurrentLocationRefName);
-                }
-            } else {
-                if (logger.isTraceEnabled()) {
-                    logger.trace("computedCurrentLocation refName does NOT require updating.");
-                }
+                } else {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("computedCurrentLocation refName does NOT require updating.");
+                    }
+                }                
             }
-
         }
 
         // For each CollectionObject docModel that has been set aside for updating,
