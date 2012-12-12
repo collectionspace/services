@@ -76,11 +76,17 @@ public class UpdateObjectLocationOnMove implements EventListener {
         DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
         DocumentModel docModel = docEventContext.getSourceDocument();
 
-        // If this event does not involve one of our relevant doctypes,
-        // return without further handling the event.
+        // If this event does not involve one of the relevant doctypes
+        // designated as being handled by this event listener, return
+        // without further handling the event.
         //
         // FIXME: We will likely need to add the Relation doctype here,
         // along with additional code to handle such changes. (See comment above.)
+        // As an alternative, we could create a second event handler for
+        // doing so, also registered as an event listener via configuration
+        // in the same document bundle as this event handler. If so, the
+        // code below could be simplified to be a single check, rather than
+        // iterating through a list.
         boolean involvesRelevantDocType = false;
         relevantDocTypesList.add(MovementConstants.NUXEO_DOCTYPE);
         for (String docType : relevantDocTypesList) {
@@ -96,13 +102,13 @@ public class UpdateObjectLocationOnMove implements EventListener {
             return;
         }
 
-        if (logger.isTraceEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("An event involving an active document of the relevant type(s) was received by UpdateObjectLocationOnMove ...");
         }
 
         // Find CollectionObject records that are related to this Movement record:
         //
-        // Via an NXQL query, get a list of (non-deleted) relation records where:
+        // Via an NXQL query, get a list of active relation records where:
         // * This movement record's CSID is the subject CSID of the relation,
         //   and its object document type is a CollectionObject doctype;
         // or
@@ -132,8 +138,9 @@ public class UpdateObjectLocationOnMove implements EventListener {
         // a list of CollectionObject CSIDs, by extracting the object CSIDs
         // from those Relation records.
 
-        // FIXME: The following code might be refactored into a generic 'get property
-        // values from a list of document models' method, if this doesn't already exist.
+        // FIXME: The following code might be refactored into a generic 'get
+        // values of a single property from a list of document models' method,
+        // if this doesn't already exist.
         String csid = "";
         List<String> collectionObjectCsids = new ArrayList<String>();
         for (DocumentModel relatedDocModel : relatedDocModels) {
@@ -158,12 +165,11 @@ public class UpdateObjectLocationOnMove implements EventListener {
         Map<DocumentModel, String> docModelsToUpdate = new HashMap<DocumentModel, String>();
         for (String collectionObjectCsid : collectionObjectCsids) {
 
-            // Verify that the CollectionObject record is active.
             collectionObjectDocModel = getDocModelFromCsid(coreSession, collectionObjectCsid);
+            // Verify that the CollectionObject record is active.
             if (!isActiveDocument(collectionObjectDocModel)) {
                 continue;
             }
-
             // Obtain the computed current location of that CollectionObject.
             computedCurrentLocationRefName = computeCurrentLocation(coreSession, collectionObjectCsid);
             if (logger.isTraceEnabled()) {
@@ -184,8 +190,8 @@ public class UpdateObjectLocationOnMove implements EventListener {
                 }
 
                 // If the value returned from the function passes validation,
-                // compare that value to the value in the computedCurrentLocation
-                // field of that CollectionObject
+                // compare it to the value in the computedCurrentLocation
+                // field of that CollectionObject.
                 //
                 // If the CollectionObject does not already have a
                 // computedCurrentLocation value, or if the two values differ ...
@@ -210,13 +216,15 @@ public class UpdateObjectLocationOnMove implements EventListener {
         }
 
         // For each CollectionObject docModel that has been set aside for updating,
-        // update its computedCurrentLocation field with its computed current
-        // location value returned from the SQL function.
+        // update the value of its computedCurrentLocation field with its new,
+        // computed current location.
+        int collectionObjectsUpdated = 0;
         for (Map.Entry<DocumentModel, String> entry : docModelsToUpdate.entrySet()) {
             DocumentModel dmodel = entry.getKey();
             String newCurrentLocationValue = entry.getValue();
             dmodel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY, newCurrentLocationValue);
             coreSession.saveDocument(dmodel);
+            collectionObjectsUpdated++;
             if (logger.isTraceEnabled()) {
                 String afterUpdateComputedCurrentLocationRefName =
                         (String) dmodel.getProperty(COLLECTIONOBJECTS_COMMON_SCHEMA, COMPUTED_CURRENT_LOCATION_PROPERTY);
@@ -224,6 +232,7 @@ public class UpdateObjectLocationOnMove implements EventListener {
 
             }
         }
+        logger.info("Updated " + collectionObjectsUpdated + " CollectionObject record(s) with a new computed current location.");
     }
 
     // FIXME: Generic methods like many of those below might be split off,
