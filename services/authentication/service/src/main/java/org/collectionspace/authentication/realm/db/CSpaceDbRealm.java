@@ -88,7 +88,8 @@ public class CSpaceDbRealm implements CSpaceRealm {
     private String datasourceName;
     private String principalsQuery;
     private String rolesQuery;
-    private String tenantsQuery;
+    private String tenantsQueryNoDisabled;
+    private String tenantsQueryWithDisabled;
     private boolean suspendResume;
 
     /**
@@ -108,9 +109,13 @@ public class CSpaceDbRealm implements CSpaceRealm {
         if (tmp != null) {
             rolesQuery = tmp.toString();
         }
-        tmp = options.get("tenantsQuery");
+        tmp = options.get("tenantsQueryNoDisabled");
         if (tmp != null) {
-            tenantsQuery = tmp.toString();
+            tenantsQueryNoDisabled = tmp.toString();
+        }
+        tmp = options.get("tenantsQueryWithDisabled");
+        if (tmp != null) {
+        	tenantsQueryWithDisabled = tmp.toString();
         }
         tmp = options.get("suspendResume");
         if (tmp != null) {
@@ -288,15 +293,61 @@ public class CSpaceDbRealm implements CSpaceRealm {
         return groupsMap.values();
 
     }
-
+    @Override
+    public Collection<Group> getTenants(String username, String groupClassName) throws LoginException {
+    	return getTenants(username, groupClassName, false);
+    }
+    
+    private boolean userIsTenantManager(Connection conn, String username) {
+    	String acctQuery = "SELECT csid FROM accounts_common WHERE userid=?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean accountIsTenantManager = false;
+        try {
+            ps = conn.prepareStatement(acctQuery);
+            ps.setString(1, username);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                String acctCSID = rs.getString(1);
+                if(AuthN.TENANT_MANAGER_ACCT_ID.equals(acctCSID)) {
+                	accountIsTenantManager = true;
+                }
+            }
+        } catch (SQLException ex) {
+            if(logger.isDebugEnabled()) {
+            	logger.debug("userIsTenantManager query failed on SQL error: " + ex.getLocalizedMessage());
+            }
+        } catch (Exception e) {
+            if(logger.isDebugEnabled()) {
+            	logger.debug("userIsTenantManager unknown error: " + e.getLocalizedMessage());
+            }
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+        return accountIsTenantManager;
+    }
+    
     /**
      * Execute the tenantsQuery against the datasourceName to obtain the tenants for
      * the authenticated user.
      * @return collection containing the roles
      */
     @Override
-    public Collection<Group> getTenants(String username, String groupClassName) throws LoginException {
+    public Collection<Group> getTenants(String username, String groupClassName, boolean includeDisabledTenants) throws LoginException {
 
+    	String tenantsQuery = getTenantQuery(includeDisabledTenants);
+    	
         if (logger.isDebugEnabled()) {
             logger.debug("getTenants using tenantsQuery: " + tenantsQuery + ", username: " + username);
         }
@@ -305,13 +356,10 @@ public class CSpaceDbRealm implements CSpaceRealm {
         HashMap<String, Group> groupsMap = new HashMap<String, Group>();
         PreparedStatement ps = null;
         ResultSet rs = null;
+    	final String defaultGroupName = "Tenants";
 
         try {
             conn = getConnection();
-            // Get the user role names
-            if (logger.isDebugEnabled()) {
-                logger.debug("Executing query: " + tenantsQuery + ", with username: " + username);
-            }
 
             ps = conn.prepareStatement(tenantsQuery);
             try {
@@ -321,15 +369,34 @@ public class CSpaceDbRealm implements CSpaceRealm {
             }
             rs = ps.executeQuery();
             if (rs.next() == false) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("No tenants found");
-                }
-                // We are running with an unauthenticatedIdentity so create an
-                // empty Tenants set and return.
-                // FIXME  should this be allowed?
-                Group g = createGroup(groupClassName, "Tenants");
-                groupsMap.put(g.getName(), g);
-                return groupsMap.values();
+        		Group group = (Group) groupsMap.get(defaultGroupName);
+        		if (group == null) {
+        			group = createGroup(groupClassName, defaultGroupName);
+        			groupsMap.put(defaultGroupName, group);
+        		}
+            	// Check for the tenantManager
+            	if(userIsTenantManager(conn, username)) {
+            		if (logger.isDebugEnabled()) {
+            			logger.debug("GetTenants called with tenantManager - synthesizing the pseudo-tenant");
+            		}
+            		try {
+            			Principal p = createTenant("PseudoTenant", AuthN.TENANT_MANAGER_ACCT_ID);
+            			if (logger.isDebugEnabled()) {
+            				logger.debug("Assign tenantManager to tenant " + AuthN.TENANT_MANAGER_ACCT_ID);
+            			}
+            			group.addMember(p);
+            		} catch (Exception e) {
+            			logger.error("Failed to create pseudo-tenant: " + e.toString());
+            		}
+            	} else {
+            		if (logger.isDebugEnabled()) {
+            			logger.debug("No tenants found");
+            		}
+            		// We are running with an unauthenticatedIdentity so return an
+            		// empty Tenants set.
+            		// FIXME  should this be allowed?
+            	}
+        		return groupsMap.values();
             }
 
             do {
@@ -337,7 +404,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
                 String tenantName = rs.getString(2);
                 String groupName = rs.getString(3);
                 if (groupName == null || groupName.length() == 0) {
-                    groupName = "Tenants";
+                    groupName = defaultGroupName;
                 }
 
                 Group group = (Group) groupsMap.get(groupName);
@@ -510,14 +577,14 @@ public class CSpaceDbRealm implements CSpaceRealm {
     /**
      * @return the tenantQuery
      */
-    public String getTenantQuery() {
-        return tenantsQuery;
+    public String getTenantQuery(boolean includeDisabledTenants) {
+        return includeDisabledTenants?tenantsQueryWithDisabled:tenantsQueryNoDisabled;
     }
 
     /**
      * @param tenantQuery the tenantQuery to set
-     */
     public void setTenantQuery(String tenantQuery) {
-        this.tenantsQuery = tenantQuery;
+        this.tenantsQueryNoDisabled = tenantQuery;
     }
+     */
 }

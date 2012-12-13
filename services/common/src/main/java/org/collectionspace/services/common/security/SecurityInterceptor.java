@@ -180,7 +180,18 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	 */
 	private void checkActive() throws WebApplicationException {
 		String userId = AuthN.get().getUserId();
-		String tenantId = AuthN.get().getCurrentTenantId(); //FIXME: REM - This variable 'tenantId' is never used.  Why?
+		try {
+			// Need to ensure that user is associated to a tenant
+			String tenantId = AuthN.get().getCurrentTenantId();
+		} catch (IllegalStateException ise) {
+			String msg = "User's account is not associated to any active tenants, userId=" + userId;
+			// Note the RFC on return types:
+			// If the request already included Authorization credentials, then the 401 response 
+			// indicates that authorization has been refused for those credentials.
+			Response response = Response.status(
+					Response.Status.UNAUTHORIZED).entity(msg).type("text/plain").build();
+			throw new WebApplicationException(ise, response);
+		}
 		try {
 			//can't use JAXB here as this runs from the common jar which cannot
 			//depend upon the account service
