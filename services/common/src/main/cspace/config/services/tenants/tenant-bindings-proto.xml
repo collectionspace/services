@@ -51,6 +51,15 @@
         <!-- begin idgenerator service meta-data -->
         <tenant:serviceBindings id="idgenerators" name="idgenerators" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.ModifyFieldDatatypes</service:classname>
+                <service:params>
+                    <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>create_id_generators_table.sql</service:value>
+                    </service:property>
+                </service:params>
+            </service:initHandler>
         </tenant:serviceBindings>
         <!-- end idgenerator service meta-data -->
         
