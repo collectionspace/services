@@ -52,7 +52,7 @@
         <tenant:serviceBindings id="idgenerators" name="idgenerators" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.common.init.ModifyFieldDatatypes</service:classname>
+                <service:classname>org.collectionspace.services.common.init.RunSqlScript</service:classname>
                 <service:params>
                     <service:property>
                         <service:key>sqlScriptName</service:key>

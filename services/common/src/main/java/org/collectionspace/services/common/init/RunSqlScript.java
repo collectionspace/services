@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.List;
 import javax.sql.DataSource;
 import org.collectionspace.services.common.api.Tools;
@@ -34,8 +35,10 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
 
     private final Logger logger = LoggerFactory.getLogger(RunSqlScript.class);
     private final static String SQL_SCRIPT_NAME_PROPERTY = "sqlScriptName";
-    private final String DATABASE_RESOURCE_DIRECTORY_NAME = "db";
-    private final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private final static String DATABASE_RESOURCE_DIRECTORY_NAME = "db";
+    private final static String LINE_SEPARATOR = System.getProperty("line.separator");
+    private final static String CANNOT_PERFORM_TASKS_MESSAGE =
+            "Will not be able to perform tasks within the RunSqlScript init handler.";
 
     /**
      * See the class javadoc for this class: it shows the syntax supported in
@@ -47,46 +50,62 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
             List<Field> fields,
             List<Property> properties) throws Exception {
 
+        /*
+         if (logger.isInfoEnabled() && sbt != null) {
+         logger.info("Running SQL script in " + sbt.getName()
+         + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
+         }
+         */
+
         if (properties == null || properties.isEmpty()) {
-            logger.debug("No properties were provided to this init handler.");
+            logger.warn("No properties were provided to the RunSqlScript init handler.");
+            logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
             return;
         }
-        String scriptResourceName = getSqlScriptName(properties);
-        logger.debug("SQL script resource name=" + scriptResourceName);
-        String scriptPath = getSqlScriptPath(scriptResourceName);
+
+        String scriptName = getSqlScriptName(properties);
+        if (Tools.isBlank(scriptName)) {
+            logger.warn("Could not get SQL script name.");
+            logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
+            return;
+        }
+
+        String scriptPath = getSqlScriptPath(scriptName);
         if (Tools.isBlank(scriptPath)) {
             logger.warn("Could not get path to SQL script.");
+            logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
             return;
         }
-        String scriptContents = getSqlScriptContents(scriptPath);
+
+        String scriptContents = getSqlScriptContents(scriptPath + scriptName);
         if (Tools.isBlank(scriptContents)) {
             logger.warn("Could not get contents of SQL script.");
+            logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
             return;
         }
+
         runScript(dataSource, scriptContents);
     }
 
     private String getSqlScriptName(List<Property> properties) {
-        String scriptResourceName = "";
+        String scriptName = "";
         for (Property property : properties) {
             if (property.getKey().equals(SQL_SCRIPT_NAME_PROPERTY)) {
-                scriptResourceName = property.getValue();
-                if (Tools.notBlank(scriptResourceName)) {
+                scriptName = property.getValue();
+                if (Tools.notBlank(scriptName)) {
                     break;
                 }
             }
         }
-        return scriptResourceName;
+        return scriptName;
     }
 
     private String getSqlScriptPath(String scriptResourceName) throws Exception {
-        String scriptPath = "";
-        String sqlResourcePath =
+        String scriptPath =
                 DATABASE_RESOURCE_DIRECTORY_NAME
                 + "/"
                 + JDBCTools.getDatabaseProductType()
                 + "/";
-        logger.debug("SQL script resource path=" + sqlResourcePath);
         return scriptPath;
     }
 
@@ -105,10 +124,17 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
      */
     private String getStringFromResource(String resourcePath) {
         String str = "";
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream instream = classLoader.getResourceAsStream(resourcePath);
+        ClassLoader classloader = getClass().getClassLoader();
+        if (classloader == null) {
+            return str;
+        }
+        URL resourceurl = classloader.getResource(resourcePath);
+        if (logger.isTraceEnabled()) {
+            logger.trace("URL=" + resourceurl.toString());
+        }
+        InputStream instream = classloader.getResourceAsStream(resourcePath);
         if (instream == null) {
-            logger.warn("Could not read from resource from path " + resourcePath);
+            logger.warn("Could not read resource from path " + resourcePath);
             return null;
         }
         try {
@@ -128,14 +154,15 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
      * @throws an IOException if an error occurs when reading the input stream.
      */
     private String stringFromInputStream(InputStream instream) throws IOException {
+        StringBuilder sb = new StringBuilder("");
         if (instream == null) {
+            logger.warn("Input stream is null.");
+            return sb.toString();
         }
         BufferedReader bufreader = new BufferedReader(new InputStreamReader(instream));
-        StringBuilder sb = new StringBuilder();
         String line = "";
-        while (line != null) {
+        while ((line = bufreader.readLine()) != null) {
             sb.append(line);
-            line = bufreader.readLine();
             sb.append(LINE_SEPARATOR);
         }
         return sb.toString();
@@ -150,9 +177,13 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
             rows = -1;
         }
         // FIXME: Verify which row values represent failure; should there always
-        // be one and only one row returned from executeUpdate?
+        // be one and only one row returned in a successful response from executeUpdate?
         if (rows < 0) {
-           logger.warn("Running SQL script failed to return expected results.");
+            logger.warn("Running SQL script failed to return expected results.");
+        } else {
+            if (logger.isInfoEnabled()) {
+                logger.info("Successfully ran SQL script.");
+            }
         }
     }
 }
