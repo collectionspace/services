@@ -120,8 +120,14 @@ public class DocumentFilter {
      * @param ctx the ctx
      */
     public DocumentFilter(ServiceContext ctx) {
-        this.setPageSize(ctx.getServiceBindingPropertyValue(
-                DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+    	// Ignore errors - some contexts do not have proper service binding info
+    	try {
+    		String pageSizeString = ctx.getServiceBindingPropertyValue(
+                    DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY); 
+    		this.setPageSize(pageSizeString);
+    	} catch(Exception e) {
+    		this.setPageSize(defaultPageSize);
+    	} 
     }
 
     /**

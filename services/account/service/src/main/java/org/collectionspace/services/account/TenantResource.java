@@ -25,14 +25,20 @@
 
 package org.collectionspace.services.account;
 
+import org.collectionspace.services.account.storage.TenantDocumentHandler;
 import org.collectionspace.services.account.storage.TenantStorageClient;
+import org.collectionspace.services.account.storage.TenantValidatorHandler;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.TenantClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.common.SecurityResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -139,4 +145,32 @@ public class TenantResource extends SecurityResourceBase {
         }
 
     }
+
+    /**
+     * Creates the document handler - special because this is not tied to a tenant or service binding
+     * As such, also sets up the validator handler.
+     * 
+     * @param ctx the ctx
+     * @param commonPart the common part
+     * 
+     * @return the document handler
+     * 
+     * @throws Exception the exception
+     */
+    @Override
+    public DocumentHandler createDocumentHandler(ServiceContext ctx, Object commonPart) throws Exception {
+        //DocumentHandler docHandler = ctx.getDocumentHandler();
+    	DocumentHandler docHandler = new TenantDocumentHandler();
+    	ctx.setDocumentHandler(docHandler);
+        docHandler.setServiceContext(ctx);
+        // Create a default document filter
+        DocumentFilter docFilter = docHandler.createDocumentFilter();
+        docHandler.setDocumentFilter(docFilter);
+        docHandler.setCommonPart(commonPart);
+        // We also need to set up the validator
+        TenantValidatorHandler validator = new TenantValidatorHandler();
+        ctx.addValidatorHandler(validator);
+        return docHandler;
+    }    
+
 }

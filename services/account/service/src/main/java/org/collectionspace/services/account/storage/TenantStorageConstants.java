@@ -58,7 +58,10 @@ public class TenantStorageConstants {
 
     final public static String Q_NAME = "name";
     final public static String Q_INCLUDE_DISABLED= "inclDis";
+    final public static String Q_ORDER_BY= "o";
+    final public static String Q_ORDER_DIR= "d";
 
+    final public static String ID_FIELD = "id";
     final public static String NAME_FIELD = "name";
     final public static String DISABLED_FIELD = "disabled";
 }

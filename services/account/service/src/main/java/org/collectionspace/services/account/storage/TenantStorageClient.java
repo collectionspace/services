@@ -63,10 +63,12 @@ public class TenantStorageClient extends JpaStorageClientImpl {
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
 
+    	/*
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "TenantStorageClient.create : ctx is missing");
         }
+        */
         if (handler == null) {
             throw new IllegalArgumentException(
                     "TenantStorageClient.create: handler is missing");
@@ -124,10 +126,12 @@ public class TenantStorageClient extends JpaStorageClientImpl {
         @Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
+        /*
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "get: ctx is missing");
-        }
+        } 
+        */
         if (handler == null) {
             throw new IllegalArgumentException(
                     "get: handler is missing");
@@ -175,10 +179,12 @@ public class TenantStorageClient extends JpaStorageClientImpl {
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
+        /*
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "TenantStorageClient.update : ctx is missing");
         }
+         */
         if (handler == null) {
             throw new IllegalArgumentException(
                     "TenantStorageClient.update: handler is missing");
@@ -228,10 +234,12 @@ public class TenantStorageClient extends JpaStorageClientImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("deleting entity with id=" + id);
         }
+        /*
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "TenantStorageClient.delete : ctx is missing");
         }
+        */
         EntityManagerFactory emf = null;
         EntityManager em = null;
         try {

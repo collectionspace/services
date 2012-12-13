@@ -61,7 +61,32 @@ public class TenantDocumentHandler
 
     @Override
     public void handleUpdate(DocumentWrapper<Tenant> wrapDoc) throws Exception {
+        Tenant tenantFound = wrapDoc.getWrappedObject();
+        Tenant tenantReceived = getCommonPart();
+        // If marked as metadata immutable, do not do update
+       	merge(tenantReceived, tenantFound);
     }
+    
+    /**
+     * merge manually merges the from account to the to account
+     * -this method is created due to inefficiency of JPA EM merge
+     * @param from
+     * @param to
+     * @return merged account
+     */
+    private Tenant merge(Tenant from, Tenant to) {
+        Date now = new Date();
+        to.setUpdatedAtItem(now);
+        // The only thing we allow changing at this point is the disabled flag
+        to.setDisabled(from.isDisabled());
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("merged account="
+                    + JaxbUtils.toString(to, Tenant.class));
+        }
+        return to;
+    }
+
 
     @Override
     public void completeUpdate(DocumentWrapper<Tenant> wrapDoc) throws Exception {

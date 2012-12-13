@@ -48,34 +48,68 @@ public class TenantJpaFilter extends JpaDocumentFilter {
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
 
         List<ParamBinding> paramList = new ArrayList<ParamBinding>();
-        String name = null;
-        List<String> nvals = getQueryParam(TenantStorageConstants.Q_NAME);
-        if (null != nvals && nvals.size() > 0) {
-            name = nvals.get(0);
-        }
-        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
-        if (null != name && !name.isEmpty()) {
-            queryStrBldr.append(" WHERE UPPER(a.");
-            queryStrBldr.append(TenantStorageConstants.NAME_FIELD);
-            queryStrBldr.append(") LIKE :");
-            queryStrBldr.append(" :" + TenantStorageConstants.Q_NAME);
-            paramList.add(new ParamBinding(
-            		TenantStorageConstants.Q_NAME, "%" + name.toUpperCase() + "%"));
+        List<String> paramVals = null;
+    	boolean whereAdded = false;
+        {
+        	// Look for a name filter
+        	String name = null;
+        	paramVals = getQueryParam(TenantStorageConstants.Q_NAME);
+        	if (null != paramVals && paramVals.size() > 0) {
+        		name = paramVals.get(0);
+        	}
+        	//boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+        	if (null != name && !name.isEmpty()) {
+        		queryStrBldr.append(" WHERE UPPER(a.");
+        		queryStrBldr.append(TenantStorageConstants.NAME_FIELD);
+        		queryStrBldr.append(") LIKE :");
+        		queryStrBldr.append(TenantStorageConstants.Q_NAME);
+        		paramList.add(new ParamBinding(
+        				TenantStorageConstants.Q_NAME, "%" + name.toUpperCase() + "%"));
+        		whereAdded = true;
+        	}
         }
 
-        String includeDisabledStr = null;
-        List<String> inclDisVals = getQueryParam(TenantStorageConstants.Q_INCLUDE_DISABLED);
-        if (null != inclDisVals && inclDisVals.size() > 0) {
-            includeDisabledStr = inclDisVals.get(0);
+        {
+        	// Look for a disabled sense filter
+        	String includeDisabledStr = null;
+        	paramVals = getQueryParam(TenantStorageConstants.Q_INCLUDE_DISABLED);
+        	if (null != paramVals && paramVals.size() > 0) {
+        		includeDisabledStr = paramVals.get(0);
+        	}
+        	// Default is to exclude disabled tenants, unless they specify to include them
+        	boolean includeDisabled = (null != includeDisabledStr && !includeDisabledStr.isEmpty() 
+        			&& Boolean.parseBoolean(includeDisabledStr));
+        	// If excluding, then add a clause
+        	if(!includeDisabled) {
+        		queryStrBldr.append(whereAdded?" AND ":" WHERE ");
+        		queryStrBldr.append("a.");
+        		queryStrBldr.append(TenantStorageConstants.DISABLED_FIELD);
+        		queryStrBldr.append("=false");
+        	}
         }
-        // Default is to exclude disabled tenants, unless they specify to include them
-    	boolean includeDisabled = (null != includeDisabledStr && !includeDisabledStr.isEmpty() 
-    			&& Boolean.parseBoolean(includeDisabledStr));
-    	// If excluding, then add a clause
-       	if(!includeDisabled) {
-        	queryStrBldr.append(" WHERE NOT a.");
-            queryStrBldr.append(TenantStorageConstants.DISABLED_FIELD);
+       	// Consider order by param. Just pick first for now.
+        {
+        	String orderBy = null;
+        	paramVals = getQueryParam(TenantStorageConstants.Q_ORDER_BY);
+        	if (null != paramVals && paramVals.size() > 0) {
+        		orderBy = paramVals.get(0);
+        	}
+        	orderBy = checkOrderByField(orderBy);
+        	queryStrBldr.append(" ORDER BY a.");
+        	queryStrBldr.append(orderBy);
         }
+
+       	// Consider order direction param. Just pick first for now.
+        {
+        	String orderDir = null;
+        	paramVals = getQueryParam(TenantStorageConstants.Q_ORDER_DIR);
+        	if (null != paramVals && paramVals.size() > 0) {
+        		orderDir = paramVals.get(0);
+        	}
+        	orderDir = checkOrderDirValue(orderDir);
+        	queryStrBldr.append(orderDir);
+       	}
+
 
         if (logger.isDebugEnabled()) {
             String query = queryStrBldr.toString();
@@ -83,6 +117,34 @@ public class TenantJpaFilter extends JpaDocumentFilter {
         }
 
         return paramList;
+    }
+    
+    private String checkOrderByField(String input) {
+    	String returnVal = TenantStorageConstants.NAME_FIELD;	// This is the default
+        if (null != input && !input.isEmpty()) {
+        	if(TenantStorageConstants.ID_FIELD.equalsIgnoreCase(input)) {
+        		returnVal = TenantStorageConstants.ID_FIELD;
+        	/* Effect of default is same, so skip this
+        	} else if(TenantStorageConstants.NAME_FIELD.equalsIgnoreCase(input)) {
+        		returnVal = TenantStorageConstants.NAME_FIELD;
+        	*/
+        	}
+        }
+    	return returnVal;
+    }
+
+    private String checkOrderDirValue(String input) {
+    	String returnVal = JPA_ASC;	// This is the default
+        if (null != input && !input.isEmpty()) {
+        	if(Q_DESC.equalsIgnoreCase(input)) {
+        		returnVal = JPA_DESC;
+        	/* Effect of default is same, so skip this
+        	} else if(Q_ASC.equalsIgnoreCase(input)) {
+        		returnVal = JPA_ASC;
+        	*/
+        	}
+        }
+    	return returnVal;
     }
 
     @Override

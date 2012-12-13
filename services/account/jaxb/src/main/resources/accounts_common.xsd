@@ -282,65 +282,67 @@
     </xs:complexType>
 
     <!-- FIXME tenant definition could be in a separate schema -->
-    <xs:complexType name="tenant">
-        <xs:annotation>
-            <xs:documentation>
-                Tenant defines the tenant in CollectionSpace
-            </xs:documentation>
-            <xs:appinfo>
-                <hj:entity>
-                    <orm:table name="tenants"/>
-                </hj:entity>
-            </xs:appinfo>
-        </xs:annotation>
-        <xs:sequence>
-            <xs:element name="id" type="xs:string" minOccurs="1">
-                <xs:annotation>
-                    <xs:appinfo>
-                        <hj:id>
-                            <orm:column name="id" length="128" nullable="false"/>
-                        </hj:id>
-                    </xs:appinfo>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="name" type="xs:string" minOccurs="1">
-                <xs:annotation>
-                    <xs:appinfo>
-                        <hj:basic>
-                            <orm:column name="name" nullable="false"/>
-                        </hj:basic>
-                    </xs:appinfo>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="disabled" type="xs:boolean">
-                <xs:annotation>
-                    <xs:appinfo>
-                        <hj:basic>
-                            <orm:column name="disabled" nullable="false"/>
-                        </hj:basic>
-                    </xs:appinfo>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="createdAt" type="xs:dateTime">
-                <xs:annotation>
-                    <xs:appinfo>
-                        <hj:basic>
-                            <orm:column name="created_at" nullable="false"/>
-                        </hj:basic>
-                    </xs:appinfo>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="updatedAt" type="xs:dateTime">
-                <xs:annotation>
-                    <xs:appinfo>
-                        <hj:basic>
-                            <orm:column name="updated_at" />
-                        </hj:basic>
-                    </xs:appinfo>
-                </xs:annotation>
-            </xs:element>
-        </xs:sequence>
-    </xs:complexType>
+	<xs:element name="tenant">
+		<xs:complexType>
+			<xs:annotation>
+				<xs:documentation>
+					Tenant defines the tenant in CollectionSpace
+				</xs:documentation>
+				<xs:appinfo>
+					<hj:entity>
+						<orm:table name="tenants" />
+					</hj:entity>
+				</xs:appinfo>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:element name="id" type="xs:string" minOccurs="1">
+					<xs:annotation>
+						<xs:appinfo>
+							<hj:id>
+								<orm:column name="id" length="128" nullable="false" />
+							</hj:id>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="name" type="xs:string" minOccurs="1">
+					<xs:annotation>
+						<xs:appinfo>
+							<hj:basic>
+								<orm:column name="name" nullable="false" />
+							</hj:basic>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="disabled" type="xs:boolean">
+					<xs:annotation>
+						<xs:appinfo>
+							<hj:basic>
+								<orm:column name="disabled" nullable="false" />
+							</hj:basic>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="createdAt" type="xs:dateTime">
+					<xs:annotation>
+						<xs:appinfo>
+							<hj:basic>
+								<orm:column name="created_at" nullable="false" />
+							</hj:basic>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="updatedAt" type="xs:dateTime">
+					<xs:annotation>
+						<xs:appinfo>
+							<hj:basic>
+								<orm:column name="updated_at" />
+							</hj:basic>
+						</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
     <xs:element name="tenants-list">
         <xs:complexType>
