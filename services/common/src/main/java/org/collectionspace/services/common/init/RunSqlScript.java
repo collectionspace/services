@@ -129,8 +129,8 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
         if (classloader == null) {
             return str;
         }
-        URL resourceurl = classloader.getResource(resourcePath);
         if (logger.isTraceEnabled()) {
+            URL resourceurl = classloader.getResource(resourcePath);
             logger.trace("URL=" + resourceurl.toString());
         }
         InputStream instream = classloader.getResourceAsStream(resourcePath);
