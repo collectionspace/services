@@ -71,13 +71,25 @@
                     /idgenerators/*/ids
                 </service:uriPath>
             -->
+            <!-- The following initHandler config block is placed here, rather than in the -->
+            <!-- idgenerators service, above, as it appears that we currently can only run -->
+            <!-- one initHandler per service - ADR 2012-12-13 -->
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.RunSqlScript</service:classname>
+                <service:params>
+                    <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>load_id_generators.sql</service:value>
+                    </service:property>
+                </service:params>
+            </service:initHandler>
         </tenant:serviceBindings>    
         <!-- end id service meta-data -->
         
         <!-- begin servicegroup service meta-data -->
         <!-- Servicegroup is a task service that has no representation in the repo, 
-                 but provides tools like keyword search across many types of services. 
-          -->
+               but provides tools like keyword search across many types of services. 
+        -->
         <tenant:serviceBindings id="servicegroups" name="servicegroups" type="utility" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler</service:documentHandler>
@@ -96,11 +108,11 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
-                	<service:SupportsHierarchy>true</service:SupportsHierarchy>
-                	<service:RefnameDisplayNameField> <!-- The field used as the display name in an object's refname -->
-	                    <service:element>objectNumber</service:element>
-	                    <service:xpath>objectNumber</service:xpath>
-                	</service:RefnameDisplayNameField>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>
+                    <service:RefnameDisplayNameField> <!-- The field used as the display name in an object's refname -->
+                        <service:element>objectNumber</service:element>
+                        <service:xpath>objectNumber</service:xpath>
+                    </service:RefnameDisplayNameField>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>objectNumber</service:element>
@@ -978,9 +990,9 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end loanout service meta-data -->
+        <!-- end loanout service meta-data -->
     
-    <!-- begin objectexit service meta-data -->
+        <!-- begin objectexit service meta-data -->
         <tenant:serviceBindings id="ObjectExit" name="ObjectExit" type="procedure" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:documentHandler>
@@ -1372,7 +1384,7 @@
                             <types:key>authRef</types:key>
                             <types:value>movementContact</types:value>
                         </types:item>
-                         <!-- Inventory Control Information group -->
+                        <!-- Inventory Control Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>inventoryContactList|inventoryContact</types:value>
@@ -1559,13 +1571,13 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
-                	<service:SupportsHierarchy>true</service:SupportsHierarchy>
-                	<service:RefnameDisplayNameField>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>
+                    <service:RefnameDisplayNameField>
                         <service:ListResultField>
                             <service:element>order</service:element>
                             <service:xpath>order</service:xpath>
                         </service:ListResultField>
-                	</service:RefnameDisplayNameField>
+                    </service:RefnameDisplayNameField>
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <service:ListResultField>
@@ -1761,7 +1773,7 @@
                             <types:key>authRef</types:key>
                             <types:value>groups|group</types:value>
                         </types:item> -->
-                      <!-- Uncomment when Concept authority/Function (line of business) vocabulary is implemented in Services -->
+                        <!-- Uncomment when Concept authority/Function (line of business) vocabulary is implemented in Services -->
                         <!--                       
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -1874,7 +1886,7 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
-                	<service:SupportsHierarchy>true</service:SupportsHierarchy>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <service:ListResultField>
@@ -1994,9 +2006,9 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end person service meta-data -->
+        <!-- end person service meta-data -->
         
-    <!-- begin locationauthority service meta-data -->
+        <!-- begin locationauthority service meta-data -->
         <tenant:serviceBindings id="Locationauthorities" name="Locationauthorities" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <!--
@@ -2392,7 +2404,7 @@
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <!-- Uncomment when bug in returning list result values from complex types,
-                             currently in the CSPACE-4813 branch (P/NP term work in services), is fixed -->
+                        currently in the CSPACE-4813 branch (P/NP term work in services), is fixed -->
                         <!--
                         <service:ListResultField>
                             <service:element>taxonFullName</service:element>
@@ -2760,9 +2772,9 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end acquisition service meta-data -->
+        <!-- end acquisition service meta-data -->
     
-    <!-- begin relation service meta-data -->
+        <!-- begin relation service meta-data -->
         <tenant:serviceBindings id="Relations" name="Relations" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
@@ -3034,7 +3046,7 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end note service meta-data -->
+        <!-- end note service meta-data -->
     
         <!-- begin role service meta-data -->
         <tenant:serviceBindings id="authorization/roles" name="authorization/roles" type="security" version="0.1">

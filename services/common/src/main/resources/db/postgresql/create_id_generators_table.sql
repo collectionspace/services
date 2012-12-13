@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright © 2009 Regents of the University of California
+ * Copyright © 2009-2012 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -25,8 +25,10 @@
  * $LastChangedDate$
  */
 
-DROP TABLE IF EXISTS id_generators;
-CREATE TABLE id_generators
+-- DROP TABLE IF EXISTS id_generators;
+
+-- 'CREATE TABLE ... IF NOT EXISTS' requires PostgreSQL 9.1 or later
+CREATE TABLE IF NOT EXISTS id_generators
 (
   csid character varying(80) NOT NULL,
   displayname character varying(80),
@@ -40,11 +42,12 @@ CREATE TABLE id_generators
   OIDS=FALSE -- See http://www.postgresql.org/docs/8.4/static/sql-createtable.html
 );
 
--- CREATE UNIQUE INDEX csid_idx ON id_generators USING btree (csid);
 CREATE OR REPLACE FUNCTION update_modified_column()
-RETURNS TRIGGER AS 'BEGIN NEW.modified = now(); RETURN NEW; END;' language 'plpgsql';
+    RETURNS TRIGGER AS
+    'BEGIN NEW.modified = now(); RETURN NEW; END;'
+    LANGUAGE 'plpgsql';
 
 CREATE TRIGGER update_customer_modtime BEFORE UPDATE
-        ON id_generators FOR EACH ROW EXECUTE PROCEDURE 
-        update_modified_column();
+    ON id_generators FOR EACH ROW EXECUTE PROCEDURE 
+    update_modified_column();
 

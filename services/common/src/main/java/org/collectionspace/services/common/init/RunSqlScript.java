@@ -77,14 +77,14 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
             return;
         }
 
-        String scriptContents = getSqlScriptContents(scriptPath + scriptName);
+        String scriptContents = getSqlScriptContents(scriptPath);
         if (Tools.isBlank(scriptContents)) {
             logger.warn("Could not get contents of SQL script.");
             logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
             return;
         }
 
-        runScript(dataSource, scriptContents);
+        runScript(dataSource, scriptContents, scriptPath);
     }
 
     private String getSqlScriptName(List<Property> properties) {
@@ -100,12 +100,13 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
         return scriptName;
     }
 
-    private String getSqlScriptPath(String scriptResourceName) throws Exception {
+    private String getSqlScriptPath(String scriptName) throws Exception {
         String scriptPath =
                 DATABASE_RESOURCE_DIRECTORY_NAME
                 + "/"
                 + JDBCTools.getDatabaseProductType()
-                + "/";
+                + "/"
+                + scriptName;
         return scriptPath;
     }
 
@@ -168,21 +169,21 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
         return sb.toString();
     }
 
-    private void runScript(DataSource dataSource, String scriptContents) {
+    private void runScript(DataSource dataSource, String scriptContents, String scriptPath) {
         int rows = 0;
         try {
             rows = JDBCTools.executeUpdate(dataSource, scriptContents);
         } catch (Throwable e) {
-            logger.warn("Running SQL script resulted in error: ", e);
+            logger.warn("Running SQL script " + scriptPath + " resulted in error: ", e);
             rows = -1;
         }
         // FIXME: Verify which row values represent failure; should there always
         // be one and only one row returned in a successful response from executeUpdate?
         if (rows < 0) {
-            logger.warn("Running SQL script failed to return expected results.");
+            logger.warn("Running SQL script " + scriptPath + " failed to return expected results.");
         } else {
             if (logger.isInfoEnabled()) {
-                logger.info("Successfully ran SQL script.");
+                logger.info("Successfully ran SQL script: " + scriptPath);
             }
         }
     }
