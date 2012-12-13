@@ -42,7 +42,7 @@
 
 -- ACCESSION_LOT_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('1a67470b-19b1-4ae3-88d4-2a0aa936270e',
@@ -70,7 +70,7 @@ one or more collection objects is acquired by the institution.',
 
 -- ACCESSION_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('9dd92952-c384-44dc-a736-95e435c1759c',
@@ -108,7 +108,7 @@ without parts.',
 
 -- ARCHIVES_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('70586d30-9dca-4a07-a3a2-1976fe898028',
@@ -141,7 +141,7 @@ acquired for the archives.',
 
 -- EVALUATION_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('d2d80822-25c7-4c7c-a105-fc40cdb0c50f',
@@ -174,7 +174,7 @@ acquired for evaluation.',
 
 -- INTAKE_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('8088cfa5-c743-4824-bb4d-fb11b12847f7',
@@ -206,7 +206,7 @@ or more collection objects enters the institution.',
 
 -- INTAKE_OBJECT_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('a91db555-5c53-4996-9918-6712351397a0',
@@ -248,7 +248,7 @@ either returned to their owner or formally acquired.',
 
 -- INVENTORY_NUMBER
 
-INSERT INTO id_generators
+INSERT IGNORE INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES
     ('6d472be6-2534-47f3-a3f1-3f160e7a9303',
@@ -288,7 +288,7 @@ INSERT INTO id_generators
 
 -- LIBRARY_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('80fedaf6-1647-4f30-9f53-a75a3cac2ffd',
@@ -321,7 +321,7 @@ formally acquired for the library.',
 
 -- LOANS_IN_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('ed87e7c6-0678-4f42-9d33-f671835586ef',
@@ -362,7 +362,7 @@ received on loan.',
 
 -- LOANS_OUT_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES
     ('4b984865-f93d-4481-b874-3dba863ec589',
@@ -403,7 +403,7 @@ loaned out of the institution.',
 
 -- LOCATION_NUMBER
 
-INSERT INTO id_generators
+INSERT IGNORE INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES
     ('1fc5e383-0786-4126-9a3c-ec7df4517ee3',
@@ -444,7 +444,7 @@ inventory or movement event.',
 
 -- MEDIA_RESOURCE_IDENTIFICATION_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES
     ('cd91d8b8-f346-4925-a425-93e02bd1c5c9',
@@ -486,7 +486,7 @@ conforming to a formal identification system.',
 
 -- MOVEMENT_REFERENCE_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES
     ('49ca9d8d-7136-47ff-a70e-4a47b9038b70',
@@ -517,7 +517,7 @@ INSERT INTO `id_generators`
 
 -- OBJECT_EXIT_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES
     ('d4eea707-d473-4367-853a-728fbcd9be17',
@@ -550,7 +550,7 @@ from the museum\'s collections.',
 
 -- STUDY_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES
     ('0518132e-dd8c-4773-8fa9-07c9af4444ee',
@@ -583,7 +583,7 @@ formally acquired for study.',
 
 -- TRANSFER_OF_TITLE_NUMBER
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES
     ('c597a209-5954-4fa6-bf3f-f83c1a0ad586',
@@ -620,7 +620,7 @@ to a receiving institution.',
  * random and pseudo-random parts.
  */
 
-INSERT INTO `id_generators`
+INSERT IGNORE INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('1fa40353-05b8-4ae6-82a6-44a18b4f3c12',

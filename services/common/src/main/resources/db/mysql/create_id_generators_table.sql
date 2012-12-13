@@ -25,8 +25,9 @@
  * $LastChangedDate$
  */
 
-DROP TABLE IF EXISTS `id_generators`;
-CREATE TABLE `id_generators` (
+-- DROP TABLE IF EXISTS `id_generators`;
+
+CREATE TABLE IF NOT EXISTS `id_generators` (
   `csid`                varchar(80) PRIMARY KEY,
   `displayname`         varchar(80),
   `description`         varchar(500),
