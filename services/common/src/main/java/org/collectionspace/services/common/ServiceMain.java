@@ -423,16 +423,16 @@ public class ServiceMain {
     			String tName = tenantBinding.getName();
     			List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
     			for (RepositoryDomainType repoDomain : repoDomainList) {
-    				String repoName = repoDomain.getName();
-    				String dbName = /* repoDomain.getRepositoryName()?? */ "nuxeo";
+    				String repoDomainName = repoDomain.getName();
+    				String dbName = JDBCTools.getDatabaseName(repoDomain.getRepositoryName());
     				if(nuxeoDBsChecked.contains(dbName)) {
     					if (logger.isDebugEnabled()) {
-    						logger.debug("Another user of db: "+dbName+": Repo: "+repoName+" and tenant: "
+    						logger.debug("Another user of db: "+dbName+": Repo: "+repoDomainName+" and tenant: "
     								+tName+" (id:"+tId+")");
     					}
     				} else {
     					if (logger.isDebugEnabled()) {
-    						logger.debug("Need to prepare db: "+dbName+" for Repo: "+repoName+" and tenant: "
+    						logger.debug("Need to prepare db: "+dbName+" for Repo: "+repoDomainName+" and tenant: "
     								+tName+" (id:"+tId+")");
     					}
 

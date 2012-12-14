@@ -11,6 +11,11 @@ import org.slf4j.LoggerFactory;
 public class ConfigUtils {
     final static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
     
+    // Default database names
+    public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
+    public static String DEFAULT_NUXEO_REPOSITORY_NAME = "default";
+    public static String DEFAULT_NUXEO_DATABASE_NAME = "nuxeo";
+    
     /*
      * Returns the list of repository/DB names defined by a tenant bindings file
      */
@@ -27,7 +32,7 @@ public class ConfigUtils {
 		
     	return result;
     }
-    
+        
     public static String getRepositoryName(TenantBindingType tenantBindingType, String domainName) {
 		String result = null;
 		

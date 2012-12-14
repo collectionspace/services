@@ -18,6 +18,8 @@
 package org.collectionspace.services.common.storage;
 
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.ConfigUtils;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +43,9 @@ public class JDBCTools {
     public static String CSPACE_DATASOURCE_NAME = "CspaceDS";
     public static String NUXEO_DATASOURCE_NAME = "NuxeoDS";
     // Default database names
-    public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
-    public static String DEFAULT_NUXEO_REPOSITORY_NAME = "default";
-    public static String DEFAULT_NUXEO_DATABASE_NAME = "nuxeo";
+    public static String DEFAULT_CSPACE_DATABASE_NAME = ConfigUtils.DEFAULT_CSPACE_DATABASE_NAME;
+    public static String DEFAULT_NUXEO_REPOSITORY_NAME = ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME;
+    public static String DEFAULT_NUXEO_DATABASE_NAME = ConfigUtils.DEFAULT_NUXEO_DATABASE_NAME;
     public static String NUXEO_MANAGER_DATASOURCE_NAME = "NuxeoMgrDS";
     public static String NUXEO_READER_DATASOURCE_NAME = "NuxeoReaderDS";
     public static String NUXEO_USER_NAME = "nuxeo";
@@ -117,17 +119,7 @@ public class JDBCTools {
             logger.error(errMsg);
             throw new NamingException(errMsg);
         }
-    	
-    	// FIXME: REM - We can rid ourselves of this special case by using the DEFAULT_NUXEO_DATABASE_NAME as the default
-    	// value for the "repositoryName" attribute in the tenant bindings XSD (XML Schema) definition.
-    	//
-    	// *Special Case* - Nuxeo's default repository name is "default" but the database is called "nuxeo"
-    	//
-    	if (dataSourceName.equals(JDBCTools.NUXEO_DATASOURCE_NAME) &&
-    			repositoryName.equals(JDBCTools.DEFAULT_NUXEO_REPOSITORY_NAME)) {
-    		repositoryName = DEFAULT_NUXEO_DATABASE_NAME;
-    	}
-        
+    	        
     	/*
     	 * We synch this block as a workaround to not have separate DataSource instances for
     	 * each Nuxeo repo/DB.  Ideally, we should replace the need for this synch block by
@@ -143,7 +135,8 @@ public class JDBCTools {
     				(org.apache.tomcat.dbcp.dbcp.BasicDataSource)getDataSource(dataSourceName);
     		// Get the template URL value from the JNDI datasource and substitute the databaseName
 	        String urlTemplate = dataSource.getUrl();
-	        String connectionUrl = urlTemplate.replace(URL_DATABASE_NAME, repositoryName);
+	        String databaseName = getDatabaseName(repositoryName);
+	        String connectionUrl = urlTemplate.replace(URL_DATABASE_NAME, databaseName);
         	dataSource.setUrl(connectionUrl);
 	        
 	        try {
@@ -290,6 +283,20 @@ public class JDBCTools {
         }
     	
         return result;
+    }
+    
+    /*
+     * By convention, the repository name and database name are the same.  However, this
+     * call encapulates that convention and allows overrides.
+     */
+    public static String getDatabaseName(String repoName) {
+    	String result = repoName;
+    	
+    	if (result.equalsIgnoreCase(DEFAULT_NUXEO_REPOSITORY_NAME) == true) {
+    		result = DEFAULT_NUXEO_DATABASE_NAME;
+    	}
+    	
+    	return result;
     }
     
     /**
