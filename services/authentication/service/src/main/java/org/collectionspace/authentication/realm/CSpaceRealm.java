@@ -53,8 +53,14 @@ public interface CSpaceRealm {
 
     /**
      * Obtain the tenants for the authenticated user.
-     * @return collection containing the roles
+     * @return collection containing the tenants
      */
     public Collection<Group> getTenants(String username, String groupClassName) throws LoginException;
+
+    /**
+     * Obtain the tenants for the authenticated user, allowing access to disable tenants
+     * @return collection containing the tenants
+     */
+    public Collection<Group> getTenants(String username, String groupClassName, boolean includeDisabledTenants) throws LoginException;
 
 }

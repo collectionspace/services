@@ -67,6 +67,10 @@ public class AuthN {
     private static volatile AuthN self = new AuthN();
     private static DataSource dataSource = null;
     private AuthNContext authnContext;
+    
+    // Define a special account value for the tenantManager. Yes, this is a hack, but
+    // less troublesome than the alternatives.
+    public static final String TENANT_MANAGER_ACCT_ID = "0"; 
 
     private AuthN() {
         //hardcoded initialization of a provider
