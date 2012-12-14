@@ -11,6 +11,11 @@ import org.slf4j.LoggerFactory;
 public class ConfigUtils {
     final static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
     
+    // Default database names
+    public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
+    public static String DEFAULT_NUXEO_REPOSITORY_NAME = "default";
+    public static String DEFAULT_NUXEO_DATABASE_NAME = "nuxeo";
+    
     /*
      * Returns the list of repository/DB names defined by a tenant bindings file
      */
@@ -25,6 +30,20 @@ public class ConfigUtils {
 			}
 		}
 		
+    	return result;
+    }
+    
+    /*
+     * By convention, the repository name and database name are the same.  However, this
+     * call encapulates that convention and allows overrides.
+     */
+    public static String getDatabaseName(TenantBindingType tenantBindingType, String domainName) {
+    	String result = getRepositoryName(tenantBindingType, domainName);
+    	
+    	if (result.equalsIgnoreCase(DEFAULT_NUXEO_REPOSITORY_NAME) == true) {
+    		result = DEFAULT_NUXEO_DATABASE_NAME;
+    	}
+    	
     	return result;
     }
     

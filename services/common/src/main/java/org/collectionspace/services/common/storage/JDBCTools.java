@@ -18,6 +18,7 @@
 package org.collectionspace.services.common.storage;
 
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.ConfigUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +42,9 @@ public class JDBCTools {
     public static String CSPACE_DATASOURCE_NAME = "CspaceDS";
     public static String NUXEO_DATASOURCE_NAME = "NuxeoDS";
     // Default database names
-    public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
-    public static String DEFAULT_NUXEO_REPOSITORY_NAME = "default";
-    public static String DEFAULT_NUXEO_DATABASE_NAME = "nuxeo";
+    public static String DEFAULT_CSPACE_DATABASE_NAME = ConfigUtils.DEFAULT_CSPACE_DATABASE_NAME;
+    public static String DEFAULT_NUXEO_REPOSITORY_NAME = ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME;
+    public static String DEFAULT_NUXEO_DATABASE_NAME = ConfigUtils.DEFAULT_NUXEO_DATABASE_NAME;
     //
     // Private constants
     //
