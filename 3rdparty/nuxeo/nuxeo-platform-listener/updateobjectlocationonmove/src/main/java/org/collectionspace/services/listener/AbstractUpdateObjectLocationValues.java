@@ -36,10 +36,10 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     protected final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
     private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
     protected final static String COMPUTED_CURRENT_LOCATION_PROPERTY = "computedCurrentLocation"; // FIXME: Create and then get from external constant
-    private final static String MOVEMENTS_COMMON_SCHEMA = "movements_common"; // FIXME: Get from external constant
+    protected final static String MOVEMENTS_COMMON_SCHEMA = "movements_common"; // FIXME: Get from external constant
     private final static String MOVEMENT_DOCTYPE = MovementConstants.NUXEO_DOCTYPE;
     private final static String LOCATION_DATE_PROPERTY = "locationDate"; // FIXME: Get from external constant
-    private final static String CURRENT_LOCATION_PROPERTY = "currentLocation"; // FIXME: Get from external constant
+    protected final static String CURRENT_LOCATION_PROPERTY = "currentLocation"; // FIXME: Get from external constant
     private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + "AND ecm:isProxy = 0 "
@@ -176,14 +176,33 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             }
         }
 
-        // Iterate through the list of CollectionObject CSIDs found
-        // and update their location value(s).
+        // Iterate through the list of CollectionObject CSIDs found,
+        // obtain their most recently associated Movement, and update
+        // their relevant field value(s) accordingly.
+        DocumentModel collectionObjectDocModel;
+        DocumentModel mostRecentMovementDocModel;
         for (String collectionObjectCsid : collectionObjectCsids) {
             if (logger.isTraceEnabled()) {
                 logger.trace("CollectionObject CSID=" + collectionObjectCsid);
             }
-            updateAllLocationValues(coreSession, collectionObjectCsid);
+            // Verify that the CollectionObject is retrievable.
+            collectionObjectDocModel = getDocModelFromCsid(coreSession, collectionObjectCsid);
+            if (collectionObjectDocModel == null) {
+                continue;
+            }
+            // Verify that the CollectionObject record is active.
+            if (!isActiveDocument(collectionObjectDocModel)) {
+                continue;
+            }
+            mostRecentMovementDocModel = getMostRecentMovement(coreSession, collectionObjectCsid);
+            if (mostRecentMovementDocModel == null) {
+                continue;
+            }
+            collectionObjectDocModel =
+                    updateCollectionObjectValuesFromMovement(collectionObjectDocModel, mostRecentMovementDocModel);
+            coreSession.saveDocument(collectionObjectDocModel);
         }
+
     }
 
     // FIXME: Generic methods like many of those below might be split off,
@@ -269,7 +288,8 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     }
 
     // FIXME: A quick first pass, using an only partly query-based technique for
-    // getting the current location, augmented by procedural code.
+    // getting the most recent Movement record related to a CollectionObject,
+    // augmented by procedural code.
     //
     // Should be replaced by a more performant method, based entirely, or nearly so,
     // on a query.
@@ -285,17 +305,20 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
      + "ORDER BY DOC.collectionspace_core:updatedAt DESC";
      */
     /**
-     * Returns the computed current location for a CollectionObject.
+     * Returns the most recent Movement record related to a CollectionObject.
+     *
+     * This method currently returns the related Movement record with the latest
+     * (i.e. most recent in time) Location Date field value.
      *
      * @param session a repository session.
      * @param collectionObjectCsid a CollectionObject identifier (CSID)
      * @throws ClientException
-     * @return the computed current location for the CollectionObject identified
-     * by the supplied CSID.
+     * @return the most recent Movement record related to the CollectionObject
+     * identified by the supplied CSID.
      */
-    protected static String computeCurrentLocation(CoreSession session, String collectionObjectCsid)
+    protected static DocumentModel getMostRecentMovement(CoreSession session, String collectionObjectCsid)
             throws ClientException {
-        String computedCurrentLocation = "";
+        DocumentModel mostRecentMovementDocModel = null;
         // Get Relation records for Movements related to this CollectionObject.
         //
         // Some values below are hard-coded for readability, rather than
@@ -317,30 +340,28 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         DocumentModelList relationDocModels = session.query(query);
         if (relationDocModels == null || relationDocModels.isEmpty()) {
             logger.warn("Unexpectedly found no relations to Movement records to/from to this CollectionObject record.");
-            return computedCurrentLocation;
+            return mostRecentMovementDocModel;
         } else {
             if (logger.isTraceEnabled()) {
                 logger.trace("Found " + relationDocModels.size() + " relations to Movement records to/from this CollectionObject record.");
             }
         }
-        // Iterate through related movement records, to get the CollectionObject's
-        // computed current location from the related Movement record with the
-        // most recent location date.
+        // Iterate through related movement records, to find the related
+        // Movement record with the most recent location date.
         GregorianCalendar mostRecentLocationDate = EARLIEST_COMPARISON_DATE;
         DocumentModel movementDocModel = null;
         Set<String> alreadyProcessedMovementCsids = new HashSet<String>();
-        String relMovementCsid = "";
-        String location = "";
+        String relatedMovementCsid = "";
         for (DocumentModel relationDocModel : relationDocModels) {
             // Due to the 'OR' operator in the query above, related Movement
             // record CSIDs may reside in either the subject or object CSID fields
             // of the relation record. Whichever CSID value doesn't match the
             // CollectionObject's CSID is inferred to be the related Movement record's CSID.
-            relMovementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
-            if (relMovementCsid.equals(collectionObjectCsid)) {
-                relMovementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+            relatedMovementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
+            if (relatedMovementCsid.equals(collectionObjectCsid)) {
+                relatedMovementCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
             }
-            if (Tools.isBlank(relMovementCsid)) {
+            if (Tools.isBlank(relatedMovementCsid)) {
                 continue;
             }
             // Because of the OR clause used in the query above, there may be
@@ -348,15 +369,15 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             // reference the same Movement record, as either the subject
             // or object of a relation to the same CollectionObject record;
             // we need to filter out those duplicates.
-            if (alreadyProcessedMovementCsids.contains(relMovementCsid)) {
+            if (alreadyProcessedMovementCsids.contains(relatedMovementCsid)) {
                 continue;
             } else {
-                alreadyProcessedMovementCsids.add(relMovementCsid);
+                alreadyProcessedMovementCsids.add(relatedMovementCsid);
             }
             if (logger.isTraceEnabled()) {
-                logger.trace("Movement CSID=" + relMovementCsid);
+                logger.trace("Movement CSID=" + relatedMovementCsid);
             }
-            movementDocModel = getDocModelFromCsid(session, relMovementCsid);
+            movementDocModel = getDocModelFromCsid(session, relatedMovementCsid);
             if (movementDocModel == null) {
                 continue;
             }
@@ -377,13 +398,10 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             }
             if (locationDate.after(mostRecentLocationDate)) {
                 mostRecentLocationDate = locationDate;
-                location = (String) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_PROPERTY);
-                if (Tools.notBlank(location)) {
-                    computedCurrentLocation = location;
-                }
+                mostRecentMovementDocModel = movementDocModel;
             }
         }
-        return computedCurrentLocation;
+        return mostRecentMovementDocModel;
     }
 
     /**
@@ -417,6 +435,14 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
 
     // Can be extended by sub-classes to update different/multiple values;
     // e.g. values for moveable locations ("crates").
-    protected abstract void updateAllLocationValues(CoreSession coreSession, String collectionObjectCsid)
+    /**
+     * Updates a CollectionObject record with selected values from a Movement record.
+     *
+     * @param collectionObjectDocModel a document model for a CollectionObject record.
+     * @param movementDocModel a document model for a Movement record.
+     * @throws ClientException
+     */
+    protected abstract DocumentModel updateCollectionObjectValuesFromMovement(DocumentModel collectionObjectDocModel,
+            DocumentModel movementDocModel)
             throws ClientException;
 }
