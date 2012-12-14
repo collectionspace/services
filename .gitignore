@@ -1,3 +1,7 @@
+3rdparty/nuxeo/nuxeo-platform-listener/.project
+3rdparty/nuxeo/nuxeo-platform-listener/.settings/
+services/JaxRsServiceProvider/.settings/.jsdtscope
+*org.eclipse.wst*
 dev-master.xml
 .metadata/
 services/collectionobject/sample/sample/.classpath

@@ -2,17 +2,28 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 
 import org.collectionspace.services.config.RepositoryClientConfigType;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.model.Repository;
 import org.nuxeo.osgi.application.FrameworkBootstrap;
+import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
+import org.nuxeo.ecm.core.repository.RepositoryFactory;
+import org.nuxeo.ecm.core.storage.sql.ra.ConnectionFactoryImpl;
+import org.nuxeo.ecm.core.storage.sql.ra.ManagedConnectionFactoryImpl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,6 +185,30 @@ public class NuxeoConnectorEmbedded {
 			}
 		}
 	}
+	
+	public String getDatabaseName(String repoName) {
+		String result = null;
+		
+		try {
+			this.getRepositoryDescriptor(repoName);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		Repository repository = null;
+		try {
+			repository = this.lookupRepository(repoName);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ConnectionFactoryImpl connectionFactory = (ConnectionFactoryImpl)repository;
+		ManagedConnectionFactoryImpl managedConnectionFactory = connectionFactory.getManagedConnectionFactory();
+		String serverUrl = managedConnectionFactory.getServerURL();
+		
+		return result;
+	}
 
 	/**
 	 * releaseRepositorySession releases given repository session
@@ -198,14 +233,51 @@ public class NuxeoConnectorEmbedded {
 	 * @return RepositoryInstance
 	 * @throws java.lang.Exception
 	 */
-	public RepositoryInstance getRepositorySession() throws Exception {
-		RepositoryInstance repoSession = getClient().openRepository();
-		if (logger.isDebugEnabled()) {
+	public RepositoryInstance getRepositorySession(RepositoryDomainType repoDomain) throws Exception {
+		RepositoryInstance repoSession = getClient().openRepository(repoDomain);
+		if (logger.isDebugEnabled() && repoSession != null) {
 			logger.debug("getRepositorySession() opened repository session");
+			String repoName = repoDomain.getRepositoryName();
+			String databaseName = this.getDatabaseName(repoName); // For debugging purposes only
 		}
 		return repoSession;
 	}
 
+    public Repository lookupRepository(String name) throws Exception {
+        Repository repo;
+        try {
+            // needed by glassfish
+            repo = (Repository) new InitialContext().lookup("NXRepository/"
+                    + name);
+        } catch (NamingException e) {
+            try {
+                // needed by jboss
+                repo = (Repository) new InitialContext().lookup("java:NXRepository/"
+                        + name);
+            } catch (NamingException ee) {
+                repo = (Repository) NXCore.getRepositoryService().getRepositoryManager().getRepository(
+                        name);
+            }
+        }
+        if (repo == null) {
+            throw new IllegalArgumentException("Repository not found: " + name);
+        }
+        return repo;
+    }
+    
+    public RepositoryDescriptor getRepositoryDescriptor(String name) throws Exception {
+    	RepositoryDescriptor repo = null;
+
+        Iterable<RepositoryDescriptor> descriptorsList = NXCore.getRepositoryService().getRepositoryManager().getDescriptors();
+        for (RepositoryDescriptor descriptor : descriptorsList) {
+        	String homeDir = descriptor.getHomeDirectory();
+        	String config = descriptor.getConfigurationFile();
+        	RepositoryFactory factor = descriptor.getFactory();
+        }
+
+        return repo;
+    }
+	
 	/**
 	 * getClient get Nuxeo client for accessing Nuxeo services remotely using
 	 * Nuxeo Java (EJB) Remote APIS
@@ -250,32 +322,30 @@ public class NuxeoConnectorEmbedded {
 	/**
 	 * retrieveWorkspaceIds retrieves all workspace ids from default repository
 	 * 
-	 * @param tenantDomain
-	 *            domain representing tenant
+	 * @param repoDomain
+	 *            a repository domain for a given tenant - see the tenant bindings XML file for details
 	 * @return
 	 * @throws java.lang.Exception
 	 */
-	public Hashtable<String, String> retrieveWorkspaceIds(String tenantDomain)
+	public Hashtable<String, String> retrieveWorkspaceIds(RepositoryDomainType repoDomain)
 			throws Exception {
 		RepositoryInstance repoSession = null;
 		Hashtable<String, String> workspaceIds = new Hashtable<String, String>();
 		try {
-			repoSession = getRepositorySession();
+			repoSession = getRepositorySession(repoDomain);
 			DocumentModel rootDoc = repoSession.getRootDocument();
-			DocumentModelList rootChildrenList = repoSession
-					.getChildren(rootDoc.getRef());
+			DocumentModelList rootChildrenList = repoSession.getChildren(rootDoc.getRef());
 			Iterator<DocumentModel> diter = rootChildrenList.iterator();
 			while (diter.hasNext()) {
 				DocumentModel domain = diter.next();
-				String domainPath = "/" + tenantDomain;
+				String domainPath = "/" + repoDomain.getStorageName();
 				if (!domain.getPathAsString().equalsIgnoreCase(domainPath)) {
-					continue;
+					continue; // If it's not our domain folder/directory then skip it
 				}
 				if (logger.isDebugEnabled()) {
 					logger.debug("domain=" + domain.toString());
 				}
-				DocumentModelList domainChildrenList = repoSession
-						.getChildren(domain.getRef());
+				DocumentModelList domainChildrenList = repoSession.getChildren(domain.getRef());
 				Iterator<DocumentModel> witer = domainChildrenList.iterator();
 				while (witer.hasNext()) {
 					DocumentModel childNode = witer.next();

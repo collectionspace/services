@@ -27,7 +27,12 @@ import java.lang.reflect.Constructor;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.config.ConfigUtils;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +113,28 @@ public class RemoteServiceContextImpl<IT, OT>
         }
     }
 
+    /*
+     * Returns the name of the service's acting repository.  Gets this from the tenant and service bindings files
+     */
+    public String getRepositoryName() throws Exception {
+    	String result = null;
+    	
+    	TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+    	String tenantId = this.getTenantId();
+    	TenantBindingType tenantBindingType = tenantBindingConfigReader.getTenantBinding(tenantId);
+    	ServiceBindingType serviceBindingType = this.getServiceBinding();
+    	String servicesRepoDomainName = serviceBindingType.getRepositoryDomain();
+    	if (servicesRepoDomainName != null && servicesRepoDomainName.trim().isEmpty() == false) {
+    		result = ConfigUtils.getRepositoryName(tenantBindingType, servicesRepoDomainName);
+    	} else {
+    		String errMsg = String.format("The '%s' service for tenant ID=%s did not declare a repository domain in its service bindings.", 
+    				serviceBindingType.getName(), tenantId);
+    		throw new Exception(errMsg);
+    	}
+    	
+    	return result;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.AbstractServiceContextImpl#getInput()
      */

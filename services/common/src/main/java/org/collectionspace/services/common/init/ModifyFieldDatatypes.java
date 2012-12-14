@@ -54,7 +54,8 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
     final Logger logger = LoggerFactory.getLogger(ModifyFieldDatatypes.class);
 
     @Override
-    public void onRepositoryInitialized(DataSource dataSource,
+    public void onRepositoryInitialized(String dataSourceName,
+    		String repositoryName,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
     		List<Property> properties) throws Exception {
@@ -66,12 +67,12 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                     + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
         }
         try {
-            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType();
+            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
             String datatype = "";
             for (Field field : fields) {
                 datatype = getDatatypeFromLogicalType(databaseProductType, field.getType());
                 // If the field is already of the desired datatype, skip it.
-                if (fieldHasDesiredDatatype(dataSource, databaseProductType, field, datatype)) {
+                if (fieldHasDesiredDatatype(dataSourceName, repositoryName, databaseProductType, field, datatype)) {
                     logger.trace("Field " + field.getTable() + "." + field.getCol()
                             + " is already of desired datatype " + datatype);
                     continue;
@@ -101,7 +102,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                 //
                 // If this assumption is no longer valid, we might instead
                 // identify the relevant repository from the table name here.
-                rows = JDBCTools.executeUpdate(dataSource, sql);
+                rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, sql);
             }
         } catch (Exception e) {
             throw e;
@@ -143,7 +144,8 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         return datatype;
     }
 
-    private boolean fieldHasDesiredDatatype(DataSource dataSource,
+    private boolean fieldHasDesiredDatatype(String dataSourceName,
+    		String repositoryName,
     		DatabaseProductType databaseProductType,
             Field field, String datatype) {
         
@@ -160,16 +162,18 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
         ResultSet rs = null;
 
         try {
-            conn = JDBCTools.getConnection(dataSource);
+            conn = JDBCTools.getConnection(dataSourceName, repositoryName);
             stmt = conn.createStatement();
+            String databaseName = JDBCTools.getDatabaseName(dataSourceName, repositoryName, conn);
+            
             if (databaseProductType == DatabaseProductType.MYSQL) {
                 sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS "
-                    + "WHERE TABLE_SCHEMA = '" + JDBCTools.getDatabaseName(conn) + "'"
+                    + "WHERE TABLE_SCHEMA = '" + databaseName + "'"
                     + " AND TABLE_NAME = '" + getTableName(field) + "'"
                     + " AND COLUMN_NAME = '" + field.getCol() + "'";
             } else if (databaseProductType == DatabaseProductType.POSTGRESQL) {
                 sql = "SELECT data_type FROM information_schema.columns "
-                    + "WHERE table_catalog = '" + JDBCTools.getDatabaseName(conn) + "'"
+                    + "WHERE table_catalog = '" + databaseName + "'"
                     + " AND table_name = '" + getTableName(field) + "'"
                     + " AND column_name = '" + field.getCol() + "'";
             }

@@ -7,11 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 
 import javax.naming.NamingException;
@@ -20,17 +15,15 @@ import javax.sql.DataSource;
 
 import org.collectionspace.authentication.AuthN;
 
-import org.collectionspace.services.config.service.InitHandler;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ConfigReader;
+import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.init.AddIndices;
 import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.common.init.IInitHandler;
-import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.JDBCTools;
-import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -213,56 +206,80 @@ public class ServiceMain {
         }
     }
     
-    /**
-     * Create required indexes (aka indices) in database tables not associated
-     * with any specific tenant.
-     * 
-     * @throws Exception 
-     */
-    void createRequiredIndices() throws Exception {
-                   
-         // Define a set of columns (fields) and their associated
-         // tables, on which database indexes should always be created
-         final String COLLECTIONSPACE_CORE_TABLE_NAME = "collectionspace_core";
-         final String NUXEO_FULLTEXT_TABLE_NAME = "fulltext";
-         final String NUXEO_HIERARCHY_TABLE_NAME = "hierarchy";
-         
-         Map<Integer,List<String>> fieldsToIndex = new HashMap<Integer,List<String>>();
-         fieldsToIndex.put(1, new ArrayList(Arrays.asList(COLLECTIONSPACE_CORE_TABLE_NAME, "tenantid")));
-         fieldsToIndex.put(2, new ArrayList(Arrays.asList(COLLECTIONSPACE_CORE_TABLE_NAME, "updatedat")));
-         fieldsToIndex.put(3, new ArrayList(Arrays.asList(NUXEO_FULLTEXT_TABLE_NAME, "jobid")));
-         fieldsToIndex.put(4, new ArrayList(Arrays.asList(NUXEO_HIERARCHY_TABLE_NAME, "name")));
-       
-         // Invoke existing post-init code to create these indexes,
-         // sending in the set of values above, in contrast to
-         // drawing these values from per-tenant configuration.
-         DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
-         AddIndices addindices = new AddIndices();
-         List<Field> fields = new ArrayList<Field>();
-         for (Map.Entry<Integer,List<String>> entry : fieldsToIndex.entrySet()) {
-             Field field = new Field();
-             field.setTable(entry.getValue().get(0)); // Table name from List item 0
-             field.setCol(entry.getValue().get(1)); // Column name from List item 1
-             fields.add(field);
-         }
-         addindices.onRepositoryInitialized(dataSource, null, fields, null);
+	/**
+	 * Create required indexes (aka indices) in database tables not associated
+	 * with any specific tenant.
+	 * 
+	 * We need to loop over each repository/db declared in the tenant bindings.
+	 * The assumption here is that each repo/db is a Nuxeo repo/DB.
+	 * 
+	 * @throws Exception
+	 */
+	void createRequiredIndices() throws Exception {
+        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
 
-    }
+        //
+        //Loop through all tenants in tenant-bindings.xml
+        //
+        for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+        	List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+			if (repositoryNameList != null && repositoryNameList.isEmpty() == false) {
+				//
+				// Loop through each repo/DB defined in a tenant bindings file
+				//
+				for (String repositoryName : repositoryNameList) {
+					// Define a set of columns (fields) and their associated
+					// tables, on which database indexes should always be created
+					final String COLLECTIONSPACE_CORE_TABLE_NAME = "collectionspace_core";
+					final String NUXEO_FULLTEXT_TABLE_NAME = "fulltext";
+					final String NUXEO_HIERARCHY_TABLE_NAME = "hierarchy";
+			
+					Map<Integer, List<String>> fieldsToIndex = new HashMap<Integer, List<String>>();
+					fieldsToIndex.put(1, new ArrayList<String>(Arrays.asList(COLLECTIONSPACE_CORE_TABLE_NAME, "tenantid")));
+					fieldsToIndex.put(2, new ArrayList<String>(Arrays.asList(COLLECTIONSPACE_CORE_TABLE_NAME, "updatedat")));
+					fieldsToIndex.put(3, new ArrayList<String>(Arrays.asList(NUXEO_FULLTEXT_TABLE_NAME, "jobid")));
+					fieldsToIndex.put(4, new ArrayList<String>(Arrays.asList(NUXEO_HIERARCHY_TABLE_NAME, "name")));
+			
+					// Invoke existing post-init code to create these indexes,
+					// sending in the set of values above, in contrast to
+					// drawing these values from per-tenant configuration.
+//					DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_DATASOURCE_NAME);
+					AddIndices addindices = new AddIndices();
+					List<Field> fields = new ArrayList<Field>();
+					for (Map.Entry<Integer, List<String>> entry : fieldsToIndex.entrySet()) {
+						Field field = new Field();
+						field.setTable(entry.getValue().get(0)); // Table name from List
+																	// item 0
+						field.setCol(entry.getValue().get(1)); // Column name from List item
+																// 1
+						fields.add(field);
+					}
+					addindices.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, null, fields, null);
+				}
+			} else {
+				String errMsg = "repositoryNameList was empty or null.";
+				logger.error(errMsg);
+				throw new Exception(errMsg);
+			}
+        }
+	}
 
     public void firePostInitHandlers() throws Exception {
-    	DataSource dataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
         Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+        //
         //Loop through all tenants in tenant-bindings.xml
-        for (TenantBindingType tbt: tenantBindingTypeMap.values()){
-            //String name = tbt.getName();
-            //String id = tbt.getId();
-            //Loop through all the services in this tenant
+        //
+        for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+        	//
+        	//Loop through all the services in this tenant
+        	//
             List<ServiceBindingType> sbtList = tbt.getServiceBindings();
-            for (ServiceBindingType sbt: sbtList){
+            for (ServiceBindingType sbt: sbtList) {
+            	String repositoryName = ConfigUtils.getRepositoryName(tbt, sbt.getRepositoryDomain()); // Each service can have a different repo domain
                 //Get the list of InitHandler elements, extract the first one (only one supported right now) and fire it using reflection.
                 List<org.collectionspace.services.config.service.InitHandler> list = sbt.getInitHandler();
-                if (list!=null && list.size()>0){
-                	org.collectionspace.services.config.service.InitHandler handlerType = list.get(0);
+                if (list != null && list.size() > 0) {
+                	org.collectionspace.services.config.service.InitHandler handlerType = list.get(0);  // REM - 12/2012: We might want to think about supporting multiple post-init handlers
                     String initHandlerClassname = handlerType.getClassname();
 
                     List<org.collectionspace.services.config.service.InitHandler.Params.Field>
@@ -276,7 +293,7 @@ public class ServiceMain {
                     Object o = instantiate(initHandlerClassname, IInitHandler.class);
                     if (o != null && o instanceof IInitHandler){
                         IInitHandler handler = (IInitHandler)o;
-                        handler.onRepositoryInitialized(dataSource, sbt, fields, props);
+                        handler.onRepositoryInitialized(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, sbt, fields, props);
                         //The InitHandler may be the default one,
                         //  or specialized classes which still implement this interface and are registered in tenant-bindings.xml.
                     }
@@ -349,8 +366,8 @@ public class ServiceMain {
     	// cached in a static hash map of the JDBCTools class.  This will speed up lookups as well as protect our
     	// code from JNDI lookup problems -for example, if the JNDI context gets stepped on or corrupted.
     	//
-    	DataSource cspaceDataSource = JDBCTools.getDataSource(JDBCTools.CSPACE_REPOSITORY_NAME);
-    	DataSource nuxeoDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_REPOSITORY_NAME);
+    	DataSource cspaceDataSource = JDBCTools.getDataSource(JDBCTools.CSPACE_DATASOURCE_NAME);
+    	DataSource nuxeoDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_DATASOURCE_NAME);
     	//
     	// Set our AuthN's datasource to be the cspaceDataSource
     	//

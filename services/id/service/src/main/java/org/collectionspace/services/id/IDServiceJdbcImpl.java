@@ -64,7 +64,6 @@
 package org.collectionspace.services.id;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
@@ -74,6 +73,10 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
+
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.storage.JDBCTools;
@@ -101,7 +104,8 @@ public class IDServiceJdbcImpl implements IDService {
     /**
      * Constructor (no-argument).
      */
-    public void IDServiceJdbcImpl() {
+    public IDServiceJdbcImpl() {
+    	// Empty
     }
 
     // -----------------
@@ -124,7 +128,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public String createID(String csid) throws Exception {
+    public String createID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid) throws Exception {
 
         logger.debug("> in createID");
 
@@ -143,7 +147,7 @@ public class IDServiceJdbcImpl implements IDService {
 
         String serializedGenerator = "";
         try {
-            IDGeneratorInstance generator = readIDGenerator(csid);
+            IDGeneratorInstance generator = readIDGenerator(ctx, csid);
             serializedGenerator = generator.getGeneratorState();
             // serializedGenerator = readIDGenerator(csid).getGeneratorState();
         } catch (DocumentNotFoundException e) {
@@ -171,7 +175,7 @@ public class IDServiceJdbcImpl implements IDService {
 
             // Retrieve the last ID associated with this generator
             // from persistent storage.
-            lastId = readLastID(csid);
+            lastId = readLastID(ctx, csid);
 
             // If there was no last generated ID associated with this generator,
             // get a new ID.
@@ -186,12 +190,12 @@ public class IDServiceJdbcImpl implements IDService {
             }
 
             // Store the 'new' ID as the last-generated ID for this generator.
-            updateLastID(csid, newId);
+            updateLastID(ctx, csid, newId);
 
             // Store the new state of this ID generator, reflecting that
             // one of its parts may possibly have had its value updated as
             // a result of the generation of this 'new' ID.
-            updateIDGenerator(csid, generator);
+            updateIDGenerator(ctx, csid, generator);
 
         } catch (DocumentNotFoundException e) {
             throw e;
@@ -220,8 +224,8 @@ public class IDServiceJdbcImpl implements IDService {
      *      *
      * @throws  DocumentNotFoundException if the requested ID generator could not be found.
      */
-    public void updateLastID(String csid, String lastId)
-            throws IllegalStateException, DocumentNotFoundException, NamingException, SQLException {
+    public void updateLastID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid, String lastId)
+            throws IllegalStateException, DocumentNotFoundException, NamingException, SQLException, Exception {
 
         logger.debug("> in updateLastID");
 
@@ -232,8 +236,7 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-
-            conn = getJdbcConnection();
+            conn = getJdbcConnection(ctx.getRepositoryName());
             conn.setAutoCommit(false);
             Statement stmt = conn.createStatement();
 
@@ -322,7 +325,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public String readLastID(String csid) throws Exception {
+    public String readLastID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid) throws Exception {
 
         logger.debug("> in readLastID");
 
@@ -334,8 +337,8 @@ public class IDServiceJdbcImpl implements IDService {
         String lastId = null;
         Connection conn = null;
         try {
-
-            conn = getJdbcConnection();
+        	String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(repositoryName);
             Statement stmt = conn.createStatement();
 
             ResultSet rs = stmt.executeQuery(
@@ -391,7 +394,7 @@ public class IDServiceJdbcImpl implements IDService {
      *
      * @throws  IllegalStateException if a storage-related error occurred.
      */
-    public void createIDGenerator(String csid, SettableIDGenerator generator)
+    private void createIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid, SettableIDGenerator generator)
             throws Exception {
 
         logger.debug("> in createIDGenerator(String, SettableIDGenerator)");
@@ -411,7 +414,7 @@ public class IDServiceJdbcImpl implements IDService {
         }
 
         try {
-            createIDGenerator(csid, serializedGenerator);
+            createIDGenerator(ctx, csid, serializedGenerator);
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (IllegalStateException e) {
@@ -441,14 +444,14 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public void createIDGenerator(String csid, String serializedGenerator)
-            throws Exception {
+    public void createIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		String csid, String serializedIDGenerator) throws Exception {
 
         logger.debug("> in createIDGenerator(String, String)");
 
         // @TODO Add checks for authorization to perform this operation.
 
-        if (serializedGenerator == null || serializedGenerator.equals("")) {
+        if (serializedIDGenerator == null || serializedIDGenerator.equals("")) {
             throw new BadRequestException(
                     "Could not understand or parse this representation "
                     + "of an ID generator.");
@@ -456,8 +459,8 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-
-            conn = getJdbcConnection();
+        	String repositoryName = ctx.getRepositoryName();
+            conn = getJdbcConnection(repositoryName);
             Statement stmt = conn.createStatement();
 
             // Test whether this ID generator already exists in the database.
@@ -504,7 +507,7 @@ public class IDServiceJdbcImpl implements IDService {
 
                 PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
                 ps.setString(1, csid);
-                ps.setString(2, serializedGenerator);
+                ps.setString(2, serializedIDGenerator);
                 ps.setNull(3, java.sql.Types.VARCHAR);
 
                 int rowsUpdated = ps.executeUpdate();
@@ -549,7 +552,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public IDGeneratorInstance readIDGenerator(String csid) throws Exception {
+    public IDGeneratorInstance readIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid) throws Exception {
 
         logger.debug("> in readIDGenerator");
 
@@ -557,8 +560,7 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-
-            conn = getJdbcConnection();
+            conn = getJdbcConnection(ctx.getRepositoryName());
             Statement stmt = conn.createStatement();
 
             ResultSet rs = stmt.executeQuery(
@@ -617,7 +619,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public Map<String, IDGeneratorInstance> readIDGeneratorsList()
+    public Map<String, IDGeneratorInstance> readIDGeneratorsList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception {
 
         logger.debug("> in readIDGeneratorsList");
@@ -628,7 +630,7 @@ public class IDServiceJdbcImpl implements IDService {
         Connection conn = null;
         try {
 
-            conn = getJdbcConnection();
+            conn = getJdbcConnection(ctx.getRepositoryName());
             Statement stmt = conn.createStatement();
 
             ResultSet rs = stmt.executeQuery(
@@ -690,8 +692,9 @@ public class IDServiceJdbcImpl implements IDService {
      *
      * @throws  IllegalStateException if a storage-related error occurred.
      */
-    public void updateIDGenerator(String csid, SettableIDGenerator generator)
-            throws Exception {
+    private void updateIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		String csid, 
+    		SettableIDGenerator generator) throws Exception {
 
         logger.debug("> in updateIDGenerator(String, SettableIDGenerator)");
 
@@ -710,7 +713,7 @@ public class IDServiceJdbcImpl implements IDService {
         }
 
         try {
-            updateIDGenerator(csid, serializedGenerator);
+            updateIDGenerator(ctx, csid, serializedGenerator);
         } catch (DocumentNotFoundException e) {
             throw e;
         } catch (BadRequestException e) {
@@ -746,21 +749,22 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public void updateIDGenerator(String csid, String serializedGenerator)
-            throws Exception {
+    public void updateIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		String csid, 
+    		String serializedIDGenerator) throws Exception {
 
         logger.debug("> in updateIDGenerator(String, String)");
 
         // @TODO: Add checks for authorization to perform this operation.
 
-        if (serializedGenerator == null || serializedGenerator.equals("")) {
+        if (serializedIDGenerator == null || serializedIDGenerator.equals("")) {
             throw new BadRequestException(
                     "Could not understand or parse this representation of an ID generator.");
         }
 
         SettableIDGenerator generator;
         try {
-            generator = IDGeneratorSerializer.deserialize(serializedGenerator);
+            generator = IDGeneratorSerializer.deserialize(serializedIDGenerator);
         } catch (IllegalArgumentException e) {
             throw e;
         }
@@ -768,8 +772,7 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-
-            conn = getJdbcConnection();
+            conn = getJdbcConnection(ctx.getRepositoryName());
             conn.setAutoCommit(false);
             Statement stmt = conn.createStatement();
 
@@ -810,7 +813,7 @@ public class IDServiceJdbcImpl implements IDService {
                     + "WHERE csid = ?";
 
             PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
-            ps.setString(1, serializedGenerator);
+            ps.setString(1, serializedIDGenerator);
             ps.setString(2, lastId);
             ps.setString(3, csid);
 
@@ -856,7 +859,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if a storage-related error occurred.
      */
     @Override
-    public void deleteIDGenerator(String csid)
+    public void deleteIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid)
             throws Exception {
 
         logger.debug("> in deleteIDGenerator");
@@ -865,8 +868,7 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-
-            conn = getJdbcConnection();
+            conn = getJdbcConnection(ctx.getRepositoryName());
             Statement stmt = conn.createStatement();
 
             // Test whether this ID generator already exists in the database.
@@ -938,13 +940,13 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  LoginException
      * @throws  SQLException if a storage-related error occurred.
      */
-    public Connection getJdbcConnection() throws NamingException, SQLException {
+    public Connection getJdbcConnection(String repositoryName) throws NamingException, SQLException {
 
         logger.debug("> in getJdbcConnection");
         
         Connection conn = null;
         try {
-            conn = JDBCTools.getConnection(JDBCTools.NUXEO_REPOSITORY_NAME);
+            conn = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName);
         } catch (NamingException e) {
             throw e;
         } catch (SQLException e) {
@@ -966,7 +968,7 @@ public class IDServiceJdbcImpl implements IDService {
      * @throws  IllegalStateException if an error occurs while checking for the
      *          existence of the specified table.
      */
-    public boolean hasTable(String tablename) throws Exception {
+    private boolean hasTable(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String tablename) throws Exception {
 
         logger.debug("> in hasTable");
 
@@ -976,8 +978,7 @@ public class IDServiceJdbcImpl implements IDService {
 
         Connection conn = null;
         try {
-
-            conn = getJdbcConnection();
+            conn = getJdbcConnection(ctx.getRepositoryName());
 
             // Retrieve a list of tables in the current database.
             final String CATALOG_NAME = null;

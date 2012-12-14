@@ -56,6 +56,7 @@ import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
+import org.jfree.util.Log;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -70,7 +71,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     private final Logger logger = LoggerFactory.getLogger(ReportDocumentModelHandler.class);
-    private static String REPOSITORY_NAME = JDBCTools.NUXEO_REPOSITORY_NAME;
     private static String REPORTS_FOLDER = "reports";
     private static String CSID_LIST_SEPARATOR = ",";
     
@@ -261,7 +261,20 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     }
 
     private Connection getConnection() throws NamingException, SQLException {
-    	return JDBCTools.getConnection(REPOSITORY_NAME);
+    	Connection result = null;
+    	
+    	ServiceContext ctx = this.getServiceContext();
+    	try {
+    		String repositoryName = ctx.getRepositoryName();
+	    	if (repositoryName != null && repositoryName.trim().isEmpty() == false) {
+	    		result = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName);
+	    	}
+		} catch (Exception e) {
+			Log.error(e);
+			throw new NamingException();
+		}
+    	
+    	return result;
     }
 
 }
