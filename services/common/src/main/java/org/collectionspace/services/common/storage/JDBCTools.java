@@ -29,6 +29,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -361,7 +362,13 @@ public class JDBCTools {
      * @throws SQLException 
      */
     public void printResultSetMetaData(ResultSet rs) throws SQLException {
+        if (rs == null) {
+            return;
+        }
         ResultSetMetaData metadata = rs.getMetaData();
+        if (metadata == null) {
+            return;
+        }
         int numberOfColumns = metadata.getColumnCount();
         for (int i = 1; i <= numberOfColumns; i++) {
             logger.debug(metadata.getColumnName(i));
