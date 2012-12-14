@@ -27,12 +27,15 @@ import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
+import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,9 +143,9 @@ public class ServiceMain {
     		System.out.println("Resuming cspace services initialization.");
     	}
     	
-    	setDataSources();
     	setServerRootDir();
         readConfig();
+    	setDataSources();
         propagateConfiguredProperties();
         //
         // Start up and initialize our embedded Nuxeo server instance
@@ -360,7 +363,11 @@ public class ServiceMain {
      * our instance of embedded Nuxeo, we can find our datasources.  Therefore, we need to preserve the datasources in these
      * static members.
      */
-    private void setDataSources() throws NamingException {
+    private void setDataSources() throws NamingException, Exception {
+    	final String DB_EXISTS_QUERY_PSQL = 
+    			"SELECT 1 AS result FROM pg_database WHERE datname=?";
+    	final String DB_EXISTS_QUERY_MYSQL = 
+    			"SELECT 1 AS result FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=?";
     	//
     	// As a side-effect of calling JDBCTools.getDataSource(...), the DataSource instance will be
     	// cached in a static hash map of the JDBCTools class.  This will speed up lookups as well as protect our
@@ -368,10 +375,205 @@ public class ServiceMain {
     	//
     	DataSource cspaceDataSource = JDBCTools.getDataSource(JDBCTools.CSPACE_DATASOURCE_NAME);
     	DataSource nuxeoDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_DATASOURCE_NAME);
+    	DataSource nuxeoMgrDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_MANAGER_DATASOURCE_NAME);
+    	DataSource nuxeoReaderDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_READER_DATASOURCE_NAME);
+    	
+    	// We need to fetch the user name and password from the nuxeoDataSource, to do grants below
+    	org.apache.tomcat.dbcp.dbcp.BasicDataSource tomcatDataSource =
+    			(org.apache.tomcat.dbcp.dbcp.BasicDataSource)nuxeoDataSource;
+    	// Get the template URL value from the JNDI datasource and substitute the databaseName
+    	String nuxeoUser = tomcatDataSource.getUsername();
+    	String nuxeoPW = tomcatDataSource.getPassword();
+    	// HACK - this should come from another DataSource
+    	tomcatDataSource =
+    			(org.apache.tomcat.dbcp.dbcp.BasicDataSource)nuxeoReaderDataSource;
+    	// Get the template URL value from the JNDI datasource and substitute the databaseName
+    	String readerUser = tomcatDataSource.getUsername();
+    	String readerPW = tomcatDataSource.getPassword();
+    	
     	//
     	// Set our AuthN's datasource to be the cspaceDataSource
     	//
     	AuthN.setDataSource(cspaceDataSource);
+
+    	// Get the NuxeoDS info and create the necessary databases.
+    	// Consider the tenant bindings to find and get the data sources for each tenant.
+    	// There may be only one, one per tenant, or something in between.
+    	DatabaseProductType dbType = JDBCTools.getDatabaseProductType(); // only returns PG or MYSQL
+    	String dbExistsQuery = (dbType==DatabaseProductType.POSTGRESQL)?
+    								DB_EXISTS_QUERY_PSQL : DB_EXISTS_QUERY_MYSQL;
+
+    	Hashtable<String, TenantBindingType> tenantBindings =
+    			tenantBindingConfigReader.getTenantBindings();
+    	HashSet<String> nuxeoDBsChecked = new HashSet<String>();
+    	PreparedStatement pstmt = null;
+    	Statement stmt = null;
+		Connection conn = null;
+		
+    	try {
+    		conn = nuxeoMgrDataSource.getConnection();
+			// First check and create the roles as needed. (nuxeo and reader)
+
+    		
+    		pstmt = conn.prepareStatement(dbExistsQuery); // create a statement
+			stmt = conn.createStatement();
+			
+    		for (TenantBindingType tenantBinding : tenantBindings.values()) {
+    			String tId = tenantBinding.getId();
+    			String tName = tenantBinding.getName();
+    			List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
+    			for (RepositoryDomainType repoDomain : repoDomainList) {
+    				String repoName = repoDomain.getName();
+    				String dbName = /* repoDomain.getRepositoryName()?? */ "nuxeo";
+    				if(nuxeoDBsChecked.contains(dbName)) {
+    					if (logger.isDebugEnabled()) {
+    						logger.debug("Another user of db: "+dbName+": Repo: "+repoName+" and tenant: "
+    								+tName+" (id:"+tId+")");
+    					}
+    				} else {
+    					if (logger.isDebugEnabled()) {
+    						logger.debug("Need to prepare db: "+dbName+" for Repo: "+repoName+" and tenant: "
+    								+tName+" (id:"+tId+")");
+    					}
+
+        				pstmt.setString(1, dbName);			// set dbName param
+            			ResultSet rs = pstmt.executeQuery();
+            			// extract data from the ResultSet
+            			boolean dbExists = rs.next(); 
+            			rs.close();
+            			if(dbExists) {
+        					if (logger.isDebugEnabled()) {
+        						logger.debug("Database: "+dbName+" already exists.");
+        					}
+            			} else {
+            				// Create the user as needed
+            				createUserIfNotExists(conn, dbType, nuxeoUser, nuxeoPW);
+            				createUserIfNotExists(conn, dbType, readerUser, readerPW);
+            				// Create the database
+            				createDatabaseWithRights(conn, dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
+            			}
+    					nuxeoDBsChecked.add(dbName);
+    				}
+    			} // Loop on repos for tenant
+    		} // Loop on tenants
+    	} catch(SQLException se) {
+    		//Handle errors for JDBC
+    		se.printStackTrace();
+    	} catch(Exception e) {
+    		//Handle errors for Class.forName
+    		e.printStackTrace();
+    	} finally {   //close resources
+    		try {
+    			if(stmt!=null) {
+    				stmt.close();
+    			}
+    		} catch(SQLException se2) {
+    			// nothing we can do
+    		}
+    		try{
+    			if(conn!=null) {
+    				conn.close();
+    			}
+    		}catch(SQLException se){
+    			se.printStackTrace();
+    		}
+    	}
+    }
+    
+    private void createUserIfNotExists(Connection conn, DatabaseProductType dbType,
+    		String username, String userPW) throws Exception {
+    	PreparedStatement pstmt = null;
+    	Statement stmt = null;
+    	final String USER_EXISTS_QUERY_PSQL = 
+    			"SELECT 1 AS result FROM pg_roles WHERE rolname=?";
+    	String userExistsQuery;
+    	if(dbType==DatabaseProductType.POSTGRESQL) {
+    		userExistsQuery = USER_EXISTS_QUERY_PSQL;
+    	} else {
+    		throw new UnsupportedOperationException("CreateUserIfNotExists only supports PSQL - MySQL NYI!");
+    	}
+    	try {
+    		pstmt = conn.prepareStatement(userExistsQuery); // create a statement
+    		pstmt.setString(1, username);			// set dbName param
+    		ResultSet rs = pstmt.executeQuery();
+    		// extract data from the ResultSet
+    		boolean userExists = rs.next();
+    		rs.close();
+    		if(userExists) {
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("User: "+username+" already exists.");
+    			}
+    		} else {
+    			stmt = conn.createStatement();
+    			String sql = "CREATE ROLE "+username+" WITH PASSWORD '"+userPW+"' LOGIN";
+    			stmt.executeUpdate(sql);
+    			// Really should do the grants as well. 
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("Created Users: '"+username+"' and 'reader'");
+    			}
+    		}
+    	} catch(Exception e) {
+    		logger.error("createUserIfNotExists failed on exception: " + e.getLocalizedMessage());
+    		throw e;	// propagate
+    	} finally {   //close resources
+    		try {
+    			if(pstmt!=null) {
+    				pstmt.close();
+    			}
+    			if(stmt!=null) {
+    				stmt.close();
+    			}
+    		} catch(SQLException se) {
+    			// nothing we can do
+    		}
+    	}
+    }
+    
+    private void createDatabaseWithRights(Connection conn, DatabaseProductType dbType, String dbName,
+    		String ownerName, String ownerPW, String readerName, String readerPW) throws Exception {
+    	Statement stmt = null;
+    	try {
+			stmt = conn.createStatement();
+    		if(dbType==DatabaseProductType.POSTGRESQL) {
+    			// Postgres does not need passwords.
+    			String sql = "CREATE DATABASE "+dbName+" ENCODING 'UTF8' OWNER "+ownerName;
+    			stmt.executeUpdate(sql);
+    			sql = "GRANT CONNECT ON DATABASE nuxeo TO "+readerName;
+    			stmt.executeUpdate(sql);
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("Created db: '"+dbName+"' with owner: '"+ownerName+"'");
+    				logger.debug(" Granted connect rights on: '"+dbName+"' to reader: '"+readerName+"'");
+    			}
+    			// Note that select rights for reader must be granted after Nuxeo startup.
+    		} else if(dbType==DatabaseProductType.MYSQL) {
+    			String sql = "CREATE database "+dbName+" DEFAULT CHARACTER SET utf8";
+    			stmt.executeUpdate(sql);
+    			sql = "GRANT ALL PRIVILEGES ON "+dbName+".* TO '"+ownerName+"'@'localhost' IDENTIFIED BY '"
+    					+ownerPW+"' WITH GRANT OPTION";
+    			stmt.executeUpdate(sql);
+    			sql = "GRANT SELECT ON "+dbName+".* TO '"+readerName+"'@'localhost' IDENTIFIED BY '"
+    					+readerPW+"' WITH GRANT OPTION";
+    			stmt.executeUpdate(sql);
+    			if (logger.isDebugEnabled()) {
+    				logger.debug("Created db: '"+dbName+"' with owner: '"+ownerName+"'");
+    				logger.debug(" Granted SELECT rights on: '"+dbName+"' to reader: '"+readerName+"'");
+    			}
+    		} else {
+    			throw new UnsupportedOperationException("createDatabaseWithRights only supports PSQL - MySQL NYI!");
+    		}
+    	} catch(Exception e) {
+    		logger.error("createDatabaseWithRights failed on exception: " + e.getLocalizedMessage());
+    		throw e;	// propagate
+    	} finally {   //close resources
+    		try {
+    			if(stmt!=null) {
+    				stmt.close();
+    			}
+    		} catch(SQLException se) {
+    			// nothing we can do
+    		}
+    	}
+
     }
     
     private void setServerRootDir() {
