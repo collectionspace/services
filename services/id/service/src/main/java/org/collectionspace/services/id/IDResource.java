@@ -37,11 +37,18 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
 import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.client.IdClient;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -62,7 +69,7 @@ import org.slf4j.LoggerFactory;
 // Set the base path component for URLs that access this service.
 @Path("/idgenerators")
 @Produces(MediaType.TEXT_PLAIN)
-public class IDResource {
+public class IDResource extends AbstractCollectionSpaceResourceImpl<PoxPayloadIn, PoxPayloadOut> {
 
     final Logger logger = LoggerFactory.getLogger(IDResource.class);
     final static IDService service = new IDServiceJdbcImpl();
@@ -127,9 +134,9 @@ public class IDResource {
 
         String newId = "";
         try {
-
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             // Obtain a new ID from the specified ID generator instance.
-            newId = service.createID(csid);
+            newId = service.createID(ctx, csid);
 
             // If the new ID is empty, return an error response.
             if (newId == null || newId.trim().isEmpty()) {
@@ -182,11 +189,12 @@ public class IDResource {
 
         ResponseBuilder builder = Response.ok();
         Response response = builder.build();
-
+        
         try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 
             String csid = UUID.randomUUID().toString();
-            service.createIDGenerator(csid, xmlPayload);
+            service.createIDGenerator(ctx, csid, xmlPayload);
 
             // Build the URI to be returned in the Location header.
             //
@@ -205,8 +213,11 @@ public class IDResource {
                     Response.created(path.build()).entity("").type(MediaType.TEXT_PLAIN).build();
 
         } catch (Exception e) {
-            response =
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+            		e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+            if (logger.isDebugEnabled() == true) {
+            	e.printStackTrace();
+            }
         }
 
         return response;
@@ -230,8 +241,8 @@ public class IDResource {
 
         String resourceRepresentation = "";
         try {
-
-            IDGeneratorInstance instance = service.readIDGenerator(csid);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            IDGeneratorInstance instance = service.readIDGenerator(ctx, csid);
 
             Document doc = DocumentHelper.createDocument();
             Element root = doc.addElement(ID_GENERATOR_NAME);
@@ -301,9 +312,9 @@ public class IDResource {
 
         String resourceRepresentation = "";
         try {
-
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             Map<String, IDGeneratorInstance> generators =
-                    service.readIDGeneratorsList();
+                    service.readIDGeneratorsList(ctx);
 
             // If no ID generator instances were found, return an empty list.
             if (generators == null || generators.isEmpty()) {
@@ -390,7 +401,8 @@ public class IDResource {
         Response response = builder.build();
 
         try {
-            service.deleteIDGenerator(csid);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            service.deleteIDGenerator(ctx, csid);
             response = Response.ok().entity("").type(MediaType.TEXT_PLAIN).build();
         } catch (Exception e) {
             response =
@@ -660,4 +672,26 @@ public class IDResource {
             return BASE_URL_PATH;
         }
     }
+
+	@Override
+	public Class<?> getCommonPartClass() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceContextFactory<PoxPayloadIn, PoxPayloadOut> getServiceContextFactory() {
+        return MultipartServiceContextFactory.get();
+	}
+
+	@Override
+	public String getServiceName() {
+		return IdClient.SERVICE_NAME;
+	}
+
+	@Override
+	protected String getVersionString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

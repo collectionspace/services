@@ -8,85 +8,68 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
   OF ANY KIND, either express or implied. See the License for the specific language 
   governing permissions and limitations under the License. -->
-<Context antiResourceLocking="false" privileged="true"
-  path="/cspace-services" docBase="cspace-services">
+<Context antiResourceLocking="false" privileged="true" path="/cspace-services"
+    docBase="cspace-services">
 
-	<!-- 
+    <!-- 
 		Setup the security realm for the CollectionSpace services
 	 -->
-	<Realm className="org.apache.catalina.realm.JAASRealm"    
-               appName="CSpaceJBossDBLoginModule" 
-               userClassNames="org.collectionspace.authentication.CSpacePrincipal"       
-               roleClassNames="org.collectionspace.authentication.CSpacePrincipal"/>
-  
-  <!-- Disable HTTP Session persistence between restart since webengine session objects
-    are not serializable -->
-  <Manager pathname="" />
+    <Realm className="org.apache.catalina.realm.JAASRealm" appName="CSpaceJBossDBLoginModule"
+        userClassNames="org.collectionspace.authentication.CSpacePrincipal"
+        roleClassNames="org.collectionspace.authentication.CSpacePrincipal"/>
 
-  <!-- define custom loader that is responsible to start nuxeo runtime (it extends the default one) -->
+    <!-- Disable HTTP Session persistence between restart since webengine session objects are not serializable -->
+    <Manager pathname=""/>
 
-  <!-- Disabled since these are specific to the default Nuxeo DM webapp	
+    <!-- define custom loader that is responsible to start nuxeo runtime (it extends the default one) -->
+
+    <!-- Disabled since these are specific to the default Nuxeo DM webapp	
   <Loader className="org.nuxeo.runtime.tomcat.NuxeoWebappLoader"
     loaderClass="org.nuxeo.runtime.tomcat.NuxeoWebappClassLoader" />
-
+    
   <Listener className="org.nuxeo.runtime.tomcat.NuxeoLauncher" home="${catalina.base}/nxserver" />
   -->
 
-  <!-- Define Nuxeo's JDBC datasources: the JNDI names will be: java:comp/env/jdbc/DATABASE_NAME.
+    <!-- Define Nuxeo's JDBC datasources: the JNDI names will be: java:comp/env/jdbc/DATABASE_NAME.
     For example java:comp/env/jdbc/nxsqldirectory This means you need to update corresponding
     JNDI bindings in nuxeo data source definitions in the config directory -->
 
-  <ResourceLink name="jdbc/nxsqldirectory" global="jdbc/nuxeo" type="javax.sql.DataSource" />
-  <ResourceLink name="jdbc/nxrelations-default-jena" global="jdbc/nuxeo" type="javax.sql.DataSource" />
-  <ResourceLink name="jdbc/comment-relations" global="jdbc/nuxeo" type="javax.sql.DataSource" />
-  <ResourceLink name="jdbc/nxaudit-logs" global="jdbc/nuxeo" type="javax.sql.DataSource" />
-  <ResourceLink name="jdbc/nxjbpm" global="jdbc/nuxeo" type="javax.sql.DataSource" />
-  <ResourceLink name="jdbc/placeful_service_ds" global="jdbc/nuxeo" type="javax.sql.DataSource" />
-  <ResourceLink name="jdbc/nxwebwidgets" global="jdbc/nuxeo" type="javax.sql.DataSource" />
-  <ResourceLink name="jdbc/nxuidsequencer" global="jdbc/nuxeo" type="javax.sql.DataSource" />
+    <ResourceLink name="jdbc/nxsqldirectory" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
+    <ResourceLink name="jdbc/nxrelations-default-jena" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
+    <ResourceLink name="jdbc/comment-relations" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
+    <ResourceLink name="jdbc/nxaudit-logs" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
+    <ResourceLink name="jdbc/nxjbpm" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
+    <ResourceLink name="jdbc/placeful_service_ds" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
+    <ResourceLink name="jdbc/nxwebwidgets" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
+    <ResourceLink name="jdbc/nxuidsequencer" global="jdbc/nuxeo" type="javax.sql.DataSource"/>
 
-  <Resource name="TransactionManager" auth="Container"
-    type="javax.transaction.TransactionManager" factory="org.nuxeo.runtime.jtajca.NuxeoTransactionManagerFactory"
-    transactionTimeoutSeconds="300" />
-  <Transaction factory="org.nuxeo.runtime.jtajca.NuxeoUserTransactionFactory" />
-  <Resource name="NuxeoConnectionManager" auth="Container"
-    type="javax.resource.spi.ConnectionManager" factory="org.nuxeo.runtime.jtajca.NuxeoConnectionManagerFactory"
-    minPoolSize="0" maxPoolSize="20"
-    idleTimeoutMinutes="0" />
+    <Resource name="TransactionManager" auth="Container" type="javax.transaction.TransactionManager"
+        factory="org.nuxeo.runtime.jtajca.NuxeoTransactionManagerFactory"
+        transactionTimeoutSeconds="300"/>
+    <Transaction factory="org.nuxeo.runtime.jtajca.NuxeoUserTransactionFactory"/>
+    <Resource name="NuxeoConnectionManager" auth="Container"
+        type="javax.resource.spi.ConnectionManager"
+        factory="org.nuxeo.runtime.jtajca.NuxeoConnectionManagerFactory" minPoolSize="0"
+        maxPoolSize="20" idleTimeoutMinutes="0"/>
 
-  <Resource auth="Container" name="Mail" type="javax.mail.Session"
-	mail.store.protocol="pop3"
-	mail.pop3.host="pop3.nosuchhost.nosuchdomain.com"
-	mail.pop3.user="nobody"
-	mail.transport.protocol="smtp"
-	mail.smtp.host="localhost" mail.smtp.port="25"
-	mail.smtp.starttls.enable="false"
-	mail.smtp.auth="false"
-	mail.smtp.user="anonymous"
-	password="password" mail.from="noreply@nuxeo.com"
-	mail.debug="false" />
+    <Resource auth="Container" name="Mail" type="javax.mail.Session" mail.store.protocol="pop3"
+        mail.pop3.host="pop3.nosuchhost.nosuchdomain.com" mail.pop3.user="nobody"
+        mail.transport.protocol="smtp" mail.smtp.host="localhost" mail.smtp.port="25"
+        mail.smtp.starttls.enable="false" mail.smtp.auth="false" mail.smtp.user="anonymous"
+        password="password" mail.from="noreply@nuxeo.com" mail.debug="false"/>
 
-	<!-- 
+    <!-- 
 		For CollectionSpace services
 	 -->
-    <Resource name="jdbc/CspaceDS"
-           auth="Container"
-           type="javax.sql.DataSource"
-           username="${db.user}"
-           password="${db.user.password}"
-           driverClassName="${db.jdbc.driver.class}"
-           url="jdbc:${db}://${db.host}:${db.port}/cspace"
-           maxActive="8"
-           maxIdle="4"/>
-		
-	<Resource name="jdbc/NuxeoDS"
-           auth="Container"
-           type="javax.sql.DataSource"
-           username="${db.user}"
-           password="${db.user.password}"
-           driverClassName="${db.jdbc.driver.class}"
-           url="jdbc:${db}://${db.host}:${db.port}/nuxeo"
-           maxActive="8"
-           maxIdle="4"/>	
+    <Resource name="jdbc/CspaceDS" auth="Container" type="javax.sql.DataSource"
+        username="${db.user}" password="${db.user.password}"
+        driverClassName="${db.jdbc.driver.class}"
+        url="jdbc:${db}://${db.host}:${db.port}/cspace"
+        maxActive="8" maxIdle="4"/>
 
+    <Resource name="jdbc/NuxeoDS" auth="Container" type="javax.sql.DataSource"
+    	username="${db.user}" password="${db.user.password}"
+    	driverClassName="${db.jdbc.driver.class}"
+        url="jdbc:${db}://${db.host}:${db.port}/${DatabaseName}"
+        maxActive="8" maxIdle="4"/>
 </Context>

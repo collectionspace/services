@@ -27,7 +27,6 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.collectionspace.services</groupId>
   <artifactId>org.collectionspace.services.id.service</artifactId>
   <packaging>jar</packaging>
   <name>services.id.service</name>
@@ -49,6 +48,12 @@
       <version>4.1</version>
       <scope>test</scope>
     </dependency>
+
+	<dependency>
+	    <groupId>org.collectionspace.services</groupId>
+	    <artifactId>org.collectionspace.services.id.client</artifactId>
+	    <version>${project.version}</version>
+	</dependency>
 
     <!-- Cobertura, a tool for identifying the extent of code coverage in test classes
     <dependency>

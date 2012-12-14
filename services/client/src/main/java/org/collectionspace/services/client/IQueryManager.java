@@ -94,6 +94,8 @@ public interface IQueryManager {
 
 	public void execQuery(String queryString);
 	
+	public String getDatasourceName();
+	
 	/**
 	 * Creates the where clause from keywords.
 	 * 
@@ -126,7 +128,10 @@ public interface IQueryManager {
 	 * 
 	 * @return the string
 	 */
-	public String createWhereClauseForPartialMatch(String field, String partialTerm);
+	public String createWhereClauseForPartialMatch(String dataSourceName,
+			String repositoryName,
+			String field,
+			String partialTerm);
 
 	/**
 	 * Creates a filtering where clause from docType, for invocables.

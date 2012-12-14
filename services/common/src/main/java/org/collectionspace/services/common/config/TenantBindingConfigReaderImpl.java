@@ -361,12 +361,10 @@ public class TenantBindingConfigReaderImpl
         }
         String repoDomain = serviceBinding.getRepositoryDomain(); 
         if (repoDomain == null) {
-        	/* This is excessive - every call to a JPA based service dumps this msg.
-            if (logger.isDebugEnabled()) {
-                logger.debug("No repository domain configured for " + serviceName
+            if (logger.isTraceEnabled()) {
+                logger.trace("No repository domain configured for " + serviceName
                         + " of tenant with id=" + tenantId);
             }
-            */
             return null;
         }
         String key = this.getTenantQualifiedIdentifier(tenantId, repoDomain.trim());

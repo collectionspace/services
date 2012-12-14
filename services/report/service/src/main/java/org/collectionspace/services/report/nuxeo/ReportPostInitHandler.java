@@ -57,12 +57,13 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */
     @Override
-    public void onRepositoryInitialized(DataSource dataSource,
+    public void onRepositoryInitialized(String dataSourceName,
+    		String repositoryName,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
-    		List<Property> properties) throws Exception {
+    		List<Property> propertyList) throws Exception {
         //Check for existing privileges, and if not there, grant them
-    	for(Property prop:properties) {
+    	for(Property prop : propertyList) {
     		if(READ_ROLE_NAME_KEY.equals(prop.getKey())) {
 	            String value = prop.getValue();
 	            if(Tools.notEmpty(value) && !readerRoleName.equals(value)){
@@ -76,12 +77,16 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
         Statement stmt = null;
         String sql = "";
         try {
-            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType();
+            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
             if (databaseProductType == DatabaseProductType.MYSQL) {
             	// Nothing to do: MYSQL already does wildcard grants in init_db.sql
             } else if(databaseProductType != DatabaseProductType.POSTGRESQL) {
                 throw new Exception("Unrecognized database system " + databaseProductType);
             } else {
+            	//
+            	// FIXME: REM 12/11/2012 - The local 'stmt' is alway null? An exception will always get thrown inside
+            	// this clause
+            	//
                 sql = "REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM "+readerRoleName;
                     stmt.execute(sql);
                 sql = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO "+readerRoleName;
