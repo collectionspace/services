@@ -154,12 +154,8 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         // Iterate through the list of Relation records found and build
         // a list of CollectionObject CSIDs, by extracting the relevant CSIDs
         // from those Relation records.
-
-        // FIXME: The following code might be refactored into a generic 'get
-        // values of a single property from a list of document models' method,
-        // if this doesn't already exist.
-        String csid = "";
-        Set<String> collectionObjectCsids = new HashSet<String>(); // Prevents/removes duplicates on add
+        String csid;
+        Set<String> collectionObjectCsids = new HashSet<String>();
         for (DocumentModel relationDocModel : relationDocModels) {
             csid = getCsidForDesiredDocType(relationDocModel, COLLECTIONOBJECT_DOCTYPE, MOVEMENT_DOCTYPE);
             if (Tools.notBlank(csid)) {
@@ -176,9 +172,9 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             }
         }
 
-        // Iterate through the list of CollectionObject CSIDs found,
-        // obtain their most recently associated Movement, and update
-        // their relevant field value(s) accordingly.
+        // Iterate through the list of CollectionObject CSIDs found.
+        // For each CollectionObject, obtain its most recent, related Movement,
+        // and update relevant field(s) with values from that Movement record.
         DocumentModel collectionObjectDocModel;
         DocumentModel mostRecentMovementDocModel;
         for (String collectionObjectCsid : collectionObjectCsids) {
@@ -194,10 +190,12 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             if (!isActiveDocument(collectionObjectDocModel)) {
                 continue;
             }
+            // Get the CollectionObject's most recent, related Movement.
             mostRecentMovementDocModel = getMostRecentMovement(coreSession, collectionObjectCsid);
             if (mostRecentMovementDocModel == null) {
                 continue;
             }
+            // Update the CollectionObject with values from that Movement.
             collectionObjectDocModel =
                     updateCollectionObjectValuesFromMovement(collectionObjectDocModel, mostRecentMovementDocModel);
             coreSession.saveDocument(collectionObjectDocModel);
@@ -205,8 +203,9 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
 
     }
 
-    // FIXME: Generic methods like many of those below might be split off,
-    // into an event utilities class, base classes, or otherwise. - ADR 2012-12-05
+    // FIXME: Generic methods like many of those below might be split off from
+    // this specific event listener/handler, into an event handler utilities
+    // class, base classes, or otherwise.
     //
     // FIXME: Identify whether the equivalent of the documentMatchesType utility
     // method is already implemented and substitute a call to the latter if so.
@@ -436,9 +435,11 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     // Can be extended by sub-classes to update different/multiple values;
     // e.g. values for moveable locations ("crates").
     /**
-     * Updates a CollectionObject record with selected values from a Movement record.
+     * Updates a CollectionObject record with selected values from a Movement
+     * record.
      *
-     * @param collectionObjectDocModel a document model for a CollectionObject record.
+     * @param collectionObjectDocModel a document model for a CollectionObject
+     * record.
      * @param movementDocModel a document model for a Movement record.
      * @throws ClientException
      */
