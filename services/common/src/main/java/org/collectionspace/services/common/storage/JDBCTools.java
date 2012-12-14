@@ -48,6 +48,9 @@ public class JDBCTools {
     public static String DEFAULT_CSPACE_DATABASE_NAME = ConfigUtils.DEFAULT_CSPACE_DATABASE_NAME;
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME;
     public static String DEFAULT_NUXEO_DATABASE_NAME = ConfigUtils.DEFAULT_NUXEO_DATABASE_NAME;
+    public static String NUXEO_MANAGER_DATASOURCE_NAME = "NuxeoMgrDS";
+    public static String NUXEO_READER_DATASOURCE_NAME = "NuxeoReaderDS";
+    public static String NUXEO_USER_NAME = "nuxeo";
     //
     // Private constants
     //
