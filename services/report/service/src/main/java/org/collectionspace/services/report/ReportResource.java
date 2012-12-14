@@ -58,7 +58,7 @@ import javax.ws.rs.core.UriInfo;
 @Produces("application/xml")
 //@Produces("application/xml;charset=UTF-8")
 public class ReportResource extends ResourceBase {
-    private static String REPOSITORY_NAME = JDBCTools.NUXEO_REPOSITORY_NAME;
+    private static String REPOSITORY_NAME = JDBCTools.NUXEO_DATASOURCE_NAME;
     private static String REPORTS_FOLDER = "reports";
     private static String CSID_LIST_SEPARATOR = ",";
     final Logger logger = LoggerFactory.getLogger(ReportResource.class);

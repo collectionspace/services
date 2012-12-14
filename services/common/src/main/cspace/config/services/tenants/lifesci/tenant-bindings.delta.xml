@@ -5,7 +5,7 @@
 	    	 
   <tenant:tenantBinding id="2" name="lifesci.collectionspace.org" displayName="Life Sciences/Natural History Demo Tenant" version="0.1">
 
-    <tenant:repositoryDomain name="default-domain" storageName="lifesci-domain" repositoryClient="nuxeo-java" />
+    <tenant:repositoryDomain name="default-domain" storageName="lifesci-domain" repositoryName="lifesci-domain" repositoryClient="nuxeo-java" />
 	
 	<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
     <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">

@@ -11,6 +11,8 @@ import org.jboss.resteasy.client.ClientResponse;
  */
 public class IdClient extends AbstractServiceClientImpl<String, String, String, IdProxy> {
 
+    public static final String SERVICE_NAME = "idgenerators";
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
      */

@@ -364,8 +364,8 @@ public abstract class ResourceBase
         //
         if (partialTerm != null && !partialTerm.isEmpty()) {
         	String partialTermMatchField = getPartialTermMatchField(ctx);
-            String ptClause = QueryManager.createWhereClauseForPartialMatch(
-            		partialTermMatchField, partialTerm);
+            String ptClause = QueryManager.createWhereClauseForPartialMatch(ctx, partialTermMatchField,
+            		partialTerm);
             docFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
         } else if (keywords != null && !keywords.isEmpty()) {
             String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);

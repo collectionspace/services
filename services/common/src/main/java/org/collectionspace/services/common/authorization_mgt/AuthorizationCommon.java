@@ -232,7 +232,8 @@ public class AuthorizationCommon {
     }
     
     private static Connection getConnection() throws NamingException, SQLException {
-        return JDBCTools.getConnection(JDBCTools.CSPACE_REPOSITORY_NAME);
+        return JDBCTools.getConnection(JDBCTools.CSPACE_DATASOURCE_NAME,
+        		JDBCTools.DEFAULT_CSPACE_DATABASE_NAME);
     }
     
     /*
@@ -928,7 +929,8 @@ public class AuthorizationCommon {
         // and we're not touching that, so we could safely toss the 
         // accounts, users, account-tenants, account-roles, and start over.
         try {
-    		DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType();
+    		DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(JDBCTools.CSPACE_DATASOURCE_NAME,
+            		JDBCTools.DEFAULT_CSPACE_DATABASE_NAME);
         	conn = getConnection();
 	        ArrayList<String> existingTenants = compileExistingTenants(conn, tenantInfo);
 	        

@@ -32,6 +32,7 @@ import javax.transaction.TransactionManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.jboss.remoting.InvokerLocator;
 import org.nuxeo.common.collections.ListenerList;
 import org.nuxeo.ecm.core.api.repository.Repository;
@@ -41,6 +42,7 @@ import org.nuxeo.ecm.core.api.repository.RepositoryManager;
 import org.nuxeo.ecm.core.client.ConnectionListener;
 import org.nuxeo.ecm.core.client.DefaultLoginHandler;
 import org.nuxeo.ecm.core.client.LoginHandler;
+import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.SchemaManagerImpl;
 import org.nuxeo.ecm.core.schema.TypeProvider;
@@ -376,15 +378,39 @@ public final class NuxeoClientEmbedded {
         return getRepositoryManager().getRepository(name);
     }
 
+    /*
+     * Open a Nuxeo repo session using the passed in repoDomain and use the default tx timeout period
+     */
+    public RepositoryInstance openRepository(RepositoryDomainType repoDomain) throws Exception {
+        return openRepository(repoDomain.getRepositoryName(), -1);
+    }
+    
+    /*
+     * Open a Nuxeo repo session using the passed in repoDomain and use the default tx timeout period
+     */
+    public RepositoryInstance openRepository(String repoName) throws Exception {
+        return openRepository(repoName, -1);
+    }    
+
+    /*
+     * Open a Nuxeo repo session using the default repo with the specified (passed in) tx timeout period
+     */
+    @Deprecated
     public RepositoryInstance openRepository(int timeoutSeconds) throws Exception {
         return openRepository(null, timeoutSeconds);
     }
 
+    /*
+     * Open a Nuxeo repo session using the default repo with the default tx timeout period
+     */
+    @Deprecated
     public RepositoryInstance openRepository() throws Exception {
-        return openRepository(-1 /*default timeout period*/);
+        return openRepository(null, -1 /*default timeout period*/);
     }
 
-    public RepositoryInstance openRepository(String name, int timeoutSeconds) throws Exception {
+    public RepositoryInstance openRepository(String repoName, int timeoutSeconds) throws Exception {
+    	RepositoryInstance result = null;
+    	
     	if (timeoutSeconds > 0) {
     		TransactionManager transactionMgr = TransactionHelper.lookupTransactionManager();
     		transactionMgr.setTransactionTimeout(timeoutSeconds);
@@ -400,20 +426,27 @@ public final class NuxeoClientEmbedded {
     	}
     	
         Repository repository = null;
-        if (name != null) {
-        	repository = getRepositoryManager().getRepository(name);
+        if (repoName != null) {
+        	repository = getRepositoryManager().getRepository(repoName);
         } else {
-        	repository = getRepositoryManager().getDefaultRepository();
+        	repository = getRepositoryManager().getDefaultRepository(); // Add a log info statement here stating that since no repo name was given we'll use the default repo instead
         }
-        RepositoryInstance repo = newRepositoryInstance(repository);
-    	String key = repo.getSessionId();
-        repositoryInstances.put(key, repo);
-        if (logger.isTraceEnabled()) {
-        	logger.trace("Added a new repository instance to our repo list.  Current count is now: "
-        			+ repositoryInstances.size());
+        
+        if (repository != null) {
+	        result = newRepositoryInstance(repository);
+	    	String key = result.getSessionId();
+	        repositoryInstances.put(key, result);
+	        if (logger.isTraceEnabled()) {
+	        	logger.trace("Added a new repository instance to our repo list.  Current count is now: "
+	        			+ repositoryInstances.size());
+	        }
+        } else {
+        	String errMsg = String.format("Could not open a session to the Nuxeo repository='%s'", repoName);
+        	logger.error(errMsg);
+        	throw new Exception(errMsg);
         }
 
-        return repo;
+        return result;
     }
 
     public void releaseRepository(RepositoryInstance repo) throws Exception {
@@ -449,7 +482,7 @@ public final class NuxeoClientEmbedded {
         if (cl == null) {
             cl = NuxeoClientEmbedded.class.getClassLoader();
         }
-        return new RepositoryInstanceHandler(repository).getProxy();
+        return new RepositoryInstanceHandler(repository).getProxy(); // Why a proxy here?
     }
 
     public void addConnectionListener(ConnectionListener listener) {

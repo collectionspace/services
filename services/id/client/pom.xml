@@ -9,7 +9,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.id.client</artifactId>
     <name>services.id.client</name>
 
@@ -19,6 +18,7 @@
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.id.service</artifactId>
@@ -26,6 +26,7 @@
             <scope>test</scope>
             <type>jar</type>
         </dependency>
+        -->
     </dependencies>
 
     <build>

@@ -109,6 +109,7 @@
 
     <target name="create_nuxeo_db"
     description="create tables(s), indices for id service">
+	<!-- No longer required since we are doing this work at system startup
 				<sql driver="${db.jdbc.driver.class}"
             url="${db.jdbc.nuxeo.url}"
             userid="${db.nuxeo.user}"
@@ -127,6 +128,7 @@
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
+		-->
     </target>
 
     <target name="deploy" depends="install"

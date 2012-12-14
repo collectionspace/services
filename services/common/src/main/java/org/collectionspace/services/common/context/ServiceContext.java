@@ -36,6 +36,7 @@ import org.collectionspace.services.common.security.SecurityContext;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
 /**
  *
@@ -146,6 +147,11 @@ public interface ServiceContext<IT, OT> {
      * @return repository domain for the tenant
      */
     public String getRepositoryDomainName();
+    
+    /*
+     * The name of the repository/db for the current context
+     */
+    public String getRepositoryName() throws Exception;
     
     /*
      * Get's the name/label used to create the storage container (folder or directory name)
@@ -323,6 +329,9 @@ public interface ServiceContext<IT, OT> {
 
     public UriInfo getUriInfo();
 
+	public RepositoryDomainType getRepositoryDomain();
+
+	public void setRepositoryDomain(RepositoryDomainType repositoryDomain);
 }
 
 

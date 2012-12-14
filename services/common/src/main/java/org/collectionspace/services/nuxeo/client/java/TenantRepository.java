@@ -83,6 +83,9 @@ public class TenantRepository {
     	LoginContext loginContext = null;
     	try {
 	    	loginContext = Framework.login();
+	    	//
+	    	// Loop through every tenant bindings file
+	    	//
 	        for (TenantBindingType tenantBinding : tenantBindings.values()) {
 	            setup(tenantBinding);
 	        }
@@ -135,29 +138,35 @@ public class TenantRepository {
      * @param repositoryDomain
      * @throws Exception
      */
-    synchronized private void createDomain(TenantBindingType tenantBinding,
+    synchronized private String createDomain(TenantBindingType tenantBinding,
             RepositoryDomainType repositoryDomain) throws Exception {
-        String domainName = repositoryDomain.getName();
+    	String result = null;
+    	
         RepositoryClient repositoryClient = getRepositoryClient(repositoryDomain);
-        String domainId = repositoryClient.getDomainId(repositoryDomain.getStorageName());
+    	String domainStorageName = repositoryDomain.getStorageName();
+        String domainId = repositoryClient.getDomainId(repositoryDomain);
+
         if (domainId == null) {
-            domainId = repositoryClient.createDomain(repositoryDomain.getStorageName());
+        	// If we didn't find it then we need to create it
+            domainId = repositoryClient.createDomain(repositoryDomain);
             if (logger.isDebugEnabled()) {
-                logger.debug("Created repository domain for " + domainName
+                logger.debug("Created repository domain for " + domainStorageName
                         + " id=" + domainId);
             }
             if (logger.isTraceEnabled()) {
-                String checkDomainId = repositoryClient.getDomainId(repositoryDomain.getStorageName());
-                logger.trace("Fetched repository domain for " + domainName
+                String checkDomainId = repositoryClient.getDomainId(repositoryDomain);
+                logger.trace("Fetched repository domain for " + domainStorageName
                         + " fetchedId=" + checkDomainId);
-                // Now try to fetch the workspace
             }
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug("Found repository domain for " + domainName
+                logger.debug("Found repository storage domain for " + domainStorageName
                         + " id=" + domainId);
             }
         }
+        
+        result = domainId;
+        return result;
     }
 
     /**
@@ -176,7 +185,7 @@ public class TenantRepository {
         //retrieve all workspace ids for a domain
         //domain specific table of workspace name and id
         Hashtable<String, String> workspaceIds =
-                repositoryClient.retrieveWorkspaceIds(repositoryDomain.getStorageName());
+                repositoryClient.retrieveWorkspaceIds(repositoryDomain);
         //verify if workspace exists for each service from the tenant binding
         for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
             String serviceName = serviceBinding.getName();
@@ -222,7 +231,7 @@ public class TenantRepository {
                                 + " in repository.  Creating new workspace ...");
                     }
                     workspaceId = repositoryClient.createWorkspace(
-                            repositoryDomain.getStorageName(),
+                            repositoryDomain,
                             serviceBinding.getName());
                     if (workspaceId == null) {
                         if (logger.isWarnEnabled()) {

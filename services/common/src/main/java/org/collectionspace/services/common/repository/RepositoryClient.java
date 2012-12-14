@@ -31,6 +31,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -54,7 +55,7 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
      * @return id of newly created domain space
      * @throws java.lang.Exception
      */
-    public String createDomain(String domainName) throws Exception;
+    public String createDomain(RepositoryDomainType repositoryDomain) throws Exception;
 
     /**
      * getDomainSpaceId gets id of the given domain
@@ -62,7 +63,7 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
      * @return
      * @throws Exception
      */
-    public String getDomainId(String domainName) throws Exception;
+    public String getDomainId(RepositoryDomainType repositoryDomain) throws Exception;
 
     /**
      * retrieveWorkspaceIds retrieve workspace ids for given domain
@@ -70,7 +71,7 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
      * @return Hashtable<workspaceName, workspaceId>
      * @throws Exception
      */
-    public Hashtable<String, String> retrieveWorkspaceIds(String domainName) throws Exception;
+    public Hashtable<String, String> retrieveWorkspaceIds(RepositoryDomainType repositoryDomain) throws Exception;
 
     /**
      * createWorkspace creates a workspace in default repository under given domain
@@ -79,7 +80,7 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
      * @return id of newly created workspace
      * @throws java.lang.Exception
      */
-    public String createWorkspace(String tenantDomain, String workspaceName) throws Exception;
+    public String createWorkspace(RepositoryDomainType repositoryDomain, String workspaceName) throws Exception;
 
     /**
      * getWorkspaceId gets an id of given workspace in default repository under given domain

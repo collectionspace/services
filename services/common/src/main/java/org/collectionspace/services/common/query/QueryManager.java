@@ -27,6 +27,7 @@
 package org.collectionspace.services.common.query;
 
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.nuxeo.QueryManagerNuxeoImpl;
 
 public class QueryManager {
@@ -59,8 +60,12 @@ public class QueryManager {
 	 * 
 	 * @return the string
 	 */
-	static public String createWhereClauseForPartialMatch(String field, String partialTerm) {
-		return queryManager.createWhereClauseForPartialMatch(field, partialTerm);
+	static public String createWhereClauseForPartialMatch(ServiceContext ctx,
+			String field,
+			String partialTerm) throws Exception {
+		String repositoryName = ctx.getRepositoryName();
+		return queryManager.createWhereClauseForPartialMatch(queryManager.getDatasourceName(),
+				repositoryName, field, partialTerm);
 	}
 	
 	/**
