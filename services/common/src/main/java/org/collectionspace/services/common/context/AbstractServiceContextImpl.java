@@ -33,6 +33,7 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.PropertyItemUtils;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -124,35 +125,42 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         //make sure tenant context exists
         checkTenantContext();
 
-        //retrieve service bindings
-        TenantBindingConfigReaderImpl tReader =
-                ServiceMain.getInstance().getTenantBindingConfigReader();
         String tenantId = securityContext.getCurrentTenantId();
-        tenantBinding = tReader.getTenantBinding(tenantId);
-        if (tenantBinding == null) {
-            String msg = "No tenant binding found for tenantId=" + tenantId
-                    + " while processing request for service= " + serviceName;
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        serviceBinding = tReader.getServiceBinding(tenantId, serviceName);
-        if (serviceBinding == null) {
-            String msg = "No service binding found while processing request for "
-                    + serviceName + " for tenant id=" + getTenantId()
-                    + " name=" + getTenantName();
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("tenantId=" + tenantId
-                    + " service binding=" + serviceBinding.getName());
-        }
-        repositoryDomain = tReader.getRepositoryDomain(tenantId, serviceName);
-        if (repositoryDomain != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("tenantId=" + tenantId
-                        + " repository doamin=" + repositoryDomain.getName());
-            }
+        if(AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID.equals(tenantId)) {
+        	// Tenant Manager has no tenant binding, so don't bother...
+        	tenantBinding = null;
+        	serviceBinding = null;
+        	repositoryDomain = null;
+        } else {
+	        //retrieve service bindings
+	        TenantBindingConfigReaderImpl tReader =
+	                ServiceMain.getInstance().getTenantBindingConfigReader();
+	        tenantBinding = tReader.getTenantBinding(tenantId);
+	        if (tenantBinding == null) {
+	            String msg = "No tenant binding found for tenantId=" + tenantId
+	                    + " while processing request for service= " + serviceName;
+	            logger.error(msg);
+	            throw new IllegalStateException(msg);
+	        }
+	        serviceBinding = tReader.getServiceBinding(tenantId, serviceName);
+	        if (serviceBinding == null) {
+	            String msg = "No service binding found while processing request for "
+	                    + serviceName + " for tenant id=" + getTenantId()
+	                    + " name=" + getTenantName();
+	            logger.error(msg);
+	            throw new IllegalStateException(msg);
+	        }
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("tenantId=" + tenantId
+	                    + " service binding=" + serviceBinding.getName());
+	        }
+	        repositoryDomain = tReader.getRepositoryDomain(tenantId, serviceName);
+	        if (repositoryDomain != null) {
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("tenantId=" + tenantId
+	                        + " repository doamin=" + repositoryDomain.getName());
+	            }
+	        }
         }
     }
 
@@ -525,6 +533,13 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return result;
     }
 
+    @Override
+    public void setDocumentHandler(DocumentHandler handler) throws Exception {
+        if (handler != null) {
+        	docHandler = handler;
+        }
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getDocumentHanlder(javax.ws.rs.core.MultivaluedMap)
      */
@@ -571,6 +586,14 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         }
         valHandlers = handlers;
         return valHandlers;
+    }
+    
+    @Override
+    public void addValidatorHandler(ValidatorHandler<IT, OT> validator) throws Exception {
+        if (valHandlers == null) {
+            valHandlers = new ArrayList<ValidatorHandler<IT, OT>>();
+        }
+        valHandlers.add(validator);
     }
 
     /* (non-Javadoc)

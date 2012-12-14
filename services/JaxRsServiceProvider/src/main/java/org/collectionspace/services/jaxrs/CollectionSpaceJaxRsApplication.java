@@ -23,6 +23,7 @@
 package org.collectionspace.services.jaxrs;
 
 import org.collectionspace.services.account.AccountResource;
+import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
@@ -99,6 +100,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new SecurityInterceptor());
         
         singletons.add(new AccountResource());
+        singletons.add(new TenantResource());
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
         singletons.add(new ServiceGroupResource());

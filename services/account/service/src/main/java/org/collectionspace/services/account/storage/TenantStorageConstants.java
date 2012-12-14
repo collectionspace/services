@@ -47,41 +47,21 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.collectionspace.services.common.storage.jpa;
 
-import java.util.List;
-import org.collectionspace.authentication.AuthN;
-import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.context.ServiceContext;
+package org.collectionspace.services.account.storage;
 
 /**
- * JPA query specific document filter
+ * TenantStorageConstants declares query params, etc.
+ * @author
  */
-public class JpaDocumentFilter extends DocumentFilter {
-	
-	public static final String Q_ASC = "asc"; 
-	public static final String Q_DESC = "desc"; 
-	public static final String JPA_ASC = " ASC"; 
-	public static final String JPA_DESC = " DESC"; 
+public class TenantStorageConstants {
 
-    public JpaDocumentFilter(ServiceContext ctx) {
-        super(ctx);
-    }
+    final public static String Q_NAME = "name";
+    final public static String Q_INCLUDE_DISABLED= "inclDis";
+    final public static String Q_ORDER_BY= "o";
+    final public static String Q_ORDER_DIR= "d";
 
-    /**
-     * addTenant adds tenant id to the where clause
-     * @param append indicates if append to existing where clause
-     * @param paramList
-     * @return whereClause with tenant context
-     */
-    protected String addTenant(boolean append, List<ParamBinding> paramList) {
-        String whereClause = "";
-        if (!append) {
-            whereClause = " WHERE tenantId = :tenantId";
-        } else {
-            whereClause = " AND tenantId = :tenantId";
-        }
-        paramList.add(new ParamBinding("tenantId", getTenantId()));
-        return whereClause;
-    }
+    final public static String ID_FIELD = "id";
+    final public static String NAME_FIELD = "name";
+    final public static String DISABLED_FIELD = "disabled";
 }

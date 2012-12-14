@@ -266,11 +266,17 @@ public interface ServiceContext<IT, OT> {
     public String getServiceBindingPropertyValue(String propName);
 
     /**
-     * getDocumentHanlder returns document handler configured in the the binding
+     * getDocumentHandler returns document handler configured in the the binding
      * it creates the handler if necessary.
      * @return document handler
      */
     public DocumentHandler getDocumentHandler() throws Exception;
+
+    /**
+     * setDocumentHandler allows for setting an externally created handler
+     * @param handler the dochandler to set into this context
+     */
+    public void setDocumentHandler(DocumentHandler handler) throws Exception;
 
     /**
      * Gets the document hanlder.
@@ -289,6 +295,13 @@ public interface ServiceContext<IT, OT> {
      * @return validation handlers
      */
     public List<ValidatorHandler<IT, OT>> getValidatorHandlers() throws Exception;
+
+    /**
+     * getValidatorHandlers returns registered (from binding) validtor handlers
+     * for the service. it creates the handlers if necessary.
+     * @return validation handlers
+     */
+    public void addValidatorHandler(ValidatorHandler<IT, OT> validator) throws Exception;
 
     /**
      * Gets the query params.
