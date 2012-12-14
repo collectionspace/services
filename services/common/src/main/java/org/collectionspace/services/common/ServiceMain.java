@@ -7,6 +7,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 import javax.naming.NamingException;
@@ -23,6 +28,7 @@ import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.init.AddIndices;
 import org.collectionspace.services.config.service.InitHandler.Params.Field;
 import org.collectionspace.services.common.init.IInitHandler;
+import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.ServiceConfig;
@@ -399,7 +405,9 @@ public class ServiceMain {
     	// Get the NuxeoDS info and create the necessary databases.
     	// Consider the tenant bindings to find and get the data sources for each tenant.
     	// There may be only one, one per tenant, or something in between.
-    	DatabaseProductType dbType = JDBCTools.getDatabaseProductType(); // only returns PG or MYSQL
+    	DatabaseProductType dbType = JDBCTools.getDatabaseProductType(
+    			JDBCTools.CSPACE_DATASOURCE_NAME,
+    			JDBCTools.DEFAULT_CSPACE_DATABASE_NAME); // only returns PG or MYSQL
     	String dbExistsQuery = (dbType==DatabaseProductType.POSTGRESQL)?
     								DB_EXISTS_QUERY_PSQL : DB_EXISTS_QUERY_MYSQL;
 
@@ -538,7 +546,7 @@ public class ServiceMain {
     			// Postgres does not need passwords.
     			String sql = "CREATE DATABASE "+dbName+" ENCODING 'UTF8' OWNER "+ownerName;
     			stmt.executeUpdate(sql);
-    			sql = "GRANT CONNECT ON DATABASE nuxeo TO "+readerName;
+    			sql = "GRANT CONNECT ON DATABASE "+dbName+" TO "+readerName;
     			stmt.executeUpdate(sql);
     			if (logger.isDebugEnabled()) {
     				logger.debug("Created db: '"+dbName+"' with owner: '"+ownerName+"'");

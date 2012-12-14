@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
-<component name="config:lifesci-domain-repository">
+<component name="config:lifesci_domain-repository">
 	<extension target="org.nuxeo.ecm.core.repository.RepositoryService"
 		point="repository">
-		<repository name="lifesci-domain"
+		<repository name="lifesci_domain"
 			factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
-			<repository name="lifesci-domain">
+			<repository name="lifesci_domain">
 		        <clustering enabled="false" delay="1000" />
 		        <binaryStore path="" />
 				<!-- The transactional datasource for Nuxeo -->
 				<xa-datasource>@XA_DATASOURCE@</xa-datasource>				
-				<property name="URL">jdbc:postgresql://localhost:5432/lifesci-domain</property>
+				<property name="URL">jdbc:postgresql://localhost:5432/lifesci_domain</property>
 				<property name="ServerName">@DB_SERVER_HOSTNAME@</property>				
-				<property name="DatabaseName">lifesci-domain</property>
+				<property name="DatabaseName">lifesci_domain</property>
 				<property name="User">@NUXEO_USER@</property>
 				<property name="Password">@NUXEO_PW@</property>
 
@@ -413,7 +413,7 @@
 
 	<extension target="org.nuxeo.ecm.core.api.repository.RepositoryManager"
 		point="repositories">
-		<documentation>The lifesci-domain repository</documentation>
-		<repository name="lifesci-domain" label="Default Repository" />
+		<documentation>The lifesci_domain repository</documentation>
+		<repository name="lifesci_domain" label="Default Repository" />
 	</extension>
 </component>

@@ -1,5 +1,6 @@
 -- drop all the objects before dropping roles
 DROP database IF EXISTS nuxeo;
+DROP database IF EXISTS lifesci_domain;
 
 DROP USER IF EXISTS nuxeo;
 DROP USER IF EXISTS reader;
