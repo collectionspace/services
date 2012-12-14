@@ -32,21 +32,7 @@ public class ConfigUtils {
 		
     	return result;
     }
-    
-    /*
-     * By convention, the repository name and database name are the same.  However, this
-     * call encapulates that convention and allows overrides.
-     */
-    public static String getDatabaseName(TenantBindingType tenantBindingType, String domainName) {
-    	String result = getRepositoryName(tenantBindingType, domainName);
-    	
-    	if (result.equalsIgnoreCase(DEFAULT_NUXEO_REPOSITORY_NAME) == true) {
-    		result = DEFAULT_NUXEO_DATABASE_NAME;
-    	}
-    	
-    	return result;
-    }
-    
+        
     public static String getRepositoryName(TenantBindingType tenantBindingType, String domainName) {
 		String result = null;
 		
