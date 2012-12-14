@@ -43,6 +43,9 @@ public class JDBCTools {
 	public static HashMap<String, DataSource> cachedDataSources = new HashMap<String, DataSource>();
     public static String CSPACE_REPOSITORY_NAME = "CspaceDS";
     public static String NUXEO_REPOSITORY_NAME = "NuxeoDS";
+    public static String NUXEO_MANAGER_DATASOURCE_NAME = "NuxeoMgrDS";
+    public static String NUXEO_READER_DATASOURCE_NAME = "NuxeoReaderDS";
+    public static String NUXEO_USER_NAME = "nuxeo";
     //
     // Private constants
     //
@@ -212,7 +215,9 @@ public class JDBCTools {
     	if(DBProductName==null) {
 	        Connection conn = null;
 	        try {
-	            conn = getConnection(getDefaultRepositoryName()); //FIXME: REM - getDefaultRepositoryName returns the Nuxeo repo name -we should be using the "cspace" repo name
+	        	// Nuxeo database may not yet exist, so use teh cspace db, which must exist.
+	            //conn = getConnection(getDefaultRepositoryName()); //FIXME: REM - getDefaultRepositoryName returns the Nuxeo repo name -we should be using the "cspace" repo name
+	            conn = getConnection(CSPACE_REPOSITORY_NAME);
 	            DBProductName = conn.getMetaData().getDatabaseProductName();
 	        } catch (Exception e) {
 	        } finally {
