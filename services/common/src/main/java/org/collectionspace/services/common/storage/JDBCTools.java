@@ -46,6 +46,9 @@ public class JDBCTools {
     public static String DEFAULT_CSPACE_DATABASE_NAME = ConfigUtils.DEFAULT_CSPACE_DATABASE_NAME;
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME;
     public static String DEFAULT_NUXEO_DATABASE_NAME = ConfigUtils.DEFAULT_NUXEO_DATABASE_NAME;
+    public static String NUXEO_MANAGER_DATASOURCE_NAME = "NuxeoMgrDS";
+    public static String NUXEO_READER_DATASOURCE_NAME = "NuxeoReaderDS";
+    public static String NUXEO_USER_NAME = "nuxeo";
     //
     // Private constants
     //
@@ -232,16 +235,17 @@ public class JDBCTools {
      * 
      * @return the database product name
      */
-    public static String getDatabaseProductName() {
+    public static String getDatabaseProductName(String dataSourceName,
+    		String repositoryName) {
     	if (DBProductName == null) {
 	        Connection conn = null;
 	        try {
-	            conn = getConnection(CSPACE_DATASOURCE_NAME, DEFAULT_CSPACE_DATABASE_NAME);
+	            conn = getConnection(dataSourceName, repositoryName);
 	            DBProductName = conn.getMetaData().getDatabaseProductName();
 	        } catch (Exception e) {
 	        	if (logger.isTraceEnabled() == true) {
 	        		logger.trace(String.format("Could not open a connection. DataSource='%s' DB='%s'.",
-	        				CSPACE_DATASOURCE_NAME, DEFAULT_CSPACE_DATABASE_NAME));
+	        				dataSourceName, repositoryName));
 	        	}
 	        } finally {
 	            try {
@@ -269,14 +273,13 @@ public class JDBCTools {
     		String repositoryName) throws Exception {
     	DatabaseProductType result = DatabaseProductType.UNRECOGNIZED;
     	
-        String productName = getDatabaseProductName();
+        String productName = getDatabaseProductName(dataSourceName, repositoryName);
         if (productName.matches("(?i).*mysql.*")) {
         	result = DatabaseProductType.MYSQL;
         } else if (productName.matches("(?i).*postgresql.*")) {
         	result = DatabaseProductType.POSTGRESQL;
         } else {
-            throw new Exception("Unrecognized database system " 
-            					+ productName);
+            throw new Exception("Unrecognized database system " + productName);
         }
     	
         return result;
@@ -297,7 +300,7 @@ public class JDBCTools {
     }
     
     /**
-     * Returns the catalog name for an open JDBC connection.
+     * Returns the catalog/database name for an open JDBC connection.
      * 
      * @param conn an open JDBC Connection
      * @return the catalog name.
