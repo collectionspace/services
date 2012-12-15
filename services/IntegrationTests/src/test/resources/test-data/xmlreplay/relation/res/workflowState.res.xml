@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="workflow">
+    <ns2:workflow_common xmlns:ns2="http://collectionspace.org/services/workflow" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <lifeCyclePolicy>cs_default</lifeCyclePolicy>
+        <currentLifeCycleState>${workflowState}</currentLifeCycleState>
+    </ns2:workflow_common>
+</document>
