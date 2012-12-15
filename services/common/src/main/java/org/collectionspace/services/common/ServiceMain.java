@@ -177,6 +177,15 @@ public class ServiceMain {
         } catch(Throwable e) {        	
         	logger.error("Default accounts and permissions setup failed with exception(s): " + e.getLocalizedMessage(), e);
         }        
+        
+        /*
+         * This might be useful for something, but the reader grants are better handled in the ReportPostInitHandler.
+        try {
+        	handlePostNuxeoInitDBTasks();
+        } catch(Throwable e) {        	
+        	logger.error("handlePostNuxeoInitDBTasks failed with exception(s): " + e.getLocalizedMessage(), e);
+        }
+        */
     }
 
     /**
@@ -390,12 +399,16 @@ public class ServiceMain {
     	// Get the template URL value from the JNDI datasource and substitute the databaseName
     	String nuxeoUser = tomcatDataSource.getUsername();
     	String nuxeoPW = tomcatDataSource.getPassword();
-    	// HACK - this should come from another DataSource
-    	tomcatDataSource =
-    			(org.apache.tomcat.dbcp.dbcp.BasicDataSource)nuxeoReaderDataSource;
-    	// Get the template URL value from the JNDI datasource and substitute the databaseName
-    	String readerUser = tomcatDataSource.getUsername();
-    	String readerPW = tomcatDataSource.getPassword();
+    	// Get reader data source, if any
+    	String readerUser = null;
+    	String readerPW = null;
+    	if(nuxeoReaderDataSource!= null) {
+	    	tomcatDataSource =
+	    			(org.apache.tomcat.dbcp.dbcp.BasicDataSource)nuxeoReaderDataSource;
+	    	// Get the template URL value from the JNDI datasource and substitute the databaseName
+	    	readerUser = tomcatDataSource.getUsername();
+	    	readerPW = tomcatDataSource.getPassword();
+    	}
     	
     	//
     	// Set our AuthN's datasource to be the cspaceDataSource
@@ -456,7 +469,9 @@ public class ServiceMain {
             			} else {
             				// Create the user as needed
             				createUserIfNotExists(conn, dbType, nuxeoUser, nuxeoPW);
-            				createUserIfNotExists(conn, dbType, readerUser, readerPW);
+            				if(readerUser!=null) {
+            					createUserIfNotExists(conn, dbType, readerUser, readerPW);
+            				}
             				// Create the database
             				createDatabaseWithRights(conn, dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
             			}
@@ -546,11 +561,15 @@ public class ServiceMain {
     			// Postgres does not need passwords.
     			String sql = "CREATE DATABASE "+dbName+" ENCODING 'UTF8' OWNER "+ownerName;
     			stmt.executeUpdate(sql);
-    			sql = "GRANT CONNECT ON DATABASE "+dbName+" TO "+readerName;
-    			stmt.executeUpdate(sql);
     			if (logger.isDebugEnabled()) {
     				logger.debug("Created db: '"+dbName+"' with owner: '"+ownerName+"'");
-    				logger.debug(" Granted connect rights on: '"+dbName+"' to reader: '"+readerName+"'");
+    			}
+    			if(readerName!= null) {
+	    			sql = "GRANT CONNECT ON DATABASE "+dbName+" TO "+readerName;
+	    			stmt.executeUpdate(sql);
+	    			if (logger.isDebugEnabled()) {
+	    				logger.debug(" Granted connect rights on: '"+dbName+"' to reader: '"+readerName+"'");
+	    			}
     			}
     			// Note that select rights for reader must be granted after Nuxeo startup.
     		} else if(dbType==DatabaseProductType.MYSQL) {
@@ -559,12 +578,16 @@ public class ServiceMain {
     			sql = "GRANT ALL PRIVILEGES ON "+dbName+".* TO '"+ownerName+"'@'localhost' IDENTIFIED BY '"
     					+ownerPW+"' WITH GRANT OPTION";
     			stmt.executeUpdate(sql);
-    			sql = "GRANT SELECT ON "+dbName+".* TO '"+readerName+"'@'localhost' IDENTIFIED BY '"
-    					+readerPW+"' WITH GRANT OPTION";
-    			stmt.executeUpdate(sql);
     			if (logger.isDebugEnabled()) {
     				logger.debug("Created db: '"+dbName+"' with owner: '"+ownerName+"'");
-    				logger.debug(" Granted SELECT rights on: '"+dbName+"' to reader: '"+readerName+"'");
+    			}
+    			if(readerName!= null) {
+	    			sql = "GRANT SELECT ON "+dbName+".* TO '"+readerName+"'@'localhost' IDENTIFIED BY '"
+	    					+readerPW+"' WITH GRANT OPTION";
+	    			stmt.executeUpdate(sql);
+	    			if (logger.isDebugEnabled()) {
+	    				logger.debug(" Granted SELECT rights on: '"+dbName+"' to reader: '"+readerName+"'");
+	    			}
     			}
     		} else {
     			throw new UnsupportedOperationException("createDatabaseWithRights only supports PSQL - MySQL NYI!");
@@ -583,6 +606,56 @@ public class ServiceMain {
     	}
 
     }
+    
+    /*
+     * This might be useful for something, but the reader grants are better handled in the ReportPostInitHandler.
+    private void handlePostNuxeoInitDBTasks() throws Exception {
+    	Statement stmt = null;
+		Connection conn = null;
+		
+    	try {
+        	DataSource nuxeoMgrDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_MANAGER_DATASOURCE_NAME);
+        	DataSource nuxeoReaderDataSource = JDBCTools.getDataSource(JDBCTools.NUXEO_READER_DATASOURCE_NAME);
+        	
+        	if(nuxeoReaderDataSource!=null) {
+	        	// We need to fetch the user name and password from the nuxeoDataSource, to do grants below
+	        	org.apache.tomcat.dbcp.dbcp.BasicDataSource tomcatDataSource =
+	        			(org.apache.tomcat.dbcp.dbcp.BasicDataSource)nuxeoReaderDataSource;
+	        	// Get the template URL value from the JNDI datasource and substitute the databaseName
+	        	String readerUser = tomcatDataSource.getUsername();
+	        	DatabaseProductType dbType = JDBCTools.getDatabaseProductType(
+	        			JDBCTools.CSPACE_DATASOURCE_NAME,
+	        			JDBCTools.DEFAULT_CSPACE_DATABASE_NAME); // only returns PG or MYSQL
+	
+	    		conn = nuxeoMgrDataSource.getConnection();
+	        	stmt = conn.createStatement();
+	    		if(dbType==DatabaseProductType.POSTGRESQL) {
+	    			// Note that select rights for reader must be granted after Nuxeo startup.
+	    			String sql = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO "+readerUser;
+	    			stmt.executeUpdate(sql);
+	    			if (logger.isDebugEnabled()) {
+	    				logger.debug(" Granted SELECT rights on all public tables to reader: '"+readerUser+"'");
+	    			}
+	    		} else if(dbType==DatabaseProductType.MYSQL) {
+	    		} else {
+	    			throw new UnsupportedOperationException("handlePostNuxeoInitDBTasks only supports Postgres/MySQL.");
+	    		}
+        	}
+    	} catch(Exception e) {
+    		logger.error("handlePostNuxeoInitDBTasks failed on exception: " + e.getLocalizedMessage());
+    		throw e;	// propagate
+    	} finally {   //close resources
+    		try {
+    			if(stmt!=null) {
+    				stmt.close();
+    			}
+    		} catch(SQLException se) {
+    			// nothing we can do
+    		}
+    	}
+
+    }
+     */
     
     private void setServerRootDir() {
         serverRootDir = System.getProperty(SERVER_HOME_PROPERTY);

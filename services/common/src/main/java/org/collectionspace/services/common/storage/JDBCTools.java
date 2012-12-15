@@ -29,6 +29,8 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -39,7 +41,7 @@ import java.util.HashMap;
  * $LastChangedDate:  $
  */
 public class JDBCTools {
-	public static HashMap<String, DataSource> cachedDataSources = new HashMap<String, DataSource>();
+    public static HashMap<String, DataSource> cachedDataSources = new HashMap<String, DataSource>();
     public static String CSPACE_DATASOURCE_NAME = "CspaceDS";
     public static String NUXEO_DATASOURCE_NAME = "NuxeoDS";
     // Default database names
@@ -152,6 +154,11 @@ public class JDBCTools {
     	        
         return result;
     }
+    
+    // Regarding the method below, we might instead identify whether we can
+    // return a CachedRowSet or equivalent.
+    // http://docs.oracle.com/javase/1.5.0/docs/api/javax/sql/rowset/CachedRowSet.html
+    // -- ADR 2012-12-06
 
     /* THIS IS BROKEN - If you close the statement, it closes the ResultSet!!!
     public static ResultSet executeQuery(String repoName, String sql) throws Exception {
@@ -347,6 +354,28 @@ public class JDBCTools {
             // cases where this may be called during server startup.
             System.out.println("username=" + metadata.getUserName());
             System.out.println("database url=" + metadata.getURL());
+        }
+    }
+    
+    /**
+     * Prints metadata related to a JDBC ResultSet, such as column names.
+     * This is a utility method for use during debugging.
+     * 
+     * @param rs a ResultSet.
+     * @throws SQLException 
+     */
+    public void printResultSetMetaData(ResultSet rs) throws SQLException {
+        if (rs == null) {
+            return;
+        }
+        ResultSetMetaData metadata = rs.getMetaData();
+        if (metadata == null) {
+            return;
+        }
+        int numberOfColumns = metadata.getColumnCount();
+        for (int i = 1; i <= numberOfColumns; i++) {
+            logger.debug(metadata.getColumnName(i));
+            // Insert other debug statements to retrieve additional per-column metadata here ...
         }
     }
 		

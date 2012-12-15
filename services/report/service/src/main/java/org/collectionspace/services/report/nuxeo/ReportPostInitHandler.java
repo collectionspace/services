@@ -83,14 +83,12 @@ public class ReportPostInitHandler extends InitHandler implements IInitHandler {
             } else if(databaseProductType != DatabaseProductType.POSTGRESQL) {
                 throw new Exception("Unrecognized database system " + databaseProductType);
             } else {
-            	//
-            	// FIXME: REM 12/11/2012 - The local 'stmt' is alway null? An exception will always get thrown inside
-            	// this clause
-            	//
-                sql = "REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM "+readerRoleName;
-                    stmt.execute(sql);
+                conn = JDBCTools.getConnection(dataSourceName, repositoryName);
+                stmt = conn.createStatement();                
+                //sql = "REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM "+readerRoleName;
+                //stmt.execute(sql);
                 sql = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO "+readerRoleName;
-                    stmt.execute(sql);
+                stmt.execute(sql);
             }
             
         } catch (SQLException sqle) {
