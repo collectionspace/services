@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.services.listener.updateobjectlocationonmove.ecm.types">
+    
+    <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+        <listener name="updateobjectlocationonmovelistener" async="true" postCommit="true"
+                  class="org.collectionspace.services.listener.UpdateObjectLocationOnMove">
+            <event>documentCreated</event>
+            <event>documentModified</event>
+            <event>lifecycle_transition_event</event>
+        </listener>
+    </extension>
+
+</component>

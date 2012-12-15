@@ -14,9 +14,7 @@
     <name>services.3rdparty.nuxeo.listener</name>
 
     <modules>
-<!-- 
-        <module>add_modulename_here</module>
- -->
+        <module>updateobjectlocationonmove</module>
     </modules>
 
     <dependencies>
