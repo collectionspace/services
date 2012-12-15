@@ -101,6 +101,253 @@
              <uri>/cspace-services/relations/</uri>
          </test>
     </testGroup>
+    
+    <!-- Test whether a relation is automatically soft deleted -->
+    <!-- when a subject of the relation is deleted --> 
+    <testGroup ID="cascadeDeleteRelationsOnSubjectDelete" autoDeletePOSTS="true">
+         <test ID="createSubject">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+             <expectedCodes>201</expectedCodes>
+         </test>
+         <test ID="createObject">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+             <expectedCodes>201</expectedCodes>
+         </test>
+         <test ID="createRelation">
+             <method>POST</method>
+             <uri>/cspace-services/relations</uri>
+             <filename>relation/r-1.xml</filename>
+             <vars>
+                <var ID="subjectCsid">${createSubject.CSID}</var>
+                <var ID="objectCsid">${createObject.CSID}</var>
+                <var ID="subjectDocumentType">objectexit</var>
+                <var ID="objectDocumentType">objectexit</var>
+                <var ID="relationshipType">affects</var>
+             </vars>
+             <expectedCodes>201</expectedCodes>
+         </test>
+         <test ID="getRelationWorkflowStateBeforeDelete">
+             <method>GET</method>
+             <uri>/cspace-services/relations/${createRelation.CSID}/workflow</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/workflowState.res.xml</filename>
+                <vars>
+                    <var ID="workflowState">project</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="getRelationListBeforeDelete">
+             <method>GET</method>
+             <uri>/cspace-services/relations?sbj=${createSubject.CSID}&amp;wf_deleted=false</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/relationsList.res.xml</filename>
+                <vars>
+                    <var ID="totalItemsValue">1</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="softDeleteSubject">
+             <method>PUT</method>
+             <uri>/cspace-services/objectexit/${createSubject.CSID}/workflow/delete</uri>
+             <expectedCodes>200</expectedCodes>
+             <!-- XmlReplay appears to require a filename on PUT. -->
+             <!-- If not present, throws "java.io.FileNotFoundException: File '' does not exist" -->
+             <!-- The contents of that file, sent in the PUT payload, will be ignored by the services. -->
+             <filename>relation/res/workflowState.res.xml</filename>
+             <vars>
+                 <var ID="workflowState">deleted</var>
+             </vars>
+         </test>
+         <test ID="verifySubjectIsSoftDeleted">
+             <method>GET</method>
+             <uri>/cspace-services/objectexit/${createSubject.CSID}/workflow</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/workflowState.res.xml</filename>
+                <vars>
+                    <var ID="workflowState">deleted</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="verifyRelationIsSoftDeleted">
+             <method>GET</method>
+             <uri>/cspace-services/relations/${createRelation.CSID}/workflow</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/workflowState.res.xml</filename>
+                <vars>
+                    <var ID="workflowState">deleted</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="getRelationListAfterDelete">
+             <method>GET</method>
+             <uri>/cspace-services/relations?sbj=${createSubject.CSID}&amp;wf_deleted=false</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/relationsList.res.xml</filename>
+                <vars>
+                    <var ID="totalItemsValue">0</var>
+                </vars>
+             </response>
+         </test>
+    </testGroup>
+    
+    <!-- Test whether multiple relations are automatically soft deleted -->
+    <!-- when an object of the relation is soft deleted. -->
+    <testGroup ID="cascadeDeleteMultipleRelationsOnObjectDelete" autoDeletePOSTS="true">
+         <test ID="createSubject1">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+             <expectedCodes>201</expectedCodes>
+         </test>
+         <test ID="createSubject2">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+             <expectedCodes>201</expectedCodes>
+         </test>
+         <test ID="createObject">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+             <expectedCodes>201</expectedCodes>
+         </test>
+         <test ID="createRelation1">
+             <method>POST</method>
+             <uri>/cspace-services/relations</uri>
+             <filename>relation/r-1.xml</filename>
+             <vars>
+                <var ID="subjectCsid">${createSubject1.CSID}</var>
+                <var ID="objectCsid">${createObject.CSID}</var>
+                <var ID="subjectDocumentType">objectexit</var>
+                <var ID="objectDocumentType">objectexit</var>
+                <var ID="relationshipType">affects</var>
+             </vars>
+             <expectedCodes>201</expectedCodes>
+         </test>
+         <test ID="createRelation2">
+             <method>POST</method>
+             <uri>/cspace-services/relations</uri>
+             <filename>relation/r-1.xml</filename>
+             <vars>
+                <var ID="subjectCsid">${createSubject2.CSID}</var>
+                <var ID="objectCsid">${createObject.CSID}</var>
+                <var ID="subjectDocumentType">objectexit</var>
+                <var ID="objectDocumentType">objectexit</var>
+                <var ID="relationshipType">affects</var>
+             </vars>
+             <expectedCodes>201</expectedCodes>
+         </test>
+         <test ID="getRelation1WorkflowStateBeforeDelete">
+             <method>GET</method>
+             <uri>/cspace-services/relations/${createRelation1.CSID}/workflow</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/workflowState.res.xml</filename>
+                <vars>
+                    <var ID="workflowState">project</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="getRelation2WorkflowStateBeforeDelete">
+             <method>GET</method>
+             <uri>/cspace-services/relations/${createRelation2.CSID}/workflow</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/workflowState.res.xml</filename>
+                <vars>
+                    <var ID="workflowState">project</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="getRelationListBeforeDelete">
+             <method>GET</method>
+             <uri>/cspace-services/relations?obj=${createObject.CSID}&amp;wf_deleted=false</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/relationsList.res.xml</filename>
+                <vars>
+                    <var ID="totalItemsValue">2</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="softDeleteObject">
+             <method>PUT</method>
+             <uri>/cspace-services/objectexit/${createObject.CSID}/workflow/delete</uri>
+             <expectedCodes>200</expectedCodes>
+             <!-- XmlReplay appears to require a filename on PUT. -->
+             <!-- If not present, throws "java.io.FileNotFoundException: File '' does not exist" -->
+             <!-- The contents of that file, sent in the PUT payload, will be ignored by the services. -->
+             <filename>relation/res/workflowState.res.xml</filename>
+             <vars>
+                 <var ID="workflowState">deleted</var>
+             </vars>
+         </test>
+         <test ID="verifyObjectIsSoftDeleted">
+             <method>GET</method>
+             <uri>/cspace-services/objectexit/${createObject.CSID}/workflow</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/workflowState.res.xml</filename>
+                <vars>
+                    <var ID="workflowState">deleted</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="verifyRelation1IsSoftDeleted">
+             <method>GET</method>
+             <uri>/cspace-services/relations/${createRelation1.CSID}/workflow</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/workflowState.res.xml</filename>
+                <vars>
+                    <var ID="workflowState">deleted</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="verifyRelation2IsSoftDeleted">
+             <method>GET</method>
+             <uri>/cspace-services/relations/${createRelation2.CSID}/workflow</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/workflowState.res.xml</filename>
+                <vars>
+                    <var ID="workflowState">deleted</var>
+                </vars>
+             </response>
+         </test>
+         <test ID="getRelationListAfterDelete">
+             <method>GET</method>
+             <uri>/cspace-services/relations?obj=${createObject.CSID}&amp;wf_deleted=false</uri>
+             <expectedCodes>200</expectedCodes>
+             <response>
+                <expected level="ADDOK" />
+                <filename>relation/res/relationsList.res.xml</filename>
+                <vars>
+                    <var ID="totalItemsValue">0</var>
+                </vars>
+             </response>
+         </test>
+    </testGroup>
          
 </xmlReplay>
         
