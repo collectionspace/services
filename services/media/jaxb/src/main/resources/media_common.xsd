@@ -58,6 +58,7 @@
                 <xs:element name="typeList" type="typeList"/>
                 <xs:element name="uri" type="xs:string" />
                 <xs:element name="blobCsid" type="xs:string" />
+                <xs:element name="externalUrl" type="xs:string" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>

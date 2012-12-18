@@ -50,6 +50,7 @@ import org.collectionspace.services.relation.RelationsCommonList.RelationListIte
 import org.collectionspace.services.relation.RelationsDocListItem;
 
 // HACK HACK HACK
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClient;
@@ -226,7 +227,7 @@ public class RelationDocumentModelHandler
     @Override
     public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc);
-        relList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object");
+        relList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|relationshipMetaType|objectCsid|uri|csid|subject|object");
         ServiceContext ctx = getServiceContext();
         String serviceContextPath = getServiceContextPath();
 
@@ -272,6 +273,8 @@ public class RelationDocumentModelHandler
         relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(), 
         												RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
 
+        relationListItem.setRelationshipMetaType((String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        												RelationJAXBSchema.RELATIONSHIP_META_TYPE));
         relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), 
         												RelationJAXBSchema.OBJECT_CSID));
 
@@ -407,7 +410,7 @@ public class RelationDocumentModelHandler
             }
         }
         if(docModel==null) {
-           	throw new DocumentNotFoundException("Relation.getSubjectOrObjectDocModel could not find doc with CSID: "
+           	throw new DocumentNotFoundException("RelationDMH.getSubjectOrObjectDocModel could not find doc with CSID: "
            				+csid+" and/or refName: "+refName );
         }
         return docModel;
@@ -430,11 +433,12 @@ public class RelationDocumentModelHandler
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID),
 	        					csid);
 	
-	        String uri = (String) subjectOrObjectDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA,
-	        															COLLECTIONSPACE_CORE_URI);
+	        String uri = (String) subjectOrObjectDocModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+	        		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_URI:RelationJAXBSchema.OBJECT_URI),
 	        					uri);
 	        
+	    	/*
 	    	String common_schema = getCommonSchemaNameForDocType(doctype);
 	    	
 	    	if(common_schema!=null) {
@@ -443,6 +447,15 @@ public class RelationDocumentModelHandler
 	            properties.put((fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME),
 	            		refname);
 	    	}
+	    	*/
+	        String refname = (String) 
+	        		subjectOrObjectDocModel.getProperty(
+	        				CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+	        				CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
+            properties.put((fSubject?
+            					RelationJAXBSchema.SUBJECT_REFNAME
+            					:RelationJAXBSchema.OBJECT_REFNAME),
+            				refname);
         } catch (ClientException ce) {
             throw new RuntimeException(
                     "populateSubjectOrObjectValues: Problem fetching field " + ce.getLocalizedMessage());
@@ -458,6 +471,7 @@ public class RelationDocumentModelHandler
         }
     }
     
+    /*
     private String getCommonSchemaNameForDocType(String docType) {
     	String common_schema = null;
     	if(docType!=null) {
@@ -478,5 +492,6 @@ public class RelationDocumentModelHandler
     	}
     	return common_schema;
     }
+    */
 
 }

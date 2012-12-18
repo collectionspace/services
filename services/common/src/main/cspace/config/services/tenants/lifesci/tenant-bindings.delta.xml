@@ -5,7 +5,7 @@
 	    	 
   <tenant:tenantBinding id="2" name="lifesci.collectionspace.org" displayName="Life Sciences/Natural History Demo Tenant" version="0.1">
 
-    <tenant:repositoryDomain name="default-domain" storageName="lifesci-domain" repositoryClient="nuxeo-java" />
+    <tenant:repositoryDomain name="default-domain" storageName="lifesci_domain" repositoryName="lifesci_domain" repositoryClient="nuxeo-java" />
 	
 	<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
     <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
@@ -54,6 +54,15 @@
 		</service:object>
 
 	</tenant:serviceBindings>
+
+  	<tenant:serviceBindings merge:matcher="id" id="Movements">
+  		<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+  			<service:params>
+  				<service:SupportsVersioning>true</service:SupportsVersioning>
+					<service:ListResultsFields merge:action="preserve" />
+  			</service:params>
+  		</service:DocHandlerParams>
+  	</tenant:serviceBindings>
 
 	<tenant:serviceBindings merge:matcher="id" id="Persons">
     <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">

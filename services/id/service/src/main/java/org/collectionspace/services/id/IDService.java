@@ -18,6 +18,10 @@ package org.collectionspace.services.id;
 
 import java.util.Map;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.context.ServiceContext;
+
 /**
  * IDService
  *
@@ -34,10 +38,10 @@ public interface IDService {
     // Create
     // Read single object
     // Generates and returns a new ID from the specified ID generator.
-    public String createID(String csid) throws Exception;
+    public String createID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid) throws Exception;
 
     // Returns the last-generated ID associated with the specified ID generator.
-    public String readLastID(String csid)
+    public String readLastID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid)
             throws Exception;
 
     // Read a list of objects (aka read multiple)
@@ -46,23 +50,24 @@ public interface IDService {
     // ----------------------------------------
     // Create
     // Adds a new ID generator.
-    public void createIDGenerator(String csid, String serializedIDGenerator)
-            throws Exception;
+    public void createIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		String csid, String serializedIDGenerator) throws Exception;
 
     // Read single object
-    public IDGeneratorInstance readIDGenerator(String csid)
+    public IDGeneratorInstance readIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid)
             throws Exception;
 
     // Read a list of objects (aka read multiple)
     // and return a list (map) of those objects and their identifiers.
-    public Map<String, IDGeneratorInstance> readIDGeneratorsList()
+    public Map<String, IDGeneratorInstance> readIDGeneratorsList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception;
 
     // Update
-    public void updateIDGenerator(String csid, String serializedIDGenerator)
-            throws Exception;
+    public void updateIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		String csid, 
+    		String serializedIDGenerator) throws Exception;
 
     // Delete (possibly not permitted - deactivate instead?)
-    public void deleteIDGenerator(String csid)
+    public void deleteIDGenerator(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid)
             throws Exception;
 }

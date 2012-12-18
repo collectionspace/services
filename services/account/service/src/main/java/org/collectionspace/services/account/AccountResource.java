@@ -50,7 +50,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -124,7 +123,7 @@ public class AccountResource extends SecurityResourceBase {
 
     @DELETE
     @Path("{csid}")
-    public Response deleteAccount(@PathParam("csid") String csid) {
+    public Response deleteAccount(@Context UriInfo uriInfo, @PathParam("csid") String csid) {
         logger.debug("deleteAccount with csid=" + csid);
         ensureCSID(csid, ServiceMessages.DELETE_FAILED);
         try {
@@ -140,7 +139,7 @@ public class AccountResource extends SecurityResourceBase {
             AccountRoleSubResource subResource = new AccountRoleSubResource("accounts/accountroles");
             subResource.deleteAccountRole(csid, SubjectType.ROLE);
             ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
-                    AccountsCommon.class);
+                    AccountsCommon.class, uriInfo);
             getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (Exception e) {

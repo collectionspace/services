@@ -80,21 +80,25 @@ import org.slf4j.LoggerFactory;
 public class AddIndices extends InitHandler implements IInitHandler {
 
     final Logger logger = LoggerFactory.getLogger(AddIndices.class);
-    private final static String INDEX_SUFFIX = "_idx";
     private final static String INDEX_SEP = "_";
+    private final static String INDEX_SUFFIX = INDEX_SEP + "idx";
+
 
     /** See the class javadoc for this class: it shows the syntax supported in the configuration params.
      */
     @Override
-    public void onRepositoryInitialized(DataSource dataSource,
+    public void onRepositoryInitialized(String dataSourceName,
+    		String repositoryName,
     		ServiceBindingType sbt, 
     		List<Field> fields, 
     		List<Property> properties) throws Exception {
         //todo: all post-init tasks for services, or delegate to services that override.
         int rows = 0;
         String sql = "";
-        logger.info("Creating indicies, as needed, for designated fields in " + sbt.getName()
-                + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
+        if (logger.isInfoEnabled() && sbt != null) {
+            logger.info("Creating indicies, as needed, for designated fields in " + sbt.getName()
+                    + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
+        }
 
         for (Field field : fields) {
             String tableName = field.getTable();
@@ -103,21 +107,25 @@ public class AddIndices extends InitHandler implements IInitHandler {
             if(Tools.notEmpty(param) && (param.indexOf(',')>-1)){
                 String[] fieldNames = param.split(",");
                 for (String fn: fieldNames){
-                    rows = addOneIndex(dataSource, tableName, fn);
+                    rows = addOneIndex(dataSourceName, repositoryName, tableName, fn);
                 }
             } else {
-                rows = addOneIndex(dataSource, tableName, fieldName);
+                rows = addOneIndex(dataSourceName, repositoryName, tableName, fieldName);
             }
         }
     }
 
-    private int addOneIndex(DataSource dataSource, String tableName, String columnName){
+    private int addOneIndex(String dataSourceName,
+    		String repositoryName, 
+    		String tableName, 
+    		String columnName) {
         int rows = 0;
         String sql = "";
         String indexName = tableName + INDEX_SEP + columnName + INDEX_SUFFIX;
         try {
-            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType();
-            if (indexExists(dataSource, databaseProductType, tableName, columnName, indexName)) {
+        	DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
+            if (indexExists(dataSourceName, repositoryName, databaseProductType,
+            		tableName, columnName, indexName)) {
                 logger.trace("Index already exists for column " + columnName
                         + " in table " + tableName);
                 // FIXME: Can add the option to drop and re-create an index here.
@@ -145,7 +153,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
                 //
                 // If this assumption is no longer valid, we might instead
                 // identify the relevant repository from the table name here.
-                rows = JDBCTools.executeUpdate(dataSource, sql);
+                rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, sql);
                 logger.trace("Index added to column ("+columnName+") on table ("+tableName+")");
             }
             return rows;
@@ -155,7 +163,8 @@ public class AddIndices extends InitHandler implements IInitHandler {
         }
     }
 
-    private boolean indexExists(DataSource dataSource,
+    private boolean indexExists(String dataSourceName,
+    		String repositoryName,
     		DatabaseProductType databaseProductType,
             String tableName, 
             String colName, 
@@ -201,7 +210,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
             //
             // If this assumption is no longer valid, we might instead
             // identify the relevant repository from the table name here.
-            conn = JDBCTools.getConnection(dataSource);
+            conn = JDBCTools.getConnection(dataSourceName, repositoryName);
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if (rs.next()) {

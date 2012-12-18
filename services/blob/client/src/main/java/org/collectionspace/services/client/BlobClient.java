@@ -37,6 +37,8 @@ public class BlobClient extends AbstractCommonListPoxServiceClientImpl<BlobProxy
 
 	//HTTP query param string for specifying a URI source to blob bits.
 	public static final String BLOB_URI_PARAM = "blobUri";
+	public static final String BLOB_CSID_PARAM = "blobCsid";
+	public static final String BLOB_PURGE_ORIGINAL = "blobPurgeOrig";
 	
 	//Image blob metadata labels
 	public static final String IMAGE_MEASURED_PART_LABEL = "digitalImage";

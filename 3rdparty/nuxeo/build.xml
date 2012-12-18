@@ -3,9 +3,9 @@
     <description>
         collectionspace nuxeo
     </description>
-  <!-- set global properties for this build -->
+    <!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
-    <!-- enviornment should be declared before reading build.properties -->
+    <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
@@ -122,13 +122,18 @@
             <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}/config"/>
             <filterset>
                 <filter token="DB" value="${db}" />
-				<filter token="DB_URL" value="jdbc:${db}://localhost:${db.port}/nuxeo${db.url.suffix}" />
+				<filter token="DB_URL" value="jdbc:${db}://${db.host}:${db.port}/nuxeo"/>
+            	<filter token="DB_SERVER_HOSTNAME" value="${db.host}"/>
 				<filter token="XA_DATASOURCE" value="${db.xaDataSource}" />
                 <filter token="NUXEO_USER" value="${db.nuxeo.user}" />
                 <filter token="NUXEO_PW" value="${db.nuxeo.user.password}" />
             </filterset>
         </copy>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-listener/build.xml" target="deploy" inheritall="false"/>
+				<!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems        
+        <ant antfile="nuxeo-platform-thumbnail/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"
@@ -137,8 +142,12 @@
         <delete dir="${jee.server.cspace}/nuxeo-server/config"/>
         <delete dir="${jee.server.cspace}/nuxeo-server/lib"/>
         <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-listener/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote/build.xml" target="undeploy" inheritall="false"/>
 		<ant antfile="nuxeo-platform-quote-api/build.xml" target="undeploy" inheritall="false"/>
+		<!-- Disabled due to integration issues between ImageMagick and Ghostscript on Linux systems
+		<ant antfile="nuxeo-platform-thumbnail/build.xml" target="undeploy" inheritall="false"/>
+		-->
     </target>
 
     <target name="dist"

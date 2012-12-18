@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">
+
+    <ns2:collectionobjects_common
+        xmlns:ns2="http://collectionspace.org/services/collectionobject">
+        <objectNumber>${objectNumber}</objectNumber>
+        <distinguishingFeatures>${distinguishingFeatures}</distinguishingFeatures>
+    </ns2:collectionobjects_common>
+
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation"
+                               xmlns:ns2="http://collectionspace.org/services/jaxb">
+        
+        <!-- Create a hierarchical relationship between an item, -->
+        <!-- its parent, and its children -->
+
+        <!-- Create a relationship between this item and its parent -->
+        <relation-list-item>
+            <!-- The current item being updated above ... -->
+            <subject>
+                <csid>${currentItemCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item -->
+            <object>
+                <csid>${parentCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+            <relationshipMetaType>${relationshipMetaType}</relationshipMetaType>
+       </relation-list-item>
+        
+        <!-- Create a relationship between this item and a child -->
+        <relation-list-item>
+            <!-- A child item ... -->
+            <subject>
+                <csid>${child1CSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item: i.e. the current item being updated above -->
+            <object>
+                <csid>${currentItemCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+        <!-- And to a second child -->
+        <relation-list-item>
+            <!-- A child item ... -->
+            <subject>
+                <csid>${child2CSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item: i.e. the current item being updated above -->
+            <object>
+                <csid>${currentItemCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+    </ns3:relations-common-list>
+</document>
+
+

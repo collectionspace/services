@@ -23,6 +23,9 @@
  */
 package org.collectionspace.services.contact;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -37,10 +40,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-
-import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.*;
+import org.collectionspace.services.common.StoredValuesUriTemplate;
+import org.collectionspace.services.common.UriTemplateFactory;
+import org.collectionspace.services.common.UriTemplateRegistryKey;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -48,6 +51,7 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactJAXBSchema;
+import org.collectionspace.services.contact.nuxeo.ContactConstants;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -150,17 +154,18 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
     public AbstractCommonList getContactList(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
-            @Context UriInfo ui) {
+            @Context UriInfo uriInfo) {
         AbstractCommonList contactObjectList = new AbstractCommonList();
-        try {
-            String parentcsid = lookupParentCSID(parentspecifier, "getContactList(parent)", "GET_CONTACT_LIST", null);
 
+        try {
+            ServiceContext ctx = createServiceContext(getContactServiceName(), uriInfo);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+        	
+            String parentcsid = lookupParentCSID(parentspecifier, "getContactList(parent)", "GET_CONTACT_LIST", null);
             ServiceContext itemCtx = createServiceContext(getItemServiceName());
             String itemcsid = lookupItemCSID(itemspecifier, parentcsid, "getContactList(item)", "GET_CONTACT_LIST", itemCtx);
 
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext ctx = createServiceContext(getContactServiceName(), queryParams);
-            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, ui);
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid, uriInfo);
             DocumentFilter myFilter = handler.getDocumentFilter(); //new DocumentFilter();
             myFilter.appendWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":"
                     + ContactJAXBSchema.IN_AUTHORITY
@@ -178,6 +183,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
                     + parentspecifier + ": and item:" + itemspecifier + ": was not found.",
                     itemspecifier);
         }
+        
         return contactObjectList;
     }
 
@@ -294,4 +300,26 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
                     + ": and item:" + itemspecifier + ": was not found.", csid);
         }
     }
+    
+    protected String getContactDocType() {
+        return ContactConstants.NUXEO_DOCTYPE;
+    }
+    
+    /**
+     * Returns a UriRegistry entry: a map of tenant-qualified URI templates
+     * for the current resource, for all tenants
+     * 
+     * @return a map of URI templates for the current resource, for all tenants
+     */
+    @Override
+    public Map<UriTemplateRegistryKey,StoredValuesUriTemplate> getUriRegistryEntries() {
+        Map<UriTemplateRegistryKey,StoredValuesUriTemplate> uriRegistryEntriesMap =
+                super.getUriRegistryEntries();
+        List<String> tenantIds = getTenantBindingsReader().getTenantIds();
+        for (String tenantId : tenantIds) {
+                uriRegistryEntriesMap.putAll(getUriRegistryEntries(tenantId, getContactDocType(), UriTemplateFactory.CONTACT));
+        }
+        return uriRegistryEntriesMap;
+    }
+
 }

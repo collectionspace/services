@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">
+    <!-- Contents of the specified CollectionObject record itself are -->
+    <!-- ignored here; we are interested only in the relations list below. -->
+    
+    <!--
+        Siblings of the chess board box:
+        (none)
+    -->
+    <!-- Note: the relations-common-list part is NOT returned -->
+    <!-- in calls to showSiblings when there are no matching items. -->
+</document>
+

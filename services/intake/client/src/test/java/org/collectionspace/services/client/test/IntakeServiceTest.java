@@ -33,7 +33,7 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.intake.EntryMethodList;
 import org.collectionspace.services.intake.FieldCollectionEventNameList;
 import org.collectionspace.services.intake.CurrentLocationGroup;

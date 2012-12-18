@@ -41,18 +41,9 @@
     </bean>
      -->
     
-    <!-- 
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.postgresql.Driver"/>
-        <property name="url" value="jdbc:postgresql://localhost:5432/cspace"/>
-        <property name="username" value="postgres"/>
-        <property name="password" value="pgSEE^quell"/>
-    </bean>
-     -->
-
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${db.jdbc.driver.class}"/>
-        <property name="url" value="jdbc:${db}://localhost:${db.port}/cspace"/>
+        <property name="url" value="jdbc:${db}://${db.host}:${db.port}/cspace"/>
         <property name="username" value="${db.user}"/>
         <property name="password" value="${db.user.password}"/>
     </bean>    

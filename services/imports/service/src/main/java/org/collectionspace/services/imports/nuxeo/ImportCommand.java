@@ -1,11 +1,10 @@
 package org.collectionspace.services.imports.nuxeo;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -18,27 +17,38 @@ import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.DocumentModelWriter;
 // we use our own override of this: import org.nuxeo.ecm.core.io.impl.plugins.XMLDirectoryReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // based loosely on package org.nuxeo.ecm.shell.commands.io.ImportCommand;
 public class ImportCommand {
-    private static final Log logger = LogFactory.getLog(ImportCommand.class);
+    
+    private final Logger logger = LoggerFactory.getLogger(ImportCommand.class);
 
-    public String run(String src, String dest) throws Exception {
+    public String run(String src, String dest, int timeOut) throws Exception {
         File file = new File(src);
         ///cspace way of configuring client and auth:
         NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
-        RepositoryInstance  repoSession = client.openRepository();
+        RepositoryInstance  repoSession = client.openRepository(timeOut);
         try {
+            if (logger.isDebugEnabled()) {
+                String msg = String.format("Start of import is Local time: %tT", Calendar.getInstance());
+                logger.debug(msg);
+            }
             return importTree(repoSession, file, dest);
         } catch (Exception e) {
             throw e;
         } finally {
-//            repository.close();
+            if (logger.isDebugEnabled()) {
+        	String msg = String.format("End of import is Local time: %tT", Calendar.getInstance());
+        	logger.debug(msg);
+            }
             client.releaseRepository(repoSession);
         }
     }
 
     String importTree(RepositoryInstance repoSession, File file, String toPath) throws Exception {
+    	Exception failed = null;
         DocumentReader reader = null;
         DocumentWriter writer = null;
         DocumentModel docModel = null;
@@ -49,7 +59,9 @@ public class ImportCommand {
         Integer numRecordsImportedForDocType = new Integer(0);
         int totalRecordsImported = 0;
         try {
-            System.out.println("importTree reading file: "+file+(file!=null ? " exists? "+file.exists() : " file param is null"));
+            if (logger.isInfoEnabled()) {
+                logger.info("importTree reading file: "+file+(file!=null ? " exists? "+file.exists() : " file param is null"));
+            }
             reader = new LoggedXMLDirectoryReader(file);  //our overload of XMLDirectoryReader.
             writer = new DocumentModelWriter(repoSession, toPath, 10);
             DocumentPipe pipe = new DocumentPipeImpl(10);
@@ -57,7 +69,7 @@ public class ImportCommand {
             pipe.setReader(reader);
             pipe.setWriter(writer);
             DocumentTranslationMap dtm = pipe.run();
-            Map<DocumentRef,DocumentRef> documentRefs = dtm.getDocRefMap();
+            Map<DocumentRef,DocumentRef> documentRefs = dtm.getDocRefMap(); // FIXME: Should be checking for null here!
             dump.append("<importedRecords>");
             for (Map.Entry entry: documentRefs.entrySet()) {
                 keyDocRef = (DocumentRef) entry.getKey();
@@ -82,8 +94,11 @@ public class ImportCommand {
             }
             dump.append("</importedRecords>");
         } catch (Exception e) {
-            throw e;
+        	failed = e;
+            throw failed;
         } finally {
+        	String status = failed == null ? "Success" : "Failed";
+        	dump.append("<status>" + status + "</status>");
             dump.append("<totalRecordsImported>"+totalRecordsImported+"</totalRecordsImported>");
             dump.append("<numRecordsImportedByDocType>");
             TreeSet<String> keys = new TreeSet<String>(recordsImportedForDocType.keySet());
@@ -100,6 +115,11 @@ public class ImportCommand {
             }
             if (writer != null) {
                 writer.close();
+            }
+            
+            if (failed != null) {
+            	String msg = "The Import service encountered an exception: " + failed.getLocalizedMessage();
+            	logger.error(msg, failed);
             }
         }
         return dump.toString();

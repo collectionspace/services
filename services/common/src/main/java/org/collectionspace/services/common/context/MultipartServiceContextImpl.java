@@ -28,11 +28,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -91,11 +93,13 @@ public class MultipartServiceContextImpl
      * 
      * @throws UnauthorizedException the unauthorized exception
      */
-    protected MultipartServiceContextImpl(String serviceName,
+    protected MultipartServiceContextImpl(
+    		String serviceName,
     		PoxPayloadIn theInput,
-    		MultivaluedMap<String, String> queryParams) 
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo) 
     			throws DocumentException, UnauthorizedException {
-    	super(serviceName, theInput, queryParams);
+    	super(serviceName, theInput, resourceMap, uriInfo);
     	setOutput(new PoxPayloadOut(serviceName));
     }
 

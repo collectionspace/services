@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">  
+    <!-- Contents of the specified CollectionObject record itself are -->
+    <!-- ignored here; we are interested only in the relations list below. -->
+    
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <pageNum>0</pageNum>
+        <itemsInPage>3</itemsInPage>
+        <totalItems>3</totalItems>
+        
+        <!-- Child relationships -->
+        
+        <relation-list-item>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${chessBoardCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <object>
+                <csid>${chessSetBoxCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+        <relation-list-item>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${bagOfWhiteChessPiecesCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <object>
+                <csid>${chessSetBoxCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+        <relation-list-item>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${bagOfBlackChessPiecesCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <object>
+                <csid>${chessSetBoxCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+    </ns3:relations-common-list>
+</document>

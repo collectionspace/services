@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.common.context.ServiceContext;
 
@@ -43,7 +44,8 @@ public class DocumentFilter {
     /** The order by clause. */
     protected String orderByClause;	// Filtering clause. Omit the "ORDER BY".
     public static final String EMPTY_ORDER_BY_CLAUSE = "";
-    public static final String ORDER_BY_LAST_UPDATED = "collectionspace_core:updatedAt DESC";
+    public static final String ORDER_BY_LAST_UPDATED = CollectionSpaceClient.CORE_UPDATED_AT + " DESC";
+    public static final String ORDER_BY_CREATED_AT = CollectionSpaceClient.CORE_CREATED_AT + " DESC";
     /** The start page. */
     protected int startPage;		// Pagination offset for list results
     /** The page size. */
@@ -118,8 +120,14 @@ public class DocumentFilter {
      * @param ctx the ctx
      */
     public DocumentFilter(ServiceContext ctx) {
-        this.setPageSize(ctx.getServiceBindingPropertyValue(
-                DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+    	// Ignore errors - some contexts do not have proper service binding info
+    	try {
+    		String pageSizeString = ctx.getServiceBindingPropertyValue(
+                    DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY); 
+    		this.setPageSize(pageSizeString);
+    	} catch(Exception e) {
+    		this.setPageSize(defaultPageSize);
+    	} 
     }
 
     /**
@@ -274,7 +282,7 @@ public class DocumentFilter {
         }
         // Set the order by clause
         String orderByStr = null;
-        List<String> list = theQueryParams.get(IClientQueryParams.SORT_BY_PARAM);
+        List<String> list = theQueryParams.get(IClientQueryParams.ORDER_BY_PARAM);
         if (list != null) {
             orderByStr = list.get(0);
         }

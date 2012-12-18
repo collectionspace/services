@@ -56,6 +56,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
 
     private final String CLASS_NAME = MediaServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(MediaServiceTest.class);
+    private final static String PUBLIC_URL_DECK = "http://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
 
     private boolean mediaCleanup = true;
     
@@ -199,6 +200,25 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     public void createWithBlobUri(String testName) throws Exception {
         createBlob(testName, true /*with URI*/);
     }
+    
+    @Test(dataProvider = "testName", 
+    		dependsOnMethods = {"createWithBlobUri"})
+    public void createMediaAndBlobWithUri(String testName) throws Exception {
+		MediaClient client = new MediaClient();
+		PoxPayloadOut multipart = createMediaInstance(createIdentifier());
+		ClientResponse<Response> mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true); // purge the original
+		String mediaCsid = null;
+		try {
+			assertStatusCode(mediaRes, testName);
+			mediaCsid = extractId(mediaRes);
+//			allResourceIdsCreated.add(mediaCsid); // Re-enable this and also add code to delete the associated blob
+		} finally {
+			if (mediaRes != null) {
+				mediaRes.releaseConnection();
+			}
+		}
+    }
+    
     
     @Test(dataProvider = "testName", 
     		dependsOnMethods = {"createWithBlobUri"})

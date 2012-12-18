@@ -24,11 +24,16 @@
 package org.collectionspace.services.common.context;
 
 import java.lang.reflect.Constructor;
-
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.config.ConfigUtils;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,11 +103,38 @@ public class RemoteServiceContextImpl<IT, OT>
      */
     protected RemoteServiceContextImpl(String serviceName,
     		IT theInput,
-    		MultivaluedMap<String, String> queryParams) throws UnauthorizedException {
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo) throws UnauthorizedException {
         this(serviceName, theInput);
-        this.setQueryParams(queryParams);
+        this.setResourceMap(resourceMap);
+        this.setUriInfo(uriInfo);
+        if (uriInfo != null) {
+        	this.setQueryParams(uriInfo.getQueryParameters());
+        }
     }
 
+    /*
+     * Returns the name of the service's acting repository.  Gets this from the tenant and service bindings files
+     */
+    public String getRepositoryName() throws Exception {
+    	String result = null;
+    	
+    	TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+    	String tenantId = this.getTenantId();
+    	TenantBindingType tenantBindingType = tenantBindingConfigReader.getTenantBinding(tenantId);
+    	ServiceBindingType serviceBindingType = this.getServiceBinding();
+    	String servicesRepoDomainName = serviceBindingType.getRepositoryDomain();
+    	if (servicesRepoDomainName != null && servicesRepoDomainName.trim().isEmpty() == false) {
+    		result = ConfigUtils.getRepositoryName(tenantBindingType, servicesRepoDomainName);
+    	} else {
+    		String errMsg = String.format("The '%s' service for tenant ID=%s did not declare a repository domain in its service bindings.", 
+    				serviceBindingType.getName(), tenantId);
+    		throw new Exception(errMsg);
+    	}
+    	
+    	return result;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.AbstractServiceContextImpl#getInput()
      */
@@ -163,7 +195,7 @@ public class RemoteServiceContextImpl<IT, OT>
     @Override
     public ServiceContext getLocalContext(String localContextClassName) throws Exception {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
-        Class ctxClass = cloader.loadClass(localContextClassName);
+        Class<?> ctxClass = cloader.loadClass(localContextClassName);
         if (!ServiceContext.class.isAssignableFrom(ctxClass)) {
             throw new IllegalArgumentException("getLocalContext requires "
                     + " implementation of " + ServiceContext.class.getName());
@@ -172,5 +204,5 @@ public class RemoteServiceContextImpl<IT, OT>
         Constructor ctor = ctxClass.getConstructor(java.lang.String.class);
         ServiceContext ctx = (ServiceContext) ctor.newInstance(getServiceName());
         return ctx;
-    }    
+    }
 }

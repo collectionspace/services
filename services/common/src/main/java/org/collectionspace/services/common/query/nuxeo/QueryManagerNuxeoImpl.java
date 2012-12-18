@@ -44,7 +44,6 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 
 import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocableUtils;
 import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
@@ -70,10 +69,10 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%\\.]");
 	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
 
-	private static String getLikeForm() {
+	private static String getLikeForm(String dataSourceName, String repositoryName) {
 		if (SEARCH_LIKE_FORM == null) {
 			try {
-				DatabaseProductType type = JDBCTools.getDatabaseProductType();
+				DatabaseProductType type = JDBCTools.getDatabaseProductType(dataSourceName, repositoryName);
 				if (type == DatabaseProductType.MYSQL) {
 					SEARCH_LIKE_FORM = IQueryManager.SEARCH_LIKE;
 				} else if (type == DatabaseProductType.POSTGRESQL) {
@@ -86,6 +85,11 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		return SEARCH_LIKE_FORM;
 	}
 
+	@Override
+	public String getDatasourceName() {
+		return JDBCTools.NUXEO_DATASOURCE_NAME;
+	}
+	
 	// TODO: This is currently just an example fixed query. This should
 	// eventually be
 	// removed or replaced with a more generic method.
@@ -256,7 +260,9 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	// Both these require using JDBC, since we cannot get to the fulltext table
 	// in NXQL
 	@Override
-	public String createWhereClauseForPartialMatch(String field,
+	public String createWhereClauseForPartialMatch(String dataSourceName,
+			String repositoryName,
+			String field,
 			String partialTerm) {
 		String trimmed = (partialTerm == null) ? "" : partialTerm.trim();
 		if (trimmed.isEmpty()) {
@@ -265,7 +271,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		if (field == null || field.isEmpty()) {
 			throw new RuntimeException("No match field specified.");
 		}
-		String ptClause = field + getLikeForm() + "'%"
+		String ptClause = field + getLikeForm(dataSourceName, repositoryName) + "'%"
 				+ unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'")
 				+ "%'";
 		return ptClause;
@@ -339,7 +345,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	public String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude) {
     	// Start with the qualified termStatus field
     	StringBuilder filterClause = new StringBuilder(qualifiedField);
-    	if(filterTerms.length == 1) {
+    	if (filterTerms.length == 1) {
     		filterClause.append(fExclude?" <> '":" = '");
     		filterClause.append(filterTerms[0]);
     		filterClause.append('\'');  

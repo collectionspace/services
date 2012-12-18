@@ -5,11 +5,10 @@
     <parent>
         <artifactId>org.collectionspace.services.objectexit</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>2.2-SNAPSHOT</version>
+        <version>3.2-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.objectexit.3rdparty</artifactId>
     <name>services.objectexit.3rdparty</name>
     <packaging>pom</packaging>
@@ -17,6 +16,14 @@
     <description>
         3rd party build for objectexit service
     </description>
+
+	<properties>
+		<ServiceName>objectexit</ServiceName>
+		<NuxeoDocTypeName>ObjectExit</NuxeoDocTypeName>	
+		<CommonSchemaName>objectexit_common</CommonSchemaName>
+		<TenantPrefix>Tenant</TenantPrefix>
+		<Lifecycle>cs_default</Lifecycle>
+	</properties>
 
     <modules>
         <module>nuxeo-platform-cs-objectexit</module>

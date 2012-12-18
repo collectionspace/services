@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.group.3rdparty</artifactId>
-        <version>2.2-SNAPSHOT</version>
+        <version>3.2-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -19,10 +19,14 @@
 
     <build>
 		<resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
+		  <resource>
+			<directory>src/main/resources</directory>
+			<filtering>true</filtering>
+		  </resource>
+		  <resource>
+			<directory>../../../../3rdparty/nuxeo/nuxeo-doctype/src/main/resources</directory>
+			<filtering>true</filtering>
+		  </resource>
 		</resources>
         <plugins>
             <plugin>
@@ -30,7 +34,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <manifestFile> src/main/resources/META-INF/MANIFEST.MF </manifestFile>
+                        <manifestFile>target/classes/META-INF/MANIFEST.MF</manifestFile>
                         <manifestEntries>
                             <Bundle-Version>${eclipseVersion}</Bundle-Version>
                             <Bundle-ManifestVersion>2</Bundle-ManifestVersion>

@@ -30,6 +30,7 @@ public interface IClientQueryParams {
 
     public static final String PAGE_SIZE_PARAM = "pgSz";
     public static final String START_PAGE_PARAM = "pgNum";
-    public static final String SORT_BY_PARAM = "sortBy";
+    public static final String ORDER_BY_PARAM = "sortBy";
+    public static final String IMPORT_TIMEOUT_PARAM = "impTimout";
     
 }

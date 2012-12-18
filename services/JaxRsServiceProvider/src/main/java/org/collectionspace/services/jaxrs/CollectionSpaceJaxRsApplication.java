@@ -23,6 +23,7 @@
 package org.collectionspace.services.jaxrs;
 
 import org.collectionspace.services.account.AccountResource;
+import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
@@ -40,7 +41,6 @@ import org.collectionspace.services.place.PlaceAuthorityResource;
 import org.collectionspace.services.concept.ConceptAuthorityResource;
 import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
-import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.report.ReportResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
 import org.collectionspace.services.dimension.DimensionResource;
@@ -60,15 +60,17 @@ import javax.ws.rs.core.Context;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 //import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
-import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceBase;	  	
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.common.ResourceMapImpl;
+import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -99,6 +101,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new SecurityInterceptor());
         
         singletons.add(new AccountResource());
+        singletons.add(new TenantResource());
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
         singletons.add(new ServiceGroupResource());
@@ -131,6 +134,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new ReportResource());
 
         singletons.add(new IDResource());
+        
         /*
         singletons.add(new WorkflowResource());
         */
@@ -143,6 +147,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(resource);
         resourceMap.put(resource.getServiceName(), resource);
     }
+    
 
     @Override
     public Set<Class<?>> getClasses() {
@@ -154,6 +159,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         return singletons;
     }
 
+    @Override
     public ResourceMap getResourceMap() {
         return resourceMap;
     }
@@ -165,5 +171,6 @@ public class CollectionSpaceJaxRsApplication extends Application
     public ServletContext getServletContext() {
     	return this.servletContext;
     }
+
 }
 

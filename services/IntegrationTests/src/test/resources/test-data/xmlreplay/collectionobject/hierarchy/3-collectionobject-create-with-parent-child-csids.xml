@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">
+
+    <ns2:collectionobjects_common
+        xmlns:ns2="http://collectionspace.org/services/collectionobject">
+        <objectNumber>${objectNumber}</objectNumber>
+    </ns2:collectionobjects_common>
+
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation"
+                               xmlns:ns2="http://collectionspace.org/services/jaxb">
+        
+        <!-- Create a hierarchical relationship between an item, -->
+        <!-- its parent, and one child -->
+        
+        <!-- 
+             ${itemCSID} is a convention understood by the Relations service,
+             which is replaced by the CSID of the item being created.  (This
+             applies to all items, including object and procedural records,
+             not just to authority item records).
+             
+             As such, ${itemCSID} does NOT get expanded by XmlReplay. 
+             It passes through, and then the service deals with it.
+        -->
+        
+        <!-- Create a relationship between this item and its parent -->
+        <relation-list-item>
+            <!-- The item being created, above ... -->
+            <subject>
+                <csid>${itemCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item -->
+            <object>
+                <csid>${parentCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+        <!-- Create a relationship between this item and a child -->
+        <relation-list-item>
+            <!-- A child item ... -->
+            <subject>
+                <csid>${childCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <!-- ... has a hasBroader relationship to ... -->
+            <predicate>hasBroader</predicate>
+            <!-- ... its parent item: the item being created above -->
+            <object>
+                <csid>${itemCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+            <relationshipMetaType>${relationshipMetaType}</relationshipMetaType>
+        </relation-list-item>
+        
+    </ns3:relations-common-list>
+</document>
+
+

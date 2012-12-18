@@ -2,6 +2,7 @@ package org.collectionspace.services.common.storage.jpa;
 
 import java.util.List;
 
+import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -13,6 +14,19 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 public abstract class JpaDocumentHandler<T, TL, WT, WLT>
 	extends AbstractDocumentHandlerImpl<T, TL, WT, WLT>{
 
+	@Override
+	protected String getRefnameDisplayName(DocumentWrapper<WT> wrapDoc) {
+		return ""; // Empty string since we don't yet support this feature in JPA documents
+	}
+	
+	@Override
+	public RefName.RefNameInterface getRefName(DocumentWrapper<WT> docWrapper, String tenantName, String serviceName) {
+		//
+		// Not implemented
+		//
+		return null;
+	}
+	
     /**
      * Extract paging info.
      *

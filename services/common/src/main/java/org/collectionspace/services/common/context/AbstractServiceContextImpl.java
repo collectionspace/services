@@ -33,6 +33,7 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.PropertyItemUtils;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -85,7 +86,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     private TenantBindingType tenantBinding;
     /** repository domain used by the service */
     private RepositoryDomainType repositoryDomain;
-    /** The override document type. */
+	/** The override document type. */
     private String overrideDocumentType = null;
     /** The val handlers. */
     private List<ValidatorHandler<IT, OT>> valHandlers = null;
@@ -93,8 +94,12 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     private DocumentHandler docHandler = null;
     /** security context */
     private SecurityContext securityContext;
-
+    /** The sessions JAX-RS URI information */
     private UriInfo uriInfo;
+    /** The current repository session */
+    private Object currentRepositorySession;
+    /** A reference count for the current repository session */
+    private int currentRepoSesssionRefCount = 0;
 
     /**
      * Instantiates a new abstract service context impl.
@@ -120,35 +125,42 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         //make sure tenant context exists
         checkTenantContext();
 
-        //retrieve service bindings
-        TenantBindingConfigReaderImpl tReader =
-                ServiceMain.getInstance().getTenantBindingConfigReader();
         String tenantId = securityContext.getCurrentTenantId();
-        tenantBinding = tReader.getTenantBinding(tenantId);
-        if (tenantBinding == null) {
-            String msg = "No tenant binding found for tenantId=" + tenantId
-                    + " while processing request for service= " + serviceName;
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        serviceBinding = tReader.getServiceBinding(tenantId, serviceName);
-        if (serviceBinding == null) {
-            String msg = "No service binding found while processing request for "
-                    + serviceName + " for tenant id=" + getTenantId()
-                    + " name=" + getTenantName();
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("tenantId=" + tenantId
-                    + " service binding=" + serviceBinding.getName());
-        }
-        repositoryDomain = tReader.getRepositoryDomain(tenantId, serviceName);
-        if (repositoryDomain != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("tenantId=" + tenantId
-                        + " repository doamin=" + repositoryDomain.getName());
-            }
+        if(AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID.equals(tenantId)) {
+        	// Tenant Manager has no tenant binding, so don't bother...
+        	tenantBinding = null;
+        	serviceBinding = null;
+        	repositoryDomain = null;
+        } else {
+	        //retrieve service bindings
+	        TenantBindingConfigReaderImpl tReader =
+	                ServiceMain.getInstance().getTenantBindingConfigReader();
+	        tenantBinding = tReader.getTenantBinding(tenantId);
+	        if (tenantBinding == null) {
+	            String msg = "No tenant binding found for tenantId=" + tenantId
+	                    + " while processing request for service= " + serviceName;
+	            logger.error(msg);
+	            throw new IllegalStateException(msg);
+	        }
+	        serviceBinding = tReader.getServiceBinding(tenantId, serviceName);
+	        if (serviceBinding == null) {
+	            String msg = "No service binding found while processing request for "
+	                    + serviceName + " for tenant id=" + getTenantId()
+	                    + " name=" + getTenantName();
+	            logger.error(msg);
+	            throw new IllegalStateException(msg);
+	        }
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("tenantId=" + tenantId
+	                    + " service binding=" + serviceBinding.getName());
+	        }
+	        repositoryDomain = tReader.getRepositoryDomain(tenantId, serviceName);
+	        if (repositoryDomain != null) {
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("tenantId=" + tenantId
+	                        + " repository doamin=" + repositoryDomain.getName());
+	            }
+	        }
         }
     }
 
@@ -521,6 +533,13 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return result;
     }
 
+    @Override
+    public void setDocumentHandler(DocumentHandler handler) throws Exception {
+        if (handler != null) {
+        	docHandler = handler;
+        }
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getDocumentHanlder(javax.ws.rs.core.MultivaluedMap)
      */
@@ -567,6 +586,14 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         }
         valHandlers = handlers;
         return valHandlers;
+    }
+    
+    @Override
+    public void addValidatorHandler(ValidatorHandler<IT, OT> validator) throws Exception {
+        if (valHandlers == null) {
+            valHandlers = new ArrayList<ValidatorHandler<IT, OT>>();
+        }
+        valHandlers.add(validator);
     }
 
     /* (non-Javadoc)
@@ -626,8 +653,57 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         this.uriInfo = ui;
     }
 
-   @Override
-   public UriInfo getUriInfo(){
-        return this.uriInfo;
-    }
+	@Override
+	public UriInfo getUriInfo() {
+		return this.uriInfo;
+	}
+	
+	/*
+	 * We expect the 'currentRepositorySession' member to be set only once per instance.  Also, we expect only one open repository session
+	 * per HTTP request.  We'll log an error if we see more than one attempt to set a service context's current repo session.
+	 * (non-Javadoc)
+	 * @see org.collectionspace.services.common.context.ServiceContext#setCurrentRepositorySession(java.lang.Object)
+	 */
+	@Override
+	public void setCurrentRepositorySession(Object repoSession) throws Exception {
+		if (repoSession == null) {
+			String errMsg = "Setting a service context's repository session to null is not allowed.";
+			logger.error(errMsg);
+			throw new Exception(errMsg);
+		} else if (currentRepositorySession != null && currentRepositorySession != repoSession) {
+			String errMsg = "The current service context's repository session was replaced.  This may cause unexpected behavior and/or data loss.";
+			logger.error(errMsg);
+			throw new Exception(errMsg);
+		}
+		
+		currentRepositorySession = repoSession;
+		this.currentRepoSesssionRefCount++;
+	}
+	
+	@Override
+	public void clearCurrentRepositorySession() {
+		if (this.currentRepoSesssionRefCount > 0) {
+			currentRepoSesssionRefCount--;
+		}
+		
+		if (currentRepoSesssionRefCount == 0) {
+			this.currentRepositorySession = null;
+		}
+	}
+	
+	@Override
+	public Object getCurrentRepositorySession() {
+		// TODO Auto-generated method stub
+		return currentRepositorySession;
+	}	
+
+	@Override	
+	public RepositoryDomainType getRepositoryDomain() {
+		return repositoryDomain;
+	}
+
+	@Override	
+	public void setRepositoryDomain(RepositoryDomainType repositoryDomain) {
+		this.repositoryDomain = repositoryDomain;
+	}
 }

@@ -194,16 +194,16 @@ public class ServiceBindingUtils {
     	}
     } 
     
-    private static ArrayList<String> commonServiceTypes = null;
     private static ArrayList<String> commonProcedureServiceTypes = null;
    
-    public static ArrayList<String> getCommonServiceTypes() {
-    	if(commonServiceTypes == null) {
-    		commonServiceTypes = new ArrayList<String>();
-				// Problematic at this point:	commonServiceTypes.add(SERVICE_TYPE_AUTHORITY);
-    		commonServiceTypes.add(SERVICE_TYPE_OBJECT);
-    		commonServiceTypes.add(SERVICE_TYPE_PROCEDURE);
-    	}
+    public static ArrayList<String> getCommonServiceTypes(boolean includeAuthorities) {
+        ArrayList<String> commonServiceTypes = new ArrayList<String>();
+		if (includeAuthorities == true) {
+			commonServiceTypes.add(SERVICE_TYPE_AUTHORITY); // REM - CSPACE-5359: Added back authorities on demand to resolve this issue.
+		}
+		commonServiceTypes.add(SERVICE_TYPE_OBJECT);
+		commonServiceTypes.add(SERVICE_TYPE_PROCEDURE);
+		
     	return commonServiceTypes;
     }
     
@@ -215,6 +215,7 @@ public class ServiceBindingUtils {
     // FIXME; this method is intended to be temporary.  It was added in part to
     // make the effect of the workaround more explicit, and in part to avoid
     // breaking the use of the getCommonServiceTypes method in ServiceGroups.
+    @Deprecated
     public static ArrayList<String> getCommonProcedureServiceTypes() {
         if(commonProcedureServiceTypes == null) {
             commonProcedureServiceTypes = new ArrayList<String>();

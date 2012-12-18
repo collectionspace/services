@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.main</artifactId>
-        <version>2.2-SNAPSHOT</version>
+        <version>3.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -17,7 +17,12 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.config</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.3rdparty.nuxeo.thumbnail</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common-api</artifactId>
@@ -26,6 +31,11 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization-mgt.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.relation.client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- 
@@ -38,6 +48,11 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -113,16 +128,27 @@
             <version>2.0.1</version>
         </dependency>
         <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.3-RC1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>1.4</version>
         </dependency>
+        <dependency>
+      		<groupId>org.apache.tomcat</groupId>
+      		<artifactId>dbcp</artifactId>
+      		<version>6.0.33</version>
+      		<scope>provided</scope>
+  		</dependency>
 
         <!-- javax -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
             <scope>provided</scope>
         </dependency>
 
@@ -256,7 +282,6 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
-            <version>${nuxeo.core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
@@ -280,7 +305,17 @@
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-storage-sql-ra</artifactId>
+            <version>${nuxeo.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-io</artifactId>
+            <version>${nuxeo.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-convert</artifactId>
             <version>${nuxeo.core.version}</version>
         </dependency>
 <!-- 
@@ -291,15 +326,21 @@
         </dependency>
  -->
         <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-io</artifactId>
-            <version>${nuxeo.core.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime-osgi</artifactId>
             <version>${nuxeo.core.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+        	<artifactId>nuxeo-opencmis-bindings</artifactId>
+            <version>${nuxeo.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.chemistry.opencmis</groupId>
+            <artifactId>chemistry-opencmis-server-bindings</artifactId>
+            <version>0.6.0</version>
+            <classifier>classes</classifier>
+        </dependency>        
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
@@ -340,6 +381,17 @@
             <id>el4jReleaseRepositoryExternal</id>
             <name>External release repository of the EL4J project</name>
             <url>http://public-el4.elca-services.ch/el4j/maven2repository</url>
+        </repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <id>Apache</id>
+            <name>External release repository of the Apache projects</name>
+            <url>https://repository.apache.org/content/groups/public/</url>
         </repository>
     </repositories>
 

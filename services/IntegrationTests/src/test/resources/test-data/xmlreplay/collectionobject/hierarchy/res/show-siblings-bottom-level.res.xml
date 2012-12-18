@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="collectionobjects">
+    <!-- Contents of the specified CollectionObject record itself are -->
+    <!-- ignored here; we are interested only in the relations list below. -->
+
+    <!--
+        Siblings of the black rook fragment 1
+        1. black rook fragment 2
+    -->
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation" xmlns:ns2="http://collectionspace.org/services/jaxb">
+        <pageNum>0</pageNum>
+        <itemsInPage>1</itemsInPage>
+        <totalItems>1</totalItems>
+
+        <relation-list-item>
+            <predicate>hasBroader</predicate>
+            <subject>
+                <csid>${blackRookFragment2CSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </subject>
+            <object>
+                <csid>${blackRookCSID}</csid>
+                <documentType>CollectionObject</documentType>
+            </object>
+        </relation-list-item>
+        
+    </ns3:relations-common-list>
+</document>
+

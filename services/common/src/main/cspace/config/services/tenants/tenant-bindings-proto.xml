@@ -51,6 +51,16 @@
         <!-- begin idgenerator service meta-data -->
         <tenant:serviceBindings id="idgenerators" name="idgenerators" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
+			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.RunSqlScript</service:classname>
+                <service:params>
+                    <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>create_id_generators_table.sql</service:value>
+                    </service:property>
+                </service:params>
+            </service:initHandler>
         </tenant:serviceBindings>
         <!-- end idgenerator service meta-data -->
         
@@ -62,13 +72,26 @@
                     /idgenerators/*/ids
                 </service:uriPath>
             -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <!-- The following initHandler config block is placed here, rather than in the -->
+            <!-- idgenerators service, above, as it appears that we currently can only run -->
+            <!-- one initHandler per service - ADR 2012-12-13 -->
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.RunSqlScript</service:classname>
+                <service:params>
+                    <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>load_id_generators.sql</service:value>
+                    </service:property>
+                </service:params>
+            </service:initHandler>
         </tenant:serviceBindings>    
         <!-- end id service meta-data -->
         
         <!-- begin servicegroup service meta-data -->
         <!-- Servicegroup is a task service that has no representation in the repo, 
-                 but provides tools like keyword search across many types of services. 
-          -->
+               but provides tools like keyword search across many types of services. 
+        -->
         <tenant:serviceBindings id="servicegroups" name="servicegroups" type="utility" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler</service:documentHandler>
@@ -87,8 +110,11 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
-                    <service:DublinCoreTitle>collectionobjects</service:DublinCoreTitle>
-                    <service:ListResultsItemMethodName>getCollectionObjectListItem</service:ListResultsItemMethodName>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>
+                    <service:RefnameDisplayNameField> <!-- The field used as the display name in an object's refname -->
+                        <service:element>objectNumber</service:element>
+                        <service:xpath>objectNumber</service:xpath>
+                    </service:RefnameDisplayNameField>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>objectNumber</service:element>
@@ -165,7 +191,10 @@
                     <service:properties>
                         <!-- Fields containing authority term references -->
                         <!-- Object Identification Information group -->
-                        <!-- There are currently no authority term references in this group -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>computedCurrentLocation</types:value>
+                        </types:item>
                         <!-- Object Description Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -221,7 +250,7 @@
                             <types:key>authRef</types:key>
                             <types:value>textualInscriptionGroupList/*/inscriptionContentInscriber</types:value>
                         </types:item>
-                        <!-- Uncomment when Concept authority is implemented in Services -->
+                        <!-- Uncomment when Concept authority/Method vocabulary is implemented in Services -->
                         <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -240,15 +269,12 @@
                             <types:key>authRef</types:key>
                             <types:value>materialGroupList/*/material</types:value>
                         </types:item>
-                        <!-- The following field may become part of a repeatable sub-group -->
-                        <!-- for materialComponent, per CSPACE-4563. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
+                        <!-- The materialComponent field may become part of a repeatable sub-group -->
+                        <!-- per CSPACE-4563. -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>materialGroupList/*/materialComponentSubGroupList/*/materialComponent</types:value>
+                            <types:value>materialGroupList/*/materialComponent</types:value>
                         </types:item>
-                        -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>materialGroupList/*/materialSource</types:value>
@@ -290,27 +316,28 @@
                             <types:value>techniqueGroupList/*/techniqueType</types:value>
                         </types:item>
                         <!-- Object History and Association Information group -->
-                        <!-- The following fields may become part of a repeatable group -->
+                        <!-- The following four fields may become part of a repeatable group -->
                         <!-- for associatedEvent, per CSPACE-3229. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventOrganization</types:value>
+                            <types:value>assocEventOrganizations|assocEventOrganization</types:value>
                         </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                             <types:key>authRef</types:key>
-                             <types:value>assocEventGroupList/*/assocEventPeople</types:value>
-                        </types:item>
+                        <!-- Uncomment when People authority is implemented in Services -->
+                        <!--<types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>assocEventPeoples|assocEventPeople</types:value>
+                        </types:item>-->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventPerson</types:value>
+                            <types:value>assocEventPersons|assocEventPerson</types:value>
                         </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- Uncomment when this field is tied to Place authority -->
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventPlace</types:value>
+                            <types:value>assocEventPlaces|assocEventPlace</types:value>
                         </types:item>
                         -->
+                        <!-- End of proposed associatedEvent group, CSPACE-3229 -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>assocOrganizationGroupList/*/assocOrganization</types:value>
@@ -330,28 +357,23 @@
                             <types:key>authRef</types:key>
                             <types:value>assocPlaceGroupList/*/assocPlace</types:value>
                         </types:item>
-                        <!-- The following fields may become part of a repeatable group -->
+                        <!-- The owner field may become part of a repeatable group -->
                         <!-- for 'owner', per CSPACE-3229. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>ownerGroupList/*/owner</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>ownerGroupList/*/ownershipPlace</types:value>
-                        </types:item>
-                        -->
+                            <types:value>owners|owner</types:value>
+                        </types:item> 
                         <!-- Object Owner's Contribution Information group -->
                         <!-- There are currently no authority term references in this group -->
                         <!-- Object Viewer's Contribution Information group -->
                         <!-- There are currently no authority term references in this group -->
                         <!-- Reference Information group -->
+                        <!-- Uncomment when Citation authority is implemented in Services -->
+                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>referenceGroupList/*/reference</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Object Collection Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -425,6 +447,10 @@
                             <types:value>recordStatus</types:value>
                         </types:item>
                         <!-- Object Description Information group -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>ageQualifier</types:value>
+                        </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>ageUnit</types:value>
@@ -532,19 +558,8 @@
                             <types:key>termRef</types:key>
                             <types:value>assocCulturalContextGroupList/*/assocCulturalContext</types:value>
                         </types:item>
-                        <!-- The following fields may become part of a repeatable group -->
-                        <!-- for associatedEvent, per CSPACE-3229. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventName</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>assocEventGroupList/*/assocEventNameType</types:value>
-                        </types:item>
-                        -->
+                        <!-- Two fields not included here, assocEventName and assocEventNameType, may become -->
+                        <!-- term lists as part of a repeatable group for associatedEvent, per CSPACE-3229. -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>assocObjectGroupList/*/assocObject</types:value>
@@ -555,21 +570,23 @@
                         </types:item>
                         <!-- The following fields may become part of a repeatable group -->
                         <!-- for 'owner', per CSPACE-3229. -->
-                        <!-- Names of ancestor elements below are placeholders and subject to change. -->
-                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>ownerGroupList/*/ownershipAccess</types:value>
+                            <types:value>ownershipAccess</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>ownerGroupList/*/ownershipCategory</types:value>
+                            <types:value>ownershipCategory</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>ownerGroupList/*/ownershipExchangeMethod</types:value>
+                            <types:value>ownershipExchangeMethod</types:value>
                         </types:item>
-                        -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>ownershipExchangePriceCurrency</types:value>
+                        </types:item>
+                        <!-- End of fields for CSPACE-3229 --> 
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>usageGroupList/*/usage</types:value>
@@ -672,14 +689,7 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.intake.nuxeo.IntakeDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.group.nuxeo.IntakeDocumentModelHandler</service:classname>
                 <service:params>
-                    <service:SchemaName>intakes</service:SchemaName>
-                    <service:DublinCoreTitle>intakes</service:DublinCoreTitle>
-                    <service:SummaryFields> entryNumber|depositor|currentOwner|uri|csid</service:SummaryFields>
-                    <service:AbstractCommonListClassname />
-                    <service:CommonListItemClassname />
-                    <service:ListResultsItemMethodName>getIntakeListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>entryNumber</service:element>
@@ -813,14 +823,7 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.loanin.nuxeo.LoaninDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.loanin.nuxeo.LoaninDocumentModelHandler</service:classname>
                 <service:params>
-                    <service:SchemaName>loansin</service:SchemaName>
-                    <service:DublinCoreTitle>loansin</service:DublinCoreTitle>
-                    <service:SummaryFields>loanInNumber|lenderList|loanReturnDate|uri|csid</service:SummaryFields>
-                    <service:AbstractCommonListClassname />
-                    <service:CommonListItemClassname />
-                    <service:ListResultsItemMethodName>getLoaninListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>loanInNumber</service:element>
@@ -876,10 +879,6 @@
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>borrowersContact</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>authRef</types:key>
-                            <types:value>loanInContact</types:value>
                         </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
@@ -993,14 +992,13 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end loanout service meta-data -->
+        <!-- end loanout service meta-data -->
     
-    <!-- begin objectexit service meta-data -->
+        <!-- begin objectexit service meta-data -->
         <tenant:serviceBindings id="ObjectExit" name="ObjectExit" type="procedure" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:classname>
                 <service:params>
                     <service:ListResultsFields>
                         <service:ListResultField>
@@ -1169,14 +1167,7 @@
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.imports.nuxeo.ImportsDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.imports.nuxeo.ImportsDocumentModelHandler</service:classname>
                 <service:params>
-                    <service:SchemaName>imports</service:SchemaName>
-                    <service:DublinCoreTitle>imports</service:DublinCoreTitle>
-                    <service:SummaryFields>importsField|uri|csid</service:SummaryFields>
-                    <service:AbstractCommonListClassname>org.collectionspace.services.imports.ImportsCommonList</service:AbstractCommonListClassname>
-                    <service:CommonListItemClassname>org.collectionspace.services.imports.ImportsCommonList$ImportsListItem</service:CommonListItemClassname>
-                    <service:ListResultsItemMethodName>getImportsListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>importsField</service:element>
@@ -1241,7 +1232,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>title</types:value>
+                    <types:value>media_common:title</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
@@ -1395,7 +1386,7 @@
                             <types:key>authRef</types:key>
                             <types:value>movementContact</types:value>
                         </types:item>
-                         <!-- Inventory Control Information group -->
+                        <!-- Inventory Control Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>inventoryContactList|inventoryContact</types:value>
@@ -1577,10 +1568,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -1628,7 +1615,7 @@
             Note there is no Vocabularyitem service, but there is a
             Repository workspace so we have to configure that.
         -->
-        <tenant:serviceBindings id="Vocabularyitems" name="Vocabularyitems" type="authority" version="0.1">
+        <tenant:serviceBindings id="Vocabularyitems" name="Vocabularyitems" type="vocabulary" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
@@ -1642,8 +1629,15 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>
+                    <service:RefnameDisplayNameField>
+                        <service:ListResultField>
+                            <service:element>order</service:element>
+                            <service:xpath>order</service:xpath>
+                        </service:ListResultField>
+                    </service:RefnameDisplayNameField>
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <service:ListResultField>
                             <service:element>order</service:element>
                             <service:xpath>order</service:xpath>
@@ -1669,6 +1663,16 @@
                     </service:field>
                 </service:params>
             </service:initHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>displayName</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>shortIdentifier</types:value>
+                </types:item>
+            </service:properties>
             <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Vocabularyitem" version="0.1">
                 <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="vocabularyitems-system" updated="" order="0">
                     <service:content contentType="application/xml">
@@ -1705,10 +1709,6 @@
                         <service:ListResultField>
                             <service:element>displayName</service:element>
                             <service:xpath>displayName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
@@ -1773,8 +1773,9 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -1824,14 +1825,18 @@
                             <types:key>authRef</types:key>
                             <types:value>foundingPlace</types:value>
                         </types:item>
+                        <!-- Uncomment when Concept authority/Group (or whatever) vocabulary is implemented in Services -->
+                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>groups|group</types:value>
-                        </types:item>
+                        </types:item> -->
+                        <!-- Uncomment when Concept authority/Function (line of business) vocabulary is implemented in Services -->
+                        <!--                       
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>functions|function</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -1878,10 +1883,6 @@
                         <service:ListResultField>
                             <service:element>displayName</service:element>
                             <service:xpath>displayName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
@@ -1943,8 +1944,9 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <service:ListResultField>
                             <service:element>foreName</service:element>
                             <service:xpath>personTermGroupList/[0]/foreName</service:xpath>
@@ -2004,22 +2006,30 @@
                             <types:key>authRef</types:key>
                             <types:value>deathPlace</types:value>
                         </types:item>
+                        <!-- Uncomment when Concept authority/Group (Ethnicity, whatever) vocabulary is implemented in Services -->
+                        <!--                       
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>groups|group</types:value>
-                        </types:item>
+                        </types:item> -->
+                        <!-- Uncomment when Concept authority/Nationality vocabulary is implemented in Services -->
+                        <!--                        
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>nationalities|nationality</types:value>
-                        </types:item>
+                        </types:item> -->
+                        <!-- Uncomment when Concept authority/Occupation vocabulary is implemented in Services -->
+                        <!--                                               
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>occupations|occupation</types:value>
-                        </types:item>
+                        </types:item> -->
+                        <!-- Uncomment when Concept authority/School or Style vocabulary is implemented in Services -->
+                        <!--                       
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>schoolsOrStyles|schoolOrStyle</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -2054,9 +2064,9 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end person service meta-data -->
+        <!-- end person service meta-data -->
         
-    <!-- begin locationauthority service meta-data -->
+        <!-- begin locationauthority service meta-data -->
         <tenant:serviceBindings id="Locationauthorities" name="Locationauthorities" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <!--
@@ -2072,10 +2082,6 @@
                         <service:ListResultField>
                             <service:element>displayName</service:element>
                             <service:xpath>displayName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
@@ -2130,8 +2136,9 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.location.nuxeo.LocationDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -2219,10 +2226,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -2275,8 +2278,9 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.place.nuxeo.PlaceDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -2402,10 +2406,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -2458,10 +2458,11 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.taxonomy.nuxeo.TaxonDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                         <!-- Uncomment when bug in returning list result values from complex types,
-                             currently in the CSPACE-4813 branch (P/NP term work in services), is fixed -->
+                        currently in the CSPACE-4813 branch (P/NP term work in services), is fixed -->
                         <!--
                         <service:ListResultField>
                             <service:element>taxonFullName</service:element>
@@ -2588,10 +2589,6 @@
                             <service:xpath>displayName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>refName</service:element>
-                            <service:xpath>refName</service:xpath>
-                        </service:ListResultField>
-                        <service:ListResultField>
                             <service:element>shortIdentifier</service:element>
                             <service:xpath>shortIdentifier</service:xpath>
                         </service:ListResultField>
@@ -2644,8 +2641,9 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.concept.nuxeo.ConceptDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
@@ -2701,6 +2699,10 @@
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>conceptTermGroupList/*/termStatus</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conceptTermGroupList/*/historicalStatus</types:value>
                         </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
@@ -2828,9 +2830,9 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end acquisition service meta-data -->
+        <!-- end acquisition service meta-data -->
     
-    <!-- begin relation service meta-data -->
+        <!-- begin relation service meta-data -->
         <tenant:serviceBindings id="Relations" name="Relations" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
@@ -2897,13 +2899,6 @@
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
                 <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
                 <service:params>
-                    <!-- The database index that is to be created for the ubiquitious updatedAt field -->
-                    <!-- in collectionspace_core is configured here in the Relation -->
-                    <!-- service, as it is a core service that will be reliably present. -->
-                    <service:field>
-                        <service:table>collectionspace_core</service:table>
-                        <service:col>updatedat</service:col>
-                    </service:field>
                     <service:field>
                         <service:table>relations_common</service:table>
                         <service:param>subjectcsid,objectcsid</service:param>
@@ -3043,10 +3038,11 @@
                             <types:key>authRef</types:key>
                             <types:value>addressGroupList/*/addressStateOrProvince</types:value>
                         </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- Per CSPACE-5080: This field is configured as a term list, rather than being tied to Place authority as described in wiki schema -->
+                        <!--<types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>addressGroupList/*/addressCountry</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -3063,6 +3059,10 @@
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>webAddressGroupList/*/webAddressType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>addressGroupList/*/addressCountry</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -3104,7 +3104,7 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-    <!-- end note service meta-data -->
+        <!-- end note service meta-data -->
     
         <!-- begin role service meta-data -->
         <tenant:serviceBindings id="authorization/roles" name="authorization/roles" type="security" version="0.1">

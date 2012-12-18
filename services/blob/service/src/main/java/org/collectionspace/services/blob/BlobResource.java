@@ -65,7 +65,7 @@ public class BlobResource extends ResourceBase {
 
 	@Override
     public String getServiceName(){
-        return BlobUtil.BLOB_RESOURCE_NAME;
+        return BlobClient.SERVICE_NAME;
     }
 
     @Override
@@ -77,12 +77,6 @@ public class BlobResource extends ResourceBase {
     @Override
     public Class<BlobsCommon> getCommonPartClass() {
     	return BlobsCommon.class;
-    }
-
-    //FIXME: Is this method used/needed?
-    @Deprecated
-    private CommonList getBlobList(MultivaluedMap<String, String> queryParams) {
-        return (CommonList)getList(queryParams);
     }
 
     @Deprecated
@@ -116,7 +110,7 @@ public class BlobResource extends ResourceBase {
     	return result;
     }
     
-    private InputStream getBlobContent(String csid, String derivativeTerm) throws WebApplicationException {
+    private InputStream getBlobContent(String csid, String derivativeTerm, StringBuffer outMimeType) throws WebApplicationException {
     	InputStream result = null;
     	
     	try {
@@ -132,7 +126,12 @@ public class BlobResource extends ResourceBase {
 	    	//
 	    	// The result of a successful get should have put the results in the
 	    	// blobInput instance
-	    	//	    	
+	    	//
+	    	
+	    	String mimeType = blobInput.getMimeType();
+	    	if (mimeType != null) {
+	    		outMimeType.append(mimeType); // blobInput's mime type was set on call to "get" above by the doc handler
+	    	}
 	    	result = BlobUtil.getBlobInput(ctx).getContentStream();
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
@@ -217,12 +216,13 @@ public class BlobResource extends ResourceBase {
     	String blobUri = queryParams.getFirst(BlobClient.BLOB_URI_PARAM);
     	
     	try {
-    		if (blobUri != null) {
+    		if (blobUri != null) { // If we were passed a URI than try to create a blob from it
 		    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-		    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
-		    	blobInput.createBlobFile(blobUri);
-		    	response = this.create(null, ctx);
+		    	BlobInput blobInput = BlobUtil.getBlobInput(ctx); // We're going to store a reference to the blob in the current context for the doc handler to use later
+		    	blobInput.createBlobFile(blobUri); // This call creates a temp blob file and points our blobInput to it
+		    	response = this.create(null, ctx); // Now finish the create.  We'll ignore the xmlPayload since we'll derive it from the blob itself
     		} else {
+    			// No URI was passed in so we're just going to create a blob record
     			response = super.create(resourceMap, ui, xmlPayload);
     		}
     	} catch (Exception e) {
@@ -234,23 +234,29 @@ public class BlobResource extends ResourceBase {
     
     @GET
     @Path("{csid}/content")
-    @Produces({"image/jpeg", "image/png", "image/tiff", "application/pdf"})
-    public InputStream getBlobContent(
-    		@PathParam("csid") String csid) {
-    	InputStream result = null;
-	    result = getBlobContent(csid, null /*derivative term*/);    	
+    public Response getBlobContent(	@PathParam("csid") String csid) {
+    	Response result = null;
+
+    	StringBuffer mimeType = new StringBuffer();
+    	InputStream contentStream = getBlobContent(csid, null /*derivative term*/, mimeType /*will get set*/);
+	    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+	    
+    	result = responseBuilder.build();
     	return result;
     }
 
     @GET
     @Path("{csid}/derivatives/{derivativeTerm}/content")
-    @Produces({"image/jpeg", "image/png", "image/tiff"})
-    public InputStream getDerivativeContent(
+    public Response getDerivativeContent(
     		@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
-    	InputStream result = null;
-	    result = getBlobContent(csid, derivativeTerm);
+    	Response result = null;
+    	
+    	StringBuffer mimeType = new StringBuffer();
+    	InputStream contentStream = getBlobContent(csid, derivativeTerm, mimeType);
+	    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
 	    
+    	result = responseBuilder.build();
     	return result;
     }
     
@@ -280,12 +286,11 @@ public class BlobResource extends ResourceBase {
         
     @GET
     @Path("{csid}/derivatives")
-    public CommonList getDerivatives(
-    		@PathParam("csid") String csid) {
+    public CommonList getDerivatives(@PathParam("csid") String csid) {
     	CommonList result = null;
 
     	ensureCSID(csid, READ);
-        try {
+    	try {
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             result = this.getDerivativeList(ctx, csid);
             if (result == null) {

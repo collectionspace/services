@@ -17,21 +17,25 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
@@ -43,16 +47,30 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.IterableQueryResult;
+import org.nuxeo.ecm.core.api.VersioningOption;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.runtime.transaction.TransactionRuntimeException;
+
+//
+// CSPACE-5036 - How to make CMISQL queries from Nuxeo
+//
+import org.apache.chemistry.opencmis.commons.server.CallContext;
+import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
+import org.apache.chemistry.opencmis.server.support.query.CmisQlExtParser_CmisBaseGrammar.boolean_factor_return;
+import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
+import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,12 +132,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      *            should be used by the caller to provide and transform the
      *            document
      * @return id in repository of the newly created document
+     * @throws BadRequestException
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public String create(ServiceContext ctx,
             DocumentHandler handler) throws BadRequestException,
-            DocumentException {
+            TransactionException, DocumentException {
 
     	String docType = NuxeoUtils.getTenantQualifiedDocType(ctx); //ctx.getDocumentType();
         if (docType == null) {
@@ -141,7 +161,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.CREATE);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
             DocumentModel wspaceDoc = repoSession.getDocument(nuxeoWspace);
             String wspacePath = wspaceDoc.getPathAsString();
@@ -149,6 +169,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             String id = IdUtils.generateId(UUID.randomUUID().toString());
             // create document model
             DocumentModel doc = repoSession.createDocumentModel(wspacePath, id, docType);
+            /* Check for a versioned document, and check In and Out before we proceed.
+             * This does not work as we do not have the uid schema on our docs.
+            if(((DocumentModelHandler) handler).supportsVersioning()) {
+	            doc.setProperty("uid","major_version",1);
+	            doc.setProperty("uid","minor_version",0);
+            }
+            */
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.CREATE, wrapDoc);
@@ -166,7 +193,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
 
@@ -180,11 +207,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @param handler
      *            should be used by the caller to provide and transform the
      *            document
+     * @throws DocumentNotFoundException if the document cannot be found in the repository
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
 
         if (handler == null) {
             throw new IllegalArgumentException(
@@ -194,7 +223,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
             DocumentModel docModel = null;
             try {
@@ -222,28 +251,30 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
 
     /**
-     * get document from the Nuxeo repository, using the docFilter params.
+     * get a document from the Nuxeo repository, using the docFilter params.
      * @param ctx service context under which this method is invoked
      * @param handler
      *            should be used by the caller to provide and transform the
      *            document. Handler must have a docFilter set to return a single item.
+     * @throws DocumentNotFoundException if the document cannot be found in the repository
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public void get(ServiceContext ctx, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         QueryContext queryContext = new QueryContext(ctx, handler);
         RepositoryInstance repoSession = null;
 
         try {
             handler.prepare(Action.GET);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
 
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
@@ -274,7 +305,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -309,20 +340,23 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * of the current context.
      * 
      * @param ctx service context under which this method is invoked
-     * @param id
+     * @param csid
      *            of the document to retrieve
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
      * @throws DocumentException
+     * @return a wrapped documentModel
      */
     @Override
     public DocumentWrapper<DocumentModel> getDoc(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            String csid) throws DocumentNotFoundException, DocumentException {
+            String csid) throws DocumentNotFoundException, TransactionException, DocumentException {
         RepositoryInstance repoSession = null;
         DocumentWrapper<DocumentModel> wrapDoc = null;
 
         try {
         	// Open a new repository session
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             wrapDoc = getDoc(repoSession, ctx, csid);
         } catch (IllegalArgumentException iae) {
             throw iae;
@@ -335,7 +369,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
         
@@ -389,24 +423,27 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * find wrapped documentModel from the Nuxeo repository
      * @param ctx service context under which this method is invoked
      * @param whereClause where NXQL where clause to get the document
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
      * @throws DocumentException
+     * @return a wrapped documentModel retrieved by the repository query
      */
     @Override
     public DocumentWrapper<DocumentModel> findDoc(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             String whereClause)
-            		throws DocumentNotFoundException, DocumentException {
+            		throws DocumentNotFoundException, TransactionException, DocumentException {
         RepositoryInstance repoSession = null;
         DocumentWrapper<DocumentModel> wrapDoc = null;
 
         try {
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             wrapDoc = findDoc(repoSession, ctx, whereClause);
         } catch (Exception e) {
 			throw new DocumentException("Unable to create a Nuxeo repository session.", e);
 		} finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
         
@@ -419,19 +456,23 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
     /**
      * find doc and return CSID from the Nuxeo repository
+     * @param repoSession
      * @param ctx service context under which this method is invoked
      * @param whereClause where NXQL where clause to get the document
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
      * @throws DocumentException
+     * @return the CollectionSpace ID (CSID) of the requested document
      */
     @Override
     public String findDocCSID(RepositoryInstance repoSession, 
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String whereClause)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         String csid = null;
         boolean releaseSession = false;
         try {
-        	if(repoSession== null) {
-        		repoSession = this.getRepositorySession();
+        	if (repoSession == null) {
+        		repoSession = this.getRepositorySession(ctx);
         		releaseSession = true;
         	}
             DocumentWrapper<DocumentModel> wrapDoc = findDoc(repoSession, ctx, whereClause);
@@ -450,7 +491,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
         	if(releaseSession && (repoSession != null)) {
-        		this.releaseRepositorySession(repoSession);
+        		this.releaseRepositorySession(ctx, repoSession);
         	}
         }
         return csid;
@@ -461,7 +502,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             RepositoryInstance repoSession,
             List<String> docTypes,
             String whereClause,
-            int pageSize, int pageNum, boolean computeTotal)
+            String orderByClause,
+            int pageSize,
+            int pageNum,
+            boolean computeTotal)
             		throws DocumentNotFoundException, DocumentException {
         DocumentWrapper<DocumentModelList> wrapDoc = null;
 
@@ -471,12 +515,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                         "The findDocs() method must specify at least one DocumentType.");
             }
             DocumentModelList docList = null;
-            QueryContext queryContext = new QueryContext(ctx, whereClause);
+            QueryContext queryContext = new QueryContext(ctx, whereClause, orderByClause);
             String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
             if (logger.isDebugEnabled()) {
                 logger.debug("findDocs() NXQL: "+query);
             }
-            docList = repoSession.query(query, null, pageSize, pageNum, computeTotal);
+            docList = repoSession.query(query, null, pageSize, pageSize*pageNum, computeTotal);
             wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
         } catch (IllegalArgumentException iae) {
             throw iae;
@@ -490,11 +534,79 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         return wrapDoc;
     }
     
+    protected static String buildInListForDocTypes(List<String> docTypes) {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("(");
+    	boolean first = true;
+    	for(String docType:docTypes) {
+    		if(first) {
+    			first = false;
+    		} else {
+    			sb.append(",");
+    		}
+			sb.append("'");
+    		sb.append(docType);
+			sb.append("'");
+    	}
+    	sb.append(")");
+    	return sb.toString();
+    }
+    
+    public DocumentWrapper<DocumentModelList> findDocs(
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+            DocumentHandler handler,
+            RepositoryInstance repoSession,
+            List<String> docTypes)
+            		throws DocumentNotFoundException, DocumentException {
+        DocumentWrapper<DocumentModelList> wrapDoc = null;
+
+        DocumentFilter filter = handler.getDocumentFilter();
+        String oldOrderBy = filter.getOrderByClause();
+        if (isClauseEmpty(oldOrderBy) == true){
+            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);
+        }
+        QueryContext queryContext = new QueryContext(ctx, handler);
+
+        try {
+            if (docTypes == null || docTypes.size() < 1) {
+                throw new DocumentNotFoundException(
+                        "The findDocs() method must specify at least one DocumentType.");
+            }
+            DocumentModelList docList = null;
+        	if (handler.isCMISQuery() == true) {
+        		String inList = buildInListForDocTypes(docTypes);
+        		ctx.getQueryParams().add(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES, inList);
+        		docList = getFilteredCMIS(repoSession, ctx, handler, queryContext);
+            } else {
+                String query = NuxeoUtils.buildNXQLQuery(docTypes, queryContext);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("findDocs() NXQL: "+query);
+                }
+                docList = repoSession.query(query, null, filter.getPageSize(), filter.getOffset(), true);
+            }
+            wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        }
+                
+        return wrapDoc;
+    }
+    
+
+    
     /**
      * Find a list of documentModels from the Nuxeo repository
      * @param docTypes a list of DocType names to match
      * @param  whereClause where the clause to qualify on
-     * @return
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
+     * @throws DocumentException
+     * @return a list of documentModels
      */
     @Override
     public DocumentWrapper<DocumentModelList> findDocs(
@@ -502,13 +614,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             List<String> docTypes,
             String whereClause,
             int pageSize, int pageNum, boolean computeTotal)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         RepositoryInstance repoSession = null;
         DocumentWrapper<DocumentModelList> wrapDoc = null;
 
         try {
-            repoSession = getRepositorySession();
-            wrapDoc = findDocs(ctx, repoSession, docTypes, whereClause,
+            repoSession = getRepositorySession(ctx);
+            wrapDoc = findDocs(ctx, repoSession, docTypes, whereClause, null,
             		pageSize, pageNum, computeTotal);
         } catch (IllegalArgumentException iae) {
             throw iae;
@@ -519,7 +631,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
         
@@ -535,7 +647,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      */
     @Override
     public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
                     "RepositoryJavaClient.getAll: handler is missing");
@@ -544,7 +656,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentModelList docModelList = new DocumentModelListImpl();
             //FIXME: Should be using NuxeoUtils.createPathRef for security reasons
             for (String csid : csidList) {
@@ -567,7 +679,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -580,11 +692,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @param handler
      *            should be used by the caller to provide and transform the
      *            document
+     * @throws DocumentNotFoundException
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public void getAll(ServiceContext ctx, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
                     "RepositoryJavaClient.getAll: handler is missing");
@@ -600,7 +714,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentRef wsDocRef = new IdRef(nuxeoWspaceId);
             DocumentModelList docList = repoSession.getChildren(wsDocRef);
             //set reposession to handle the document
@@ -617,7 +731,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -656,11 +770,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         DocumentWrapper<DocumentModel> result = null;
         RepositoryInstance repoSession = null;
         try {
-        	repoSession = getRepositorySession();
+        	repoSession = getRepositorySession(ctx);
         	result = getDocFromCsid(ctx, repoSession, csid);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
         
@@ -672,43 +786,75 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     }
 
     /**
-     * find doc and return CSID from the Nuxeo repository
-     * @param ctx service context under which this method is invoked
-     * @param whereClause where NXQL where clause to get the document
-     * @throws DocumentException
+     * Returns a URI value for a document in the Nuxeo repository
+     * @param wrappedDoc a wrapped documentModel
+     * @throws ClientException
+     * @return a document URI
      */
     @Override
     public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws ClientException {
     	DocumentModel docModel = wrappedDoc.getWrappedObject();
-        String uri = (String)docModel.getProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
-        			DocumentModelHandler.COLLECTIONSPACE_CORE_URI);
+        String uri = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
+        		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
         return uri;
     }
 
+    /*
+     * See CSPACE-5036 - How to make CMISQL queries from Nuxeo
+     */
+	private IterableQueryResult makeCMISQLQuery(RepositoryInstance repoSession, String query, QueryContext queryContext) {
+		IterableQueryResult result = null;
+		
+		// the NuxeoRepository should be constructed only once, then cached
+		// (its construction is expensive)
+		try {
+			NuxeoRepository repo = new NuxeoRepository(
+					repoSession.getRepositoryName(), repoSession
+							.getRootDocument().getId());
+			logger.debug("Repository ID:" + repo.getId() + " Root folder:"
+					+ repo.getRootFolderId());
 
+			CallContextImpl callContext = new CallContextImpl(
+					CallContext.BINDING_LOCAL, repo.getId(), false);
+			callContext.put(CallContext.USERNAME, repoSession.getPrincipal()
+					.getName());
+			NuxeoCmisService cmisService = new NuxeoCmisService(repo,
+					callContext, repoSession);
+
+			result = repoSession.queryAndFetch(query, "CMISQL", cmisService);
+		} catch (ClientException e) {
+			// TODO Auto-generated catch block
+			logger.error("Encounter trouble making the following CMIS query: " + query, e);
+		}
+		
+		return result;
+	}
+     
     /**
      * getFiltered get all documents for an entity service from the Document repository,
      * given filter parameters specified by the handler. 
      * @param ctx service context under which this method is invoked
      * @param handler should be used by the caller to provide and transform the document
      * @throws DocumentNotFoundException if workspace not found
+     * @throws TransactionException
      * @throws DocumentException
      */
     @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
-            throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, TransactionException, DocumentException {
 
         DocumentFilter filter = handler.getDocumentFilter();
         String oldOrderBy = filter.getOrderByClause();
         if (isClauseEmpty(oldOrderBy) == true){
-            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);  //per http://issues.collectionspace.org/browse/CSPACE-705 (Doesn't this conflict with what happens with the QueryContext instance that we create below?)
+            filter.setOrderByClause(DocumentFilter.ORDER_BY_LAST_UPDATED);
         }
         QueryContext queryContext = new QueryContext(ctx, handler);
 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx); //Keeps a refcount here for the repository session so you need to release this when finished
+            
             DocumentModelList docList = null;
             String query = NuxeoUtils.buildNXQLQuery(ctx, queryContext);
 
@@ -721,7 +867,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         	Profiler profiler = new Profiler(this, 2);
         	profiler.log("Executing NXQL query: " + query.toString());
         	profiler.start();
-            if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
+        	if (handler.isCMISQuery() == true) {
+        		docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); //FIXME: REM - Need to deal with paging info in CMIS query
+        	} else if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
                 docList = repoSession.query(query, null,
                         queryContext.getDocFilter().getPageSize(), queryContext.getDocFilter().getOffset(), true);
             } else {
@@ -743,11 +891,85 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
 
+    private DocumentModelList getFilteredCMIS(RepositoryInstance repoSession, ServiceContext ctx, DocumentHandler handler, QueryContext queryContext)
+            throws DocumentNotFoundException, DocumentException {
+
+    	DocumentModelList result = new DocumentModelListImpl();
+        try {
+            String query = handler.getCMISQuery(queryContext);
+
+        	DocumentFilter docFilter = handler.getDocumentFilter();
+            int pageSize = docFilter.getPageSize();
+            int offset = docFilter.getOffset();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing CMIS query: " + query.toString()
+                		+ "with pageSize: "+pageSize+" at offset: "+offset);
+            }
+
+            // If we have limit and/or offset, then pass true to get totalSize
+            // in returned DocumentModelList.
+        	Profiler profiler = new Profiler(this, 2);
+        	profiler.log("Executing CMIS query: " + query.toString());
+        	profiler.start();
+        	//
+        	IterableQueryResult queryResult = makeCMISQLQuery(repoSession, query, queryContext);
+        	try {
+            	int totalSize = (int)queryResult.size();
+            	((DocumentModelListImpl)result).setTotalSize(totalSize);
+				// Skip the rows before our offset
+				if (offset > 0) {
+					queryResult.skipTo(offset);
+				}
+        		int nRows = 0;
+        		for (Map<String, Serializable> row : queryResult) {
+        			if (logger.isTraceEnabled()) {
+	        			logger.trace(" Hierarchy Table ID is:" + row.get(IQueryManager.CMIS_TARGET_NUXEO_ID)
+	        					+ " nuxeo:pathSegment is: " + row.get(IQueryManager.CMIS_TARGET_NAME));
+        			}
+        			String nuxeoId = (String) row.get(IQueryManager.CMIS_TARGET_NUXEO_ID);
+        			DocumentModel docModel = NuxeoUtils.getDocumentModel(repoSession, nuxeoId);
+        			result.add(docModel);
+        			nRows++;
+					if (nRows >= pageSize && pageSize != 0 ) { // A page size of zero means that they want all of them
+						logger.debug("Got page full of items - quitting");
+						break;
+					}
+        		}
+        	} finally {
+        		queryResult.close();
+        	}
+        	//
+            profiler.stop();
+
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        }
+        
+        //
+        // Since we're not supporting paging yet for CMIS queries, we need to perform
+        // a workaround for the paging information we return in our list of results
+        //
+        /*
+        if (result != null) {
+        	docFilter.setStartPage(0);
+        	if (totalSize > docFilter.getPageSize()) {
+        		docFilter.setPageSize(totalSize);
+            	((DocumentModelListImpl)result).setTotalSize(totalSize);
+        	}
+        }
+        */
+        
+        return result;
+    }
+    
     private String logException(Exception e, String msg) {
     	String result = null;
     	
@@ -768,16 +990,19 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * update given document in the Nuxeo repository
      *
      * @param ctx service context under which this method is invoked
-     * @param id
+     * @param csid
      *            of the document
      * @param handler
      *            should be used by the caller to provide and transform the
      *            document
+     * @throws BadRequestException
+     * @throws DocumentNotFoundException
+     * @throws TransactionException if the transaction times out or otherwise cannot be successfully completed
      * @throws DocumentException
      */
     @Override
     public void update(ServiceContext ctx, String csid, DocumentHandler handler)
-            throws BadRequestException, DocumentNotFoundException,
+            throws BadRequestException, DocumentNotFoundException, TransactionException,
             DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
@@ -787,7 +1012,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.UPDATE);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentRef docRef = NuxeoUtils.createPathRef(ctx, csid);
             DocumentModel doc = null;
             try {
@@ -796,6 +1021,27 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             	String msg = logException(ce, "Could not find document to update with CSID=" + csid);
                 throw new DocumentNotFoundException(msg, ce);
             }
+            // Check for a versioned document, and check In and Out before we proceed.
+            if(((DocumentModelHandler) handler).supportsVersioning()) {
+            	/* Once we advance to 5.5 or later, we can add this. 
+            	 * See also https://jira.nuxeo.com/browse/NXP-8506
+            	if(!doc.isVersionable()) {
+            		throw new DocumentException("Configuration for: "
+            				+handler.getServiceContextPath()+" supports versioning, but Nuxeo config does not!");
+            	}
+            	 */
+            	/* Force a version number - Not working. Apparently we need to configure the uid schema??
+	            if(doc.getProperty("uid","major_version") == null) {
+		            doc.setProperty("uid","major_version",1);
+	            }
+	            if(doc.getProperty("uid","minor_version") == null) {
+		            doc.setProperty("uid","minor_version",0);
+	            }
+	            */
+            	doc.checkIn(VersioningOption.MINOR, null); 
+            	doc.checkOut();
+            }
+            
             //
             // Set reposession to handle the document
             //
@@ -818,7 +1064,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -826,8 +1072,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     /**
      * Save a documentModel to the Nuxeo repository.
      * @param ctx service context under which this method is invoked
+     * @param repoSession
      * @param docModel the document to save
      * @param fSaveSession if TRUE, will call CoreSession.save() to save accumulated changes.
+     * @throws ClientException
      * @throws DocumentException
      */
     public void saveDocWithoutHandlerProcessing(
@@ -857,8 +1105,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * Save a list of documentModels to the Nuxeo repository.
      * 
      * @param ctx service context under which this method is invoked
-     * @param docModel the document to save
+     * @param repoSession a repository session
+     * @param docModelList a list of document models
      * @param fSaveSession if TRUE, will call CoreSession.save() to save accumulated changes.
+     * @throws ClientException
      * @throws DocumentException
      */
     public void saveDocListWithoutHandlerProcessing(
@@ -868,7 +1118,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             boolean fSaveSession)
             throws ClientException, DocumentException {
         try {
-            repoSession = getRepositorySession();
             DocumentModel[] docModelArray = new DocumentModel[docList.size()];
             repoSession.saveDocuments(docList.toArray(docModelArray));
             if (fSaveSession) {
@@ -891,7 +1140,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      */
     @Override
     public void delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException,
-            DocumentException {
+            DocumentException, TransactionException {
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "delete(ctx, ix, handler): ctx is missing");
@@ -906,7 +1155,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         RepositoryInstance repoSession = null;
         try {
         	handler.prepare(Action.DELETE);
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession(ctx);
             DocumentWrapper<DocumentModel> wrapDoc = null;
             try {
             	DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
@@ -929,7 +1178,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(ctx, repoSession);
             }
         }
     }
@@ -946,19 +1195,24 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     }
 
     @Override
-    public Hashtable<String, String> retrieveWorkspaceIds(String domainName) throws Exception {
-        return NuxeoConnectorEmbedded.getInstance().retrieveWorkspaceIds(domainName);
+    public Hashtable<String, String> retrieveWorkspaceIds(RepositoryDomainType repoDomain) throws Exception {
+        return NuxeoConnectorEmbedded.getInstance().retrieveWorkspaceIds(repoDomain);
     }
 
     @Override
-    public String createDomain(String domainName) throws Exception {
+    public String createDomain(RepositoryDomainType repositoryDomain) throws Exception {
         RepositoryInstance repoSession = null;
         String domainId = null;
         try {
         	//
+        	// Open a connection to the domain's repo/db
+        	//
+        	String repoName = repositoryDomain.getRepositoryName();
+            repoSession = getRepositorySession(repoName); // domainName=storageName=repoName=databaseName
+        	//
         	// First create the top-level domain directory
         	//
-            repoSession = getRepositorySession();
+        	String domainName = repositoryDomain.getStorageName();
             DocumentRef parentDocRef = new PathRef("/");
             DocumentModel parentDoc = repoSession.getDocument(parentDocRef);
             DocumentModel domainDoc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
@@ -990,12 +1244,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Could not create tenant domain name=" + domainName + " caught exception ", e);
+                logger.debug("Could not create tenant domain name=" + repositoryDomain.getStorageName() + " caught exception ", e);
             }
             throw e;
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(null, repoSession);
             }
         }
         
@@ -1003,27 +1257,28 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     }
 
     @Override
-    public String getDomainId(String domainName) throws Exception {
+    public String getDomainId(RepositoryDomainType repositoryDomain) throws Exception {
         String domainId = null;
         RepositoryInstance repoSession = null;
         
-        if (domainName != null && !domainName.isEmpty()) {
+        String repoName = repositoryDomain.getRepositoryName();
+        String domainStorageName = repositoryDomain.getStorageName();
+        if (domainStorageName != null && !domainStorageName.isEmpty()) {
 	        try {
-	            repoSession = getRepositorySession();
-	            DocumentRef docRef = new PathRef(
-	                    "/" + domainName);
+	            repoSession = getRepositorySession(repoName);
+	            DocumentRef docRef = new PathRef("/" + domainStorageName);
 	            DocumentModel domain = repoSession.getDocument(docRef);
 	            domainId = domain.getId();
 	        } catch (Exception e) {
 	            if (logger.isTraceEnabled()) {
-	                logger.trace("Caught exception ", e);
+	                logger.trace("Caught exception ", e);  // The document doesn't exist, this let's us know we need to create it
 	            }
 	            //there is no way to identify if document does not exist due to
 	            //lack of typed exception for getDocument method
 	            return null;
 	        } finally {
 	            if (repoSession != null) {
-	                releaseRepositorySession(repoSession);
+	                releaseRepositorySession(null, repoSession);
 	            }
 	        }
         }
@@ -1064,12 +1319,21 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @see org.collectionspace.services.common.repository.RepositoryClient#createWorkspace(java.lang.String, java.lang.String)
      */
     @Override
-    public String createWorkspace(String domainName, String workspaceName) throws Exception {
+    public String createWorkspace(RepositoryDomainType repositoryDomain, String workspaceName) throws Exception {
         RepositoryInstance repoSession = null;
         String workspaceId = null;
         try {
-            repoSession = getRepositorySession();
-            DocumentModel parentDoc = getWorkspacesRoot(repoSession, domainName);            
+        	String repoName = repositoryDomain.getRepositoryName();
+            repoSession = getRepositorySession(repoName);
+            
+            String domainStorageName = repositoryDomain.getStorageName();
+            DocumentModel parentDoc = getWorkspacesRoot(repoSession, domainStorageName);
+            if (logger.isTraceEnabled()) {
+	            for (String facet : parentDoc.getFacets()) {
+	            	logger.trace("Facet: " + facet);
+	            }
+            }
+            
             DocumentModel doc = repoSession.createDocumentModel(parentDoc.getPathAsString(),
                     workspaceName, NuxeoUtils.WORKSPACE_DOCUMENT_TYPE);
             doc.setPropertyValue("dc:title", workspaceName);
@@ -1089,7 +1353,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw e;
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(null, repoSession);
             }
         }
         return workspaceId;
@@ -1099,12 +1363,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * @see org.collectionspace.services.common.repository.RepositoryClient#getWorkspaceId(java.lang.String, java.lang.String)
      */
     @Override
+    @Deprecated
     public String getWorkspaceId(String tenantDomain, String workspaceName) throws Exception {
         String workspaceId = null;
         
         RepositoryInstance repoSession = null;
         try {
-            repoSession = getRepositorySession();
+            repoSession = getRepositorySession((ServiceContext)null);
             DocumentRef docRef = new PathRef(
                     "/" + tenantDomain
                     + "/" + NuxeoUtils.Workspaces
@@ -1120,33 +1385,66 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throw new DocumentException(e);
         } finally {
             if (repoSession != null) {
-                releaseRepositorySession(repoSession);
+                releaseRepositorySession(null, repoSession);
             }
         }
         
         return workspaceId;
     }
 
-
+    public RepositoryInstance getRepositorySession(ServiceContext ctx) throws Exception {
+    	return getRepositorySession(ctx, ctx.getRepositoryName());
+    }
+    
+    public RepositoryInstance getRepositorySession(String repoName) throws Exception {
+    	return getRepositorySession(null, repoName);
+    }
+    
     /**
-     * Gets the repository session. - Package access only.
+     * Gets the repository session. - Package access only.  If the 'ctx' param is null then the repo name must be non-mull and vice-versa
      *
      * @return the repository session
      * @throws Exception the exception
      */
-    public RepositoryInstance getRepositorySession() throws Exception {
-        // FIXME: is it possible to reuse repository session?
-        // Authentication failures happen while trying to reuse the session
+    public RepositoryInstance getRepositorySession(ServiceContext ctx, String repoName) throws Exception {
+    	RepositoryInstance repoSession = null;
+    	
     	Profiler profiler = new Profiler("getRepositorySession():", 2);
     	profiler.start();
-    	
-        NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
-        RepositoryInstance repoSession = client.openRepository();
+    	//
+    	// To get a connection to the Nuxeo repo, we need either a valid ServiceContext instance or a repository name
+    	//
+        if (ctx != null) {
+        	repoName = ctx.getRepositoryName(); // Notice we are overriding the passed in 'repoName' since we have a valid service context passed in to us
+        	repoSession = (RepositoryInstance)ctx.getCurrentRepositorySession(); // Look to see if one exists in the context before creating one
+        } else if (repoName == null || repoName.trim().isEmpty()) {
+        	String errMsg = String.format("We can't get a connection to the Nuxeo repo because the service context passed in was null and no repository name was passed in either.");
+        	logger.error(errMsg);
+        	throw new Exception(errMsg);
+        }        
+        //
+        // If we couldn't find a repoSession from the service context (or the context was null) then we need to create a new one using
+        // just the repo name
+        //
+        if (repoSession == null) {
+	        NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
+	        repoSession = client.openRepository(repoName);
+        } else {
+            if (logger.isDebugEnabled() == true) {
+            	logger.warn("Reusing the current context's repository session.");
+            }        	
+        }
+        
         if (logger.isTraceEnabled()) {
             logger.trace("Testing call to getRepository() repository root: " + repoSession.getRootDocument());
         }
         
         profiler.stop();
+        
+        if (ctx != null) {
+        	ctx.setCurrentRepositorySession(repoSession); // For reusing, save the repository session in the current service context
+        }
+        
         return repoSession;
     }
 
@@ -1155,11 +1453,22 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      *
      * @param repoSession the repo session
      */
-    public void releaseRepositorySession(RepositoryInstance repoSession) {
+    public void releaseRepositorySession(ServiceContext ctx, RepositoryInstance repoSession) throws TransactionException {
         try {
             NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
             // release session
-            client.releaseRepository(repoSession);
+            if (ctx != null) {
+            	ctx.clearCurrentRepositorySession(); //clear the current context of the now closed repo session
+            	if (ctx.getCurrentRepositorySession() == null) {
+                    client.releaseRepository(repoSession); //release the repo session if the service context's ref count is zeo.
+            	}
+            } else {
+                client.releaseRepository(repoSession); //repo session was acquired without a service context
+            }
+        } catch (TransactionRuntimeException tre) {
+            TransactionException te = new TransactionException(tre);
+            logger.error(te.getMessage(), tre); // Log the standard transaction exception message, plus an exception-specific stack trace
+            throw te;
         } catch (Exception e) {
             logger.error("Could not close the repository session", e);
             // no need to throw this service specific exception
@@ -1173,5 +1482,5 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 			DocumentException {
 		// This is a placeholder for when we change the StorageClient interface to treat workflow transitions as 1st class operations like 'get', 'create', 'update, 'delete', etc
 	}
-
+                
 }

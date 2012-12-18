@@ -28,10 +28,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
@@ -359,12 +361,10 @@ public class TenantBindingConfigReaderImpl
         }
         String repoDomain = serviceBinding.getRepositoryDomain(); 
         if (repoDomain == null) {
-        	/* This is excessive - every call to a JPA based service dumps this msg.
-            if (logger.isDebugEnabled()) {
-                logger.debug("No repository domain configured for " + serviceName
+            if (logger.isTraceEnabled()) {
+                logger.trace("No repository domain configured for " + serviceName
                         + " of tenant with id=" + tenantId);
             }
-            */
             return null;
         }
         String key = this.getTenantQualifiedIdentifier(tenantId, repoDomain.trim());
@@ -407,9 +407,10 @@ public class TenantBindingConfigReaderImpl
     	return getServiceBindingsByType(tenantId, serviceTypes);
     }
     /**
-     * getServiceBinding gets service binding for given tenant for a given service
+     * getServiceBindingsByType gets service bindings for a given tenant
+     * for the services that fall within a supplied set of service type(s)
      * @param tenantId
-     * @param serviceName
+     * @param serviceTypes
      * @return
      */
     public List<ServiceBindingType> getServiceBindingsByType(
@@ -470,6 +471,28 @@ public class TenantBindingConfigReaderImpl
     }
 
     public String getResourcesDir(){
-        return getConfigRootDir() + File.separator + "resources";
+        return getConfigRootDir() + File.separator + RESOURCES_DIR_NAME;
+    }
+    
+    
+    /**
+     * Returns a list of tenant identifiers (tenant IDs).
+     * 
+     * @return a list of tenant IDs
+     */
+    public List<String> getTenantIds() {
+        List<String> tenantIds = new ArrayList<String>();
+        String tenantId;
+        Hashtable<String, TenantBindingType> tenantBindings = getTenantBindings();
+        if (tenantBindings != null && !tenantBindings.isEmpty()) {
+            Enumeration keys = tenantBindings.keys();
+            while (keys.hasMoreElements()) {
+                tenantId = (String) keys.nextElement();
+                if (Tools.notBlank(tenantId)) {
+                    tenantIds.add(tenantId);
+                }
+            }
+        }
+        return tenantIds;
     }
 }

@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.3rdparty</artifactId>
-        <version>2.2-SNAPSHOT</version>
+        <version>3.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.3rdparty.nuxeo</artifactId>
     <packaging>pom</packaging>
     <name>services.3rdparty.nuxeo</name>
 
     <modules>
-        <module>nuxeo-platform-collectionspace</module>
+		<module>nuxeo-platform-collectionspace</module>
+		<module>nuxeo-platform-listener</module>
 		<module>nuxeo-platform-quote-api</module>
 		<module>nuxeo-platform-quote</module>
-    </modules>
+		<module>nuxeo-platform-thumbnail</module>
+	</modules>
 
     <dependencies>
         <dependency>

@@ -6,7 +6,7 @@
     <pageNum>0</pageNum>
     <itemsInPage>2</itemsInPage>
     <totalItems>2</totalItems>
-    <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid|subject|object</fieldsReturned>
+    <fieldsReturned>subjectCsid|relationshipType|predicateDisplayName|relationshipMetaType|objectCsid|uri|csid|subject|object</fieldsReturned>
     <relation-list-item>
       <subjectCsid>${child2CSID}</subjectCsid>
       <predicate>hasBroader</predicate>

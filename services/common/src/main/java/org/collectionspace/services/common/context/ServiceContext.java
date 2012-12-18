@@ -36,6 +36,7 @@ import org.collectionspace.services.common.security.SecurityContext;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
 /**
  *
@@ -60,6 +61,21 @@ public interface ServiceContext<IT, OT> {
     /** Used to qualify document types **/
 	public static final String TENANT_SUFFIX = "Tenant";    
 
+	/* 
+	 * Sets the current/open repository session
+	 */
+	public void setCurrentRepositorySession(Object repoSession) throws Exception;
+	
+	/*
+	 * Decrements the context's repo session ref count and nulls it if the count becomes 0.
+	 */
+	public void clearCurrentRepositorySession();
+	
+	/*
+	 * If a current repository session exists, returns it.
+	 */
+	public Object getCurrentRepositorySession();
+	
     /**
      * getSecurityContext is contains security info. for the service layer
      */
@@ -131,6 +147,11 @@ public interface ServiceContext<IT, OT> {
      * @return repository domain for the tenant
      */
     public String getRepositoryDomainName();
+    
+    /*
+     * The name of the repository/db for the current context
+     */
+    public String getRepositoryName() throws Exception;
     
     /*
      * Get's the name/label used to create the storage container (folder or directory name)
@@ -251,11 +272,17 @@ public interface ServiceContext<IT, OT> {
     public String getServiceBindingPropertyValue(String propName);
 
     /**
-     * getDocumentHanlder returns document handler configured in the the binding
+     * getDocumentHandler returns document handler configured in the the binding
      * it creates the handler if necessary.
      * @return document handler
      */
     public DocumentHandler getDocumentHandler() throws Exception;
+
+    /**
+     * setDocumentHandler allows for setting an externally created handler
+     * @param handler the dochandler to set into this context
+     */
+    public void setDocumentHandler(DocumentHandler handler) throws Exception;
 
     /**
      * Gets the document hanlder.
@@ -274,6 +301,13 @@ public interface ServiceContext<IT, OT> {
      * @return validation handlers
      */
     public List<ValidatorHandler<IT, OT>> getValidatorHandlers() throws Exception;
+
+    /**
+     * getValidatorHandlers returns registered (from binding) validtor handlers
+     * for the service. it creates the handlers if necessary.
+     * @return validation handlers
+     */
+    public void addValidatorHandler(ValidatorHandler<IT, OT> validator) throws Exception;
 
     /**
      * Gets the query params.
@@ -295,6 +329,9 @@ public interface ServiceContext<IT, OT> {
 
     public UriInfo getUriInfo();
 
+	public RepositoryDomainType getRepositoryDomain();
+
+	public void setRepositoryDomain(RepositoryDomainType repositoryDomain);
 }
 
 

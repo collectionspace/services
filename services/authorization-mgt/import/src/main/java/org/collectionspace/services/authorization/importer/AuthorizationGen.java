@@ -43,6 +43,7 @@ import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.client.RoleClient;
+import org.collectionspace.services.client.TenantClient;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.RolesList;
@@ -65,14 +66,18 @@ public class AuthorizationGen {
     //
     final public static boolean AUTHZ_IS_ENTITY_PROXY = false;
     
+    final public static String TENANT_MGMNT_ID = "0";
+    
     final Logger logger = LoggerFactory.getLogger(AuthorizationGen.class);
+    private List<Permission> tenantMgmntPermList = new ArrayList<Permission>();
+    private List<PermissionRole> tenantMgmntPermRoleList = new ArrayList<PermissionRole>();
     private List<Permission> adminPermList = new ArrayList<Permission>();
     private List<PermissionRole> adminPermRoleList = new ArrayList<PermissionRole>();
     private List<Permission> readerPermList = new ArrayList<Permission>();
     private List<PermissionRole> readerPermRoleList = new ArrayList<PermissionRole>();
     private List<Role> adminRoles = new ArrayList<Role>();
     private List<Role> readerRoles = new ArrayList<Role>();
-    private Role cspaceAdminRole;
+    private Role cspaceTenantMgmntRole;
     private Hashtable<String, TenantBindingType> tenantBindings =
             new Hashtable<String, TenantBindingType>();
 	//
@@ -87,7 +92,7 @@ public class AuthorizationGen {
                 new TenantBindingConfigReaderImpl(tenantRootDirPath);
         tenantBindingConfigReader.read();
         tenantBindings = tenantBindingConfigReader.getTenantBindings();
-        cspaceAdminRole = buildCSpaceAdminRole();
+        cspaceTenantMgmntRole = buildTenantMgmntRole();
 
         if (logger.isDebugEnabled()) {
             logger.debug("initialized with tenant bindings from " + tenantRootDirPath);
@@ -108,6 +113,9 @@ public class AuthorizationGen {
             List<Permission> readerPerms = createDefaultReaderPermissions(tenantId, AUTHZ_IS_ENTITY_PROXY);
             readerPermList.addAll(readerPerms);
         }
+        
+        List<Permission> tenantMgmntPerms = createDefaultTenantMgmntPermissions();
+        tenantMgmntPermList.addAll(tenantMgmntPerms);
     }
 
     /**
@@ -142,6 +150,29 @@ public class AuthorizationGen {
         }
         
         return apcList;
+    }
+
+    /**
+     * createDefaultTenantMgmntPermissions creates default permissions for known 
+     * Tenant Mgmnt services. 
+     * @return
+     */
+    public List<Permission> createDefaultTenantMgmntPermissions() {
+        ArrayList<Permission> apcList = new ArrayList<Permission>();
+        // Later can think about ways to configure this if we want to
+        Permission perm = createTenantMgmntPermission(TenantClient.SERVICE_NAME);
+        apcList.add(perm);
+        
+        return apcList;
+    }
+
+    /**
+     * createTenantMgmntPermission creates special admin permissions for tenant management
+     * @return
+     */
+    private Permission  createTenantMgmntPermission(String resourceName) {
+    	Permission perm = buildAdminPermission(TENANT_MGMNT_ID, resourceName);
+    	return perm;
     }
 
     private Permission buildAdminPermission(String tenantId, String resourceName) {
@@ -192,6 +223,7 @@ public class AuthorizationGen {
 	        allPermList = new ArrayList<Permission>();
 	        allPermList.addAll(adminPermList);
 	        allPermList.addAll(readerPermList);
+	        allPermList.addAll(tenantMgmntPermList);
     	}
         return allPermList;
     }
@@ -202,6 +234,10 @@ public class AuthorizationGen {
 
     public List<Permission> getDefaultReaderPermissions() {
         return readerPermList;
+    }
+
+    public List<Permission> getDefaultTenantMgmntPermissions() {
+        return tenantMgmntPermList;
     }
 
     /**
@@ -226,7 +262,7 @@ public class AuthorizationGen {
         if (result == null) {
     		// the role doesn't exist already, so we need to create it
     		String description = "Generated tenant " + type + " role.";
-	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_ADMINISTRATOR, description);
+	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_ADMINISTRATOR, description, true /*immutable*/);
         }
         
         return result;
@@ -239,7 +275,7 @@ public class AuthorizationGen {
         if (result == null) {
     		// the role doesn't exist already, so we need to create it
     		String description = "Generated tenant " + type + " role.";
-	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_READER, description);
+	        result = AuthorizationCommon.createRole(tenantId, AuthorizationCommon.ROLE_TENANT_READER, description, true /*immutable*/);
         }
         
         return result;
@@ -251,8 +287,8 @@ public class AuthorizationGen {
 	        allRoleList = new ArrayList<Role>();
 	        allRoleList.addAll(adminRoles);
 	        allRoleList.addAll(readerRoles);
-	        // Finally, add the "super" role to the list
-	        allRoleList.add(cspaceAdminRole);
+	        // Finally, add the tenant manager role to the list
+	        allRoleList.add(cspaceTenantMgmntRole);
     	}
         return allRoleList;
     }
@@ -268,12 +304,20 @@ public class AuthorizationGen {
             readerPermRoleList.add(permRdrRole);
         }
         
-        //CSpace Administrator has all access
+        //CSpace Tenant Manager has all access
+        // PLS - this looks wrong. This should be a tenantMgmnt role, and only have access to 
+        // tenantMgmnt perms. Will leave this for now...
         List<Role> roles = new ArrayList<Role>();
-        roles.add(cspaceAdminRole);
-        for (Permission p : adminPermList) {
+        roles.add(cspaceTenantMgmntRole);
+        /* for (Permission p : adminPermList) {
             PermissionRole permCAdmRole = associatePermissionRoles(p, roles, false);
             adminPermRoleList.add(permCAdmRole);
+        }  */       
+        // Now associate the tenant management perms to the role
+        for (Permission p : tenantMgmntPermList) {
+        	// Note we enforce tenant, as should all be tenant 0 (the special one)
+            PermissionRole permTMRole = associatePermissionRoles(p, roles, true);
+            tenantMgmntPermRoleList.add(permTMRole);
         }        
     }
 
@@ -344,6 +388,7 @@ public class AuthorizationGen {
 	        allPermRoleList = new ArrayList<PermissionRole>();
 	        allPermRoleList.addAll(adminPermRoleList);
 	        allPermRoleList.addAll(readerPermRoleList);
+	        allPermRoleList.addAll(tenantMgmntPermRoleList);
     	}
         return allPermRoleList;
     }
@@ -356,18 +401,19 @@ public class AuthorizationGen {
         return readerPermRoleList;
     }
 
-    private Role buildCSpaceAdminRole() {
+    private Role buildTenantMgmntRole() {
         Role role = new Role();
         
-        role.setDescription("A generated super role that has permissions across tenancies.");
-        role.setDisplayName(AuthorizationCommon.ROLE_ADMINISTRATOR);
+        role.setDescription("A generated super role that has permissions to manage tenants.");
+        role.setDisplayName(AuthorizationCommon.ROLE_ALL_TENANTS_MANAGER);
         role.setRoleName(AuthorizationCommon.getQualifiedRoleName(
-        		AuthorizationCommon.ADMINISTRATOR_TENANT_ID, role.getDisplayName()));
-        role.setCsid(AuthorizationCommon.ROLE_ADMINISTRATOR_ID);
-        role.setTenantId(AuthorizationCommon.ADMINISTRATOR_TENANT_ID);
+        		AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID, role.getDisplayName()));
+        role.setCsid(AuthorizationCommon.ROLE_ALL_TENANTS_MANAGER_ID);
+        role.setTenantId(AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID);
         
         return role;
     }
+    
 
     public void exportDefaultRoles(String fileName) {
         RolesList rList = new RolesList();

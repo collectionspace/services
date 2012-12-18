@@ -3,7 +3,7 @@
     <pageNum>0</pageNum>
     <pageSize>40</pageSize>
 		<itemsInPage>2</itemsInPage>
-    <fieldsReturned>csid|uri|updatedAt|displayName|shortIdentifier|refName|termStatus</fieldsReturned>
+    <fieldsReturned>csid|uri|refName|updatedAt|displayName|shortIdentifier|termStatus</fieldsReturned>
     <list-item>
         <shortIdentifier>pschmitz</shortIdentifier>
     </list-item>

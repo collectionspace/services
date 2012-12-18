@@ -58,6 +58,11 @@ import org.collectionspace.services.common.context.ServiceContext;
  * JPA query specific document filter
  */
 public class JpaDocumentFilter extends DocumentFilter {
+	
+	public static final String Q_ASC = "asc"; 
+	public static final String Q_DESC = "desc"; 
+	public static final String JPA_ASC = " ASC"; 
+	public static final String JPA_DESC = " DESC"; 
 
     public JpaDocumentFilter(ServiceContext ctx) {
         super(ctx);

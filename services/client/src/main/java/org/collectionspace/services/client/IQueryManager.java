@@ -38,12 +38,63 @@ public interface IQueryManager {
     final static String SEARCH_TYPE_KEYWORDS_AS = "as";
     final static String SEARCH_TYPE_PARTIALTERM = "pt";
     final static String SEARCH_TYPE_DOCTYPE = "doctype";
-    final static String SEARCH_TYPE_INVCOATION_MODE = "mode";
+    final static String SEARCH_TYPE_INVOCATION_MODE = "mode";
     final static String SEARCH_TYPE_INVOCATION = "inv";
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
 
+	//
+	// Nuxeo pseudo-values (and filters) for special document properties.
+	//
+	final static String NUXEO_IS_PROXY = "ecm:isProxy";
+	final static String NUXEO_IS_PROXY_FILTER = NUXEO_IS_PROXY + " = 0";
+	final static String NUXEO_IS_VERSION = "ecm:isCheckedInVersion";
+	final static String NUXEO_IS_VERSION_FILTER = NUXEO_IS_VERSION + " = 0";
+	// In the CMIS context, the prefix is nuxeo, not ecm
+	final static String NUXEO_CMIS_IS_VERSION = "nuxeo:isVersion";
+	final static String NUXEO_CMIS_IS_VERSION_FILTER = NUXEO_CMIS_IS_VERSION + " = false";
+	
+	//
+	// Query params for CMIS queries on the relationship (Relation) table.
+	//
+	final static String SEARCH_RELATED_TO_CSID_AS_SUBJECT = "rtSbj";
+	final static String SEARCH_RELATED_TO_CSID_AS_OBJECT = "rtObj";
+	final static String SEARCH_RELATED_TO_CSID_AS_EITHER = "rtEither";
+	final static String SEARCH_RELATED_MATCH_OBJ_DOCTYPES = "rtObjDocTypes";
+	final static String SELECT_DOC_TYPE_FIELD = "selectDocType";
+	
+	final static String MARK_RELATED_TO_CSID_AS_SUBJECT = "mkRtSbj";
+	//
+	// Generic CMIS property mapping constants
+	//
+	final static String CMIS_OBJECT_ID = "cmis:objectId";
+	final static String CMIS_NUXEO_PATHSEGMENT = "nuxeo:pathSegment";
+	//
+	// Nuxeo related CMIS property mapping constants
+	final static String CMIS_NUXEO_ID = CMIS_OBJECT_ID;
+	final static String CMIS_NUXEO_NAME = CMIS_NUXEO_PATHSEGMENT;
+	final static String CMIS_NUXEO_TITLE = "dc:title";
+	final static String CMIS_CS_UPDATED_AT = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":" + CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
+	
+	// CollectionSpace CMIS property mapping constants
+	final static String CMIS_TARGET_PREFIX = "DOC";
+	final static String CMIS_CORESCHEMA_PREFIX = "CORE";
+	// Relations CMIS property mapping constants
+	final static String CMIS_RELATIONS_PREFIX = "REL";
+	
+	final static String CMIS_JOIN_NUXEO_IS_VERSION_FILTER = 
+			IQueryManager.CMIS_TARGET_PREFIX + "." + IQueryManager.NUXEO_CMIS_IS_VERSION_FILTER;
+
+	
+	final static String CMIS_TARGET_NUXEO_ID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_ID;
+	final static String CMIS_TARGET_CSID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
+	final static String CMIS_TARGET_TITLE = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_TITLE;
+	final static String CMIS_TARGET_NAME = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
+	final static String CMIS_TARGET_UPDATED_AT = CMIS_TARGET_PREFIX + "." + CMIS_CS_UPDATED_AT;
+
 	public void execQuery(String queryString);
+	
+	public String getDatasourceName();
 	
 	/**
 	 * Creates the where clause from keywords.
@@ -77,7 +128,10 @@ public interface IQueryManager {
 	 * 
 	 * @return the string
 	 */
-	public String createWhereClauseForPartialMatch(String field, String partialTerm);
+	public String createWhereClauseForPartialMatch(String dataSourceName,
+			String repositoryName,
+			String field,
+			String partialTerm);
 
 	/**
 	 * Creates a filtering where clause from docType, for invocables.

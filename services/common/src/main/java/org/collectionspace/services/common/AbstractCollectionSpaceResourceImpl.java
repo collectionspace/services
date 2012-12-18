@@ -40,6 +40,7 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
@@ -159,7 +160,8 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     protected ServiceContext<IT, OT> createServiceContext() throws Exception {    	
         ServiceContext<IT, OT> ctx = createServiceContext(this.getServiceName(),
         		(IT)null, //inputType
-        		(MultivaluedMap<String, String>)null, /*queryParams*/
+        		null, // The resource map
+        		(UriInfo)null, // The query params
         		this.getCommonPartClass());
         return ctx;
     }    
@@ -176,11 +178,23 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     protected ServiceContext<IT, OT> createServiceContext(String serviceName) throws Exception {    	
         ServiceContext<IT, OT> ctx = createServiceContext(
         		serviceName,
-        		(IT)null, /*input*/
-        		(MultivaluedMap<String, String>)null, /*queryParams*/
+        		(IT)null, // The input part
+        		null, // The resource map
+        		(UriInfo)null, // The queryParams
         		(Class<?>)null  /*input type's Class*/);
         return ctx;
     }
+    
+    protected ServiceContext<IT, OT> createServiceContext(String serviceName, UriInfo ui) throws Exception {    	
+        ServiceContext<IT, OT> ctx = createServiceContext(
+        		serviceName,
+        		(IT)null, // The input part
+        		null, // The resource map
+        		(UriInfo)null, // The queryParams
+        		(Class<?>)null  /*input type's Class*/);
+        ctx.setUriInfo(ui);
+        return ctx;
+    }    
     
     /**
      * Creates the service context.
@@ -194,57 +208,33 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      */
     protected ServiceContext<IT, OT> createServiceContext(String serviceName,
     		IT input) throws Exception {    	
-        ServiceContext<IT, OT> ctx = createServiceContext(serviceName, input,
-        		(MultivaluedMap<String, String>)null, /*queryParams*/
+        ServiceContext<IT, OT> ctx = createServiceContext(serviceName,
+        		input,
+        		null, // The resource map
+        		(UriInfo)null, /*queryParams*/
         		(Class<?>)null  /*input type's Class*/);
         return ctx;
     }
     
-    /**
-     * Creates the service context.
-     * 
-     * @param serviceName the service name
-     * @return the service context< i t, o t>
-     * @throws Exception the exception
-     */
     protected ServiceContext<IT, OT> createServiceContext(String serviceName,
-    		MultivaluedMap<String, String> queryParams) throws Exception {    	
+    		IT input,
+    		UriInfo uriInfo) throws Exception {    	
         ServiceContext<IT, OT> ctx = createServiceContext(serviceName,
-        		(IT)null,
-        		queryParams,
+        		input,
+        		null, // The resource map
+        		uriInfo, /*queryParams*/
         		(Class<?>)null  /*input type's Class*/);
         return ctx;
-    }    
-
-    /**
-     * Creates the service context.
-     * 
-     * @param queryParams the query params
-     * 
-     * @return the service context< i t, o t>
-     * 
-     * @throws Exception the exception
-     */
-    protected ServiceContext<IT, OT> createServiceContext(MultivaluedMap<String, String> queryParams) throws Exception {
+    }
+    
+    protected ServiceContext<IT, OT> createServiceContext(UriInfo uriInfo) throws Exception {
         ServiceContext<IT, OT> ctx = createServiceContext(
         		(IT)null, /*input*/
-        		queryParams,
+        		uriInfo,
         		(Class<?>)null  /*input type's Class*/);
         return ctx;
     }
 
-    protected ServiceContext<IT, OT> createServiceContext(UriInfo ui) throws Exception {
-        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        ServiceContext<IT, OT> ctx = createServiceContext(
-        		(IT)null, /*input*/
-        		queryParams,
-        		(Class<?>)null  /*input type's Class*/);
-        return ctx;
-    }
-
-
-
-        
     /**
      * Creates the service context.
      * 
@@ -261,6 +251,14 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         return ctx;
     }
     
+    protected ServiceContext<IT, OT> createServiceContext(IT input, UriInfo uriInfo) throws Exception {    	
+        ServiceContext<IT, OT> ctx = createServiceContext(
+        		input,
+        		uriInfo,
+        		null ); // The class param/argument
+        return ctx;
+    }    
+    
     /**
      * Creates the service context.
      * 
@@ -274,11 +272,59 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     protected ServiceContext<IT, OT> createServiceContext(IT input, Class<?> theClass) throws Exception {    	
         ServiceContext<IT, OT> ctx = createServiceContext(
         		input,
-        		(MultivaluedMap<String, String>)null, //queryParams,
+        		(UriInfo)null, //queryParams,
         		theClass);
         return ctx;
     }
     
+    protected ServiceContext<IT, OT> createServiceContext(IT input, Class<?> theClass, UriInfo uriInfo) throws Exception {    	
+        ServiceContext<IT, OT> ctx = createServiceContext(
+        		input,
+        		uriInfo,
+        		theClass);
+        return ctx;
+    }
+    
+    protected ServiceContext<IT, OT> createServiceContext(
+    		String serviceName,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo) throws Exception {
+    	ServiceContext<IT, OT> ctx = createServiceContext(
+    			serviceName,
+    			null, // The input object
+    			resourceMap,
+    			uriInfo,
+    			null /* the class of the input type */);
+    	return ctx;
+    }
+        
+    protected ServiceContext<IT, OT> createServiceContext(
+    		IT input,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo) throws Exception {
+    	ServiceContext<IT, OT> ctx = createServiceContext(
+    			this.getServiceName(),
+    			input,
+    			resourceMap,
+    			uriInfo,
+    			null /* the class of the input type */);
+    	return ctx;
+    }
+    
+    protected ServiceContext<IT, OT> createServiceContext(
+    		String serviceName,
+    		IT input,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo) throws Exception {
+    	ServiceContext<IT, OT> ctx = createServiceContext(
+    			serviceName,
+    			input,
+    			resourceMap,
+    			uriInfo,
+    			null /* the class of the input type */);
+    	return ctx;
+    }
+        
     /**
      * Creates the service context.
      * 
@@ -290,13 +336,14 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      * 
      * @throws Exception the exception
      */
-    protected ServiceContext<IT, OT> createServiceContext(
+    private ServiceContext<IT, OT> createServiceContext(
     		IT input,
-    		MultivaluedMap<String, String> queryParams,
+    		UriInfo uriInfo,
     		Class<?> theClass) throws Exception {
     	return createServiceContext(this.getServiceName(),
     			input,
-    			queryParams,
+    			null, // The resource map
+    			uriInfo,
     			theClass);
     }
 
@@ -315,17 +362,20 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     private ServiceContext<IT, OT> createServiceContext(
     		String serviceName,
     		IT input,
-    		MultivaluedMap<String, String> queryParams,
+    		ResourceMap resourceMap,
+    		UriInfo uriInfo,
     		Class<?> theClass) throws Exception {
         ServiceContext<IT, OT> ctx = getServiceContextFactory().createServiceContext(
         		serviceName,
         		input,
-        		queryParams,
+        		resourceMap,
+        		uriInfo,
         		theClass != null ? theClass.getPackage().getName() : null,
         		theClass != null ? theClass.getName() : null);
-        if(theClass != null) {
+        if (theClass != null) {
             ctx.setProperty(ServiceContextProperties.ENTITY_CLASS, theClass);
         }
+        
         return ctx;
     }
         
@@ -398,6 +448,11 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         	//
         	logException = false;
             response = Response.status(Response.Status.NOT_FOUND).entity(serviceMsg + " on " + getClass().getName() + " csid=" + csid).type("text/plain").build();
+            result = new WebApplicationException(response);
+            
+        } else if (e instanceof TransactionException) {
+            int code = ((TransactionException) e).getErrorCode();
+            response = Response.status(code).entity(e.getMessage()).type("text/plain").build();
             result = new WebApplicationException(response);
 
         } else if (e instanceof BadRequestException) {

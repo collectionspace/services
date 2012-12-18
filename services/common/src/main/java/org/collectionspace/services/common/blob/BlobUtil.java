@@ -3,14 +3,14 @@ package org.collectionspace.services.common.blob;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BlobUtil {
-	//FIXME: REM - We should have a class/interface in common that has constant defs for the names of all the services.
-	public static String BLOB_RESOURCE_NAME = "blobs";
+	//
+	//
 	private static final Logger logger = LoggerFactory.getLogger(BlobUtil.class);
 	
     public static BlobInput getBlobInput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {

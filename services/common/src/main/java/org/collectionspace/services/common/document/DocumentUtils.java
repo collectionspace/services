@@ -31,6 +31,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,8 +77,10 @@ import org.nuxeo.ecm.core.schema.types.ListType;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.SimpleType;
 import org.nuxeo.ecm.core.schema.types.Type;
+import org.nuxeo.ecm.core.schema.types.TypeException;
 import org.nuxeo.ecm.core.schema.types.JavaTypes;
 import org.nuxeo.ecm.core.schema.types.primitives.DateType;
+import org.nuxeo.ecm.core.schema.types.primitives.DoubleType;
 import org.nuxeo.ecm.core.schema.types.primitives.StringType;
 import org.nuxeo.ecm.core.schema.types.FieldImpl;
 import org.nuxeo.ecm.core.schema.types.QName;
@@ -122,6 +127,8 @@ public class DocumentUtils {
 
 	/** The XML elements with this suffix will indicate. */
 	private static String STRUCTURED_TYPE_SUFFIX = "List";
+       
+
 
 	/**
 	 * The Class NameValue.
@@ -578,52 +585,56 @@ public class DocumentUtils {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	private static void buildProperty(Document document, Element parent, 
-			Field field, Object value) throws IOException {
-		Type type = field.getType();
-		//no need to qualify each element name as namespace is already added
-		String propName = field.getName().getLocalName();
-		Element element = document.createElement(propName);
-		parent.appendChild(element);
-		// extract the element content
-		if (type.isSimpleType()) {
-            String encodedVal = type.encode(value);
-            /*
-             * We need a way to produce just a Date when the specified data
-             * type is an xs:date vs. xs:datetime. Nuxeo maps both to a Calendar. Sigh.
-			if(logger.isTraceEnabled() && isDateType(type)) {
-				String dateValType = "unknown";
-				if (value instanceof java.util.Date) {
-					dateValType = "java.util.Date";
-		        } else if (value instanceof java.util.Calendar) {
-					dateValType = "java.util.Calendar";
-		        }
-				logger.trace("building XML for date type: "+type.getName()
-						+" value type: "+dateValType
-						+" encoded: "+encodedVal);
-			}
-			*/
-            element.setTextContent(encodedVal);
-		} else if (type.isComplexType()) {
-			ComplexType ctype = (ComplexType) type;
-			if (ctype.getName().equals(TypeConstants.CONTENT)) {
-				throw new RuntimeException(
-						"Unexpected schema type: BLOB for field: "+propName);
-			} else {
-				buildComplex(document, element, ctype, (Map) value);
-			}
-		} else if (type.isListType()) {
-			if (value instanceof List) {
-				buildList(document, element, (ListType) type, (List) value);
-			} else if (value.getClass().getComponentType() != null) {
-				buildList(document, element, (ListType) type,
-						PrimitiveArrays.toList(value));
-			} else {
-				throw new IllegalArgumentException(
-						"A value of list type is neither list neither array: "
-						+ value);
-			}
-		}
-	}
+            Field field, Object value) throws IOException {
+            Type type = field.getType(); 
+           //no need to qualify each element name as namespace is already added
+            String propName = field.getName().getLocalName();
+            Element element = document.createElement(propName);
+            parent.appendChild(element);
+            // extract the element content
+            if (type.isSimpleType()) {
+                if (isNuxeoDecimalType(type) && valueMatchesNuxeoType(type, value)) {
+                    element.setTextContent(nuxeoDecimalValueToDecimalString(value));
+               /*
+                * We need a way to produce just a Date when the specified data
+                * type is an xs:date vs. xs:datetime. Nuxeo maps both to a Calendar. Sigh.
+                if(logger.isTraceEnabled() && isDateType(type)) {
+                    String dateValType = "unknown";
+                    if (value instanceof java.util.Date) {
+                        dateValType = "java.util.Date";
+                    } else if (value instanceof java.util.Calendar) {
+                        dateValType = "java.util.Calendar";
+                    }
+                    logger.trace("building XML for date type: "+type.getName()
+                            +" value type: "+dateValType
+                            +" encoded: "+encodedVal);
+                }
+                */
+                } else {
+                    String encodedVal = type.encode(value);
+                    element.setTextContent(encodedVal);
+                }
+            } else if (type.isComplexType()) {
+                ComplexType ctype = (ComplexType) type;
+                if (ctype.getName().equals(TypeConstants.CONTENT)) {
+                    throw new RuntimeException(
+                            "Unexpected schema type: BLOB for field: "+propName);
+                } else {
+                    buildComplex(document, element, ctype, (Map) value);
+                }
+            } else if (type.isListType()) {
+                if (value instanceof List) {
+                    buildList(document, element, (ListType) type, (List) value);
+                } else if (value.getClass().getComponentType() != null) {
+                    buildList(document, element, (ListType) type,
+                            PrimitiveArrays.toList(value));
+                } else {
+                    throw new IllegalArgumentException(
+                            "A value of list type is neither list neither array: "
+                            + value);
+                }
+            }
+        }
 
 	/**
 	 * Builds the complex.
@@ -860,7 +871,58 @@ public class DocumentUtils {
 		}
 		return isComplex;
 	}
-
+        
+        /*
+         * Identifies whether a property type is a Nuxeo decimal type.
+         * 
+         * Note: currently, elements declared as xs:decimal in XSD schemas
+         * are handled as the Nuxeo primitive DoubleType.  If this type
+         * changes, the test below should be changed accordingly.
+         *
+         * @param type   a type.
+	 * @return       true, if is a Nuxeo decimal type;
+         *               false, if it is not a Nuxeo decimal type.
+         */
+        private static boolean isNuxeoDecimalType(Type type) {
+            return ((SimpleType)type).getPrimitiveType() instanceof DoubleType;
+        }
+        
+        /*
+         * Returns a string representation of the value of a Nuxeo decimal type.
+         * 
+         * Note: currently, elements declared as xs:decimal in XSD schemas
+         * are handled as the Nuxeo primitive DoubleType, and their values
+         * are convertible into the Java Double type.  If this type
+         * changes, the conversion below should be changed accordingly.
+         *
+	 * @return  a string representation of the value of a Nuxeo decimal type.
+         *     An empty string is returned if the value cannot be cast to the
+         *     appropriate type.
+         */
+        private static String nuxeoDecimalValueToDecimalString(Object value) {
+            Double doubleVal;
+            try {
+                doubleVal = (Double) value;
+            } catch (ClassCastException cce) {
+                logger.warn("Could not convert a Nuxeo decimal value to its string equivalent: "
+                        + cce.getMessage());
+                return "";
+            }
+            // FIXME: Without a Locale supplied as an argument, NumberFormat will
+            // use the decimal separator and other numeric formatting conventions
+            // for the current default Locale.  In some Locales, this could
+            // potentially result in returning values that might not be capable
+            // of being round-tripped; this should be invetigated. Alternately,
+            // we might standardize on a particular locale whose values are known
+            // to be capable of also being ingested on return. - ADR 2012-08-07
+            NumberFormat formatter = NumberFormat.getInstance();
+            if (formatter instanceof DecimalFormat) {
+                // This pattern allows up to 15 decimal digits, and will prepend
+                // a '0' if only fractional digits are included in the value.
+                ((DecimalFormat) formatter).applyPattern("0.###############");
+            }
+            return formatter.format(doubleVal.doubleValue());
+       }
 
         /*
          * Identifies whether a property type is a date type.
@@ -869,12 +931,14 @@ public class DocumentUtils {
 	 * @return       true, if is a date type;
          *               false, if it is not a date type.
          */
-        private static boolean isDateType(Type type) {
-    		// TODO simplify this to return ((SimpleType)type).getPrimitiveType() instanceof DateType;
-            SimpleType st = (SimpleType) type;
-            if (st.getPrimitiveType() instanceof DateType) {
-                return true;
-            } else {
+        private static boolean isNuxeoDateType(Type type) {
+            return ((SimpleType)type).getPrimitiveType() instanceof DateType;
+        }
+                
+        private static boolean valueMatchesNuxeoType(Type type, Object value) {
+            try {
+                return type.validate(value);
+            } catch (TypeException te) {
                 return false;
             }
         }
@@ -1161,8 +1225,11 @@ public class DocumentUtils {
 				Object value = getElementData(element, field.getType(), ctx);
 				data.put(name, value);
 			} else	{
-				if (logger.isDebugEnabled() == true) {
-					logger.debug("Invalid input document. No such property was found [" +
+                            // FIXME: substitute an appropriate constant for "csid" below.
+                            // One potential class to which to add that constant, if it is not already
+                            // declared, might be AbstractCollectionSpaceResourceImpl - ADR 2012-09-24
+                            if (! name.equals("csid")) { // 'csid' elements in input payloads can be safely ignored. 
+                                logger.warn("Invalid input document. No such property was found [" +
 							name + "] in schema " + schemaName);
 				}
 			}
@@ -1185,7 +1252,7 @@ public class DocumentUtils {
                 String dateStr = "";
 		
 		if (type.isSimpleType()) {
-                        if (isDateType(type)) {
+                        if (isNuxeoDateType(type)) {
                             String dateVal = element.getText();
                             if (dateVal == null || dateVal.trim().isEmpty()) {
                                 result = type.decode("");

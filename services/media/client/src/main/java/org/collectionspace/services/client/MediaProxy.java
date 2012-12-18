@@ -34,4 +34,11 @@ public interface MediaProxy extends CollectionSpaceCommonListPoxProxy {
     ClientResponse<Response>createBlobFromUri(@PathParam("csid") String csid,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,
     		String emptyXML); //this "emptyXML" param is needed to force RESTEasy to produce a Content-Type header for this POST    
+
+    @POST
+	@Produces("application/xml")
+	@Consumes("application/xml")
+    ClientResponse<Response>createMediaAndBlobWithUri(byte[] xmlPayload,
+    		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,
+    		@QueryParam(BlobClient.BLOB_PURGE_ORIGINAL) boolean purgeOriginal);    
 }
