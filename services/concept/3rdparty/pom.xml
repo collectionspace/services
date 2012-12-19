@@ -9,7 +9,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.concept.3rdparty</artifactId>
     <name>services.concept.3rdparty</name>
     <packaging>pom</packaging>
@@ -18,6 +17,8 @@
     </description>
 
     <modules>
+    <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-concept</module>
+        -->
     </modules>
 </project>

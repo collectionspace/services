@@ -108,11 +108,15 @@
 
     <target name="deploy" depends="install"
     description="deploy note in ${jee.server.nuxeo}">
+    	<!-- This is an unused and deprecated artifact from an unused Service
         <ant antfile="nuxeo-platform-cs-note/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"
     description="undeploy note from ${jee.server.nuxeo}">
+    	<!-- This is an unused and deprecated artifact from an unused Service.  Leave this undeploy
+    	target active only for backwards compatibility. -->
         <ant antfile="nuxeo-platform-cs-note/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
