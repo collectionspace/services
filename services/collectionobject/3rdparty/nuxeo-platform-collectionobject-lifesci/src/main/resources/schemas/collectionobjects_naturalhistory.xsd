@@ -24,7 +24,7 @@
   <xs:element name="fieldLocPlace" type="xs:string"/>
   <xs:element name="catalogDate" type="xs:string"/>
   -->
-
+  
     <xs:element name="hybridName" type="xs:string"/>
     <xs:element name="labelHeader" type="xs:string"/>
     <xs:element name="labelFooter" type="xs:string"/>
@@ -41,6 +41,16 @@
     <xs:element name="donorDateGroup" type="structuredDateGroup"/>
     <xs:element name="donorNote" type="xs:string"/>
 
+	<xs:element name="accessionDate" type="xs:date"/>
+	<xs:element name="requestedBy" type="xs:string"/>
+	<xs:element name="source" type="xs:string"/>
+	<xs:element name="vegetationType" type="xs:string"/>
+	<xs:element name="rare" type="xs:boolean"/>
+	
+    <xs:element name="provenanceType" type="xs:string"/>
+    <xs:element name="distribution" type="xs:boolean"/>
+    <xs:element name="securityRisk" type="xs:string"/>
+
     <xs:element name="taxonomicIdentGroupList" type="taxonomicIdentGroupList"/>
     <xs:element name="localNameGroupList" type="localNameGroupList"/>
     <xs:element name="hybridParentGroupList" type="hybridParentGroupList"/>
@@ -48,6 +58,7 @@
     <xs:element name="associatedTaxaGroupList" type="associatedTaxaGroupList"/>
     <xs:element name="annotationGroupList" type="annotationGroupList"/>
     <xs:element name="localityGroupList" type="localityGroupList"/>
+	<xs:element name="accessionUseGroupList" type="accessionUseGroupList"/>
 
     <xs:complexType name="taxonomicIdentGroupList">
         <xs:sequence>
@@ -66,6 +77,10 @@
             <xs:element name="reference" type="xs:string"/>
             <xs:element name="refPage" type="xs:string"/>
             <xs:element name="notes" type="xs:string"/>
+			<xs:element name="taxonomicIdentHybridParentGroupList" type="taxonomicIdentHybridParentGroupList"/>
+			<xs:element name="taxonomicIdentHybridName" type="xs:string"/>
+			<xs:element name="affinityTaxon" type="xs:string"/>
+			<xs:element name="hybridFlag" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -81,6 +96,19 @@
             <xs:element name="localNameLanguage" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
+
+	<xs:complexType name="taxonomicIdentHybridParentGroupList">
+	    <xs:sequence>
+	        <xs:element name="taxonomicIdentHybridParentGroup" type="taxonomicIdentHybridParentGroup" minOccurs="0"
+							maxOccurs="unbounded"/>
+	    </xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="taxonomicIdentHybridParentGroup">
+	    <xs:sequence>
+	        <xs:element name="taxonomicIdentHybridParent" type="xs:string"/>
+	        <xs:element name="taxonomicIdentHybridParentQualifier" type="xs:string"/>
+	    </xs:sequence>
+	</xs:complexType>
 
     <xs:complexType name="hybridParentGroupList">
         <xs:sequence>
@@ -155,6 +183,7 @@
             <xs:element name="fieldLocCountry" type="xs:string"/>
             <xs:element name="fieldLocHigherGeography" type="xs:string"/>
             <xs:element name="fieldLocPlace" type="xs:string"/>
+			<xs:element name="taxonomicRange" type="xs:string"/>
 
             <xs:element name="vCoordinates" type="xs:string"/>
             <xs:element name="vLatitude" type="xs:string"/>
@@ -195,6 +224,23 @@
             <xs:element name="geoRefVerificationStatus" type="xs:string"/>
             <xs:element name="geoRefRemarks" type="xs:string"/>
             <xs:element name="geoRefPlaceName" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="accessionUseGroupList">
+        <xs:sequence>
+            <xs:element name="accessionUseGroup" type="accessionUseGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="accessionUseGroup">
+        <xs:sequence>
+            <xs:element name="useType" type="xs:string"/>
+            <xs:element name="usedIn" type="xs:string"/>
+            <xs:element name="materialType" type="xs:string"/>
+            <xs:element name="requestDate" type="xs:date"/>
+            <xs:element name="filledDate" type="xs:date"/>
+            <xs:element name="useNotes" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

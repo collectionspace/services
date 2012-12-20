@@ -1077,6 +1077,10 @@
                             <service:xpath>name</service:xpath>
                             <service:setter>setName</service:setter>
                         </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>createsNewFocus</service:element>
+                            <service:xpath>createsNewFocus</service:xpath>
+                        </service:ListResultField>
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>

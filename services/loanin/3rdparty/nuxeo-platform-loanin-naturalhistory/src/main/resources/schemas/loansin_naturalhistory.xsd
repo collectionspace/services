@@ -19,6 +19,7 @@
 	version="0.1">
 
 	<xs:element name="lenderLoanNumber" type="xs:string"/>
+	<xs:element name="majorGroup" type="xs:string"/>	
 	
 	<xs:element name="geographyList">
 		<xs:complexType>

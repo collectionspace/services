@@ -230,11 +230,6 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.claim.service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.relation.service</artifactId>
             <version>${project.version}</version>
         </dependency>
