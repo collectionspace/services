@@ -14,7 +14,7 @@ GitHub Enterprise
 Site Status
 
 The quick brown fox jumped over the lazy dog.
-This change is to master;
+Another change using SmartGit client.
 
 All good boys deserve fudge.
 
