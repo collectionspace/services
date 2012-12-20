@@ -95,9 +95,10 @@ public class BatchResource extends ResourceBase {
     }
 
     @Override
-    protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
+    protected AbstractCommonList getCommonList(UriInfo ui) {
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
+            MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
             String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVCOATION_MODE);
