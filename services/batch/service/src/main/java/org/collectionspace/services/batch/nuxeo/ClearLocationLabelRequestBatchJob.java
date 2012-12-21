@@ -86,7 +86,7 @@ public class ClearLocationLabelRequestBatchJob extends AbstractBatchJob {
 				"<ns2:movements_botgarden xmlns:ns2=\"http://collectionspace.org/services/movement/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
 					getFieldXml("labelRequested", MovementConstants.LABEL_REQUESTED_NO_VALUE) +
 					getFieldXml("labelSize", "") +
-					getFieldXml("labelStandType>", "") +
+					getFieldXml("labelStandType", "") +
 					getFieldXml("labelCount", "") +
 				"</ns2:movements_botgarden>" +
 			"</document>";
