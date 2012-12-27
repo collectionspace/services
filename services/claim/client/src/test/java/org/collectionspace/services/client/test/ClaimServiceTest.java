@@ -32,7 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
-import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ClaimClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
