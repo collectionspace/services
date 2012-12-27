@@ -101,7 +101,7 @@ public class BatchResource extends ResourceBase {
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
-            String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVCOATION_MODE);
+            String mode = queryParams.getFirst(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
             String whereClause = null;
             DocumentFilter documentFilter = null;
             String common_part =ctx.getCommonPartLabel(); 
