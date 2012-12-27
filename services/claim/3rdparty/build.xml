@@ -111,15 +111,21 @@
     <target name="deploy" depends="install"
     description="deploy claim in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-claim/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-claim-anthropology/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-claim-pahma/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy claim from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-claim/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-claim-anthropology/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-claim-pahma/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for claim" depends="package">
         <ant antfile="nuxeo-platform-cs-claim/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-claim-anthropology/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-claim-pahma/build.xml" target="dist" inheritall="false"/>
     </target>
 </project>

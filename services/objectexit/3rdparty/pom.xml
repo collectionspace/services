@@ -27,5 +27,7 @@
 
     <modules>
         <module>nuxeo-platform-cs-objectexit</module>
+        <module>nuxeo-platform-objectexit-anthropology</module>
+        <module>nuxeo-platform-objectexit-pahma</module>
     </modules>
 </project>

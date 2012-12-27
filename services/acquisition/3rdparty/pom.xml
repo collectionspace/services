@@ -17,7 +17,16 @@
         3rd party build for acquisition service
     </description>
 
+    <properties>
+        <ServiceName>acquisition</ServiceName>
+        <NuxeoDocTypeName>Acquisition</NuxeoDocTypeName>   
+        <CommonSchemaName>acquisitions_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+    </properties>
+    
     <modules>
         <module>nuxeo-platform-cs-acquisition</module>
+        <module>nuxeo-platform-acquisition-anthropology</module>
+        <module>nuxeo-platform-acquisition-pahma</module>
     </modules>
 </project>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+	CollectionObject schema (XSD)
+	
+	Entity  : CollectionObject
+	Part    : Local - Phoebe A. Hearst Museum of Anthropology
+	Used for: Nuxeo EP core document type
+
+	$LastChangedRevision: 4929 $
+	$LastChangedDate: 2011-06-07 13:26:32 -0700 (Tue, 07 Jun 2011) $
+-->
+
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ns="http://collectionspace.org/services/collectionobject/local/pahma"
+	xmlns="http://collectionspace.org/services/collectionobject/local/pahma"
+	targetNamespace="http://collectionspace.org/services/collectionobject/local/pahma"
+	version="0.1">
+	
+	<xs:element name="sortableObjectNumber" type="xs:string"/>
+	<xs:element name="pahmaTms2003DataSource" type="xs:string"/>
+	<xs:element name="pahmaTmsLegacyDepartment" type="xs:string"/>
+	<xs:element name="pahmaCollectionList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pahmaCollection" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="pahmaObjectStatusList" type="xs:string">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pahmaObjectStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="inventoryCount" type="xs:string"/>
+	<xs:element name="portfolioSeries" type="xs:string"/>
+	<xs:element name="pahmaObjectID" type="xs:string"/>
+	<xs:element name="isComponent" type="xs:string"/>
+
+	<xs:element name="pahmaAltNumGroupList" type="pahmaAltNumGroupList"/> <!-- TEMPORARY INSERTION TO ALLOW NOTES ON OTHER/ALTERNATE NUMBERS. TO BE REMOVED ONCE NOTE IS INCLUDED IN COMMON SCHEMA FOR OTHER NUMBER -->
+	<xs:element name="ownershipHistoryGroupList" type="ownershipHistoryGroupList"/> <!-- TEMPORARY REPLACEMENT UNTIL COMMON SCHEMA HAS REPEATABLE, LINKED OWNERSHIP DETAILS -->
+	<xs:element name="ageEstimateGroupList" type="ageEstimateGroupList"/>
+	
+	<xs:complexType name="pahmaAltNumGroupList">
+		<xs:sequence>
+			<xs:element name="pahmaAltNumGroup" type="pahmaAltNumGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="pahmaAltNumGroup">
+		<xs:sequence>
+			<xs:element name="pahmaAltNum" type="xs:string"/>
+			<xs:element name="pahmaAltNumType" type="xs:string"/>
+			<xs:element name="pahmaAltNumNote" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="ageEstimateGroupList">
+		<xs:sequence>
+			<xs:element name="ageEstimateGroup" type="ageEstimateGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>	
+	<xs:complexType name="ageEstimateGroup">
+		<xs:sequence>
+			<xs:element name="ageEstimate" type="xs:integer"/>
+			<xs:element name="ageEstimateQualifier" type="xs:string"/>
+			<xs:element name="ageEstimateUnit" type="xs:string"/>
+			<xs:element name="ageEstimateNote" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="ownershipHistoryGroupList">
+		<xs:sequence>
+			<xs:element name="ownershipHistoryGroup" type="ownershipHistoryGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ownershipHistoryGroup">
+		<xs:sequence>
+			<xs:element name="previousOwner" type="xs:string"/>
+			<xs:element name="ownershipDateGroup" type="structuredDateGroup"/>
+			<xs:element name="ownershipCategory" type="xs:string"/>
+			<xs:element name="ownershipPlace" type="xs:string"/>
+			<xs:element name="ownershipMethod" type="xs:string"/>
+			<xs:element name="ownershipNote" type="xs:string"/>
+			<xs:element name="ownershipPriceCurrency" type="xs:string"/>
+			<xs:element name="ownershipPriceAmount" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="pahmaNagpraCodeLegacyList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pahmaNagpraCodeLegacy" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="pahmaEthnographicFileCodeList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pahmaEthnographicFileCode" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="pahmaFieldCollectionDateGroupList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pahmaFieldCollectionDateGroup" type="structuredDateGroup" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="pahmaFieldCollectionPlaceList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="pahmaFieldCollectionPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="pahmaFieldLocVerbatim" type="xs:string"/>
+	
+	<xs:complexType name="structuredDateGroup">
+		<xs:sequence>
+			<xs:element name="dateDisplayDate" type="xs:string"/>
+			<xs:element name="dateAssociation" type="xs:string"/>
+			<xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleEra" type="xs:string"/>
+			<xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+			<xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+			<xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+			<xs:element name="dateLatestYear" type="xs:integer"/>
+			<xs:element name="dateLatestMonth" type="xs:integer"/>
+			<xs:element name="dateLatestDay" type="xs:integer"/>
+			<xs:element name="dateLatestEra" type="xs:string"/>
+			<xs:element name="dateLatestCertainty" type="xs:string"/>
+			<xs:element name="dateLatestQualifier" type="xs:string"/>
+			<xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+			<xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+			<xs:element name="datePeriod" type="xs:string"/>
+			<xs:element name="dateNote" type="xs:string"/>
+			<xs:element name="dateEarliestScalarValue" type="xs:date"/>
+			<xs:element name="dateLatestScalarValue" type="xs:date"/>
+			<xs:element name="scalarValuesComputed" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

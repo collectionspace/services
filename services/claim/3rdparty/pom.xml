@@ -27,5 +27,7 @@
 
     <modules>
         <module>nuxeo-platform-cs-claim</module>
+        <module>nuxeo-platform-claim-anthropology</module>
+        <module>nuxeo-platform-claim-pahma</module>
     </modules>
 </project>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.${ServiceName}.${TenantLabel}.coreTypes">
+	<extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
+		<schema name="${CustomSchemaName}" prefix="${CustomSchemaName}" src="schemas/${CustomSchemaName}.xsd"/>
+		<!--
+		<schema name="collectionobjects_anthropology" prefix="collectionobjects_anthropology" src="schemas/collectionobjects_anthropology.xsd"/>
+		<schema name="collectionobjects_naturalhistory" prefix="collectionobjects_naturalhistory" src="schemas/collectionobjects_naturalhistory.xsd"/>
+		-->
+	</extension>
+	<extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
+		<doctype name="${NuxeoDocTypeName}${TenantPrefix}${TenantId}" extends="${NuxeoDocTypeName}">
+			<schema name="common"/>
+			<schema name="dublincore"/>
+			<schema name="${CommonSchemaName}"/>
+			<schema name="collectionobjects_naturalhistory"/>
+			<schema name="collectionobjects_anthropology"/>
+			<schema name="${CustomSchemaName}"/>
+		</doctype>
+	</extension>
+	</component>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Loan Out schema (XSD)
+    
+    Entity  : Loanout
+    Part    : pahma
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/loanout/local/pahma"
+    xmlns="http://collectionspace.org/loanout/local/pahma"
+    targetNamespace="http://collectionspace.org/loanout/local/pahma"
+    version="0.1">
+
+    <xs:element name="loanOutDateGroup" type="structuredDateGroup"/>
+    <xs:element name="loanReturnDateGroup" type="structuredDateGroup"/>
+
+    <xs:complexType name="structuredDateGroup">
+        <xs:sequence>
+            <xs:element name="dateDisplayDate" type="xs:string"/>
+            <xs:element name="dateAssociation" type="xs:string"/>
+            <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+            <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+            <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+            <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+            <xs:element name="dateLatestYear" type="xs:integer"/>
+            <xs:element name="dateLatestMonth" type="xs:integer"/>
+            <xs:element name="dateLatestDay" type="xs:integer"/>
+            <xs:element name="dateLatestEra" type="xs:string"/>
+            <xs:element name="dateLatestCertainty" type="xs:string"/>
+            <xs:element name="dateLatestQualifier" type="xs:string"/>
+            <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+            <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+            <xs:element name="datePeriod" type="xs:string"/>
+            <xs:element name="dateNote" type="xs:string"/>
+            <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+            <xs:element name="dateLatestScalarValue" type="xs:date"/>
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

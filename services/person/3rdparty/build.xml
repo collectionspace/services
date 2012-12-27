@@ -112,24 +112,32 @@
     description="deploy person in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-anthropology/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-pahma/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy person from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-anthropology/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-pahma/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for person" depends="package">
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="dist" inheritall="false"/>
         <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-anthropology/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-pahma/build.xml" target="dist" inheritall="false"/>
     </target>
     
     <target name="dist_installer"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="dist_installer" inheritall="false"/>
         <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-anthropology/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="nuxeo-platform-person-pahma/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 
 </project>
