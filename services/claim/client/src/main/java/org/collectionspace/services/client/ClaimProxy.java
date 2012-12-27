@@ -49,7 +49,7 @@ public interface ClaimProxy extends CollectionSpaceCommonListPoxProxy {
     @GET
     @Produces({"application/xml"})
     ClientResponse<AbstractCommonList> readListSortedBy(
-        @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortFieldName);
+        @QueryParam(IClientQueryParams.ORDER_BY_PARAM) String sortFieldName);
     
     @Override
 	@GET
@@ -68,5 +68,5 @@ public interface ClaimProxy extends CollectionSpaceCommonListPoxProxy {
     @Produces({"application/xml"})
     ClientResponse<AbstractCommonList> keywordSearchSortedBy(
         @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
-        @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortFieldName);
+        @QueryParam(IClientQueryParams.ORDER_BY_PARAM) String sortFieldName);
 }
