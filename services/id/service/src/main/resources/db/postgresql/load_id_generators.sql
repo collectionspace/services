@@ -676,3 +676,5 @@ INSERT INTO id_generators
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
+
+\i load_pahma_id_generators.sql
