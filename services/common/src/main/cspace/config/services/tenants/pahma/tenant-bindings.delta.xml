@@ -6,6 +6,18 @@
 	<tenant:tenantBinding id="15" name="pahma.cspace.berkeley.edu" displayName="CollectionSpace PAHMA Tenant" version="0.1">
 		
 		<tenant:repositoryDomain name="default-domain" storageName="pahma-domain" repositoryClient="nuxeo-java" />
+
+		<tenant:serviceBindings	 merge:matcher="id" id="servicegroups">
+			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+				<service:classname>org.collectionspace.services.common.init.RunSqlScript</service:classname>
+				<service:params>
+					<service:property>
+						<service:key>sqlScriptName</service:key>
+						<service:value>load_pahma_id_generators.sql</service:value>
+					</service:property>
+				</service:params>
+			</service:initHandler>
+		</tenant:serviceBindings>
 		
 		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
 			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
