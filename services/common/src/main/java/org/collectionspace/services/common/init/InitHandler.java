@@ -42,6 +42,8 @@ public class InitHandler implements IInitHandler {
      *
      * See org.collectionspace.services.common.init.AddIndices for an implementation example.
      *
+     * @param dataSourceName 
+     * @param repositoryName 
      * @param sbt a service binding type.
      * @param fields A list of fields and their attributes.
      * @param properties A properties bag for additional properties.
