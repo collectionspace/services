@@ -31,9 +31,9 @@ import org.collectionspace.services.config.service.ServiceBindingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RunSqlScript extends InitHandler implements IInitHandler {
+public class RunSqlScripts extends InitHandler implements IInitHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(RunSqlScript.class);
+    private final Logger logger = LoggerFactory.getLogger(RunSqlScripts.class);
     private final static String SQL_SCRIPT_NAME_PROPERTY = "sqlScriptName";
     private final static String DATABASE_RESOURCE_DIRECTORY_NAME = "db";
     private final static String LINE_SEPARATOR = System.getProperty("line.separator");
