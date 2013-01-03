@@ -19,7 +19,7 @@
  * create_id_generators_table.sql
  *
  * Creates the "id_generators" table, used by the ID Service,
- * and sets the access permissions of that table.
+ * and sets up associated trigger(s) and function(s).
  */
 
 -- Temporarily suppress messages of NOTICE level and below
