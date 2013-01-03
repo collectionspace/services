@@ -53,7 +53,7 @@
             <!-- other URI paths through which this service could be accessed -->
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.common.init.RunSqlScript</service:classname>
+                <service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
                 <service:params>
                     <service:property>
                         <service:key>sqlScriptName</service:key>
