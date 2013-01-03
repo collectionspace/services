@@ -26,12 +26,6 @@
 SET SESSION client_min_messages=WARNING;
 
 -- 'CREATE TABLE ... IF NOT EXISTS' requires PostgreSQL 9.1 or later.
---
--- To adapt this script for use with PostgreSQL 9.0 or earlier (untested),
--- try substituting the following two lines for the line below:
--- DROP TABLE IF EXISTS id_generators;
--- CREATE TABLE id_generators ...
---
 CREATE TABLE IF NOT EXISTS id_generators
 (
   csid character varying(80) NOT NULL,
