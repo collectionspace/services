@@ -34,6 +34,7 @@ public class TaxonConstants {
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Taxon";
     
     public final static String COMMON_SCHEMA_NAME = "taxon_common";
+    public final static String NATURALHISTORY_SCHEMA_NAME = "taxon_naturalhistory";
 
     public final static String IN_AUTHORITY_SCHEMA_NAME = COMMON_SCHEMA_NAME;
     public final static String IN_AUTHORITY_FIELD_NAME = "inAuthority";
@@ -46,6 +47,9 @@ public class TaxonConstants {
     
     public final static String REFNAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
     public final static String REFNAME_FIELD_NAME = "refName";    
+
+    public final static String CONSERVATION_CATEGORY_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String CONSERVATION_CATEGORY_FIELD_NAME = "plantAttributesGroupList/plantAttributesGroup/conservationCategory";    
 
     public final static String COMMON_VOCABULARY_SHORTID = "common";
 }

@@ -21,10 +21,13 @@ import org.collectionspace.services.client.PlaceAuthorityClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
@@ -267,9 +270,69 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 
 		return payload;
 	}
+	
+	protected PoxPayloadOut findAuthorityItemByRefName(String serviceName, String refName) throws URISyntaxException, DocumentException {
+		RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
+		
+		String vocabularyShortId = item.getParentShortIdentifier();
+		String itemShortId = item.getShortIdentifier();
+		
+		return findAuthorityItemByShortId(serviceName, vocabularyShortId, itemShortId);
+	}
 
-	protected PoxPayloadOut findPlaceByShortId(String vocabularyShortId, String itemShortId) throws URISyntaxException, DocumentException {
-		return findAuthorityItemByShortId(PlaceAuthorityClient.SERVICE_NAME, vocabularyShortId, itemShortId);
+	protected PoxPayloadOut findPlaceByRefName(String refName) throws URISyntaxException, DocumentException {
+		return findAuthorityItemByRefName(PlaceAuthorityClient.SERVICE_NAME, refName);
+	}
+	
+	protected PoxPayloadOut findTaxonByRefName(String refName) throws URISyntaxException, DocumentException {
+		return findAuthorityItemByRefName(TaxonomyAuthorityClient.SERVICE_NAME, refName);
+	}
+	
+	protected List<String> findReferencingObjects(String serviceName, String parentCsid, String csid, String type, String sourceField) throws URISyntaxException {
+		logger.debug("findReferencingObjects serviceName=" + serviceName + " parentCsid=" + parentCsid + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
+
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
+		AuthorityRefDocList refDocList = resource.getReferencingObjects(parentCsid, csid, createRefSearchFilterUriInfo(type));
+		List<String> csids = new ArrayList<String>();
+		
+		for (AuthorityRefDocList.AuthorityRefDocItem item : refDocList.getAuthorityRefDocItem()) {
+			if (!item.getWorkflowState().equals(WorkflowClient.WORKFLOWSTATE_DELETED) && (sourceField == null || item.getSourceField().equals(sourceField))) {
+				csids.add(item.getDocId());
+			}
+		}
+
+		return csids;
+	}
+
+	protected List<String> findReferencingObjects(String serviceName, String csid, String type, String sourceField) throws URISyntaxException, DocumentException {
+		logger.debug("findReferencingObjects serviceName=" + serviceName + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
+
+		List<String> vocabularyCsids = getVocabularyCsids(serviceName);
+		String parentCsid = null;
+		
+		if (vocabularyCsids.size() == 1) {
+			parentCsid = vocabularyCsids.get(0);
+		}
+		else {
+			for (String vocabularyCsid : vocabularyCsids) {
+				PoxPayloadOut itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+				
+				if (itemPayload != null) {
+					parentCsid = vocabularyCsid;
+					break;
+				}
+			}
+		}
+		
+		return findReferencingObjects(serviceName, parentCsid, csid, type, sourceField);
+	}
+
+	protected List<String> findReferencingCollectionObjects(String serviceName, String csid, String sourceField) throws URISyntaxException, DocumentException {
+		return findReferencingObjects(serviceName, csid, ServiceBindingUtils.SERVICE_TYPE_OBJECT, sourceField);
+	}
+
+	protected List<String> findReferencingCollectionObjects(String serviceName, String vocabularyShortId, String csid, String sourceField) throws URISyntaxException, DocumentException {
+		return findReferencingObjects(serviceName, "urn:cspace:name(" + vocabularyShortId + ")", csid, ServiceBindingUtils.SERVICE_TYPE_OBJECT, sourceField);
 	}
 	
 	/**
@@ -282,6 +345,8 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 
 	protected UriInfo createUriInfo(String queryString) throws URISyntaxException {
+		queryString = escapeQueryString(queryString);
+		
 		URI	absolutePath = new URI("");
 		URI	baseUri = new URI("");
 
@@ -293,19 +358,23 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 
 	protected UriInfo createKeywordSearchUriInfo(String schemaName, String fieldName, String value) throws URISyntaxException {
-		String queryString = "kw=&as=( (" +schemaName + ":" + fieldName + " ILIKE \"" + value + "\") )&wf_deleted=false";
-		URI uri =  new URI(null, null, null, queryString, null);
-
-		return createUriInfo(uri.getRawQuery());		
+		return createUriInfo("kw=&as=( (" +schemaName + ":" + fieldName + " ILIKE \"" + value + "\") )&wf_deleted=false");
 	}
 
 	protected UriInfo createRelationSearchUriInfo(String subjectCsid, String objType) throws URISyntaxException {
-		String queryString = "sbj=" + subjectCsid + "&objType=" + objType;
+		return createUriInfo("sbj=" + subjectCsid + "&objType=" + objType + "&wf_deleted=false");
+	}
+	
+	protected UriInfo createRefSearchFilterUriInfo(String type) throws URISyntaxException {
+		return createUriInfo("type=" + type + "&wf_deleted=false");
+	}
+	
+	protected String escapeQueryString(String queryString) throws URISyntaxException {
 		URI uri =  new URI(null, null, null, queryString, null);
 
-		return createUriInfo(uri.getRawQuery());		
+		return uri.getRawQuery();
 	}
-
+	
 	/**
 	 * Get a field value from a PoxPayloadOut, given a part name and xpath expression.
 	 */

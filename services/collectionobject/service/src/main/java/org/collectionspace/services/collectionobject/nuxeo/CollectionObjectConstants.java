@@ -38,6 +38,9 @@ public class CollectionObjectConstants {
     public final static String NATURALHISTORY_SCHEMA_NAME = "collectionobjects_naturalhistory";
     public final static String BOTGARDEN_SCHEMA_NAME = "collectionobjects_botgarden";
 
+    public final static String URI_SCHEMA_NAME = CORE_SCHEMA_NAME;
+    public final static String URI_FIELD_NAME = "uri";
+
     public final static String WORKFLOW_STATE_SCHEMA_NAME = CORE_SCHEMA_NAME;
     public final static String WORKFLOW_STATE_FIELD_NAME = "workflowState";
 
@@ -67,6 +70,9 @@ public class CollectionObjectConstants {
 
     public final static String HYBRID_FLAG_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String HYBRID_FLAG_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/hybridFlag";
+
+    public final static String RARE_FLAG_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String RARE_FLAG_FIELD_NAME = "rare";
 
     public final static String HYBRID_PARENT_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String HYBRID_PARENT_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/taxonomicIdentHybridParentGroupList/taxonomicIdentHybridParentGroup/taxonomicIdentHybridParent";
