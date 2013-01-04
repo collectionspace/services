@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+    </auths>
+        
+    <!-- This tests the UpdateObjectLocationBatchJob -->
+        
+    <testGroup ID="testSingleRecordBatchUpdate" autoDeletePOSTS="true">
+            
+        <test ID="createBatchRecord">
+            <method>POST</method>
+            <uri>/cspace-services/batch</uri>
+            <filename>batch/updateobjloc.xml</filename>
+        </test>
+                
+        <test ID="createCollectionObject">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>batch/collObj1.xml</filename>
+        </test>
+        
+        <!-- This post of a batch job invocation request doesn't create a new record, -->
+        <!-- so we need to exclude it from the post-run auto-deletion of records. -->
+        <test ID="invokeBatch" auth="test" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc.xml</filename>
+            <vars>
+                <var ID="collectionObjectCSID">${createCollectionObject.CSID}</var>
+            </vars>
+        </test>
+
+        <test ID="readUpdatedCollectionObjectRecord">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
+            <filename>batch/updateobjloc.xml</filename>
+        </test> 
+        
+    </testGroup>
+    
+</xmlReplay>
+
