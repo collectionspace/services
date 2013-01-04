@@ -28,7 +28,7 @@
     <xs:element name="hybridName" type="xs:string"/>
     <xs:element name="labelHeader" type="xs:string"/>
     <xs:element name="labelFooter" type="xs:string"/>
-    <xs:element name="cultivated" type="xs:boolean"/>
+    <xs:element name="cultivated" type="xs:string"/>
     <xs:element name="basicStorageLocation" type="xs:string"/>
 
     <!-- This is intended to complement numberOfObjects from the common schema. -->
@@ -45,7 +45,7 @@
 	<xs:element name="requestedBy" type="xs:string"/>
 	<xs:element name="source" type="xs:string"/>
 	<xs:element name="vegetationType" type="xs:string"/>
-	<xs:element name="rare" type="xs:boolean"/>
+	<xs:element name="rare" type="xs:string"/>
 	
     <xs:element name="provenanceType" type="xs:string"/>
     <xs:element name="distribution" type="xs:boolean"/>
