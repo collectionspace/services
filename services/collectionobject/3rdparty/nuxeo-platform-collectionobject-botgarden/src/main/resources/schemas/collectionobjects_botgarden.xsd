@@ -15,7 +15,7 @@
 	<xs:element name="handwritten" type="xs:string"/>
 	<xs:element name="postToPublic" type="xs:string"/>
 	
-	<xs:element name="deadFlag" type="xs:boolean"/>
+	<xs:element name="deadFlag" type="xs:string"/>
 	<xs:element name="deadDate" type="xs:date"/>
 	<xs:element name="cbdRestriction" type="xs:boolean"/>
 	
