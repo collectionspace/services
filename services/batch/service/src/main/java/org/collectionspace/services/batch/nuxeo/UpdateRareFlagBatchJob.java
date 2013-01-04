@@ -2,6 +2,7 @@ package org.collectionspace.services.batch.nuxeo;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
@@ -14,6 +15,7 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.invocable.InvocationContext.ListCSIDs;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.dom4j.DocumentException;
@@ -37,21 +39,49 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		try {
 			String mode = getInvocationContext().getMode();
 			
-			if (mode.equalsIgnoreCase(INVOCATION_MODE_SINGLE)) {
+			if (mode.equals(INVOCATION_MODE_SINGLE)) {
+				/*
+				 * In a single document context, the single csid must specify a collectionobject or a
+				 * taxonomy record. If it's a collectionobject, the rare flag for the specified
+				 * collectionobject will be updated. If it's a taxonomy record, the rare flag will be
+				 * updated for each collectionobject with a primary determination that refers to the
+				 * specified taxonomy record.
+				 */
+				
 				String csid = getInvocationContext().getSingleCSID();
 				
 				if (StringUtils.isEmpty(csid)) {
 					throw new Exception("Missing context csid");
 				}
-	
-				logger.debug("docType=" + getInvocationContext().getDocType());
 				
-				if (getInvocationContext().getDocType().equals(CollectionObjectConstants.NUXEO_DOCTYPE)) {
+				String docType = getInvocationContext().getDocType();
+				
+				if (docType.equals(CollectionObjectConstants.NUXEO_DOCTYPE)) {
 					setResults(updateRareFlag(csid));
 				}
-				else {
+				else if (docType.equals(TaxonConstants.NUXEO_DOCTYPE)) {
 					setResults(updateReferencingRareFlags(csid));
 				}
+				else {
+					throw new Exception("Unsupported document type: " + docType);
+				}
+			}
+			else if (mode.equals(INVOCATION_MODE_LIST)) {
+				/*
+				 * In a list context, the csids must specify collectionobjects. The rare flag for
+				 * each collectionobject will be updated.
+				 */
+				ListCSIDs csids = getInvocationContext().getListCSIDs();
+				
+				setResults(updateRareFlags(csids.getCsid()));
+			}
+			else if (mode.equals(INVOCATION_MODE_NO_CONTEXT)) {
+				/*
+				 * If there is no context, the rare flag will be updated for all (non-deleted)
+				 * collectionobjects.
+				 */
+				
+				setResults(updateAllRareFlags());
 			}
 			else {
 				throw new Exception("Unsupported invocation mode: " + mode);
@@ -65,6 +95,16 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		}
 	}
 	
+	/**
+	 * Updates the rare flags of collectionobjects that refer to the specified taxon record.
+	 * A collectionobject is considered to refer to the taxon record if the refname of its
+	 * primary taxonomic identification is the refname of the taxon record.
+	 * 
+	 * @param taxonCsid		The csid of the taxon record
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	public InvocationResults updateReferencingRareFlags(String taxonCsid) throws URISyntaxException, DocumentException {
 		PoxPayloadOut taxonPayload = findTaxonByCsid(taxonCsid);
 		String taxonRefName = getFieldValue(taxonPayload, TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
@@ -97,12 +137,31 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
+	/**
+	 * Updates the rare flag of the specified collectionobject.
+	 * 
+	 * @param collectionObjectCsid	The csid of the collectionobject
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	public InvocationResults updateRareFlag(String collectionObjectCsid) throws URISyntaxException, DocumentException {
 		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 		
 		return updateRareFlag(collectionObjectPayload);
 	}
 	
+	/**
+	 * Updates the rare flag of the specified collectionobject. The rare flag is determined by looking at
+	 * the taxon record that is referenced by the primary taxonomic determination of the collectionobject.
+	 * If the taxon record has any non-null conservation category, the rare flag is set to true. Otherwise,
+	 * it is set to false.
+	 * 
+	 * @param collectionObjectPayload	The payload representing the collectionobject
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	public InvocationResults updateRareFlag(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
 		InvocationResults results = new InvocationResults();
 
@@ -163,6 +222,73 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
+	/**
+	 * Updates the rare flags of the specified collectionobjects.
+	 * 
+	 * @param collectionObjectCsids		The csids of the collectionobjects
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
+	public InvocationResults updateRareFlags(List<String> collectionObjectCsids) throws URISyntaxException, DocumentException {
+		int numSubmitted = collectionObjectCsids.size();
+		long numAffected = 0;
+		
+		
+		for (String collectionObjectCsid : collectionObjectCsids) {
+			InvocationResults itemResults = updateRareFlag(collectionObjectCsid);
+
+			numAffected += itemResults.getNumAffected();
+		}
+		
+		InvocationResults results = new InvocationResults();
+		results.setNumAffected(numAffected);
+		results.setUserNote("updated " + numAffected + " of " + numSubmitted + " cataloging records");
+		
+		return results;
+	}
+
+	/**
+	 * Updates the rare flags of all collectionobjects.
+	 * 
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
+	public InvocationResults updateAllRareFlags() throws URISyntaxException, DocumentException {
+		long numFound = 0;
+		long numAffected = 0;
+		
+		int pageSize = 50;
+		int pageNum = 0;
+		List<String> csids = Collections.emptyList();
+		
+		do {
+			csids = findAllCollectionObjects(pageSize, pageNum);
+			logger.debug("pageNum=" + pageNum + " pageSize=" + pageSize + " result size=" + csids.size());
+			
+			InvocationResults pageResults = updateRareFlags(csids);
+			
+			numAffected += pageResults.getNumAffected();
+			numFound += csids.size();
+			
+			pageNum++;
+		}
+		while (csids.size() == pageSize);
+		
+		InvocationResults results = new InvocationResults();
+		results.setNumAffected(numAffected);
+		results.setUserNote("updated " + numAffected + " of " + numFound + " cataloging records");
+		
+		return null;
+	}
+
+	/**
+	 * Sets the rare flag of the specified collectionobject to the specified value.
+	 * 
+	 * @param collectionObjectCsid	The csid of the collectionobject
+	 * @param rareFlag				The value of the rare flag
+	 */
 	private void setRareFlag(String collectionObjectCsid, boolean rareFlag) {
 		String updatePayload = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

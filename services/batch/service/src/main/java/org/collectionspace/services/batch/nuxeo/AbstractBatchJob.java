@@ -215,6 +215,27 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 		return findByCsid(MovementClient.SERVICE_NAME, csid);
 	}
 	
+	protected List<String> findAll(String serviceName, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+		ResourceBase resource = resourceMap.get(serviceName);	
+		AbstractCommonList list = resource.getList(this.createPagedListUriInfo(pageNum, pageSize));
+		List<String> csids = new ArrayList<String>();
+		
+		for (AbstractCommonList.ListItem item : list.getListItem()) {
+			for (org.w3c.dom.Element element : item.getAny()) {
+				if (element.getTagName().equals("csid")) {
+					csids.add(element.getTextContent());
+					break;
+				}
+			}
+		}
+		
+		return csids;
+	}
+	
+	protected List<String> findAllCollectionObjects(int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+		return findAll(CollectionObjectClient.SERVICE_NAME, pageSize, pageNum);
+	}
+	
 	protected List<String> getVocabularyCsids(String serviceName) throws URISyntaxException {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
 		AbstractCommonList vocabularyList = resource.getAuthorityList(createDeleteFilterUriInfo());
@@ -368,7 +389,11 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	protected UriInfo createRefSearchFilterUriInfo(String type) throws URISyntaxException {
 		return createUriInfo("type=" + type + "&wf_deleted=false");
 	}
-	
+
+	protected UriInfo createPagedListUriInfo(int pageNum, int pageSize) throws URISyntaxException {
+		return createUriInfo("pgSz=" + pageSize + "&pgNum=" + pageNum + "&wf_deleted=false");
+	}
+
 	protected String escapeQueryString(String queryString) throws URISyntaxException {
 		URI uri =  new URI(null, null, null, queryString, null);
 
