@@ -61,6 +61,7 @@
         <module>loanout</module>
         <module>objectexit</module>
         <module>propagation</module>
+        <module>plantlabel</module>
         <module>batch</module>
         <module>imports</module>
         <module>location</module>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Plant Label schema (XSD)
+    
+    Entity  : Plantlabel 
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/plantlabel"
+  xmlns="http://collectionspace.org/services/plantlabel"
+  targetNamespace="http://collectionspace.org/services/plantlabel"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Plant+Label+Schema -->    
+    
+    <!--  Plant Label Information Group -->
+    <xs:element name="plantlabels_common">
+        <xs:complexType>
+            <xs:sequence>                
+                <xs:element name="propNumber" type="xs:string"/>
+                <xs:element name="propDate" type="structuredDateGroup"/>
+                <xs:element name="propReason" type="xs:string"/>
+                <xs:element name="propType" type="xs:string"/>
+                <xs:element name="propComments" type="xs:string"/>
+                <xs:element name="numStarted" type="xs:integer"/>
+
+                <!-- Seed propagation information -->
+                <xs:element name="scarStratGroupList" type="scarStratGroupList"/>
+                <xs:element name="extraSeeds" type="xs:boolean"/>
+                <xs:element name="spores" type="xs:boolean"/>
+
+                <!-- Cutting propagation information -->
+                <xs:element name="cuttingType" type="xs:string"/>
+                <xs:element name="hormone" type="xs:string"/>
+                <xs:element name="concentration" type="xs:string"/>
+                <xs:element name="wounded" type="xs:boolean"/>
+
+                <!-- Living plant material information -->
+                <xs:element name="plantType" type="xs:string"/>
+                
+                <xs:element name="propActivityGroupList" type="propActivityGroupList"/>
+
+                <!-- Success of the propagation -->
+                <xs:element name="germinationDate" type="xs:date"/>
+                <xs:element name="successRate" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="scarStratGroupList">
+        <xs:sequence>
+            <xs:element name="scarStratGroup" type="scarStratGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="scarStratGroup">
+        <xs:sequence>
+            <xs:element name="scarStrat" type="xs:string"/>
+            <xs:element name="duration" type="xs:integer"/>
+            <xs:element name="durationUnit" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="propActivityGroupList">
+        <xs:sequence>
+            <xs:element name="propActivityGroup" type="propActivityGroup" minOccurs="0"
+                   maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="propActivityGroup">
+        <xs:sequence>
+            <xs:element name="order" type="xs:integer"/>
+            <xs:element name="activityDate" type="structuredDateGroup"/>
+            <xs:element name="activityType" type="xs:string"/>
+            <xs:element name="propCount" type="xs:integer"/>    
+            <xs:element name="medium" type="xs:string"/>
+            <xs:element name="potSize" type="xs:string"/>
+            <xs:element name="nurseryLocation" type="xs:string"/>
+            <xs:element name="conditions" type="xs:string"/>    
+            <xs:element name="chemicalApplied" type="xs:string"/>
+            <xs:element name="activityComments" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="structuredDateGroup">
+		<xs:sequence>
+			<xs:element name="dateDisplayDate" type="xs:string"/>
+			<xs:element name="dateAssociation" type="xs:string"/>
+			<xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleEra" type="xs:string"/>
+			<xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+			<xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+			<xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+			<xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+			<xs:element name="dateLatestYear" type="xs:integer"/>
+			<xs:element name="dateLatestMonth" type="xs:integer"/>
+			<xs:element name="dateLatestDay" type="xs:integer"/>
+			<xs:element name="dateLatestEra" type="xs:string"/>
+			<xs:element name="dateLatestCertainty" type="xs:string"/>
+			<xs:element name="dateLatestQualifier" type="xs:string"/>
+			<xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+			<xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+			<xs:element name="datePeriod" type="xs:string"/>
+			<xs:element name="dateNote" type="xs:string"/>
+			<xs:element name="dateEarliestScalarValue" type="xs:date"/>
+			<xs:element name="dateLatestScalarValue" type="xs:date"/>
+			<xs:element name="scalarValuesComputed" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
+
