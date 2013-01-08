@@ -7,7 +7,7 @@
         
     <!-- This tests the UpdateObjectLocationBatchJob -->
         
-    <testGroup ID="testSingleRecordBatchUpdate" autoDeletePOSTS="true">
+    <testGroup ID="testSingleRecordBatchUpdate" autoDeletePOSTS="false">
             
         <test ID="createBatchRecord">
             <method>POST</method>
@@ -19,6 +19,28 @@
             <method>POST</method>
             <uri>/cspace-services/collectionobjects</uri>
             <filename>batch/collObj1.xml</filename>
+        </test>
+        
+        <test ID="createMovement1WithRelationToCollectionObject">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement1-with-relation.xml</filename>
+            <vars>
+                <var ID="currentLocation">location-1</var>
+                <var ID="locationDate">1900-01-01</var>
+                <var ID="relatedCollectionObjectCSID">${createCollectionObject.CSID}</var>
+            </vars>
+        </test>
+        
+        <test ID="createMovement2WithRelationToCollectionObject">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement1-with-relation.xml</filename>
+            <vars>
+                <var ID="currentLocation">location-2</var>
+                <var ID="locationDate">2000-01-01</var>
+                <var ID="relatedCollectionObjectCSID">${createCollectionObject.CSID}</var>
+            </vars>
         </test>
         
         <!-- This post of a batch job invocation request doesn't create a new record, -->
