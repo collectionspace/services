@@ -50,6 +50,6 @@ public class TaxonConstants {
 
     public final static String CONSERVATION_CATEGORY_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String CONSERVATION_CATEGORY_FIELD_NAME = "plantAttributesGroupList/plantAttributesGroup/conservationCategory";    
-
+    
     public final static String COMMON_VOCABULARY_SHORTID = "common";
 }

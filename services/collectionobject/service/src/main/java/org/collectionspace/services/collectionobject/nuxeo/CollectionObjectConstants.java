@@ -58,6 +58,7 @@ public class CollectionObjectConstants {
 
     public final static String TAXON_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String TAXON_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/taxon";
+    public final static String PRIMARY_TAXON_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup[0]/taxon";
 
     public final static String DETERMINATION_BY_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String DETERMINATION_BY_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/identBy";
