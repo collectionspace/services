@@ -326,7 +326,13 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 		List<String> csids = new ArrayList<String>();
 		
 		for (AuthorityRefDocList.AuthorityRefDocItem item : refDocList.getAuthorityRefDocItem()) {
-			if (!item.getWorkflowState().equals(WorkflowClient.WORKFLOWSTATE_DELETED) && (sourceField == null || item.getSourceField().equals(sourceField))) {
+			/*
+			 *  If a multivalue field contains a reference to the object multiple times, the referencing object
+			 *  seems to get returned multiple times in the list, but only the first has a non-null workflow state.
+			 *  A bug? Handle this by discarding list items with a null workflow state.
+			 */
+			
+			if (item.getWorkflowState() != null && !item.getWorkflowState().equals(WorkflowClient.WORKFLOWSTATE_DELETED) && (sourceField == null || item.getSourceField().equals(sourceField))) {
 				csids.add(item.getDocId());
 			}
 		}
