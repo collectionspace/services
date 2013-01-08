@@ -44,6 +44,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     private final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common";
     private final static String MOVEMENTS_COMMON_SCHEMA = MovementConstants.NUXEO_SCHEMA_NAME;
     private final static String COMPUTED_CURRENT_LOCATION_ELEMENT_NAME = "computedCurrentLocation";
+    private final static String CURRENT_LOCATION_ELEMENT_NAME = "currentLocation";
     private final static String LOCATION_DATE_ELEMENT_NAME = "locationDate";
     private final static String OBJECT_NUMBER_ELEMENT_NAME = "objectNumber";
     private InvocationResults results = new InvocationResults();
@@ -245,17 +246,16 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                             logger.info("Location date value = " + locationDate);
                         }
                     }
-                    currentLocation = AbstractCommonListUtils.ListItemGetElementValue(movementRecord, COMPUTED_CURRENT_LOCATION_ELEMENT_NAME);
+                    currentLocation = AbstractCommonListUtils.ListItemGetElementValue(movementRecord, CURRENT_LOCATION_ELEMENT_NAME);
                     if (Tools.notBlank(currentLocation)) {
                         if (logger.isInfoEnabled()) {
                             logger.info("Current location value = " + currentLocation);
                         }
                     }
                     if (Tools.notBlank(locationDate) && Tools.notBlank(currentLocation)) {
-                        // Assumes for  that all values for this element/field will be
-                        // ISO 8601 date values that can be ordered via string comparison.
-                        // We might consider whether to first convert to date values instead.
-                        if (locationDate.compareTo(mostRecentLocationDate) > 1) {
+                        // Assumes that all values for this element/field will be ISO 8601
+                        // date representations, each of which can be ordered via string comparison.
+                        if (locationDate.compareTo(mostRecentLocationDate) > 0) {
                             mostRecentLocationDate = locationDate;
                             computedCurrentLocation = currentLocation;
                         }
