@@ -15,7 +15,6 @@ import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.loanout.nuxeo.LoanoutConstants;
@@ -130,21 +129,14 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		String reverseDisplayName = null;
 		String fieldCollectionPlaceRefName = getFieldValue(collectionObjectPayload, CollectionObjectConstants.FIELD_COLLECTION_PLACE_SCHEMA_NAME, CollectionObjectConstants.FIELD_COLLECTION_PLACE_FIELD_NAME);		
 
-		if (StringUtils.isNotBlank(fieldCollectionPlaceRefName)) {		
-			RefName.AuthorityItem item = RefName.AuthorityItem.parse(fieldCollectionPlaceRefName);
-			
-			String vocabularyShortId = item.getParentShortIdentifier();
-			String itemShortId = item.getShortIdentifier();
-			
-			logger.debug("finding place: vocabularyShortId=" + vocabularyShortId + " itemShortId=" + itemShortId);
-			
+		if (StringUtils.isNotBlank(fieldCollectionPlaceRefName)) {			
 			PoxPayloadOut placePayload = null;
 			
 			try {
-				placePayload = findPlaceByShortId(vocabularyShortId, itemShortId);
+				placePayload = findPlaceByRefName(fieldCollectionPlaceRefName);
 			}
 			catch (WebApplicationException e) {
-				logger.error("Error finding place: vocabularyShortId=" + vocabularyShortId + " itemShortId=" + itemShortId, e);
+				logger.error("Error finding place: refName=" + fieldCollectionPlaceRefName, e);
 			}
 	
 			if (placePayload != null) {
