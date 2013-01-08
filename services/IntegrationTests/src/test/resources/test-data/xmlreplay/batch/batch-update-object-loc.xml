@@ -7,7 +7,7 @@
         
     <!-- This tests the UpdateObjectLocationBatchJob -->
         
-    <testGroup ID="testSingleRecordBatchUpdate" autoDeletePOSTS="false">
+    <testGroup ID="testSingleRecordBatchUpdate" autoDeletePOSTS="true">
             
         <test ID="createBatchRecord">
             <method>POST</method>
@@ -34,6 +34,10 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
+        <!-- The currentLocation value of this Movement record, which -->
+        <!-- has the most recent locationDate value, should thus be -->
+        <!-- reflected in the computedCurrentLocation value in the -->
+        <!-- CollectionObject record after invoking the batch job. -->
         <test ID="createMovement2">
             <method>POST</method>
             <uri>/cspace-services/movements</uri>
@@ -100,16 +104,29 @@
         <test ID="invokeBatch" auth="test" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
-            <filename>batch/batch-invoke-updateobjloc.xml</filename>
+            <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
             <vars>
                 <var ID="collectionObjectCSID">${createCollectionObject.CSID}</var>
             </vars>
+            <expectedCodes>200</expectedCodes>
         </test>
 
+        <!-- Verify that, following the invocation of the batch job, the -->
+        <!-- computedCurrentLocation field in the CollectionObject record -->
+        <!-- has been updated to the appropriate value, reflecting the -->
+        <!-- most recent movement (e.g. the Movement record with latest locationDate). -->
         <test ID="readUpdatedCollectionObjectRecord">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
             <filename>batch/updateobjloc.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
         </test> 
         
     </testGroup>
