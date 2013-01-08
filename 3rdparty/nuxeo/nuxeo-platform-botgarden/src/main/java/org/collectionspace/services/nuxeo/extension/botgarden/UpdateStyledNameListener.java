@@ -3,6 +3,7 @@ package org.collectionspace.services.nuxeo.extension.botgarden;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.nuxeo.FormatVoucherNameBatchJob;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.loanout.nuxeo.LoanoutConstants;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -32,7 +33,7 @@ public class UpdateStyledNameListener implements EventListener {
 			if (doc.getType().startsWith(LoanoutConstants.NUXEO_DOCTYPE) && 
 					!doc.isVersion() && 
 					!doc.isProxy() && 
-					!doc.getCurrentLifeCycleState().equals(LoanoutConstants.DELETED_STATE)) {
+					!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 				
 				if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
 					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);	            	

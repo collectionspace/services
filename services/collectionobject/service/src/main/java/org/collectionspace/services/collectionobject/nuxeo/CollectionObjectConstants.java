@@ -83,6 +83,4 @@ public class CollectionObjectConstants {
 
     public final static String HYBRID_QUALIFIER_FEMALE_VALUE = "female";
     public final static String HYBRID_QUALIFIER_MALE_VALUE = "male";
-    
-	public static final String DELETED_STATE = "deleted";
 }

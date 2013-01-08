@@ -186,7 +186,7 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 			PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
 			String movementWorkflowState = getFieldValue(movementPayload, MovementConstants.WORKFLOW_STATE_SCHEMA_NAME, MovementConstants.WORKFLOW_STATE_FIELD_NAME);
 		
-			if (!movementWorkflowState.equals(MovementConstants.DELETED_STATE)) {
+			if (!movementWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 				if (foundMovementCsid != null) {
 					return null;
 				}

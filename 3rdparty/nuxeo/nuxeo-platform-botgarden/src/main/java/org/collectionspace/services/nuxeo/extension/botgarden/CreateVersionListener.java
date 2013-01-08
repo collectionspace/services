@@ -2,6 +2,7 @@ package org.collectionspace.services.nuxeo.extension.botgarden;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -34,7 +35,7 @@ public class CreateVersionListener implements EventListener {
 				if (doc.getType().startsWith(MovementConstants.NUXEO_DOCTYPE) && 
 						!doc.isVersion() && 
 						!doc.isProxy() &&
-						!doc.getCurrentLifeCycleState().equals(MovementConstants.DELETED_STATE)) {
+						!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 					// Version the document
 					DocumentRef versionRef = doc.checkIn(VersioningOption.MINOR, null);        	
 					DocumentModel versionDoc = context.getCoreSession().getDocument(versionRef);

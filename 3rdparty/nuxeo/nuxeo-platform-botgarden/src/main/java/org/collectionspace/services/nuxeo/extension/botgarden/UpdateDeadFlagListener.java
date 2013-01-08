@@ -3,6 +3,7 @@ package org.collectionspace.services.nuxeo.extension.botgarden;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.nuxeo.UpdateDeadFlagBatchJob;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.invocable.InvocationResults;
@@ -70,7 +71,7 @@ public class UpdateDeadFlagListener implements EventListener {
 				if (doc.getType().startsWith(MovementConstants.NUXEO_DOCTYPE) &&
 						!doc.isVersion() && 
 						!doc.isProxy() && 
-						!doc.getCurrentLifeCycleState().equals(MovementConstants.DELETED_STATE)) {
+						!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 					String actionCode = (String) doc.getProperty(MovementConstants.ACTION_CODE_SCHEMA_NAME, MovementConstants.ACTION_CODE_FIELD_NAME);           	
 
 					logger.debug("actionCode=" + actionCode);

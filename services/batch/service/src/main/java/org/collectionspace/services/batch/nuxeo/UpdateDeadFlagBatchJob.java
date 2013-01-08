@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.invocable.InvocationResults;
@@ -140,7 +141,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 
 		String workflowState = getFieldValue(payload, CollectionObjectConstants.WORKFLOW_STATE_SCHEMA_NAME, CollectionObjectConstants.WORKFLOW_STATE_FIELD_NAME);
 		
-		if (workflowState.equals(CollectionObjectConstants.DELETED_STATE)) {
+		if (workflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 			logger.debug("skipping deleted collectionobject: " + collectionObjectCsid);
 		}
 		else {			
@@ -178,7 +179,7 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 							PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
 							String movementWorkflowState = getFieldValue(movementPayload, MovementConstants.WORKFLOW_STATE_SCHEMA_NAME, MovementConstants.WORKFLOW_STATE_FIELD_NAME);
 						
-							if (!movementWorkflowState.equals(MovementConstants.DELETED_STATE)) {
+							if (!movementWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 								logger.debug("found live location: movementCsid=" + movementCsid);
 								
 								liveLocationExists = true;
