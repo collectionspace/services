@@ -7,8 +7,7 @@
         <locationDate>${locationDate}</locationDate>
     </ns2:movements_common>
 
-    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation"
-                               xmlns:ns2="http://collectionspace.org/services/jaxb">
+    <ns3:relations-common-list xmlns:ns3="http://collectionspace.org/services/relation">
         <!-- 
              ${itemCSID} is a convention understood by the Relations service,
              which is replaced by the CSID of the item being created.  (This
@@ -25,7 +24,7 @@
                 <documentType>Movement</documentType>
             </subject>
             <!-- ... has an 'affects' relationship to ... -->
-            <predicate>affects</predicate>
+            <relationshipType>affects</relationshipType>
             <!-- ... its related item -->
             <object>
                 <csid>${relatedCollectionObjectCSID}</csid>

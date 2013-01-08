@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.batch.AbstractBatchInvocable;
+import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -38,23 +39,16 @@ import org.slf4j.LoggerFactory;
 
 public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
-    // FIXME; Get from existing constants and replace these local declarations
-    final static String COLLECTIONOBJECTS_COMMON_SCHEMA_NAME = "collectionobjects_common";
-    final static String OBJECT_NUMBER_FIELD_NAME = "objectNumber";
-    private final static String RELATIONS_COMMON_SCHEMA = "relations_common"; // FIXME: Get from external constant
-    private final static String RELATION_DOCTYPE = "Relation"; // FIXME: Get from external constant
-    private final static String SUBJECT_CSID_PROPERTY = "subjectCsid"; // FIXME: Get from external constant
-    private final static String OBJECT_CSID_PROPERTY = "objectCsid"; // FIXME: Get from external constant
-    private final static String SUBJECT_DOCTYPE_PROPERTY = "subjectDocumentType"; // FIXME: Get from external constant
-    private final static String OBJECT_DOCTYPE_PROPERTY = "objectDocumentType"; // FIXME: Get from external constant
-    protected final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
-    private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
-    protected final static String COMPUTED_CURRENT_LOCATION_PROPERTY = "computedCurrentLocation"; // FIXME: Create and then get from external constant
-    protected final static String MOVEMENTS_COMMON_SCHEMA = "movements_common"; // FIXME: Get from external constant
-    private final static String MOVEMENT_DOCTYPE = MovementConstants.NUXEO_DOCTYPE;
+    // FIXME: Where appropriate, get from existing constants rather than local declarations
+    private final static String COLLECTIONOBJECTS_COMMON_SCHEMA_NAME = "collectionobjects_common";
+    private final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common";
+    private final static String MOVEMENTS_COMMON_SCHEMA = MovementConstants.NUXEO_SCHEMA_NAME;
+    private final static String COMPUTED_CURRENT_LOCATION_ELEMENT_NAME = "computedCurrentLocation";
+    private final static String LOCATION_DATE_ELEMENT_NAME = "locationDate";
+    private final static String OBJECT_NUMBER_ELEMENT_NAME = "objectNumber";
     private InvocationResults results = new InvocationResults();
-    final String CLASSNAME = this.getClass().getSimpleName();
-    final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationBatchJob.class);
+    private final String CLASSNAME = this.getClass().getSimpleName();
+    private final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationBatchJob.class);
 
     // Initialization tasks
     public UpdateObjectLocationBatchJob() {
@@ -220,20 +214,11 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                 if (relatedMovements.getTotalItems() == 0) {
                     // continue;
                 }
-                
-                /*
-                 * Query resulting from the above:
-                 * Executing CMIS query: SELECT DOC.nuxeo:pathSegment, DOC.dc:title,
-                 * REL.dc:title, REL.relations_common:objectCsid, REL.relations_common:subjectCsid
-                 * FROM Movement DOC JOIN Relation REL ON REL.relations_common:subjectCsid = DOC.nuxeo:pathSegment
-                 * WHERE REL.relations_common:objectCsid = 'c0bdd018-01c1-412a-bc21' AND
-                 * DOC.nuxeo:isVersion = false ORDER BY DOC.collectionspace_core:updatedAt
-                 */
 
                 // FIXME: Get the reciprocal relation records, via rtSbj=, as well,
                 // and remove duplicates
 
-                // FIXME Temporary for testing
+                // FIXME Temporary for testing, until we integrate the two list results
                 queryString = "rtSbj=" + csid;
                 uri = new URI(null, null, null, queryString, null);
                 uriInfo = createUriInfo(uri.getRawQuery());
@@ -246,44 +231,37 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                 if (relatedMovements.getTotalItems() == 0) {
                     continue;
                 }
-                
-                /*
-                 * Query resulting from the above:
-                 * Executing CMIS query: SELECT DOC.nuxeo:pathSegment, DOC.dc:title,
-                 * REL.dc:title, REL.relations_common:objectCsid, REL.relations_common:subjectCsid
-                 * FROM Movement DOC JOIN Relation REL ON REL.relations_common:objectCsid = DOC.nuxeo:pathSegment
-                 * WHERE REL.relations_common:subjectCsid = '7db3c206-3a3c-4f5c-8155' AND
-                 * DOC.nuxeo:isVersion = false ORDER BY DOC.collectionspace_core:updatedAt DESC
-                 */
 
+                // Get the latest movement record from among those, and extract
+                // its current location value
+                computedCurrentLocation = "";
+                String currentLocation;
+                String locationDate;
+                String mostRecentLocationDate = "";
+                for (AbstractCommonList.ListItem movementRecord : relatedMovements.getListItem()) {
+                    locationDate = AbstractCommonListUtils.ListItemGetElementValue(movementRecord, LOCATION_DATE_ELEMENT_NAME);
+                    if (Tools.notBlank(locationDate)) {
+                        if (logger.isInfoEnabled()) {
+                            logger.info("Location date value = " + locationDate);
+                        }
+                    }
+                    currentLocation = AbstractCommonListUtils.ListItemGetElementValue(movementRecord, COMPUTED_CURRENT_LOCATION_ELEMENT_NAME);
+                    if (Tools.notBlank(currentLocation)) {
+                        if (logger.isInfoEnabled()) {
+                            logger.info("Current location value = " + currentLocation);
+                        }
+                    }
+                    if (Tools.notBlank(locationDate) && Tools.notBlank(currentLocation)) {
+                        // Assumes for  that all values for this element/field will be
+                        // ISO 8601 date values that can be ordered via string comparison.
+                        // We might consider whether to first convert to date values instead.
+                        if (locationDate.compareTo(mostRecentLocationDate) > 1) {
+                            mostRecentLocationDate = locationDate;
+                            computedCurrentLocation = currentLocation;
+                        }
+                    }
 
-                /*
-                 // FIXME: Similar to RelationsUtils.buildWhereClause()
-                 // We might consider adding a 'bidirectional where clause' like the following there.
-
-                 String query = String.format(
-                 "SELECT * FROM %1$s WHERE " // collectionspace_core:tenantId =  "
-                 + "("
-                 + "  (%2$s:subjectCsid = '%3$s' "
-                 + "  AND %2$s:objectDocumentType = '%4$s') "
-                 + " OR "
-                 + "  (%2$s:objectCsid = '%3$s' "
-                 + "  AND %2$s:subjectDocumentType = '%4$s') "
-                 + ")"
-                 + ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT,
-                 RELATION_DOCTYPE, RELATIONS_COMMON_SCHEMA, csid, MOVEMENT_DOCTYPE);
-
-                 relationResource.getList(uriInfo);
-                 query = NuxeoUtils.buildNXQLQuery(csids, null);
-                 DocumentModelList relationDocModels = coreSession.query(query);
-                 */
-
-                // Get the latest movement record from among those
-
-                // Extract its current location value
-
-                // FIXME: Temporary during testing/development
-                computedCurrentLocation = COMPUTED_CURRENT_LOCATION;
+                }
 
                 // Update the computed current location value in the CollectionObject record
                 collectionObjectPayload = findByCsid(collectionObjectResource, csid);
@@ -297,7 +275,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                      objectNumber = getFieldValue(collectionObjectPayload,
                      COLLECTIONOBJECTS_COMMON_SCHEMA_NAME,
                      "ns2", "http://collectionspace.org/services/collectionobject",
-                     OBJECT_NUMBER_FIELD_NAME);
+                     OBJECT_NUMBER_ELEMENT_NAME);
                      if (logger.isInfoEnabled()) {
                      logger.info("Object number: " + objectNumber);
                      }
@@ -332,8 +310,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             return getResults();
         }
 
-        getResults()
-                .setNumAffected(numAffected);
+        getResults().setNumAffected(numAffected);
         return getResults();
     }
 }
