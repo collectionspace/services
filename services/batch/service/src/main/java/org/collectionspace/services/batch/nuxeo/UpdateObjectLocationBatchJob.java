@@ -212,26 +212,26 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                     logger.info("Identified " + relatedMovements.getTotalItems()
                             + " movement records related to CollectionObject record " + csid);
                 }
-                if (relatedMovements.getTotalItems() == 0) {
-                    // continue;
-                }
 
-                // FIXME: Get the reciprocal relation records, via rtSbj=, as well,
-                // and remove duplicates
+                // FIXME: Get relation records in the reverse direction as well,
+                // via rtSbj=, merge with records obtained above, and remove duplicates
 
-                // FIXME Temporary for testing, until we integrate the two list results
                 queryString = "rtSbj=" + csid;
                 uri = new URI(null, null, null, queryString, null);
                 uriInfo = createUriInfo(uri.getRawQuery());
 
-                relatedMovements = movementResource.getList(uriInfo);
+                AbstractCommonList reverseRelatedMovements = movementResource.getList(uriInfo);
                 if (logger.isInfoEnabled()) {
-                    logger.info("Identified " + relatedMovements.getTotalItems()
-                            + " movement records related to CollectionObject record " + csid);
+                    logger.info("Identified " + reverseRelatedMovements.getTotalItems()
+                            + " movement records related in the reverse  to CollectionObject record " + csid);
                 }
-                if (relatedMovements.getTotalItems() == 0) {
+                
+                if ((relatedMovements.getTotalItems() == 0) && reverseRelatedMovements.getTotalItems() == 0) {
                     continue;
                 }
+                
+                // Merge the two lists
+                relatedMovements.getListItem().addAll(reverseRelatedMovements.getListItem());
 
                 // Get the latest movement record from among those, and extract
                 // its current location value

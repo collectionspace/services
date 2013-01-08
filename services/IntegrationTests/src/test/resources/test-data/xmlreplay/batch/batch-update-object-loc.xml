@@ -8,6 +8,8 @@
     <!-- This tests the UpdateObjectLocationBatchJob -->
         
     <testGroup ID="testSingleRecordBatchUpdate" autoDeletePOSTS="true">
+        
+        <!-- Tests with CollectionObject->Movement relations -->
             
         <test ID="createBatchRecord">
             <method>POST</method>
@@ -60,7 +62,7 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <test ID="relateMovement1ToCollectionObject">
+        <test ID="relateCollectionObjectToMovement1">
             <method>POST</method>
             <uri>/cspace-services/relations</uri>
             <filename>batch/relation.xml</filename>
@@ -73,7 +75,7 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <test ID="relateMovement2ToCollectionObject">
+        <test ID="relateCollectionObjectToMovement2">
             <method>POST</method>
             <uri>/cspace-services/relations</uri>
             <filename>batch/relation.xml</filename>
@@ -86,7 +88,7 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <test ID="relateMovement3ToCollectionObject">
+        <test ID="relateCollectionObjectToMovement3">
             <method>POST</method>
             <uri>/cspace-services/relations</uri>
             <filename>batch/relation.xml</filename>
@@ -115,7 +117,7 @@
         <!-- computedCurrentLocation field in the CollectionObject record has -->
         <!-- been updated to the appropriate value, reflecting the most recent -->
         <!-- movement (e.g. the Movement record with the most recent locationDate). -->
-        <test ID="readUpdatedCollectionObjectRecord1">
+        <test ID="readUpdatedCollectionObjectRecord">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
             <filename>batch/updateobjloc.xml</filename>
@@ -128,6 +130,8 @@
             </response>
             <expectedCodes>200</expectedCodes>
         </test>
+        
+        <!-- Tests with Movement->CollectionObject relations -->
         
         <!-- The currentLocation value of this new Movement record, which now -->
         <!-- has the most recent locationDate value, should thus be -->
@@ -144,8 +148,10 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <!-- Represents a reversal of the (subject-object) direction of the relationship -->
-        <test ID="relateCollectionObjectToMovement4">
+        <!-- Note that this payload reflects a reversal of the subject-object directionality -->
+        <!-- of the relationship: this is a Movement->CollectionObject relationship, -->
+        <!-- rather than a CollectionObject->Movement relationship. -->
+        <test ID="relateMovement4ToCollectionObject">
             <method>POST</method>
             <uri>/cspace-services/relations</uri>
             <filename>batch/relation.xml</filename>
@@ -168,7 +174,6 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
-        <!--
         <test ID="readUpdatedCollectionObjectRecordAfterAddingReverseRelation">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
@@ -182,7 +187,6 @@
             </response>
             <expectedCodes>200</expectedCodes>
         </test>
-        -->
         
     </testGroup>
     
