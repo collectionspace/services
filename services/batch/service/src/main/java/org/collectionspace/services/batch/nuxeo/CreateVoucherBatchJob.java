@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.invocable.InvocationResults;
@@ -73,37 +74,47 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 	
 	public InvocationResults createVoucherFromCataloging(String collectionObjectCsid, String movementCsid) throws ResourceException, URISyntaxException, DocumentException {
 		InvocationResults results = new InvocationResults();
-		Map<String, String> fields = new HashMap<String, String>();
-		
-		if (movementCsid == null) {
-			movementCsid = findSingleRelatedMovement(collectionObjectCsid);
-		}
 
-		if (movementCsid != null) {
-			PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
-			
-			if (movementPayload != null) {
-				fields.put("gardenLocation", getFieldValue(movementPayload, MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME));
-			}
-		}
-		
 		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
+		String collectionObjectWorkflowState = getFieldValue(collectionObjectPayload, CollectionObjectConstants.WORKFLOW_STATE_SCHEMA_NAME, CollectionObjectConstants.WORKFLOW_STATE_FIELD_NAME);
 		
-		fields.put("fieldCollectionNote", getFieldCollectionNote(collectionObjectPayload));
-		fields.put("annotation", getAnnotation(collectionObjectPayload));
-		fields.put("labelRequested", LoanoutConstants.LABEL_REQUESTED_NO_VALUE);
-		
-		String voucherCsid = createVoucher(fields);
-		logger.debug("voucher created: voucherCsid=" + voucherCsid);
-		
-		String forwardRelationCsid = createRelation(voucherCsid, LoanoutConstants.NUXEO_DOCTYPE, collectionObjectCsid, CollectionObjectConstants.NUXEO_DOCTYPE, RelationConstants.AFFECTS_TYPE);
-		String backwardRelationCsid = createRelation(collectionObjectCsid, CollectionObjectConstants.NUXEO_DOCTYPE, voucherCsid, LoanoutConstants.NUXEO_DOCTYPE, RelationConstants.AFFECTS_TYPE);
-		logger.debug("relations created: forwardRelationCsid=" + forwardRelationCsid + " backwardRelationCsid=" + backwardRelationCsid);
-		
-		results.setNumAffected(1);
-		results.setPrimaryURICreated("loanout.html?csid=" + voucherCsid);
-		results.setUserNote("Voucher created");
+		if (collectionObjectWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+			logger.debug("skipping deleted collectionobject: collectionObjectCsid=" + collectionObjectCsid);
 
+			results.setNumAffected(0);
+			results.setUserNote("skipped deleted record");
+		}
+		else {
+			Map<String, String> fields = new HashMap<String, String>();
+			
+			if (movementCsid == null) {
+				movementCsid = findSingleRelatedMovement(collectionObjectCsid);
+			}
+	
+			if (movementCsid != null) {
+				PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
+				
+				if (movementPayload != null) {
+					fields.put("gardenLocation", getFieldValue(movementPayload, MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME));
+				}
+			}
+					
+			fields.put("fieldCollectionNote", getFieldCollectionNote(collectionObjectPayload));
+			fields.put("annotation", getAnnotation(collectionObjectPayload));
+			fields.put("labelRequested", LoanoutConstants.LABEL_REQUESTED_NO_VALUE);
+			
+			String voucherCsid = createVoucher(fields);
+			logger.debug("voucher created: voucherCsid=" + voucherCsid);
+			
+			String forwardRelationCsid = createRelation(voucherCsid, LoanoutConstants.NUXEO_DOCTYPE, collectionObjectCsid, CollectionObjectConstants.NUXEO_DOCTYPE, RelationConstants.AFFECTS_TYPE);
+			String backwardRelationCsid = createRelation(collectionObjectCsid, CollectionObjectConstants.NUXEO_DOCTYPE, voucherCsid, LoanoutConstants.NUXEO_DOCTYPE, RelationConstants.AFFECTS_TYPE);
+			logger.debug("relations created: forwardRelationCsid=" + forwardRelationCsid + " backwardRelationCsid=" + backwardRelationCsid);
+			
+			results.setNumAffected(1);
+			results.setPrimaryURICreated("loanout.html?csid=" + voucherCsid);
+			results.setUserNote("Voucher created");
+		}
+		
 		return results;
 	}
 	
@@ -193,8 +204,6 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		
 		List<String> collectionObjectCsids = findRelatedCollectionObjects(movementCsid);
 
-		// There should only be one, but just in case...
-			
 		for (String collectionObjectCsid : collectionObjectCsids) {
 			InvocationResults innerResults = createVoucherFromCataloging(collectionObjectCsid, movementCsid);
 				

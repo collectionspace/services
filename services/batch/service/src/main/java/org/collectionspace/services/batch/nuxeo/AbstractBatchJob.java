@@ -150,11 +150,11 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 
 	/**
-	 * Return a list of csids that are related to the subjectCsid, and have doctype objectDocType.
-	 * Deleted objects are not filtered from the list.
+	 * Return the csids of records that are related to a given subject record, and have a given document type.
+	 * Soft-deleted relations are filtered from the list, but soft-deleted object records are not.
 	 * 
-	 * @param subjectCsid
-	 * @param objectDocType
+	 * @param subjectCsid		The csid of the subject record
+	 * @param objectDocType		The document type of the object records to find
 	 * @return
 	 * @throws URISyntaxException
 	 */
@@ -178,6 +178,15 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 		return findRelated(subjectCsid, MovementConstants.NUXEO_DOCTYPE);
 	}
 
+	/**
+	 * Returns the movement record related to the specified record, if there is only one.
+	 * Returns null if there are zero or more than one related movement records.
+	 * 
+	 * @param subjectCsid	The csid of the record
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	protected String findSingleRelatedMovement(String subjectCsid) throws URISyntaxException, DocumentException {
 		String foundMovementCsid = null;
 		List<String> movementCsids = findRelatedMovements(subjectCsid);

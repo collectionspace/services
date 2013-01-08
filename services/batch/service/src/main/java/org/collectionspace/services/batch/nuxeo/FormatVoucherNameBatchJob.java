@@ -10,6 +10,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.api.TaxonFormatter;
@@ -117,11 +118,18 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 	public VoucherName getVoucherName(String voucherCsid) throws URISyntaxException, DocumentException {
 		VoucherName name = null;
 		List<String> collectionObjectCsids = findRelatedCollectionObjects(voucherCsid);
+		PoxPayloadOut collectionObjectPayload = null;
 		
-		if (collectionObjectCsids.size() > 0) {
-			String collectionObjectCsid = collectionObjectCsids.get(0);
-			PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
-
+		for (String candidateCsid : collectionObjectCsids) {
+			PoxPayloadOut candidatePayload = findCollectionObjectByCsid(candidateCsid);
+			String workflowState = getFieldValue(candidatePayload, CollectionObjectConstants.WORKFLOW_STATE_SCHEMA_NAME, CollectionObjectConstants.WORKFLOW_STATE_FIELD_NAME);
+			
+			if (!workflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+				collectionObjectPayload = candidatePayload;
+			}
+		}
+		
+		if (collectionObjectPayload != null) {
 			name = new VoucherName();
 			
 			name.setName(getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.TAXON_SCHEMA_NAME, CollectionObjectConstants.TAXON_FIELD_NAME)));
