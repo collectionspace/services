@@ -86,23 +86,22 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
-        <!-- Reversal of the direction of the relationship -->
-        <test ID="relateCollectionObjectToMovement3">
+        <test ID="relateMovement3ToCollectionObject">
             <method>POST</method>
             <uri>/cspace-services/relations</uri>
             <filename>batch/relation.xml</filename>
             <vars>
-                <var ID="subjectCsid">${createMovement3.CSID}</var>
-                <var ID="subjectDocumentType">Movement</var>
-                <var ID="objectCsid">${createCollectionObject.CSID}</var>
-                <var ID="objectDocumentType">CollectionObject</var>
+                <var ID="subjectCsid">${createCollectionObject.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement3.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
             </vars>
             <expectedCodes>201</expectedCodes>
         </test>
         
         <!-- This post of a batch job invocation request doesn't create a new record, -->
         <!-- so we need to exclude it from the post-run auto-deletion of records. -->
-        <test ID="invokeBatch" auth="test" autoDeletePOSTS="false">
+        <test ID="invokeBatch1" auth="test" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
             <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
@@ -116,7 +115,7 @@
         <!-- computedCurrentLocation field in the CollectionObject record has -->
         <!-- been updated to the appropriate value, reflecting the most recent -->
         <!-- movement (e.g. the Movement record with the most recent locationDate). -->
-        <test ID="readUpdatedCollectionObjectRecord">
+        <test ID="readUpdatedCollectionObjectRecord1">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
             <filename>batch/updateobjloc.xml</filename>
@@ -128,7 +127,62 @@
                 </vars>
             </response>
             <expectedCodes>200</expectedCodes>
-        </test> 
+        </test>
+        
+        <!-- The currentLocation value of this new Movement record, which now -->
+        <!-- has the most recent locationDate value, should thus be -->
+        <!-- reflected in the computedCurrentLocation value in the -->
+        <!-- CollectionObject record after invoking the batch job a second time. -->
+        <test ID="createMovement4">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">location-4</var>
+                <var ID="locationDate">2100-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <!-- Represents a reversal of the (subject-object) direction of the relationship -->
+        <test ID="relateCollectionObjectToMovement4">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createMovement4.CSID}</var>
+                <var ID="subjectDocumentType">Movement</var>
+                <var ID="objectCsid">${createCollectionObject.CSID}</var>
+                <var ID="objectDocumentType">CollectionObject</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="invokeBatchAfterAddingReverseRelation" auth="test" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
+            <vars>
+                <var ID="collectionObjectCSID">${createCollectionObject.CSID}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!--
+        <test ID="readUpdatedCollectionObjectRecordAfterAddingReverseRelation">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
+            <filename>batch/updateobjloc.xml</filename>
+            <response>
+                <expected level="TEXT" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement4.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        -->
         
     </testGroup>
     
