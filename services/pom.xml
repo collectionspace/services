@@ -44,7 +44,9 @@
         <module>authorization-mgt</module> <!-- relies on authorization -->
         <module>common-test</module>
         <module>account</module> <!-- relies on authorization-mgt.import -->
+        <!-- 
         <module>note</module>
+         -->
         <module>relation</module>
         <module>query</module>
         <module>acquisition</module>

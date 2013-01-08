@@ -26,6 +26,8 @@
 	</properties>
 
     <modules>
+    	<!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-group</module>
+        -->
     </modules>
 </project>
