@@ -5,6 +5,9 @@
     <mode>single</mode>
     <docType>CollectionObject</docType>
     <singleCSID>${collectionObjectCSID}</singleCSID>
+    <groupCSID></groupCSID>
+    <listCsids></listCsids>
+    <params></params>
 </ns2:invocationContext>
 
 

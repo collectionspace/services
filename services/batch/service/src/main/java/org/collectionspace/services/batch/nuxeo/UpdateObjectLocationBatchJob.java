@@ -19,6 +19,7 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.DocumentException;
@@ -62,10 +63,8 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         setCompletionStatus(STATUS_MIN_PROGRESS);
 
         try {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Invoking " + CLASSNAME + " ...");
-                logger.trace("Invocation context is: " + getInvocationContext().getMode());
-            }
+
+            logInvocationContext();
 
             List<String> csids = new ArrayList<String>();
             if (requestIsForInvocationModeSingle()) {
@@ -74,7 +73,11 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                     csids.add(singleCsid);
                 }
             } else if (requestIsForInvocationModeList()) {
-                List<String> listCsids = (getInvocationContext().getListCSIDs().getCsid());
+                InvocationContext.ListCSIDs invListCsids = getInvocationContext().getListCSIDs();
+                if (invListCsids == null) {
+                    throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
+                }
+                List<String> listCsids = invListCsids.getCsid();
                 if (listCsids == null || listCsids.isEmpty()) {
                     throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
                 }
@@ -296,4 +299,5 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         getResults().setNumAffected(numAffected);
         return getResults();
     }
+
 }
