@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.storage.JDBCTools;
@@ -30,9 +31,9 @@ import org.collectionspace.services.config.service.ServiceBindingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RunSqlScript extends InitHandler implements IInitHandler {
+public class RunSqlScripts extends InitHandler implements IInitHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(RunSqlScript.class);
+    private final Logger logger = LoggerFactory.getLogger(RunSqlScripts.class);
     private final static String SQL_SCRIPT_NAME_PROPERTY = "sqlScriptName";
     private final static String DATABASE_RESOURCE_DIRECTORY_NAME = "db";
     private final static String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -45,59 +46,51 @@ public class RunSqlScript extends InitHandler implements IInitHandler {
      */
     @Override
     public void onRepositoryInitialized(String dataSourceName,
-    		String repositoryName,
-    		ServiceBindingType sbt, 
-    		List<Field> fields, 
-    		List<Property> properties) throws Exception {
-
-        /*
-         if (logger.isInfoEnabled() && sbt != null) {
-         logger.info("Running SQL script in " + sbt.getName()
-         + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
-         }
-         */
+            String repositoryName,
+            ServiceBindingType sbt,
+            List<Field> fields,
+            List<Property> properties) throws Exception {
 
         if (properties == null || properties.isEmpty()) {
             logger.warn("No properties were provided to the RunSqlScript init handler.");
             logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
             return;
         }
-
-        String scriptName = getSqlScriptName(properties);
-        if (Tools.isBlank(scriptName)) {
-            logger.warn("Could not get SQL script name.");
+        List<String> scriptNames = getSqlScriptNames(properties);
+        if (scriptNames == null || scriptNames.isEmpty()) {
+            logger.warn("Could not obtain the name of any SQL script to run.");
             logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
             return;
         }
-
-        String scriptPath = getSqlScriptPath(dataSourceName, repositoryName, scriptName);
-        if (Tools.isBlank(scriptPath)) {
-            logger.warn("Could not get path to SQL script.");
-            logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
-            return;
+        for (String scriptName : scriptNames) {
+            String scriptPath = getSqlScriptPath(dataSourceName, repositoryName, scriptName);
+            if (Tools.isBlank(scriptPath)) {
+                logger.warn("Could not get path to SQL script.");
+                logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
+                continue;
+            }
+            String scriptContents = getSqlScriptContents(scriptPath);
+            if (Tools.isBlank(scriptContents)) {
+                logger.warn("Could not get contents of SQL script.");
+                logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
+                continue;
+            }
+            runScript(dataSourceName, repositoryName, scriptContents, scriptPath);
         }
-
-        String scriptContents = getSqlScriptContents(scriptPath);
-        if (Tools.isBlank(scriptContents)) {
-            logger.warn("Could not get contents of SQL script.");
-            logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
-            return;
-        }
-
-        runScript(dataSourceName, repositoryName, scriptContents, scriptPath);
     }
 
-    private String getSqlScriptName(List<Property> properties) {
+    private List<String> getSqlScriptNames(List<Property> properties) {
         String scriptName = "";
+        List<String> scriptNames = new ArrayList<String>();
         for (Property property : properties) {
             if (property.getKey().equals(SQL_SCRIPT_NAME_PROPERTY)) {
                 scriptName = property.getValue();
                 if (Tools.notBlank(scriptName)) {
-                    break;
+                    scriptNames.add(scriptName);
                 }
             }
         }
-        return scriptName;
+        return scriptNames;
     }
 
     private String getSqlScriptPath(String dataSourceName, String repositoryName, String scriptName) throws Exception {
