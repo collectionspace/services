@@ -37,7 +37,7 @@
         </test>
         
         <!-- The currentLocation value of this Movement record, which -->
-        <!-- has the most recent locationDate value, should thus be -->
+        <!-- has the most recent locationDate value, should also be -->
         <!-- reflected in the computedCurrentLocation value in the -->
         <!-- CollectionObject record after invoking the batch job. -->
         <test ID="createMovement2">
@@ -122,7 +122,7 @@
             <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
             <filename>batch/updateobjloc.xml</filename>
             <response>
-                <expected level="TEXT" />
+                <expected level="ADDOK" />
                 <filename>batch/res/collectionobject.res.xml</filename>
                 <vars>
                     <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
@@ -134,7 +134,7 @@
         <!-- Tests with Movement->CollectionObject relations -->
         
         <!-- The currentLocation value of this new Movement record, which now -->
-        <!-- has the most recent locationDate value, should thus be -->
+        <!-- has the most recent locationDate value, should also be -->
         <!-- reflected in the computedCurrentLocation value in the -->
         <!-- CollectionObject record after invoking the batch job a second time. -->
         <test ID="createMovement4">
@@ -179,7 +179,7 @@
             <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
             <filename>batch/updateobjloc.xml</filename>
             <response>
-                <expected level="TEXT" />
+                <expected level="ADDOK" />
                 <filename>batch/res/collectionobject.res.xml</filename>
                 <vars>
                     <var ID="computedCurrentLocationValue">${createMovement4.currentLocation}</var>

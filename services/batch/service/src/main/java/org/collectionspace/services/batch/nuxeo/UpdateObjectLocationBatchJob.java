@@ -156,9 +156,19 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         try {
             Document document = builder.build(new StringReader(payload.toXML()));
             Element root = document.getRootElement();
+            // The part element is always expected to have an explicit namespace.
             Element part = root.getChild(partLabel, partNamespace);
+            // Try getting the field element both with and without a namespace.
+            // Even though a field element that lacks a namespace prefix
+            // may yet inherit its namespace from a parent, JDOM may require that
+            // the getChild() call be made without a namespace.
             Element field = part.getChild(fieldPath, partNamespace);
-            value = field.getText();
+            if (field == null) {
+                field = part.getChild(fieldPath);
+            }
+            if (field != null) {
+                value = field.getText();
+            }
         } catch (Exception e) {
             logger.error("Error getting value from field path " + fieldPath
                     + " in schema part " + partLabel);
