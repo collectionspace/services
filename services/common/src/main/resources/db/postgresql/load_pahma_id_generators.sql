@@ -48,8 +48,8 @@
 
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
-  VALUES 
-    ('cc9d02af-d2e6-47a9-896c-111e83b2c48b',
+  SELECT 
+     'cc9d02af-d2e6-47a9-896c-111e83b2c48b',
      'PAHMA Loan In Number',
      'Identifies activities in which collection objects are
 received on loan.',
@@ -88,14 +88,20 @@ received on loan.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>');
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE 'cc9d02af-d2e6-47a9-896c-111e83b2c48b' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
+
 
 -- LOANS_OUT_NUMBER (add a space)
 
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
-  VALUES
-    ('a6cc9a5f-de4e-424a-8b73-11878a51392c',
+  SELECT
+     'a6cc9a5f-de4e-424a-8b73-11878a51392c',
      'PAHMA Loan Out Number',
      'Identifies activities in which collection objects are
 loaned out of the institution.',
@@ -134,14 +140,19 @@ loaned out of the institution.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>');
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE 'a6cc9a5f-de4e-424a-8b73-11878a51392c' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
 
 -- ACCESSION_NUMBER (add "ACC" and a space)
 
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
-  VALUES 
-    ('eca96f5d-498b-476a-bd4e-ff115c4d2a15',
+  SELECT 
+     'eca96f5d-498b-476a-bd4e-ff115c4d2a15',
      'PAHMA Accession Number',
      'Identifies individual collection objects formally
 acquired by the institution. Used for collection objects
@@ -181,14 +192,19 @@ without parts.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>');
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE 'eca96f5d-498b-476a-bd4e-ff115c4d2a15' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
 
 -- OBJECT_EXIT_NUMBER (add a space)
 
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
-  VALUES
-    ('a9ba78e7-bf92-4282-bfae-b2ee10c912c4',
+  SELECT
+     'a9ba78e7-bf92-4282-bfae-b2ee10c912c4',
      'PAHMA Object Exit Number',
      'Identifies an exit from the museum of collection objects, via
 transfer or destruction, and the deaccessioning of those objects
@@ -228,14 +244,19 @@ from the museum''s collections.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>');
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE 'a9ba78e7-bf92-4282-bfae-b2ee10c912c4' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
 
 -- INTAKE_NUMBER (add a space)
 
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
-  VALUES 
-    ('83eda2f2-5f29-4d4a-8217-dc1d9f5ce0eb',
+  SELECT 
+     '83eda2f2-5f29-4d4a-8217-dc1d9f5ce0eb',
      'PAHMA Intake Number',
      'Identifies intake activities, in which a lot of one
 or more collection objects enters the institution.',
@@ -274,14 +295,19 @@ or more collection objects enters the institution.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>');
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE '83eda2f2-5f29-4d4a-8217-dc1d9f5ce0eb' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
 
 -- CATALOGING
 
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
-  VALUES 
-    ('20912112-c22f-4b35-829e-ba33a32980aa',
+  SELECT 
+     '20912112-c22f-4b35-829e-ba33a32980aa',
      'Cataloging Number',
      'PAHMA cataloging number.',
      '9',
@@ -319,14 +345,19 @@ INSERT INTO id_generators
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>');
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE '20912112-c22f-4b35-829e-ba33a32980aa' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
 
 -- CLAIM_NUMBER
 
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
-  VALUES 
-    ('c8ca295e-30ce-4903-b8d0-ed0154dee229',
+  SELECT 
+     'c8ca295e-30ce-4903-b8d0-ed0154dee229',
      'PAHMA Claim Number',
      'Identifies a Claim.',
      '9',
@@ -364,8 +395,12 @@ INSERT INTO id_generators
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>');
-
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE 'c8ca295e-30ce-4903-b8d0-ed0154dee229' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
 
 /*
  * For future reference (see PAHMA-298):
