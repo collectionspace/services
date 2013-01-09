@@ -30,10 +30,8 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     public final int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
     public final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
     public final int INT_ERROR_STATUS = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
-    private final String INVOCATION_MODE_NOT_SUPPORTED_MESSAGE =
-            "Requested invocation mode is not supported by this batch job";
-    protected final String CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT_MESSAGE =
-            "Could not find required CSID values in the context for this batch job.";
+    protected final String CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT =
+            "Could not find required CSID values in the invocation context for this batch job.";
     private List<String> invocationModes;
     private ResourceMap resourceMap;
     private InvocationContext context;
@@ -148,15 +146,6 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
         }
         invResults.setUserNote(getErrorInfo().getMessage());
         setResults(invResults);
-    }
-
-    protected boolean requestedInvocationModeIsSupported() {
-        // Constants for invocation modes are implemented as lowercase Strings
-        return (getSupportedInvocationModes().contains(getInvocationContext().getMode().toLowerCase()) ? true : false);
-    }
-
-    protected void setInvocationModeNotSupportedResult() {
-        setErrorResult(INVOCATION_MODE_NOT_SUPPORTED_MESSAGE, BAD_REQUEST_STATUS);
     }
 
     @Override

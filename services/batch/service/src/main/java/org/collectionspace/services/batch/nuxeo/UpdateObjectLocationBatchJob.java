@@ -1,51 +1,32 @@
 package org.collectionspace.services.batch.nuxeo;
 
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.MovementClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
+import org.dom4j.DocumentException;
+import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-
-import java.io.StringReader;
-
-import org.dom4j.DocumentException;
-
-
-/*
- import org.dom4j.DocumentHelper;
- import org.dom4j.Element;
- import org.dom4j.Node;
- import org.dom4j.XPath;
- */
-
-import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.jdom.Namespace;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,17 +34,19 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     // FIXME: Where appropriate, get from existing constants rather than local declarations
     private final static String COLLECTIONOBJECTS_COMMON_SCHEMA_NAME = "collectionobjects_common";
-    private final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common";
-    private final static String MOVEMENTS_COMMON_SCHEMA = MovementConstants.NUXEO_SCHEMA_NAME;
-    private final static String COMPUTED_CURRENT_LOCATION_ELEMENT_NAME = "computedCurrentLocation";
+    private final static String CSID_ELEMENT_NAME = "csid";
     private final static String CURRENT_LOCATION_ELEMENT_NAME = "currentLocation";
     private final static String LOCATION_DATE_ELEMENT_NAME = "locationDate";
     private final static String OBJECT_NUMBER_ELEMENT_NAME = "objectNumber";
+    private final static String COLLECTIONOBJECTS_COMMON_NAMESPACE_PREFIX = "ns2";
+    private final static String COLLECTIONOBJECTS_COMMON_NAMESPACE_URI =
+            "http://collectionspace.org/services/collectionobject";
     private final static Namespace COLLECTIONOBJECTS_COMMON_NAMESPACE =
-            Namespace.getNamespace("ns2", "http://collectionspace.org/services/collectionobject");
-    private InvocationResults results = new InvocationResults();
+            Namespace.getNamespace(
+            COLLECTIONOBJECTS_COMMON_NAMESPACE_PREFIX,
+            COLLECTIONOBJECTS_COMMON_NAMESPACE_URI);
     private final String CLASSNAME = this.getClass().getSimpleName();
-    private final Logger logger = LoggerFactory.getLogger(UpdateObjectLocationBatchJob.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // Initialization tasks
     public UpdateObjectLocationBatchJob() {
@@ -79,14 +62,9 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         setCompletionStatus(STATUS_MIN_PROGRESS);
 
         try {
-            // FIXME: Placeholder during early development
-            if (logger.isInfoEnabled()) {
-                logger.info("Invoking " + CLASSNAME + " ...");
-                logger.info("Invocation context is: " + getInvocationContext().getMode());
-            }
-
-            if (!requestedInvocationModeIsSupported()) {
-                setInvocationModeNotSupportedResult();
+            if (logger.isTraceEnabled()) {
+                logger.trace("Invoking " + CLASSNAME + " ...");
+                logger.trace("Invocation context is: " + getInvocationContext().getMode());
             }
 
             List<String> csids = new ArrayList<String>();
@@ -98,7 +76,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             } else if (requestIsForInvocationModeList()) {
                 List<String> listCsids = (getInvocationContext().getListCSIDs().getCsid());
                 if (listCsids == null || listCsids.isEmpty()) {
-                    throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT_MESSAGE);
+                    throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
                 }
                 csids.addAll(listCsids);
             } else if (requestIsForInvocationModeGroup()) {
@@ -108,10 +86,10 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             }
 
             if (csids.isEmpty()) {
-                throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT_MESSAGE);
+                throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
             }
 
-            // Update the current computed location field for each CollectionObject
+            // Update the computed current location field for each CollectionObject
             setResults(updateComputedCurrentLocations(csids));
             setCompletionStatus(STATUS_COMPLETE);
 
@@ -144,13 +122,12 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.<PathSegment>emptyList());
     }
 
-    protected UriInfo createRelationSearchUriInfo(String subjectCsid, String objType) throws URISyntaxException {
-        String queryString = "sbj=" + subjectCsid + "&objType=" + objType;
-        URI uri = new URI(null, null, null, queryString, null);
+    protected UriInfo createRelatedRecordsUriInfo(String query) throws URISyntaxException {
+        URI uri = new URI(null, null, null, query, null);
         return createUriInfo(uri.getRawQuery());
     }
 
-    protected String getFieldValue(PoxPayloadOut payload, String partLabel, Namespace partNamespace, String fieldPath) {
+    protected String getFieldElementValue(PoxPayloadOut payload, String partLabel, Namespace partNamespace, String fieldPath) {
         String value = null;
         SAXBuilder builder = new SAXBuilder();
         try {
@@ -177,115 +154,73 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return value;
     }
 
-    /**
-     * Get a field value from a PoxPayloadOut, given a part name and xpath
-     * expression.
-     */
-    /*
-     protected String getFieldValue(PoxPayloadOut payload, String partLabel, String fieldPath) {
-     String value = null;
-     PayloadOutputPart part = payload.getPart(partLabel);
-
-     if (part != null) {
-     Element element = part.asElement();
-     Node node = element.selectSingleNode(fieldPath);
-
-     if (node != null) {
-     value = node.getText();
-     }
-     }
-
-     return value;
-     }
-     */
-    /**
-     * Get a field value from a PoxPayloadOut, given a part name and
-     * namespace-qualified xpath expression.
-     */
-    /*
-     protected String getFieldValue(PoxPayloadOut payload, String partLabel, String namespacePrefix, String namespace, String fieldPath) {
-     String value = null;
-     PayloadOutputPart part = payload.getPart(partLabel);
-
-     if (part != null) {
-     Element element = part.asElement();
-     logger.info(partLabel + " part element =" + element.asXML());
-
-     Map<String, String> namespaceUris = new HashMap<String, String>();
-     namespaceUris.put(namespacePrefix, namespace);
-
-     XPath xPath = DocumentHelper.createXPath(fieldPath);
-     xPath.setNamespaceURIs(namespaceUris);
-
-     Node node = xPath.selectSingleNode(element);
-     // Node node = element.selectSingleNode(fieldPath);
-
-     if (node != null) {
-     value = node.getText();
-     }
-     }
-
-     return value;
-     }
-     */
     private InvocationResults updateComputedCurrentLocations(List<String> csids) {
 
         ResourceMap resourcemap = getResourceMap();
         ResourceBase collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
         ResourceBase movementResource = resourcemap.get(MovementClient.SERVICE_NAME);
         PoxPayloadOut collectionObjectPayload;
-        String objectNumber;
         String computedCurrentLocation;
+        String objectNumber;
+        String movementCsid;
         int numAffected = 0;
 
         try {
 
-            // For each CollectionObject record:
-            for (String csid : csids) {
+            // For each CollectionObject record
+            for (String collectionObjectCsid : csids) {
 
                 // Get the movement records related to this record
 
-                // FIXME: Create a convenience method for constructing queries like the following
-                String queryString = "rtObj=" + csid; // FIXME: Get from constant
-                URI uri = new URI(null, null, null, queryString, null);
-                UriInfo uriInfo = createUriInfo(uri.getRawQuery());
+                // Get movement records related to this record where the CollectionObject
+                // record is the subject of the relation
+                String queryString = "rtObj=" + collectionObjectCsid; // FIXME: Get from constant
+                UriInfo uriInfo = createRelatedRecordsUriInfo(queryString);
 
                 AbstractCommonList relatedMovements = movementResource.getList(uriInfo);
-                if (logger.isInfoEnabled()) {
-                    logger.info("Identified " + relatedMovements.getTotalItems()
-                            + " Movement records related to the object CollectionObject record " + csid);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Identified " + relatedMovements.getTotalItems()
+                            + " Movement records related to the object CollectionObject record " + collectionObjectCsid);
                 }
 
-                // Get relation records in the reverse direction as well,
-                // merge with records obtained above, and remove duplicates
-                queryString = "rtSbj=" + csid; // FIXME: Get from constant
-                uri = new URI(null, null, null, queryString, null);
-                uriInfo = createUriInfo(uri.getRawQuery());
+                // Get movement records related to this record where the CollectionObject
+                // record is the object of the relation
+                queryString = "rtSbj=" + collectionObjectCsid; // FIXME: Get from constant
+                uriInfo = createRelatedRecordsUriInfo(queryString);
 
                 AbstractCommonList reverseRelatedMovements = movementResource.getList(uriInfo);
-                if (logger.isInfoEnabled()) {
-                    logger.info("Identified " + reverseRelatedMovements.getTotalItems()
-                            + " Movement records related to the subject CollectionObject record " + csid);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Identified " + reverseRelatedMovements.getTotalItems()
+                            + " Movement records related to the subject CollectionObject record " + collectionObjectCsid);
                 }
 
                 if ((relatedMovements.getTotalItems() == 0) && reverseRelatedMovements.getTotalItems() == 0) {
                     continue;
                 }
 
-                // Merge the two lists
+                // Merge the two lists of related movement records
                 relatedMovements.getListItem().addAll(reverseRelatedMovements.getListItem());
 
                 // Get the latest movement record from among those, and extract
                 // its current location value
+                Set<String> alreadyProcessedMovementCsids = new HashSet<String>();
                 computedCurrentLocation = "";
                 String currentLocation;
                 String locationDate;
                 String mostRecentLocationDate = "";
                 for (AbstractCommonList.ListItem movementRecord : relatedMovements.getListItem()) {
-
-                    // FIXME: Add 'de-duping' code here to avoid processing any
-                    // related Movement record more than once
-
+                    movementCsid = AbstractCommonListUtils.ListItemGetElementValue(movementRecord, CSID_ELEMENT_NAME);
+                    if (Tools.isBlank(movementCsid)) {
+                        continue;
+                    }
+                    // Avoid processing any related Movement record more than once,
+                    // regardless of the directionality of its relation(s) to this
+                    // CollectionObject record.
+                    if (alreadyProcessedMovementCsids.contains(movementCsid)) {
+                        continue;
+                    } else {
+                        alreadyProcessedMovementCsids.add(movementCsid);
+                    }
                     locationDate = AbstractCommonListUtils.ListItemGetElementValue(movementRecord, LOCATION_DATE_ELEMENT_NAME);
                     if (Tools.isBlank(locationDate)) {
                         continue;
@@ -294,55 +229,55 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                     if (Tools.isBlank(currentLocation)) {
                         continue;
                     }
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Location date value = " + locationDate);
-                        logger.info("Current location value = " + currentLocation);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Location date value = " + locationDate);
+                        logger.trace("Current location value = " + currentLocation);
                     }
                     // Assumes that all values for this element/field will be consistent ISO 8601
                     // date/time representations, each of which can be ordered via string comparison.
+                    //
+                    // If this is *not* the case, we can instead parse and convert these values
+                    // to date/time objects.
                     if (locationDate.compareTo(mostRecentLocationDate) > 0) {
                         mostRecentLocationDate = locationDate;
-                        // FIXME: Add validation here that the currentLocation value parses successfully as an item refName
+                        // FIXME: Add optional validation here that the currentLocation value
+                        // parses successfully as an item refName
                         computedCurrentLocation = currentLocation;
                     }
 
                 }
 
                 // Update the computed current location value in the CollectionObject record
-                collectionObjectPayload = findByCsid(collectionObjectResource, csid);
+                collectionObjectPayload = findByCsid(collectionObjectResource, collectionObjectCsid);
                 if (Tools.notBlank(collectionObjectPayload.toXML())) {
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Payload: " + "\n" + collectionObjectPayload);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Payload: " + "\n" + collectionObjectPayload);
                     }
-                    // Silently fails at various places in dom4j calls (selectSingleNode, selectNode,
-                    // createXpath) in any of the methods tried, without throwing an Exception.
-                    //
-                    // Those methods are now commented out, in favor of a replacement, however temporary,
-                    // using JDOM.
-                    //
-                    // FIXME: Get namespace from constant; verify whether prefix or URI is required
-                    objectNumber = getFieldValue(collectionObjectPayload,
+                    objectNumber = getFieldElementValue(collectionObjectPayload,
                             COLLECTIONOBJECTS_COMMON_SCHEMA_NAME, COLLECTIONOBJECTS_COMMON_NAMESPACE,
                             OBJECT_NUMBER_ELEMENT_NAME);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Object number: " + objectNumber);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Object number: " + objectNumber);
                     }
                     if (Tools.notBlank(objectNumber)) {
                         String collectionObjectUpdatePayload =
                                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                                 + "<document name=\"collectionobject\">"
-                                + "<ns2:collectionobjects_common xmlns:ns2=\"http://collectionspace.org/services/collectionobject\">"
-                                + "<objectNumber>" + objectNumber + "</objectNumber>"
-                                + "<computedCurrentLocation>" + computedCurrentLocation + "</computedCurrentLocation>"
-                                + "</ns2:collectionobjects_common></document>";
-                        if (logger.isInfoEnabled()) {
-                            logger.info("Update payload: " + "\n" + collectionObjectUpdatePayload);
+                                + "  <ns2:collectionobjects_common "
+                                + "      xmlns:ns2=\"http://collectionspace.org/services/collectionobject\">"
+                                + "    <objectNumber>" + objectNumber + "</objectNumber>"
+                                + "    <computedCurrentLocation>" + computedCurrentLocation + "</computedCurrentLocation>"
+                                + "  </ns2:collectionobjects_common>"
+                                + "</document>";
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("Update payload: " + "\n" + collectionObjectUpdatePayload);
                         }
-                        byte[] response = collectionObjectResource.update(resourcemap, null, csid, collectionObjectUpdatePayload);
+                        byte[] response = collectionObjectResource.update(resourcemap, null, collectionObjectCsid,
+                                collectionObjectUpdatePayload);
                         numAffected++;
                         if (logger.isTraceEnabled()) {
-                            logger.trace("Computed current location value for CollectionObject " + csid + " set to " + computedCurrentLocation);
-
+                            logger.trace("Computed current location value for CollectionObject " + collectionObjectCsid
+                                    + " was set to " + computedCurrentLocation);
                         }
                     }
 
@@ -357,6 +292,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             return getResults();
         }
 
+        logger.info("Updated computedCurrentLocation values in " + numAffected + " CollectionObject records.");
         getResults().setNumAffected(numAffected);
         return getResults();
     }
