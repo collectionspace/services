@@ -7,7 +7,7 @@
         
     <!-- This tests the UpdateObjectLocationBatchJob -->
         
-    <testGroup ID="testBatchUpdateComputedCurrentLocationInvModeSingle" autoDeletePOSTS="true">
+    <testGroup ID="invocationModeSingle" autoDeletePOSTS="true">
         
         <!-- Tests with CollectionObject->Movement relations -->
             
@@ -190,7 +190,7 @@
         
     </testGroup>
     
-    <testGroup ID="testBatchUpdateComputedCurrentLocationInvModeList" autoDeletePOSTS="true">
+    <testGroup ID="invocationModeModeList" autoDeletePOSTS="true">
         
         <test ID="createBatchRecord">
             <method>POST</method>

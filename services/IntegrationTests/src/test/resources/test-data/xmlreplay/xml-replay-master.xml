@@ -43,16 +43,21 @@
     
     <run controlFile="versioning/versioning.xml" testGroup="VersionedRecordFiltering" />
     
-    <run controlFile="batch/batch-update-object-loc.xml" testGroup="testBatchUpdateComputedCurrentLocationInvModeSingle" />
-    <run controlFile="batch/batch-update-object-loc.xml" testGroup="testBatchUpdateComputedCurrentLocationInvModeList" />
-
+    <run controlFile="batch/batch.xml" />
+    <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeSingle" />
+    <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeList" />
+    
     <!-- Broken tests -->
     
-    <!-- After most tests above were re-enabled in August 2012, the Batch test -->
-    <!-- was still failing.  See comments on CSPACE-5472 - ADR 2012-09-07 -->
-    <!-- run controlFile="batch/batch.xml" / -->
+    <!-- FIXME: the following tests were commented out without any annotation as to why this was done. -->
+    <!-- We might check whether any of these tests should be re-enabled - ADR 2012-09-07 -->
+    
+    <!-- run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" / -->
+    <!-- run controlFile="objectexit/object-exit.xml" testGroup="domwalk" / -->
+    <!-- run controlFile="media/media.xml" testGroup="authrefs" / -->
+    <!-- run controlFile="./organization.xml" testGroup="organization" / -->
 
-    <!-- All other comments on broken tests, below, are historic, and lack JIRA issue context. - ADR 2012-09-07 -->
+    <!-- Comments on broken tests, below, are historic, were written by various authors, and lack JIRA issue context. - ADR 2012-09-07 -->
     
     <!-- No - this test is broken -->
     <!-- run controlFile="relation/relation.xml" testGroup="r2only" / -->
@@ -66,14 +71,6 @@
     When the DB is cleaned with [ant create_db import] it runs OK.
     -->
     <!-- run controlFile="./security.xml" testGroup="securityRemovingRoleperms" / -->
-    
-    <!-- FIXME: We might check whether any of the following tests should be re-enabled - ADR 2012-09-07 -->
-    
-    <!-- run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" / -->
-    <!-- run controlFile="objectexit/object-exit.xml" testGroup="domwalk" / -->
-    <!-- run controlFile="media/media.xml" testGroup="authrefs" / -->
-    <!-- run controlFile="./organization.xml" testGroup="organization" / -->
-    
     
 </xmlReplayMaster>
 
