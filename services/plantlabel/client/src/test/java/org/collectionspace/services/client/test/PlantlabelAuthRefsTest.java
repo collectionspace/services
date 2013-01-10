@@ -41,8 +41,6 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.plantlabel.PropActivityGroup;
-import org.collectionspace.services.plantlabel.PropActivityGroupList;
 import org.collectionspace.services.plantlabel.PlantlabelsCommon;
 import org.collectionspace.services.person.PersonTermGroup;
 
@@ -116,7 +114,7 @@ public class PlantlabelAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         // references, and will refer to Person resources by their refNames.
         PlantlabelClient plantlabelClient = new PlantlabelClient();
         PoxPayloadOut multipart = createPlantlabelInstance(
-                "propagationNumber-" + identifier,
+                "familyName-" + identifier,
                 CURRENT_DATE_UTC);
         ClientResponse<Response> response = plantlabelClient.create(multipart);
         int statusCode = response.getStatus();
@@ -326,15 +324,11 @@ public class PlantlabelAuthRefsTest extends BaseServiceTest<AbstractCommonList> 
         return SERVICE_PATH_COMPONENT;
     }
 
-    private PoxPayloadOut createPlantlabelInstance(String propagationNumber,
+    private PoxPayloadOut createPlantlabelInstance(String familyName,
     		String returnDate) {
     	PlantlabelsCommon plantlabelCommon = new PlantlabelsCommon();
-    	plantlabelCommon.setPropNumber(propagationNumber);
-    	plantlabelCommon.setPropNumber(returnDate);
-    	PropActivityGroupList propActivityGroupList =  new PropActivityGroupList();
-    	PropActivityGroup propActivityGroup = new PropActivityGroup();
-    	propActivityGroupList.getPropActivityGroup().add(propActivityGroup);
-    	plantlabelCommon.setPropActivityGroupList(propActivityGroupList);
+    	plantlabelCommon.setFamily(familyName);
+    	plantlabelCommon.setFamily(returnDate);
 
     	PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
     	PayloadOutputPart commonPart =

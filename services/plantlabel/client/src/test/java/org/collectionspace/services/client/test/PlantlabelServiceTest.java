@@ -36,8 +36,6 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.plantlabel.PropActivityGroup;
-import org.collectionspace.services.plantlabel.PropActivityGroupList;
 import org.collectionspace.services.plantlabel.PlantlabelsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -281,20 +279,13 @@ public class PlantlabelServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
         }
         Assert.assertNotNull(plantlabelCommon);
 
-        // Check selected fields.
-        PropActivityGroupList propActivityGroupList = plantlabelCommon.getPropActivityGroupList();
-        Assert.assertNotNull(propActivityGroupList);
-        List<PropActivityGroup> propActivityGroups = propActivityGroupList.getPropActivityGroup();
-        Assert.assertNotNull(propActivityGroups);
-        Assert.assertTrue(propActivityGroups.size() > 0);
-
         if (logger.isDebugEnabled()) {
             logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
-                    + "UTF-8 data received=" + plantlabelCommon.getPropComments());
+                    + "UTF-8 data received=" + plantlabelCommon.getLabelData());
         }
 
-        Assert.assertEquals(plantlabelCommon.getPropComments(), getUTF8DataFragment(),
-                "UTF-8 data retrieved '" + plantlabelCommon.getPropComments()
+        Assert.assertEquals(plantlabelCommon.getLabelData(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + plantlabelCommon.getLabelData()
                 + "' does not match expected data '" + getUTF8DataFragment());
     }
 
@@ -423,8 +414,8 @@ public class PlantlabelServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
         Assert.assertNotNull(plantlabelCommon);
 
         // Update the content of this resource.
-        plantlabelCommon.setPropNumber("updated-" + plantlabelCommon.getPropNumber());
-        plantlabelCommon.setPropComments("updated-" + plantlabelCommon.getPropComments());
+        plantlabelCommon.setFamily("updated-" + plantlabelCommon.getFamily());
+        plantlabelCommon.setLabelData("updated-" + plantlabelCommon.getLabelData());
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(plantlabelCommon, PlantlabelsCommon.class));
@@ -463,19 +454,19 @@ public class PlantlabelServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
         Assert.assertNotNull(updatedPlantlabelCommon);
 
         // Check selected fields in the updated common part.
-        Assert.assertEquals(updatedPlantlabelCommon.getPropNumber(),
-                plantlabelCommon.getPropNumber(),
+        Assert.assertEquals(updatedPlantlabelCommon.getFamily(),
+                plantlabelCommon.getFamily(),
                 "Data in updated object did not match submitted data.");
 
         if (logger.isDebugEnabled()) {
-            logger.debug("UTF-8 data sent=" + plantlabelCommon.getPropComments() + "\n"
-                    + "UTF-8 data received=" + updatedPlantlabelCommon.getPropComments());
+            logger.debug("UTF-8 data sent=" + plantlabelCommon.getLabelData() + "\n"
+                    + "UTF-8 data received=" + updatedPlantlabelCommon.getLabelData());
         }
-        Assert.assertTrue(updatedPlantlabelCommon.getPropComments().contains(getUTF8DataFragment()),
-                "UTF-8 data retrieved '" + updatedPlantlabelCommon.getPropComments()
+        Assert.assertTrue(updatedPlantlabelCommon.getLabelData().contains(getUTF8DataFragment()),
+                "UTF-8 data retrieved '" + updatedPlantlabelCommon.getLabelData()
                 + "' does not contain expected data '" + getUTF8DataFragment());
-        Assert.assertEquals(updatedPlantlabelCommon.getPropComments(),
-                plantlabelCommon.getPropComments(),
+        Assert.assertEquals(updatedPlantlabelCommon.getLabelData(),
+                plantlabelCommon.getLabelData(),
                 "Data in updated object did not match submitted data.");
     }
 
@@ -639,28 +630,24 @@ public class PlantlabelServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
      */
     private PoxPayloadOut createPlantlabelInstance(String identifier) {
         return createPlantlabelInstance(
-                "propNumber-" + identifier,
+                "family-" + identifier,
                 "returnDate-" + identifier);
     }
 
     /**
      * Creates the plantlabel instance.
      *
-     * @param propNumber the plantlabel number
+     * @param familyName the plantlabel family
      * @param returnDate the return date
      * @return the multipart output
      */
-    private PoxPayloadOut createPlantlabelInstance(String propNumber,
+    private PoxPayloadOut createPlantlabelInstance(String familyName,
             String returnDate) {
 
         PlantlabelsCommon plantlabelCommon = new PlantlabelsCommon();
-        plantlabelCommon.setPropNumber(propNumber);
-        PropActivityGroupList propActivityGroupList = new PropActivityGroupList();
-        PropActivityGroup propActivityGroup = new PropActivityGroup();
-        propActivityGroupList.getPropActivityGroup().add(propActivityGroup);
-        plantlabelCommon.setPropActivityGroupList(propActivityGroupList);
-        plantlabelCommon.setPropReason("For Surfboards of the 1960s exhibition.");
-        plantlabelCommon.setPropComments(getUTF8DataFragment());
+        plantlabelCommon.setFamily(familyName);
+        plantlabelCommon.setLocale("Mexico");
+        plantlabelCommon.setLabelData(getUTF8DataFragment());
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =

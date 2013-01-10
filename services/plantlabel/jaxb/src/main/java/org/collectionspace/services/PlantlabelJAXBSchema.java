@@ -4,12 +4,12 @@
 package org.collectionspace.services;
 
 public interface PlantlabelJAXBSchema {
-    final static String PROP_NUMBER = "propNumber";
-    // final static String PROP_DATE = "propDate";
-    final static String PROP_REASON = "propReason";
-    final static String PROP_TYPE = "propType";
-    final static String PROP_COMMENTS = "propComments";
-    final static String GERMINATION_DATE = "germinationDate";
+    final static String FAMILY = "family";
+    final static String COMMON_NAME = "commonName";
+    final static String LOCALE = "locale";
+    final static String TAXON_NAME = "taxonName";
+    final static String LABEL_DATA = "labelData";
+    final static String NUMBER_OF_LABELS = "numberOfLabels";
 }
 
 

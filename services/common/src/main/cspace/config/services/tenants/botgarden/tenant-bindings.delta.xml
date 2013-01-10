@@ -458,18 +458,18 @@
                 <service:params>
                     <service:SchemaName>plantlabels</service:SchemaName>
                     <service:DublinCoreTitle>plantlabels</service:DublinCoreTitle>
-                    <service:SummaryFields>propNumber|propDate|uri|csid</service:SummaryFields>
+                    <service:SummaryFields>taxonName|family|uri|csid</service:SummaryFields>
                     <service:AbstractCommonListClassname />
                     <service:CommonListItemClassname />
                     <service:ListResultsItemMethodName>getPlantlabelListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
-                            <service:element>propNumber</service:element>
-                            <service:xpath>propNumber</service:xpath>
+                            <service:element>taxonName</service:element>
+                            <service:xpath>taxonName</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>propDate</service:element>
-                            <service:xpath>propDate</service:xpath>
+                            <service:element>family</service:element>
+                            <service:xpath>family</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>
                 </service:params>
@@ -478,11 +478,11 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>propType</types:value>
+                    <types:value>printLabels</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
-                    <types:value>propNumber</types:value>
+                    <types:value>family</types:value>
                 </types:item>
             </service:properties>
             
