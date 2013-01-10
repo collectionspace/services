@@ -64,32 +64,28 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
         try {
 
-            logInvocationContext();
-
             List<String> csids = new ArrayList<String>();
             if (requestIsForInvocationModeSingle()) {
                 String singleCsid = getInvocationContext().getSingleCSID();
-                if (Tools.notBlank(singleCsid)) {
+                if (Tools.isBlank(singleCsid)) {
+                    throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
+                } else {
                     csids.add(singleCsid);
                 }
             } else if (requestIsForInvocationModeList()) {
-                InvocationContext.ListCSIDs invListCsids = getInvocationContext().getListCSIDs();
-                if (invListCsids == null) {
-                    throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
-                }
-                List<String> listCsids = invListCsids.getCsid();
-                if (listCsids == null || listCsids.isEmpty()) {
+                List<String> listCsids = getListCsids();
+                if (listCsids.isEmpty()) {
                     throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
                 }
                 csids.addAll(listCsids);
             } else if (requestIsForInvocationModeGroup()) {
-                String groupCsid = getInvocationContext().getGroupCSID();
-                // FIXME: Get individual CSIDs from the group
-                // and add them to the list
-            }
-
-            if (csids.isEmpty()) {
-                throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
+                // Currently not supported
+                // FIXME: Get individual CSIDs, if any, from the group
+                // String groupCsid = getInvocationContext().getGroupCSID();
+                // ...
+            } else if (requestIsForInvocationModeNoContext()) {
+                // Currently not supported
+                // FIXME: Add code to invoke batch job on every active CollectionObject
             }
 
             // Update the computed current location field for each CollectionObject
@@ -299,5 +295,4 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         getResults().setNumAffected(numAffected);
         return getResults();
     }
-
 }

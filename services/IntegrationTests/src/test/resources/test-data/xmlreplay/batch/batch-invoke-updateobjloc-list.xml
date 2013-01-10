@@ -6,10 +6,10 @@
     <docType>CollectionObject</docType>
     <singleCSID></singleCSID>
     <groupCSID></groupCSID>
-    <listCsids>
+    <listCSIDs>
         <csid>${collectionObject1CSID}</csid>
         <csid>${collectionObject2CSID}</csid>
-    </listCsids>
+    </listCSIDs>
     <params>
         <param>
             <key>some key</key>

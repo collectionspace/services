@@ -6,7 +6,7 @@
     <docType>CollectionObject</docType>
     <singleCSID>${collectionObjectCSID}</singleCSID>
     <groupCSID></groupCSID>
-    <listCsids></listCsids>
+    <listCSIDs></listCSIDs>
     <params></params>
 </ns2:invocationContext>
 

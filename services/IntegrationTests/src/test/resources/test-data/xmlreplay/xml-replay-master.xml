@@ -42,8 +42,10 @@
     <run controlFile="collectionobject/collectionobject-displayname-update.xml" testGroup="DisplayNameChangesReflectedInRefNames" />
     
     <run controlFile="versioning/versioning.xml" testGroup="VersionedRecordFiltering" />
-
     
+    <run controlFile="batch/batch-update-object-loc.xml" testGroup="testBatchUpdateComputedCurrentLocationInvModeSingle" />
+    <run controlFile="batch/batch-update-object-loc.xml" testGroup="testBatchUpdateComputedCurrentLocationInvModeList" />
+
     <!-- Broken tests -->
     
     <!-- After most tests above were re-enabled in August 2012, the Batch test -->

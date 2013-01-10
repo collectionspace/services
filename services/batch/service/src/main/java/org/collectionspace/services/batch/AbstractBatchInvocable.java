@@ -53,38 +53,6 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
         this.errorInfo = null;
     }
 
-    protected void logInvocationContext() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Invocation mode=" + this.getInvocationContext().getMode());
-            logger.info("Invocation doc type=" + this.getInvocationContext().getDocType());
-            logger.info("Invocation single CSID=" + this.getInvocationContext().getSingleCSID());
-            logger.info("Invocation group CSID=" + this.getInvocationContext().getGroupCSID());
-            InvocationContext.ListCSIDs lcsids = this.getInvocationContext().getListCSIDs();
-            if (lcsids == null) {
-                logger.info("Invocation list CSIDs are null.");
-            } else {
-                List<String> csidsList = lcsids.getCsid();
-                if (csidsList != null) {
-                    for (String listcsid : csidsList) {
-                        logger.info("List CSID=" + listcsid);
-                    }
-                }
-            }
-            InvocationContext.Params params = this.getInvocationContext().getParams();
-            if (params == null) {
-                logger.info("Invocation list Params are null.");
-            } else {
-                List<InvocationContext.Params.Param> paramsList = params.getParam();
-                if (paramsList != null) {
-                    for (InvocationContext.Params.Param param : paramsList) {
-                        logger.info("Param key=" + param.getKey());
-                        logger.info("Param value=" + param.getValue());
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public List<String> getSupportedInvocationModes() {
         return invocationModes;
@@ -153,6 +121,36 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
 
     protected boolean requestIsForInvocationModeNoContext() {
         return (INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(getInvocationContext().getMode()) ? true : false);
+    }
+
+    protected List<String> getListCsids() {
+        List<String> emptyCsidsList = Collections.emptyList();
+        InvocationContext.ListCSIDs lcsids = getInvocationContext().getListCSIDs();
+        if (lcsids == null) {
+            return emptyCsidsList;
+        } else {
+            List<String> csidsList = lcsids.getCsid();
+            if (csidsList == null) {
+                return emptyCsidsList;
+            } else {
+                return csidsList;
+            }
+        }
+    }
+
+    protected List<InvocationContext.Params.Param> getParams() {
+        List<InvocationContext.Params.Param> emptyParamsList = Collections.emptyList();
+        InvocationContext.Params params = this.getInvocationContext().getParams();
+        if (params == null) {
+            return emptyParamsList;
+        } else {
+            List<InvocationContext.Params.Param> paramsList = params.getParam();
+            if (paramsList == null) {
+                return emptyParamsList;
+            } else {
+                return paramsList;
+            }
+        }
     }
 
     protected void setErrorResult(String message) {
