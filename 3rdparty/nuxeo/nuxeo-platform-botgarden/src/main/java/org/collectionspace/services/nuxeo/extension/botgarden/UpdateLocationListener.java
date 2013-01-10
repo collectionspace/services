@@ -1,9 +1,9 @@
 package org.collectionspace.services.nuxeo.extension.botgarden;
 
-import static org.collectionspace.services.movement.nuxeo.MovementConstants.*;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
@@ -32,11 +32,11 @@ public class UpdateLocationListener implements EventListener {
 			DocumentEventContext context = (DocumentEventContext) ec;
 			DocumentModel doc = context.getSourceDocument();
 
-			if (doc.getType().startsWith(NUXEO_DOCTYPE) && 
+			if (doc.getType().startsWith(MovementConstants.NUXEO_DOCTYPE) && 
 					!doc.isVersion() && 
 					!doc.isProxy() && 
-					!doc.getCurrentLifeCycleState().equals(DELETED_STATE)) {
-				String actionCode = (String) doc.getProperty(ACTION_CODE_SCHEMA_NAME, ACTION_CODE_FIELD_NAME);
+					!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+				String actionCode = (String) doc.getProperty(MovementConstants.ACTION_CODE_SCHEMA_NAME, MovementConstants.ACTION_CODE_FIELD_NAME);
 
 				logger.debug("actionCode=" + actionCode);
 
@@ -49,7 +49,7 @@ public class UpdateLocationListener implements EventListener {
 					 * event to fire, taking us into the other branch of this code, with the current document
 					 * becoming the previous document.
 					 */
-					if (actionCode != null && actionCode.equals(DEAD_ACTION_CODE)) {
+					if (actionCode != null && actionCode.equals(MovementConstants.DEAD_ACTION_CODE)) {
 						context.getCoreSession().saveDocument(doc);
 
 						/*
@@ -60,16 +60,16 @@ public class UpdateLocationListener implements EventListener {
 					}
 				}
 				else {	            	
-					if (actionCode != null && actionCode.equals(DEAD_ACTION_CODE)) {
-						doc.setProperty(CURRENT_LOCATION_SCHEMA_NAME, CURRENT_LOCATION_FIELD_NAME, NONE_LOCATION);
+					if (actionCode != null && actionCode.equals(MovementConstants.DEAD_ACTION_CODE)) {
+						doc.setProperty(MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME, MovementConstants.NONE_LOCATION);
 					}
 
 					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);	            	
-					String previousLocation = (String) previousDoc.getProperty(CURRENT_LOCATION_SCHEMA_NAME, CURRENT_LOCATION_FIELD_NAME);
+					String previousLocation = (String) previousDoc.getProperty(MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME);
 
 					logger.debug("previousLocation=" + previousLocation);
 
-					doc.setProperty(PREVIOUS_LOCATION_SCHEMA_NAME, PREVIOUS_LOCATION_FIELD_NAME, previousLocation);
+					doc.setProperty(MovementConstants.PREVIOUS_LOCATION_SCHEMA_NAME, MovementConstants.PREVIOUS_LOCATION_FIELD_NAME, previousLocation);
 				}
 			}
 		}

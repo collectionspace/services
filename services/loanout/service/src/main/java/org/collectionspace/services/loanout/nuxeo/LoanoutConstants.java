@@ -42,6 +42,4 @@ public class LoanoutConstants {
 	
 	public static final String STYLED_NAME_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
 	public static final String STYLED_NAME_FIELD_NAME = "styledName";
-	
-	public static final String DELETED_STATE = "deleted";
 }

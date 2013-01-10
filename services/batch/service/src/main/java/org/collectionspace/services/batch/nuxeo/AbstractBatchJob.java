@@ -21,10 +21,13 @@ import org.collectionspace.services.client.PlaceAuthorityClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
@@ -147,11 +150,11 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 
 	/**
-	 * Return a list of csids that are related to the subjectCsid, and have doctype objectDocType.
-	 * Deleted objects are not filtered from the list.
+	 * Return the csids of records that are related to a given subject record, and have a given document type.
+	 * Soft-deleted relations are filtered from the list, but soft-deleted object records are not.
 	 * 
-	 * @param subjectCsid
-	 * @param objectDocType
+	 * @param subjectCsid		The csid of the subject record
+	 * @param objectDocType		The document type of the object records to find
 	 * @return
 	 * @throws URISyntaxException
 	 */
@@ -175,6 +178,15 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 		return findRelated(subjectCsid, MovementConstants.NUXEO_DOCTYPE);
 	}
 
+	/**
+	 * Returns the movement record related to the specified record, if there is only one.
+	 * Returns null if there are zero or more than one related movement records.
+	 * 
+	 * @param subjectCsid	The csid of the record
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	protected String findSingleRelatedMovement(String subjectCsid) throws URISyntaxException, DocumentException {
 		String foundMovementCsid = null;
 		List<String> movementCsids = findRelatedMovements(subjectCsid);
@@ -183,7 +195,7 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 			PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
 			String movementWorkflowState = getFieldValue(movementPayload, MovementConstants.WORKFLOW_STATE_SCHEMA_NAME, MovementConstants.WORKFLOW_STATE_FIELD_NAME);
 		
-			if (!movementWorkflowState.equals(MovementConstants.DELETED_STATE)) {
+			if (!movementWorkflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 				if (foundMovementCsid != null) {
 					return null;
 				}
@@ -210,6 +222,27 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 
 	protected PoxPayloadOut findMovementByCsid(String csid) throws URISyntaxException, DocumentException {
 		return findByCsid(MovementClient.SERVICE_NAME, csid);
+	}
+	
+	protected List<String> findAll(String serviceName, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+		ResourceBase resource = resourceMap.get(serviceName);	
+		AbstractCommonList list = resource.getList(this.createPagedListUriInfo(pageNum, pageSize));
+		List<String> csids = new ArrayList<String>();
+		
+		for (AbstractCommonList.ListItem item : list.getListItem()) {
+			for (org.w3c.dom.Element element : item.getAny()) {
+				if (element.getTagName().equals("csid")) {
+					csids.add(element.getTextContent());
+					break;
+				}
+			}
+		}
+		
+		return csids;
+	}
+	
+	protected List<String> findAllCollectionObjects(int pageSize, int pageNum) throws URISyntaxException, DocumentException {
+		return findAll(CollectionObjectClient.SERVICE_NAME, pageSize, pageNum);
 	}
 	
 	protected List<String> getVocabularyCsids(String serviceName) throws URISyntaxException {
@@ -267,9 +300,75 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 
 		return payload;
 	}
+	
+	protected PoxPayloadOut findAuthorityItemByRefName(String serviceName, String refName) throws URISyntaxException, DocumentException {
+		RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
+		
+		String vocabularyShortId = item.getParentShortIdentifier();
+		String itemShortId = item.getShortIdentifier();
+		
+		return findAuthorityItemByShortId(serviceName, vocabularyShortId, itemShortId);
+	}
 
-	protected PoxPayloadOut findPlaceByShortId(String vocabularyShortId, String itemShortId) throws URISyntaxException, DocumentException {
-		return findAuthorityItemByShortId(PlaceAuthorityClient.SERVICE_NAME, vocabularyShortId, itemShortId);
+	protected PoxPayloadOut findPlaceByRefName(String refName) throws URISyntaxException, DocumentException {
+		return findAuthorityItemByRefName(PlaceAuthorityClient.SERVICE_NAME, refName);
+	}
+	
+	protected PoxPayloadOut findTaxonByRefName(String refName) throws URISyntaxException, DocumentException {
+		return findAuthorityItemByRefName(TaxonomyAuthorityClient.SERVICE_NAME, refName);
+	}
+	
+	protected List<String> findReferencingObjects(String serviceName, String parentCsid, String csid, String type, String sourceField) throws URISyntaxException {
+		logger.debug("findReferencingObjects serviceName=" + serviceName + " parentCsid=" + parentCsid + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
+
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
+		AuthorityRefDocList refDocList = resource.getReferencingObjects(parentCsid, csid, createRefSearchFilterUriInfo(type));
+		List<String> csids = new ArrayList<String>();
+		
+		for (AuthorityRefDocList.AuthorityRefDocItem item : refDocList.getAuthorityRefDocItem()) {
+			/*
+			 *  If a multivalue field contains a reference to the object multiple times, the referencing object
+			 *  seems to get returned multiple times in the list, but only the first has a non-null workflow state.
+			 *  A bug? Handle this by discarding list items with a null workflow state.
+			 */
+			
+			if (item.getWorkflowState() != null && !item.getWorkflowState().equals(WorkflowClient.WORKFLOWSTATE_DELETED) && (sourceField == null || item.getSourceField().equals(sourceField))) {
+				csids.add(item.getDocId());
+			}
+		}
+
+		return csids;
+	}
+
+	protected List<String> findReferencingObjects(String serviceName, String csid, String type, String sourceField) throws URISyntaxException, DocumentException {
+		logger.debug("findReferencingObjects serviceName=" + serviceName + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
+
+		List<String> vocabularyCsids = getVocabularyCsids(serviceName);
+		String parentCsid = null;
+		
+		if (vocabularyCsids.size() == 1) {
+			parentCsid = vocabularyCsids.get(0);
+		}
+		else {
+			for (String vocabularyCsid : vocabularyCsids) {
+				PoxPayloadOut itemPayload = findAuthorityItemByCsid(serviceName, vocabularyCsid, csid);
+				
+				if (itemPayload != null) {
+					parentCsid = vocabularyCsid;
+					break;
+				}
+			}
+		}
+		
+		return findReferencingObjects(serviceName, parentCsid, csid, type, sourceField);
+	}
+
+	protected List<String> findReferencingCollectionObjects(String serviceName, String csid, String sourceField) throws URISyntaxException, DocumentException {
+		return findReferencingObjects(serviceName, csid, ServiceBindingUtils.SERVICE_TYPE_OBJECT, sourceField);
+	}
+
+	protected List<String> findReferencingCollectionObjects(String serviceName, String vocabularyShortId, String csid, String sourceField) throws URISyntaxException, DocumentException {
+		return findReferencingObjects(serviceName, "urn:cspace:name(" + vocabularyShortId + ")", csid, ServiceBindingUtils.SERVICE_TYPE_OBJECT, sourceField);
 	}
 	
 	/**
@@ -282,6 +381,8 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 
 	protected UriInfo createUriInfo(String queryString) throws URISyntaxException {
+		queryString = escapeQueryString(queryString);
+		
 		URI	absolutePath = new URI("");
 		URI	baseUri = new URI("");
 
@@ -293,19 +394,27 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 
 	protected UriInfo createKeywordSearchUriInfo(String schemaName, String fieldName, String value) throws URISyntaxException {
-		String queryString = "kw=&as=( (" +schemaName + ":" + fieldName + " ILIKE \"" + value + "\") )&wf_deleted=false";
-		URI uri =  new URI(null, null, null, queryString, null);
-
-		return createUriInfo(uri.getRawQuery());		
+		return createUriInfo("kw=&as=( (" +schemaName + ":" + fieldName + " ILIKE \"" + value + "\") )&wf_deleted=false");
 	}
 
 	protected UriInfo createRelationSearchUriInfo(String subjectCsid, String objType) throws URISyntaxException {
-		String queryString = "sbj=" + subjectCsid + "&objType=" + objType;
-		URI uri =  new URI(null, null, null, queryString, null);
-
-		return createUriInfo(uri.getRawQuery());		
+		return createUriInfo("sbj=" + subjectCsid + "&objType=" + objType + "&wf_deleted=false");
+	}
+	
+	protected UriInfo createRefSearchFilterUriInfo(String type) throws URISyntaxException {
+		return createUriInfo("type=" + type + "&wf_deleted=false");
 	}
 
+	protected UriInfo createPagedListUriInfo(int pageNum, int pageSize) throws URISyntaxException {
+		return createUriInfo("pgSz=" + pageSize + "&pgNum=" + pageNum + "&wf_deleted=false");
+	}
+
+	protected String escapeQueryString(String queryString) throws URISyntaxException {
+		URI uri =  new URI(null, null, null, queryString, null);
+
+		return uri.getRawQuery();
+	}
+	
 	/**
 	 * Get a field value from a PoxPayloadOut, given a part name and xpath expression.
 	 */
