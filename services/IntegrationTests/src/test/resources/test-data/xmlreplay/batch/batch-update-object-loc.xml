@@ -188,6 +188,48 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
+        <!-- Test with a soft-deleted related Movement record -->
+        <test ID="softDeleteMovement2">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement4.CSID}/workflow/delete</uri>
+            <expectedCodes>200</expectedCodes>
+            <!-- XmlReplay appears to require a filename on PUT. -->
+            <!-- If not present, throws "java.io.FileNotFoundException: File '' does not exist" -->
+            <!-- The contents of that file, sent in the PUT payload, will be ignored by the services. -->
+            <!-- Note that the filename below is in a different module than -->
+            <!-- the present XmlReplay control file. -->
+            <filename>relation/res/workflowState.res.xml</filename>
+            <vars>
+                <var ID="workflowState">deleted</var>
+            </vars>
+        </test>
+        
+        <test ID="invokeBatchAfterSoftDeletingMovement" auth="test" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
+            <vars>
+                <var ID="collectionObjectCSID">${createCollectionObject.CSID}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!-- After soft-deleting related Movement record 4, the computedCurrentLocation -->
+        <!-- value should have reverted to the currentLocation value of Movement record 2. -->
+        <test ID="readUpdatedCollectionObjectRecordAfterSoftDeletingMovement">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
+            <filename>batch/updateobjloc.xml</filename>
+            <response>
+                <expected level="ADDOK" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
     </testGroup>
     
     <testGroup ID="invocationModeModeList" autoDeletePOSTS="true">

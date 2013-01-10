@@ -15,6 +15,7 @@ import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.MovementClient;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
@@ -99,7 +100,10 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     }
 
-    // Ray's convenience methods from his AbstractBatchJob class for the UC Berkeley Botanical Garden v2.4 implementation.
+    // #################################################################
+    // Ray's convenience methods from his AbstractBatchJob class for the
+    // UC Berkeley Botanical Garden v2.4 implementation.
+    // #################################################################
     protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
         ResourceBase resource = getResourceMap().get(serviceName);
         return findByCsid(resource, csid);
@@ -121,6 +125,10 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.<PathSegment>emptyList());
     }
 
+    // #################################################################
+    // Other convenience methods
+    // #################################################################
+    
     protected UriInfo createRelatedRecordsUriInfo(String query) throws URISyntaxException {
         URI uri = new URI(null, null, null, query, null);
         return createUriInfo(uri.getRawQuery());
@@ -169,11 +177,17 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             // For each CollectionObject record
             for (String collectionObjectCsid : csids) {
 
+                if (recordIsDeleted(collectionObjectCsid)) {
+                    continue;
+                }
+
                 // Get the movement records related to this record
 
                 // Get movement records related to this record where the CollectionObject
                 // record is the subject of the relation
-                String queryString = "rtObj=" + collectionObjectCsid; // FIXME: Get from constant
+                // FIXME: Get query string(s) from constant(s)
+                String queryString = "rtObj=" + collectionObjectCsid
+                        + "&" + WorkflowClient.WORKFLOW_QUERY_NONDELETED + "=false";
                 UriInfo uriInfo = createRelatedRecordsUriInfo(queryString);
 
                 AbstractCommonList relatedMovements = movementResource.getList(uriInfo);
@@ -184,7 +198,9 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
                 // Get movement records related to this record where the CollectionObject
                 // record is the object of the relation
-                queryString = "rtSbj=" + collectionObjectCsid; // FIXME: Get from constant
+                // FIXME: Get query string(s) from constant(s)
+                queryString = "rtSbj=" + collectionObjectCsid
+                        + "&" + WorkflowClient.WORKFLOW_QUERY_NONDELETED + "=false";
                 uriInfo = createRelatedRecordsUriInfo(queryString);
 
                 AbstractCommonList reverseRelatedMovements = movementResource.getList(uriInfo);
@@ -294,5 +310,10 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         logger.info("Updated computedCurrentLocation values in " + numAffected + " CollectionObject records.");
         getResults().setNumAffected(numAffected);
         return getResults();
+    }
+
+    private boolean recordIsDeleted(String collectionObjectCsid) {
+        return false;
+        // throw new UnsupportedOperationException("Not yet implemented");
     }
 }
