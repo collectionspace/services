@@ -33,6 +33,7 @@ import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.Tools;

@@ -10,17 +10,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.MovementClient;
-import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.DocumentException;
@@ -35,11 +35,20 @@ import org.slf4j.LoggerFactory;
 public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     // FIXME: Where appropriate, get from existing constants rather than local declarations
-    private final static String COLLECTIONOBJECTS_COMMON_SCHEMA_NAME = "collectionobjects_common";
     private final static String CSID_ELEMENT_NAME = "csid";
     private final static String CURRENT_LOCATION_ELEMENT_NAME = "currentLocation";
+    private final static String LIFECYCLE_STATE_ELEMENT_NAME = "currentLifeCycleState";
     private final static String LOCATION_DATE_ELEMENT_NAME = "locationDate";
     private final static String OBJECT_NUMBER_ELEMENT_NAME = "objectNumber";
+    private final static String WORKFLOW_COMMON_SCHEMA_NAME = "workflow_common";
+    private final static String WORKFLOW_COMMON_NAMESPACE_PREFIX = "ns2";
+    private final static String WORKFLOW_COMMON_NAMESPACE_URI =
+            "http://collectionspace.org/services/workflow";
+    private final static Namespace WORKFLOW_COMMON_NAMESPACE =
+            Namespace.getNamespace(
+            WORKFLOW_COMMON_NAMESPACE_PREFIX,
+            WORKFLOW_COMMON_NAMESPACE_URI);
+    private final static String COLLECTIONOBJECTS_COMMON_SCHEMA_NAME = "collectionobjects_common";
     private final static String COLLECTIONOBJECTS_COMMON_NAMESPACE_PREFIX = "ns2";
     private final static String COLLECTIONOBJECTS_COMMON_NAMESPACE_URI =
             "http://collectionspace.org/services/collectionobject";
@@ -47,6 +56,9 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             Namespace.getNamespace(
             COLLECTIONOBJECTS_COMMON_NAMESPACE_PREFIX,
             COLLECTIONOBJECTS_COMMON_NAMESPACE_URI);
+    private final static String NONDELETED_QUERY_COMPONENT =
+            "&" + WorkflowClient.WORKFLOW_QUERY_NONDELETED + "=false";
+    private PoxPayloadOut payloadOut;
     private final String CLASSNAME = this.getClass().getSimpleName();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -128,7 +140,6 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     // #################################################################
     // Other convenience methods
     // #################################################################
-    
     protected UriInfo createRelatedRecordsUriInfo(String query) throws URISyntaxException {
         URI uri = new URI(null, null, null, query, null);
         return createUriInfo(uri.getRawQuery());
@@ -161,6 +172,21 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return value;
     }
 
+    private boolean isRecordDeleted(ResourceBase resource, String collectionObjectCsid) throws URISyntaxException, DocumentException {
+        boolean isDeleted = false;
+        byte[] workflowResponse = resource.getWorkflow(createUriInfo(), collectionObjectCsid);
+        if (workflowResponse != null) {
+            payloadOut = new PoxPayloadOut(workflowResponse);
+            String workflowState =
+                    getFieldElementValue(payloadOut, WORKFLOW_COMMON_SCHEMA_NAME,
+                    WORKFLOW_COMMON_NAMESPACE, LIFECYCLE_STATE_ELEMENT_NAME);
+            if (Tools.notBlank(workflowState) && workflowState.contentEquals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+                isDeleted = true;
+            }
+        }
+        return isDeleted;
+    }
+
     private InvocationResults updateComputedCurrentLocations(List<String> csids) {
 
         ResourceMap resourcemap = getResourceMap();
@@ -170,6 +196,8 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         String computedCurrentLocation;
         String objectNumber;
         String movementCsid;
+        PoxPayloadOut payloadOut;
+        String queryString;
         int numAffected = 0;
 
         try {
@@ -177,7 +205,11 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             // For each CollectionObject record
             for (String collectionObjectCsid : csids) {
 
-                if (recordIsDeleted(collectionObjectCsid)) {
+                // Skip over soft-deleted CollectionObject records
+                if (isRecordDeleted(collectionObjectResource, collectionObjectCsid)) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Skipping soft-deleted CollectionObject record with CSID " + collectionObjectCsid);
+                    }
                     continue;
                 }
 
@@ -185,28 +217,26 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
                 // Get movement records related to this record where the CollectionObject
                 // record is the subject of the relation
-                // FIXME: Get query string(s) from constant(s)
-                String queryString = "rtObj=" + collectionObjectCsid
-                        + "&" + WorkflowClient.WORKFLOW_QUERY_NONDELETED + "=false";
+                // FIXME: Get query string(s) from constant(s), where appropriate
+                queryString = "rtObj=" + collectionObjectCsid + NONDELETED_QUERY_COMPONENT;
                 UriInfo uriInfo = createRelatedRecordsUriInfo(queryString);
 
                 AbstractCommonList relatedMovements = movementResource.getList(uriInfo);
                 if (logger.isTraceEnabled()) {
                     logger.trace("Identified " + relatedMovements.getTotalItems()
-                            + " Movement records related to the object CollectionObject record " + collectionObjectCsid);
+                            + " Movement record(s) related to the object CollectionObject record " + collectionObjectCsid);
                 }
 
                 // Get movement records related to this record where the CollectionObject
                 // record is the object of the relation
-                // FIXME: Get query string(s) from constant(s)
-                queryString = "rtSbj=" + collectionObjectCsid
-                        + "&" + WorkflowClient.WORKFLOW_QUERY_NONDELETED + "=false";
+                // FIXME: Get query string(s) from constant(s), where appropriate
+                queryString = "rtSbj=" + collectionObjectCsid + NONDELETED_QUERY_COMPONENT;
                 uriInfo = createRelatedRecordsUriInfo(queryString);
 
                 AbstractCommonList reverseRelatedMovements = movementResource.getList(uriInfo);
                 if (logger.isTraceEnabled()) {
                     logger.trace("Identified " + reverseRelatedMovements.getTotalItems()
-                            + " Movement records related to the subject CollectionObject record " + collectionObjectCsid);
+                            + " Movement record(s) related to the subject CollectionObject record " + collectionObjectCsid);
                 }
 
                 if ((relatedMovements.getTotalItems() == 0) && reverseRelatedMovements.getTotalItems() == 0) {
@@ -215,6 +245,11 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
                 // Merge the two lists of related movement records
                 relatedMovements.getListItem().addAll(reverseRelatedMovements.getListItem());
+                
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Identified a total of " + relatedMovements.getListItem().size()
+                            + " Movement record(s) related to the subject CollectionObject record " + collectionObjectCsid);
+                }
 
                 // Get the latest movement record from among those, and extract
                 // its current location value
@@ -307,13 +342,8 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             return getResults();
         }
 
-        logger.info("Updated computedCurrentLocation values in " + numAffected + " CollectionObject records.");
+        logger.info("Updated computedCurrentLocation values in " + numAffected + " CollectionObject record(s).");
         getResults().setNumAffected(numAffected);
         return getResults();
-    }
-
-    private boolean recordIsDeleted(String collectionObjectCsid) {
-        return false;
-        // throw new UnsupportedOperationException("Not yet implemented");
     }
 }

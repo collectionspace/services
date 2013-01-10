@@ -189,7 +189,8 @@
         </test>
         
         <!-- Test with a soft-deleted related Movement record -->
-        <test ID="softDeleteMovement2">
+        
+        <test ID="softDeleteMovement4">
             <method>PUT</method>
             <uri>/cspace-services/movements/${createMovement4.CSID}/workflow/delete</uri>
             <expectedCodes>200</expectedCodes>
@@ -217,6 +218,54 @@
         <!-- After soft-deleting related Movement record 4, the computedCurrentLocation -->
         <!-- value should have reverted to the currentLocation value of Movement record 2. -->
         <test ID="readUpdatedCollectionObjectRecordAfterSoftDeletingMovement">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
+            <filename>batch/updateobjloc.xml</filename>
+            <response>
+                <expected level="ADDOK" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!-- Test with a soft-deleted CollectionObject record -->
+
+        <!-- After deleting Movement record 2 outright, the computedCurrentLocation -->
+        <!-- value should then be drawn from the currentLocation value of Movement record 1, -->
+        <!-- the next most-recent Movement record. -->
+        <test ID="deleteMovement2">
+            <method>DELETE</method>
+            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!-- However, now we soft-delete the CollectionObject record itself. -->
+        <test ID="softDeleteCollectionObject">
+            <method>PUT</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}/workflow/delete</uri>
+            <expectedCodes>200</expectedCodes>
+            <filename>relation/res/workflowState.res.xml</filename>
+            <vars>
+                <var ID="workflowState">deleted</var>
+            </vars>
+        </test>
+        
+        <test ID="invokeBatchAfterSoftDeletingCollectionObject" auth="test" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc-single.xml</filename>
+            <vars>
+                <var ID="collectionObjectCSID">${createCollectionObject.CSID}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!-- On re-reading the CollectionObject, its computedCurrentLocation -->
+        <!-- value should remain at its value prior to its having been soft-deleted. -->
+        <test ID="readUpdatedCollectionObjectRecordAfterSoftDeletion">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${createCollectionObject.CSID}</uri>
             <filename>batch/updateobjloc.xml</filename>

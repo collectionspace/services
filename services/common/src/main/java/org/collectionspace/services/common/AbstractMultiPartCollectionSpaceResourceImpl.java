@@ -176,6 +176,15 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends Abstr
     public byte[] getWorkflow(
     		@Context UriInfo uriInfo,
             @PathParam("csid") String csid) {
+        return getWorkflow(uriInfo, csid, null);
+        
+    }
+    
+    // Added to expose this functionality to batch jobs via the ResourceMap
+    // of ResourceBase classes.
+    //
+    // Argument 'params' is unused, and exists only to avoid duplicating method signatures.
+    public byte[] getWorkflow(UriInfo uriInfo, String csid, String params) {
         PoxPayloadOut result = null;
 
         try {
