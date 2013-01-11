@@ -55,8 +55,6 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             Namespace.getNamespace(
             COLLECTIONOBJECTS_COMMON_NAMESPACE_PREFIX,
             COLLECTIONOBJECTS_COMMON_NAMESPACE_URI);
-    private final static String NONDELETED_QUERY_COMPONENT =
-            "&" + WorkflowClient.WORKFLOW_QUERY_NONDELETED + "=false";
     private final String CLASSNAME = this.getClass().getSimpleName();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -94,12 +92,18 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                 csids.addAll(listCsids);
             } else if (requestIsForInvocationModeGroup()) {
                 // Currently not supported
-                // FIXME: Get individual CSIDs, if any, from the group
-                // String groupCsid = getInvocationContext().getGroupCSID();
-                // ...
+                String groupCsid = getInvocationContext().getGroupCSID();
+                List<String> groupMemberCsids = getMemberCsidsFromGroup(groupCsid);
+                if (groupMemberCsids.isEmpty()) {
+                    throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
+                }
+                csids.addAll(groupMemberCsids);
             } else if (requestIsForInvocationModeNoContext()) {
-                // Currently not supported
-                // FIXME: Add code to invoke batch job on every active CollectionObject
+                List<String> noContextCsids = getNoContextCsids();
+                if (noContextCsids.isEmpty()) {
+                    throw new Exception(CSID_VALUES_NOT_PROVIDED_IN_INVOCATION_CONTEXT);
+                }
+                csids.addAll(noContextCsids);
             }
 
             // Update the value of the computed current location field for each CollectionObject
@@ -119,8 +123,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         ResourceBase collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
         ResourceBase movementResource = resourcemap.get(MovementClient.SERVICE_NAME);
         String computedCurrentLocation;
-        PoxPayloadOut payloadOut;
-        int numAffected = 0;
+        int numUpdated = 0;
 
         try {
 
@@ -134,21 +137,18 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                     }
                     continue;
                 }
-
-                // Get the Movement records related to this record
-                AbstractCommonList relatedMovements = getRelatedMovements(movementResource, collectionObjectCsid);
-
+                // Get the Movement records related to this CollectionObject record
+                AbstractCommonList relatedMovements =
+                        getRelatedRecords(movementResource, collectionObjectCsid, true /* exclude deleted records */);
                 // Skip over CollectionObject records that have no related Movement records
                 if (relatedMovements.getListItem().isEmpty()) {
                     continue;
                 }
-
-                // Based on data in its related Movement records, compute the
-                // current location of this CollectionObject
+                // Compute the current location of this CollectionObject,
+                // based on data in its related Movement records
                 computedCurrentLocation = computeCurrentLocation(relatedMovements);
-
-                // Skip over CollectionObject records where no computed current
-                // location value can be obtained from related Movement records.
+                // Skip over CollectionObject records where no current location
+                // value can be computed from related Movement records
                 //
                 // FIXME: Clarify: it ever necessary to 'unset' a computed
                 // current location value, by setting it to a null or empty value,
@@ -156,64 +156,24 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                 if (Tools.isBlank(computedCurrentLocation)) {
                     continue;
                 }
-
                 // Update the value of the computed current location field
                 // in the CollectionObject record
-                numAffected = updateComputedCurrentLocationValue(collectionObjectResource,
-                        collectionObjectCsid, computedCurrentLocation, resourcemap, numAffected);
+                numUpdated = updateComputedCurrentLocationValue(collectionObjectResource,
+                        collectionObjectCsid, computedCurrentLocation, resourcemap, numUpdated);
             }
 
         } catch (Exception e) {
             String errMsg = "Error encountered in " + CLASSNAME + ": " + e.getLocalizedMessage() + " ";
-            errMsg = errMsg + "Successfully updated " + numAffected + " CollectionObject record(s) prior to error.";
+            errMsg = errMsg + "Successfully updated " + numUpdated + " CollectionObject record(s) prior to error.";
             logger.error(errMsg);
             setErrorResult(errMsg);
-            getResults().setNumAffected(numAffected);
+            getResults().setNumAffected(numUpdated);
             return getResults();
         }
 
-        logger.info("Updated computedCurrentLocation values in " + numAffected + " CollectionObject record(s).");
-        getResults().setNumAffected(numAffected);
+        logger.info("Updated computedCurrentLocation values in " + numUpdated + " CollectionObject record(s).");
+        getResults().setNumAffected(numUpdated);
         return getResults();
-    }
-
-    private AbstractCommonList getRelatedMovements(ResourceBase movementResource, String csid)
-            throws URISyntaxException, DocumentException {
-
-        // Get movement records related to a record, specified by its CSID,
-        // where the record is the object of the relation
-        // FIXME: Get query string(s) from constant(s), where appropriate
-        String queryString = "rtObj=" + csid + NONDELETED_QUERY_COMPONENT;
-        UriInfo uriInfo = createRelatedRecordsUriInfo(queryString);
-        AbstractCommonList relatedMovements = movementResource.getList(uriInfo);
-        if (logger.isTraceEnabled()) {
-            logger.trace("Identified " + relatedMovements.getTotalItems()
-                    + " Movement record(s) related to the object CollectionObject record " + csid);
-        }
-
-        // Get movement records related to a record, specified by its CSID,
-        // where the record is the subject of the relation
-        // FIXME: Get query string(s) from constant(s), where appropriate
-        queryString = "rtSbj=" + csid + NONDELETED_QUERY_COMPONENT;
-        uriInfo = createRelatedRecordsUriInfo(queryString);
-        AbstractCommonList reverseRelatedMovements = movementResource.getList(uriInfo);
-        if (logger.isTraceEnabled()) {
-            logger.trace("Identified " + reverseRelatedMovements.getTotalItems()
-                    + " Movement record(s) related to the subject CollectionObject record " + csid);
-        }
-
-        // If the second list contains any related movement records,
-        // merge it into the first list
-        if (reverseRelatedMovements.getListItem().size() > 0) {
-            relatedMovements.getListItem().addAll(reverseRelatedMovements.getListItem());
-        }
-
-        if (logger.isTraceEnabled()) {
-            logger.trace("Identified a total of " + relatedMovements.getListItem().size()
-                    + " Movement record(s) related to the subject CollectionObject record " + csid);
-        }
-
-        return relatedMovements;
     }
 
     private String computeCurrentLocation(AbstractCommonList relatedMovements) {
@@ -271,7 +231,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     }
 
     private int updateComputedCurrentLocationValue(ResourceBase collectionObjectResource,
-            String collectionObjectCsid, String computedCurrentLocation, ResourceMap resourcemap, int numAffected)
+            String collectionObjectCsid, String computedCurrentLocation, ResourceMap resourcemap, int numUpdated)
             throws DocumentException, URISyntaxException {
         PoxPayloadOut collectionObjectPayload;
         String objectNumber;
@@ -302,7 +262,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                 }
                 byte[] response = collectionObjectResource.update(resourcemap, null, collectionObjectCsid,
                         collectionObjectUpdatePayload);
-                numAffected++;
+                numUpdated++;
                 if (logger.isTraceEnabled()) {
                     logger.trace("Computed current location value for CollectionObject " + collectionObjectCsid
                             + " was set to " + computedCurrentLocation);
@@ -310,7 +270,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             }
 
         }
-        return numAffected;
+        return numUpdated;
     }
 
     // #################################################################
@@ -341,8 +301,8 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     // #################################################################
     // Other convenience methods
     // #################################################################
-    protected UriInfo createRelatedRecordsUriInfo(String query) throws URISyntaxException {
-        URI uri = new URI(null, null, null, query, null);
+    protected UriInfo createRelatedRecordsUriInfo(String queryString) throws URISyntaxException {
+        URI uri = new URI(null, null, null, queryString, null);
         return createUriInfo(uri.getRawQuery());
     }
 
@@ -373,7 +333,8 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return value;
     }
 
-    private boolean isRecordDeleted(ResourceBase resource, String collectionObjectCsid) throws URISyntaxException, DocumentException {
+    private boolean isRecordDeleted(ResourceBase resource, String collectionObjectCsid)
+            throws URISyntaxException, DocumentException {
         boolean isDeleted = false;
         byte[] workflowResponse = resource.getWorkflow(createUriInfo(), collectionObjectCsid);
         if (workflowResponse != null) {
@@ -381,10 +342,80 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             String workflowState =
                     getFieldElementValue(payloadOut, WORKFLOW_COMMON_SCHEMA_NAME,
                     WORKFLOW_COMMON_NAMESPACE, LIFECYCLE_STATE_ELEMENT_NAME);
-            if (Tools.notBlank(workflowState) && workflowState.contentEquals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+            if (Tools.notBlank(workflowState) && workflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
                 isDeleted = true;
             }
         }
         return isDeleted;
+    }
+
+    private AbstractCommonList getRelatedRecords(ResourceBase resource, String csid, boolean excludeDeletedRecords)
+            throws URISyntaxException, DocumentException {
+
+        // Get records related to a record, specified by its CSID,
+        // where the record is the object of the relation
+        UriInfo uriInfo = createUriInfo();
+        // FIXME: Get this from constant(s), where appropriate
+        uriInfo.getQueryParameters().add("rtObj", csid);
+        if (excludeDeletedRecords) {
+            uriInfo.getQueryParameters().add(WorkflowClient.WORKFLOW_QUERY_NONDELETED, "false");
+        }
+
+        AbstractCommonList relatedRecords = resource.getList(uriInfo);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Identified " + relatedRecords.getTotalItems()
+                    + " record(s) related to the object record with CSID " + csid);
+        }
+
+        // Get records related to a record, specified by its CSID,
+        // where the record is the subject of the relation
+        // FIXME: Get query string(s) from constant(s), where appropriate
+        uriInfo = createUriInfo();
+        uriInfo.getQueryParameters().add("rtSbj", csid);
+        if (excludeDeletedRecords) {
+            uriInfo.getQueryParameters().add(WorkflowClient.WORKFLOW_QUERY_NONDELETED, "false");
+        }
+        AbstractCommonList reverseRelatedRecords = resource.getList(uriInfo);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Identified " + reverseRelatedRecords.getTotalItems()
+                    + " record(s) related to the subject record with CSID " + csid);
+        }
+
+        // If the second list contains any related records,
+        // merge it into the first list
+        if (reverseRelatedRecords.getListItem().size() > 0) {
+            relatedRecords.getListItem().addAll(reverseRelatedRecords.getListItem());
+        }
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("Identified a total of " + relatedRecords.getListItem().size()
+                    + " record(s) related to the record with CSID " + csid);
+        }
+
+        return relatedRecords;
+    }
+
+    // Not currently supported
+    private List<String> getMemberCsidsFromGroup(String groupCsid) throws URISyntaxException {
+        List<String> memberCsids = Collections.emptyList();
+        return memberCsids;
+    }
+
+    private List<String> getNoContextCsids() throws URISyntaxException {
+        List<String> noContextCsids = Collections.emptyList();
+        ResourceMap resourcemap = getResourceMap();
+        ResourceBase collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
+        UriInfo uriInfo = createUriInfo();
+        uriInfo.getQueryParameters().add(WorkflowClient.WORKFLOW_QUERY_NONDELETED, "false");
+        AbstractCommonList collectionObjects = collectionObjectResource.getList(uriInfo);
+        for (AbstractCommonList.ListItem collectionObjectRecord : collectionObjects.getListItem()) {
+            noContextCsids.add(AbstractCommonListUtils.ListItemGetElementValue(collectionObjectRecord, CSID_ELEMENT_NAME));
+        }
+        if (logger.isInfoEnabled()) {
+            logger.info("Identified " + noContextCsids.size()
+                    + " total active CollectionObjects to process in the 'no context' invocation mode.");
+        }
+        return noContextCsids;
+
     }
 }
