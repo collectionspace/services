@@ -9,6 +9,8 @@
         </forDocTypes>
         <supportsSingleDoc>true</supportsSingleDoc>
         <supportsDocList>true</supportsDocList>
+        <supportsGroup>false</supportsGroup>
+        <supportsNoContext>true</supportsNoContext>
         <createsNewFocus>false</createsNewFocus>
         <className>org.collectionspace.services.batch.nuxeo.UpdateObjectLocationBatchJob</className>
     </ns2:batch_common>

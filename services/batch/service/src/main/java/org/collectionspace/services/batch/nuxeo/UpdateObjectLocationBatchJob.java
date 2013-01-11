@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     // FIXME: Where appropriate, get from existing constants rather than local declarations
+    private final static String COMPUTED_CURRENT_LOCATION_ELEMENT_NAME = "computedCurrentLocation";
     private final static String CSID_ELEMENT_NAME = "csid";
     private final static String CURRENT_LOCATION_ELEMENT_NAME = "currentLocation";
     private final static String LIFECYCLE_STATE_ELEMENT_NAME = "currentLifeCycleState";
@@ -60,7 +61,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
     // Initialization tasks
     public UpdateObjectLocationBatchJob() {
-        setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST));
+        setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
     }
 
     /**
@@ -91,7 +92,8 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                 }
                 csids.addAll(listCsids);
             } else if (requestIsForInvocationModeGroup()) {
-                // Currently not supported
+                // This invocation mode is currently not yet supported.
+                // FIXME: Add code to getMemberCsidsFromGroup() to support this mode.
                 String groupCsid = getInvocationContext().getGroupCSID();
                 List<String> groupMemberCsids = getMemberCsidsFromGroup(groupCsid);
                 if (groupMemberCsids.isEmpty()) {
@@ -221,8 +223,9 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             if (locationDate.compareTo(mostRecentLocationDate) > 0) {
                 mostRecentLocationDate = locationDate;
                 // FIXME: Add optional validation here that the currentLocation value
-                // parses successfully as an item refName. (We might make that validation
-                // dependent on the value of a parameter passed in during batch job invocation.)
+                // parses successfully as an item refName.
+                // Consider making this optional validation, in turn dependent on the
+                // value of a parameter passed in during batch job invocation.
                 computedCurrentLocation = currentLocation;
             }
 
@@ -235,46 +238,65 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             throws DocumentException, URISyntaxException {
         PoxPayloadOut collectionObjectPayload;
         String objectNumber;
+        String previousComputedCurrentLocation;
 
         collectionObjectPayload = findByCsid(collectionObjectResource, collectionObjectCsid);
-        if (Tools.notBlank(collectionObjectPayload.toXML())) {
+        if (Tools.isBlank(collectionObjectPayload.toXML())) {
+            return numUpdated;
+        } else {
             if (logger.isTraceEnabled()) {
                 logger.trace("Payload: " + "\n" + collectionObjectPayload);
             }
-            objectNumber = getFieldElementValue(collectionObjectPayload,
-                    COLLECTIONOBJECTS_COMMON_SCHEMA_NAME, COLLECTIONOBJECTS_COMMON_NAMESPACE,
-                    OBJECT_NUMBER_ELEMENT_NAME);
-            if (logger.isTraceEnabled()) {
-                logger.trace("Object number: " + objectNumber);
-            }
-            if (Tools.notBlank(objectNumber)) {
-                String collectionObjectUpdatePayload =
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                        + "<document name=\"collectionobject\">"
-                        + "  <ns2:collectionobjects_common "
-                        + "      xmlns:ns2=\"http://collectionspace.org/services/collectionobject\">"
-                        + "    <objectNumber>" + objectNumber + "</objectNumber>"
-                        + "    <computedCurrentLocation>" + computedCurrentLocation + "</computedCurrentLocation>"
-                        + "  </ns2:collectionobjects_common>"
-                        + "</document>";
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Update payload: " + "\n" + collectionObjectUpdatePayload);
-                }
-                byte[] response = collectionObjectResource.update(resourcemap, null, collectionObjectCsid,
-                        collectionObjectUpdatePayload);
-                numUpdated++;
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Computed current location value for CollectionObject " + collectionObjectCsid
-                            + " was set to " + computedCurrentLocation);
-                }
-            }
+        }
+        // Perform the update only if the computed current location value will change
+        previousComputedCurrentLocation = getFieldElementValue(collectionObjectPayload,
+                COLLECTIONOBJECTS_COMMON_SCHEMA_NAME, COLLECTIONOBJECTS_COMMON_NAMESPACE,
+                COMPUTED_CURRENT_LOCATION_ELEMENT_NAME);
+        if (Tools.notBlank(previousComputedCurrentLocation)
+                && computedCurrentLocation.equals(previousComputedCurrentLocation)) {
+            return numUpdated;
+        }
+        // In the default CollectionObject validation handler, the object number
+        // is a required field and its (non-blank) value must be present in update
+        // payloads to successfully perform an update.
+        //
+        // FIXME: Consider making this check for an object number dependent on the
+        // value of a parameter passed in during batch job invocation.
+        objectNumber = getFieldElementValue(collectionObjectPayload,
+                COLLECTIONOBJECTS_COMMON_SCHEMA_NAME, COLLECTIONOBJECTS_COMMON_NAMESPACE,
+                OBJECT_NUMBER_ELEMENT_NAME);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Object number: " + objectNumber);
+        }
+        if (Tools.isBlank(objectNumber)) {
+            return numUpdated;
+        }
+
+        String collectionObjectUpdatePayload =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                + "<document name=\"collectionobject\">"
+                + "  <ns2:collectionobjects_common "
+                + "      xmlns:ns2=\"http://collectionspace.org/services/collectionobject\">"
+                + "    <objectNumber>" + objectNumber + "</objectNumber>"
+                + "    <computedCurrentLocation>" + computedCurrentLocation + "</computedCurrentLocation>"
+                + "  </ns2:collectionobjects_common>"
+                + "</document>";
+        if (logger.isTraceEnabled()) {
+            logger.trace("Update payload: " + "\n" + collectionObjectUpdatePayload);
+        }
+        byte[] response = collectionObjectResource.update(resourcemap, null, collectionObjectCsid,
+                collectionObjectUpdatePayload);
+        numUpdated++;
+        if (logger.isTraceEnabled()) {
+            logger.trace("Computed current location value for CollectionObject " + collectionObjectCsid
+                    + " was set to " + computedCurrentLocation);
 
         }
         return numUpdated;
     }
 
     // #################################################################
-    // Ray's convenience methods from his AbstractBatchJob class for the
+    // Ray Lee's convenience methods from his AbstractBatchJob class for the
     // UC Berkeley Botanical Garden v2.4 implementation.
     // #################################################################
     protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
@@ -395,27 +417,26 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return relatedRecords;
     }
 
-    // Not currently supported
+    // Stub method, as this invocation mode is not currently supported
     private List<String> getMemberCsidsFromGroup(String groupCsid) throws URISyntaxException {
         List<String> memberCsids = Collections.emptyList();
         return memberCsids;
     }
 
     private List<String> getNoContextCsids() throws URISyntaxException {
-        List<String> noContextCsids = Collections.emptyList();
+        List<String> noContextCsids = new ArrayList<String>();
         ResourceMap resourcemap = getResourceMap();
         ResourceBase collectionObjectResource = resourcemap.get(CollectionObjectClient.SERVICE_NAME);
         UriInfo uriInfo = createUriInfo();
         uriInfo.getQueryParameters().add(WorkflowClient.WORKFLOW_QUERY_NONDELETED, "false");
         AbstractCommonList collectionObjects = collectionObjectResource.getList(uriInfo);
         for (AbstractCommonList.ListItem collectionObjectRecord : collectionObjects.getListItem()) {
-            noContextCsids.add(AbstractCommonListUtils.ListItemGetElementValue(collectionObjectRecord, CSID_ELEMENT_NAME));
+            noContextCsids.add(AbstractCommonListUtils.ListItemGetCSID(collectionObjectRecord));
         }
         if (logger.isInfoEnabled()) {
             logger.info("Identified " + noContextCsids.size()
                     + " total active CollectionObjects to process in the 'no context' invocation mode.");
         }
         return noContextCsids;
-
     }
 }
