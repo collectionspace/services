@@ -133,11 +133,15 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             for (String collectionObjectCsid : csids) {
 
                 // Skip over soft-deleted CollectionObject records
-                if (isRecordDeleted(collectionObjectResource, collectionObjectCsid)) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("Skipping soft-deleted CollectionObject record with CSID " + collectionObjectCsid);
+                //
+                // (No context invocations already have filtered out those records)
+                if (!requestIsForInvocationModeNoContext()) {
+                    if (isRecordDeleted(collectionObjectResource, collectionObjectCsid)) {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("Skipping soft-deleted CollectionObject record with CSID " + collectionObjectCsid);
+                        }
+                        continue;
                     }
-                    continue;
                 }
                 // Get the Movement records related to this CollectionObject record
                 AbstractCommonList relatedMovements =
