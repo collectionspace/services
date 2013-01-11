@@ -57,7 +57,7 @@
             <arg value="-f" />
             <arg value="${basedir}/pom.xml" />
             <arg value="-N" />
-            <!-- arg value="${mvn.opts}" / -->
+            <arg value="${mvn.opts}" />
         </exec>
     </target>
     <target name="package-windows" if="osfamily-windows">
