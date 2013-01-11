@@ -281,7 +281,7 @@
         
     </testGroup>
     
-    <testGroup ID="invocationModeModeList" autoDeletePOSTS="true">
+    <testGroup ID="invocationModeList" autoDeletePOSTS="true">
         
         <test ID="createBatchRecord">
             <method>POST</method>
@@ -421,6 +421,178 @@
 
     </testGroup>
     
+    <testGroup ID="invocationModeGroup" autoDeletePOSTS="true">
+        
+        <test ID="createBatchRecord">
+            <method>POST</method>
+            <uri>/cspace-services/batch</uri>
+            <filename>batch/batch-create-updateobjloc.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createCollectionObject1">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>batch/collObj1.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createCollectionObject2">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>batch/collObj1.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement1">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">location-1</var>
+                <var ID="locationDate">1900-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement2">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">location-2</var>
+                <var ID="locationDate">2000-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement3">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>batch/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">location-3</var>
+                <var ID="locationDate">1800-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObject1ToMovement1">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObject1.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement1.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateMovement2toCollectionObject1">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createMovement2.CSID}</var>
+                <var ID="subjectDocumentType">Movement</var>
+                <var ID="objectCsid">${createCollectionObject1.CSID}</var>
+                <var ID="objectDocumentType">CollectionObject</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObject2ToMovement3">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObject2.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement3.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createGroup">
+            <method>POST</method>
+            <uri>/cspace-services/groups</uri>
+            <filename>batch/group.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObject1ToGroup">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObject1.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createGroup.CSID}</var>
+                <var ID="objectDocumentType">Group</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObject2ToGroup">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>batch/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObject2.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createGroup.CSID}</var>
+                <var ID="objectDocumentType">Group</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="invokeBatchWithGroup" auth="test" autoDeletePOSTS="false">
+            <method>POST</method>
+            <uri>/cspace-services/batch/${createBatchRecord.CSID}</uri>
+            <filename>batch/batch-invoke-updateobjloc-group.xml</filename>
+            <vars>
+                <var ID="groupCSID">${createGroup.CSID}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!-- This CollectionObject record's computedCurrentLocation field should -->
+        <!-- have been updated with the currentLocation value from Movement record 2 -->
+        <test ID="readUpdatedCollectionObjectRecord1">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <filename>batch/updateobjloc.xml</filename>
+            <response>
+                <expected level="ADDOK" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!-- This CollectionObject record's computedCurrentLocation field should -->
+        <!-- have been updated with the currentLocation value from Movement record 3 -->
+        <test ID="readUpdatedCollectionObjectRecord2">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject2.CSID}</uri>
+            <filename>batch/updateobjloc.xml</filename>
+            <response>
+                <expected level="ADDOK" />
+                <filename>batch/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement3.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+    </testGroup>
+    
     <!--
         WARNING: DANGER, WILL ROBINSON! This test group will process every active
         CollectionObject record available to the batch job.
@@ -433,8 +605,7 @@
         only at your peril.  Use ONLY during development. - ADR 2013-01-10
     -->
     
-    <!--
-    <testGroup ID="invocationModeModeNoContext" autoDeletePOSTS="true">
+    <testGroup ID="invocationModeNoContext" autoDeletePOSTS="true">
         
         <test ID="createBatchRecord">
             <method>POST</method>
@@ -554,7 +725,6 @@
         </test>
         
     </testGroup>
-    -->
     
 </xmlReplay>
 

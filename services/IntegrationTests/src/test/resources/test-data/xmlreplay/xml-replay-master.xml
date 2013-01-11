@@ -50,6 +50,7 @@
     <!--
     <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeSingle" />
     <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeList" />
+    <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeGroup" />
     -->
     
     <!-- Broken tests -->

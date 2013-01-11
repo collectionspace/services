@@ -9,7 +9,7 @@
         </forDocTypes>
         <supportsSingleDoc>true</supportsSingleDoc>
         <supportsDocList>true</supportsDocList>
-        <supportsGroup>false</supportsGroup>
+        <supportsGroup>true</supportsGroup>
         <supportsNoContext>false</supportsNoContext>
         <createsNewFocus>false</createsNewFocus>
         <className>org.collectionspace.services.batch.nuxeo.UpdateObjectLocationBatchJob</className>
