@@ -14,6 +14,7 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
@@ -440,7 +441,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
      * @throws URISyntaxException
      */
     private AbstractCommonList getRecordsRelatedToObjectCsid(ResourceBase resource, String csid, boolean excludeDeletedRecords) throws URISyntaxException {
-        return getRecordsRelatedToCsid(resource, csid, "rtObj", excludeDeletedRecords);
+        return getRecordsRelatedToCsid(resource, csid, IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT, excludeDeletedRecords);
     }
 
     /**
@@ -457,7 +458,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
      * @throws URISyntaxException
      */
     private AbstractCommonList getRecordsRelatedToSubjectCsid(ResourceBase resource, String csid, boolean excludeDeletedRecords) throws URISyntaxException {
-        return getRecordsRelatedToCsid(resource, csid, "rtSbj", excludeDeletedRecords);
+        return getRecordsRelatedToCsid(resource, csid, IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT, excludeDeletedRecords);
     }
 
     private AbstractCommonList getRelatedRecords(ResourceBase resource, String csid, boolean excludeDeletedRecords)
