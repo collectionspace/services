@@ -159,22 +159,24 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
                 if (relatedMovements.getListItem().isEmpty()) {
                     continue;
                 }
-                // Compute the current location of this CollectionObject,
-                // based on data in its related Movement records
-                computedCurrentLocation = computeCurrentLocation(relatedMovements);
-                // Skip over CollectionObject records where no current location
-                // value can be computed
+                // Get the most recent 'suitable' Movement record, one which
+                // contains both a location date and a current location value
+                AbstractCommonList.ListItem mostRecentMovement = getMostRecentMovement(relatedMovements);
+                // Skip over CollectionObject records where no suitable
+                // most recent Movement record can be identified.
                 //
                 // FIXME: Clarify: it ever necessary to 'unset' a computed
                 // current location value, by setting it to a null or empty value,
-                // if that value is no longer obtainable from related Movement records?
-                if (Tools.isBlank(computedCurrentLocation)) {
+                // if that value is no longer obtainable from related Movement
+                // records, if any?
+                if (mostRecentMovement == null) {
                     continue;
                 }
                 // Update the value of the computed current location field
+                // (and, via subclasses, this and/or other relevant fields)
                 // in the CollectionObject record
-                numUpdated = updateComputedCurrentLocationValue(collectionObjectResource,
-                        collectionObjectCsid, computedCurrentLocation, resourcemap, numUpdated);
+                numUpdated = updateCollectionObjectValues(collectionObjectResource,
+                        collectionObjectCsid, mostRecentMovement, resourcemap, numUpdated);
             }
 
         } catch (Exception e) {
@@ -191,16 +193,15 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         return getResults();
     }
 
-    private String computeCurrentLocation(AbstractCommonList relatedMovements) {
+    private AbstractCommonList.ListItem getMostRecentMovement(AbstractCommonList relatedMovements) {
         Set<String> alreadyProcessedMovementCsids = new HashSet<String>();
-        String computedCurrentLocation;
+        AbstractCommonList.ListItem mostRecentMovement = null;
         String movementCsid;
-        computedCurrentLocation = "";
         String currentLocation;
         String locationDate;
         String mostRecentLocationDate = "";
-        for (AbstractCommonList.ListItem movementRecord : relatedMovements.getListItem()) {
-            movementCsid = AbstractCommonListUtils.ListItemGetElementValue(movementRecord, CSID_ELEMENT_NAME);
+        for (AbstractCommonList.ListItem movementListItem : relatedMovements.getListItem()) {
+            movementCsid = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, CSID_ELEMENT_NAME);
             if (Tools.isBlank(movementCsid)) {
                 continue;
             }
@@ -212,21 +213,26 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             } else {
                 alreadyProcessedMovementCsids.add(movementCsid);
             }
-            locationDate = AbstractCommonListUtils.ListItemGetElementValue(movementRecord, LOCATION_DATE_ELEMENT_NAME);
+            locationDate = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, LOCATION_DATE_ELEMENT_NAME);
             if (Tools.isBlank(locationDate)) {
                 continue;
             }
-            currentLocation = AbstractCommonListUtils.ListItemGetElementValue(movementRecord, CURRENT_LOCATION_ELEMENT_NAME);
+            currentLocation = AbstractCommonListUtils.ListItemGetElementValue(movementListItem, CURRENT_LOCATION_ELEMENT_NAME);
             if (Tools.isBlank(currentLocation)) {
                 continue;
             }
+            // FIXME: Add optional validation here that this Movement record's
+            // currentLocation value parses successfully as an item refName,
+            // before identifying that record as the most recent Movement.
+            // Consider making this optional validation, in turn dependent on the
+            // value of a parameter passed in during batch job invocation.
             if (logger.isTraceEnabled()) {
                 logger.trace("Location date value = " + locationDate);
                 logger.trace("Current location value = " + currentLocation);
             }
             // If this record's location date value is more recent than that of other
-            // Movement records processed so far, set the computed current location
-            // to its current location value.
+            // Movement records processed so far, set the current Movement record
+            // as the most recent Movement.
             //
             // The following comparison assumes that all values for this element/field
             // will be consistent ISO 8601 date/time representations, each of which can
@@ -236,21 +242,25 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             // to date/time objects.
             if (locationDate.compareTo(mostRecentLocationDate) > 0) {
                 mostRecentLocationDate = locationDate;
-                // FIXME: Add optional validation here that the currentLocation value
-                // parses successfully as an item refName.
-                // Consider making this optional validation, in turn dependent on the
-                // value of a parameter passed in during batch job invocation.
-                computedCurrentLocation = currentLocation;
+                mostRecentMovement = movementListItem;
             }
 
         }
-        return computedCurrentLocation;
+        return mostRecentMovement;
     }
 
-    private int updateComputedCurrentLocationValue(ResourceBase collectionObjectResource,
-            String collectionObjectCsid, String computedCurrentLocation, ResourceMap resourcemap, int numUpdated)
+    // This method can be overridden and extended to update a custom set of
+    // values in the CollectionObject record by pulling in values from its
+    // most recent related Movement record.
+    //
+    // Note: any such values must first be exposed in Movement list items,
+    // in turn via configuration in Services tenant bindings ("listResultsField").
+    protected int updateCollectionObjectValues(ResourceBase collectionObjectResource,
+            String collectionObjectCsid, AbstractCommonList.ListItem mostRecentMovement,
+            ResourceMap resourcemap, int numUpdated)
             throws DocumentException, URISyntaxException {
         PoxPayloadOut collectionObjectPayload;
+        String computedCurrentLocation;
         String objectNumber;
         String previousComputedCurrentLocation;
 
@@ -264,6 +274,8 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         }
         // Perform the update only if the computed current location value will change
         // as a result of the update
+        computedCurrentLocation =
+                AbstractCommonListUtils.ListItemGetElementValue(mostRecentMovement, CURRENT_LOCATION_ELEMENT_NAME);
         previousComputedCurrentLocation = getFieldElementValue(collectionObjectPayload,
                 COLLECTIONOBJECTS_COMMON_SCHEMA_NAME, COLLECTIONOBJECTS_COMMON_NAMESPACE,
                 COMPUTED_CURRENT_LOCATION_ELEMENT_NAME);
