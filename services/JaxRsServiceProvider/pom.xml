@@ -31,6 +31,7 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
+			<scope>provided</scope>
         </dependency>
         <!-- somewhere dependency is added 1.5.8 unnecessarily -->
         <dependency>
@@ -696,12 +697,12 @@
                     </webResources>
                     <archive>
                         <manifest>
-                            <packageName>${pom.groupid}</packageName>
+                            <packageName>${project.groupId}</packageName>
                             <!--addDefaultImplementationEntries/-->
                         </manifest>
                         <manifestEntries>
                             <Vendor>CollectionSpace Services</Vendor>
-                            <Package>${pom.groupId}</Package>
+                            <Package>${project.groupId}</Package>
                             <Release>${cs.release}</Release>
                         </manifestEntries>
                     </archive>
