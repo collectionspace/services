@@ -605,6 +605,7 @@
         only at your peril.  Use ONLY during development. - ADR 2013-01-10
     -->
     
+    <!--
     <testGroup ID="invocationModeNoContext" autoDeletePOSTS="true">
         
         <test ID="createBatchRecord">
@@ -725,6 +726,7 @@
         </test>
         
     </testGroup>
+    -->
     
 </xmlReplay>
 
