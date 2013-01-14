@@ -198,7 +198,7 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.plantlabel.service</artifactId>
+            <artifactId>org.collectionspace.services.pottag.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -443,25 +443,25 @@
         </tenant:serviceBindings>
         <!-- end propagation service meta-data -->
 
-        <!-- begin plantlabel service meta-data -->
-        <tenant:serviceBindings merge:matcher="skip" merge:action="insert" id="Plantlabels" name="Plantlabels" type="procedure" version="0.1">
+        <!-- begin pottag service meta-data -->
+        <tenant:serviceBindings merge:matcher="skip" merge:action="insert" id="Pottags" name="Pottags" type="procedure" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
-                /plantlabels/*/authorityrefs/
+                /pottags/*/authorityrefs/
             </service:uriPath>
             -->
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
-            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.plantlabel.nuxeo.PlantlabelDocumentModelHandler</service:documentHandler>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.pottag.nuxeo.PottagDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.plantlabel.nuxeo.PlantlabelDocumentModelHandler</service:classname>
+                <service:classname>org.collectionspace.services.pottag.nuxeo.PottagDocumentModelHandler</service:classname>
                 <service:params>
-                    <service:SchemaName>plantlabels</service:SchemaName>
-                    <service:DublinCoreTitle>plantlabels</service:DublinCoreTitle>
+                    <service:SchemaName>pottags</service:SchemaName>
+                    <service:DublinCoreTitle>pottags</service:DublinCoreTitle>
                     <service:SummaryFields>taxonName|family|uri|csid</service:SummaryFields>
                     <service:AbstractCommonListClassname />
                     <service:CommonListItemClassname />
-                    <service:ListResultsItemMethodName>getPlantlabelListItem</service:ListResultsItemMethodName>
+                    <service:ListResultsItemMethodName>getPottagListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
                             <service:element>taxonName</service:element>
@@ -474,7 +474,7 @@
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
-            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.plantlabel.nuxeo.PlantlabelValidatorHandler</service:validatorHandler>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.pottag.nuxeo.PottagValidatorHandler</service:validatorHandler>
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
@@ -498,19 +498,19 @@
             </service:initHandler>
             -->
             
-            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Plantlabel" version="0.1">
-                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="plantlabels-system" updated="" order="0">
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Pottag" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="pottags-system" updated="" order="0">
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
                     </service:content>
                 </service:part>
-                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="plantlabels_common" updated="" order="1">
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="pottags_common" updated="" order="1">
                     <service:properties>
                         <!-- Fields containing authority term references -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                     </service:properties>
                     <service:content contentType="application/xml">
-                        <service:xmlContent namespaceURI="http://collectionspace.org/services/plantlabel" schemaLocation="http://collectionspace.org/services/plantlabel http://services.collectionspace.org/plantlabel/plantlabels_common.xsd" />
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/pottag" schemaLocation="http://collectionspace.org/services/pottag http://services.collectionspace.org/pottag/pottags_common.xsd" />
                     </service:content>
                 </service:part>
                 <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
@@ -520,7 +520,7 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-        <!-- end plantlabel service meta-data -->
+        <!-- end pottag service meta-data -->
 
     </tenant:tenantBinding>
 	    	       
