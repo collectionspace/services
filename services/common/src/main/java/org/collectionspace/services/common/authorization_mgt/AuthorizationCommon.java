@@ -381,6 +381,7 @@ public class AuthorizationCommon {
     
     private static Hashtable<String, String> getTenantNamesFromConfig(TenantBindingConfigReaderImpl tenantBindingConfigReader) {
 
+    	// Note that this only handles tenants not marked as "createDisabled"
     	Hashtable<String, TenantBindingType> tenantBindings =
     			tenantBindingConfigReader.getTenantBindings();
     	Hashtable<String, String> tenantInfo = new Hashtable<String, String>();
@@ -934,6 +935,7 @@ public class AuthorizationCommon {
         	conn = getConnection();
 	        ArrayList<String> existingTenants = compileExistingTenants(conn, tenantInfo);
 	        
+	    	// Note that this only creates tenants not marked as "createDisabled"
 	        createMissingTenants(conn, tenantInfo, existingTenants);
 	        
 	        ArrayList<String> usersInRepo = findOrCreateDefaultUsers(conn, tenantInfo);
