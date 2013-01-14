@@ -263,18 +263,30 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	public String createWhereClauseForPartialMatch(String dataSourceName,
 			String repositoryName,
 			String field,
+			boolean startingWildcard,
 			String partialTerm) {
 		String trimmed = (partialTerm == null) ? "" : partialTerm.trim();
 		if (trimmed.isEmpty()) {
 			throw new RuntimeException("No partialTerm specified.");
 		}
+		if(trimmed.charAt(0) == '*') {
+			if(trimmed.length() == 1) { // only a star is not enough
+				throw new RuntimeException("No partialTerm specified.");
+			}
+			trimmed = trimmed.substring(1);
+			startingWildcard = true;		// force a starting wildcard match
+		}
 		if (field == null || field.isEmpty()) {
 			throw new RuntimeException("No match field specified.");
 		}
-		String ptClause = field + getLikeForm(dataSourceName, repositoryName) + "'%"
-				+ unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'")
-				+ "%'";
-		return ptClause;
+			
+		StringBuilder ptClause = new StringBuilder(trimmed.length()+field.length()+20);
+		ptClause.append(field);
+		ptClause.append(getLikeForm(dataSourceName, repositoryName));
+		ptClause.append(startingWildcard?"'%":"'");
+		ptClause.append(unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'"));
+		ptClause.append("%'");
+		return ptClause.toString();
 	}
 
 	/**
