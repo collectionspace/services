@@ -16,6 +16,11 @@
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -31,17 +36,12 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.loanout.client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.relation.client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.batch.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.collectionobject.client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -49,6 +49,26 @@
             <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId> <!-- FIXME: REM - Is this really a required dependency? -->
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.loanout.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.movement.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.movement.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.relation.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>        
         <!-- External dependencies -->        
         <dependency>
             <groupId>junit</groupId>
@@ -61,7 +81,7 @@
             <artifactId>testng</artifactId>
         </dependency>
         
-      <!-- javax -->
+        <!-- javax -->
 
         <dependency>
             <groupId>javax.security</groupId>
@@ -75,6 +95,13 @@
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
             <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>        
         </dependency>
         
         <!-- jboss -->
