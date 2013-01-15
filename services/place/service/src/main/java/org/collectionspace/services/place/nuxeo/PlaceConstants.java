@@ -41,5 +41,5 @@ public class PlaceConstants {
     public final static String TERM_TYPE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
     public final static String TERM_TYPE_FIELD_NAME = "placeTermGroupList/placeTermGroup/termType";
     
-    public final static String REVERSE_TERM_TYPE = "reverse-qualified";
+    public final static String REVERSE_TERM_TYPE = "Reverse Qualified Name";
 }
