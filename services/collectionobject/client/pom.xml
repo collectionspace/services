@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.collectionobject</artifactId>
-        <version>3.2.1-SNAPSHOT</version>
+        <version>3.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -55,11 +55,7 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.organization.client</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.person.client</artifactId>
-            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <!-- External dependencies -->
         <dependency>
