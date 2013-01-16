@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.report.nuxeo;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,21 +31,33 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import javax.naming.NamingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporter;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.JRCsvExporter;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.JRXmlExporter;
 
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -88,6 +101,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 
 		String invocationMode = invContext.getMode();
 		String modeProperty = null;
+		String outputMimeType = ReportClient.DEFAULT_REPORT_OUTPUT_MIME;
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(REPORTS_STD_TENANTID_PARAM, ctx.getTenantId());
 		boolean checkDocType = true;
@@ -126,6 +140,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
         			+invocationMode);
 		}
 		
+		
 		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
@@ -155,6 +170,10 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 	        	}
 	    	}
 			reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
+			String reportOutputMime = (String)docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
+			if(!Tools.isEmpty(reportOutputMime)) {
+				outputMimeType = reportOutputMime;
+			}
 		} catch (PropertyException pe) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Property exception getting batch values: ", pe);
@@ -175,11 +194,12 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 				repoClient.releaseRepositorySession(ctx, repoSession);
 			}
 		}
-       	return buildReportResponse(csid, params, reportFileName);
+       	return buildReportResponse(csid, params, reportFileName, outputMimeType);
 	}
 
 
-    private Response buildReportResponse(String reportCSID, HashMap<String, Object> params, String reportFileName)
+    private Response buildReportResponse(String reportCSID, 
+    		HashMap<String, Object> params, String reportFileName, String outputMimeType)
     				throws Exception {
 		Connection conn = null;
 		Response response = null;
@@ -192,18 +212,61 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 			conn = getConnection();
 	
             if (logger.isTraceEnabled()) {
-            	logger.trace("ReportResource for Report csid=" + reportCSID
-            			+" opening report file: "+fullPath);
+            	logger.trace("ReportResource for csid=" + reportCSID
+            			+" output as "+outputMimeType+" using report file: "+fullPath);
             }
 			FileInputStream fileStream = new FileInputStream(fullPath);
 	
-	        // fill the report
-			JasperPrint jasperprint = JasperFillManager.fillReport(fileStream, params,conn);
 			// export report to pdf and build a response with the bytes
-			byte[] pdfasbytes = JasperExportManager.exportReportToPdf(jasperprint);
+			//JasperExportManager.exportReportToPdf(jasperprint);
 			
+			// Report will be to a byte output array.
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+			JRExporter exporter = null;
+			// Strip extension from report filename.
+			String outputFilename = reportFileName;
+			// Strip extension from report filename.
+			int idx = outputFilename.lastIndexOf("."); 
+			if(idx>0)
+				outputFilename = outputFilename.substring(0, idx);
+			// Strip any sub-dir from report filename.
+			idx = outputFilename.lastIndexOf(File.separator); 
+			if(idx>0)
+				outputFilename = outputFilename.substring(idx+1);
+			if(outputMimeType.equals(MediaType.APPLICATION_XML)) {
+				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+				exporter = new JRXmlExporter();
+				outputFilename = outputFilename+".xml";
+			} else if(outputMimeType.equals(MediaType.TEXT_HTML)) {
+				exporter = new JRHtmlExporter();
+				outputFilename = outputFilename+".html";
+			} else if(outputMimeType.equals(ReportClient.PDF_MIME_TYPE)) {
+				exporter = new JRPdfExporter();
+				outputFilename = outputFilename+".pdf";
+			} else if(outputMimeType.equals(ReportClient.CSV_MIME_TYPE)) {
+				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+				exporter = new JRCsvExporter();
+				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ",");
+				outputFilename = outputFilename+".csv";
+			} else if(outputMimeType.equals(ReportClient.TSV_MIME_TYPE)) {
+				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+				exporter = new JRCsvExporter();
+				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, "\t");
+				outputFilename = outputFilename+".csv";
+			}
+	        // fill the report
+			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
+				
+			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+			exporter.exportReport();
+			byte[] reportAsBytes = baos.toByteArray();
+
 			// Need to set response type for what is requested...
-	        response = Response.ok(pdfasbytes, "application/pdf").build();
+			ResponseBuilder builder = Response.ok(reportAsBytes, outputMimeType);
+			builder = builder.header("Content-Disposition","inline;filename=\""+outputFilename+"\"");
+	        response = builder.build();
 	
 	       	return response;    	
         } catch (SQLException sqle) {
