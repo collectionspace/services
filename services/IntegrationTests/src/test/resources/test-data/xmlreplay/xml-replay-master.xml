@@ -53,6 +53,8 @@
     <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeGroup" />
     -->
     
+    <run controlFile="listener/listener-update-object-loc.xml" testGroup="updateObjectLocationOnMoveEventListener" />
+    
     <!-- Broken tests -->
     
     <!-- FIXME: the following tests were commented out without any annotation as to why this was done. -->
