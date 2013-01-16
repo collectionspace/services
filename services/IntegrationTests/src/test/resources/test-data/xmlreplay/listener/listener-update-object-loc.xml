@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
+    </auths>
+        
+    <!-- This tests the UpdateObjectLocationOnMoveEventListener -->
+        
+    <testGroup ID="updateObjectLocationOnMoveEventListener" autoDeletePOSTS="true">
+        
+        <test ID="createCollectionObject1">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>listener/collectionobject.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createCollectionObject2">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects</uri>
+            <filename>listener/collectionobject.xml</filename>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement1">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Seattle1358215545509)'Seattle, WA, USA'</var>
+                <var ID="locationDate">1650-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement2">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Portland1358215545512)'Portland, OR, USA'</var>
+                <var ID="locationDate">1700-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement3">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Victoria1358215545515)'Victoria, BC, Canada'</var>
+                <var ID="locationDate">1800-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement4">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Vancouver1358215545518)'Vancouver, BC, Canada'</var>
+                <var ID="locationDate">1900-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="createMovement5">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Olympia1358215545521)'Olympia, WA, USA'</var>
+                <var ID="locationDate">2000-01-01</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObject1ToMovement1">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>listener/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObject1.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement1.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObject2ToMovement1">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>listener/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObject2.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement1.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <!-- Computed current location doesn't appear to be updated -->
+        <!-- merely upon a Relation being created; some intervening action -->
+        <!-- invoking the listener must also occur. This appears to be -->
+        <!-- because newly-created relations aren't being returned in results -->
+        <!-- from the first query - which returns a list of Relation document -->
+        <!-- models - that is made in AbstractUpdateObjectLocationValues.handleEvent() --> 
+        <test ID="updateMovement1">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement1.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Seattle1358215545509)'Seattle, WA, USA'</var>
+                <var ID="locationDate">1650-02-01</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterMovement1Update">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement1.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject2AfterMovement1Update">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject2.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement1.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="relateMovement2ToCollectionObject1">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>listener/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createMovement2.CSID}</var>
+                <var ID="subjectDocumentType">Movement</var>
+                <var ID="objectCsid">${createCollectionObject1.CSID}</var>
+                <var ID="objectDocumentType">CollectionObject</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="updateMovement2">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Portland1358215545512)'Portland, OR, USA'</var>
+                <var ID="locationDate">1700-02-01</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+
+        <test ID="readCollectionObject1AfterMovement2Update">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="relateMovement3ToCollectionObject1">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>listener/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createMovement3.CSID}</var>
+                <var ID="subjectDocumentType">Movement</var>
+                <var ID="objectCsid">${createCollectionObject1.CSID}</var>
+                <var ID="objectDocumentType">CollectionObject</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="updateMovement3">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Victoria1358215545515)'Victoria, BC, Canada'</var>
+                <var ID="locationDate">1800-02-01</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterMovement3Update">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement3.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObject1ToMovement4">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>listener/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObject1.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement4.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObject1ToMovement5">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>listener/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObject1.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement5.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <test ID="updateMovement5">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement5.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Olympia1358215545521)'Olympia, WA, USA'</var>
+                <var ID="locationDate">2000-02-02</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterMovement5Update">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement5.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+    </testGroup>
+    
+    <testGroup ID="TestsStillUnderDevelopment">
+                
+        <test ID="softDeleteRelationBetweenCollectionObject1AndMovement5">
+            <method>PUT</method>
+            <uri>/cspace-services/relations/${relateCollectionObject1ToMovement5.CSID}/workflow/delete</uri>
+            <expectedCodes>200</expectedCodes>
+            <filename>relation/res/workflowState.res.xml</filename>
+            <vars>
+                <var ID="workflowState">deleted</var>
+            </vars>
+        </test>
+        
+        <test ID="readCollectionObject1AfterRelationSoftDelete">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement4.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="deleteRelationBetweenCollectionObject1AndMovement4">
+            <method>DELETE</method>
+            <uri>/cspace-services/relations/${relateCollectionObject1ToMovement4.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterRelationDelete">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement3.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="softDeleteMovement3">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement3.CSID}/workflow/delete</uri>
+            <expectedCodes>200</expectedCodes>
+            <!-- XmlReplay appears to require a filename on PUT. -->
+            <!-- If not present, throws "java.io.FileNotFoundException: File '' does not exist" -->
+            <!-- The contents of that file, sent in the PUT payload, will be ignored by the services. -->
+            <!-- Note that the filename below is in a different module than -->
+            <!-- the present XmlReplay control file. -->
+            <filename>relation/res/workflowState.res.xml</filename>
+            <vars>
+                <var ID="workflowState">deleted</var>
+            </vars>
+        </test>
+        
+        <test ID="readCollectionObject1AfterMovement3SoftDelete">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement2.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="deleteMovement2">
+            <method>DELETE</method>
+            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterMovement2Delete">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement1.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+    </testGroup>
+    
+</xmlReplay>
+
