@@ -31,6 +31,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
@@ -105,6 +107,10 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(REPORTS_STD_TENANTID_PARAM, ctx.getTenantId());
 		boolean checkDocType = true;
+		
+		// Note we set before we put in the default ones, so they cannot override tenant or CSID.
+		setParamsFromContext(params, invContext);
+		
 		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
     		params.put(REPORTS_STD_CSID_PARAM, invContext.getSingleCSID());
@@ -196,6 +202,24 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 		}
        	return buildReportResponse(csid, params, reportFileName, outputMimeType);
 	}
+	
+	private void setParamsFromContext(Map<String, Object> params, InvocationContext invContext) {
+		InvocationContext.Params icParams = invContext.getParams();
+		if(icParams!= null) {
+			List<InvocationContext.Params.Param> icParamList = icParams.getParam();
+			if(icParamList != null) {
+				for(InvocationContext.Params.Param param:icParamList) {
+					String key = param.getKey();
+					String value = param.getValue();
+					if(!Tools.isEmpty(key) && !Tools.isEmpty(value)) {
+						params.put(key, value);
+					}
+				}
+			}
+		}
+		
+	}
+
 
 
     private Response buildReportResponse(String reportCSID, 

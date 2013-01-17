@@ -1,0 +1,18 @@
+As an example of invoking the acq_basic report from, e.g., poster, here is a payload that shows how to use parameters. The report has a parameter called "queryYear" that when invoked in the no-context mode, will restrict the acquisitions to that year. See the actual report for how the query is built. 
+
+The invocation payload is:
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:invocationContext
+xmlns:ns2="http://collectionspace.org/services/common/invocable">
+  <mode>nocontext</mode>
+  <docType>Acquisition</docType>
+  <params>
+    <param>
+      <key>queryYear</key>
+      <value>2000</value>
+    </param>
+  </params>
+</ns2:invocationContext>
+
+Note that this can be used for a report with any output type - it only impacts the invocation properties. 
