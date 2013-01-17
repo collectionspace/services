@@ -857,7 +857,13 @@ public class NuxeoImageUtils {
 				// Next, we need to remove the actual file from Nuxeo's data directory
 				DocumentBlobHolder docBlobHolder = (DocumentBlobHolder) documentModel
 						.getAdapter(BlobHolder.class);
-				boolean deleteSuccess = NuxeoUtils.deleteFileOfBlob(docBlobHolder.getBlob());
+				Blob blob = docBlobHolder.getBlob();
+				if(blob == null) {
+					logger.error("Could not get blob for original image. Trying to delete original for: {}",
+							file.getName());
+				} else {
+					boolean deleteSuccess = NuxeoUtils.deleteFileOfBlob(docBlobHolder.getBlob());
+				}
 			}
 		} catch (Exception e) {
 			result = null;
