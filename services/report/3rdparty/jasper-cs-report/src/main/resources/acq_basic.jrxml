@@ -16,21 +16,29 @@
 	<parameter name="csid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
 	</parameter>
-	<parameter name="where_clause" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA[(($P{csid}==null||($P{csid}.length()==0))?"":" AND hierarchy.name = '"+$P{csid}+"'")]]></defaultValueExpression>
+	<parameter name="queryYear" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String">
 		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
 	</parameter>
+	<parameter name="where_clause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[(($P{csid}!=null && $P{csid}.length()>0)?
+    (" AND hierarchy.name = '"+$P{csid}+"'")
+    :(($P{queryYear}==null || $P{queryYear}.length()==0)?" AND 1=1"
+        :" AND acquisitions_common.acquisitionauthorizerdate >= '"+$P{queryYear}
+            +"-1-1' AND acquisitions_common.acquisitionauthorizerdate <= '"
+            +$P{queryYear}+"-12-31'"))]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT
-     acquisitions_common."originalobjectpurchasepricevalue" AS acquisitions_common_originalobjectpurchasepricevalue,
-     acquisitions_common."transferoftitlenumber" AS acquisitions_common_transferoftitlenumber,
-     acquisitions_common."acquisitionreferencenumber" AS acquisitions_common_acquisitionreferencenumber,
-     acquisitions_common."acquisitionmethod" AS acquisitions_common_acquisitionmethod,
-     acquisitions_common."acquisitionauthorizerdate" AS acquisitions_common_acquisitionauthorizerdate,
-     acquisitions_common."acquisitionauthorizer" AS acquisitions_common_acquisitionauthorizer,
-     acquisitions_common."acquisitionreason" AS acquisitions_common_acquisitionreason
+     acquisitions_common."originalobjectpurchasepricevalue" AS ac_originalobjectpurchasepricevalue,
+     acquisitions_common."transferoftitlenumber" AS ac_transferoftitlenumber,
+     acquisitions_common."acquisitionreferencenumber" AS ac_acquisitionreferencenumber,
+     acquisitions_common."acquisitionmethod" AS ac_acquisitionmethod,
+     acquisitions_common."acquisitionauthorizerdate" AS ac_acqauth_date,
+     acquisitions_common."acquisitionauthorizer" AS ac_acquisitionauthorizer,
+     acquisitions_common."acquisitionreason" AS ac_acquisitionreason
 FROM
      "public"."acquisitions_common" acquisitions_common INNER JOIN "public"."hierarchy" hierarchy ON acquisitions_common."id" = hierarchy."id"
 INNER JOIN "public"."collectionspace_core" core ON acquisitions_common."id" = core."id"
@@ -38,20 +46,20 @@ INNER JOIN "public"."misc" misc ON misc."id" = hierarchy."id"
 WHERE core.tenantid = $P{tenantid} AND misc.lifecyclestate != 'deleted'
 $P!{where_clause}]]>
 	</queryString>
-	<field name="acquisitions_common_originalobjectpurchasepricevalue" class="java.lang.String"/>
-	<field name="acquisitions_common_transferoftitlenumber" class="java.lang.String"/>
-	<field name="acquisitions_common_acquisitionreferencenumber" class="java.lang.String"/>
-	<field name="acquisitions_common_acquisitionmethod" class="java.lang.String"/>
-	<field name="acquisitions_common_acquisitionauthorizerdate" class="java.lang.String"/>
-	<field name="acquisitions_common_acquisitionauthorizer" class="java.lang.String"/>
-	<field name="acquisitions_common_acquisitionreason" class="java.lang.String"/>
+	<field name="ac_originalobjectpurchasepricevalue" class="java.lang.Double"/>
+	<field name="ac_transferoftitlenumber" class="java.lang.String"/>
+	<field name="ac_acquisitionreferencenumber" class="java.lang.String"/>
+	<field name="ac_acquisitionmethod" class="java.lang.String"/>
+	<field name="ac_acqauth_date" class="java.sql.Timestamp"/>
+	<field name="ac_acquisitionauthorizer" class="java.lang.String"/>
+	<field name="ac_acquisitionreason" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
 		<band height="102" splitType="Stretch">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="0" width="797" height="76" backcolor="#FFFFFF"/>
+				<reportElement mode="Opaque" x="0" y="0" width="797" height="90" backcolor="#FFFFFF"/>
 				<staticText>
 					<reportElement style="SubTitle" x="458" y="0" width="339" height="29"/>
 					<textElement textAlignment="Right">
@@ -61,7 +69,7 @@ $P!{where_clause}]]>
 				</staticText>
 				<image>
 					<reportElement x="0" y="0" width="349" height="67"/>
-					<imageExpression class="java.lang.String"><![CDATA["http://www.collectionspace.org/sites/all/themes/CStheme/images/CSpaceLogo.png"]]></imageExpression>
+					<imageExpression><![CDATA["http://www.collectionspace.org/sites/all/themes/CStheme/images/CSpaceLogo.png"]]></imageExpression>
 				</image>
 			</frame>
 			<frame>
@@ -127,46 +135,46 @@ $P!{where_clause}]]>
 					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_originalobjectpurchasepricevalue}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{ac_originalobjectpurchasepricevalue}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="2" y="0" width="139" height="18"/>
 					<textElement>
 						<font fontName="DejaVu Serif" size="12"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionreferencenumber}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{ac_acquisitionreferencenumber}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="228" y="0" width="144" height="18"/>
 					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionauthorizerdate}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{ac_acqauth_date}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="372" y="0" width="155" height="18"/>
 					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[($F{acquisitions_common_acquisitionauthorizer}==null ||
-    $F{acquisitions_common_acquisitionauthorizer}.isEmpty())?
-  "":$F{acquisitions_common_acquisitionauthorizer}.substring(
-     $F{acquisitions_common_acquisitionauthorizer}.lastIndexOf( ")" )+2,
-       $F{acquisitions_common_acquisitionauthorizer}.length()-1).replaceAll("[+]"," ")]]></textFieldExpression>
+					<textFieldExpression><![CDATA[($F{ac_acquisitionauthorizer}==null ||
+    $F{ac_acquisitionauthorizer}.isEmpty())?
+  "":$F{ac_acquisitionauthorizer}.substring(
+     $F{ac_acquisitionauthorizer}.lastIndexOf( ")" )+2,
+       $F{ac_acquisitionauthorizer}.length()-1).replaceAll("[+]"," ")]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="527" y="0" width="150" height="18"/>
 					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionreason}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{ac_acquisitionreason}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true">
 					<reportElement style="Detail" positionType="Float" x="677" y="0" width="120" height="18"/>
 					<textElement textAlignment="Center">
 						<font fontName="DejaVu Serif" size="13"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$F{acquisitions_common_acquisitionmethod}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{ac_acquisitionmethod}]]></textFieldExpression>
 				</textField>
 			</frame>
 		</band>
@@ -190,21 +198,21 @@ $P!{where_clause}]]>
 					<textElement verticalAlignment="Middle">
 						<font fontName="DejaVu Serif" size="10" isBold="false"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement style="Column header" x="677" y="3" width="80" height="20" forecolor="#FFFFFF"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="DejaVu Serif" size="10" isBold="false"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
 				</textField>
 				<textField pattern="EEEEE dd MMMMM yyyy">
 					<reportElement style="Column header" x="2" y="3" width="197" height="20" forecolor="#FFFFFF"/>
 					<textElement verticalAlignment="Middle">
 						<font fontName="DejaVu Serif" size="10" isBold="false"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[new java.util.Date()]]></textFieldExpression>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 				</textField>
 			</frame>
 		</band>
