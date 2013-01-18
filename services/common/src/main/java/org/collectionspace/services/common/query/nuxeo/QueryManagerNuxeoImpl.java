@@ -86,7 +86,6 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		}
 		return SEARCH_LIKE_FORM;
 	}
-    private String SQL_WILDCARD_CHAR = "%";
 
 	@Override
 	public String getDatasourceName() {
