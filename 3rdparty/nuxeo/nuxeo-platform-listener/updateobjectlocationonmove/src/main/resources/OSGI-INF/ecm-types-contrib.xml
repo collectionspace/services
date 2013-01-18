@@ -3,7 +3,7 @@
     
     <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
         <listener name="updateobjectlocationonmovelistener" async="true" postCommit="true"
-                  class="org.collectionspace.services.listener.UpdateObjectLocationOnMove">
+                  class="org.collectionspace.services.listener.UpdateObjectLocationAndCrateOnMove">
             <event>documentCreated</event>
             <event>documentModified</event>
             <event>lifecycle_transition_event</event>
