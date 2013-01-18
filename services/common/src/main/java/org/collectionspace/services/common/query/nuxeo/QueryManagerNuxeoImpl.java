@@ -68,6 +68,8 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	// HACK to work around Nuxeo regression that tokenizes on '.'. 
 	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%\\.]");
 	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
+	private static Pattern advSearchSqlWildcard = Pattern.compile(".*?[I]*LIKE\\s*\\\"\\%\\\".*?");
+
 
 	private static String getLikeForm(String dataSourceName, String repositoryName) {
 		if (SEARCH_LIKE_FORM == null) {
@@ -84,6 +86,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		}
 		return SEARCH_LIKE_FORM;
 	}
+    private String SQL_WILDCARD_CHAR = "%";
 
 	@Override
 	public String getDatasourceName() {
@@ -135,9 +138,14 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	public String createWhereClauseFromAdvancedSearch(String advancedSearch) {
 		String result = null;
 		//
-		// Process search term.  FIXME: REM - Do we need to perform and string filtering here?
+		// Process search term.  FIXME: REM - Do we need to perform any string filtering here?
 		//
 		if (advancedSearch != null && !advancedSearch.isEmpty()) {
+                        // Filtering of advanced searches on a single '%' char, per CSPACE-5828
+                    	Matcher regexMatcher = advSearchSqlWildcard.matcher(advancedSearch.trim());
+                        if (regexMatcher.matches()) {
+                            return "";
+                        }
 			StringBuffer advancedSearchWhereClause = new StringBuffer(
 					advancedSearch);
 			result = advancedSearchWhereClause.toString();
