@@ -49,17 +49,14 @@ import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
 import org.collectionspace.services.person.PersonAuthorityResource;
-import org.collectionspace.services.workflow.WorkflowResource;
+import org.collectionspace.services.article.ArticleResource;
 
 //import org.collectionspace.services.query.QueryResource;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 //import org.collectionspace.services.common.FileUtils;
@@ -71,11 +68,6 @@ import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.common.ResourceMapImpl;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
-import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-//import org.collectionspace.services.common.document.DocumentUtils;
-//import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
-//import org.collectionspace.services.common.profile.Profiler;
 
 /**
  * CollectionSpaceJaxRsApplication, the root application
@@ -106,7 +98,6 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new ServiceGroupResource());
         singletons.add(new ImportsResource());
 
-
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());
         addResourceToMapAndSingletons(new OrgAuthorityResource());
@@ -130,6 +121,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new BlobResource());
         addResourceToMapAndSingletons(new MovementResource());
         addResourceToMapAndSingletons(new ReportResource());
+        addResourceToMapAndSingletons(new ArticleResource());
 
         singletons.add(new IDResource());
         
@@ -146,7 +138,6 @@ public class CollectionSpaceJaxRsApplication extends Application
         resourceMap.put(resource.getServiceName(), resource);
     }
     
-
     @Override
     public Set<Class<?>> getClasses() {
         return empty;

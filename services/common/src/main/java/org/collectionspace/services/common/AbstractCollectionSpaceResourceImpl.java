@@ -46,7 +46,9 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
-import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.spi.HttpRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -498,4 +500,10 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         
         return result;
     }
+    
+	@Override
+	public boolean allowAnonymousAccess(HttpRequest request,
+			ResourceMethod method) {
+		return false;
+	}    
 }

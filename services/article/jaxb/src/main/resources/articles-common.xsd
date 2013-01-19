@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- ArticlesCommon XML Schema (XSD) Entity : ArticlesCommon Used for: JAXB 
+	binding between XML and Java objects $LastChangedRevision$ $LastChangedDate$ -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+	elementFormDefault="unqualified" xmlns:ns="http://collectionspace.org/services/article"
+	xmlns="http://collectionspace.org/services/article" targetNamespace="http://collectionspace.org/services/article"
+	version="0.1">
+
+	<!-- Avoid XmlRootElement nightmare: See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html -->
+	<xs:element name="articles_common">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="articleNumber" type="xs:string" />			<!-- An ID for the article (different than the CSID) -->
+				<xs:element name="articleContentUrl" type="xs:string" />		<!-- The URL of the article's content -->
+				<xs:element name="articleJobId" type="xs:string" />				<!-- The asynch job ID -if any -->
+				<xs:element name="articleSource" type="xs:string" />			<!-- The name of the service/resource that was used to create the article. -->
+				<xs:element name="articlePublisher" type="xs:string" />			<!-- The user who published the article -->
+				<xs:element name="accessExpirationDate" type="xs:dateTime" />	<!-- When the article is no longer available for access -->
+				<xs:element name="accessedCount" type="xs:integer" />			<!-- How many times the article has been accessed. -->
+				<xs:element name="accessCountLimit" type="xs:integer" />		<!-- The maximum times the article can be accessed. -->
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

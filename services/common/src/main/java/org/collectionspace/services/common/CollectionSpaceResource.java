@@ -28,6 +28,8 @@ import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.jboss.resteasy.core.ResourceMethod;
+import org.jboss.resteasy.spi.HttpRequest;
 
 /**
  * The Interface CollectionSpaceResource.
@@ -84,4 +86,14 @@ public interface CollectionSpaceResource<IT, OT> {
      */
     public ServiceContextFactory<IT, OT> getServiceContextFactory();
 
+    /*
+     * Returns true if this resource allow anonymous access.  It addition to returning 'true', this
+     * resources base URL path needs to be declared in the Spring Security config file's 'springSecurityFilterChain' bean.
+     * There needs to be a 'filter-chain' element something like the following:
+			<sec:filter-chain pattern="/articles/**"
+                              filters="none"/>
+     * See the "applicationContext-security.xml" file for details.
+     */
+	public boolean allowAnonymousAccess(HttpRequest request, ResourceMethod method);
+    
 }

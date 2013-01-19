@@ -47,14 +47,17 @@ import javax.security.auth.login.LoginException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.client.workflow.WorkflowClient;
+import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,13 +88,52 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
     private static final String ERROR_NUXEO_LOGOUT = "Attempt to logout when Nuxeo login context was null";
     private static final String ERROR_UNBALANCED_LOGINS = "The number of Logins vs Logouts to the Nuxeo framework was unbalanced.";    
 	
+    private boolean implementsInterface(Class<?> clazz, Class<?> interfaze) {
+    	boolean result = false;
+    	
+    	Class<?>[] interfaces = clazz.getInterfaces();
+    	for (Class<?> interfaceItem : interfaces) {
+    		if (interfaceItem.equals(interfaze)) {
+    			result = true;
+    			break;
+    		}
+    	}
+    	
+    	return result;
+    }
+    
+    private boolean isAnonymousRequest(HttpRequest request, ResourceMethod resourceMethod) {
+    	boolean result = false;
+    	
+		Class<?> resourceClass = resourceMethod.getResourceClass();
+		try {
+			CollectionSpaceResource resourceInstance = (CollectionSpaceResource)resourceClass.newInstance();
+			result = resourceInstance.allowAnonymousAccess(request, resourceMethod);
+		} catch (InstantiationException e) {
+			logger.error("isAnonymousRequest: ", e);
+		} catch (IllegalAccessException e) {
+			logger.error("isAnonymousRequest: ", e);
+		}
 
+    	return result;
+    }
+    
 	/* (non-Javadoc)
 	 * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest, org.jboss.resteasy.core.ResourceMethod)
 	 */
 	@Override
-	public ServerResponse preProcess(HttpRequest request, ResourceMethod method)
+	public ServerResponse preProcess(HttpRequest request, ResourceMethod resourceMethod)
 	throws Failure, WebApplicationException {
+		ServerResponse result = null; // A null value essentially means success for this method
+		
+		if (isAnonymousRequest(request, resourceMethod) == true) {
+			// We don't need to check credentials for anonymous requests.  Just login to Nuxeo and
+			// exit
+			nuxeoPreProcess(request, resourceMethod);
+
+			return result;
+		}
+		
 		final String servicesResource = "/cspace-services/"; // HACK - this is configured in war
 		final int servicesResourceLen = servicesResource.length();
 		String httpMethod = request.getHttpMethod();
@@ -151,7 +193,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			//
 			// Login to Nuxeo
 			//
-			nuxeoPreProcess(request, method);
+			nuxeoPreProcess(request, resourceMethod);
 			
 			//
 			// We've passed all the checks.  Now just log the results
@@ -163,7 +205,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 			}
 		}
 		
-		return null;
+		return result;
 	}
 	
 	@Override
@@ -228,7 +270,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	//
 	// Nuxeo login support
 	//
-	public ServerResponse nuxeoPreProcess(HttpRequest arg0, ResourceMethod arg1)
+	public ServerResponse nuxeoPreProcess(HttpRequest request, ResourceMethod resourceMethod)
 			throws Failure, WebApplicationException {
 		try {
 			nuxeoLogin();
