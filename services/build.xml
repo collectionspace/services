@@ -5,7 +5,7 @@
     <!-- set global properties for this build -->
     <property name="services.trunk" value=".."/>
     <property file="${services.trunk}/build.properties" />
-    <property name="mvn.opts" value="" />
+    <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
     <property name="javadoc.jar" value="org.collectionspace.services-javadoc.jar"/>
 
