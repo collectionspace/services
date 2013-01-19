@@ -1,7 +1,7 @@
 
 <project name="nuxeo-platform-cs-article" default="package" basedir=".">
     <description>
-        article nuxeo document type
+        Article nuxeo document type
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>

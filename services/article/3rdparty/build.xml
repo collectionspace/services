@@ -1,7 +1,7 @@
 
 <project name="article.3rdparty" default="package" basedir=".">
     <description>
-        article service 3rdparty
+        Article service 3rdparty
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
