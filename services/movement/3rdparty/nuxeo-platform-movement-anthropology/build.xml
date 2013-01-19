@@ -8,7 +8,7 @@
     <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
-    <property name="mvn.opts" value="" />
+    <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
     <property name="nuxeo.movement.jar"
         value="org.collectionspace.services.movement.3rdparty.anthropology.nuxeo-${cspace.release}.jar"/>
