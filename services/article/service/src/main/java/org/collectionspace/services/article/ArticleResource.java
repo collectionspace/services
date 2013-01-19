@@ -32,8 +32,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.UriInfo;
 
 @Path(ArticleClient.SERVICE_PATH)
 @Consumes("application/xml")
@@ -63,10 +68,17 @@ public class ArticleResource extends ResourceBase {
 			ResourceMethod method) {
 		return true;
 	}
+	
+    @GET
+    @Path("/published/{csid}")
+    @Produces("text/plain")
+    public byte[] getPublishedResource(
+            @Context Request request,    		
+            @Context UriInfo uriInfo,
+            @PathParam("csid") String csid) {
+    	return get(request, uriInfo, csid);
+    }
 }
-
-
-
 
 
 

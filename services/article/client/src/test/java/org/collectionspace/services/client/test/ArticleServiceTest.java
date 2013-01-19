@@ -585,17 +585,17 @@ public class ArticleServiceTest extends
 	 * @return the multipart output
 	 */
 	private PoxPayloadOut createArticleInstance(String identifier) {
-		return createArticleInstance("loaninNumber-" + identifier,
-				"returnDate-" + identifier);
+		return createArticleInstance("articleNumber-" + identifier,
+				"articleJobId-" + identifier);
 	}
 
 	/**
-	 * Creates the article instance.
+	 * Creates the Article instance.
 	 * 
-	 * @param loaninNumber
+	 * @param articleNumber
 	 *            the article number
-	 * @param returnDate
-	 *            the return date
+	 * @param articleJobId
+	 *            the article asynch job ID
 	 * @return the multipart output
 	 */
 	private PoxPayloadOut createArticleInstance(String articleNumber,
