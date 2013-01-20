@@ -6,6 +6,8 @@ package org.collectionspace.services.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -665,6 +667,22 @@ public class ServiceMain {
             		SERVER_HOME_PROPERTY + "' was not set.  Using \"" +
             		serverRootDir +
             		"\" instead.");
+        }
+        
+        if (logger.isErrorEnabled() == true) {
+        	System.out.println("+++ server root directory is: " + serverRootDir);
+        	try {
+				FileOutputStream appLayerRootHello = new FileOutputStream(serverRootDir + "webapps\\collectionspace\\hello");
+				try {
+					appLayerRootHello.write("Hello?".getBytes());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 

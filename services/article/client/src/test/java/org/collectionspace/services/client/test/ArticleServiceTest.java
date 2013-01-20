@@ -401,10 +401,9 @@ public class ArticleServiceTest extends
 					+ "\n" + "UTF-8 data received="
 					+ updatedArticleCommon.getArticleJobId());
 		}
-		Assert.assertTrue(
-				updatedArticleCommon.getArticleJobId().contains(
+		Assert.assertTrue(updatedArticleCommon.getArticleSource().contains(
 						getUTF8DataFragment()), "UTF-8 data retrieved '"
-						+ updatedArticleCommon.getArticleJobId()
+						+ updatedArticleCommon.getArticleSource()
 						+ "' does not contain expected data '"
 						+ getUTF8DataFragment());
 		Assert.assertEquals(updatedArticleCommon.getArticleJobId(),
@@ -604,6 +603,8 @@ public class ArticleServiceTest extends
 		ArticlesCommon articlesCommon = new ArticlesCommon();
 		articlesCommon.setArticleNumber(articleNumber);
 		articlesCommon.setArticleJobId(articleJobId);
+		articlesCommon.setArticleSource(getUTF8DataFragment());
+
 
 		PoxPayloadOut multipart = new PoxPayloadOut(
 				this.getServicePathComponent());
