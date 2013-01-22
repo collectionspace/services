@@ -38,6 +38,16 @@
             <artifactId>org.collectionspace.services.relation.client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.article.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.article.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- 
         <dependency>
 			<groupId>org.collectionspace.services</groupId>

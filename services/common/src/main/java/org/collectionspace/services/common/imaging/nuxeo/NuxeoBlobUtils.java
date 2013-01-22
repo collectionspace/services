@@ -80,6 +80,7 @@ import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
 import org.nuxeo.ecm.core.api.impl.DocumentModelImpl;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
+import org.nuxeo.ecm.core.api.impl.blob.InputStreamBlob;
 import org.nuxeo.ecm.core.api.impl.blob.StreamingBlob;
 import org.nuxeo.ecm.core.api.impl.blob.ByteArrayBlob;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -100,6 +101,9 @@ import org.slf4j.LoggerFactory;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.DimensionSubGroup;
@@ -110,6 +114,7 @@ import org.collectionspace.services.blob.MeasuredPartGroupList;
 //import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.extension.thumbnail.ThumbnailConstants;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.blob.BlobOutput;
@@ -118,13 +123,13 @@ import org.collectionspace.services.config.service.ListResultField;
 
 
 /**
- * The Class NuxeoImageUtils.
+ * The Class NuxeoBlobUtils.
  */
-public class NuxeoImageUtils {
+public class NuxeoBlobUtils {
 		
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory
-			.getLogger(NuxeoImageUtils.class);
+			.getLogger(NuxeoBlobUtils.class);
 
 	public static final String DOCUMENT_PLACEHOLDER_IMAGE = "documentImage.jpg";
 	public static final String DOCUMENT_MISSING_PLACEHOLDER_IMAGE = "documentImageMissing.jpg";
@@ -186,7 +191,7 @@ public class NuxeoImageUtils {
 	/**
 	 * Instantiates a new nuxeo image utils.
 	 */
-	NuxeoImageUtils() {
+	NuxeoBlobUtils() {
 		// empty constructor
 	}
 
@@ -295,13 +300,16 @@ public class NuxeoImageUtils {
 	static private boolean isImageMedia(Blob nuxeoBlob) {
 		boolean result = false;
 		
-		String mimeType = nuxeoBlob.getMimeType().toLowerCase().trim();
-		String[] parts = mimeType.split("/"); // split strings like "application/xml" into an array of two strings
-		if (parts.length == 2) {
-			for (String type : imageTypes) {
-				if (parts[1].equalsIgnoreCase(type)) {
-					result = true;
-					break;
+		String mimeType = nuxeoBlob.getMimeType();
+		if (mimeType != null) {
+			mimeType = mimeType.toLowerCase().trim();
+			String[] parts = mimeType.split("/"); // split strings like "application/xml" into an array of two strings
+			if (parts.length == 2) {
+				for (String type : imageTypes) {
+					if (parts[1].equalsIgnoreCase(type)) {
+						result = true;
+						break;
+					}
 				}
 			}
 		}
@@ -744,7 +752,68 @@ public class NuxeoImageUtils {
 		return result;
 	}
 	
+	static private RepositoryInstance getRepositorySession(ServiceContext ctx, RepositoryClient repositoryClient) {
+		RepositoryInstance result = null;		
+		RepositoryJavaClientImpl nuxeoClient = (RepositoryJavaClientImpl)repositoryClient;
+		
+		try {
+			result = nuxeoClient.getRepositorySession(ctx);
+		} catch (Exception e) {
+            logger.error("Could not get a repository session to the Nuxeo repository", e);
+		}
+		
+		return result;
+	}
+	
+	static private void releaseRepositorySession(ServiceContext ctx, RepositoryClient repositoryClient, RepositoryInstance repoSession) throws TransactionException {
+		RepositoryJavaClientImpl nuxeoClient = (RepositoryJavaClientImpl)repositoryClient;
+		nuxeoClient.releaseRepositorySession(ctx, repoSession);
+	}
+	
+	static public BlobsCommon createBlobInRepository(
+			ServiceContext ctx,
+			RepositoryClient repositoryClient,
+			InputStream inputStream,
+			String blobName) throws TransactionException {
+		BlobsCommon result = null;
 
+		boolean repoSessionCleanup = false;
+		RepositoryInstance repoSession = (RepositoryInstance)ctx.getCurrentRepositorySession();
+		if (repoSession == null) {
+			repoSession = getRepositorySession(ctx, repositoryClient);
+			repoSessionCleanup = true;
+		}
+		
+		String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
+		DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
+		
+		try {
+			DocumentModel blobLocation = repoSession.getDocument(nuxeoWspace);
+			Blob inputStreamBlob = new InputStreamBlob(inputStream);
+			String digestAlgorithm = getFileManagerService()
+					.getDigestAlgorithm(); // Only call this because we seem to need some way of initializing Nuxeo's FileManager with a call.
+			
+			logger.debug("Start --> Starting call to Nuxeo to create the blob document."); // For example, see Nuxeo's DefaultPictureAdapter class for details
+			DocumentModel documentModel = getFileManagerService()
+					.createDocumentFromBlob(repoSession, inputStreamBlob,
+							blobLocation.getPathAsString(), true,
+							blobName);
+			logger.debug("Stop --> Finished calling Nuxeo to create the blob document.");
+
+			result = createBlobsCommon(documentModel, inputStreamBlob); // Now create our metadata resource document
+
+		} catch (Exception e) {
+			result = null;
+			logger.error("Could not create new Nuxeo blob document.", e); //FIXME: REM - This should probably be re-throwing the exception?
+		} finally {
+			if (repoSessionCleanup == true) {
+				releaseRepositorySession(ctx, repositoryClient, repoSession);
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * Creates the picture.
 	 * 
@@ -800,7 +869,7 @@ public class NuxeoImageUtils {
 		
 		return result;
 	}
-
+	
 	/**
 	 * Creates the image blob.
 	 * 
@@ -900,6 +969,32 @@ public class NuxeoImageUtils {
 		return result;
 	}
 
+	static public BlobOutput getBlobOutput(ServiceContext ctx,
+			RepositoryClient repositoryClient,
+			String repositoryId,
+			StringBuffer outMimeType) throws TransactionException {
+		BlobOutput result = null;
+		
+		boolean repoSessionCleanup = false;
+		RepositoryInstance repoSession = (RepositoryInstance)ctx.getCurrentRepositorySession();
+		if (repoSession == null) {
+			repoSession = getRepositorySession(ctx, repositoryClient);
+			repoSessionCleanup = true;
+		}
+		
+		try {
+			result = getBlobOutput(ctx, repoSession, repositoryId, null, true, outMimeType);
+		}
+		
+		finally {
+			if (repoSessionCleanup == true) {
+				releaseRepositorySession(ctx, repositoryClient, repoSession);
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * Gets the image.
 	 * 

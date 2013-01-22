@@ -49,7 +49,6 @@ import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
 import org.collectionspace.services.person.PersonAuthorityResource;
-import org.collectionspace.services.article.ArticleResource;
 
 //import org.collectionspace.services.query.QueryResource;
 
@@ -66,6 +65,7 @@ import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.common.ResourceMapImpl;
+import org.collectionspace.services.common.article.ArticleResource;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
 
