@@ -27,7 +27,6 @@ import java.io.InputStream;
 
 import org.collectionspace.services.article.ArticlesCommon;
 import org.collectionspace.services.client.ArticleClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;

@@ -668,22 +668,6 @@ public class ServiceMain {
             		serverRootDir +
             		"\" instead.");
         }
-        
-        if (logger.isErrorEnabled() == true) {
-        	System.out.println("+++ server root directory is: " + serverRootDir);
-        	try {
-				FileOutputStream appLayerRootHello = new FileOutputStream(serverRootDir + "webapps\\collectionspace\\hello");
-				try {
-					appLayerRootHello.write("Hello?".getBytes());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
     }
 
 

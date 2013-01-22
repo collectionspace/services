@@ -82,7 +82,8 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 	public Response invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			String csid,
-			InvocationContext invContext) throws Exception {
+			InvocationContext invContext,
+			boolean isPublishing) throws Exception {
 		RepositoryInstance repoSession = null;
 		boolean releaseRepoSession = false;
 
@@ -175,11 +176,11 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 				repoClient.releaseRepositorySession(ctx, repoSession);
 			}
 		}
-       	return buildReportResponse(csid, params, reportFileName);
+       	return buildReportResponse(csid, params, reportFileName, isPublishing);
 	}
 
 
-    private Response buildReportResponse(String reportCSID, HashMap<String, Object> params, String reportFileName)
+    private Response buildReportResponse(String reportCSID, HashMap<String, Object> params, String reportFileName, boolean isPublishing)
     				throws Exception {
 		Connection conn = null;
 		Response response = null;
@@ -202,8 +203,12 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 			// export report to pdf and build a response with the bytes
 			byte[] pdfasbytes = JasperExportManager.exportReportToPdf(jasperprint);
 			
+			if (isPublishing == tru) {
+				
+			} else {
 			// Need to set response type for what is requested...
-	        response = Response.ok(pdfasbytes, "application/pdf").build();
+				response = Response.ok(pdfasbytes, "application/pdf").build();
+			}
 	
 	       	return response;    	
         } catch (SQLException sqle) {
