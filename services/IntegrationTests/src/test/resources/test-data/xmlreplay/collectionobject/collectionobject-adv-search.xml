@@ -48,7 +48,7 @@
         <!-- expected text within a single field in the extension schema part. -->
         <test ID="co2advsearch">
             <method>GET</method>
-            <uri>/cspace-services/collectionobjects?as=collectionobjects_naturalhistory%3AfieldLocVerbatim%3D'jlmbsoqjlmbsoq'</uri>
+            <uri>/cspace-services/collectionobjects?as=collectionobjects_naturalhistory%3AlabelHeader%3D'jlmbsoqjlmbsoq'</uri>
             <response>
                 <expected level="TEXT" />
                 <label>abstract-common-list</label>

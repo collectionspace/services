@@ -8,7 +8,7 @@
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
-    <property name="mvn.opts" value="" />
+    <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
     <property name="authorization-common.jar" value="cspace-services-authz-common.jar"/>
     <condition property="osfamily-unix">
