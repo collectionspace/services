@@ -8,7 +8,7 @@ package org.collectionspace.services;
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="articleNumber" type="xs:string" />			<!-- An ID for the article (different than the CSID) -->
-				<xs:element name="articleContentUrl" type="xs:string" />		<!-- The URL of the article's content -->
+				<xs:element name="articleContentCsid" type="xs:string" />		<!-- The URL of the article's content -->
 				<xs:element name="articleJobId" type="xs:string" />				<!-- The asynch job ID -if any -->
 				<xs:element name="articleSource" type="xs:string" />			<!-- The name of the service/resource that was used to create the article. -->
 				<xs:element name="articlePublisher" type="xs:string" />			<!-- The user who published the article -->
@@ -22,7 +22,7 @@ package org.collectionspace.services;
 
 public interface ArticlesCommonJAXBSchema {
     final static String ARTICLE_NUMBER = "articleNumber";
-    final static String ARTICLE_CONTENT_URL = "articleContentUrl";
+    final static String ARTICLE_CONTENT_CSID = "articleContentCsid";
     final static String ARTICLE_JOB_ID = "articleJobId";
     final static String ARTICLE_SOURCE = "articleSource";
     final static String ARTICLE_PUBLISHER = "articlePublisher";

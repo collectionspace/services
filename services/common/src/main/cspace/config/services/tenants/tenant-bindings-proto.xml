@@ -2926,8 +2926,8 @@
                             <service:xpath>articleNumber</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>articleContentUrl</service:element>
-                            <service:xpath>articleContentUrl</service:xpath>
+                            <service:element>articleContentCsid</service:element>
+                            <service:xpath>articleContentCsid</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>
                 </service:params>
@@ -2936,7 +2936,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>articleContentUrl</types:value>
+                    <types:value>articleContentCsid</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>

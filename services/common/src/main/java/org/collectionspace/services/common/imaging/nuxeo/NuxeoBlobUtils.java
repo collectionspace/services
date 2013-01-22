@@ -984,9 +984,12 @@ public class NuxeoBlobUtils {
 		
 		try {
 			result = getBlobOutput(ctx, repoSession, repositoryId, null, true, outMimeType);
-		}
-		
-		finally {
+			if (outMimeType.length() == 0) {
+				BlobsCommon blobsCommon = result.getBlobsCommon();
+				String mimeType = blobsCommon.getMimeType();
+				outMimeType.append(mimeType);
+			}			
+		} finally {
 			if (repoSessionCleanup == true) {
 				releaseRepositorySession(ctx, repositoryClient, repoSession);
 			}
