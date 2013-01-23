@@ -23,10 +23,12 @@
  */
 package org.collectionspace.services.report.nuxeo;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -34,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import javax.naming.NamingException;
 import javax.ws.rs.WebApplicationException;
@@ -94,16 +95,17 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     private static String REPORTS_STD_CSIDLIST_PARAM = "csidlist";
     private static String REPORTS_STD_TENANTID_PARAM = "tenantid";
 	
-	public Response invokeReport(
+	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			String csid,
-			InvocationContext invContext) throws Exception {
+			InvocationContext invContext,
+			StringBuffer outMimeType,
+			StringBuffer outReportFileName) throws Exception {
 		RepositoryInstance repoSession = null;
 		boolean releaseRepoSession = false;
 
 		String invocationMode = invContext.getMode();
 		String modeProperty = null;
-		String outputMimeType = ReportClient.DEFAULT_REPORT_OUTPUT_MIME;
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(REPORTS_STD_TENANTID_PARAM, ctx.getTenantId());
 		boolean checkDocType = true;
@@ -154,8 +156,8 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 			releaseRepoSession = true;
 		}
 
-		String reportFileName = null;
 		// Get properties from the batch docModel, and release the session
+		String reportFileNameProperty;
 		try {
 			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
 			DocumentModel docModel = wrapper.getWrappedObject();
@@ -175,10 +177,12 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 	        				+invContext.getDocType());
 	        	}
 	    	}
-			reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
+	    	reportFileNameProperty = ((String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME)); // Set the outgoing param with the report file name
 			String reportOutputMime = (String)docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
 			if(!Tools.isEmpty(reportOutputMime)) {
-				outputMimeType = reportOutputMime;
+				outMimeType.append(reportOutputMime);
+			} else {
+				outMimeType.append(ReportClient.DEFAULT_REPORT_OUTPUT_MIME);
 			}
 		} catch (PropertyException pe) {
 			if (logger.isDebugEnabled()) {
@@ -200,7 +204,8 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 				repoClient.releaseRepositorySession(ctx, repoSession);
 			}
 		}
-       	return buildReportResponse(csid, params, reportFileName, outputMimeType);
+		
+       	return buildReportResult(csid, params, reportFileNameProperty, outMimeType.toString(), outReportFileName);
 	}
 	
 	private void setParamsFromContext(Map<String, Object> params, InvocationContext invContext) {
@@ -220,13 +225,12 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 		
 	}
 
-
-
-    private Response buildReportResponse(String reportCSID, 
-    		HashMap<String, Object> params, String reportFileName, String outputMimeType)
+    private InputStream buildReportResult(String reportCSID, 
+    		HashMap<String, Object> params, String reportFileName, String outputMimeType, StringBuffer outReportFileName)
     				throws Exception {
 		Connection conn = null;
-		Response response = null;
+		InputStream result = null;
+		
     	try {
 			String fullPath = ServiceMain.getInstance().getServerRootDir() +
 								File.separator + ConfigReader.CSPACE_DIR_NAME + 
@@ -279,20 +283,16 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, "\t");
 				outputFilename = outputFilename+".csv";
 			}
+			outReportFileName.append(outputFilename); // Set the out going param to the report's final file name
 	        // fill the report
 			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
 				
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
 			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
 			exporter.exportReport();
-			byte[] reportAsBytes = baos.toByteArray();
-
-			// Need to set response type for what is requested...
-			ResponseBuilder builder = Response.ok(reportAsBytes, outputMimeType);
-			builder = builder.header("Content-Disposition","inline;filename=\""+outputFilename+"\"");
-	        response = builder.build();
+			result = new ByteArrayInputStream(baos.toByteArray());
 	
-	       	return response;    	
+	       	return result;
         } catch (SQLException sqle) {
             // SQLExceptions can be chained. We have at least one exception, so
             // set up a loop to make sure we let the user know about all of them
@@ -306,7 +306,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 	                tempException = tempException.getNextException();
 	            }
             }
-            response = Response.status(
+            Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
             throw new WebApplicationException(response);
@@ -314,7 +314,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             if (logger.isDebugEnabled()) {
             	logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: "+jre.getCause());
             }
-            response = Response.status(
+            Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
             throw new WebApplicationException(response);
@@ -322,7 +322,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             if (logger.isDebugEnabled()) {
             	logger.debug("FileNotFoundException: " + fnfe.getLocalizedMessage());
             }
-            response = Response.status(
+            Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
             throw new WebApplicationException(response);

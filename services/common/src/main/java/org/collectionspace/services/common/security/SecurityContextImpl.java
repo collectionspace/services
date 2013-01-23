@@ -27,8 +27,10 @@
  */
 package org.collectionspace.services.common.security;
 
+import javax.ws.rs.core.UriInfo;
+
 import org.collectionspace.authentication.AuthN;
-import org.collectionspace.authentication.CSpaceTenant;
+import org.collectionspace.authentication.spi.AuthNContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,11 +44,38 @@ public class SecurityContextImpl implements SecurityContext {
     private String userId;
     private String currentTenantName;
     private String currentTenantId;
+    
+    private String getTenantId(UriInfo uriInfo) throws UnauthorizedException {
+    	String result = AuthN.get().getCurrentTenantId();
+    	
+    	String userId = AuthN.get().getUserId();
+        if (userId.equals(AuthNContext.ANONYMOUS_USER) == true) {
+            //
+            // If anonymous access is being attempted, then a tenant ID needs to be set as a query param
+            //        	
+        	if (uriInfo == null) {
+        		String errMsg = "Anonymous access attempted without a valid tenant ID query paramter.  A null 'UriInfo' instance was passed into the service context constructor.";
+        		logger.error(errMsg);
+        		throw new UnauthorizedException(errMsg);
+        	}
+        	
+        	String tenantId = uriInfo.getQueryParameters().getFirst(AuthNContext.TENANT_ID_QUERY_PARAM);
+        	if (tenantId == null) {
+        		String errMsg = String.format("Anonymous access to '%s' attempted without a valid tenant ID query paramter.",
+        				uriInfo.getPath());
+        		logger.error(errMsg);
+        		throw new UnauthorizedException(errMsg);
+        	}
+	        result = tenantId;
+        }
+        
+        return result;
+    }
 
-    public SecurityContextImpl() {
+    public SecurityContextImpl(UriInfo uriInfo) throws UnauthorizedException {
         userId = AuthN.get().getUserId();
-        currentTenantId = AuthN.get().getCurrentTenantId();
-        currentTenantName = AuthN.get().getCurrentTenantName();
+        currentTenantId = getTenantId(uriInfo);               
+        currentTenantName = AuthN.get().getCurrentTenantName();        
     }
 
     @Override

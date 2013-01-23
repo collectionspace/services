@@ -71,11 +71,12 @@
         <module>contact</module>
         <module>workflow</module>
         <module>media</module>
-        <module>JaxRsServiceProvider</module>
+        <module>article</module>        
         <!--module>sdk</module-->
         <module>IntegrationTests</module>
         <module>PerformanceTests</module>
         <module>security</module>
+        <module>JaxRsServiceProvider</module>
     </modules>
 
     <dependencies>

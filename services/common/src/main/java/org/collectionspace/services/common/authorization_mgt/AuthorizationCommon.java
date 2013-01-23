@@ -123,9 +123,9 @@ public class AuthorizationCommon {
     public static final String DEFAULT_ADMIN_PASSWORD = "Administrator";
     public static final String DEFAULT_READER_PASSWORD = "reader";
 
-    public static String ROLE_SPRING_ADMIN_ID = "-1";
-    public static String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";
-
+    public static final String ROLE_SPRING_ADMIN_ID = "-1";
+    public static final String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";
+    
     // SQL for init tasks
 	final private static String INSERT_ACCOUNT_ROLE_SQL_MYSQL = 
 			"INSERT INTO accounts_roles(account_id, user_id, role_id, role_name, created_at)"

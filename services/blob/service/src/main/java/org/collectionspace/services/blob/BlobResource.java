@@ -23,24 +23,36 @@
  */
 package org.collectionspace.services.blob;
 
+import org.collectionspace.services.article.ArticlesCommon;
+import org.collectionspace.services.client.ArticleClient;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.article.ArticleResource;
+import org.collectionspace.services.common.article.ArticleUtil;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
+import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentRef;
+import org.nuxeo.ecm.core.api.IdRef;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -50,11 +62,15 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
+
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 //FIXME: REM - We should not have Nuxeo dependencies in our resource classes.
 
@@ -110,11 +126,13 @@ public class BlobResource extends ResourceBase {
     	return result;
     }
     
-    private InputStream getBlobContent(String csid, String derivativeTerm, StringBuffer outMimeType) throws WebApplicationException {
+    private InputStream getBlobContent(ServiceContext ctx,
+    		String csid, 
+    		String derivativeTerm, 
+    		StringBuffer outMimeType) throws WebApplicationException {
     	InputStream result = null;
     	
     	try {
-	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 	    	blobInput.setDerivativeTerm(derivativeTerm);
 	    	blobInput.setContentRequested(true);
@@ -236,14 +254,46 @@ public class BlobResource extends ResourceBase {
     @Path("{csid}/content")
     public Response getBlobContent(	@PathParam("csid") String csid) {
     	Response result = null;
-
-    	StringBuffer mimeType = new StringBuffer();
-    	InputStream contentStream = getBlobContent(csid, null /*derivative term*/, mimeType /*will get set*/);
-	    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
-	    
-    	result = responseBuilder.build();
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+    	
+    	try {
+	    	ctx = createServiceContext();
+	    	
+	    	StringBuffer mimeType = new StringBuffer();
+	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);
+		    
+	    	Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+	    	result = responseBuilder.build();
+    	} catch (Exception e) {
+    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+    	}
+    	
     	return result;
     }
+    
+    /*
+     * Publish the blob content.
+     */
+    @GET
+    @Path("{csid}/content/publish")
+    public Response publishBlobContent(
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo uriInfo,
+    		@PathParam("csid") String csid) {
+    	Response result = null;
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+    	
+    	try {
+			ctx = createServiceContext();
+	    	StringBuffer mimeType = new StringBuffer();
+	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);	    	
+	    	result = ArticleUtil.publishToRepository(resourceMap, uriInfo, getRepositoryClient(ctx), ctx, contentStream, csid);
+    	} catch (Exception e) {
+    		throw bigReThrow(e, ServiceMessages.PUT_FAILED);
+    	}
+    	
+    	return result;
+    }    
 
     @GET
     @Path("{csid}/derivatives/{derivativeTerm}/content")
@@ -251,13 +301,21 @@ public class BlobResource extends ResourceBase {
     		@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
     	Response result = null;
+    	ServiceContext ctx = null;
     	
-    	StringBuffer mimeType = new StringBuffer();
-    	InputStream contentStream = getBlobContent(csid, derivativeTerm, mimeType);
-	    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
-	    
-    	result = responseBuilder.build();
-    	return result;
+	    	try {
+		    	ctx = createServiceContext();
+
+		    	StringBuffer mimeType = new StringBuffer();
+		    	InputStream contentStream = getBlobContent(ctx, csid, derivativeTerm, mimeType);
+			    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+			    
+		    	result = responseBuilder.build();
+	    	} catch (Exception e) {
+	    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+	    	}
+	    	
+	    return result;
     }
     
     @GET

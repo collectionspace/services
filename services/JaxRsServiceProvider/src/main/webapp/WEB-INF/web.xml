@@ -10,10 +10,12 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">    
     <display-name>CollectionSpace Services</display-name>
     	
+    <!-- 
     <login-config>
         <auth-method>BASIC</auth-method>
         <realm-name>CollectionSpace realm</realm-name>
     </login-config>
+     -->
 
 	<env-entry>
         <description>Sets the logging context for the Tiger web-app</description>
@@ -57,6 +59,7 @@
 		<filter-name>CSpaceFilter</filter-name>
         <filter-class>org.collectionspace.services.common.profile.CSpaceFilter</filter-class>
 	</filter>
+	
 	<filter-mapping>
 		<filter-name>CSpaceFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -109,11 +112,21 @@
             <servlet-class>
                 org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
             </servlet-class>
-    </servlet>
-    
+    </servlet>    
     <servlet-mapping>
         <servlet-name>Resteasy</servlet-name>
         <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+            <servlet-name>PublishedResourcesServlet</servlet-name>
+            <servlet-class>
+                org.collectionspace.services.common.servlet.PublishedResourcesServlet
+            </servlet-class>
+    </servlet>    
+    <servlet-mapping>
+        <servlet-name>PublishedResourcesServlet</servlet-name>
+        <url-pattern>/published/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

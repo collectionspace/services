@@ -25,11 +25,14 @@ package org.collectionspace.services.client.test;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.Response;
+
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
+import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
@@ -59,6 +62,42 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     // Instance variables specific to this test.    
     private String testDocType = "Acquisition";
 
+    @Test(dataProvider = "testName", dependsOnMethods = {"create"})    
+    public void publishReportInstance(String testName) throws Exception {
+        // Perform setup.
+        setupCreate();
+
+        // Submit the request to the service and store the response.
+        ReportClient client = (ReportClient)this.getClientInstance();
+        
+        createReportInstance()
+    	
+    	//
+    	// Hard coded for now, but need to create this test in the Integration test area where
+    	// we'll create an Acquisition instance for this test
+    	//
+    	InvocationContext invocationContext = new InvocationContext();
+    	invocationContext.setDocType("Acquisition");
+    	invocationContext.setMode("single");
+    	invocationContext.setSingleCSID("34abdc63-944c-421d-a585");
+    	
+    	String reportCsid = "8680d49c-99b8-4788-aa45";
+        ClientResponse<Response> res = client.publishReport(reportCsid, invocationContext);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(testRequestType, statusCode));
+        Assert.assertEquals(statusCode, testExpectedStatusCode);
+
+        String articleCsid = extractId(res);
+        Assert.assertNotNull(articleCsid);
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */

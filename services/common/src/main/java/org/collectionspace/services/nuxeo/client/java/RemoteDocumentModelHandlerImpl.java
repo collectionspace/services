@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
+import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
@@ -324,8 +325,9 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             addOutputPart(unQObjectProperties, schema, partMeta);
         }
         
+        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
+
         if (supportsHierarchy() == true) {
-            MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
             String showSiblings = ctx.getQueryParams().getFirst(CommonAPI.showSiblings_QP);
             if (Tools.isTrue(showSiblings)) {
                 showSiblings(wrapDoc, ctx);
@@ -345,7 +347,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             }
         }
         
-        addAccountPermissionsPart();
+        String currentUser = ctx.getUserId();
+        if (currentUser.equalsIgnoreCase(AuthNContext.ANONYMOUS_USER) == false) {
+        	addAccountPermissionsPart();
+        }
     }
     
     private void addExtraCoreValues(DocumentModel docModel, Map<String, Object> unQObjectProperties)
