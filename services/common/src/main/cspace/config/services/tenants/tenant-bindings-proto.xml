@@ -1437,6 +1437,10 @@
                   <service:element>claimNumber</service:element>
                   <service:xpath>claimNumber</service:xpath>
                 </service:ListResultField>
+                <service:ListResultField>
+                  <service:element>filedOnBehalfOf</service:element>
+                  <service:xpath>claimClaimantGroupList/[0]/filedOnBehalfOf</service:xpath>
+                </service:ListResultField>
               </service:ListResultsFields>
             </service:params>
           </service:DocHandlerParams>
