@@ -22,11 +22,16 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.acquisition.AcquisitionSourceList;
+import org.collectionspace.services.acquisition.AcquisitionsCommon;
+import org.collectionspace.services.acquisition.StructuredDateGroup;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -35,6 +40,7 @@ import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.client.AcquisitionClient;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
@@ -62,15 +68,56 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     // Instance variables specific to this test.    
     private String testDocType = "Acquisition";
 
+    private String createAquisitionResource() {
+    	String result = null;
+    	
+    	AcquisitionClient acquisitionClient = new AcquisitionClient();
+    	AcquisitionsCommon acquisitionsCommon = new AcquisitionsCommon();
+    	acquisitionsCommon.setAcquisitionReason("It was nice.");
+    	acquisitionsCommon.setOriginalObjectPurchasePriceValue(new BigDecimal(500));
+    	acquisitionsCommon.setAcquisitionReferenceNumber("2013.003.0004");
+    	
+    	AcquisitionSourceList asl = new AcquisitionSourceList();
+    	List<String> sourceList = asl.getAcquisitionSource();
+    	sourceList.add("The Jim Henson Legacy");
+    	acquisitionsCommon.setAcquisitionSources(asl);
+    	
+    	StructuredDateGroup sdg = new StructuredDateGroup();
+    	sdg.setDateDisplayDate("12/12/2012");
+    	acquisitionsCommon.setAccessionDateGroup(sdg);
+    	
+        PoxPayloadOut poxPayloadOut = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = poxPayloadOut.addPart(acquisitionClient.getCommonPartName(), acquisitionsCommon);
+        ClientResponse<Response> res = acquisitionClient.create(poxPayloadOut);
+    	try {
+            setupCreate();
+	        int statusCode = res.getStatus();
+	        if (logger.isDebugEnabled()) {
+	            logger.debug(this.getClass().getCanonicalName() + ": HTTP status = " + statusCode);
+	        }
+	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(testRequestType, statusCode));
+	        Assert.assertEquals(statusCode, testExpectedStatusCode);
+	
+	        result = extractId(res);
+	        // Store the IDs from every resource created by tests,
+	        // so they can be deleted after tests have been run.
+	        allResourceIdsCreated.add(result);
+    	} finally {
+    		res.releaseConnection();
+    	}
+    	
+    	return result;
+    }
+    
     @Test(dataProvider = "testName", dependsOnMethods = {"create"})    
     public void publishReportInstance(String testName) throws Exception {
         // Perform setup.
-        setupCreate();
 
         // Submit the request to the service and store the response.
         ReportClient client = (ReportClient)this.getClientInstance();
-        
-        createReportInstance()
+        String reportCsid = createResource(testName, this.getKnowResourceIdentifier());
+    	String acquisitionCsid = createAquisitionResource();
     	
     	//
     	// Hard coded for now, but need to create this test in the Integration test area where
@@ -79,11 +126,11 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
     	InvocationContext invocationContext = new InvocationContext();
     	invocationContext.setDocType("Acquisition");
     	invocationContext.setMode("single");
-    	invocationContext.setSingleCSID("34abdc63-944c-421d-a585");
+    	invocationContext.setSingleCSID(acquisitionCsid);
     	
-    	String reportCsid = "8680d49c-99b8-4788-aa45";
         ClientResponse<Response> res = client.publishReport(reportCsid, invocationContext);
         int statusCode = res.getStatus();
+        setupCreate();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
