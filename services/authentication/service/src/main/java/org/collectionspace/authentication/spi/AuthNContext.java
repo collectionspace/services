@@ -38,6 +38,8 @@ public abstract class AuthNContext {
 	public static final String ANONYMOUS_TENANT_NAME = ANONYMOUS_USER;
     public static final String SPRING_ADMIN_USER = "SPRING_ADMIN";
     public static final String TENANT_ID_QUERY_PARAM = "tid";
+    public static final String TENANT_ID_PATH_PARAM = "tenantId";
+
 	
     /**
      * getUserId returns authenticated user id

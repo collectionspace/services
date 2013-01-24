@@ -287,7 +287,8 @@ public class BlobResource extends ResourceBase {
 			ctx = createServiceContext();
 	    	StringBuffer mimeType = new StringBuffer();
 	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);	    	
-	    	result = ArticleUtil.publishToRepository(resourceMap, uriInfo, getRepositoryClient(ctx), ctx, contentStream, csid);
+	    	result = ArticleUtil.publishToRepository((ArticlesCommon)null, resourceMap, uriInfo, 
+	    			getRepositoryClient(ctx), ctx, contentStream, csid);
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.PUT_FAILED);
     	}

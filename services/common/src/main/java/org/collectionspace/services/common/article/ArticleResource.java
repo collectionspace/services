@@ -25,6 +25,7 @@ package org.collectionspace.services.common.article;
 
 import java.io.InputStream;
 
+import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.article.ArticlesCommon;
 import org.collectionspace.services.client.ArticleClient;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -80,11 +81,12 @@ public class ArticleResource extends ResourceBase {
 	}
 	
     @GET
-    @Path("/published/{csid}")
+    @Path("/{csid}/{tenantId}/published")
     public Response getPublishedResource(
             @Context Request request,
             @Context UriInfo uriInfo,
-            @PathParam("csid") String csid) {
+            @PathParam("csid") String csid,
+            @PathParam(AuthNContext.TENANT_ID_PATH_PARAM) String tenantId) {
     	Response result = null;
 
         try {

@@ -59,7 +59,8 @@ public class SecurityContextImpl implements SecurityContext {
         		throw new UnauthorizedException(errMsg);
         	}
         	
-        	String tenantId = uriInfo.getQueryParameters().getFirst(AuthNContext.TENANT_ID_QUERY_PARAM);
+//        	String tenantId = uriInfo.getQueryParameters().getFirst(AuthNContext.TENANT_ID_QUERY_PARAM);
+        	String tenantId = uriInfo.getPathParameters().getFirst(AuthNContext.TENANT_ID_PATH_PARAM);
         	if (tenantId == null) {
         		String errMsg = String.format("Anonymous access to '%s' attempted without a valid tenant ID query paramter.",
         				uriInfo.getPath());

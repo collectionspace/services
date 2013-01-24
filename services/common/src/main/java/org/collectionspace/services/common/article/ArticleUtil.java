@@ -18,14 +18,40 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 
 public class ArticleUtil {
 	
-	public static Response publishToRepository(ResourceMap resourceMap,
+	/*
+	 * Sets common fields for an ArticlesCommon instance
+	 */
+	private static ArticlesCommon setArticlesCommonMetadata(
+			ArticlesCommon articlesCommon,
+			UriInfo uriInfo,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx) {
+		ArticlesCommon result = articlesCommon;
+		
+		if (result == null) {
+			result = new ArticlesCommon(); // If they passed in null, we'll create a new instance
+		}
+		
+    	String publishingService = parentCtx.getServiceName(); // Overrides any existing value
+    	result.setArticleSource(publishingService);
+    	
+    	String articleContentUrl = "the public url goes here";
+    	result.setArticleContentUrl(articleContentUrl);
+		
+		return result;
+	}
+	
+	/*
+	 * Publishes a PoxPayloadOut instance for public access
+	 */
+	public static Response publishToRepository(
+			ArticlesCommon articlesCommon,
+			ResourceMap resourceMap,
     		UriInfo uriInfo,
-    		ServiceContext parentCtx,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
 			PoxPayloadOut poxPayloadOut) {
 		Response result = null;
 		
-    	ArticlesCommon articlesCommon = new ArticlesCommon();
-    	articlesCommon.setArticlePublisher("Hello, this is a test.");
+    	articlesCommon = setArticlesCommonMetadata(articlesCommon, uriInfo, parentCtx);
     	PoxPayloadIn input = new PoxPayloadIn(ArticleClient.SERVICE_PAYLOAD_NAME, articlesCommon, 
     			ArticleClient.SERVICE_COMMON_PART_NAME);
     	    	
@@ -35,19 +61,25 @@ public class ArticleUtil {
 		return result;
 	}
 	
-	public static Response publishToRepository(ResourceMap resourceMap,
+	/*
+	 * Publishes a a byte stream for public access
+	 */
+	public static Response publishToRepository(
+			ArticlesCommon articlesCommon,
+			ResourceMap resourceMap,
     		UriInfo uriInfo,
-    		RepositoryClient repositoryClient,
-    		ServiceContext parentCtx,
+    		RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
 			InputStream inputStream,
 			String streamName) throws TransactionException {
 		Response result = null;
 		
     	BlobsCommon blobsCommon = NuxeoBlobUtils.createBlobInRepository(parentCtx, repositoryClient, inputStream, streamName);
 		
-    	ArticlesCommon articlesCommon = new ArticlesCommon();
-    	articlesCommon.setArticlePublisher(parentCtx.getUserId());
+    	articlesCommon = setArticlesCommonMetadata(articlesCommon, uriInfo, parentCtx);
     	articlesCommon.setArticleContentCsid(blobsCommon.getRepositoryId());
+    	articlesCommon.setArticleContentName(streamName);
+    	
     	PoxPayloadOut poxPayloadOut = new PoxPayloadOut(ArticleClient.SERVICE_PAYLOAD_NAME);
     	poxPayloadOut.addPart(ArticleClient.SERVICE_COMMON_PART_NAME, articlesCommon);
     	
