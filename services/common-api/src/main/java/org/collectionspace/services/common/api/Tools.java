@@ -123,6 +123,8 @@ public class Tools {
 
     static boolean m_fileSystemIsDOS = "\\".equals(File.separator);
     static boolean m_fileSystemIsMac = ":".equals(File.separator);
+    
+    public final static String FILE_EXTENSION_SEPARATOR = ".";
 
     public static boolean fileSystemIsDOS(){return m_fileSystemIsDOS;}
     public static boolean fileSystemIsMac(){return m_fileSystemIsMac;}
@@ -153,6 +155,19 @@ public class Tools {
         }
         return dir + file;
     }
+    
+    public static String getFilenameExtension(String filename) {
+        int dot = filename.lastIndexOf(FILE_EXTENSION_SEPARATOR);
+        return (dot>=0)?filename.substring(dot + 1):null;
+        }
+
+    public static String getFilenameBase(String filename) {
+        int dot = filename.lastIndexOf(FILE_EXTENSION_SEPARATOR);
+        if(dot<0)
+        	dot = filename.length();
+        int sep = filename.lastIndexOf(File.separator); // Note: if -1, then sep+1=0, which is right
+        return filename.substring(sep + 1, dot);
+        }
 
     public static String getStackTrace(Throwable e){
         return getStackTrace(e, -1);

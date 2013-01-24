@@ -44,6 +44,7 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -53,6 +54,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRXmlExporter;
 
+import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -228,18 +230,39 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 		Connection conn = null;
 		Response response = null;
     	try {
-			String fullPath = ServiceMain.getInstance().getServerRootDir() +
+    		String fileNameBase = Tools.getFilenameBase(reportFileName);
+    		String compiledReportFilename = fileNameBase+ReportClient.COMPILED_REPORT_EXTENSION;
+    		String reportDescriptionFilename = fileNameBase+ReportClient.REPORT_DECSRIPTION_EXTENSION;
+    		
+			String basePath = ServiceMain.getInstance().getServerRootDir() +
 								File.separator + ConfigReader.CSPACE_DIR_NAME + 
 								File.separator + REPORTS_FOLDER +
 								// File.separator + tenantName +
-								File.separator + reportFileName;
+								File.separator; // + reportFileName;
+			
+			String compiledFilePath = basePath+compiledReportFilename; 
+			File f = new File(compiledFilePath);
+			if(!f.exists()) { // Need to compile the file
+				// First verify that there is a source file.
+				String sourceFilePath = basePath+reportDescriptionFilename; 
+				File f2 = new File(sourceFilePath);
+				if(!f2.exists()) { // Missing source file - error!
+					logger.error("Report for csid={} is missing the specified source file: {}",
+									reportCSID, sourceFilePath);
+					throw new RuntimeException("Report is missing the specified source file!");
+				}
+            	logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
+            			reportCSID, compiledFilePath);
+            	JasperCompileManager.compileReportToFile(sourceFilePath, compiledFilePath);
+			}				
+				
 			conn = getConnection();
 	
             if (logger.isTraceEnabled()) {
             	logger.trace("ReportResource for csid=" + reportCSID
-            			+" output as "+outputMimeType+" using report file: "+fullPath);
+            			+" output as "+outputMimeType+" using report file: "+compiledFilePath);
             }
-			FileInputStream fileStream = new FileInputStream(fullPath);
+			FileInputStream fileStream = new FileInputStream(compiledFilePath);
 	
 			// export report to pdf and build a response with the bytes
 			//JasperExportManager.exportReportToPdf(jasperprint);
