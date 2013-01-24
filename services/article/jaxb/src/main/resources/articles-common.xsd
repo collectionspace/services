@@ -13,15 +13,15 @@
 	<xs:element name="articles_common">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="articleNumber" type="xs:string" />			<!-- An ID for the article (different than the CSID) -->
-				<xs:element name="articleContentName" type="xs:string" />
-				<xs:element name="articleContentCsid" type="xs:string" />		<!-- The URL of the article's content -->
-				<xs:element name="articleContentUrl" type="xs:string" />		<!-- The URL of the article's content -->
-				<xs:element name="articleJobId" type="xs:string" />				<!-- The asynch job ID -if any -->
-				<xs:element name="articleSource" type="xs:string" />			<!-- The name of the service/resource that was used to create the article. -->
-				<xs:element name="accessExpirationDate" type="xs:dateTime" />	<!-- When the article is no longer available for access -->
-				<xs:element name="accessedCount" type="xs:integer" />			<!-- How many times the article has been accessed. -->
-				<xs:element name="accessedCountLimit" type="xs:integer" />		<!-- The maximum times the article can be accessed. -->
+				<xs:element name="articleNumber" type="xs:string" />				<!-- An identifier for the article (different than the CSID) -->
+				<xs:element name="articleContentName" type="xs:string" />			<!-- A name for the article's content  -->
+				<xs:element name="articleContentRepositoryId" type="xs:string" />	<!-- The backend repository ID of the article's content -->
+				<xs:element name="articleContentUrl" type="xs:string" />			<!-- The publicly accessible URL of the article's content -->	
+				<xs:element name="articleJobId" type="xs:string" />					<!-- The asynch job ID -if any -->
+				<xs:element name="articleSource" type="xs:string" />				<!-- The name of the service/resource that was used to create the article. -->
+				<xs:element name="accessExpirationDate" type="xs:dateTime" />		<!-- When the article is no longer available for access -->
+				<xs:element name="accessedCount" type="xs:integer" />				<!-- How many times the article has been accessed. -->
+				<xs:element name="accessedCountLimit" type="xs:integer" />			<!-- The maximum times the article can be accessed. -->
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

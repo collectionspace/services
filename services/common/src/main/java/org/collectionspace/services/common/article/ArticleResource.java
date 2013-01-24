@@ -81,7 +81,7 @@ public class ArticleResource extends ResourceBase {
 	}
 	
     @GET
-    @Path("/{csid}/{tenantId}/published")
+    @Path("/{csid}/{tenantId}/" + ArticleClient.PUBLICITEMS_CONTENT_SUFFIX) // "content"
     public Response getPublishedResource(
             @Context Request request,
             @Context UriInfo uriInfo,
@@ -99,7 +99,7 @@ public class ArticleResource extends ResourceBase {
 			//
 			// Get the repository blob ID and retrieve the content as a stream
 			//
-			String blobContentCsid = articlesCommon.getArticleContentCsid();
+			String blobContentCsid = articlesCommon.getArticleContentRepositoryId();
 			StringBuffer outMimeType = new StringBuffer();
 			BlobOutput blobOutput = NuxeoBlobUtils.getBlobOutput(ctx, getRepositoryClient(ctx), blobContentCsid, outMimeType);
 			InputStream contentStream = blobOutput.getBlobInputStream();

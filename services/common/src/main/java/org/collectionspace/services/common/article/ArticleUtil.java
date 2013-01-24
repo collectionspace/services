@@ -31,12 +31,20 @@ public class ArticleUtil {
 			result = new ArticlesCommon(); // If they passed in null, we'll create a new instance
 		}
 		
-    	String publishingService = parentCtx.getServiceName(); // Overrides any existing value
-    	result.setArticleSource(publishingService);
+		String articleSource = result.getArticleSource();
+		if (articleSource == null || articleSource.trim().isEmpty()) {
+	    	String publishingService = parentCtx.getServiceName(); // Overrides any existing value
+	    	result.setArticleSource(publishingService);
+		}
     	
-    	String articleContentUrl = "the public url goes here";
-    	result.setArticleContentUrl(articleContentUrl);
-		
+    	String publicUrl = String.format("%s%s/%s/%s/%s",	// e.g., http://{base url}/articles/{csid}/{tenant ID}/content
+    			uriInfo.getBaseUri().toString(), 			// the base part of the URL
+    			ArticleClient.SERVICE_NAME,					// the base service path to the Article service
+    			ArticleClient.CSID_PATH_PARAM_VAR,			// the {csid} param part that will be filled in later in ArticleDocumentModelHandler.fillAllParts() method
+    			parentCtx.getTenantId(),					// the tenant ID part
+    			ArticleClient.PUBLICITEMS_CONTENT_SUFFIX);	// the final "content" suffix
+    	result.setArticleContentUrl(publicUrl);
+    	
 		return result;
 	}
 	
@@ -77,7 +85,7 @@ public class ArticleUtil {
     	BlobsCommon blobsCommon = NuxeoBlobUtils.createBlobInRepository(parentCtx, repositoryClient, inputStream, streamName);
 		
     	articlesCommon = setArticlesCommonMetadata(articlesCommon, uriInfo, parentCtx);
-    	articlesCommon.setArticleContentCsid(blobsCommon.getRepositoryId());
+    	articlesCommon.setArticleContentRepositoryId(blobsCommon.getRepositoryId());
     	articlesCommon.setArticleContentName(streamName);
     	
     	PoxPayloadOut poxPayloadOut = new PoxPayloadOut(ArticleClient.SERVICE_PAYLOAD_NAME);

@@ -23,8 +23,12 @@
  */
 package org.collectionspace.services.article.nuxeo;
 
+import org.collectionspace.services.ArticlesCommonJAXBSchema;
 import org.collectionspace.services.article.ArticlesCommon;
+import org.collectionspace.services.client.ArticleClient;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.nuxeo.ecm.core.api.DocumentModel;
 
 /** ArticleDocumentModelHandler
  *  $LastChangedRevision$
@@ -32,5 +36,24 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
  */
 public class ArticleDocumentModelHandler
         extends DocHandlerBase<ArticlesCommon> {
+	
+	@Override
+	public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
+		//
+		// Call our parent's implementation first to fill out most of the document model properties
+		//
+		super.fillAllParts(wrapDoc, action);
+		
+		//
+		// Since we didn't know the CSID when we created the publicly accessible URL we need to
+		// add it now.
+		//
+		DocumentModel documentModel = wrapDoc.getWrappedObject();
+		String url = (String) documentModel.getProperty(ArticleClient.SERVICE_COMMON_PART_NAME,
+				ArticlesCommonJAXBSchema.ARTICLE_CONTENT_URL);
+		url = url.replace(ArticleClient.CSID_PATH_PARAM_VAR, documentModel.getName());
+		documentModel.setProperty(ArticleClient.SERVICE_COMMON_PART_NAME,
+				ArticlesCommonJAXBSchema.ARTICLE_CONTENT_URL, url);
+	}
 }
 

@@ -154,8 +154,8 @@ public class ReportResource extends ResourceBase {
     /*
      * Publishes the report to the Articles service.  The response is a URI to the corresponding Article resource instance in
      * the form of /articles/{csid}.
-     * To access the contents of the report use a form like /articles/published/{csid}?tid={tenant ID}.  For example,
-     * http://localhost:8180/cspace-services/articles/published/2991da78-6001-4f34-b02c?tid=1
+     * To access the contents of the report use a form like /articles/{csid}/{tenantId}/content.  For example,
+     * http://localhost:8180/cspace-services/articles/2991da78-6001-4f34-b02/1/content
      */
     @POST
     @Path("{csid}/publish")

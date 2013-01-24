@@ -2926,9 +2926,13 @@
                             <service:xpath>articleNumber</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>articleContentCsid</service:element>
-                            <service:xpath>articleContentCsid</service:xpath>
+                            <service:element>articleSource</service:element>
+                            <service:xpath>articleSource</service:xpath>
                         </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>articleContentUrl</service:element>
+                            <service:xpath>articleContentUrl</service:xpath>
+                        </service:ListResultField>                  
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>

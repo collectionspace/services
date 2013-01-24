@@ -117,16 +117,5 @@
         <servlet-name>Resteasy</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
-    
-    <servlet>
-            <servlet-name>PublishedResourcesServlet</servlet-name>
-            <servlet-class>
-                org.collectionspace.services.common.servlet.PublishedResourcesServlet
-            </servlet-class>
-    </servlet>    
-    <servlet-mapping>
-        <servlet-name>PublishedResourcesServlet</servlet-name>
-        <url-pattern>/published/*</url-pattern>
-    </servlet-mapping>
 
 </web-app>

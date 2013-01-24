@@ -22,11 +22,12 @@ package org.collectionspace.services;
 
 public interface ArticlesCommonJAXBSchema {
     final static String ARTICLE_NUMBER = "articleNumber";
-    final static String ARTICLE_CONTENT_CSID = "articleContentCsid";
+    final static String ARTICLE_CONTENT_NAME = "articleContentName";
+    final static String ARTICLE_CONTENT_REPO_ID = "articleContentRepositoryId";
+    final static String ARTICLE_CONTENT_URL = "articleContentUrl";
     final static String ARTICLE_JOB_ID = "articleJobId";
     final static String ARTICLE_SOURCE = "articleSource";
-    final static String ARTICLE_PUBLISHER = "articlePublisher";
     final static String ARTICLE_ACCESS_EXPIRATION_DATE = "accessExpirationDate";
     final static String ARTICLE_ACCESSED_COUNT = "accessedCount";
-    final static String ARTICLE_ACCESS_COUNT_LIMIT = "accessCountLimit";
+    final static String ARTICLE_ACCESSED_COUNT_LIMIT = "accesseedCountLimit";
 }
