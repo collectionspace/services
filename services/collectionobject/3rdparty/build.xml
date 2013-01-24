@@ -10,7 +10,7 @@
     <property file="${services.trunk}/build.properties" />
 	<property name="nuxeo-platform-collectionobject" value="nuxeo-platform-cs-collectionobject"/>
 	<property name="nuxeo-platform-collectionobject-lifesci" value="nuxeo-platform-collectionobject-lifesci"/>
-    <property name="mvn.opts" value="" />
+    <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
     <property name="build" location="build"/>
 
