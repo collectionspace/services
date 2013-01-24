@@ -6,7 +6,7 @@
     <property name="installer.trunk" value=".."/>
     <property name="services.trunk" value="../../.."/>
     <property file="${installer.trunk}/build.properties" />
-    <property name="mvn.opts" value="" />
+    <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
 
     <condition property="osfamily-unix">

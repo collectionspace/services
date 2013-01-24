@@ -10,7 +10,7 @@
   <property file="${services.trunk}/build.properties" />
   <!-- Set local properties for this build -->
   <property file="build.properties" />
-  <property name="mvn.opts" value="" />
+  <property name="mvn.opts" value="-V" />
   <property name="src" location="src"/>
   <property name="build" location="build"/>
   <property name="dist"  location="dist"/>
