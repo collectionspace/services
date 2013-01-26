@@ -251,11 +251,13 @@ public class BlobResource extends ResourceBase {
     	
     	try {
 	    	ctx = createServiceContext();
-	    	
+			BlobsCommon blobsCommon = getBlobsCommon(csid);
 	    	StringBuffer mimeType = new StringBuffer();
 	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);
 		    
 	    	Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
+	    	responseBuilder = responseBuilder.header("Content-Disposition","inline;filename=\""
+	    			+ blobsCommon.getName() +"\"");
 	    	result = responseBuilder.build();
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
@@ -288,8 +290,7 @@ public class BlobResource extends ResourceBase {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
     	
     	try {
-			ctx = createServiceContext();
-			
+			ctx = createServiceContext();			
 			BlobsCommon blobsCommon = getBlobsCommon(csid);
 	    	StringBuffer mimeType = new StringBuffer();
 	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);	    	
@@ -314,11 +315,11 @@ public class BlobResource extends ResourceBase {
     	
 	    	try {
 		    	ctx = createServiceContext();
-
+				BlobsCommon blobsCommon = getBlobsCommon(csid);
 		    	StringBuffer mimeType = new StringBuffer();
 		    	InputStream contentStream = getBlobContent(ctx, csid, derivativeTerm, mimeType);
 		    	result = ArticleUtil.publishToRepository((ArticlesCommon)null, resourceMap, uriInfo, 
-		    			getRepositoryClient(ctx), ctx, contentStream, csid);
+		    			getRepositoryClient(ctx), ctx, contentStream, blobsCommon.getName());
 	    	} catch (Exception e) {
 	    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
 	    	}
@@ -332,15 +333,16 @@ public class BlobResource extends ResourceBase {
     		@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
     	Response result = null;
-    	ServiceContext ctx = null;
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
     	
 	    	try {
 		    	ctx = createServiceContext();
-
+				BlobsCommon blobsCommon = getBlobsCommon(csid);
 		    	StringBuffer mimeType = new StringBuffer();
 		    	InputStream contentStream = getBlobContent(ctx, csid, derivativeTerm, mimeType);
 			    Response.ResponseBuilder responseBuilder = Response.ok(contentStream, mimeType.toString());
-			    
+		    	responseBuilder = responseBuilder.header("Content-Disposition","inline;filename=\""
+		    			+ blobsCommon.getName() +"\"");
 		    	result = responseBuilder.build();
 	    	} catch (Exception e) {
 	    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);

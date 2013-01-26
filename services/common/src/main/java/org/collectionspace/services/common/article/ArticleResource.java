@@ -107,6 +107,8 @@ public class ArticleResource extends ResourceBase {
 			// Return the content stream in the response
 			//
 	    	Response.ResponseBuilder responseBuilder = Response.ok(contentStream, outMimeType.toString());
+	    	responseBuilder = responseBuilder.header("Content-Disposition","inline;filename=\""
+	    			+ articlesCommon.getArticleContentName() +"\"");
 	    	result = responseBuilder.build();
 		} catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
