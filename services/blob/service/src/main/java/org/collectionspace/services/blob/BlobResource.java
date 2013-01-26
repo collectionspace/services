@@ -24,29 +24,22 @@
 package org.collectionspace.services.blob;
 
 import org.collectionspace.services.article.ArticlesCommon;
-import org.collectionspace.services.client.ArticleClient;
 import org.collectionspace.services.client.BlobClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PayloadPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.article.ArticleResource;
 import org.collectionspace.services.common.article.ArticleUtil;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
-import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentRef;
-import org.nuxeo.ecm.core.api.IdRef;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -271,6 +264,17 @@ public class BlobResource extends ResourceBase {
     	return result;
     }
     
+    private BlobsCommon getBlobsCommon(String csid) throws Exception {
+    	BlobsCommon result = null;
+    	
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+		PoxPayloadOut ppo = this.get(csid, ctx);
+		PayloadPart blobsCommonPart = ppo.getPart(BlobClient.SERVICE_COMMON_PART_NAME);
+		result = (BlobsCommon)blobsCommonPart.getBody();
+		
+    	return result;
+    }
+    
     /*
      * Publish the blob content.
      */
@@ -285,17 +289,43 @@ public class BlobResource extends ResourceBase {
     	
     	try {
 			ctx = createServiceContext();
+			
+			BlobsCommon blobsCommon = getBlobsCommon(csid);
 	    	StringBuffer mimeType = new StringBuffer();
 	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);	    	
 	    	result = ArticleUtil.publishToRepository((ArticlesCommon)null, resourceMap, uriInfo, 
-	    			getRepositoryClient(ctx), ctx, contentStream, csid);
+	    			getRepositoryClient(ctx), ctx, contentStream, blobsCommon.getName());
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.PUT_FAILED);
     	}
     	
     	return result;
-    }    
+    }
+    
+    @GET
+    @Path("{csid}/derivatives/{derivativeTerm}/content/publish")
+    public Response publishDerivativeContent(
+    		@Context ResourceMap resourceMap,
+    		@Context UriInfo uriInfo,    		
+    		@PathParam("csid") String csid,
+    		@PathParam("derivativeTerm") String derivativeTerm) {
+    	Response result = null;
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+    	
+	    	try {
+		    	ctx = createServiceContext();
 
+		    	StringBuffer mimeType = new StringBuffer();
+		    	InputStream contentStream = getBlobContent(ctx, csid, derivativeTerm, mimeType);
+		    	result = ArticleUtil.publishToRepository((ArticlesCommon)null, resourceMap, uriInfo, 
+		    			getRepositoryClient(ctx), ctx, contentStream, csid);
+	    	} catch (Exception e) {
+	    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+	    	}
+	    	
+	    return result;
+    }
+    
     @GET
     @Path("{csid}/derivatives/{derivativeTerm}/content")
     public Response getDerivativeContent(

@@ -23,7 +23,13 @@
 package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
+import java.math.BigInteger;
+import java.util.Date;
+
 import javax.ws.rs.core.Response;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -602,9 +608,21 @@ public class ArticleServiceTest extends
 
 		ArticlesCommon articlesCommon = new ArticlesCommon();
 		articlesCommon.setArticleNumber(articleNumber);
+		articlesCommon.setArticleContentName("contentname-" + articleNumber);
+		articlesCommon.setArticleContentRepositoryId("42640780-82eb-4650-8a70");
+		articlesCommon.setArticleContentUrl("https://github.com/collectionspace/services/blob/CSPACE-5564-REM-A/services/article/jaxb/src/main/resources/articles-common.xsd");
 		articlesCommon.setArticleJobId(articleJobId);
 		articlesCommon.setArticleSource(getUTF8DataFragment());
-
+		try {
+			XMLGregorianCalendar expirationDate = 
+					DatatypeFactory.newInstance().newXMLGregorianCalendarDate(2013, 12, 31, 0);
+			articlesCommon.setAccessExpirationDate(expirationDate);
+		} catch (DatatypeConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		articlesCommon.setAccessedCount(new BigInteger("3"));
+		articlesCommon.setAccessedCountLimit(new BigInteger("5"));
 
 		PoxPayloadOut multipart = new PoxPayloadOut(
 				this.getServicePathComponent());

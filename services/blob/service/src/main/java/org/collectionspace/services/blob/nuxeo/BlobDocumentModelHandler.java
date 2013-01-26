@@ -222,7 +222,7 @@ extends DocHandlerBase<BlobsCommon> {
 			DocumentModel documentModel = wrapDoc.getWrappedObject();
 			RepositoryInstance repoSession = this.getRepositorySession();
 	        
-			BlobsCommon blobsCommon = NuxeoBlobUtils.createBlobInRepository(ctx, repoSession, blobInput, purgeOriginal);
+			BlobsCommon blobsCommon = NuxeoBlobUtils.createBlobInRepository(ctx, repoSession, blobInput, purgeOriginal, true);
 			blobInput.setBlobCsid(documentModel.getName()); //Assumption here is that the documentModel "name" field is storing a CSID
 
 	        PoxPayloadIn input = ctx.getInput();

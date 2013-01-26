@@ -82,7 +82,8 @@ public class ArticleUtil {
 			String streamName) throws TransactionException {
 		Response result = null;
 		
-    	BlobsCommon blobsCommon = NuxeoBlobUtils.createBlobInRepository(parentCtx, repositoryClient, inputStream, streamName);
+    	BlobsCommon blobsCommon = NuxeoBlobUtils.createBlobInRepository(parentCtx, repositoryClient,
+    			inputStream, streamName, false);
 		
     	articlesCommon = setArticlesCommonMetadata(articlesCommon, uriInfo, parentCtx);
     	articlesCommon.setArticleContentRepositoryId(blobsCommon.getRepositoryId());
