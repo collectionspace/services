@@ -11,8 +11,8 @@
     <property name="nuxeo-platform-collectionobject" value="nuxeo-platform-cs-collectionobject"/>
     <property name="nuxeo-platform-collectionobject-lifesci" value="nuxeo-platform-collectionobject-lifesci"/>
     <property name="nuxeo-platform-collectionobject-anthropology" value="nuxeo-platform-collectionobject-anthropology"/>
-    <property name="mvn.opts" value="-V" />
     <property name="nuxeo-platform-collectionobject-pahma" value="nuxeo-platform-collectionobject-pahma"/>
+    <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
     <property name="build" location="build"/>
 
