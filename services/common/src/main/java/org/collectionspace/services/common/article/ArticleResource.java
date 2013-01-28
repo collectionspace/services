@@ -26,8 +26,8 @@ package org.collectionspace.services.common.article;
 import java.io.InputStream;
 
 import org.collectionspace.authentication.spi.AuthNContext;
-import org.collectionspace.services.article.ArticlesCommon;
-import org.collectionspace.services.client.ArticleClient;
+import org.collectionspace.services.article.PublicitemsCommon;
+import org.collectionspace.services.client.PublicItemClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
@@ -51,7 +51,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-@Path(ArticleClient.SERVICE_PATH)
+@Path(PublicItemClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class ArticleResource extends ResourceBase {
@@ -66,12 +66,12 @@ public class ArticleResource extends ResourceBase {
     
     @Override
     public String getServiceName() {
-        return ArticleClient.SERVICE_NAME;
+        return PublicItemClient.SERVICE_NAME;
     }
 
     @Override
-    public Class<ArticlesCommon> getCommonPartClass() {
-    	return ArticlesCommon.class;
+    public Class<PublicitemsCommon> getCommonPartClass() {
+    	return PublicitemsCommon.class;
     }
 
 	@Override
@@ -81,7 +81,7 @@ public class ArticleResource extends ResourceBase {
 	}
 	
     @GET
-    @Path("/{csid}/{tenantId}/" + ArticleClient.PUBLICITEMS_CONTENT_SUFFIX) // "content"
+    @Path("/{csid}/{tenantId}/" + PublicItemClient.PUBLICITEMS_CONTENT_SUFFIX) // "content"
     public Response getPublishedResource(
             @Context Request request,
             @Context UriInfo uriInfo,
@@ -95,7 +95,7 @@ public class ArticleResource extends ResourceBase {
         	//
 			RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
 			PoxPayloadOut poxPayloadOut = get(csid, ctx);
-			ArticlesCommon articlesCommon = (ArticlesCommon)poxPayloadOut.getPart(ArticleClient.SERVICE_COMMON_PART_NAME).getBody();
+			PublicitemsCommon articlesCommon = (PublicitemsCommon)poxPayloadOut.getPart(PublicItemClient.SERVICE_COMMON_PART_NAME).getBody();
 			//
 			// Get the repository blob ID and retrieve the content as a stream
 			//

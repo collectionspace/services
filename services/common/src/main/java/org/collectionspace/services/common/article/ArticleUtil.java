@@ -5,9 +5,9 @@ import java.io.InputStream;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.article.ArticlesCommon;
+import org.collectionspace.services.article.PublicitemsCommon;
 import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.client.ArticleClient;
+import org.collectionspace.services.client.PublicItemClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceMap;
@@ -21,29 +21,29 @@ public class ArticleUtil {
 	/*
 	 * Sets common fields for an ArticlesCommon instance
 	 */
-	private static ArticlesCommon setArticlesCommonMetadata(
-			ArticlesCommon articlesCommon,
+	private static PublicitemsCommon setArticlesCommonMetadata(
+			PublicitemsCommon articlesCommon,
 			UriInfo uriInfo,
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx) {
-		ArticlesCommon result = articlesCommon;
+		PublicitemsCommon result = articlesCommon;
 		
 		if (result == null) {
-			result = new ArticlesCommon(); // If they passed in null, we'll create a new instance
+			result = new PublicitemsCommon(); // If they passed in null, we'll create a new instance
 		}
 		
-		String articleSource = result.getArticleSource();
-		if (articleSource == null || articleSource.trim().isEmpty()) {
+		String itemSource = result.getItemSource();
+		if (itemSource == null || itemSource.trim().isEmpty()) {
 	    	String publishingService = parentCtx.getServiceName(); // Overrides any existing value
-	    	result.setArticleSource(publishingService);
+	    	result.setItemSource(publishingService);
 		}
     	
-    	String publicUrl = String.format("%s%s/%s/%s/%s",	// e.g., http://{base url}/articles/{csid}/{tenant ID}/content
-    			uriInfo.getBaseUri().toString(), 			// the base part of the URL
-    			ArticleClient.SERVICE_NAME,					// the base service path to the Article service
-    			ArticleClient.CSID_PATH_PARAM_VAR,			// the {csid} param part that will be filled in later in ArticleDocumentModelHandler.fillAllParts() method
-    			parentCtx.getTenantId(),					// the tenant ID part
-    			ArticleClient.PUBLICITEMS_CONTENT_SUFFIX);	// the final "content" suffix
-    	result.setArticleContentUrl(publicUrl);
+    	String publicUri = String.format("%s/%s/%s/%s",			// e.g., publicitems/{csid}/{tenant ID}/content
+//    			uriInfo.getBaseUri().toString(), 				// the base part of the URL
+    			PublicItemClient.SERVICE_NAME,					// the base service path to the Article service
+    			PublicItemClient.CSID_PATH_PARAM_VAR,			// the {csid} param part that will be filled in later in ArticleDocumentModelHandler.fillAllParts() method
+    			parentCtx.getTenantId(),						// the tenant ID part
+    			PublicItemClient.PUBLICITEMS_CONTENT_SUFFIX);	// the final "content" suffix
+    	result.setItemContentUri(publicUri);
     	
 		return result;
 	}
@@ -52,7 +52,7 @@ public class ArticleUtil {
 	 * Publishes a PoxPayloadOut instance for public access
 	 */
 	public static Response publishToRepository(
-			ArticlesCommon articlesCommon,
+			PublicitemsCommon articlesCommon,
 			ResourceMap resourceMap,
     		UriInfo uriInfo,
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
@@ -60,8 +60,8 @@ public class ArticleUtil {
 		Response result = null;
 		
     	articlesCommon = setArticlesCommonMetadata(articlesCommon, uriInfo, parentCtx);
-    	PoxPayloadIn input = new PoxPayloadIn(ArticleClient.SERVICE_PAYLOAD_NAME, articlesCommon, 
-    			ArticleClient.SERVICE_COMMON_PART_NAME);
+    	PoxPayloadIn input = new PoxPayloadIn(PublicItemClient.SERVICE_PAYLOAD_NAME, articlesCommon, 
+    			PublicItemClient.SERVICE_COMMON_PART_NAME);
     	    	
     	ArticleResource articleResource = new ArticleResource();
     	result = articleResource.create(parentCtx, resourceMap, uriInfo, input.getXmlPayload());
@@ -73,7 +73,7 @@ public class ArticleUtil {
 	 * Publishes a a byte stream for public access
 	 */
 	public static Response publishToRepository(
-			ArticlesCommon articlesCommon,
+			PublicitemsCommon articlesCommon,
 			ResourceMap resourceMap,
     		UriInfo uriInfo,
     		RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient,
@@ -86,11 +86,11 @@ public class ArticleUtil {
     			inputStream, streamName, false);
 		
     	articlesCommon = setArticlesCommonMetadata(articlesCommon, uriInfo, parentCtx);
-    	articlesCommon.setArticleContentRepositoryId(blobsCommon.getRepositoryId());
-    	articlesCommon.setArticleContentName(streamName);
+    	articlesCommon.setItemContentId(blobsCommon.getRepositoryId());
+    	articlesCommon.setItemContentName(streamName);
     	
-    	PoxPayloadOut poxPayloadOut = new PoxPayloadOut(ArticleClient.SERVICE_PAYLOAD_NAME);
-    	poxPayloadOut.addPart(ArticleClient.SERVICE_COMMON_PART_NAME, articlesCommon);
+    	PoxPayloadOut poxPayloadOut = new PoxPayloadOut(PublicItemClient.SERVICE_PAYLOAD_NAME);
+    	poxPayloadOut.addPart(PublicItemClient.SERVICE_COMMON_PART_NAME, articlesCommon);
     	
     	ArticleResource articleResource = new ArticleResource();
     	result = articleResource.create(parentCtx, resourceMap, uriInfo, poxPayloadOut.toXML());

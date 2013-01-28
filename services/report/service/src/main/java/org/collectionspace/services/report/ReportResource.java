@@ -27,7 +27,7 @@ import java.io.InputStream;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler;
-import org.collectionspace.services.article.ArticlesCommon;
+import org.collectionspace.services.article.PublicitemsCommon;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -171,7 +171,7 @@ public class ReportResource extends ResourceBase {
             StringBuffer outReportFileName = new StringBuffer();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outReportFileName);            
-            response = ArticleUtil.publishToRepository((ArticlesCommon)null, resourceMap, uriInfo, getRepositoryClient(ctx), ctx, 
+            response = ArticleUtil.publishToRepository((PublicitemsCommon)null, resourceMap, uriInfo, getRepositoryClient(ctx), ctx, 
             		reportInputStream, outReportFileName.toString());
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.POST_FAILED);

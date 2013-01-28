@@ -21,11 +21,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.article.nuxeo;
+package org.collectionspace.services.publicitem.nuxeo;
 
-import org.collectionspace.services.ArticlesCommonJAXBSchema;
-import org.collectionspace.services.article.ArticlesCommon;
-import org.collectionspace.services.client.ArticleClient;
+import javax.ws.rs.core.UriInfo;
+
+import org.collectionspace.services.PublicitemsCommonJAXBSchema;
+import org.collectionspace.services.article.PublicitemsCommon;
+import org.collectionspace.services.client.PublicItemClient;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -34,8 +36,8 @@ import org.nuxeo.ecm.core.api.DocumentModel;
  *  $LastChangedRevision$
  *  $LastChangedDate$
  */
-public class ArticleDocumentModelHandler
-        extends DocHandlerBase<ArticlesCommon> {
+public class PublicItemDocumentModelHandler
+        extends DocHandlerBase<PublicitemsCommon> {
 	
 	@Override
 	public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
@@ -49,11 +51,27 @@ public class ArticleDocumentModelHandler
 		// add it now.
 		//
 		DocumentModel documentModel = wrapDoc.getWrappedObject();
-		String url = (String) documentModel.getProperty(ArticleClient.SERVICE_COMMON_PART_NAME,
-				ArticlesCommonJAXBSchema.ARTICLE_CONTENT_URL);
-		url = url.replace(ArticleClient.CSID_PATH_PARAM_VAR, documentModel.getName());
-		documentModel.setProperty(ArticleClient.SERVICE_COMMON_PART_NAME,
-				ArticlesCommonJAXBSchema.ARTICLE_CONTENT_URL, url);
+		String url = (String) documentModel.getProperty(PublicItemClient.SERVICE_COMMON_PART_NAME,
+				PublicitemsCommonJAXBSchema.ITEM_CONTENT_URI);
+		url = url.replace(PublicItemClient.CSID_PATH_PARAM_VAR, documentModel.getName());
+		documentModel.setProperty(PublicItemClient.SERVICE_COMMON_PART_NAME,
+				PublicitemsCommonJAXBSchema.ITEM_CONTENT_URI, url);
 	}
+	
+    @Override
+    public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
+            throws Exception {
+    	//
+    	// Replace the URI with a fully qualified URL
+    	//
+        DocumentModel documentModel = wrapDoc.getWrappedObject();
+		String itemContentUri = (String) documentModel.getProperty(PublicItemClient.SERVICE_COMMON_PART_NAME,
+				PublicitemsCommonJAXBSchema.ITEM_CONTENT_URI);        
+        UriInfo uriInfo = this.getServiceContext().getUriInfo();
+        String baseUrl = uriInfo.getBaseUri().toString();
+        String url = String.format("%s%s", baseUrl, itemContentUri);
+		documentModel.setProperty(PublicItemClient.SERVICE_COMMON_PART_NAME,
+				PublicitemsCommonJAXBSchema.ITEM_CONTENT_URI, url);
+    }	
 }
 

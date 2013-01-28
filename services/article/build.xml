@@ -1,7 +1,7 @@
 
-<project name="article" default="package" basedir=".">
+<project name="publicitem" default="package" basedir=".">
     <description>
-        Article service
+        PublicItem service
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
@@ -107,17 +107,17 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy article service">
+    description="deploy publicitem service">
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy article service">
+    description="undeploy publicitem service">
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist" depends="package"
-    description="distribute article service">
+    description="distribute publicitem service">
         <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
     </target>
 

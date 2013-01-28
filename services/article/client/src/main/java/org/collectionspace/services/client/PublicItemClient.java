@@ -23,7 +23,7 @@ package org.collectionspace.services.client;
  * $LastChangedDate$
  *
  */
-public class ArticleClient extends AbstractCommonListPoxServiceClientImpl<ArticleProxy> {
+public class PublicItemClient extends AbstractCommonListPoxServiceClientImpl<PublicItemProxy> {
 
     public static final String SERVICE_NAME = "articles";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -48,8 +48,8 @@ public class ArticleClient extends AbstractCommonListPoxServiceClientImpl<Articl
     }
 
     @Override
-    public Class<ArticleProxy> getProxyClass() {
-        return ArticleProxy.class;
+    public Class<PublicItemProxy> getProxyClass() {
+        return PublicItemProxy.class;
     }
 
 }

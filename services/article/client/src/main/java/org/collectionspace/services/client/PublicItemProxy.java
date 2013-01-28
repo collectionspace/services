@@ -27,8 +27,8 @@ import javax.ws.rs.Produces;
  * $LastChangedDate$
  *
  */
-@Path(ArticleClient.SERVICE_PATH_PROXY)
+@Path(PublicItemClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface ArticleProxy extends CollectionSpaceCommonListPoxProxy {
+public interface PublicItemProxy extends CollectionSpaceCommonListPoxProxy {
 }

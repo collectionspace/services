@@ -24,7 +24,6 @@ package org.collectionspace.services.client.test;
 
 //import java.util.ArrayList;
 import java.math.BigInteger;
-import java.util.Date;
 
 import javax.ws.rs.core.Response;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -32,15 +31,13 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.collectionspace.services.client.AbstractCommonListUtils;
-import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.ArticleClient;
+import org.collectionspace.services.client.PublicItemClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.article.ArticlesCommon;
+import org.collectionspace.services.publicitem.PublicitemsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
@@ -49,21 +46,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ArticleServiceTest, carries out tests against a deployed and running Articles
+ * PublicItemServiceTest, carries out tests against a deployed and running PublicItem
  * Service.
  * 
  * $LastChangedRevision$ $LastChangedDate$
  */
-public class ArticleServiceTest extends
-		AbstractPoxServiceTestImpl<AbstractCommonList, ArticlesCommon> {
+public class PublicItemServiceTest extends
+		AbstractPoxServiceTestImpl<AbstractCommonList, PublicitemsCommon> {
 
 	/** The logger. */
-	private final String CLASS_NAME = ArticleServiceTest.class.getName();
+	private final String CLASS_NAME = PublicItemServiceTest.class.getName();
 	private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 	// Instance variables specific to this test.
 	/** The service path component. */
-	final String SERVICE_NAME = "articles";
-	final String SERVICE_PATH_COMPONENT = "articles";
+	final String SERVICE_NAME = PublicItemClient.SERVICE_NAME;
+	final String SERVICE_PATH_COMPONENT = PublicItemClient.SERVICE_PATH_COMPONENT;
 
 	/*
 	 * (non-Javadoc)
@@ -73,8 +70,8 @@ public class ArticleServiceTest extends
 	 * ()
 	 */
 	@Override
-	protected ArticleClient getClientInstance() {
-		return new ArticleClient();
+	protected PublicItemClient getClientInstance() {
+		return new PublicItemClient();
 	}
 
 	/*
@@ -112,9 +109,9 @@ public class ArticleServiceTest extends
 		setupCreate();
 
 		// Submit the request to the service and store the response.
-		ArticleClient client = new ArticleClient();
+		PublicItemClient client = new PublicItemClient();
 		String identifier = createIdentifier();
-		PoxPayloadOut multipart = createArticleInstance(identifier);
+		PoxPayloadOut multipart = createPublicItemInstance(identifier);
 		String newID = null;
 		ClientResponse<Response> res = client.create(multipart);
 		try {
@@ -191,7 +188,7 @@ public class ArticleServiceTest extends
 		setupRead();
 
 		// Submit the request to the service and store the response.
-		ArticleClient client = new ArticleClient();
+		PublicItemClient client = new PublicItemClient();
 		ClientResponse<String> res = client.read(knownResourceId);
 		PoxPayloadIn input = null;
 		try {
@@ -206,11 +203,11 @@ public class ArticleServiceTest extends
 		// Get the common part of the response and verify that it is not null.
 		PayloadInputPart payloadInputPart = input.getPart(client
 				.getCommonPartName());
-		ArticlesCommon articlesCommon = null;
+		PublicitemsCommon publicItemsCommon = null;
 		if (payloadInputPart != null) {
-			articlesCommon = (ArticlesCommon) payloadInputPart.getBody();
+			publicItemsCommon = (PublicitemsCommon) payloadInputPart.getBody();
 		}
-		Assert.assertNotNull(articlesCommon);
+		Assert.assertNotNull(publicItemsCommon);
 
 	}
 
@@ -231,7 +228,7 @@ public class ArticleServiceTest extends
 		setupReadNonExistent();
 
 		// Submit the request to the service and store the response.
-		ArticleClient client = new ArticleClient();
+		PublicItemClient client = new PublicItemClient();
 		ClientResponse<String> res = client.read(NON_EXISTENT_ID);
 		try {
 			int statusCode = res.getStatus();
@@ -274,7 +271,7 @@ public class ArticleServiceTest extends
 
 		// Submit the request to the service and store the response.
 		AbstractCommonList list = null;
-		ArticleClient client = new ArticleClient();
+		PublicItemClient client = new PublicItemClient();
 		ClientResponse<AbstractCommonList> res = client.readList();
 		assertStatusCode(res, testName);
 		try {
@@ -330,7 +327,7 @@ public class ArticleServiceTest extends
 		setupRead();
 
 		// Retrieve the contents of a resource to update.
-		ArticleClient client = new ArticleClient();
+		PublicItemClient client = new PublicItemClient();
 		ClientResponse<String> res = client.read(knownResourceId);
 		PoxPayloadIn input = null;
 		try {
@@ -348,19 +345,19 @@ public class ArticleServiceTest extends
 		// Extract the common part from the response.
 		PayloadInputPart payloadInputPart = input.getPart(client
 				.getCommonPartName());
-		ArticlesCommon articlesCommon = null;
+		PublicitemsCommon publicItemsCommon = null;
 		if (payloadInputPart != null) {
-			articlesCommon = (ArticlesCommon) payloadInputPart.getBody();
+			publicItemsCommon = (PublicitemsCommon) payloadInputPart.getBody();
 		}
-		Assert.assertNotNull(articlesCommon);
+		Assert.assertNotNull(publicItemsCommon);
 
 		// Update the content of this resource.
-		articlesCommon.setArticleNumber("updated-"
-				+ articlesCommon.getArticleNumber());
-		articlesCommon.setArticleJobId("updated-" + articlesCommon.getArticleJobId());
+		publicItemsCommon.setItemNumber("updated-"
+				+ publicItemsCommon.getItemNumber());
+		publicItemsCommon.setContentCreationJobId("updated-" + publicItemsCommon.getContentCreationJobId());
 		if (logger.isDebugEnabled()) {
 			logger.debug("to be updated object");
-			logger.debug(objectAsXmlString(articlesCommon, ArticlesCommon.class));
+			logger.debug(objectAsXmlString(publicItemsCommon, PublicitemsCommon.class));
 		}
 
 		setupUpdate();
@@ -369,7 +366,7 @@ public class ArticleServiceTest extends
 		// and store the response.
 		PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
 		PayloadOutputPart commonPart = output.addPart(
-				client.getCommonPartName(), articlesCommon);
+				client.getCommonPartName(), publicItemsCommon);
 		res = client.update(knownResourceId, output);
 		try {
 			assertStatusCode(res, testName);
@@ -391,29 +388,29 @@ public class ArticleServiceTest extends
 
 		// Extract the updated common part from the response.
 		payloadInputPart = input.getPart(client.getCommonPartName());
-		ArticlesCommon updatedArticleCommon = null;
+		PublicitemsCommon updatedPublicitemsCommon = null;
 		if (payloadInputPart != null) {
-			updatedArticleCommon = (ArticlesCommon) payloadInputPart.getBody();
+			updatedPublicitemsCommon = (PublicitemsCommon) payloadInputPart.getBody();
 		}
-		Assert.assertNotNull(updatedArticleCommon);
+		Assert.assertNotNull(updatedPublicitemsCommon);
 
 		// Check selected fields in the updated common part.
-		Assert.assertEquals(updatedArticleCommon.getArticleNumber(),
-				articlesCommon.getArticleNumber(),
+		Assert.assertEquals(updatedPublicitemsCommon.getItemNumber(),
+				publicItemsCommon.getItemNumber(),
 				"Data in updated object did not match submitted data.");
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("UTF-8 data sent=" + articlesCommon.getArticleJobId()
+			logger.debug("UTF-8 data sent=" + publicItemsCommon.getContentCreationJobId()
 					+ "\n" + "UTF-8 data received="
-					+ updatedArticleCommon.getArticleJobId());
+					+ updatedPublicitemsCommon.getContentCreationJobId());
 		}
-		Assert.assertTrue(updatedArticleCommon.getArticleSource().contains(
+		Assert.assertTrue(updatedPublicitemsCommon.getContentSource().contains(
 						getUTF8DataFragment()), "UTF-8 data retrieved '"
-						+ updatedArticleCommon.getArticleSource()
+						+ updatedPublicitemsCommon.getContentSource()
 						+ "' does not contain expected data '"
 						+ getUTF8DataFragment());
-		Assert.assertEquals(updatedArticleCommon.getArticleJobId(),
-				articlesCommon.getArticleJobId(),
+		Assert.assertEquals(updatedPublicitemsCommon.getContentCreationJobId(),
+				publicItemsCommon.getContentCreationJobId(),
 				"Data in updated object did not match submitted data.");
 	}
 
@@ -428,8 +425,8 @@ public class ArticleServiceTest extends
 		// Submit the request to the service and store the response.
 		// Note: The ID used in this 'create' call may be arbitrary.
 		// The only relevant ID may be the one used in update(), below.
-		ArticleClient client = new ArticleClient();
-		PoxPayloadOut multipart = createArticleInstance(NON_EXISTENT_ID);
+		PublicItemClient client = new PublicItemClient();
+		PoxPayloadOut multipart = createPublicItemInstance(NON_EXISTENT_ID);
 		ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
 		try {
 			int statusCode = res.getStatus();
@@ -471,7 +468,7 @@ public class ArticleServiceTest extends
 		setupDelete();
 
 		// Submit the request to the service and store the response.
-		ArticleClient client = new ArticleClient();
+		PublicItemClient client = new PublicItemClient();
 		ClientResponse<Response> res = client.delete(knownResourceId);
 		try {
 			int statusCode = res.getStatus();
@@ -508,7 +505,7 @@ public class ArticleServiceTest extends
 		setupDeleteNonExistent();
 
 		// Submit the request to the service and store the response.
-		ArticleClient client = new ArticleClient();
+		PublicItemClient client = new PublicItemClient();
 		ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
 		try {
 			int statusCode = res.getStatus();
@@ -579,59 +576,59 @@ public class ArticleServiceTest extends
 
 	@Override
 	protected PoxPayloadOut createInstance(String identifier) {
-		return createArticleInstance(identifier);
+		return createPublicItemInstance(identifier);
 	}
 
 	/**
-	 * Creates the article instance.
+	 * Creates the publicitem instance.
 	 * 
 	 * @param identifier
 	 *            the identifier
 	 * @return the multipart output
 	 */
-	private PoxPayloadOut createArticleInstance(String identifier) {
-		return createArticleInstance("articleNumber-" + identifier,
-				"articleJobId-" + identifier);
+	private PoxPayloadOut createPublicItemInstance(String identifier) {
+		return createPublicItemInstance("itemNumber-" + identifier,
+				"contentCreationJobId-" + identifier);
 	}
 
 	/**
-	 * Creates the Article instance.
+	 * Creates the PublicItem instance.
 	 * 
-	 * @param articleNumber
-	 *            the article number
-	 * @param articleJobId
-	 *            the article asynch job ID
+	 * @param itemNumber
+	 *            the publicitem number
+	 * @param contentCreationJobId
+	 *            the publicitem asynch job ID
 	 * @return the multipart output
 	 */
-	private PoxPayloadOut createArticleInstance(String articleNumber,
-			String articleJobId) {
+	private PoxPayloadOut createPublicItemInstance(String itemNumber,
+			String itemJobId) {
 
-		ArticlesCommon articlesCommon = new ArticlesCommon();
-		articlesCommon.setArticleNumber(articleNumber);
-		articlesCommon.setArticleContentName("contentname-" + articleNumber);
-		articlesCommon.setArticleContentRepositoryId("42640780-82eb-4650-8a70");
-		articlesCommon.setArticleContentUrl("https://github.com/collectionspace/services/blob/CSPACE-5564-REM-A/services/article/jaxb/src/main/resources/articles-common.xsd");
-		articlesCommon.setArticleJobId(articleJobId);
-		articlesCommon.setArticleSource(getUTF8DataFragment());
+		PublicitemsCommon publicItemsCommon = new PublicitemsCommon();
+		publicItemsCommon.setItemNumber(itemNumber);
+		publicItemsCommon.setContentName("Inventory report-" + itemNumber);
+		publicItemsCommon.setContentId("42640780-82eb-4650-8a70");
+		publicItemsCommon.setContentUri("publicitems/1/7eaf0780-9eeb-af50-9d76/content");
+		publicItemsCommon.setContentCreationJobId(itemJobId);
+		publicItemsCommon.setContentSource(getUTF8DataFragment());
 		try {
 			XMLGregorianCalendar expirationDate = 
 					DatatypeFactory.newInstance().newXMLGregorianCalendarDate(2013, 12, 31, 0);
-			articlesCommon.setAccessExpirationDate(expirationDate);
+			publicItemsCommon.setContentExpirationDate(expirationDate);
 		} catch (DatatypeConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		articlesCommon.setAccessedCount(new BigInteger("3"));
-		articlesCommon.setAccessedCountLimit(new BigInteger("5"));
+		publicItemsCommon.setContentAccessedCount(new BigInteger("3"));
+		publicItemsCommon.setContentAccessCountLimit(new BigInteger("5"));
 
 		PoxPayloadOut multipart = new PoxPayloadOut(
 				this.getServicePathComponent());
 		PayloadOutputPart commonPart = multipart.addPart(
-				new ArticleClient().getCommonPartName(), articlesCommon);
+				new PublicItemClient().getCommonPartName(), publicItemsCommon);
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("To be created, article common:");
-			logger.debug(objectAsXmlString(articlesCommon, ArticlesCommon.class));
+			logger.debug("To be created, publicitem common:");
+			logger.debug(objectAsXmlString(publicItemsCommon, PublicitemsCommon.class));
 		}
 
 		return multipart;
@@ -646,19 +643,19 @@ public class ArticleServiceTest extends
 	@Override
 	protected PoxPayloadOut createInstance(String commonPartName,
 			String identifier) {
-		PoxPayloadOut result = createArticleInstance(identifier);
+		PoxPayloadOut result = createPublicItemInstance(identifier);
 		return result;
 	}
 
 	@Override
-	protected ArticlesCommon updateInstance(ArticlesCommon commonPartObject) {
+	protected PublicitemsCommon updateInstance(PublicitemsCommon commonPartObject) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	protected void compareUpdatedInstances(ArticlesCommon original,
-			ArticlesCommon updated) throws Exception {
+	protected void compareUpdatedInstances(PublicitemsCommon original,
+			PublicitemsCommon updated) throws Exception {
 		// TODO Auto-generated method stub
 
 	}

@@ -21,13 +21,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.article.nuxeo;
+package org.collectionspace.services.publicitem.nuxeo;
 
 /**
  * ArticleConstants specifies constants for the Articles In service
  *
  */
-public class ArticleConstants {
+public class PublicItemConstants {
     public final static String NUXEO_DOCTYPE = "Article";
     public final static String NUXEO_SCHEMA_NAME = "article";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Article";

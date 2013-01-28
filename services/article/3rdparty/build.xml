@@ -1,7 +1,7 @@
 
-<project name="article.3rdparty" default="package" basedir=".">
+<project name="publicitem.3rdparty" default="package" basedir=".">
     <description>
-        Article service 3rdparty
+        PublicItem service 3rdparty
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
@@ -109,18 +109,18 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy article in ${jee.server.nuxeo}">
-        <ant antfile="nuxeo-platform-cs-article/build.xml" target="deploy" inheritall="false"/>
+    description="deploy publicitem in ${jee.server.nuxeo}">
+        <ant antfile="nuxeo-platform-cs-publicitem/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy article from ${jee.server.nuxeo}">
-        <ant antfile="nuxeo-platform-cs-article/build.xml" target="undeploy" inheritall="false"/>
+    description="undeploy publicitem from ${jee.server.nuxeo}">
+        <ant antfile="nuxeo-platform-cs-publicitem/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
-    description="generate distribution for article" depends="package">
-        <ant antfile="nuxeo-platform-cs-article/build.xml" target="dist" inheritall="false"/>
+    description="generate distribution for publicitem" depends="package">
+        <ant antfile="nuxeo-platform-cs-publicitem/build.xml" target="dist" inheritall="false"/>
     </target>
 
 

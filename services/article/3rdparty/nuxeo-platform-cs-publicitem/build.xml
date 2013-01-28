@@ -1,7 +1,7 @@
 
-<project name="nuxeo-platform-cs-article" default="package" basedir=".">
+<project name="nuxeo-platform-cs-publicitem" default="package" basedir=".">
     <description>
-        Article nuxeo document type
+        PublicItem's Nuxeo document type
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>
@@ -10,10 +10,10 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="nuxeo.article.jar"
-        value="org.collectionspace.services.article.3rdparty.nuxeo-${cspace.release}.jar"/>
-    <property name="nuxeo.article.jars.all"
-        value="org.collectionspace.services.article.3rdparty.nuxeo-*.jar"/>
+    <property name="nuxeo.publicitem.jar"
+        value="org.collectionspace.services.publicitem.3rdparty.nuxeo-${cspace.release}.jar"/>
+    <property name="nuxeo.publicitem.jars.all"
+        value="org.collectionspace.services.publicitem.3rdparty.nuxeo-*.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -113,24 +113,24 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy article doctype in ${jee.server.nuxeo}">
-        <copy file="${basedir}/target/${nuxeo.article.jar}"
+        description="deploy publicitem doctype in ${jee.server.nuxeo}">
+        <copy file="${basedir}/target/${nuxeo.publicitem.jar}"
         todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-        description="undeploy article doctype from ${jee.server.nuxeo}">
+        description="undeploy publicitem doctype from ${jee.server.nuxeo}">
         <delete>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.article.jars.all}"/>
+                <include name="${nuxeo.publicitem.jars.all}"/>
             </fileset>
         </delete>
     </target>
 
     <target name="dist"
-        description="generate distribution for article doctype" depends="package">
+        description="generate distribution for publicitem doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
-            <fileset file="${basedir}/target/${nuxeo.article.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.publicitem.jar}"/>
         </copy>
     </target>
 

@@ -8,8 +8,8 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.collectionspace.services.article</artifactId>
-    <name>services.article</name>
+    <artifactId>org.collectionspace.services.publicitem</artifactId>
+    <name>services.publicitem</name>
     <packaging>pom</packaging>
 
     <dependencies>
