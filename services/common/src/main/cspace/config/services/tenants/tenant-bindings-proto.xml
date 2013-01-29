@@ -2908,58 +2908,58 @@
         </tenant:serviceBindings>
         <!-- end account service meta-data -->
     
-        <!-- begin Article service meta-data -->
-        <tenant:serviceBindings id="Articles" name="Articles" type="procedure" version="0.1">
+        <!-- begin PublicItem service meta-data -->
+        <tenant:serviceBindings id="PublicItems" name="PublicItems" type="procedure" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
-                /articles/*/authorityrefs/
+                /publicitems/*/authorityrefs/
             </service:uriPath>
             -->
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
-            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.article.nuxeo.ArticleDocumentModelHandler</service:documentHandler>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.publicitem.nuxeo.PublicItemDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
                     <service:ListResultsFields>
                         <service:ListResultField>
-                            <service:element>articleNumber</service:element>
-                            <service:xpath>articleNumber</service:xpath>
+                            <service:element>itemNumber</service:element>
+                            <service:xpath>itemNumber</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>articleSource</service:element>
-                            <service:xpath>articleSource</service:xpath>
+                            <service:element>contentSource</service:element>
+                            <service:xpath>contentSource</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:element>articleContentUrl</service:element>
-                            <service:xpath>articleContentUrl</service:xpath>
-                        </service:ListResultField>                  
+                            <service:element>contentUri</service:element>
+                            <service:xpath>contentUri</service:xpath>
+                        </service:ListResultField>
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
-            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.article.nuxeo.ArticleValidatorHandler</service:validatorHandler>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.publicitem.nuxeo.PublicItemValidatorHandler</service:validatorHandler>
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>articleContentCsid</types:value>
+                    <types:value>contentName</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
-                    <types:value>articleNumber</types:value>
+                    <types:value>itemNumber</types:value>
                 </types:item>
             </service:properties>
-            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Article" version="0.1">
-                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="articles-system" updated="" order="0">
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="PublicItem" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="publicitems-system" updated="" order="0">
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
                     </service:content>
                 </service:part>
-                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="articles_common" updated="" order="1">
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="publicitems_common" updated="" order="1">
                     <service:properties>
                         <!-- Fields containing authority term references -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                     </service:properties>
                     <service:content contentType="application/xml">
-                        <service:xmlContent namespaceURI="http://collectionspace.org/services/article" schemaLocation="http://collectionspace.org/services/article http://services.collectionspace.org/article/articles_common.xsd" />
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/publicitem" schemaLocation="http://collectionspace.org/services/publicitem http://services.collectionspace.org/publicitem/publicitems_common.xsd" />
                     </service:content>
                 </service:part>
                 <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
@@ -2969,7 +2969,7 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-        <!-- end Article service meta-data -->    
+        <!-- end PublicItem service meta-data -->    
     
         <!-- begin dimension service meta-data -->
         <tenant:serviceBindings id="Dimensions" name="Dimensions" type="utility" version="0.1">

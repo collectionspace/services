@@ -65,7 +65,7 @@ import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.common.ResourceMapImpl;
-import org.collectionspace.services.common.article.ArticleResource;
+import org.collectionspace.services.common.publicitem.PublicItemResource;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
 
@@ -121,7 +121,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new BlobResource());
         addResourceToMapAndSingletons(new MovementResource());
         addResourceToMapAndSingletons(new ReportResource());
-        addResourceToMapAndSingletons(new ArticleResource());
+        addResourceToMapAndSingletons(new PublicItemResource());
 
         singletons.add(new IDResource());
         

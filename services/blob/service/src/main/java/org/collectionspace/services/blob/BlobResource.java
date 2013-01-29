@@ -23,7 +23,7 @@
  */
 package org.collectionspace.services.blob;
 
-import org.collectionspace.services.article.PublicitemsCommon;
+import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PayloadPart;
@@ -33,10 +33,10 @@ import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.article.ArticleUtil;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.publicitem.PublicItemUtil;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -294,7 +294,7 @@ public class BlobResource extends ResourceBase {
 			BlobsCommon blobsCommon = getBlobsCommon(csid);
 	    	StringBuffer mimeType = new StringBuffer();
 	    	InputStream contentStream = getBlobContent(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);	    	
-	    	result = ArticleUtil.publishToRepository((PublicitemsCommon)null, resourceMap, uriInfo, 
+	    	result = PublicItemUtil.publishToRepository((PublicitemsCommon)null, resourceMap, uriInfo, 
 	    			getRepositoryClient(ctx), ctx, contentStream, blobsCommon.getName());
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.PUT_FAILED);
@@ -318,7 +318,7 @@ public class BlobResource extends ResourceBase {
 				BlobsCommon blobsCommon = getBlobsCommon(csid);
 		    	StringBuffer mimeType = new StringBuffer();
 		    	InputStream contentStream = getBlobContent(ctx, csid, derivativeTerm, mimeType);
-		    	result = ArticleUtil.publishToRepository((PublicitemsCommon)null, resourceMap, uriInfo, 
+		    	result = PublicItemUtil.publishToRepository((PublicitemsCommon)null, resourceMap, uriInfo, 
 		    			getRepositoryClient(ctx), ctx, contentStream, blobsCommon.getName());
 	    	} catch (Exception e) {
 	    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);

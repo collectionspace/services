@@ -90,10 +90,10 @@ public interface CollectionSpaceResource<IT, OT> {
      * Returns true if this resource allow anonymous access.  It addition to returning 'true', this
      * resources base URL path needs to be declared in the Spring Security config file's 'springSecurityFilterChain' bean.
      * There needs to be a 'filter-chain' element something like the following:
-			<sec:filter-chain pattern="/articles/**"
-                              filters="none"/>
      * See the "applicationContext-security.xml" file for details.
      */
+//			<sec:filter-chain pattern="/publicitems/*/*/content"
+//                              filters="none"/>
 	public boolean allowAnonymousAccess(HttpRequest request, ResourceMethod method);
     
 }

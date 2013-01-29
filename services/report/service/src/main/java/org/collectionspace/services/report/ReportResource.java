@@ -27,7 +27,7 @@ import java.io.InputStream;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler;
-import org.collectionspace.services.article.PublicitemsCommon;
+import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -35,13 +35,14 @@ import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.article.ArticleUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
+import org.collectionspace.services.common.publicitem.PublicItemUtil;
 import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,10 +153,10 @@ public class ReportResource extends ResourceBase {
     }
     
     /*
-     * Publishes the report to the Articles service.  The response is a URI to the corresponding Article resource instance in
-     * the form of /articles/{csid}.
-     * To access the contents of the report use a form like /articles/{csid}/{tenantId}/content.  For example,
-     * http://localhost:8180/cspace-services/articles/2991da78-6001-4f34-b02/1/content
+     * Publishes the report to the PublicItem service.  The response is a URI to the corresponding PublicItem resource instance in
+     * the form of /publicitems/{csid}.
+     * To access the contents of the report use a form like /publicitems/{tenantId}/{csid}/content.  For example,
+     * http://localhost:8180/cspace-services/publicitems/2991da78-6001-4f34-b02/1/content
      */
     @POST
     @Path("{csid}/publish")
@@ -171,8 +172,14 @@ public class ReportResource extends ResourceBase {
             StringBuffer outReportFileName = new StringBuffer();
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outReportFileName);            
-            response = ArticleUtil.publishToRepository((PublicitemsCommon)null, resourceMap, uriInfo, getRepositoryClient(ctx), ctx, 
-            		reportInputStream, outReportFileName.toString());
+            response = PublicItemUtil.publishToRepository(
+            		(PublicitemsCommon)null, 
+            		resourceMap, 
+            		uriInfo, 
+            		getRepositoryClient(ctx), 
+            		ctx, 
+            		reportInputStream, 
+            		outReportFileName.toString());
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.POST_FAILED);
         }

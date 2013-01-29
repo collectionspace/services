@@ -197,7 +197,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	@Override
 	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
 			throws Exception {
-		// Do nothing by default, but children can override if they want.  The really workflow transition happens in the WorkflowDocumemtModelHandler class
+		// Do nothing by default, but children can override if they want.  The real workflow transition happens in the WorkflowDocumemtModelHandler class
 	}
     	
     @Override

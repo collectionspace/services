@@ -71,7 +71,7 @@
         <module>contact</module>
         <module>workflow</module>
         <module>media</module>
-        <module>article</module>        
+        <module>publicitem</module>        
         <!--module>sdk</module-->
         <module>IntegrationTests</module>
         <module>PerformanceTests</module>

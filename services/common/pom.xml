@@ -40,12 +40,12 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.article.client</artifactId>
+            <artifactId>org.collectionspace.services.publicitem.client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.article.jaxb</artifactId>
+            <artifactId>org.collectionspace.services.publicitem.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- 

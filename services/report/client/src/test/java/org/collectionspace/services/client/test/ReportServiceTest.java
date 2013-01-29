@@ -141,8 +141,8 @@ public class ReportServiceTest extends AbstractPoxServiceTestImpl<AbstractCommon
                 invalidStatusCodeMessage(testRequestType, statusCode));
         Assert.assertEquals(statusCode, testExpectedStatusCode);
 
-        String articleCsid = extractId(res);
-        Assert.assertNotNull(articleCsid);
+        String publicItemCsid = extractId(res);
+        Assert.assertNotNull(publicItemCsid);
     }
     
     /* (non-Javadoc)

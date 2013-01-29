@@ -201,7 +201,7 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.article.service</artifactId>
+            <artifactId>org.collectionspace.services.publicitem.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
