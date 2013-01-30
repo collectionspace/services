@@ -95,9 +95,8 @@ public class CollectionObjectValidatorHandler extends ValidatorHandlerImpl<PoxPa
 	protected void handleUpdate()
 			throws InvalidDocumentException {
     	try {
-	        // PAHMA-473: Disable non-empty objectNumber requirement, so that updates don't need to retrieve the current objectNumber.
-            //CollectionobjectsCommon co = (CollectionobjectsCommon) getCommonPart();
-            //validateCollectionobjectsCommon(co);                        
+            CollectionobjectsCommon co = (CollectionobjectsCommon) getCommonPart();
+            validateCollectionobjectsCommon(co);                        
     	} catch (AssertionError e) {
     		if (logger.isErrorEnabled() == true) {
     			logger.error(e.getMessage(), e);

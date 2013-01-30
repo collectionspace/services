@@ -30,6 +30,8 @@
 					</service:ListResultsFields>
 				</service:params>
 			</service:DocHandlerParams>
+
+			<service:validatorHandler merge:matcher="tag" merge:action="replace" xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.PahmaCollectionObjectValidatorHandler</service:validatorHandler>
 			
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 				<service:part id="1" merge:matcher="id">
