@@ -53,6 +53,9 @@ import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRXmlExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.collectionspace.services.ReportJAXBSchema;
@@ -301,6 +304,22 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 				exporter = new JRCsvExporter();
 				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, "\t");
 				outputFilename = outputFilename+".csv";
+			} else if(outputMimeType.equals(ReportClient.MSWORD_MIME_TYPE)	// Understand msword as docx
+					|| outputMimeType.equals(ReportClient.OPEN_DOCX_MIME_TYPE)) {
+				exporter = new JRDocxExporter();
+				outputFilename = outputFilename+".docx";
+			} else if(outputMimeType.equals(ReportClient.MSEXCEL_MIME_TYPE)	// Understand msexcel as xlsx
+					|| outputMimeType.equals(ReportClient.OPEN_XLSX_MIME_TYPE)) {
+				exporter = new JRXlsxExporter();
+				outputFilename = outputFilename+".xlsx";
+			} else if(outputMimeType.equals(ReportClient.MSPPT_MIME_TYPE)	// Understand msppt as xlsx
+					|| outputMimeType.equals(ReportClient.OPEN_PPTX_MIME_TYPE)) {
+				exporter = new JRPptxExporter();
+				outputFilename = outputFilename+".pptx";
+			} else {
+				logger.error("Reporting: unsupported output MIME type - defaulting to PDF");
+				exporter = new JRPdfExporter();
+				outputFilename = outputFilename+"-default-to.pdf";
 			}
 	        // fill the report
 			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);

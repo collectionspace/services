@@ -59,6 +59,9 @@ $P!{where_clause}]]>
 	<title>
 		<band height="102" splitType="Stretch">
 			<frame>
+				<reportElement mode="Opaque" x="0" y="76" width="802" height="14" forecolor="#000000" backcolor="#66FFFF"/>
+			</frame>
+			<frame>
 				<reportElement mode="Opaque" x="0" y="0" width="797" height="90" backcolor="#FFFFFF"/>
 				<staticText>
 					<reportElement style="SubTitle" x="458" y="0" width="339" height="29"/>
@@ -71,9 +74,6 @@ $P!{where_clause}]]>
 					<reportElement x="0" y="0" width="349" height="67"/>
 					<imageExpression><![CDATA["http://www.collectionspace.org/sites/all/themes/CStheme/images/CSpaceLogo.png"]]></imageExpression>
 				</image>
-			</frame>
-			<frame>
-				<reportElement mode="Opaque" x="0" y="76" width="802" height="14" forecolor="#000000" backcolor="#66FFFF"/>
 			</frame>
 		</band>
 	</title>
