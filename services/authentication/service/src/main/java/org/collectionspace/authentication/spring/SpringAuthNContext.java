@@ -78,6 +78,7 @@ final public class SpringAuthNContext extends AuthNContext {
         if (caller == null) {
             String msg = "Could not find Subject!";
             //TODO: find out why subject is not null
+            // Can happen during ant import, when there is no session/user.
             //FIXME: if logger is loaded when authn comes up, use it
             //logger.warn(msg);
             System.err.println(msg);
