@@ -42,6 +42,7 @@
     <collectionspace_core:updatedBy>${updatedBy}</collectionspace_core:updatedBy>
     <collectionspace_core:tenantId>${tenantID}</collectionspace_core:tenantId>
     <collectionspace_core:uri>${uri}</collectionspace_core:uri>
+    <collectionspace_core:refName>${refName}</collectionspace_core:refName>
   </schema>
   ${Schema}
 </document>
