@@ -34,4 +34,7 @@ public class RoleStorageConstants {
 
     final public static String ROLE_NAME = "roleName";
 
+    final public static String PERM_ROLE_REL_ROLE_ID = "roleId";
+    final public static String PERM_ROLE_REL_PERM_ID = "permissionId";
+
 }
