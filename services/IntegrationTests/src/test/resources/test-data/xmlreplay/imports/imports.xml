@@ -5,8 +5,8 @@
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
     
-   <!-- ================================================================================ -->
-    
+    <!-- ================================================================================ -->
+        
     <testGroup ID="importsTestGroup" autoDeletePOSTS="false">
 
         <!-- Import a single ObjectExit record -->
@@ -81,9 +81,9 @@
             * Insert the value of that CSID into a field via expansion
               of the ${docID} variable.
             * Verify that variable has been expanded in the imported record.
-            * Verify that a server-side variable has also been expanded in the
+            * Verify that server-side variables have also been expanded in the
               wrapper template for imported records; specifically, that an
-              expected value is is present in the collectionspace_core part.
+              expected values are present in the collectionspace_core part.
             (See "Variables supported in expansion of request" in
             http://wiki.collectionspace.org/display/collectionspace/Imports+Service+Home)
         -->
@@ -115,6 +115,10 @@
                         <label>objectexit_common</label>
                     </part>
                 </parts>
+                <vars>
+                    <var ID="uriValue">/objectexit/${importObjectExitWithVarExpansion.recordCSID}</var>
+                    <var ID="refNameValue">urn:cspace:core.collectionspace.org:objectexit:id(${importObjectExitWithVarExpansion.recordCSID})</var>
+                </vars>
             </response>
         </test>
         <test ID="deleteObjectExitWithVarExpansion">
@@ -123,6 +127,102 @@
             <uri>/cspace-services/objectexit/${importObjectExitWithVarExpansion.recordCSID}</uri>
         </test>
         
+                
+        <!-- Verify that the refName generated for an object or procedural record -->
+        <!-- in a service supporting hierarchy includes a display name, derived -->
+        <!-- from the value of a specific, designated field in that record. -->
+        <!-- Verify that this value is present, as well, in the collectionspace_core part. --> 
+        <test ID="importCollectionObjectWithVarExpansion">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-collectionobject-varexpansion.xml</filename>
+            <vars>
+                <var ID="recordCSID">715dc8f1-9846-4da7-90ab-b4224936e9e2</var>
+                <var ID="objectNumberValue">COLLECTIONOBJECT-IMPORT-TEST-1999.7</var>
+                <var ID="briefDescriptionValue">Photograph of a Kordofan Giraffe near an Acacia shrub.</var>
+            </vars>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-collectionobject.res.xml</filename>
+            </response>
+        </test>
+        <test ID="verifyCollectionObjectWithVarExpansion">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${importCollectionObjectWithVarExpansion.recordCSID}</uri>
+            <response>
+                <filename>imports/res/import-collectionobject-varexpansion.res.xml</filename>
+                <expected level="ADDOK" />
+                <parts>
+                    <part>
+                        <label>collectionspace_core</label>
+                    </part>
+                    <part>
+                        <label>collectionobjects_common</label>
+                    </part>
+                </parts>
+                <vars>
+                    <var ID="uriValue">/collectionobjects/${importCollectionObjectWithVarExpansion.recordCSID}</var>
+                    <!-- Note: This test may fail if the RefnameDisplayNameField for -->
+                    <!-- CollectionObject records, in the core tenant, changes to a -->
+                    <!-- field other than objectNumber. -->
+                    <var ID="refNameValue">urn:cspace:core.collectionspace.org:collectionobjects:id(${importCollectionObjectWithVarExpansion.recordCSID})'${importCollectionObjectWithVarExpansion.objectNumberValue}'</var>
+                </vars>
+            </response>
+        </test>
+        <test ID="deleteCollectionObjectWithVarExpansion">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/${importCollectionObjectWithVarExpansion.recordCSID}</uri>
+        </test>
+        
+                
+        <!-- Verify that a refName value provided in the body of an authority record -->
+        <!-- is made present, as well, in the collectionspace_core part's refName field. -->
+        <test ID="importLocationAuthorityWithVarExpansion">
+            <expectedCodes>200</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/imports</uri>
+            <filename>imports/import-locationauthority-varexpansion.xml</filename>
+            <vars>
+                <var ID="recordCSID">88b7753c-f63b-4254-80a2-4dfcb3342c63</var>
+                <var ID="displayNameValue">Outbuilding Locations</var>
+                <var ID="shortIdentifierValue">outbuildinglocations</var>
+                <var ID="refNameValue">urn:cspace:core.collectionspace.org:locationauthorities:name(outbuildinglocations)'Outbuilding Locations'</var>
+            </vars>
+            <response>
+                <expected level="TEXT" />
+                <filename>imports/res/import-locationauthority.res.xml</filename>
+            </response>
+        </test>
+        <test ID="verifyLocationAuthorityWithVarExpansion">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/${importLocationAuthorityWithVarExpansion.recordCSID}</uri>
+            <response>
+                <filename>imports/res/import-locationauthority-varexpansion.res.xml</filename>
+                <expected level="ADDOK" />
+                <parts>
+                    <part>
+                        <label>collectionspace_core</label>
+                    </part>
+                    <part>
+                        <label>locationauthorities_common</label>
+                    </part>
+                </parts>
+                <vars>
+                    <var ID="uriValue">/locationauthorities/${importLocationAuthorityWithVarExpansion.recordCSID}</var>
+                    <var ID="refNameValue">${importLocationAuthorityWithVarExpansion.refNameValue}</var>
+                </vars>
+            </response>
+        </test>
+        <test ID="deleteLocationAuthorityWithVarExpansion">
+            <expectedCodes>200</expectedCodes>
+            <method>DELETE</method>
+            <uri>/cspace-services/locationauthorities/${importLocationAuthorityWithVarExpansion.recordCSID}</uri>
+        </test>
+                
         <!--
             Import a record containing dollar sign and backslash character(s).
             (See CSPACE-3917.) 
