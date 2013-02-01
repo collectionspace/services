@@ -104,7 +104,7 @@ public class IDGeneratorSerializer {
       generator = (SettableIDGenerator) xstream.fromXML(serializedGenerator);
     } catch (XStreamException e) {
 	    throw new BadRequestException(
-	      "Could not understand or parse this representation of an ID generator.");
+	      "Could not understand or parse this representation of an ID generator.", e);
     }
 
     return generator;
