@@ -23,20 +23,26 @@
  */
 package org.collectionspace.services.report;
 
+import java.io.InputStream;
+
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler;
+import org.collectionspace.services.publicitem.PublicitemsCommon;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.ResourceBase;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
+import org.collectionspace.services.common.publicitem.PublicItemUtil;
 import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +58,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 @Path(ReportClient.SERVICE_PATH)
 @Consumes("application/xml")
@@ -145,13 +152,77 @@ public class ReportResource extends ResourceBase {
     	return invokeReport(ui, csid, invContext);
     }
     
+    /*
+     * Publishes the report to the PublicItem service.  The response is a URI to the corresponding PublicItem resource instance in
+     * the form of /publicitems/{csid}.
+     * To access the contents of the report use a form like /publicitems/{tenantId}/{csid}/content.  For example,
+     * http://localhost:8180/cspace-services/publicitems/2991da78-6001-4f34-b02/1/content
+     */
+    @POST
+    @Path("{csid}/publish")
+    public Response invokeReportAndPublish(
+    		@Context ResourceMap resourceMap,    		
+    		@Context UriInfo uriInfo,
+    		@PathParam("csid") String csid,
+    		InvocationContext invContext) {
+    	Response response = null;
+    	
+        try {
+            StringBuffer outMimeType = new StringBuffer();
+            StringBuffer outReportFileName = new StringBuffer();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outReportFileName);            
+            response = PublicItemUtil.publishToRepository(
+            		(PublicitemsCommon)null, 
+            		resourceMap, 
+            		uriInfo, 
+            		getRepositoryClient(ctx), 
+            		ctx, 
+            		reportInputStream, 
+            		outReportFileName.toString());
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.POST_FAILED);
+        }
+        
+        return response;
+    }
+    
     @POST
     @Path("{csid}")
-    @Produces("application/pdf")
     public Response invokeReport(
     		@Context UriInfo ui,
     		@PathParam("csid") String csid,
     		InvocationContext invContext) {
+    	Response response = null;
+    	
+        try {
+            StringBuffer outMimeType = new StringBuffer();
+            StringBuffer outFileName = new StringBuffer();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            InputStream reportInputStream = invokeReport(ctx, csid, invContext, outMimeType, outFileName);
+            
+			// Need to set response type for what is requested...
+			ResponseBuilder builder = Response.ok(reportInputStream, outMimeType.toString());
+			builder = builder.header("Content-Disposition","inline;filename=\""+ outFileName.toString() +"\"");
+	        response = builder.build();                                    
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.POST_FAILED);
+        }
+        
+        return response;
+    }
+    
+    /*
+     * Does the actual report generation and returns an InputStream with the results.
+     */
+    private InputStream invokeReport(
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    		String csid,
+    		InvocationContext invContext,
+    		StringBuffer outMimeType,
+    		StringBuffer outReportFileName) throws Exception {
+    	InputStream result = null;
+    	
         if (csid == null || "".equals(csid)) {
             logger.error("invokeReport: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
@@ -159,19 +230,15 @@ public class ReportResource extends ResourceBase {
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
+        
         if (logger.isTraceEnabled()) {
             logger.trace("invokeReport with csid=" + csid);
         }
-        try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            ReportDocumentModelHandler handler = (ReportDocumentModelHandler)createDocumentHandler(ctx);
-            
-            return handler.invokeReport(ctx, csid, invContext);
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.POST_FAILED);
-        }
+    	
+        ReportDocumentModelHandler handler = (ReportDocumentModelHandler)createDocumentHandler(ctx);
+        result = handler.invokeReport(ctx, csid, invContext, outMimeType, outReportFileName);
+        
+        return result;
     }
     
-
-
 }

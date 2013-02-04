@@ -13,9 +13,9 @@
     <url>http://www.collectionspace.org</url>
     
     <modules>
-        <module>service</module>
-        <module>3rdparty</module>
         <module>client</module>
+        <module>3rdparty</module>
+        <module>service</module>
     </modules>
 
 </project>

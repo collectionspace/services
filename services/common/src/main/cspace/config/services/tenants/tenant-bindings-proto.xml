@@ -2908,6 +2908,69 @@
         </tenant:serviceBindings>
         <!-- end account service meta-data -->
     
+        <!-- begin PublicItem service meta-data -->
+        <tenant:serviceBindings id="PublicItems" name="PublicItems" type="procedure" version="0.1">
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /publicitems/*/authorityrefs/
+            </service:uriPath>
+            -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.publicitem.nuxeo.PublicItemDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>itemNumber</service:element>
+                            <service:xpath>itemNumber</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>contentSource</service:element>
+                            <service:xpath>contentSource</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>contentUri</service:element>
+                            <service:xpath>contentUri</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.publicitem.nuxeo.PublicItemValidatorHandler</service:validatorHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>contentName</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>itemNumber</types:value>
+                </types:item>
+            </service:properties>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="PublicItem" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="publicitems-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="publicitems_common" updated="" order="1">
+                    <service:properties>
+                        <!-- Fields containing authority term references -->
+                        <!-- Fields containing term list / controlled vocabulary references -->
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/publicitem" schemaLocation="http://collectionspace.org/services/publicitem http://services.collectionspace.org/publicitem/publicitems_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end PublicItem service meta-data -->    
+    
         <!-- begin dimension service meta-data -->
         <tenant:serviceBindings id="Dimensions" name="Dimensions" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->

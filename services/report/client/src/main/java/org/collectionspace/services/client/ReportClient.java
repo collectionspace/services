@@ -26,6 +26,10 @@
  */
 package org.collectionspace.services.client;
 
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -79,6 +83,11 @@ public class ReportClient extends AbstractCommonListPoxServiceClientImpl<ReportP
     public ClientResponse<AbstractCommonList> readListFiltered(
         		String docType, String mode) {
         return getProxy().readListFiltered(docType, mode);
+    }
+    
+    public ClientResponse<Response> publishReport(String csid,
+    		InvocationContext invContext) {
+    	return getProxy().publishReport(csid, invContext);
     }
     
 }

@@ -60,8 +60,8 @@ public class RemoteServiceContextFactory<IT, OT>
      * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String)
      */
     @Override
-    public ServiceContext<IT, OT> createServiceContext(String serviceName) throws Exception {
-    	RemoteServiceContext<IT, OT> ctx = new RemoteServiceContextImpl<IT, OT>(serviceName);
+    public ServiceContext<IT, OT> createServiceContext(String serviceName, UriInfo uriInfo) throws Exception {
+    	RemoteServiceContext<IT, OT> ctx = new RemoteServiceContextImpl<IT, OT>(serviceName, uriInfo);
     	return ctx;
     }
     
@@ -70,8 +70,8 @@ public class RemoteServiceContextFactory<IT, OT>
      */
     @Override
     public ServiceContext<IT, OT> createServiceContext(String serviceName,
-    		IT theInput) throws Exception {
-    	RemoteServiceContext<IT, OT> ctx = new RemoteServiceContextImpl<IT, OT>(serviceName, theInput);
+    		IT theInput, UriInfo uriInfo) throws Exception {
+    	RemoteServiceContext<IT, OT> ctx = new RemoteServiceContextImpl<IT, OT>(serviceName, theInput, uriInfo);
         return ctx;
     }
     
