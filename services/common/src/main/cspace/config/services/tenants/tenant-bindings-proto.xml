@@ -53,11 +53,15 @@
             <!-- other URI paths through which this service could be accessed -->
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.common.init.RunSqlScript</service:classname>
+                <service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
                 <service:params>
                     <service:property>
                         <service:key>sqlScriptName</service:key>
                         <service:value>create_id_generators_table.sql</service:value>
+                    </service:property>
+                    <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>load_id_generators.sql</service:value>
                     </service:property>
                 </service:params>
             </service:initHandler>
@@ -73,18 +77,6 @@
                 </service:uriPath>
             -->
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
-            <!-- The following initHandler config block is placed here, rather than in the -->
-            <!-- idgenerators service, above, as it appears that we currently can only run -->
-            <!-- one initHandler per service - ADR 2012-12-13 -->
-            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
-                <service:classname>org.collectionspace.services.common.init.RunSqlScript</service:classname>
-                <service:params>
-                    <service:property>
-                        <service:key>sqlScriptName</service:key>
-                        <service:value>load_id_generators.sql</service:value>
-                    </service:property>
-                </service:params>
-            </service:initHandler>
         </tenant:serviceBindings>    
         <!-- end id service meta-data -->
         
@@ -1444,6 +1436,10 @@
                 <service:ListResultField>
                   <service:element>claimNumber</service:element>
                   <service:xpath>claimNumber</service:xpath>
+                </service:ListResultField>
+                <service:ListResultField>
+                  <service:element>filedOnBehalfOf</service:element>
+                  <service:xpath>claimClaimantGroupList/[0]/filedOnBehalfOf</service:xpath>
                 </service:ListResultField>
               </service:ListResultsFields>
             </service:params>

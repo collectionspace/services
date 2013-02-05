@@ -324,6 +324,46 @@ public class JpaStorageUtils {
         return result;
     }
     
+    public static Object getEntityByDualKeys(EntityManager em, String entityName, 
+    		String key1, String value1,
+    		String key2, String value2) {
+    	return getEntityByDualKeys(em, entityName, key1, value1, key2, value2, null);
+    }
+    
+    public static Object getEntityByDualKeys(EntityManager em, String entityName, 
+    		String key1, String value1,
+    		String key2, String value2,
+            String tenantId) {
+    	Object result = null;
+    	
+        if (entityName == null) {
+            throw new IllegalArgumentException("entityName is required");
+        }
+        if (key1 == null || key2 == null) {
+            throw new IllegalArgumentException("key names are required");
+        }
+        
+        StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+        queryStrBldr.append(entityName);
+        queryStrBldr.append(" a");
+        queryStrBldr.append(" WHERE " + key1 + " = :" + key1);
+        queryStrBldr.append(" AND " + key2 + " = :" + key2);
+        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+        if (!csAdmin && tenantId != null) {
+            queryStrBldr.append(" AND tenantId = :tenantId");
+        }
+        String queryStr = queryStrBldr.toString(); //for debugging
+        Query q = em.createQuery(queryStr);
+        q.setParameter(key1, value1);
+        q.setParameter(key2, value2);
+        if (!csAdmin) {
+            q.setParameter("tenantId", tenantId);
+        }
+        result = q.getSingleResult();
+
+        return result;
+    }
+    
     public static Object getEnityByKey(String entityName, String key, String value,
             String tenantId) {
         EntityManagerFactory emf = null;

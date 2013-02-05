@@ -32,6 +32,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.common.authorization_mgt.RoleStorageConstants;
 import org.collectionspace.services.common.document.JaxbUtils;
@@ -76,6 +77,25 @@ public class AuthorizationStore {
     	}
     	
     	return theRole;
+    }
+    
+    
+    static public PermissionRoleRel getPermRoleRel(EntityManager em, String permId, String roleId) {
+    	PermissionRoleRel permRoleRel = null;
+    	
+    	try {
+    		permRoleRel = (PermissionRoleRel)JpaStorageUtils.getEntityByDualKeys(em, 
+    				PermissionRoleRel.class.getName(),
+    				RoleStorageConstants.PERM_ROLE_REL_PERM_ID, permId, 
+    				RoleStorageConstants.PERM_ROLE_REL_ROLE_ID, roleId);
+    	} catch (Throwable e) {
+    		if (logger.isTraceEnabled()) {
+    			logger.trace("Could not retrieve permissionRoleRel with permId =" + permId 
+    					+" and roleId="+roleId, e);
+    		}
+    	}
+    	
+    	return permRoleRel;
     }
     
     
@@ -138,10 +158,37 @@ public class AuthorizationStore {
     	boolean result = false;
     	
     	try {
-    		String csid = (String)JaxbUtils.getValue(entity, "getCsid");
-    		Object existingEntity = em.find(entity.getClass(), csid);
-    		if (existingEntity != null) {
-    			result = true;
+    		if(entity instanceof Role) {
+    			// If find by name, exists
+    			Role roleEntity = (Role)entity;
+    			String roleName = roleEntity.getRoleName();
+    			String tenantId = roleEntity.getTenantId();
+    			if(getRoleByName(em, roleName, tenantId)!=null) {
+    				result = true;
+    	    		logger.trace("Role {} already exists in tenant {}.", roleName, tenantId);
+    			} else {
+    	    		logger.trace("Role {} does not exist in tenant {}.", roleName, tenantId);
+    			}
+    		} else if(entity instanceof PermissionRoleRel) {
+    			// If find by name, exists
+    			PermissionRoleRel permRoleEntity = (PermissionRoleRel)entity;
+    			String roleId = permRoleEntity.getRoleId();
+    			String permId = permRoleEntity.getPermissionId();
+    			if(getPermRoleRel(em, permId, roleId)!=null) {
+    				result = true;
+    	    		logger.trace("PermRoleRel for {}, {} already exists.", permId, roleId);
+    			} else {
+    	    		logger.trace("PermRoleRel for {}, {} does not exist.", permId, roleId);
+    			}
+    		} else {	// Default case; also best test for Permission
+    			String csid = (String)JaxbUtils.getValue(entity, "getCsid");
+    			Object existingEntity = em.find(entity.getClass(), csid);
+    			if (existingEntity != null) {
+    				result = true;
+    	    		logger.trace("Entity with csid {} already exists.", csid);
+    			} else {
+    	    		logger.trace("Entity with csid {} does not exist.", csid);
+    			}
     		}
     	} catch (Exception e) {
     		//NOTE: Not all entities have a CSID attribute
@@ -154,15 +201,20 @@ public class AuthorizationStore {
      */
     public String store(EntityManager em, Object entity) throws Exception {
     	boolean entityExists = exists(em, entity);
+    	/* 
+    	 * Logging moved to exists, for better detail
     	if (entityExists == true) {
-    		logger.debug("Entity to persist already exists.");
+    		logger.trace("Entity to persist already exists.");
     	}
+    	 */
         if (JaxbUtils.getValue(entity, "getCreatedAt") == null) {
             JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
         }
         
         if (entityExists == true) {
         	//em.merge(entity); FIXME: Leave commented out until we address CSPACE-5031
+        	// PLS: Question: why merge? what might be new to change, and is this really a good idea?
+        	// Shouldn't we define them once and leave them alone?
         } else {
         	em.persist(entity);
         }

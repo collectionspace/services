@@ -320,15 +320,40 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             }
             acl = provider.getProviderAclService().createAcl(oid);
         }
-        acl.insertAce(acl.getEntries().size(), permission, sid, grant);
-        provider.getProviderAclService().updateAcl(acl);
+        // Need to see if there is already an entry, so we do not duplicate (e.g., 
+        // when we run our permission-roles init more than once.
+        List<AccessControlEntry> aceEntries = acl.getEntries();
+        if(aceListHasEntry(aceEntries, permission, sid, grant)) {
+            if (log.isDebugEnabled()) {
+                log.debug("addPermission: Pre-existing acl for oid=" + oid.toString()
+                        + " perm=" + permission.toString()
+                        + " sid=" + sid.toString()
+                        + " grant=" + grant);
+            }
+        	
+        } else {
+            acl.insertAce(acl.getEntries().size(), permission, sid, grant);
+            provider.getProviderAclService().updateAcl(acl);
 
-        if (log.isDebugEnabled()) {
-            log.debug("addPermission: added acl for oid=" + oid.toString()
-                    + " perm=" + permission.toString()
-                    + " sid=" + sid.toString()
-                    + " grant=" + grant);
+            if (log.isDebugEnabled()) {
+                log.debug("addPermission: added acl for oid=" + oid.toString()
+                        + " perm=" + permission.toString()
+                        + " sid=" + sid.toString()
+                        + " grant=" + grant);
+            }
         }
+    }
+    
+    private boolean aceListHasEntry(List<AccessControlEntry> aceEntries, Permission permission,
+            Sid sid, boolean grant) {
+    	for(AccessControlEntry entry : aceEntries) {
+    		if(permission.equals(entry.getPermission())
+    			&& sid.equals(entry.getSid())
+    			&& grant == entry.isGranting()) {
+    			return true;
+    		}
+    	}
+    	return false;
     }
 
     /**

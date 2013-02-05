@@ -29,6 +29,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -139,10 +140,19 @@ public class JDBCTools {
 	        String urlTemplate = dataSource.getUrl();
 	        String databaseName = getDatabaseName(repositoryName);
 	        String connectionUrl = urlTemplate.replace(URL_DATABASE_NAME, databaseName);
-        	dataSource.setUrl(connectionUrl);
+
+	        // ATTENTION!
+	        // Turns out the Tomcat BasicDataSource used a connection pool, so changing the url does not
+	        // get you a corresponding connection. Use the more basic implementation for now, unless
+	        // and until we do things right by creating additional JNDI data sources.
+	        
+        	//dataSource.setUrl(connectionUrl);
+	        String user = dataSource.getUsername();
+	        String password = dataSource.getPassword();
 	        
 	        try {
-	        	conn = dataSource.getConnection();
+	        	//conn = dataSource.getConnection();
+	        	conn = DriverManager.getConnection(connectionUrl, user, password);
 	        	result = conn;
 	        	if (logger.isTraceEnabled() == true && conn != null) {
 	        		logger.trace(String.format("Connection made to repository = '%s' using datasource = '%s'", repositoryName, dataSourceName));
