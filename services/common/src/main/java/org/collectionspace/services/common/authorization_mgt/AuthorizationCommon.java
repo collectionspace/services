@@ -123,9 +123,9 @@ public class AuthorizationCommon {
     public static final String DEFAULT_ADMIN_PASSWORD = "Administrator";
     public static final String DEFAULT_READER_PASSWORD = "reader";
 
-    public static String ROLE_SPRING_ADMIN_ID = "-1";
-    public static String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";
-
+    public static final String ROLE_SPRING_ADMIN_ID = "-1";
+    public static final String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";
+    
     // SQL for init tasks
 	final private static String INSERT_ACCOUNT_ROLE_SQL_MYSQL = 
 			"INSERT INTO accounts_roles(account_id, user_id, role_id, role_name, created_at)"
@@ -381,6 +381,7 @@ public class AuthorizationCommon {
     
     private static Hashtable<String, String> getTenantNamesFromConfig(TenantBindingConfigReaderImpl tenantBindingConfigReader) {
 
+    	// Note that this only handles tenants not marked as "createDisabled"
     	Hashtable<String, TenantBindingType> tenantBindings =
     			tenantBindingConfigReader.getTenantBindings();
     	Hashtable<String, String> tenantInfo = new Hashtable<String, String>();
@@ -934,6 +935,7 @@ public class AuthorizationCommon {
         	conn = getConnection();
 	        ArrayList<String> existingTenants = compileExistingTenants(conn, tenantInfo);
 	        
+	    	// Note that this only creates tenants not marked as "createDisabled"
 	        createMissingTenants(conn, tenantInfo, existingTenants);
 	        
 	        ArrayList<String> usersInRepo = findOrCreateDefaultUsers(conn, tenantInfo);

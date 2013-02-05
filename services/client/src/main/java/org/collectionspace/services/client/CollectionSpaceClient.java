@@ -36,6 +36,7 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
  */
 public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P extends CollectionSpaceProxy<CLT>> {
 
+	public final static String CSID_PATH_PARAM_VAR = "{csid}";
     public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
     
     public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";

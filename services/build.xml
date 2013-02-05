@@ -184,6 +184,7 @@
         <ant antfile="dimension/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="contact/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="claim/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="publicitem/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false"/>
     </target>
 
@@ -194,6 +195,7 @@
         <ant antfile="vocabulary/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="person/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="publicitem/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="undeploy" inheritAll="false"/>

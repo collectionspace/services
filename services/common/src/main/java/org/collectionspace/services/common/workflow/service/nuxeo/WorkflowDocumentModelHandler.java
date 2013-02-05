@@ -76,6 +76,13 @@ public class WorkflowDocumentModelHandler
     	super.handleUpdate(wrapDoc);
     }
     
+    @Override
+    protected void handleRefNameChanges(ServiceContext ctx, DocumentModel docModel) throws ClientException {
+    	//
+    	// We are intentionally overriding this method to do nothing since the Workflow resource is a meta-resource without a refname
+    	//
+    }    
+    
     /*
      * Handle read (GET)
      */

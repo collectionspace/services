@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:invocationContext
+    xmlns:ns2="http://collectionspace.org/services/common/invocable"
+    xmlns:ns3="http://collectionspace.org/services/jaxb">
+    <mode>list</mode>
+    <docType>CollectionObject</docType>
+    <singleCSID></singleCSID>
+    <groupCSID></groupCSID>
+    <listCSIDs>
+        <csid>${collectionObject1CSID}</csid>
+        <csid>${collectionObject2CSID}</csid>
+    </listCSIDs>
+    <params>
+        <param>
+            <key>some key</key>
+            <value>some value</value>
+        </param>
+    </params>
+</ns2:invocationContext>
+
+

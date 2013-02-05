@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services</artifactId>
-        <version>3.2-SNAPSHOT</version>
+        <version>3.2.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -72,11 +72,12 @@
         <module>contact</module>
         <module>workflow</module>
         <module>media</module>
-        <module>JaxRsServiceProvider</module>
+        <module>publicitem</module>        
         <!--module>sdk</module-->
         <module>IntegrationTests</module>
         <module>PerformanceTests</module>
         <module>security</module>
+        <module>JaxRsServiceProvider</module>
     </modules>
 
     <dependencies>

@@ -22,14 +22,18 @@
         org.apache.catalina.core
         org.springframework.security
     -->
-
+	
     <bean id="springSecurityFilterChain"
           class="org.springframework.security.web.FilterChainProxy">
         <sec:filter-chain-map path-type="ant">
+			<!-- Exclude the resource path to public items' content from AuthN and AuthZ.  Let's us publish resources with anonymous access. -->
+			<sec:filter-chain pattern="/publicitems/*/*/content"
+                              filters="none"/>
             <sec:filter-chain pattern="/**"
                               filters="securityContextPersistenceFilter,basicAuthenticationFilter,logoutFilter,exTranslationFilter,filterInvocationInterceptor"/>
         </sec:filter-chain-map>
     </bean>
+	
 
     <bean id="securityContextPersistenceFilter"
           class="org.springframework.security.web.context.SecurityContextPersistenceFilter">

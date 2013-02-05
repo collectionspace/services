@@ -27,7 +27,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PayloadInputPart;
@@ -38,10 +37,7 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-//import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,9 +62,10 @@ public class MultipartServiceContextImpl
      * 
      * @throws UnauthorizedException the unauthorized exception
      */
-    protected MultipartServiceContextImpl(String serviceName)
+    protected MultipartServiceContextImpl(String serviceName,
+    		UriInfo uriInfo)
     		throws DocumentException, UnauthorizedException {
-    	super(serviceName);
+    	super(serviceName, uriInfo);
     	setOutput(new PoxPayloadOut(serviceName));
     }
     
@@ -79,9 +76,9 @@ public class MultipartServiceContextImpl
      * 
      * @throws UnauthorizedException the unauthorized exception
      */
-    protected MultipartServiceContextImpl(String serviceName, PoxPayloadIn theInput)
+    protected MultipartServiceContextImpl(String serviceName, PoxPayloadIn theInput, UriInfo uriInfo)
     		throws DocumentException, UnauthorizedException {
-        super(serviceName, theInput);
+        super(serviceName, theInput, uriInfo);
         setOutput(new PoxPayloadOut(serviceName));
     }
 

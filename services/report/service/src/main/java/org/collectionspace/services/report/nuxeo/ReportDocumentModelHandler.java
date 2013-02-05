@@ -23,28 +23,49 @@
  */
 package org.collectionspace.services.report.nuxeo;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
 
 import javax.naming.NamingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporter;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.JRCsvExporter;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.JRXmlExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 
+import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -79,10 +100,12 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     private static String REPORTS_STD_CSIDLIST_PARAM = "csidlist";
     private static String REPORTS_STD_TENANTID_PARAM = "tenantid";
 	
-	public Response invokeReport(
+	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			String csid,
-			InvocationContext invContext) throws Exception {
+			InvocationContext invContext,
+			StringBuffer outMimeType,
+			StringBuffer outReportFileName) throws Exception {
 		RepositoryInstance repoSession = null;
 		boolean releaseRepoSession = false;
 
@@ -91,6 +114,10 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(REPORTS_STD_TENANTID_PARAM, ctx.getTenantId());
 		boolean checkDocType = true;
+		
+		// Note we set before we put in the default ones, so they cannot override tenant or CSID.
+		setParamsFromContext(params, invContext);
+		
 		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
     		params.put(REPORTS_STD_CSID_PARAM, invContext.getSingleCSID());
@@ -126,6 +153,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
         			+invocationMode);
 		}
 		
+		
 		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
@@ -133,8 +161,8 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 			releaseRepoSession = true;
 		}
 
-		String reportFileName = null;
 		// Get properties from the batch docModel, and release the session
+		String reportFileNameProperty;
 		try {
 			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
 			DocumentModel docModel = wrapper.getWrappedObject();
@@ -154,7 +182,13 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 	        				+invContext.getDocType());
 	        	}
 	    	}
-			reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
+	    	reportFileNameProperty = ((String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME)); // Set the outgoing param with the report file name
+			String reportOutputMime = (String)docModel.getPropertyValue(ReportJAXBSchema.OUTPUT_MIME);
+			if(!Tools.isEmpty(reportOutputMime)) {
+				outMimeType.append(reportOutputMime);
+			} else {
+				outMimeType.append(ReportClient.DEFAULT_REPORT_OUTPUT_MIME);
+			}
 		} catch (PropertyException pe) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Property exception getting batch values: ", pe);
@@ -175,37 +209,132 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 				repoClient.releaseRepositorySession(ctx, repoSession);
 			}
 		}
-       	return buildReportResponse(csid, params, reportFileName);
+		
+       	return buildReportResult(csid, params, reportFileNameProperty, outMimeType.toString(), outReportFileName);
+	}
+	
+	private void setParamsFromContext(Map<String, Object> params, InvocationContext invContext) {
+		InvocationContext.Params icParams = invContext.getParams();
+		if(icParams!= null) {
+			List<InvocationContext.Params.Param> icParamList = icParams.getParam();
+			if(icParamList != null) {
+				for(InvocationContext.Params.Param param:icParamList) {
+					String key = param.getKey();
+					String value = param.getValue();
+					if(!Tools.isEmpty(key) && !Tools.isEmpty(value)) {
+						params.put(key, value);
+					}
+				}
+			}
+		}
+		
 	}
 
-
-    private Response buildReportResponse(String reportCSID, HashMap<String, Object> params, String reportFileName)
+    private InputStream buildReportResult(String reportCSID, 
+    		HashMap<String, Object> params, String reportFileName, String outputMimeType, StringBuffer outReportFileName)
     				throws Exception {
 		Connection conn = null;
-		Response response = null;
+		InputStream result = null;
+		
     	try {
-			String fullPath = ServiceMain.getInstance().getServerRootDir() +
+    		String fileNameBase = Tools.getFilenameBase(reportFileName);
+    		String compiledReportFilename = fileNameBase+ReportClient.COMPILED_REPORT_EXTENSION;
+    		String reportDescriptionFilename = fileNameBase+ReportClient.REPORT_DECSRIPTION_EXTENSION;
+    		
+			String basePath = ServiceMain.getInstance().getServerRootDir() +
 								File.separator + ConfigReader.CSPACE_DIR_NAME + 
 								File.separator + REPORTS_FOLDER +
 								// File.separator + tenantName +
-								File.separator + reportFileName;
+								File.separator; // + reportFileName;
+			
+			String compiledFilePath = basePath+compiledReportFilename; 
+			File f = new File(compiledFilePath);
+			if(!f.exists()) { // Need to compile the file
+				// First verify that there is a source file.
+				String sourceFilePath = basePath+reportDescriptionFilename; 
+				File f2 = new File(sourceFilePath);
+				if(!f2.exists()) { // Missing source file - error!
+					logger.error("Report for csid={} is missing the specified source file: {}",
+									reportCSID, sourceFilePath);
+					throw new RuntimeException("Report is missing the specified source file!");
+				}
+            	logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
+            			reportCSID, compiledFilePath);
+            	JasperCompileManager.compileReportToFile(sourceFilePath, compiledFilePath);
+			}				
+				
 			conn = getConnection();
 	
             if (logger.isTraceEnabled()) {
-            	logger.trace("ReportResource for Report csid=" + reportCSID
-            			+" opening report file: "+fullPath);
+            	logger.trace("ReportResource for csid=" + reportCSID
+            			+" output as "+outputMimeType+" using report file: "+compiledFilePath);
             }
-			FileInputStream fileStream = new FileInputStream(fullPath);
+			FileInputStream fileStream = new FileInputStream(compiledFilePath);
 	
-	        // fill the report
-			JasperPrint jasperprint = JasperFillManager.fillReport(fileStream, params,conn);
 			// export report to pdf and build a response with the bytes
-			byte[] pdfasbytes = JasperExportManager.exportReportToPdf(jasperprint);
+			//JasperExportManager.exportReportToPdf(jasperprint);
 			
-			// Need to set response type for what is requested...
-	        response = Response.ok(pdfasbytes, "application/pdf").build();
+			// Report will be to a byte output array.
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+			JRExporter exporter = null;
+			// Strip extension from report filename.
+			String outputFilename = reportFileName;
+			// Strip extension from report filename.
+			int idx = outputFilename.lastIndexOf("."); 
+			if(idx>0)
+				outputFilename = outputFilename.substring(0, idx);
+			// Strip any sub-dir from report filename.
+			idx = outputFilename.lastIndexOf(File.separator); 
+			if(idx>0)
+				outputFilename = outputFilename.substring(idx+1);
+			if(outputMimeType.equals(MediaType.APPLICATION_XML)) {
+				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+				exporter = new JRXmlExporter();
+				outputFilename = outputFilename+".xml";
+			} else if(outputMimeType.equals(MediaType.TEXT_HTML)) {
+				exporter = new JRHtmlExporter();
+				outputFilename = outputFilename+".html";
+			} else if(outputMimeType.equals(ReportClient.PDF_MIME_TYPE)) {
+				exporter = new JRPdfExporter();
+				outputFilename = outputFilename+".pdf";
+			} else if(outputMimeType.equals(ReportClient.CSV_MIME_TYPE)) {
+				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+				exporter = new JRCsvExporter();
+				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ",");
+				outputFilename = outputFilename+".csv";
+			} else if(outputMimeType.equals(ReportClient.TSV_MIME_TYPE)) {
+				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+				exporter = new JRCsvExporter();
+				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, "\t");
+				outputFilename = outputFilename+".csv";
+			} else if(outputMimeType.equals(ReportClient.MSWORD_MIME_TYPE)	// Understand msword as docx
+					|| outputMimeType.equals(ReportClient.OPEN_DOCX_MIME_TYPE)) {
+				exporter = new JRDocxExporter();
+				outputFilename = outputFilename+".docx";
+			} else if(outputMimeType.equals(ReportClient.MSEXCEL_MIME_TYPE)	// Understand msexcel as xlsx
+					|| outputMimeType.equals(ReportClient.OPEN_XLSX_MIME_TYPE)) {
+				exporter = new JRXlsxExporter();
+				outputFilename = outputFilename+".xlsx";
+			} else if(outputMimeType.equals(ReportClient.MSPPT_MIME_TYPE)	// Understand msppt as xlsx
+					|| outputMimeType.equals(ReportClient.OPEN_PPTX_MIME_TYPE)) {
+				exporter = new JRPptxExporter();
+				outputFilename = outputFilename+".pptx";
+			} else {
+				logger.error("Reporting: unsupported output MIME type - defaulting to PDF");
+				exporter = new JRPdfExporter();
+				outputFilename = outputFilename+"-default-to.pdf";
+			}
+			outReportFileName.append(outputFilename); // Set the out going param to the report's final file name
+	        // fill the report
+			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
+				
+			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+			exporter.exportReport();
+			result = new ByteArrayInputStream(baos.toByteArray());
 	
-	       	return response;    	
+	       	return result;
         } catch (SQLException sqle) {
             // SQLExceptions can be chained. We have at least one exception, so
             // set up a loop to make sure we let the user know about all of them
@@ -219,7 +348,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 	                tempException = tempException.getNextException();
 	            }
             }
-            response = Response.status(
+            Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
             throw new WebApplicationException(response);
@@ -227,7 +356,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             if (logger.isDebugEnabled()) {
             	logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: "+jre.getCause());
             }
-            response = Response.status(
+            Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
             throw new WebApplicationException(response);
@@ -235,7 +364,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
             if (logger.isDebugEnabled()) {
             	logger.debug("FileNotFoundException: " + fnfe.getLocalizedMessage());
             }
-            response = Response.status(
+            Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
             throw new WebApplicationException(response);
