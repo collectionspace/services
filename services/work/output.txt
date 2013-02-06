@@ -1,0 +1,744 @@
+[INFO] Scanning for projects...
+[INFO] Reactor build order: 
+[INFO]   services.work
+[INFO]   services.work.jaxb
+[INFO]   services.work.client
+[INFO]   services.work.service
+[INFO]   services.work.3rdparty
+[INFO]   services.work.3rdparty.nuxeo
+[INFO] ------------------------------------------------------------------------
+[INFO] Building services.work
+[INFO]    task-segment: [test]
+[INFO] ------------------------------------------------------------------------
+[INFO] No goals needed for project - skipping
+[INFO] ------------------------------------------------------------------------
+[INFO] Building services.work.jaxb
+[INFO]    task-segment: [test]
+[INFO] ------------------------------------------------------------------------
+[INFO] [jaxb2:generate {execution: default}]
+[INFO] Skipped XJC execution. Generated sources were up-to-date.
+[INFO] [resources:resources {execution: default-resources}]
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 2 resources
+[INFO] Copying 1 resource
+[INFO] [compiler:compile {execution: default-compile}]
+[INFO] Nothing to compile - all classes are up to date
+[INFO] [resources:testResources {execution: default-testResources}]
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/mjesse/Documents/github/walker/services/services/work/jaxb/src/test/resources
+[INFO] [compiler:testCompile {execution: default-testCompile}]
+[INFO] No sources to compile
+[WARNING] DEPRECATED [systemProperties]: Use systemPropertyVariables instead.
+[INFO] [surefire:test {execution: default-test}]
+[INFO] No tests to run.
+[INFO] Surefire report directory: /Users/mjesse/Documents/github/walker/services/services/work/jaxb/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running TestSuite
+There are no tests to run.
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Building services.work.client
+[INFO]    task-segment: [test]
+[INFO] ------------------------------------------------------------------------
+[INFO] [resources:resources {execution: default-resources}]
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/mjesse/Documents/github/walker/services/services/work/client/src/main/resources
+[INFO] [compiler:compile {execution: default-compile}]
+[INFO] Nothing to compile - all classes are up to date
+[INFO] [resources:testResources {execution: default-testResources}]
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] [compiler:testCompile {execution: default-testCompile}]
+[INFO] Nothing to compile - all classes are up to date
+[WARNING] DEPRECATED [systemProperties]: Use systemPropertyVariables instead.
+[INFO] [surefire:test {execution: default-test}]
+[INFO] Surefire report directory: /Users/mjesse/Documents/github/walker/services/services/work/client/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running TestSuite
+2013-02-05 17:40:24,168 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:24,229 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:24,233 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:24,936 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = create
+===================================================
+2013-02-05 17:40:24,948 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:24,948 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:24,949 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:25,034 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:26,115 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] create: HTTP status = 201
+2013-02-05 17:40:26,118 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/3983ae95-ffec-40e9-be1c
+2013-02-05 17:40:26,118 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=3983ae95-ffec-40e9-be1c
+2013-02-05 17:40:26,120 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:100] create: Setting knownResourceId=3983ae95-ffec-40e9-be1c
+2013-02-05 17:40:26,127 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = createList
+===================================================
+2013-02-05 17:40:26,129 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:26,129 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:26,130 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:26,168 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:26,626 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:26,627 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/12d307c8-6fa2-44cd-b6b7
+2013-02-05 17:40:26,628 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=12d307c8-6fa2-44cd-b6b7
+2013-02-05 17:40:26,630 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:26,631 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:26,631 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:26,659 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:26,959 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:26,960 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/37563d16-ba88-4f80-a5a8
+2013-02-05 17:40:26,960 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=37563d16-ba88-4f80-a5a8
+2013-02-05 17:40:26,961 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:26,973 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:26,974 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:26,995 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:27,198 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:27,198 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/18ab8cb4-099f-4936-9492
+2013-02-05 17:40:27,199 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=18ab8cb4-099f-4936-9492
+2013-02-05 17:40:27,200 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:27,201 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:27,201 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:27,219 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:27,606 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:27,607 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/175cdd05-e79c-4dd4-b657
+2013-02-05 17:40:27,608 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=175cdd05-e79c-4dd4-b657
+2013-02-05 17:40:27,609 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:27,616 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:27,617 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:27,638 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:27,870 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:27,871 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/64d8cd08-a95d-441a-afac
+2013-02-05 17:40:27,871 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=64d8cd08-a95d-441a-afac
+2013-02-05 17:40:27,872 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:27,873 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:27,874 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:27,905 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:28,099 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:28,100 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/7e4cc36a-31cb-428f-a301
+2013-02-05 17:40:28,115 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=7e4cc36a-31cb-428f-a301
+2013-02-05 17:40:28,117 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:28,117 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:28,118 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:28,134 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:28,374 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:28,375 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/196cff90-c760-4dff-a8e1
+2013-02-05 17:40:28,381 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=196cff90-c760-4dff-a8e1
+2013-02-05 17:40:28,382 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:28,392 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:28,392 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:28,407 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:28,849 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:28,849 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/71c79387-8ac1-44e3-a648
+2013-02-05 17:40:28,850 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=71c79387-8ac1-44e3-a648
+2013-02-05 17:40:28,851 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:28,852 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:28,853 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:28,871 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:29,148 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:29,149 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/d3f9ca52-8f58-44d2-9e3d
+2013-02-05 17:40:29,151 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=d3f9ca52-8f58-44d2-9e3d
+2013-02-05 17:40:29,154 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:29,155 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:29,155 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:29,169 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:29,357 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createList: HTTP status = 201
+2013-02-05 17:40:29,358 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/036a5fd8-f613-45c7-ac68
+2013-02-05 17:40:29,358 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=036a5fd8-f613-45c7-ac68
+2013-02-05 17:40:29,363 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = read
+===================================================
+2013-02-05 17:40:29,364 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:29,365 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:29,365 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:29,852 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:194] read: status = 200
+2013-02-05 17:40:29,856 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:29,856 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:29,857 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:29,879 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:29,881 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:29,882 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:29,882 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:29,917 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:29,921 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:29,930 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:29,946 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:72] Reading part workauthorities_common ...
+2013-02-05 17:40:30,156 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readList
+===================================================
+2013-02-05 17:40:30,157 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:30,158 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:30,158 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:30,497 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:429] readList: status = 200
+2013-02-05 17:40:30,501 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readPaginatedList
+===================================================
+2013-02-05 17:40:30,502 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:30,502 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:30,502 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:30,609 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:758] readPaginatedList: status = 200
+2013-02-05 17:40:30,619 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:477] readPaginatedList:created list of 11 to be paginated.
+2013-02-05 17:40:30,708 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:758] readPaginatedList: status = 200
+2013-02-05 17:40:30,731 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:785] readPaginatedList:page number is 0
+2013-02-05 17:40:30,731 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:791] readPaginatedList:page size is 3
+2013-02-05 17:40:30,731 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:797] readPaginatedList:actual items in page was/were 3
+2013-02-05 17:40:30,732 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:803] readPaginatedList:total number of items is 11
+2013-02-05 17:40:30,831 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:758] readPaginatedList: status = 200
+2013-02-05 17:40:30,854 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:785] readPaginatedList:page number is 1
+2013-02-05 17:40:30,854 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:791] readPaginatedList:page size is 3
+2013-02-05 17:40:30,855 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:797] readPaginatedList:actual items in page was/were 3
+2013-02-05 17:40:30,855 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:803] readPaginatedList:total number of items is 11
+2013-02-05 17:40:30,997 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:758] readPaginatedList: status = 200
+2013-02-05 17:40:31,093 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:785] readPaginatedList:page number is 2
+2013-02-05 17:40:31,094 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:791] readPaginatedList:page size is 3
+2013-02-05 17:40:31,094 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:797] readPaginatedList:actual items in page was/were 3
+2013-02-05 17:40:31,094 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:803] readPaginatedList:total number of items is 11
+2013-02-05 17:40:31,186 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:758] readPaginatedList: status = 200
+2013-02-05 17:40:31,202 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:785] readPaginatedList:page number is 3
+2013-02-05 17:40:31,203 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:791] readPaginatedList:page size is 3
+2013-02-05 17:40:31,203 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:797] readPaginatedList:actual items in page was/were 2
+2013-02-05 17:40:31,203 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:803] readPaginatedList:total number of items is 11
+2013-02-05 17:40:31,205 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = testSubmitRequest
+===================================================
+2013-02-05 17:40:31,206 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:31,211 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:31,212 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:31,503 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:372] testSubmitRequest: url=http://localhost:8180/cspace-services/workauthorities/3983ae95-ffec-40e9-be1c status=200
+2013-02-05 17:40:31,506 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = update
+===================================================
+2013-02-05 17:40:31,507 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:31,508 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:31,508 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:31,838 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:317] update: read status = 200
+2013-02-05 17:40:31,838 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:322] Got object to update with CSID= 3983ae95-ffec-40e9-be1c
+2013-02-05 17:40:31,839 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:31,840 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:31,840 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:31,856 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:72] Reading part workauthorities_common ...
+2013-02-05 17:40:32,128 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:329] 
+
+To be updated fields: CSID = 3983ae95-ffec-40e9-be1c
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workauthorities_common xmlns:ns2="http://collectionspace.org/services/work">
+    <displayName>updated-displayName-1360450869391</displayName>
+    <vocabType>updated-WorkAuthority</vocabType>
+</ns2:workauthorities_common>
+
+2013-02-05 17:40:32,131 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:32,131 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:32,133 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:32,606 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:339] update: status = 200
+2013-02-05 17:40:32,607 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:32,607 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:32,608 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:32,625 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:72] Reading part workauthorities_common ...
+2013-02-05 17:40:32,760 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readWorkflow
+===================================================
+2013-02-05 17:40:32,761 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:32,786 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:32,787 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:32,932 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:664] readWorkflow: status = 200
+2013-02-05 17:40:33,019 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:33,020 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:33,020 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:33,031 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:33,031 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:33,032 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:33,040 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:33,211 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/ad8ded5b-8885-4748-a745
+2013-02-05 17:40:33,212 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=ad8ded5b-8885-4748-a745
+2013-02-05 17:40:33,213 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:33,214 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:33,214 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:33,224 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:33,225 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:33,225 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:33,233 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:33,399 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/4c2e8eea-4cd5-4e3f-82f2
+2013-02-05 17:40:33,399 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=4c2e8eea-4cd5-4e3f-82f2
+2013-02-05 17:40:33,404 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:33,404 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:33,404 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:33,434 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:33,435 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:33,436 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:33,445 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:33,667 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/814172fb-9069-44d3-81bc
+2013-02-05 17:40:33,667 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=814172fb-9069-44d3-81bc
+2013-02-05 17:40:33,668 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:33,668 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:33,669 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:33,793 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:664] readWorkflow: status = 200
+2013-02-05 17:40:33,794 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:818] Got object to update life cycle state with ID: 814172fb-9069-44d3-81bc
+2013-02-05 17:40:33,836 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:830] Current workflow state:<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:workflow_common xmlns:ns2="http://collectionspace.org/services/workflow">
+    <lifeCyclePolicy>cs_default</lifeCyclePolicy>
+    <currentLifeCycleState>project</currentLifeCycleState>
+</ns2:workflow_common>
+
+2013-02-05 17:40:34,036 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:664] readWorkflow: status = 200
+2013-02-05 17:40:34,126 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:664] readWorkflow: status = 200
+2013-02-05 17:40:34,126 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:857] Got workflow state of updated object with ID: 814172fb-9069-44d3-81bc
+2013-02-05 17:40:34,133 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:863] Expected workflow state found: deleted
+2013-02-05 17:40:34,134 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:34,134 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:34,134 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:34,404 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:664] readWorkflow: status = 200
+2013-02-05 17:40:34,508 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:34,508 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:34,509 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:34,606 INFO  [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:550] Workflow transition to 'deleted' is complete
+2013-02-05 17:40:34,609 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = delete
+===================================================
+2013-02-05 17:40:34,618 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readNonExistent
+===================================================
+2013-02-05 17:40:34,619 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:34,620 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:34,620 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:34,714 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:242] readNonExistent: status = 404
+2013-02-05 17:40:34,720 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = baseCRUDTests
+===================================================
+2013-02-05 17:40:34,722 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = CRUDTests
+===================================================
+2013-02-05 17:40:34,725 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = createItem
+===================================================
+2013-02-05 17:40:34,726 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:34,727 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:34,727 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:34,734 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:109] Creating item with display name: "Muppets Take Manhattan (1984)" in locationAuthority: "3983ae95-ffec-40e9-be1c"
+2013-02-05 17:40:34,734 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:83] to be created, work common 
+2013-02-05 17:40:34,933 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:234] extractId:uri=http://localhost:8180/cspace-services/workauthorities/3983ae95-ffec-40e9-be1c/items/59763387-2665-4cf7-b188
+2013-02-05 17:40:34,934 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:239] id=59763387-2665-4cf7-b188
+2013-02-05 17:40:34,934 DEBUG [main] [org.collectionspace.services.client.test.WorkAuthorityServiceTest:152] createItemInAuthority(3983ae95-ffec-40e9-be1c,null): knownItemResourceId=59763387-2665-4cf7-b188
+2013-02-05 17:40:34,943 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = baseAuthorityTests
+===================================================
+2013-02-05 17:40:34,945 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = createItemList
+===================================================
+2013-02-05 17:40:34,945 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:34,946 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:34,946 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:34,953 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:35,128 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:163] createItemList: HTTP status = 201
+2013-02-05 17:40:35,128 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/c70af1dd-d27c-43ef-aebe
+2013-02-05 17:40:35,129 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=c70af1dd-d27c-43ef-aebe
+2013-02-05 17:40:35,130 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:35,130 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:35,130 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:35,138 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:109] Creating item with display name: "Muppets Take Manhattan (1984)" in locationAuthority: "c70af1dd-d27c-43ef-aebe"
+2013-02-05 17:40:35,140 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:83] to be created, work common 
+2013-02-05 17:40:35,535 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:234] extractId:uri=http://localhost:8180/cspace-services/workauthorities/c70af1dd-d27c-43ef-aebe/items/b615f65c-2141-45d8-95f2
+2013-02-05 17:40:35,535 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:239] id=b615f65c-2141-45d8-95f2
+2013-02-05 17:40:35,538 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:35,539 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:35,539 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:35,546 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:109] Creating item with display name: "Muppets Take Manhattan (1984)" in locationAuthority: "c70af1dd-d27c-43ef-aebe"
+2013-02-05 17:40:35,547 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:83] to be created, work common 
+2013-02-05 17:40:35,803 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:234] extractId:uri=http://localhost:8180/cspace-services/workauthorities/c70af1dd-d27c-43ef-aebe/items/ff11bc76-efeb-41f7-8255
+2013-02-05 17:40:35,804 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:239] id=ff11bc76-efeb-41f7-8255
+2013-02-05 17:40:35,805 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:35,805 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:35,805 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:35,826 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:109] Creating item with display name: "Muppets Take Manhattan (1984)" in locationAuthority: "c70af1dd-d27c-43ef-aebe"
+2013-02-05 17:40:35,827 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:83] to be created, work common 
+2013-02-05 17:40:36,013 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:234] extractId:uri=http://localhost:8180/cspace-services/workauthorities/c70af1dd-d27c-43ef-aebe/items/9ad7de8a-6a91-4326-aa03
+2013-02-05 17:40:36,014 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:239] id=9ad7de8a-6a91-4326-aa03
+2013-02-05 17:40:36,016 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:36,018 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:36,019 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:36,026 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:109] Creating item with display name: "Muppets Take Manhattan (1984)" in locationAuthority: "c70af1dd-d27c-43ef-aebe"
+2013-02-05 17:40:36,026 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:83] to be created, work common 
+2013-02-05 17:40:36,191 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:234] extractId:uri=http://localhost:8180/cspace-services/workauthorities/c70af1dd-d27c-43ef-aebe/items/010c033e-b272-4b08-8226
+2013-02-05 17:40:36,192 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:239] id=010c033e-b272-4b08-8226
+2013-02-05 17:40:36,192 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:36,194 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:36,194 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:36,200 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:109] Creating item with display name: "Muppets Take Manhattan (1984)" in locationAuthority: "c70af1dd-d27c-43ef-aebe"
+2013-02-05 17:40:36,201 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:83] to be created, work common 
+2013-02-05 17:40:36,412 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:234] extractId:uri=http://localhost:8180/cspace-services/workauthorities/c70af1dd-d27c-43ef-aebe/items/486bb415-76ab-4780-b39f
+2013-02-05 17:40:36,412 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:239] id=486bb415-76ab-4780-b39f
+2013-02-05 17:40:36,417 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readByName
+===================================================
+2013-02-05 17:40:36,419 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:36,419 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:36,420 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:36,748 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:228] readByName: status = 200
+2013-02-05 17:40:36,749 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:36,749 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:36,749 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:36,756 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:72] Reading part workauthorities_common ...
+2013-02-05 17:40:36,951 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readItem
+===================================================
+2013-02-05 17:40:36,952 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:36,953 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:36,953 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:37,230 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:294] readItem: status = 200
+2013-02-05 17:40:37,231 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:37,231 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:37,232 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:37,237 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:72] Reading part works_common ...
+2013-02-05 17:40:37,329 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readItemListByName
+===================================================
+2013-02-05 17:40:37,331 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:37,331 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:37,331 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:37,443 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:348]   readItemListByName: status = 200
+2013-02-05 17:40:37,502 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:359]   readItemListByName: Expected 5 items; got: 5 of: 5
+2013-02-05 17:40:37,505 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readItemNonExistent
+===================================================
+2013-02-05 17:40:37,505 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:37,506 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:37,506 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:37,614 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:273] readItemNonExistent: status = 404
+2013-02-05 17:40:37,615 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = testItemSubmitRequest
+===================================================
+2013-02-05 17:40:37,616 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:37,616 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:37,616 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:37,890 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:121] testItemSubmitRequest: url=http://localhost:8180/cspace-services/workauthorities/3983ae95-ffec-40e9-be1c/items/59763387-2665-4cf7-b188 status=200
+2013-02-05 17:40:37,891 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = verifyIgnoredUpdateWithInAuthority
+===================================================
+2013-02-05 17:40:37,892 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:37,892 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:37,893 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:38,427 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:143] verifyIgnoredUpdateWithInAuthority read authority:3983ae95-ffec-40e9-be1c/Item:59763387-2665-4cf7-b188 status = 200
+2013-02-05 17:40:38,428 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:38,428 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:38,429 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:38,435 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:72] Reading part works_common ...
+2013-02-05 17:40:38,620 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:38,621 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:38,621 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:38,877 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:164] verifyIgnoredUpdateWithInAuthority: status = 200
+2013-02-05 17:40:39,224 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:39,224 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:39,225 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:39,231 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:72] Reading part works_common ...
+2013-02-05 17:40:39,326 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = updateItem
+===================================================
+2013-02-05 17:40:39,327 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:39,327 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:39,327 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:39,685 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:437] updateItem: read status = 200
+2013-02-05 17:40:39,685 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:442] got Authority item to update with ID: 59763387-2665-4cf7-b188 in authority: 3983ae95-ffec-40e9-be1c
+2013-02-05 17:40:39,686 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:39,687 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:39,687 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:39,693 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:72] Reading part works_common ...
+2013-02-05 17:40:39,855 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:452] 
+
+To be updated fields: CSID = 59763387-2665-4cf7-b188
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:works_common xmlns:ns2="http://collectionspace.org/services/work">
+    <csid>59763387-2665-4cf7-b188</csid>
+    <inAuthority>3983ae95-ffec-40e9-be1c</inAuthority>
+    <shortIdentifier>muppetstakemanhattan</shortIdentifier>
+    <refName>urn:cspace:core.collectionspace.org:workauthorities:name(1360450869391):item:name(muppetstakemanhattan)'Muppets Take Manhattan (1984)'</refName>
+    <workTermGroupList>
+        <workTermGroup>
+            <termDisplayName>updated-Muppets Take Manhattan (1984)</termDisplayName>
+            <termName>updated-Muppets Take Manhattan</termName>
+            <termType></termType>
+            <termStatus>accepted</termStatus>
+            <termQualifier></termQualifier>
+            <termLanguage></termLanguage>
+            <termPrefForLang>false</termPrefForLang>
+            <termSource>featurefilms</termSource>
+            <termSourceDetail>internal</termSourceDetail>
+            <termSourceID></termSourceID>
+            <termSourceNote></termSourceNote>
+        </workTermGroup>
+    </workTermGroupList>
+    <creatorGroupList/>
+    <publisherGroupList/>
+    <workDateGroupList/>
+</ns2:works_common>
+
+2013-02-05 17:40:39,858 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:39,877 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:39,883 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:40,271 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:467] updateItem: status = 200
+2013-02-05 17:40:40,272 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:40,272 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:40,273 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:40,278 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:72] Reading part works_common ...
+2013-02-05 17:40:40,327 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = deleteItem
+===================================================
+2013-02-05 17:40:40,329 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = deleteNonExistentItem
+===================================================
+2013-02-05 17:40:40,330 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:40,330 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:40,330 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:40,423 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:395] deleteNonExistentItem: status = 404
+2013-02-05 17:40:40,425 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = deleteNonExistent
+===================================================
+2013-02-05 17:40:40,426 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:40,427 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:40,427 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:40,513 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:266] deleteNonExistent: status = 404
+2013-02-05 17:40:40,515 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = updateNonExistent
+===================================================
+2013-02-05 17:40:40,516 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:40,516 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:40,516 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:40,522 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:40,661 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:699] updateNonExistent: status = 404
+2013-02-05 17:40:40,664 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = updateNonExistentItem
+===================================================
+2013-02-05 17:40:40,665 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:40,665 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:40,665 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:40,672 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:83] to be created, work common 
+2013-02-05 17:40:40,849 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:508] updateNonExistentItem: status = 404
+2013-02-05 17:40:40,851 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readItemList
+===================================================
+2013-02-05 17:40:40,852 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:40,852 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:40,852 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:41,054 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:664] readItemList: status = 200
+2013-02-05 17:40:41,102 DEBUG [main] [org.collectionspace.services.client.test.WorkAuthorityServiceTest:278] readItemList: Expected 5 items; got: 5
+2013-02-05 17:40:41,106 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readItemListByAuthorityName
+===================================================
+2013-02-05 17:40:41,108 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:41,108 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:41,109 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:41,260 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:664] readItemList: status = 200
+2013-02-05 17:40:41,298 DEBUG [main] [org.collectionspace.services.client.test.WorkAuthorityServiceTest:278] readItemList: Expected 5 items; got: 5
+2013-02-05 17:40:41,299 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = verifyIllegalItemDisplayName
+===================================================
+2013-02-05 17:40:41,300 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:41,300 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:41,301 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:41,614 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:664] verifyIllegalItemDisplayName: status = 200
+2013-02-05 17:40:41,877 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:664] verifyIllegalItemDisplayName: status = 400
+2013-02-05 17:40:41,879 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = localDeleteItem
+===================================================
+2013-02-05 17:40:41,880 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:41,880 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:41,880 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:41,991 DEBUG [main] [org.collectionspace.services.client.test.AbstractAuthorityServiceTest:322] delete: status = 200
+2013-02-05 17:40:41,993 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = localDelete
+===================================================
+2013-02-05 17:40:41,994 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:41,995 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:41,995 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:42,118 DEBUG [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:221] localDelete: status = 200
+2013-02-05 17:40:42,119 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = readAuthorityItemWorkflow
+===================================================
+2013-02-05 17:40:42,120 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:42,120 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:42,121 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:42,132 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:42,133 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:42,133 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:42,141 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:42,142 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:42,142 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:42,148 DEBUG [main] [org.collectionspace.services.client.WorkAuthorityClientUtils:48] to be created, workAuthority common 
+2013-02-05 17:40:42,444 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:393] extractId:uri=http://localhost:8180/cspace-services/workauthorities/3bb3435f-19a2-4615-a718
+2013-02-05 17:40:42,445 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:398] id=3bb3435f-19a2-4615-a718
+2013-02-05 17:40:42,448 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:42,448 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:42,448 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:42,454 WARN  [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:985] Sub-class test clients should override this method
+2013-02-05 17:40:42,454 WARN  [main] [org.collectionspace.services.client.test.AbstractServiceTestImpl:1062] org.collectionspace.services.client.test.WorkAuthorityServiceTest did not implement createWorkflowTarget() method.  No workflow tests performed.
+2013-02-05 17:40:42,462 DEBUG [main] [org.collectionspace.services.client.test.BaseServiceTest:644] 
+===================================================
+Class = WorkAuthorityServiceTest
+ Test = searchWorkflowDeleted
+===================================================
+2013-02-05 17:40:42,475 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:42,476 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:42,477 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+2013-02-05 17:40:42,497 DEBUG [main] [org.collectionspace.services.client.test.WorkAuthorityServiceTest:342] Cleaning up temporary resources created for testing ...
+2013-02-05 17:40:42,498 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:269] readProperties() using url=http://localhost:8180/cspace-services/
+2013-02-05 17:40:42,498 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:323] setupHttpClient() using url=http://localhost:8180/cspace-services/ user=admin@core.collectionspace.org password=Administrator
+2013-02-05 17:40:42,498 DEBUG [main] [org.collectionspace.services.client.AbstractServiceClientImpl:334] setupHttpClient: set preemptive authentication
+Tests run: 34, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 20.689 sec
+
+Results :
+
+Tests run: 34, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Building services.work.service
+[INFO]    task-segment: [test]
+[INFO] ------------------------------------------------------------------------
+[INFO] [resources:resources {execution: default-resources}]
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/mjesse/Documents/github/walker/services/services/work/service/src/main/resources
+[INFO] [compiler:compile {execution: default-compile}]
+[INFO] Nothing to compile - all classes are up to date
+[INFO] [resources:testResources {execution: default-testResources}]
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/mjesse/Documents/github/walker/services/services/work/service/src/test/resources
+[INFO] [compiler:testCompile {execution: default-testCompile}]
+[INFO] No sources to compile
+[WARNING] DEPRECATED [systemProperties]: Use systemPropertyVariables instead.
+[INFO] [surefire:test {execution: default-test}]
+[INFO] No tests to run.
+[INFO] Surefire report directory: /Users/mjesse/Documents/github/walker/services/services/work/service/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running TestSuite
+There are no tests to run.
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Building services.work.3rdparty
+[INFO]    task-segment: [test]
+[INFO] ------------------------------------------------------------------------
+[INFO] No goals needed for project - skipping
+[INFO] ------------------------------------------------------------------------
+[INFO] Building services.work.3rdparty.nuxeo
+[INFO]    task-segment: [test]
+[INFO] ------------------------------------------------------------------------
+[INFO] [resources:resources {execution: default-resources}]
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 8 resources
+[INFO] [compiler:compile {execution: default-compile}]
+[INFO] No sources to compile
+[INFO] [resources:testResources {execution: default-testResources}]
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/mjesse/Documents/github/walker/services/services/work/3rdparty/nuxeo-platform-cs-work/src/test/resources
+[INFO] [compiler:testCompile {execution: default-testCompile}]
+[INFO] No sources to compile
+[WARNING] DEPRECATED [systemProperties]: Use systemPropertyVariables instead.
+[INFO] [surefire:test {execution: default-test}]
+[INFO] No tests to run.
+[INFO] Surefire report directory: /Users/mjesse/Documents/github/walker/services/services/work/3rdparty/nuxeo-platform-cs-work/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running TestSuite
+There are no tests to run.
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] ------------------------------------------------------------------------
+[INFO] services.work ......................................... SUCCESS [0.362s]
+[INFO] services.work.jaxb .................................... SUCCESS [6.008s]
+[INFO] services.work.client .................................. SUCCESS [22.019s]
+[INFO] services.work.service ................................. SUCCESS [1.629s]
+[INFO] services.work.3rdparty ................................ SUCCESS [0.001s]
+[INFO] services.work.3rdparty.nuxeo .......................... SUCCESS [0.525s]
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 31 seconds
+[INFO] Finished at: Tue Feb 05 17:40:46 EST 2013
+[INFO] Final Memory: 50M/102M
+[INFO] ------------------------------------------------------------------------
