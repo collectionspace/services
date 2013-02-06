@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>3.2-SNAPSHOT</version>
+        <version>3.2.1-SNAPSHOT</version>
     </parent>
     
     <artifactId>org.collectionspace.services.blob</artifactId>
@@ -13,9 +13,9 @@
     <url>http://www.collectionspace.org</url>
     
     <modules>
-        <module>service</module>
-        <module>3rdparty</module>
         <module>client</module>
+        <module>3rdparty</module>
+        <module>service</module>
     </modules>
 
 </project>

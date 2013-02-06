@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!-- PublicitemsCommon XML Schema (XSD) Entity : PublicitemsCommon Used for: JAXB 
+	binding between XML and Java objects $LastChangedRevision$ $LastChangedDate$ -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+	elementFormDefault="unqualified" xmlns:ns="http://collectionspace.org/services/publicitem"
+	xmlns="http://collectionspace.org/services/publicitem" targetNamespace="http://collectionspace.org/services/publicitem"
+	version="0.1">
+
+	<!-- Avoid XmlRootElement nightmare: See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html -->
+	<xs:element name="publicitems_common">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="itemNumber" type="xs:string" />				<!-- An identifier for the publicitem (different than the CSID) -->
+				<xs:element name="contentName" type="xs:string" />				<!-- A name for the publicitem's content  -->
+				<xs:element name="contentId" type="xs:string" />				<!-- The the ID of the content blob in the back-end repository -->
+				<xs:element name="contentUri" type="xs:string" />				<!-- The publicly accessible URL of the publicitem's content -->	
+				<xs:element name="contentCreationJobId" type="xs:string" />		<!-- The asynch job ID -if any -->
+				<xs:element name="contentSource" type="xs:string" />			<!-- The name of the service/resource that was used to create the publicitem. -->
+				<xs:element name="contentExpirationDate" type="xs:dateTime" />	<!-- When the publicitem is no longer available for access -->
+				<xs:element name="contentAccessedCount" type="xs:integer" />	<!-- How many times the publicitem has been accessed. -->
+				<xs:element name="contentAccessCountLimit" type="xs:integer" />	<!-- The maximum times the publicitem can be accessed. -->
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="groups">
+
+    <ns2:groups_common xmlns:ns2="http://collectionspace.org/group">
+        <title>A group title</title>
+    </ns2:groups_common>
+
+</document>
+
+

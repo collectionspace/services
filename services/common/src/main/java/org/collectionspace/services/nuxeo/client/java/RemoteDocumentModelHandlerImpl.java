@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
+import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.authorization.AccountPermission;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.lifecycle.TransitionDef;
@@ -68,13 +69,11 @@ import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.api.CommonAPI;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
-import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
@@ -198,7 +197,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
 	@Override
 	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
 			throws Exception {
-		// Do nothing by default, but children can override if they want.  The really workflow transition happens in the WorkflowDocumemtModelHandler class
+		// Do nothing by default, but children can override if they want.  The real workflow transition happens in the WorkflowDocumemtModelHandler class
 	}
     	
     @Override
@@ -324,8 +323,9 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             addOutputPart(unQObjectProperties, schema, partMeta);
         }
         
+        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
+
         if (supportsHierarchy() == true) {
-            MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
             String showSiblings = ctx.getQueryParams().getFirst(CommonAPI.showSiblings_QP);
             if (Tools.isTrue(showSiblings)) {
                 showSiblings(wrapDoc, ctx);
@@ -345,7 +345,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             }
         }
         
-        addAccountPermissionsPart();
+        String currentUser = ctx.getUserId();
+        if (currentUser.equalsIgnoreCase(AuthNContext.ANONYMOUS_USER) == false) {
+        	addAccountPermissionsPart();
+        }
     }
     
     private void addExtraCoreValues(DocumentModel docModel, Map<String, Object> unQObjectProperties)

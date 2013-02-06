@@ -91,6 +91,8 @@ public interface IQueryManager {
 	final static String CMIS_TARGET_TITLE = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_TITLE;
 	final static String CMIS_TARGET_NAME = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
 	final static String CMIS_TARGET_UPDATED_AT = CMIS_TARGET_PREFIX + "." + CMIS_CS_UPDATED_AT;
+	
+	final static String TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM = "ptStartingWildcard";
 
 	public void execQuery(String queryString);
 	
@@ -131,6 +133,7 @@ public interface IQueryManager {
 	public String createWhereClauseForPartialMatch(String dataSourceName,
 			String repositoryName,
 			String field,
+			boolean startingWildcard,
 			String partialTerm);
 
 	/**

@@ -1,8 +1,5 @@
 package org.collectionspace.services.client;
 
-import org.jboss.resteasy.client.ClientResponse;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-
 /**
  * An AcquisitionClient.
 

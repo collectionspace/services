@@ -24,7 +24,6 @@
 
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.MediaType;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
@@ -55,6 +54,15 @@ public class CollectionObjectFactory {
      * @return
      */
 
+    public static PoxPayloadOut createCollectionObjectInstance(String commonPartName,
+            CollectionobjectsCommon collectionObjectCommon) {
+
+        PoxPayloadOut multipart = new PoxPayloadOut(getServicePathComponent());
+        PayloadOutputPart commonPart =
+                multipart.addPart(commonPartName, collectionObjectCommon);
+
+        return multipart;
+    }    
     /**
      * Creates the collection object instance.
      *
@@ -71,13 +79,14 @@ public class CollectionObjectFactory {
 
         PoxPayloadOut multipart = new PoxPayloadOut(getServicePathComponent());
         PayloadOutputPart commonPart =
-                multipart.addPart(collectionObjectCommon, MediaType.APPLICATION_XML_TYPE);
+                multipart.addPart(commonPartName, collectionObjectCommon);
         commonPart.setLabel(commonPartName);
 
         if (conh != null) {
-            PayloadOutputPart nhPart = multipart.addPart(conh, MediaType.APPLICATION_XML_TYPE);
+            PayloadOutputPart nhPart = multipart.addPart(nhPartName, conh);
             nhPart.setLabel(nhPartName);
         }
+        
         return multipart;
     }
 

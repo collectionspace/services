@@ -56,6 +56,10 @@ import org.slf4j.LoggerFactory;
  */
 public class TenantBindingConfigReaderImpl
         extends AbstractConfigReaderImpl<List<TenantBindingType>> {
+	
+	final public static boolean INCLUDE_CREATE_DISABLED_TENANTS = true;
+	final public static boolean EXCLUDE_CREATE_DISABLED_TENANTS = false;
+	
     final private static String TENANT_BINDINGS_ERROR = "Tenant bindings error: ";
     final private static String TENANT_BINDINGS_ROOTDIRNAME = "tenants";
     final private static String TENANT_BINDINGS_FILENAME_PREFIX = "tenant-bindings";
@@ -65,8 +69,11 @@ public class TenantBindingConfigReaderImpl
     
     final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReaderImpl.class);
     private List<TenantBindingType> tenantBindingTypeList;
+    //tenant id, tenant binding, for tenants not marked as createDisabled
+    private Hashtable<String, TenantBindingType> enabledTenantBindings =
+            new Hashtable<String, TenantBindingType>();
     //tenant id, tenant binding
-    private Hashtable<String, TenantBindingType> tenantBindings =
+    private Hashtable<String, TenantBindingType> allTenantBindings =
             new Hashtable<String, TenantBindingType>();
     //repository domains
     private Hashtable<String, RepositoryDomainType> domains =
@@ -179,20 +186,26 @@ public class TenantBindingConfigReaderImpl
         tenantBindingTypeList = readTenantConfigs(protoBindingsFile, tenantDirs);
         
         for (TenantBindingType tenantBinding : tenantBindingTypeList) {
-        	if(tenantBindings.get(tenantBinding.getId()) != null) {
-        		TenantBindingType tenantBindingOld = tenantBindings.get(tenantBinding.getId());
+        	if(allTenantBindings.get(tenantBinding.getId()) != null) {
+        		TenantBindingType tenantBindingOld = allTenantBindings.get(tenantBinding.getId());
                 logger.error("Ignoring duplicate binding definition for tenant id=" 
                 		+ tenantBinding.getId()
                         + " existing name=" + tenantBindingOld.getName()
                         + " conflicting (ignored) name=" + tenantBinding.getName());
                 continue;
         	}
-            tenantBindings.put(tenantBinding.getId(), tenantBinding);
+        	allTenantBindings.put(tenantBinding.getId(), tenantBinding);
+        	if(!tenantBinding.isCreateDisabled()) {
+            	enabledTenantBindings.put(tenantBinding.getId(), tenantBinding);
+        	} else {
+        	}
             readDomains(tenantBinding);
             readServiceBindings(tenantBinding);
             if (logger.isInfoEnabled()) {
                 logger.info("Finished reading tenant bindings for tenant id=" + tenantBinding.getId()
                         + " name=" + tenantBinding.getName());
+            	if(tenantBinding.isCreateDisabled())
+            		logger.info("Tenant tenant id={} is marked createDisabled.", tenantBinding.getId());
             }
         }
     }
@@ -324,7 +337,15 @@ public class TenantBindingConfigReaderImpl
      * @return
      */
     public Hashtable<String, TenantBindingType> getTenantBindings() {
-        return tenantBindings;
+        return getTenantBindings(EXCLUDE_CREATE_DISABLED_TENANTS);
+    }
+
+    /**
+     * getTenantBindings returns all the tenant bindings read from configuration
+     * @return
+     */
+    public Hashtable<String, TenantBindingType> getTenantBindings(boolean includeDisabled) {
+        return includeDisabled?allTenantBindings:enabledTenantBindings;
     }
 
     /**
@@ -334,7 +355,7 @@ public class TenantBindingConfigReaderImpl
      */
     public TenantBindingType getTenantBinding(
             String tenantId) {
-        return tenantBindings.get(tenantId);
+        return allTenantBindings.get(tenantId);
     }
 
     /**
@@ -416,7 +437,7 @@ public class TenantBindingConfigReaderImpl
     public List<ServiceBindingType> getServiceBindingsByType(
             String tenantId, List<String> serviceTypes) {
         ArrayList<ServiceBindingType> list = null;
-        TenantBindingType tenant = tenantBindings.get(tenantId);
+        TenantBindingType tenant = allTenantBindings.get(tenantId);
         if (tenant != null) {
             for (ServiceBindingType sb : tenant.getServiceBindings()) {
                 if (serviceTypes.contains(sb.getType())) {
@@ -458,7 +479,7 @@ public class TenantBindingConfigReaderImpl
         if (propList == null || propList.isEmpty()) {
             return;
         }
-        for (TenantBindingType tenant : tenantBindings.values()) {
+        for (TenantBindingType tenant : allTenantBindings.values()) {
             for (PropertyItemType prop : propList) {
                 TenantBindingUtils.setPropertyValue(tenant,
                         prop, TenantBindingUtils.SET_PROP_IF_MISSING);
@@ -481,9 +502,17 @@ public class TenantBindingConfigReaderImpl
      * @return a list of tenant IDs
      */
     public List<String> getTenantIds() {
+    	return getTenantIds(EXCLUDE_CREATE_DISABLED_TENANTS);
+    }
+    /**
+     * Returns a list of tenant identifiers (tenant IDs).
+     * 
+     * @return a list of tenant IDs
+     */
+    public List<String> getTenantIds(boolean includeDisabled) {
         List<String> tenantIds = new ArrayList<String>();
         String tenantId;
-        Hashtable<String, TenantBindingType> tenantBindings = getTenantBindings();
+        Hashtable<String, TenantBindingType> tenantBindings = getTenantBindings(includeDisabled);
         if (tenantBindings != null && !tenantBindings.isEmpty()) {
             Enumeration keys = tenantBindings.keys();
             while (keys.hasMoreElements()) {

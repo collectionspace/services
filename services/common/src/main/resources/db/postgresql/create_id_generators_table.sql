@@ -19,15 +19,13 @@
  * create_id_generators_table.sql
  *
  * Creates the "id_generators" table, used by the ID Service,
- * and sets the access permissions of that table.
- *
- * $LastChangedRevision$
- * $LastChangedDate$
+ * and sets up associated trigger(s) and function(s).
  */
 
--- DROP TABLE IF EXISTS id_generators;
+-- Temporarily suppress messages of NOTICE level and below
+SET SESSION client_min_messages=WARNING;
 
--- 'CREATE TABLE ... IF NOT EXISTS' requires PostgreSQL 9.1 or later
+-- 'CREATE TABLE ... IF NOT EXISTS' requires PostgreSQL 9.1 or later.
 CREATE TABLE IF NOT EXISTS id_generators
 (
   csid character varying(80) NOT NULL,
@@ -39,7 +37,7 @@ CREATE TABLE IF NOT EXISTS id_generators
   modified timestamp without time zone NOT NULL DEFAULT now(),
   CONSTRAINT id_generators_pkey PRIMARY KEY (csid)
 ) WITH (
-  OIDS=FALSE -- See http://www.postgresql.org/docs/8.4/static/sql-createtable.html
+  OIDS=FALSE -- See "Notes" on http://www.postgresql.org/docs/9.1/static/sql-createtable.html
 );
 
 CREATE OR REPLACE FUNCTION update_modified_column()
@@ -47,6 +45,7 @@ CREATE OR REPLACE FUNCTION update_modified_column()
     'BEGIN NEW.modified = now(); RETURN NEW; END;'
     LANGUAGE 'plpgsql';
 
+DROP TRIGGER IF EXISTS update_customer_modtime ON id_generators;
 CREATE TRIGGER update_customer_modtime BEFORE UPDATE
     ON id_generators FOR EACH ROW EXECUTE PROCEDURE 
     update_modified_column();
