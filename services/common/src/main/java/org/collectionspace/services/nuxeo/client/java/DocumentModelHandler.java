@@ -472,7 +472,9 @@ public abstract class DocumentModelHandler<T, TL>
 	    	String matchObjDocTypes = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES);
 	    	String selectDocType = (String)queryParams.getFirst(IQueryManager.SELECT_DOC_TYPE_FIELD);
 
-	    	String docType = this.getServiceContext().getDocumentType();
+	    	//String docType = this.getServiceContext().getDocumentType();
+	    	// If this type in this tenant has been extended, be sure to use that so extension schema is visible.
+	    	String docType = NuxeoUtils.getTenantQualifiedDocType(this.getServiceContext());
 	    	if (selectDocType != null && !selectDocType.isEmpty()) {  
 	    		docType = selectDocType;
 	    	}
