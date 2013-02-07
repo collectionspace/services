@@ -39,11 +39,6 @@
                 <xs:element name="labelData" type="xs:string"/>
                 <xs:element name="numberOfLabels" type="xs:integer"/>
                 <xs:element name="printLabels" type="xs:string"/>
-
-                <!-- Propagation Plant Label Information -->
-                <xs:element name="gardenLocationAbreviation" type="xs:string"/>
-                <xs:element name="collector" type="xs:string"/>
-                <xs:element name="ecologyData" type="xs:string"/>
             </xs:sequence>
 
         </xs:complexType>
