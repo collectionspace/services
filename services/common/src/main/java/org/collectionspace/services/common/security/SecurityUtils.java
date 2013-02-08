@@ -39,6 +39,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.authentication.spi.AuthNContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -258,7 +259,8 @@ public class SecurityUtils {
     	}
     	
         if (tenantId != null) {
-            if (ADMIN_TENANT_ID.equals(tenantId) == true) {
+            if (ADMIN_TENANT_ID.equals(tenantId) == true ||
+            		AuthNContext.ANONYMOUS_TENANT_ID.equals(tenantId)) {
                 result = true;
             }
         }
