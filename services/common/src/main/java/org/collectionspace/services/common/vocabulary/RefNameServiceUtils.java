@@ -303,18 +303,24 @@ public class RefNameServiceUtils {
             // Strip off displayName and only match the base, so we get references to all 
             // the NPTs as well as the PT.
     		String strippedRefName = RefNameUtils.stripAuthorityTermDisplayName(refName);
-            int nRefsFound = processRefObjsDocList(docList, ctx.getTenantId(), strippedRefName, true, queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
-                    list, null);
-
+    		
+    		// *** Need to pass in pagination info here. 
+            int nRefsFound = processRefObjsDocListForList(docList, ctx.getTenantId(), strippedRefName, 
+            		queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
+                    list, pageSize, pageNum);
+            	
             commonList.setPageSize(pageSize);
             
             // Values returned in the pagination block above the list items
             // need to reflect the number of references to authority items
             // returned, rather than the number of documents originally scanned
             // to find such references.
+            // This will be an estimate only...
             commonList.setPageNum(pageNum);
-            commonList.setTotalItems(list.size());
+           	commonList.setTotalItems(nRefsFound);	// Accurate if total was scanned, otherwise, just an estimate
+            commonList.setItemsInPage(list.size());
 
+            /* Pagination is now handled in the processing step
             // Slice the list to return only the specified page of items
             // in the list results.
             //
@@ -359,6 +365,7 @@ public class RefNameServiceUtils {
             wrapperList.getAuthorityRefDocItem().clear();
             wrapperList.getAuthorityRefDocItem().addAll(currentPageList);
             commonList.setItemsInPage(currentPageList.size());
+            */
             
             if (logger.isDebugEnabled() && (nRefsFound < docList.size())) {
                 logger.debug("Internal curiosity: got fewer matches of refs than # docs matched..."); // We found a ref to ourself and have excluded it.
@@ -433,8 +440,9 @@ public class RefNameServiceUtils {
 
                 // Only match complete refNames - unless and until we decide how to resolve changes
                 // to NPTs we will defer that and only change PTs or refNames as passed in.
-                int nRefsFoundThisPage = processRefObjsDocList(docList, ctx.getTenantId(), oldRefName, false, queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
-                        null, newRefName);
+                int nRefsFoundThisPage = processRefObjsDocListForUpdate(docList, ctx.getTenantId(), oldRefName, 
+                		queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
+                        newRefName);
                 if (nRefsFoundThisPage > 0) {
                     ((RepositoryJavaClientImpl) repoClient).saveDocListWithoutHandlerProcessing(ctx, repoSession, docList, true); // Flush the document model list out to Nuxeo storage
                     nRefsFound += nRefsFoundThisPage;
@@ -566,8 +574,31 @@ public class RefNameServiceUtils {
 		return result;
 	}
 
+    private static int processRefObjsDocListForUpdate(
+            DocumentModelList docList,
+            String tenantId,
+            String refName,
+            Map<String, ServiceBindingType> queriedServiceBindings,
+            Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
+            String newAuthorityRefName) {
+    	return processRefObjsDocList(docList, tenantId, refName, false, queriedServiceBindings,
+    			authRefFieldsByService, null, 0, 0, newAuthorityRefName);
+    }
+    			
+    private static int processRefObjsDocListForList(
+            DocumentModelList docList,
+            String tenantId,
+            String refName,
+            Map<String, ServiceBindingType> queriedServiceBindings,
+            Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
+            List<AuthorityRefDocList.AuthorityRefDocItem> list, 
+            int pageSize, int pageNum) {
+    	return processRefObjsDocList(docList, tenantId, refName, true, queriedServiceBindings,
+    			authRefFieldsByService, list, pageSize, pageNum, null);
+    }
+    			
 
-    /*
+	/*
      * Runs through the list of found docs, processing them. If list is
      * non-null, then processing means gather the info for items. If list is
      * null, and newRefName is non-null, then processing means replacing and
@@ -583,9 +614,19 @@ public class RefNameServiceUtils {
             Map<String, ServiceBindingType> queriedServiceBindings,
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
             List<AuthorityRefDocList.AuthorityRefDocItem> list,
+            int pageSize, int pageNum,	// Only used when constructing a list.
             String newAuthorityRefName) {
+        UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
         Iterator<DocumentModel> iter = docList.iterator();
         int nRefsFoundTotal = 0;
+        boolean foundSelf = false;
+
+        // When paginating results, we have to guess at the total. First guess is the number of docs returned
+        // by the query. However, this returns some false positives, so may be high. 
+        // In addition, we can match multiple fields per doc, so this may be low. Fun, eh?
+        int nDocsReturnedInQuery = (int)docList.totalSize();
+        int nDocsProcessed = 0;
+        int firstItemInPage = pageNum*pageSize;
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             AuthorityRefDocList.AuthorityRefDocItem ilistItem;
@@ -603,10 +644,17 @@ public class RefNameServiceUtils {
                     throw new InternalError("processRefObjsDocList() called with neither an itemList nor a new RefName!");
                 }
                 ilistItem = null;
+                pageSize = 0;
+                firstItemInPage = 0;	// Do not paginate if updating, rather than building list
             } else {    // Have a list - refObjs case
                 if (newAuthorityRefName != null) {
                     throw new InternalError("processRefObjsDocList() called with both an itemList and a new RefName!");
                 }
+                if(firstItemInPage > 100) {
+                	logger.warn("Processing a large offset (size:{}, num:{}) for refObjs - will be expensive!!!",
+                				pageSize, pageNum);
+                }
+                // Note that we have to go through check all the fields to determine the actual page start
                 ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
                 String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
                 try {
@@ -619,7 +667,6 @@ public class RefNameServiceUtils {
                 }
                 ilistItem.setDocId(csid);
                 String uri = "";
-                UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
                 UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, docType);
                 StoredValuesUriTemplate template = registry.get(key);
                 if (template != null) {
@@ -672,38 +719,70 @@ public class RefNameServiceUtils {
             //String authRefAncestorField = "";
             //String authRefDescendantField = "";
             //String sourceField = "";
-            int nRefsFoundInDoc = 0;
 
             ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps = new ArrayList<RefNameServiceUtils.AuthRefInfo>();
             try {
                 findAuthRefPropertiesInDoc(docModel, matchingAuthRefFields, refName, matchBaseOnly, foundProps); // REM - side effect that foundProps is set
-                for (RefNameServiceUtils.AuthRefInfo ari : foundProps) {
-                    if (ilistItem != null) {
-                        if (nRefsFoundInDoc == 0) {    // First one?
-                            ilistItem.setSourceField(ari.getQualifiedDisplayName());
-                        } else {    // duplicates from one object
-                            ilistItem = cloneAuthRefDocItem(ilistItem, ari.getQualifiedDisplayName());
-                        }
-                        list.add(ilistItem);
-                    } else {    // update refName case
-                        Property propToUpdate = ari.getProperty();
-                        propToUpdate.setValue(newAuthorityRefName);
-                    }
-                    nRefsFoundInDoc++;
+                if(!foundProps.isEmpty()) {
+                    int nRefsFoundInDoc = 0;
+                	for (RefNameServiceUtils.AuthRefInfo ari : foundProps) {
+                		if (ilistItem != null) {
+                			// So this is a true positive, and not a false one. We have to consider pagination now.
+                			if(nRefsFoundTotal >= firstItemInPage) {	// skipped enough already
+                				if (nRefsFoundInDoc == 0) {    // First one?
+                					ilistItem.setSourceField(ari.getQualifiedDisplayName());
+                				} else {    // duplicates from one object
+                					ilistItem = cloneAuthRefDocItem(ilistItem, ari.getQualifiedDisplayName());
+                				}
+                				list.add(ilistItem);
+                        		nRefsFoundInDoc++;	// Only increment if processed, or clone logic above will fail
+                			}
+                		} else {    // update refName case
+                			Property propToUpdate = ari.getProperty();
+                			propToUpdate.setValue(newAuthorityRefName);
+                		}
+                		nRefsFoundTotal++;		// Whether we processed or not, we found - essential to pagination logic
+                	}
+                } else if(ilistItem != null) {
+                	String docRefName = ilistItem.getRefName();
+                    if (matchBaseOnly?
+	            			(docRefName!=null && docRefName.startsWith(refName))
+	            			:refName.equals(docRefName)) {
+                		// We found the self for an item
+                		foundSelf = true;
+                		logger.debug("getAuthorityRefDocs: Result: "
+                						+ docType + " [" + NuxeoUtils.getCsid(docModel)
+                						+ "] appears to be self for: ["
+                						+ refName + "]");
+                	} else {
+                		logger.debug("getAuthorityRefDocs: Result: "
+                						+ docType + " [" + NuxeoUtils.getCsid(docModel)
+                						+ "] does not reference ["
+                						+ refName + "]");
+                	}
                 }
             } catch (ClientException ce) {
-                throw new RuntimeException(
-                        "getAuthorityRefDocs: Problem fetching values from repo: " + ce.getLocalizedMessage());
+            	throw new RuntimeException(
+            			"getAuthorityRefDocs: Problem fetching values from repo: " + ce.getLocalizedMessage());
             }
-            if (nRefsFoundInDoc == 0) {
-                logger.warn(
-                        "getAuthorityRefDocs: Result: "
-                        + docType + " [" + NuxeoUtils.getCsid(docModel)
-                        + "] does not reference ["
-                        + refName + "]");
+            nDocsProcessed++;
+            // Done processing that doc. Are we done with the whole page?
+            // Note pageSize <=0 means do them all
+            if((pageSize > 0) && ((nRefsFoundTotal-firstItemInPage)>=pageSize)) {
+            	// Quitting early, so we need to estimate the total. Assume one per doc
+            	// for the rest of the docs we matched in the query
+            	int unprocessedDocs = nDocsReturnedInQuery - nDocsProcessed;
+            	if(unprocessedDocs>0) {
+            		// We generally match ourselves in the keyword search. If we already saw ourselves
+            		// then do not try to correct for this. Otherwise, decrement the total.
+            		// Yes, this is fairly goofy, but the whole estimation mechanism is goofy. 
+                	if(!foundSelf)
+                		unprocessedDocs--;
+                	nRefsFoundTotal += unprocessedDocs;
+            	}
+            	break;
             }
-            nRefsFoundTotal += nRefsFoundInDoc;
-        }
+        } // close while(iterator)
         return nRefsFoundTotal;
     }
 
