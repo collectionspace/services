@@ -1026,7 +1026,14 @@ public class NuxeoBlobUtils {
 			logger.error("Could not create image blob.", e);
 			throw e;
 		} finally {
-			
+			//
+			// If we created a temp file then we should delete it.
+			//
+			if (targetFile.equals(originalFile) == false) {
+				if (targetFile.delete() == false) {
+					logger.warn(String.format("Attempt to delete temporary file '%s' failed.", targetFile.getAbsolutePath()));
+				}
+			}
 		}
 
 		return result;
