@@ -45,15 +45,31 @@
 					<service:properties merge:matcher="tag">
 						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
 							<types:key>authRef</types:key>
-							<types:value>assocPeopleGroupList/*/assocPeople</types:value>
-						</types:item>
+							<types:value>materialGroupList/*/material</types:value>
+						</types:item>                        
 						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
 							<types:key>authRef</types:key>
 							<types:value>contentPeoples|contentPeople</types:value>
 						</types:item>
 						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
 							<types:key>authRef</types:key>
+							<types:value>contentPlaces|contentPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
 							<types:value>objectProductionPeopleGroupList/*/objectProductionPeople</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>objectProductionPlaceGroupList/*/objectProductionPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>assocPeopleGroupList/*/assocPeople</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>assocPlaceGroupList/*/assocPlace</types:value>
 						</types:item>
 						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
 							<types:key>authRef</types:key>
@@ -67,6 +83,11 @@
 							<types:key>authRef</types:key>
 							<types:value>assocEventPlaces|assocEventPlace</types:value>
 						</types:item>
+						<!-- FIXME: Need to remove this from proto. How? -->
+						<!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>assocConceptGroupList/*/assocConcept</types:value>
+						</types:item> -->
 					</service:properties>
 				</service:part>
 				
@@ -108,11 +129,19 @@
 						</types:item>
 						<types:item xmlns:types="http://collectionspace.org/services/config/types">
 							<types:key>authRef</types:key>
+							<types:value>computedCrate</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
 							<types:value>accessRestrictionGroupList/*/accessRestrictionRequestor</types:value>
 						</types:item>
 						<types:item xmlns:types="http://collectionspace.org/services/config/types">
 							<types:key>authRef</types:key>
 							<types:value>accessRestrictionGroupList/*/accessRestrictionOnBehalfOf</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>repatriationClaimGroupList/*/repatriationClaimClaimant</types:value>
 						</types:item>
 					</service:properties>
 					
@@ -140,6 +169,10 @@
 							<types:key>authRef</types:key>
 							<types:value>pahmaFieldCollectionPlaceList|pahmaFieldCollectionPlace</types:value>
 						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>termRef</types:key>
+							<types:value>ownershipHistoryGroupList/*/ownershipPriceCurrency</types:value>
+						</types:item>
 					</service:properties>
 
 					<service:content contentType="application/xml">
@@ -151,8 +184,29 @@
 			</service:object>
 		</tenant:serviceBindings>
 
+		<tenant:serviceBindings merge:matcher="id" id="Intakes">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>fieldCollectionPlace</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
 		<tenant:serviceBindings merge:matcher="id" id="Loansin">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>termRef</types:key>
+							<types:value>loanPurpose</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansin_pahma" updated="" order="3">
 					<service:content contentType="application/xml">
 						<service:xmlContent namespaceURI="http://collectionspace.org/services/loanin/local/pahma" schemaLocation="http://collectionspace.org/services/loanin/local/pahma http://collectionspace.org/services/loanin/local/loansin_pahma.xsd" />
@@ -163,6 +217,14 @@
 
 		<tenant:serviceBindings merge:matcher="id" id="Loansout">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>termRef</types:key>
+							<types:value>loanPurpose</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansout_pahma" updated="" order="3">
 					<service:content contentType="application/xml">
 						<service:xmlContent namespaceURI="http://collectionspace.org/services/loanout/local/pahma" schemaLocation="http://collectionspace.org/services/loanout/local/pahma http://collectionspace.org/services/loanout/local/loansout_pahma.xsd" />
@@ -216,9 +278,33 @@
 			</service:object>
 		</tenant:serviceBindings>
 
+		<tenant:serviceBindings merge:matcher="id" id="Groups">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>termRef</types:key>
+							<types:value>responsibleDepartment</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		
 		<tenant:serviceBindings merge:matcher="id" id="Media">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
-				
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>coverage</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>subjects|subject</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="media_pahma" updated="" order="3">
 					<service:content contentType="application/xml">
 						<service:xmlContent namespaceURI="http://collectionspace.org/services/media/local/pahma" schemaLocation="http://collectionspace.org/services/media/local/pahma http://collectionspace.org/services/media/local/media_pahma.xsd" />
@@ -257,6 +343,10 @@
 						<types:item xmlns:types="http://collectionspace.org/services/config/types">
 							<types:key>authRef</types:key>
 							<types:value>locationHandlers|locationHandler</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>crate</types:value>
 						</types:item>
 					</service:properties>
 
@@ -320,6 +410,18 @@
 
 		<tenant:serviceBindings merge:matcher="id" id="Organizations">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>foundingPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>groups|group</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="organizations_anthropology" updated="" order="3">
 					<service:content contentType="application/xml">
 						<service:xmlContent namespaceURI="http://collectionspace.org/services/organization/domain/anthropology" 
@@ -331,14 +433,28 @@
 
 		<tenant:serviceBindings merge:matcher="id" id="Persons">
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
-				
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>birthPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>deathPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>groups|group</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
 				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="persons_anthropology" updated="" order="3">
 					<service:content contentType="application/xml">
 						<service:xmlContent namespaceURI="http://collectionspace.org/services/person/domain/anthropology" 
 							schemaLocation="http://collectionspace.org/services/person/domain/anthropology http://collectionspace.org/services/person/domain/persons_anthropology.xsd" />
 					</service:content>
 				</service:part>
-				
 			</service:object>
 		</tenant:serviceBindings>
 
@@ -348,6 +464,19 @@
 					<service:content contentType="application/xml">
 						<service:xmlContent namespaceURI="http://collectionspace.org/services/location/domain/anthropology" schemaLocation="http://collectionspace.org/services/location/domain/anthropology http://collectionspace.org/services/location/domain/locations_anthropology.xsd" />
 					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		
+		<tenant:serviceBindings merge:matcher="id" id="Places">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>termRef</types:key>
+							<types:value>placeType</types:value>
+						</types:item>
+					</service:properties>
 				</service:part>
 			</service:object>
 		</tenant:serviceBindings>
