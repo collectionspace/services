@@ -43,6 +43,8 @@
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
 				<service:part id="1" merge:matcher="id">
 					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" id="assocConcept" merge:matcher="id" merge:action="delete"/>
+
 						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
 							<types:key>authRef</types:key>
 							<types:value>materialGroupList/*/material</types:value>
@@ -83,11 +85,6 @@
 							<types:key>authRef</types:key>
 							<types:value>assocEventPlaces|assocEventPlace</types:value>
 						</types:item>
-						<!-- FIXME: Need to remove this from proto. How? -->
-						<!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
-							<types:key>authRef</types:key>
-							<types:value>assocConceptGroupList/*/assocConcept</types:value>
-						</types:item> -->
 					</service:properties>
 				</service:part>
 				
