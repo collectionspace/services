@@ -542,7 +542,8 @@
                             <types:key>termRef</types:key>
                             <types:value>assocActivityGroupList/*/assocActivity</types:value>
                         </types:item> -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- Hack: Put an id on this item so it can be deleted in the pahma overlay (this won't affect other deployments). -->
+                        <types:item id="assocConcept" xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>assocConceptGroupList/*/assocConcept</types:value>
                         </types:item>
