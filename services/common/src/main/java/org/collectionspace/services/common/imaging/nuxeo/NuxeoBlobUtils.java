@@ -63,25 +63,28 @@ import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
 import org.nuxeo.ecm.core.repository.RepositoryManager;
 
 import org.nuxeo.ecm.core.repository.RepositoryService;
-//import org.nuxeo.runtime.model.ComponentManager;
-//import org.nuxeo.runtime.model.impl.ComponentManagerImpl;
-//import org.nuxeo.ecm.core.api.ejb.DocumentManagerBean;
-//import org.nuxeo.ecm.core.storage.sql.RepositoryImpl;
-//import org.nuxeo.ecm.core.storage.sql.Repository;
-import org.nuxeo.ecm.core.storage.sql.Binary;
 import org.nuxeo.ecm.core.storage.sql.BinaryManager;
 import org.nuxeo.ecm.core.storage.sql.DefaultBinaryManager;
+
+/*
+ * Keep these commented out import statements as reminders of Nuxeo's blob management
+import org.nuxeo.runtime.model.ComponentManager;
+import org.nuxeo.runtime.model.impl.ComponentManagerImpl;
+import org.nuxeo.ecm.core.api.ejb.DocumentManagerBean;
+import org.nuxeo.ecm.core.storage.sql.RepositoryImpl;
+import org.nuxeo.ecm.core.storage.sql.Repository;
+import org.nuxeo.ecm.core.storage.sql.Binary;
 import org.nuxeo.ecm.core.storage.sql.RepositoryImpl;
 import org.nuxeo.ecm.core.storage.sql.RepositoryResolver;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLBlob;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLRepository;
-//import org.nuxeo.ecm.core.storage.sql.RepositoryDescriptor;
+import org.nuxeo.ecm.core.storage.sql.RepositoryDescriptor;
+import org.nuxeo.ecm.core.api.DocumentResolver;
+*/
 
-//import org.nuxeo.ecm.core.api.DocumentResolver;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
-import org.nuxeo.ecm.core.api.impl.DocumentModelImpl;
 import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.core.api.impl.blob.InputStreamBlob;
 import org.nuxeo.ecm.core.api.impl.blob.StreamingBlob;
@@ -90,13 +93,10 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.Blob;
 import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.event.EventServiceAdmin;
-import org.nuxeo.ecm.core.event.impl.EventListenerList;
 
-import org.nuxeo.ecm.core.schema.DocumentType;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.types.Schema;
 
@@ -106,27 +106,24 @@ import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.blob.BlobOutput;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.DimensionSubGroup;
 import org.collectionspace.services.blob.DimensionSubGroupList;
 import org.collectionspace.services.blob.MeasuredPartGroup;
 import org.collectionspace.services.blob.MeasuredPartGroupList;
-//import org.collectionspace.services.blob.BlobsCommonList;
-//import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.nuxeo.extension.thumbnail.ThumbnailConstants;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.collectionspace.services.common.blob.BlobOutput;
-
 import org.collectionspace.services.config.service.ListResultField;
 
 
@@ -138,6 +135,12 @@ public class NuxeoBlobUtils {
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory
 			.getLogger(NuxeoBlobUtils.class);
+
+	//
+	// File name constants
+	//
+    private static final String NUXEO_FILENAME_BAD_CHARS = "[^a-zA-Z_0-9-.%:/\\ ]";
+    private static final String NUXEO_FILENAME_VALID_STRING = "[a-zA-Z_0-9-.%:/\\ ]+";
 
 	public static final String DOCUMENT_PLACEHOLDER_IMAGE = "documentImage.jpg";
 	public static final String DOCUMENT_MISSING_PLACEHOLDER_IMAGE = "documentImageMissing.jpg";
@@ -180,7 +183,6 @@ public class NuxeoBlobUtils {
 	public static final String SCHEMA_IMAGE_METADATA = "image_metadata";
 
 	private static final int THUMB_SIZE_HEIGHT = 100;
-
 	private static final int THUMB_SIZE_WIDTH = 75;
 
 	// static DefaultBinaryManager binaryManager = new DefaultBinaryManager();
@@ -261,6 +263,35 @@ public class NuxeoBlobUtils {
 		}
 
 		return item;
+	}
+	
+	static public String getSanizitedFilename(File srcFile) throws Exception {
+		return getSanizitedFilename(srcFile.getName());
+	}
+	
+	/*
+	 * Valid Nuxeo file names are a subset of *nix and Windows filenames, so we need to check.
+	 */
+	static public String getSanizitedFilename(String fileName) throws Exception {
+		String result = fileName;
+		
+		if (fileName != null && fileName.matches(NUXEO_FILENAME_VALID_STRING) == false) {
+			String fixedString = fileName.replaceAll(NUXEO_FILENAME_BAD_CHARS, "_");  // Replace "bad" chars with underscore character
+			if (fixedString.matches(NUXEO_FILENAME_VALID_STRING) == true) {
+				result = fixedString;
+			} else {
+				String errMsg = String.format("\tSorry, the sanizited string '%s' is still bad.", fixedString);
+				throw new Exception(errMsg);
+			}
+		}
+		
+		if (result != null && logger.isDebugEnabled() == true) {
+			if (result.equals(fileName) == false) {
+				logger.debug(String.format("The file name '%s' was sanizitized to '%s'.", fileName, result));
+			}
+		}
+
+		return result;
 	}
 
 	static public CommonList getBlobDerivatives(RepositoryInstance repoSession,
@@ -717,11 +748,8 @@ public class NuxeoBlobUtils {
 		return blob;
 	}
 
-	private static Blob createNuxeoFileBasedBlob(File file) {
-		Blob result = null;
-
-		result = new FileBlob(file);
-		return result;
+	private static Blob createNuxeoFileBasedBlob(File file) throws Exception {
+		return new FileBlob(file);
 	}
 
 	/**
@@ -960,22 +988,45 @@ public class NuxeoBlobUtils {
 			boolean useNuxeoAdaptors) throws Exception {
 		BlobsCommon result = null;
 
+		File originalFile = blobInput.getBlobFile();
+		File targetFile = originalFile;
 		try {
-			File blobFile = blobInput.getBlobFile();
 			// We'll store the blob inside the workspace directory of the calling service
 			String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
 			DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
 			DocumentModel wspaceDoc = repoSession.getDocument(nuxeoWspace);
+			//
+			// If the original file's name contains "illegal" characters, then we create a copy of the file to give Nuxeo.
+			//
+			String sanitizedName = NuxeoBlobUtils.getSanizitedFilename(originalFile);
+			if (sanitizedName.equals(originalFile.getName()) == false) {
+				targetFile = FileUtils.createTmpFile(originalFile, sanitizedName);
+				if (logger.isDebugEnabled() == true) {
+					logger.debug(String.format("The file '%s''s name has characters that Nuxeo can't deal with.  Rather than renaming the file, we created a new temp file at '%s'",
+							originalFile.getName(), targetFile.getAbsolutePath()));
+				}
+			}			
 			
 			result = createBlobInRepository(repoSession,
 					wspaceDoc,
 					purgeOriginal,
-					blobFile, 
+					targetFile, 
 					null, // MIME type
 					useNuxeoAdaptors);
+			//
+			// Make sure we're using the original file name in our BlobsCommon instance.  If the original file's name
+			// contained illegal characters, then we created and handed a copy of the file to Nuxeo.  We don't want the
+			// copy's file name stored in the BlobsCommon instance, we want the original file name instead.
+			//
+			if (targetFile.equals(originalFile) == false) {
+				result.setName(originalFile.getName());
+			}
+			
 		} catch (Exception e) {
-			logger.error("Could not create image blob", e);
+			logger.error("Could not create image blob.", e);
 			throw e;
+		} finally {
+			
 		}
 
 		return result;
@@ -1019,8 +1070,6 @@ public class NuxeoBlobUtils {
 		BlobsCommon result = null;
 
 		try {
-			// Blob fileBlob = createStreamingBlob(blobFile, blobFile.getName(),
-			// mimeType);
 			Blob fileBlob = createNuxeoFileBasedBlob(file);
 			
 			DocumentModel documentModel = createDocumentFromBlob(

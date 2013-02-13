@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 //import java.io.IOException;
@@ -66,6 +65,14 @@ public class FileUtils {
 	public static final String TMP_BLOB_PREFIX = "cspace_blob_";
 	public static final String DEFAULT_BLOB_NAME = "blob";
 	private static final String FILE_FORM_FIELD = "file";
+	
+	/*
+	 * Creates a copy of the srcFile to a temp file
+	 */
+	static public File createTmpFile(File srcFile, String prefix) throws Exception {
+		File result = createTmpFile(new FileInputStream(srcFile), prefix);
+		return result;
+	}
 	
 	/**
 	 * Creates the tmp file.
