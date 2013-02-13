@@ -257,20 +257,32 @@
                             <types:key>authRef</types:key>
                             <types:value>nonTextualInscriptionGroupList/*/inscriptionDescriptionMethod</types:value>
                         </types:item> -->
-                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- Uncomment when this field is transitioned to using a vocabulary -->
+                        <!-- in the Concept authority. See CSPACE-5881 and CSPACE-5835 -->
+                        <!--
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>materialGroupList/*/material</types:value>
-                        </types:item> -->
+                        </types:item>
+                        -->
+                        <!-- Uncomment when this field is transitioned to using a vocabulary -->
+                        <!-- in the Concept authority. See CSPACE-5881 and CSPACE-5835 -->
                         <!-- The materialComponent field may become part of a repeatable sub-group -->
                         <!-- per CSPACE-4563. -->
-                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!--
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>materialGroupList/*/materialComponent</types:value>
                         </types:item>
+                        -->
+                        <!-- Uncomment when this field is transitioned to using a vocabulary -->
+                        <!-- in the Place authority.  See CSPACE-5881 and CSPACE-5835 -->
+                        <!--
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>materialGroupList/*/materialSource</types:value>
-                        </types:item> -->
+                        </types:item>
+                        -->
                         <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>styles|style</types:value>
