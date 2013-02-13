@@ -280,7 +280,7 @@ public class BlobResource extends ResourceBase {
     /*
      * Publish the blob content.
      */
-    @GET
+    @POST
     @Path("{csid}/content/publish")
     public Response publishBlobContent(
     		@Context ResourceMap resourceMap,
@@ -303,7 +303,7 @@ public class BlobResource extends ResourceBase {
     	return result;
     }
     
-    @GET
+    @POST
     @Path("{csid}/derivatives/{derivativeTerm}/content/publish")
     public Response publishDerivativeContent(
     		@Context ResourceMap resourceMap,
