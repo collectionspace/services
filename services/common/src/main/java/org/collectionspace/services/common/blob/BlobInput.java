@@ -10,14 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 
-//import org.collectionspace.services.blob.BlobsCommonList; 
-//import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
-//import org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler;
-//import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.Download;
 import org.collectionspace.services.common.document.DocumentException;
-import org.slf4j.LoggerFactory;
+import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
+
 import org.apache.commons.io.FileUtils;
 
 public class BlobInput {
@@ -28,6 +25,7 @@ public class BlobInput {
 	private File blobFile = null;
 	private String blobUri = null;
 	private String blobMimeType = null;
+	private String originalFileName = null;
 	
 	private String derivativeTerm;
 	private boolean derivativeListRequested = false;
@@ -54,6 +52,42 @@ public class BlobInput {
 	}
 	
 	/*
+	 * Save the original file name in case we rename it because of illegal Nuxeo file name characters
+	 */
+	private void setBlobFileName(String fileName) throws Exception {
+		String sanitizedResult = NuxeoBlobUtils.getSanizitedFilename(fileName);
+		if (fileName.equals(sanitizedResult) == true) {
+			originalFileName = null; //
+		} else {
+			originalFileName = fileName;
+		}
+	}
+	
+	public String getBlobFilename() throws Exception {
+		String result = null;
+		
+		if (originalFileName != null && originalFileName.trim().isEmpty() == false) {
+			result = originalFileName;
+		} else {
+			File theBlobFile = this.getBlobFile();
+			if (theBlobFile != null) {
+				result = theBlobFile.getName();
+			}
+		}
+		
+		//
+		// Add a log warning if the blob file name fails Nuxeo's file name restrictions.
+		//
+		String sanitizedResult = NuxeoBlobUtils.getSanizitedFilename(result);
+		if (result.equals(sanitizedResult) == false) {
+			logger.warn(String.format("The file name '%s' contains characters that Nuxeo deems illegal.",
+					result));
+		}		
+		
+		return result;
+	}
+	
+	/*
 	 * Getters and Setters
 	 */
 	public boolean isSchemaRequested() {
@@ -76,8 +110,12 @@ public class BlobInput {
 		return blobFile;
 	}
 
-	public void setBlobFile(File blobFile) {
+	public void setBlobFile(File blobFile) throws Exception {
 		this.blobFile = blobFile;
+		if (blobFile != null) {
+			String fileName = blobFile.getName();
+			setBlobFileName(fileName);
+		}
 	}
 
 	public String getBlobUri() {
@@ -135,7 +173,7 @@ public class BlobInput {
 	// FIXME: REM - The callers of this method are sending us a multipart form-data post, so why
 	// are we also receiving the blobUri?
 	//
-	public void createBlobFile(HttpServletRequest req, String blobUri) {
+	public void createBlobFile(HttpServletRequest req, String blobUri) throws Exception {
     	File tmpFile = org.collectionspace.services.common.FileUtils.createTmpFile(req);
     	this.setBlobFile(tmpFile);
     	this.setBlobUri(blobUri);
@@ -147,11 +185,15 @@ public class BlobInput {
 
 		if (blobUrl.getProtocol().equalsIgnoreCase("http")) {
 			Download fetchedFile = new Download(blobUrl);
-			logger.debug("Starting blob download into temp file:" + fetchedFile.getFilePath());
+			if (logger.isDebugEnabled() == true) {
+				logger.debug("Starting blob download into temp file:" + fetchedFile.getFilePath());
+			}
 			while (fetchedFile.getStatus() == Download.DOWNLOADING) {
 				// Do nothing while we wait for the file to download
 			}
-			logger.debug("Finished blob download into temp file: " + fetchedFile.getFilePath());
+			if (logger.isDebugEnabled() == true) {
+				logger.debug("Finished blob download into temp file: " + fetchedFile.getFilePath());
+			}
 			
 			int status = fetchedFile.getStatus();
 			if (status == Download.COMPLETE) {
