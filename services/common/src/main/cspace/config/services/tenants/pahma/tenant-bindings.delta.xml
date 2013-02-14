@@ -319,6 +319,11 @@
 							<service:schema>movements_anthropology</service:schema>
 							<service:xpath>computedSummary</service:xpath>
 						</service:ListResultField>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                             <service:element>crate</service:element>
+                             <service:schema>movements_anthropology</service:schema>
+                             <service:xpath>crate</service:xpath>
+                        </service:ListResultField>
 					</service:ListResultsFields>
 				</service:params>
 			</service:DocHandlerParams>
