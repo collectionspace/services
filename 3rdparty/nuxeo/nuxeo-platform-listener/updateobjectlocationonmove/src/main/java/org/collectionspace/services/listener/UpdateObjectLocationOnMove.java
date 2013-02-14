@@ -39,8 +39,8 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
         //
         // * If it is not blank ...
         // * Is then capable of being successfully parsed by an authority item parser.
-        if ((Tools.notBlank(currentLocationRefName)
-                && (RefNameUtils.parseAuthorityTermInfo(currentLocationRefName) == null))) {
+        if (Tools.notBlank(currentLocationRefName)
+                && RefNameUtils.parseAuthorityTermInfo(currentLocationRefName) == null) {
             logger.warn("Could not parse current location refName '" + currentLocationRefName + "'");
             return collectionObjectDocModel;
         } else {
@@ -59,9 +59,9 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
             logger.trace("Existing computedCurrentLocation refName=" + existingComputedCurrentLocationRefName);
         }
 
-        // If the new value is blank, the existing value should always be
-        // overwritten ('nulled out') with a blank value.
-        if (Tools.isBlank(currentLocationRefName)) {
+        // If the new value is blank, any non-blank existing value should always
+        // be overwritten ('nulled out') with a blank value.
+        if (Tools.isBlank(currentLocationRefName) && Tools.notBlank(existingComputedCurrentLocationRefName)) {
             collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
                     COMPUTED_CURRENT_LOCATION_PROPERTY, (Serializable) null);
             // Otherwise, if the existing value is blank, or if the new value
