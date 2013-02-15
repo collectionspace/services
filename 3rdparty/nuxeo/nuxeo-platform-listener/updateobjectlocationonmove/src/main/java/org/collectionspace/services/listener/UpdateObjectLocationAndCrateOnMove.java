@@ -64,10 +64,12 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
         if (Tools.isBlank(crateRefName) && Tools.notBlank(existingCrateRefName)) {
             collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_ANTHROPOLOGY_SCHEMA,
                     COMPUTED_CRATE_PROPERTY, (Serializable) null);
-            // Otherwise, if the existing value is blank, or if the new value
-            // is different than the existing value ...
-        } else if (Tools.isBlank(existingCrateRefName)
-                || (!crateRefName.equals(existingCrateRefName))) {
+            // Otherwise, if the new value is not blank, and
+            // * the existing value is blank, or
+            // * the new value is different than the existing value ...
+        } else if (Tools.notBlank(crateRefName) &&
+                    (Tools.isBlank(existingCrateRefName)
+                    || !crateRefName.equals(existingCrateRefName))) {
             if (logger.isTraceEnabled()) {
                 logger.trace("crate refName requires updating.");
             }
