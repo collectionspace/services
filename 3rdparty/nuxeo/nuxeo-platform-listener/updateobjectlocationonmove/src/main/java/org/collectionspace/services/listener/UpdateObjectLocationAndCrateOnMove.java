@@ -31,7 +31,7 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
             DocumentModel movementDocModel)
             throws ClientException {
         
-        // Get the current location value from the Movement (the "new" value)
+        // Get the current crate value from the Movement (the "new" value)
         String crateRefName =
                 (String) movementDocModel.getProperty(MOVEMENTS_ANTHROPOLOGY_SCHEMA, CRATE_PROPERTY);
 
