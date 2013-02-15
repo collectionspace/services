@@ -374,6 +374,40 @@
         </test>
         -->
         
+        <test ID="updateMovement3WithBlankCurrentLocationSecondTime">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation"></var>
+                <var ID="locationDate">1800-02-01</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!--        
+            Uncomment only when working on the computed current location
+            event listener / handler. - ADR - 2013-02-14
+            
+            (See comments above for more details.)
+        -->
+        <!--
+        <test ID="readCollectionObject1AfterMovement3BlankCurrentLocationUpdateSecondTime">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <filename>listener/res/collectionobject-without-current-location.res.xml</filename>
+                <expected level="TREE" />
+                <parts>
+                    <part>
+                        <label>collectionobjects_common</label>
+                    </part>
+                </parts>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        -->
+        
         <test ID="updateMovement3WithNonBlankCurrentLocation">
             <method>PUT</method>
             <uri>/cspace-services/movements/${createMovement2.CSID}</uri>

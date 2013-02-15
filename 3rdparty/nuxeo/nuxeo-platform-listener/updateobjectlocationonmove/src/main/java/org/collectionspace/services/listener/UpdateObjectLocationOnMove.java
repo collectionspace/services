@@ -64,10 +64,12 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
         if (Tools.isBlank(currentLocationRefName) && Tools.notBlank(existingComputedCurrentLocationRefName)) {
             collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
                     COMPUTED_CURRENT_LOCATION_PROPERTY, (Serializable) null);
-            // Otherwise, if the existing value is blank, or if the new value
-            // is different than the existing value ...
-        } else if (Tools.isBlank(existingComputedCurrentLocationRefName)
-                || (!currentLocationRefName.equals(existingComputedCurrentLocationRefName))) {
+            // Otherwise, if the new value is not blank, and
+            // * the existing value is blank, or
+            // * the new value is different than the existing value ...
+        } else if (Tools.notBlank(currentLocationRefName) &&
+                    (Tools.isBlank(existingComputedCurrentLocationRefName)
+                    || !currentLocationRefName.equals(existingComputedCurrentLocationRefName))) {
             if (logger.isTraceEnabled()) {
                 logger.trace("computedCurrentLocation refName requires updating.");
             }
