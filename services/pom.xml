@@ -30,6 +30,8 @@
     be built after the security module and common modules are built
     -->
     <modules>
+	        <module>report</module>
+<!--
         <module>config</module>
         <module>common-api</module>
         <module>authentication</module>
@@ -41,9 +43,9 @@
         <module>hyperjaxb</module>
         <module>common</module>
         <module>authority</module>
-        <module>authorization-mgt</module> <!-- relies on authorization -->
+        <module>authorization-mgt</module> 
         <module>common-test</module>
-        <module>account</module> <!-- relies on authorization-mgt.import -->
+        <module>account</module> 
         <module>note</module>
         <module>relation</module>
         <module>query</module>
@@ -66,17 +68,15 @@
         <module>concept</module>
         <module>taxonomy</module>
         <module>movement</module>
-        <module>report</module>
         <module>dimension</module>
         <module>contact</module>
         <module>workflow</module>
         <module>media</module>
         <module>publicitem</module>        
-        <!--module>sdk</module-->
         <module>IntegrationTests</module>
         <module>PerformanceTests</module>
         <module>security</module>
-        <module>JaxRsServiceProvider</module>
+        <module>JaxRsServiceProvider</module> -->
     </modules>
 
     <dependencies>
