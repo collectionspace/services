@@ -333,7 +333,109 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
+        <test ID="updateMovement3WithBlankCurrentLocation">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation"></var>
+                <var ID="locationDate">1800-02-01</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!--
+            This test verifies that the computedCurrentLocation field
+            value has been set to null, because that field will *not*
+            be emitted in the response payload when it has a null value.
+            
+            This is an inherently fragile test, in comparing tree structures,
+            and will break if there are any changes to any of the relevant
+            schemas, including collectionspace_core, collectionobjects_common,
+            and account_permission.
+            
+            Uncomment only when working on the computed current location
+            event listener / handler. - ADR - 2013-02-14
+        -->
+        <!--
+        <test ID="readCollectionObject1AfterMovement3BlankCurrentLocationUpdate">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <filename>listener/res/collectionobject-without-current-location.res.xml</filename>
+                <expected level="TREE" />
+                <parts>
+                    <part>
+                        <label>collectionobjects_common</label>
+                    </part>
+                </parts>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        -->
+        
+        <test ID="updateMovement3WithBlankCurrentLocationSecondTime">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation"></var>
+                <var ID="locationDate">1800-02-01</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <!--        
+            Uncomment only when working on the computed current location
+            event listener / handler. - ADR - 2013-02-14
+            
+            (See comments above for more details.)
+        -->
+        <!--
+        <test ID="readCollectionObject1AfterMovement3BlankCurrentLocationUpdateSecondTime">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <filename>listener/res/collectionobject-without-current-location.res.xml</filename>
+                <expected level="TREE" />
+                <parts>
+                    <part>
+                        <label>collectionobjects_common</label>
+                    </part>
+                </parts>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        -->
+        
+        <test ID="updateMovement3WithNonBlankCurrentLocation">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement2.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Ottawa1358215545567)'Ottawa, ON, Canada'</var>
+                <var ID="locationDate">1800-02-01</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+
+        <test ID="readCollectionObject1AfterMovement3BlankCurrentLocationUpdate">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${updateMovement3WithNonBlankCurrentLocation.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
     </testGroup>
+    
+    <!-- Some of the following tests pertain to CSPACE-5793, not yet -->
+    <!-- resolved as of this writing. - ADR 2013-02-14 -->
     
     <testGroup ID="TestsStillUnderDevelopment">
         
