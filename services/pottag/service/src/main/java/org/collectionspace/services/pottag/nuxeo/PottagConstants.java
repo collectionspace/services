@@ -32,4 +32,11 @@ public class PottagConstants {
     public final static String NUXEO_DOCTYPE = "Pottag";
     public final static String NUXEO_SCHEMA_NAME = "pottag";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Pottag";
+
+	public static final String COMMON_SCHEMA_NAME = "pottags_common";
+
+    public final static String LABEL_REQUESTED_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String LABEL_REQUESTED_FIELD_NAME = "printLabels";
+    public final static String LABEL_REQUESTED_YES_VALUE = "yes";
+    public final static String LABEL_REQUESTED_NO_VALUE = "no";
 }
