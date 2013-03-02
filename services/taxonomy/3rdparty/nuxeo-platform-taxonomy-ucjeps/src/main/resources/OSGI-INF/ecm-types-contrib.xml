@@ -9,9 +9,9 @@
       <layouts mode="any">
         <layout>heading</layout>
         <layout>collectionspace_core</layout>
-        <layout>taxon</layout>
+        <layout>{CommonSchemaName}</layout>
         <layout>taxon_naturalhistory</layout>
-		<!-- <layout>${CustomSchemaName}</layout> -->
+        <layout>${CustomSchemaName}</layout> 
       </layouts>
     </type>
 
