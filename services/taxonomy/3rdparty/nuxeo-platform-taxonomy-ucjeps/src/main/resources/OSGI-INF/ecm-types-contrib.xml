@@ -9,7 +9,7 @@
       <layouts mode="any">
         <layout>heading</layout>
         <layout>collectionspace_core</layout>
-        <layout>{CommonSchemaName}</layout>
+        <layout>taxon</layout>
         <layout>taxon_naturalhistory</layout>
         <layout>${CustomSchemaName}</layout> 
       </layouts>
