@@ -66,8 +66,9 @@ public class AccountJpaFilter extends JpaDocumentFilter {
             queryStrBldr.append(" UPPER(a." + AccountStorageConstants.SCREEN_NAME + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + AccountStorageConstants.Q_SCREEN_NAME);
+            // CSPACE-2029
             paramList.add(new ParamBinding(AccountStorageConstants.Q_SCREEN_NAME, "%"
-                    + screenName.toUpperCase() + "%"));
+                    + replaceSpacesWithQueryWildcards(screenName.toUpperCase()) + "%"));
         }
 
         String uid = null;
@@ -126,5 +127,13 @@ public class AccountJpaFilter extends JpaDocumentFilter {
         String whereClause = " JOIN a.tenants as at WHERE at.tenantId = :tenantId";
         paramList.add(new ParamBinding("tenantId", tenantId));
         return whereClause;
+    }
+    
+    public String replaceSpacesWithQueryWildcards(String str) {
+        if (null == str || str.trim().isEmpty()) {
+            return str;
+        } else {
+            return str.trim().replaceAll("[\\s]+","%");
+        }
     }
 }
