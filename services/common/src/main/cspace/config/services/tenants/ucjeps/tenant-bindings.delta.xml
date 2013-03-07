@@ -262,6 +262,13 @@
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/taxonomy/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/taxonomy/domain/naturalhistory http://collectionspace.org/services/taxonomy/domain/taxon_naturalhistory.xsd" />
                     </service:content>
                 </service:part>
+                <service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="taxon_ucjeps" updated="" order="4">
+                    <service:properties>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/taxonomy/local/ucjeps" schemaLocation="http://collectionspace.org/services/taxonomy/local/ucjeps http://collectionspace.org/services/taxonomy/local/taxon_ucjeps.xsd" />
+                    </service:content>
+                </service:part>
             </service:object>
 
         </tenant:serviceBindings>

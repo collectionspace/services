@@ -5,7 +5,7 @@
   <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
     point="layouts">
 
-    <!-- <layout name="${CustomSchemaName}"> -->
+    <layout name="${CustomSchemaName}">
 	<!-- Insert layout settings for the custom schema here. -->
 	<!--
       <templates>
@@ -28,7 +28,8 @@
         </properties>
       </widget>
       -->
-    <!-- </layout> -->
+    </layout>
+    
     <layout name="taxon_naturalhistory">
     </layout>
   </extension>
