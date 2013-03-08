@@ -40,7 +40,14 @@ import org.collectionspace.services.common.XmlSaxFragmenter;
 import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.RefName.RefNameInterface;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.config.service.DocHandlerParams;
+import org.collectionspace.services.config.service.ListResultField;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -69,12 +76,16 @@ public class TemplateExpander {
     // non-namespace-qualified elements.
     private static final String IN_AUTHORITY_NAMESPACE_XPATH = "//*[local-name()='inAuthority']";
     private static final String IN_AUTHORITY_NO_NAMESPACE_XPATH = "//inAuthority";
+    private static final String REFNAME_NAMESPACE_XPATH = "//*[local-name()='refName']";
+    private static final String REFNAME_NO_NAMESPACE_XPATH = "//refName]";
     private static final String SERVICE_ATTRIBUTE = "service";
     private static final String TYPE_ATTRIBUTE = "type";
     private static final String CREATED_AT_ATTRIBUTE = "createdAt";
     private static final String CREATED_BY_ATTRIBUTE = "createdBy";
     private static final String UPDATED_AT_ATTRIBUTE = "updatedAt";
     private static final String UPDATED_BY_ATTRIBUTE = "updatedBy";
+    private static TenantBindingConfigReaderImpl tReader =
+            ServiceMain.getInstance().getTenantBindingConfigReader();
 
     protected static String var(String theVar) {
         return "\\$\\{" + theVar + "\\}";
@@ -160,6 +171,9 @@ public class TemplateExpander {
                 getAttributeValue(perRecordAttributes, UPDATED_BY_ATTRIBUTE));
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"),
                 getDocUri(tenantId, SERVICE_TYPE, docID, partTmpl));
+        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("refName"),
+                getRefName(tenantId, SERVICE_TYPE, docID, partTmpl));
+
 
         String serviceDir = outDir + '/' + docID;
         FileTools.saveFile(serviceDir, "document.xml", wrapperTmpl, FileTools.FORCE_CREATE_PARENT_DIRS);
@@ -258,7 +272,7 @@ public class TemplateExpander {
     // - ADR 2012-05-24
     private static String getInAuthorityValue(String xmlFragment) {
         String inAuthorityValue = "";
-        // Check in two ways for the inAuthority value: one intended for records with
+        // Check for the inAuthority value in two ways: one intended for records with
         // namespace-qualified elements, the second for unqualified elements.
         // (There may be a more elegant way to do this with a single XPath expression,
         // via an OR operator or the like.)
@@ -269,6 +283,19 @@ public class TemplateExpander {
         return inAuthorityValue;
     }
 
+    private static String getRefNameValue(String xmlFragment) {
+        String refNameValue = "";
+        // Check for the refName value in two ways: one intended for records with
+        // namespace-qualified elements, the second for unqualified elements.
+        // (There may be a more elegant way to do this with a single XPath expression,
+        // via an OR operator or the like.)
+        refNameValue = extractValueFromXmlFragment(REFNAME_NAMESPACE_XPATH, xmlFragment);
+        if (Tools.isBlank(refNameValue)) {
+            refNameValue = extractValueFromXmlFragment(REFNAME_NO_NAMESPACE_XPATH, xmlFragment);
+        }
+        return refNameValue;
+    }
+
     // FIXME: Need to handle cases here where the xmlFragment may contain more
     // than one matching expression. (Simply matching on instance [0] within
     // the XPath expression might not be reasonable, as it won't always be
@@ -276,8 +303,9 @@ public class TemplateExpander {
     private static String extractValueFromXmlFragment(String xpathExpr, String xmlFragment) {
         String value = "";
         try {
-            // FIXME: Cruelly ugly hack; at this point for imported records
-            // with more than one <schema> child, we have a non-well-formed fragment.
+            // FIXME: This '<root>' wrapper is a crudely ugly hack; it has been
+            // added because, at this point when handling imported records with
+            // more than one <schema> child, we have only a non-well-formed fragment.
             String xmlFragmentWrapped = "<root>" + xmlFragment + "</root>";
             InputSource input = new InputSource(new StringReader(xmlFragmentWrapped));
             value = xpath.evaluate(xpathExpr, input);
@@ -294,6 +322,82 @@ public class TemplateExpander {
             attributeVal = (String) attributes.get(attributeName.toLowerCase());
         }
         return attributeVal;
+    }
+
+    private static String getRefName(String tenantId, String serviceType, String docID, String partTmpl) {
+        String refName = "";
+        String refNameDisplayName = "";
+
+        // If a valid refName value is provided within the imported record,
+        // use that value
+        refName = getRefNameValue(partTmpl);
+        if (Tools.notBlank(refName)) {
+            // FIXME Validate the provided refName by attempting to parse it   
+            return refName.toString();
+        }
+        
+        // Note: if there proves a need to automatically generate short
+        // identifier-style refNames for authority and authority item records,
+        // that code should be inserted here.
+
+        // If this service supports hierarchy, get the refName display name from
+        // the appropriate field in the record, so it can be added to the refName
+        if (serviceSupportsHierarchy(tenantId, serviceType)) {
+            String displayNameFieldXpath = getRefNameDisplayNameXpath(tenantId, serviceType);
+            refNameDisplayName = extractValueFromXmlFragment(displayNameFieldXpath, partTmpl);
+        }
+        // Generate a 'plain ID' form of refName
+        RefName.RefNameInterface refname =
+                RefName.Authority.buildAuthority(getTenantName(tenantId),
+                getServiceName(tenantId, serviceType), docID, null, refNameDisplayName);
+        refName = refname.toString();
+
+        return refName;
+    }
+
+    private static String getTenantName(String tenantId) {
+        TenantBindingType tenantBinding = tReader.getTenantBinding(tenantId);
+        return tenantBinding.getName();
+    }
+
+    private static String getServiceName(String tenantId, String serviceType) {
+        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, serviceType);
+        return serviceBinding.getName();
+    }
+
+    private static boolean serviceSupportsHierarchy(String tenantId, String serviceType) {
+        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, serviceType);
+        DocHandlerParams params = serviceBinding.getDocHandlerParams();
+        if (params == null || params.getParams() == null || params.getParams().isSupportsHierarchy() == null) {
+            return false;
+        } else {
+            return params.getParams().isSupportsHierarchy();
+        }
+    }
+
+    private static String getRefNameDisplayNameXpath(String tenantId, String serviceType) {
+        String displayNameXPath = "";
+        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, serviceType);
+        DocHandlerParams params = serviceBinding.getDocHandlerParams();
+        if (params == null || params.getParams() == null) {
+            return displayNameXPath;
+        }
+        ListResultField displayNameField = params.getParams().getRefnameDisplayNameField();
+        if (displayNameField == null) {
+            return displayNameXPath;
+
+        }
+        // Based on the two sample Xpath values for the RefnameDisplayNameField
+        // value, it appears these values require prefacing with the 'double slash'
+        // abbreviation, signifying the axis that selects all matching descendants
+        // of the document root. If that assumption proves incorrect in the future,
+        // we will need to revise this line. - ADR 2013-03-07
+        if (Tools.isBlank(displayNameField.getXpath())) {
+            return displayNameXPath;
+        } else {
+            displayNameXPath = "//" + displayNameField.getXpath();
+        }
+        return displayNameXPath;
     }
 
     /**
