@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<imports>
+    <import service="Locationauthorities" type="Locationauthority" CSID="${recordCSID}">
+        <schema xmlns:locationauthorities_common="http://collectionspace.org/services/location" 
+                name="locationauthorities_common">
+            <displayName>${displayNameValue}</displayName>
+            <shortIdentifier>${shortIdentifierValue}</shortIdentifier>
+            <refName>${refNameValue}</refName>
+        </schema>
+    </import>
+</imports>
