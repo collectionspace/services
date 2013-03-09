@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<imports>
+    <import service="CollectionObjects" type="CollectionObject" CSID="${recordCSID}">
+        <schema xmlns:collectionobjects_common="http://collectionspace.org/services/collectionobjects" 
+                name="collectionobjects_common">
+            <objectNumber>${objectNumberValue}</objectNumber>
+            <briefDescriptions>
+                <briefDescription>${briefDescriptionValue}</briefDescription>
+            </briefDescriptions>
+        </schema>
+    </import>
+</imports>
