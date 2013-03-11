@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.authentication.spi.AuthNContext;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.ServiceMain;
@@ -118,15 +119,16 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      * 
      * @throws UnauthorizedException the unauthorized exception
      */
-    protected AbstractServiceContextImpl(String serviceName) throws UnauthorizedException {
+    protected AbstractServiceContextImpl(String serviceName, UriInfo uriInfo) throws UnauthorizedException {
 
         //establish security context
-        securityContext = new SecurityContextImpl();
+        securityContext = new SecurityContextImpl(uriInfo);
         //make sure tenant context exists
         checkTenantContext();
 
         String tenantId = securityContext.getCurrentTenantId();
-        if(AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID.equals(tenantId)) {
+        if (AuthorizationCommon.ALL_TENANTS_MANAGER_TENANT_ID.equals(tenantId) ||
+        		AuthNContext.ANONYMOUS_TENANT_ID.equals(tenantId)) {
         	// Tenant Manager has no tenant binding, so don't bother...
         	tenantBinding = null;
         	serviceBinding = null;

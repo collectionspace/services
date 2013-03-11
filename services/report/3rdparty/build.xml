@@ -8,7 +8,7 @@
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
-    <property name="mvn.opts" value="" />
+    <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
 
     <condition property="osfamily-unix">
@@ -112,7 +112,7 @@
 			description="Copy sample jasper files to ${jee.server.cspace}/cspace/reports">
         <copy todir="${jee.server.cspace}/cspace/reports">
 					<fileset dir="${basedir}/jasper-cs-report/src/main/resources"
-									includes="*.jasper"/>
+									includes="*.jrxml"/>
         </copy>
     </target>
 

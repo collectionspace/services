@@ -27,8 +27,13 @@
 package org.collectionspace.services.common.query;
 
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.config.TenantBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.nuxeo.QueryManagerNuxeoImpl;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 
 public class QueryManager {
 	static private final IQueryManager queryManager = new QueryManagerNuxeoImpl();
@@ -64,8 +69,17 @@ public class QueryManager {
 			String field,
 			String partialTerm) throws Exception {
 		String repositoryName = ctx.getRepositoryName();
+        // Otherwise, generate that list and cache it for re-use.
+        TenantBindingConfigReaderImpl tReader =
+                ServiceMain.getInstance().getTenantBindingConfigReader();
+        TenantBindingType tenantBinding = tReader.getTenantBinding(ctx.getTenantId());
+        String ptStartingWildcardValue = TenantBindingUtils.getPropertyValue(tenantBinding,
+        		IQueryManager.TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM);
+        boolean ptStartingWildcard = (ptStartingWildcardValue==null) 
+        			|| Boolean.parseBoolean(ptStartingWildcardValue);
+
 		return queryManager.createWhereClauseForPartialMatch(queryManager.getDatasourceName(),
-				repositoryName, field, partialTerm);
+				repositoryName, field, ptStartingWildcard, partialTerm);
 	}
 	
 	/**

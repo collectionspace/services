@@ -1,45 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- A comment. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.main</artifactId>
-        <version>3.2-SNAPSHOT</version>
-    </parent>
-    
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
-    <artifactId>org.collectionspace.services.report</artifactId>
-    <name>services.report</name>
-    <packaging>pom</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.collectionspace.services</groupId>
+		<artifactId>org.collectionspace.services.main</artifactId>
+		<version>3.2.1-SNAPSHOT</version>
+	</parent>
 
-    <dependencies>
-        <dependency>
-            <groupId>net.sf.jasperreports</groupId>
-            <artifactId>jasperreports</artifactId>
-            <version>4.5.1</version>
-        </dependency>
-        <!-- Jasper Reports fonts are still at 4.0.0, but are compatible with later software releases - ADR 2012-06-05 -->
-        <!-- http://jasperforge.org/plugins/espforum/view.php?group_id=102&forumid=103&topicid=97145 -->
-        <dependency>
-            <groupId>net.sf.jasperreports</groupId>
-            <artifactId>jasperreports-fonts</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>1.7.5</version>
-        </dependency>
-    </dependencies>
-		
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.collectionspace.services</groupId>
+	<artifactId>org.collectionspace.services.report</artifactId>
+	<name>services.report</name>
+	<packaging>pom</packaging>
 
-    <modules>
-        <module>jaxb</module>
-        <module>service</module>
-        <module>3rdparty</module>
-        <module>client</module>
-    </modules>
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>5.0.1</version>
+		</dependency>
+		<!-- Jasper Reports fonts are still at 4.0.0, but are compatible with later 
+			software releases - ADR 2012-06-05 -->
+		<!-- http://jasperforge.org/plugins/espforum/view.php?group_id=102&forumid=103&topicid=97145 -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+		<!-- For some reason, have to declare this dependency explicitly, ot it does not find it.
+			It is a dependency of jasperreports 5.0.1 
+			-->
+		<dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>2.1.7</version>
+		</dependency>
+		<!-- The Jasper POM declares this as a compile-time dependency, but it is needed at runtime.
+			-->
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+	</dependencies>
+
+
+	<modules>
+		<module>jaxb</module>
+		<module>service</module>
+		<module>3rdparty</module>
+		<module>client</module>
+	</modules>
 
 </project>
 

@@ -6,7 +6,7 @@
 	<property environment="env" />
 	<!-- set global properties for this build -->
 	<property file="build.properties" />
-	<property name="mvn.opts" value="" />
+	<property name="mvn.opts" value="-V" />
 	<property name="src" location="src"/>
 
 	<condition property="osfamily-unix">

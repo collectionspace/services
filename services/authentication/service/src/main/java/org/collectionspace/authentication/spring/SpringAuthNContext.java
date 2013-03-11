@@ -23,14 +23,17 @@
  */
 package org.collectionspace.authentication.spring;
 
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
+
+import java.security.acl.Group;
 import javax.security.auth.Subject;
+
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.spi.AuthNContext;
+
 import org.springframework.security.authentication.jaas.JaasAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,8 +46,14 @@ final public class SpringAuthNContext extends AuthNContext {
     //private static final String SUBJECT_CONTEXT_KEY = "javax.security.auth.Subject.container";
 
     public String getUserId() {
+    	String result = ANONYMOUS_USER;
+    	
         Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
-        return authToken.getName();
+        if (authToken != null) {
+        	result = authToken.getName();
+    }
+        
+        return result;
     }
 
     /**
@@ -64,25 +73,31 @@ final public class SpringAuthNContext extends AuthNContext {
 
     @Override
     public String getCurrentTenantId() {
-        //FIXME assumption in 1.0: each user is associated with a single tenant
+    	String result = ANONYMOUS_TENANT_ID;
+    	
+    	String userId = getUserId();
+    	if (userId.equals(ANONYMOUS_USER) == false && userId.equals(SPRING_ADMIN_USER) == false) {
         String[] tenantIds = getTenantIds();
         if (tenantIds.length < 1) {
             throw new IllegalStateException("No tenant associated with user=" + getUserId());
         }
-        return getTenantIds()[0];
+	        result = getTenantIds()[0];
+    }
+    	
+    	return result;
     }
 
     public CSpaceTenant[] getTenants() {
         List<CSpaceTenant> tenants = new ArrayList<CSpaceTenant>();
         Subject caller = getSubject();
         if (caller == null) {
-            String msg = "Could not find Subject!";
-            //TODO: find out why subject is not null
-            //FIXME: if logger is loaded when authn comes up, use it
-            //logger.warn(msg);
-            System.err.println(msg);
+        	if (getUserId().equals(SPRING_ADMIN_USER) == false) {
+	            String msg = String.format("Could not find Subject in SpringAuthNContext for user '%s'!", getUserId()); 
+	            System.err.println(msg);	            
+        	}
             return tenants.toArray(new CSpaceTenant[0]);
         }
+        
         Set<Group> groups = null;
         groups = caller.getPrincipals(Group.class);
         if (groups != null && groups.size() == 0) {
@@ -112,12 +127,17 @@ final public class SpringAuthNContext extends AuthNContext {
 
     @Override
     public String getCurrentTenantName() {
-        //FIXME assumption in 1.0: each user is associated with a single tenant
+    	String result = ANONYMOUS_TENANT_NAME;
+    	
+    	if (getUserId().equals(ANONYMOUS_USER) == false) {
         CSpaceTenant[] tenants = getTenants();
         if (tenants.length < 1) {
             throw new IllegalStateException("No tenant associated with user=" + getUserId());
         }
-        return getTenants()[0].getName();
+	        result = getTenants()[0].getName();
+    }
+    	
+    	return result;
     }
 
     public Subject getSubject() {

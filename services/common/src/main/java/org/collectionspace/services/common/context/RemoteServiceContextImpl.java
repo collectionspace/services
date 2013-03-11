@@ -76,8 +76,8 @@ public class RemoteServiceContextImpl<IT, OT>
      * 
      * @throws UnauthorizedException the unauthorized exception
      */
-    protected RemoteServiceContextImpl(String serviceName) throws UnauthorizedException {
-        super(serviceName);
+    protected RemoteServiceContextImpl(String serviceName, UriInfo uriInfo) throws UnauthorizedException {
+        super(serviceName, uriInfo);
     }
 
     /**
@@ -87,8 +87,8 @@ public class RemoteServiceContextImpl<IT, OT>
      * 
      * @throws UnauthorizedException the unauthorized exception
      */
-    protected RemoteServiceContextImpl(String serviceName, IT theInput) throws UnauthorizedException {
-    	this(serviceName);
+    protected RemoteServiceContextImpl(String serviceName, IT theInput, UriInfo uriInfo) throws UnauthorizedException {
+    	this(serviceName, uriInfo);
         this.input = theInput;        
     }
 
@@ -105,7 +105,7 @@ public class RemoteServiceContextImpl<IT, OT>
     		IT theInput,
     		ResourceMap resourceMap,
     		UriInfo uriInfo) throws UnauthorizedException {
-        this(serviceName, theInput);
+        this(serviceName, theInput, uriInfo);
         this.setResourceMap(resourceMap);
         this.setUriInfo(uriInfo);
         if (uriInfo != null) {

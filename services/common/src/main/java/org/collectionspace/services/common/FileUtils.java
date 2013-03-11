@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 //import java.io.IOException;
@@ -51,6 +50,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +67,33 @@ public class FileUtils {
 	public static final String DEFAULT_BLOB_NAME = "blob";
 	private static final String FILE_FORM_FIELD = "file";
 	
+    public static String getExtension(File file) {
+    	return getExtension(file.getName());
+    }
+    
+    // Call this method to get the extension by passing the file name
+    public static String getExtension(String fileName) {
+        if (fileName == null) {
+            return null;
+        }
+ 
+        int index = fileName.lastIndexOf(".");
+        if (index == -1) {
+            return "";
+        }
+ 
+        return fileName.substring(index + 1);
+    }
+    
+	/*
+	 * Creates a copy of the srcFile to a temp file
+	 */
+	static public File createTmpFile(File srcFile, String prefix) throws Exception {
+		String fileExtension = FileUtils.getExtension(srcFile);
+		File result = createTmpFile(new FileInputStream(srcFile), prefix, fileExtension);
+		return result;
+	}
+	
 	/**
 	 * Creates the tmp file.
 	 *
@@ -76,11 +103,25 @@ public class FileUtils {
 	 */
 	static public File createTmpFile(InputStream streamIn,
 			String filePrefix) {
+		return createTmpFile(streamIn, filePrefix, null);
+	}
+	
+	/**
+	 * Creates the tmp file.
+	 *
+	 * @param streamIn the stream in
+	 * @param filePrefix the file prefix
+	 * @param fileExtension the file extension
+	 * @return the file
+	 */
+	static public File createTmpFile(InputStream streamIn,
+			String filePrefix, String fileExtension) {
 		File result = null;
 		
 		filePrefix = filePrefix != null ? filePrefix : "";
+		fileExtension = fileExtension != null ? "." + fileExtension : "";
 		String tmpDir = System.getProperty("java.io.tmpdir");
-		result = new File(tmpDir, filePrefix + UUID.randomUUID().toString());
+		result = new File(tmpDir, filePrefix + UUID.randomUUID().toString() + fileExtension);
 		if (logger.isDebugEnabled() == true) {
 			logger.debug("Creating temp file at:" + result.getAbsolutePath());
 		}

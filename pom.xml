@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services</artifactId>
-	<version>3.2-SNAPSHOT</version>
+	<version>3.2.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>services</name>
 
@@ -22,8 +22,8 @@
 		<nuxeo.platform.version>5.5-I20111104_1115</nuxeo.platform.version>
 		<nuxeo.core.version>5.5-I20111104_1115</nuxeo.core.version>
 -->
-		<cspace.services.version>3.2-SNAPSHOT</cspace.services.version>
-		<cspace.services.client.version>3.2-SNAPSHOT</cspace.services.client.version>
+		<cspace.services.version>3.2.1-SNAPSHOT</cspace.services.version>
+		<cspace.services.client.version>3.2.1-SNAPSHOT</cspace.services.client.version>
 		<spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.2.RELEASE</spring.security.version>
 	</properties>
@@ -234,8 +234,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>2.3</version>
 					<configuration>
-						<source>1.6</source>
-						<target>1.6</target>
+						<source>1.7</source>
+						<target>1.7</target>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -251,7 +251,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>2.0</version>
+					<version>2.1.1</version>
 					<configuration>
 						<warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
 						<archive>

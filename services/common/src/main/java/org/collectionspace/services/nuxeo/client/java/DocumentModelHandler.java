@@ -80,8 +80,8 @@ public abstract class DocumentModelHandler<T, TL>
     private final Logger logger = LoggerFactory.getLogger(DocumentModelHandler.class);
     private RepositoryInstance repositorySession;
 
-    protected String oldRefNameOnUpdate = null;
-    protected String newRefNameOnUpdate = null;
+    protected String oldRefNameOnUpdate = null;  // FIXME: REM - We should have setters and getters for these
+    protected String newRefNameOnUpdate = null;  // FIXME: two fields.
     
     /*
      * Map Nuxeo's life cycle object to our JAX-B based life cycle object
@@ -398,7 +398,7 @@ public abstract class DocumentModelHandler<T, TL>
     	return result;
     }
     
-    private void handleRefNameChanges(ServiceContext ctx, DocumentModel docModel) throws ClientException {
+    protected void handleRefNameChanges(ServiceContext ctx, DocumentModel docModel) throws ClientException {
     	// First get the old refName
     	this.oldRefNameOnUpdate = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
             		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
@@ -407,7 +407,7 @@ public abstract class DocumentModelHandler<T, TL>
         if (refName != null) {
         	this.newRefNameOnUpdate = refName.toString();
         } else {
-        	logger.error(String.format("refName for document is missing.  Document CSID=%s", docModel.getName()));
+        	logger.error(String.format("The refName for document is missing.  Document CSID=%s", docModel.getName())); // FIXME: REM - We should probably be throwing an exception here?
         }
         //
         // Set the refName if it is an update or if the old refName was empty or null
@@ -472,7 +472,9 @@ public abstract class DocumentModelHandler<T, TL>
 	    	String matchObjDocTypes = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES);
 	    	String selectDocType = (String)queryParams.getFirst(IQueryManager.SELECT_DOC_TYPE_FIELD);
 
-	    	String docType = this.getServiceContext().getDocumentType();
+	    	//String docType = this.getServiceContext().getDocumentType();
+	    	// If this type in this tenant has been extended, be sure to use that so extension schema is visible.
+	    	String docType = NuxeoUtils.getTenantQualifiedDocType(this.getServiceContext());
 	    	if (selectDocType != null && !selectDocType.isEmpty()) {  
 	    		docType = selectDocType;
 	    	}

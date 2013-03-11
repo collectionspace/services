@@ -69,6 +69,17 @@ public class JpaStorageUtils {
     // This is the column name for ID field of all the JPA objects
     public static final String CSID_LABEL = "csid";
     
+    private static boolean useTenantId(String tenantId) {
+    	boolean result = true;
+    	
+        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+    	if (csAdmin == true || tenantId == null) {
+    		result = false;
+    	}
+
+    	return result;
+    }
+    
     public static Object getEntity(String id, Class entityClazz)
     		throws DocumentNotFoundException {
         EntityManagerFactory emf = null;
@@ -305,18 +316,58 @@ public class JpaStorageUtils {
             throw new IllegalArgumentException("tenantId is required");
         }
         
+        boolean useTenantId = useTenantId(tenantId);
         StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
         queryStrBldr.append(entityName);
         queryStrBldr.append(" a");
         queryStrBldr.append(" WHERE " + key + " = :" + key);
-        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
-        if (!csAdmin) {
+        if (useTenantId == true) {
             queryStrBldr.append(" AND tenantId = :tenantId");
         }
         String queryStr = queryStrBldr.toString(); //for debugging
         Query q = em.createQuery(queryStr);
         q.setParameter(key, value);
-        if (!csAdmin) {
+        if (useTenantId == true) {
+            q.setParameter("tenantId", tenantId);
+        }
+        result = q.getSingleResult();
+
+        return result;
+    }
+    
+    public static Object getEntityByDualKeys(EntityManager em, String entityName, 
+    		String key1, String value1,
+    		String key2, String value2) {
+    	return getEntityByDualKeys(em, entityName, key1, value1, key2, value2, null);
+    }
+    
+    public static Object getEntityByDualKeys(EntityManager em, String entityName, 
+    		String key1, String value1,
+    		String key2, String value2,
+            String tenantId) {
+    	Object result = null;
+    	
+        if (entityName == null) {
+            throw new IllegalArgumentException("entityName is required");
+        }
+        if (key1 == null || key2 == null) {
+            throw new IllegalArgumentException("key names are required");
+        }
+        
+        boolean useTenantId = useTenantId(tenantId);
+        StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+        queryStrBldr.append(entityName);
+        queryStrBldr.append(" a");
+        queryStrBldr.append(" WHERE " + key1 + " = :" + key1);
+        queryStrBldr.append(" AND " + key2 + " = :" + key2);
+        if (useTenantId == true) {
+            queryStrBldr.append(" AND tenantId = :tenantId");
+        }
+        String queryStr = queryStrBldr.toString(); //for debugging
+        Query q = em.createQuery(queryStr);
+        q.setParameter(key1, value1);
+        q.setParameter(key2, value2);
+        if (useTenantId == true) {
             q.setParameter("tenantId", tenantId);
         }
         result = q.getSingleResult();
@@ -391,8 +442,9 @@ public class JpaStorageUtils {
             queryStrBldr.append(entityName);
             queryStrBldr.append(" a");
             queryStrBldr.append(" WHERE csid = :csid");
-            boolean csAdmin = SecurityUtils.isCSpaceAdmin();
-            if (!csAdmin) {
+            
+            boolean useTenantId = useTenantId(tenantId);
+            if (useTenantId == true) {
                 queryStrBldr.append(" AND tenantId = :tenantId");
             }
             emf = getEntityManagerFactory();
@@ -400,7 +452,7 @@ public class JpaStorageUtils {
             String queryStr = queryStrBldr.toString(); //for debugging
             Query q = em.createQuery(queryStr);
             q.setParameter("csid", id);
-            if (!csAdmin) {
+            if (useTenantId) {
                 q.setParameter("tenantId", tenantId);
             }
             o = q.getSingleResult();

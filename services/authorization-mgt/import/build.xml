@@ -1,4 +1,3 @@
-
 <project name="authorization-mgt.import" default="package" basedir=".">
     <description>
         collectionspace authorization-mgt import
@@ -8,7 +7,7 @@
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
-    <property name="mvn.opts" value="" />
+    <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
 
     <condition property="osfamily-unix">

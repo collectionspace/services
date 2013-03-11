@@ -91,7 +91,10 @@ public class AuthorizationGen {
         TenantBindingConfigReaderImpl tenantBindingConfigReader =
                 new TenantBindingConfigReaderImpl(tenantRootDirPath);
         tenantBindingConfigReader.read();
-        tenantBindings = tenantBindingConfigReader.getTenantBindings();
+        // Note that we build permissions for all tenants, whether or not they are marked create disabled.
+        // This is a hack until we can correctly run an incremental import.
+        tenantBindings = tenantBindingConfigReader.getTenantBindings(
+        						TenantBindingConfigReaderImpl.INCLUDE_CREATE_DISABLED_TENANTS);
         cspaceTenantMgmntRole = buildTenantMgmntRole();
 
         if (logger.isDebugEnabled()) {

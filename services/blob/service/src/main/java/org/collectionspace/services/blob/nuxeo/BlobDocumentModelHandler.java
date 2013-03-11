@@ -35,7 +35,7 @@ import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
+import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
@@ -148,7 +148,7 @@ extends DocHandlerBase<BlobsCommon> {
 		//
 		if (blobInput.isDerivativeListRequested() == true) {
 	        List<ListResultField> resultsFields = getListItemsArray();
-			CommonList blobsCommonList = NuxeoImageUtils.getBlobDerivatives( //FIXME: REM - Need to replace "NuxeoImageUtils" with something more general like "BlobUtils" since we may support other blob types.
+			CommonList blobsCommonList = NuxeoBlobUtils.getBlobDerivatives( //FIXME: REM - Need to replace "NuxeoImageUtils" with something more general like "BlobUtils" since we may support other blob types.
 					repoSession, blobRepositoryId, resultsFields, getDerivativePathBase(docModel));
 //			ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, blobsCommonList);
 			blobInput.setDerivativeList(blobsCommonList);
@@ -163,15 +163,15 @@ extends DocHandlerBase<BlobsCommon> {
 		//
 		if (derivativeTerm != null || getContentFlag == true) {
 			StringBuffer mimeTypeBuffer = new StringBuffer();
-			BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession,
+			BlobOutput blobOutput = NuxeoBlobUtils.getBlobOutput(ctx, repoSession,
 					blobRepositoryId, derivativeTerm, getContentFlag, mimeTypeBuffer);
 			if (getContentFlag == true) {
 				if (blobOutput != null) {
 					blobInput.setContentStream(blobOutput.getBlobInputStream());
 				} else {
 					// If we can't find the blob's content, we'll return a "missing document" image
-					blobInput.setContentStream(NuxeoImageUtils.getResource(NuxeoImageUtils.DOCUMENT_MISSING_PLACEHOLDER_IMAGE));
-					mimeTypeBuffer.append(NuxeoImageUtils.MIME_JPEG);
+					blobInput.setContentStream(NuxeoBlobUtils.getResource(NuxeoBlobUtils.DOCUMENT_MISSING_PLACEHOLDER_IMAGE));
+					mimeTypeBuffer.append(NuxeoBlobUtils.MIME_JPEG);
 				}
 			}
 	
@@ -194,8 +194,8 @@ extends DocHandlerBase<BlobsCommon> {
 			this.setCommonPartProperties(docModel, blobsCommon);
 			// finish extracting the other parts by calling the parent
 		} else {
-			extractMetadata(blobRepositoryId, NuxeoImageUtils.SCHEMA_IMAGE_METADATA);
-			extractMetadata(blobRepositoryId, NuxeoImageUtils.SCHEMA_IPTC);
+			extractMetadata(blobRepositoryId, NuxeoBlobUtils.SCHEMA_IMAGE_METADATA);
+			extractMetadata(blobRepositoryId, NuxeoBlobUtils.SCHEMA_IPTC);
 		}
 		
 		//
@@ -222,7 +222,7 @@ extends DocHandlerBase<BlobsCommon> {
 			DocumentModel documentModel = wrapDoc.getWrappedObject();
 			RepositoryInstance repoSession = this.getRepositorySession();
 	        
-			BlobsCommon blobsCommon = NuxeoImageUtils.createBlobInRepository(ctx, repoSession, blobInput, purgeOriginal);
+			BlobsCommon blobsCommon = NuxeoBlobUtils.createBlobInRepository(ctx, repoSession, blobInput, purgeOriginal, true);
 			blobInput.setBlobCsid(documentModel.getName()); //Assumption here is that the documentModel "name" field is storing a CSID
 
 	        PoxPayloadIn input = ctx.getInput();

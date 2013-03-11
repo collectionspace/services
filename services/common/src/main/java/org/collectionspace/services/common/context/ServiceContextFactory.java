@@ -45,7 +45,7 @@ public interface ServiceContextFactory<IT, OT> {
      * 
      * @throws Exception the exception
      */
-    public ServiceContext<IT, OT> createServiceContext(String serviceName, IT input) throws Exception;
+    public ServiceContext<IT, OT> createServiceContext(String serviceName, IT input, UriInfo uriInfo) throws Exception;
     
     /**
      * Creates a new ServiceContext object.
@@ -56,7 +56,7 @@ public interface ServiceContextFactory<IT, OT> {
      * 
      * @throws Exception the exception
      */
-    public ServiceContext<IT, OT> createServiceContext(String serviceName) throws Exception;
+    public ServiceContext<IT, OT> createServiceContext(String serviceName, UriInfo uriInfo) throws Exception;
 
     /**
      * Creates a new ServiceContext object.

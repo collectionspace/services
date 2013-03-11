@@ -60,8 +60,10 @@ public class MultipartServiceContextFactory
      * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String)
      */
     @Override
-    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(String serviceName) throws Exception {
-        MultipartServiceContext ctx = new MultipartServiceContextImpl(serviceName);
+    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(
+    		String serviceName,
+    		UriInfo uriInfo) throws Exception {
+        MultipartServiceContext ctx = new MultipartServiceContextImpl(serviceName, uriInfo);
         return ctx;
     }
 
@@ -70,8 +72,9 @@ public class MultipartServiceContextFactory
      */
     @Override
     public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(String serviceName,
-    		PoxPayloadIn input) throws Exception {
-        MultipartServiceContext ctx = new MultipartServiceContextImpl(serviceName, input);
+    		PoxPayloadIn input,
+    		UriInfo uriInfo) throws Exception {
+        MultipartServiceContext ctx = new MultipartServiceContextImpl(serviceName, input, uriInfo);
         return ctx;
     }
         

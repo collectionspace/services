@@ -137,12 +137,17 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 
 	private static String _templateDir = null;
 
-	public static String getTemplateDir() {
+	public static String getTemplateDir() throws FileNotFoundException {
 		if (_templateDir == null) {
 			TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance()
 					.getTenantBindingConfigReader();
 			_templateDir = tReader.getResourcesDir() + File.separator
 					+ "templates";
+		}
+		
+		File templateDir = new File(_templateDir);  // We need to make sure the 'templates' directory is not missing
+		if (templateDir.exists() == false) {
+			throw new FileNotFoundException("The Import service's template directory is missing: " + _templateDir);
 		}
 		return _templateDir;
 	}
