@@ -69,6 +69,10 @@ public class CollectionObjectConstants {
     public final static String DETERMINATION_INSTITUTION_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String DETERMINATION_INSTITUTION_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/institution";
 
+    public final static String DETERMINATION_KIND_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String DETERMINATION_KIND_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/identKind";
+    public final static String DETERMINATION_KIND_DETERMINATION_VALUE = "determination";
+
     public final static String HYBRID_FLAG_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String HYBRID_FLAG_FIELD_NAME = "taxonomicIdentGroupList/taxonomicIdentGroup/hybridFlag";
 

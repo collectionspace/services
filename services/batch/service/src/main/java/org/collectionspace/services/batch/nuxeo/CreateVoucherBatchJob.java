@@ -177,24 +177,28 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 	}
 	
 	private String getAnnotation(PoxPayloadOut collectionObjectPayload) {
-		String determinationBy = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_BY_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_BY_FIELD_NAME));
-		String determinationInstitution = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_INSTITUTION_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_INSTITUTION_FIELD_NAME));
-		String determinationDate = getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_DATE_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_DATE_FIELD_NAME);
-
 		String annotation = "";
-		
-		if (StringUtils.isNotBlank(determinationBy)) {
-			annotation += "det. by " + determinationBy;
+		String determinationKind = getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_KIND_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_KIND_FIELD_NAME);
+
+		if (determinationKind.equals(CollectionObjectConstants.DETERMINATION_KIND_DETERMINATION_VALUE)) {
+			String determinationBy = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_BY_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_BY_FIELD_NAME));
 			
-			if (StringUtils.isNotBlank(determinationInstitution)) {
-				annotation += ", " + determinationInstitution;
-			}
-			
-			if (StringUtils.isNotBlank(determinationDate)) {
-				annotation += ", " + determinationDate;
-			}
-		}
-		
+			if (StringUtils.isNotBlank(determinationBy)) {
+				annotation += "det. by " + determinationBy;
+
+				String determinationInstitution = getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_INSTITUTION_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_INSTITUTION_FIELD_NAME));
+				String determinationDate = getFieldValue(collectionObjectPayload, CollectionObjectConstants.DETERMINATION_DATE_SCHEMA_NAME, CollectionObjectConstants.DETERMINATION_DATE_FIELD_NAME);
+
+				if (StringUtils.isNotBlank(determinationInstitution)) {
+					annotation += ", " + determinationInstitution;
+				}
+				
+				if (StringUtils.isNotBlank(determinationDate)) {
+					annotation += ", " + determinationDate;
+				}
+			}	
+		}		
+
 		return annotation;
 	}
 	
