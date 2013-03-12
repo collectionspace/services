@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="collectionobjects">
+    <ns2:collectionobjects_common
+        xmlns:ns2="http://collectionspace.org/services/collectionobject">
+        <objectNumber>${importCollectionObjectWithVarExpansion.objectNumberValue}</objectNumber>
+        <briefDescriptions>
+            <briefDescription>${importCollectionObjectWithVarExpansion.briefDescriptionValue}</briefDescription>
+        </briefDescriptions>
+    </ns2:collectionobjects_common>
+    <ns2:collectionspace_core xmlns:ns2="http://collectionspace.org/collectionspace_core/"
+                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <!-- Note: This test may fail if the identifier for the core tenant changes. -->
+        <tenantId>1</tenantId>
+        <uri>${uriValue}</uri>
+        <!-- Note: This test may fail if the RefnameDisplayNameField for -->
+        <!-- CollectionObject records, in the core tenant, changes to a -->
+        <!-- field other than objectNumber. -->
+        <refName>${refNameValue}</refName>
+    </ns2:collectionspace_core>
+</document>
+
