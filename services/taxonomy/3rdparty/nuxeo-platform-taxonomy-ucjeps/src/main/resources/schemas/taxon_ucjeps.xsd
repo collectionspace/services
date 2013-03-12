@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Taxon schema (XSD)
+    
+    Entity  : Taxon (item child of a TaxonomyAuthority) 
+    Part    : Local extension schema for UCJEPS tenant
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision: 4622 $
+    $LastChangedDate: 2011-05-05 16:51:51 -0700 (Thu, 05 May 2011) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/taxonomy/local/ucjeps"
+  xmlns="http://collectionspace.org/services/taxonomy/local/ucjeps"
+  targetNamespace="http://collectionspace.org/services/taxonomy/local/ucjeps"
+  version="0.1"
+>
+        <xs:element name="taxonMajorGroup" type="xs:string"/>
+</xs:schema>

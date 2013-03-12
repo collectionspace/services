@@ -27,6 +27,7 @@
     <modules>
     	<module>nuxeo-platform-cs-collectionobject</module>
         <module>nuxeo-platform-collectionobject-lifesci</module>
+        <module>nuxeo-platform-collectionobject-ucjeps</module>
     </modules>
 
 </project>
