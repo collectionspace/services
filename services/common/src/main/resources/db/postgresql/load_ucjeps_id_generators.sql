@@ -46,7 +46,7 @@
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   SELECT 
-    ('ed3c8578-cf01-4a05-b7fc-8e49b96273c6',
+     'ed3c8578-cf01-4a05-b7fc-8e49b96273c6',
      'UC Accession Number',
      'Identifies individual collection objects formally
 acquired by the UC Herbarium. Used for collection objects
@@ -65,7 +65,7 @@ without parts.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>')
+</org.collectionspace.services.id.SettableIDGenerator>'
 WHERE 'ed3c8578-cf01-4a05-b7fc-8e49b96273c6' NOT IN
       (
       SELECT  csid
@@ -78,7 +78,7 @@ WHERE 'ed3c8578-cf01-4a05-b7fc-8e49b96273c6' NOT IN
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   SELECT 
-    ('d9eca382-23b7-47aa-8d9b-d7ff88f49e2b',
+     'd9eca382-23b7-47aa-8d9b-d7ff88f49e2b',
      'JEPS Accession Number',
      'Identifies individual collection objects formally
 acquired by the Jepson Herbarium. Used for collection objects
@@ -97,7 +97,7 @@ without parts.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>')
+</org.collectionspace.services.id.SettableIDGenerator>'
 WHERE 'd9eca382-23b7-47aa-8d9b-d7ff88f49e2b' NOT IN
       (
       SELECT  csid
@@ -110,7 +110,7 @@ WHERE 'd9eca382-23b7-47aa-8d9b-d7ff88f49e2b' NOT IN
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   SELECT 
-    ('9e1526e8-a0a3-4e1c-9ced-060ddc02450d',
+     '9e1526e8-a0a3-4e1c-9ced-060ddc02450d',
      'UC Loan Out Number',
      'Identifies activities in which collection objects are
 loaned out of the institution.',
@@ -128,7 +128,7 @@ loaned out of the institution.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>')
+</org.collectionspace.services.id.SettableIDGenerator>'
 WHERE '9e1526e8-a0a3-4e1c-9ced-060ddc02450d' NOT IN
       (
       SELECT  csid
@@ -141,7 +141,7 @@ WHERE '9e1526e8-a0a3-4e1c-9ced-060ddc02450d' NOT IN
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   SELECT 
-    ('84e1bd24-c0cc-4873-9f2a-ef89fc1d4299',
+     '84e1bd24-c0cc-4873-9f2a-ef89fc1d4299',
      'JEPS Loan Out Number',
      'Identifies activities in which collection objects are
 loaned out of the institution.',
@@ -159,7 +159,7 @@ loaned out of the institution.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>')
+</org.collectionspace.services.id.SettableIDGenerator>'
 WHERE '84e1bd24-c0cc-4873-9f2a-ef89fc1d4299' NOT IN
       (
       SELECT  csid
