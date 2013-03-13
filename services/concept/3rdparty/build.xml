@@ -111,21 +111,29 @@
     <target name="deploy" depends="install"
     description="deploy concept in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-concept/build.xml" target="deploy" inheritall="false"/>
+		<ant antfile="nuxeo-platform-concept-naturalhistory/build.xml" target="deploy" inheritall="false"/>
+		<ant antfile="nuxeo-platform-concept-botgarden/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy concept from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-concept/build.xml" target="undeploy" inheritall="false"/>
+		<ant antfile="nuxeo-platform-concept-naturalhistory/build.xml" target="undeploy" inheritall="false"/>
+		<ant antfile="nuxeo-platform-concept-botgarden/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for concept" depends="package">
         <ant antfile="nuxeo-platform-cs-concept/build.xml" target="dist" inheritall="false"/>
+		<ant antfile="nuxeo-platform-concept-naturalhistory/build.xml" target="dist" inheritall="false"/>
+		<ant antfile="nuxeo-platform-concept-botgarden/build.xml" target="dist" inheritall="false"/>
     </target>
     
     <target name="dist_installer"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="nuxeo-platform-cs-concept/build.xml" target="dist_installer" inheritall="false"/>
+		<ant antfile="nuxeo-platform-concept-naturalhistory/build.xml" target="dist_installer" inheritall="false"/>
+		<ant antfile="nuxeo-platform-concept-botgarden/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 
 </project>

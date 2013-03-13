@@ -41,6 +41,8 @@ import org.collectionspace.services.place.PlaceAuthorityResource;
 import org.collectionspace.services.concept.ConceptAuthorityResource;
 import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
+import org.collectionspace.services.propagation.PropagationResource;
+import org.collectionspace.services.pottag.PottagResource;
 import org.collectionspace.services.report.ReportResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
 import org.collectionspace.services.dimension.DimensionResource;
@@ -121,6 +123,8 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new MediaResource());
         addResourceToMapAndSingletons(new BlobResource());
         addResourceToMapAndSingletons(new MovementResource());
+        addResourceToMapAndSingletons(new PropagationResource());
+        addResourceToMapAndSingletons(new PottagResource());
         addResourceToMapAndSingletons(new ClaimResource());
         addResourceToMapAndSingletons(new ReportResource());
         addResourceToMapAndSingletons(new PublicItemResource());

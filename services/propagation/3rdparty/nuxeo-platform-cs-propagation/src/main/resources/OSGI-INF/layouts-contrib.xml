@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+
+<!--
+layouts-contrib.xml
+
+Layout file for configuring screen layouts in the
+user interface of Nuxeo EP's web application, for
+viewing or editing CollectionSpace records stored
+in the Nuxeo repository,
+
+See the "Nuxeo Book" for an introductory description
+of how to edit this file.  For instance, for Nuxeo EP 5.3:
+http://doc.nuxeo.org/5.3/books/nuxeo-book/html/
+
+$LastChangedRevision: $
+$LastChangedDate: $
+-->
+
+<component name="org.collectionspace.propagation.layouts.webapp">
+
+    <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+               point="layouts">
+
+        <layout name="propagation">
+            <templates>
+                <template mode="any">/layouts/layout_default_template.xhtml</template>
+            </templates>
+            <rows>
+                <row><widget>propNumber</widget></row>
+                <row><widget>propType</widget></row>
+                <!-- <row><widget>propDate</widget></row> -->
+                <row><widget>germinationDate</widget></row>
+                <row><widget>propComments</widget></row>
+                <row><widget>propReason</widget></row>
+            </rows>
+
+            <widget name="propNumber" type="text">
+                <labels>
+                    <label mode="any">propNumber</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="propagations_common">propNumber</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="propType" type="text">
+                <labels>
+                    <label mode="any">propType</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="propagations_common">propType</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <!-- <widget name="propDate" type="text">
+                <labels>
+                    <label mode="any">propDate</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="propagations_common">propDate</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget> -->
+
+            <widget name="germinationDate" type="text">
+                <labels>
+                    <label mode="any">germinationDate</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="propagations_common">germinationDate</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="propComments" type="text">
+                <labels>
+                    <label mode="any">propComments</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="propagations_common">propComments</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+            <widget name="propReason" type="text">
+                <labels>
+                    <label mode="any">propReason</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="propagations_common">propReason</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+
+        </layout>
+    </extension>
+</component>

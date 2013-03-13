@@ -20,7 +20,7 @@
     
     <xs:element name="previousLocation" type="xs:string"/>
 
-    <xs:element name="labelRequested" type="xs:boolean"/>
+    <xs:element name="labelRequested" type="xs:string"/>
     <xs:element name="labelSize" type="xs:string"/>
     <xs:element name="labelStandType" type="xs:string"/>
     <xs:element name="labelCount" type="xs:integer"/>

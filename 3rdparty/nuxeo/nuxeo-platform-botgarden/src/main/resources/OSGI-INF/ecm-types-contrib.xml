@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.nuxeo.botgarden.ecm.types">	
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updatelocationlistener" async="false" postCommit="false"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateLocationListener" priority="100">
+			<event>documentCreated</event>
+			<event>beforeDocumentModification</event>
+		</listener>
+	</extension>
+	<!--
+		Deleting dead locations in a Nuxeo event handler causes problems in the app and ui layers,
+		since they're not expecting a save of a record to cause the record to be deleted. Instead,
+		deletion will be invoked from the ui layer.
+	-->
+	<!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="deletedeadlocationlistener" async="false" postCommit="false"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.DeleteDeadLocationListener" priority="150">
+			<event>documentModified</event>
+		</listener>
+	</extension> -->
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updatedeadflaglistener" async="true" postCommit="true"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateDeadFlagListener" priority="200">
+			<event>documentCreated</event>
+			<event>documentModified</event>
+		</listener>
+	</extension>
+	<!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updatestylednamelistener" async="false" postCommit="true"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateStyledNameListener" priority="200">
+			<event>documentCreated</event>
+			<event>beforeDocumentModification</event>
+			<event>documentModified</event>
+		</listener>
+	</extension> -->
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updateformatteddisplaynamelistener" async="false" postCommit="true"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateFormattedDisplayNameListener" priority="200">
+			<event>beforeDocumentModification</event>
+			<event>documentCreated</event>
+		</listener>
+	</extension>
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="updaterareflaglistener" async="false" postCommit="true"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateRareFlagListener" priority="200">
+			<event>beforeDocumentModification</event>
+			<event>documentModified</event>
+			<event>documentCreated</event>
+		</listener>
+	</extension>
+	<!-- 
+		We should be able to use the versioning support that's now built into cspace, but need to make
+		sure it doesn't create versions on import, and we possibly need to refactor UpdateLocationListener 
+		so that two versions don't get created in the case of a document that is created with an action code of dead.
+	-->
+	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+		<listener name="createversionlistener" async="false" postCommit="false"
+			class="org.collectionspace.services.nuxeo.extension.botgarden.CreateVersionListener" priority="999">
+			<event>documentCreated</event>
+			<event>documentModified</event>
+		</listener>
+	</extension>
+</component>

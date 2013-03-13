@@ -196,6 +196,16 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.propagation.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.pottag.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.report.service</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -541,6 +551,11 @@
 					<artifactId>oauth</artifactId>
 					<groupId>net.oauth.core</groupId>
 				</exclusion>
+				<!-- Exclude google-collections, because we have a dependency on guava (the newer, renamed google-collections) in the batch service, via org.gbif:name-parser -->
+	            <exclusion>
+                    <artifactId>google-collections</artifactId>
+                    <groupId>com.google.collections</groupId>
+	            </exclusion>
 			</exclusions>
         </dependency>
         <dependency>

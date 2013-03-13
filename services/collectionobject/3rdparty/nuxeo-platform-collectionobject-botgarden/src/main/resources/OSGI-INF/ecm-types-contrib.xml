@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.${ServiceName}.${TenantLabel}.ecm.types">
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="${NuxeoDocTypeName}${TenantPrefix}${TenantId}" coretype="${NuxeoDocTypeName}${TenantPrefix}${TenantId}">
+      <label>org.collectionspace.${NuxeoDocTypeName}${TenantPrefix}${TenantId}</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>collectionspace_core</layout>
+        <layout>${CommonSchemaName}</layout>
+        <layout>collectionobjects_naturalhistory</layout>
+		<layout>${CustomSchemaName}</layout>
+      </layouts>
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>"${NuxeoDocTypeName}${TenantPrefix}${TenantId}"</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>"${NuxeoDocTypeName}${TenantPrefix}${TenantId}"</type>
+      </subtypes>
+    </type>
+  </extension>
+</component>

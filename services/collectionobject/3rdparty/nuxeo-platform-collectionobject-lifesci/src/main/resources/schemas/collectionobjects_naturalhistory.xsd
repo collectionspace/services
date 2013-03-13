@@ -186,6 +186,7 @@
 			<xs:element name="taxonomicRange" type="xs:string"/>
 
             <xs:element name="vCoordinates" type="xs:string"/>
+            <xs:element name="vOtherCoords" type="xs:string"/>            
             <xs:element name="vLatitude" type="xs:string"/>
             <xs:element name="vLongitude" type="xs:string"/>
             <xs:element name="vCoordSys" type="xs:string"/>

@@ -32,4 +32,14 @@ public class LoanoutConstants {
     public final static String NUXEO_DOCTYPE = "Loanout";
     public final static String NUXEO_SCHEMA_NAME = "loanout";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Loanout";
+    
+	public static final String BOTGARDEN_SCHEMA_NAME = "loansout_botgarden";
+
+	public static final String LABEL_REQUESTED_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
+	public static final String LABEL_REQUESTED_FIELD_NAME = "labelRequested";
+	public static final String LABEL_REQUESTED_YES_VALUE = "Yes";
+	public static final String LABEL_REQUESTED_NO_VALUE = "No";
+	
+	public static final String STYLED_NAME_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
+	public static final String STYLED_NAME_FIELD_NAME = "styledName";
 }

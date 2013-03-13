@@ -19,6 +19,7 @@
 		<module>nuxeo-platform-quote-api</module>
 		<module>nuxeo-platform-quote</module>
 		<module>nuxeo-platform-thumbnail</module>
+		<module>nuxeo-platform-botgarden</module>
 	</modules>
 
     <dependencies>
