@@ -6,6 +6,17 @@
     <tenant:tenantBinding id="35" name="botgarden.cspace.berkeley.edu" displayName="CollectionSpace BotGarden Tenant" version="0.1">
         <tenant:repositoryDomain name="default-domain" storageName="botgarden-domain" repositoryClient="nuxeo-java" />
 
+        <tenant:serviceBindings merge:matcher="id" id="idgenerators">
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:property merge:matcher="skip" merge:action="insert">
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>load_botgarden_id_generators.sql</service:value>
+                    </service:property>
+                </service:params>
+            </service:initHandler>
+        </tenant:serviceBindings>
+        
         <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
