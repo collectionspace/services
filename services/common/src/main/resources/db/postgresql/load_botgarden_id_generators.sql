@@ -46,7 +46,7 @@
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   SELECT 
-    ('ed3c8578-cf01-4a05-b7fc-8e49b96273c6',
+     'ed3c8578-cf01-4a05-b7fc-8e49b96273c6',
      'UC Accession Number',
      'Identifies individual collection objects formally
 acquired by the UC Herbarium. Used for collection objects
@@ -65,7 +65,7 @@ without parts.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>')
+</org.collectionspace.services.id.SettableIDGenerator>'
 WHERE 'ed3c8578-cf01-4a05-b7fc-8e49b96273c6' NOT IN
       (
       SELECT  csid
@@ -79,7 +79,7 @@ WHERE 'ed3c8578-cf01-4a05-b7fc-8e49b96273c6' NOT IN
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   SELECT 
-    ('d9eca382-23b7-47aa-8d9b-d7ff88f49e2b',
+     'd9eca382-23b7-47aa-8d9b-d7ff88f49e2b',
      'JEPS Accession Number',
      'Identifies individual collection objects formally
 acquired by the Jepson Herbarium. Used for collection objects
@@ -98,7 +98,7 @@ without parts.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>')
+</org.collectionspace.services.id.SettableIDGenerator>'
 WHERE 'd9eca382-23b7-47aa-8d9b-d7ff88f49e2b' NOT IN
       (
       SELECT  csid
@@ -112,7 +112,7 @@ WHERE 'd9eca382-23b7-47aa-8d9b-d7ff88f49e2b' NOT IN
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   SELECT 
-    ('940710aa-3df4-4bd4-8d6f-9bf6a92b35cc',
+     '940710aa-3df4-4bd4-8d6f-9bf6a92b35cc',
      'Voucher Collection Number',
      'Identifies Botanical Garden vouchers.',
      '9',
@@ -136,7 +136,7 @@ INSERT INTO id_generators
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>')
+</org.collectionspace.services.id.SettableIDGenerator>'
 WHERE '940710aa-3df4-4bd4-8d6f-9bf6a92b35cc' NOT IN
       (
       SELECT  csid
@@ -149,7 +149,7 @@ WHERE '940710aa-3df4-4bd4-8d6f-9bf6a92b35cc' NOT IN
 INSERT INTO id_generators
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   SELECT 
-    ('81cf5a56-d43d-49e9-ac11-61cf4b0923d4',
+     '81cf5a56-d43d-49e9-ac11-61cf4b0923d4',
      'Propagation Number',
      'Identifies activities in which accessions are
 propagated.',
@@ -167,7 +167,7 @@ propagated.',
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
-</org.collectionspace.services.id.SettableIDGenerator>')
+</org.collectionspace.services.id.SettableIDGenerator>'
 WHERE '81cf5a56-d43d-49e9-ac11-61cf4b0923d4' NOT IN
       (
       SELECT  csid
