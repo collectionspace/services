@@ -288,8 +288,9 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * 
 	 * @param collectionObjectCsid	The csid of the collectionobject
 	 * @param rareFlag				The value of the rare flag
+	 * @throws URISyntaxException 
 	 */
-	private void setRareFlag(String collectionObjectCsid, boolean rareFlag) {
+	private void setRareFlag(String collectionObjectCsid, boolean rareFlag) throws URISyntaxException {
 		String updatePayload = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"collectionobjects\">" +
@@ -301,6 +302,6 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 			"</document>";
 		
 		ResourceBase resource = getResourceMap().get(CollectionObjectClient.SERVICE_NAME);
-		resource.update(getResourceMap(), collectionObjectCsid, updatePayload);
+		resource.update(getResourceMap(), createUriInfo(), collectionObjectCsid, updatePayload);
 	}
 }

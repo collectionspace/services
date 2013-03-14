@@ -207,8 +207,9 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 	 * @param collectionObjectCsid	the csid of the collectionobject to update
 	 * @param deadFlag				the new value of the dead flag field
 	 * @param deadDate				the new value of the dead date field
+	 * @throws URISyntaxException 
 	 */
-	private void setDeadFlag(String collectionObjectCsid, boolean deadFlag, String deadDate) {
+	private void setDeadFlag(String collectionObjectCsid, boolean deadFlag, String deadDate) throws URISyntaxException {
 		String updatePayload = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"collectionobjects\">" +
@@ -221,6 +222,6 @@ public class UpdateDeadFlagBatchJob extends AbstractBatchJob {
 			"</document>";
 		
 		ResourceBase resource = getResourceMap().get(CollectionObjectClient.SERVICE_NAME);
-		resource.update(getResourceMap(), collectionObjectCsid, updatePayload);
+		resource.update(getResourceMap(), createUriInfo(), collectionObjectCsid, updatePayload);
 	}
 }

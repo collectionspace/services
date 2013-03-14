@@ -74,7 +74,7 @@ public class ClearVoucherLabelRequestBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
-	private void clearLabelRequest(String loanoutCsid) {
+	private void clearLabelRequest(String loanoutCsid) throws URISyntaxException {
 		logger.debug("clear label request: loanoutCsid=" + loanoutCsid);
 
 		final String updatePayload = 
@@ -86,7 +86,7 @@ public class ClearVoucherLabelRequestBatchJob extends AbstractBatchJob {
 			"</document>";
 				
 		ResourceBase resource = getResourceMap().get(LoanoutClient.SERVICE_NAME);
-		resource.update(getResourceMap(), loanoutCsid, updatePayload);
+		resource.update(getResourceMap(), createUriInfo(), loanoutCsid, updatePayload);
 	}
 	
 	private List<String> findLabelRequests() throws URISyntaxException {

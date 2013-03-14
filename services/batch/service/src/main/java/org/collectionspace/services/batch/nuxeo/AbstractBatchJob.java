@@ -25,6 +25,8 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -33,7 +35,7 @@ import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.collectionspace.services.relation.RelationResource;
+import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -209,7 +211,7 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 
 	protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
 		ResourceBase resource = resourceMap.get(serviceName);
-		byte[] response = resource.get(createUriInfo(), csid);
+		byte[] response = resource.get(null, createUriInfo(), csid);
 
 		PoxPayloadOut payload = new PoxPayloadOut(response);
 
@@ -281,7 +283,7 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	
 	protected PoxPayloadOut findAuthorityItemByCsid(String serviceName, String vocabularyCsid, String csid) throws URISyntaxException, DocumentException {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
-		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), vocabularyCsid, csid);
+		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), resourceMap, vocabularyCsid, csid);
 		 
 		PoxPayloadOut payload = new PoxPayloadOut(response);
 
@@ -294,7 +296,7 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	
 	protected PoxPayloadOut findAuthorityItemByShortId(String serviceName, String vocabularyShortId, String itemShortId) throws URISyntaxException, DocumentException {
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
-		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), "urn:cspace:name(" + vocabularyShortId + ")", "urn:cspace:name(" + itemShortId + ")");
+		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), resourceMap, "urn:cspace:name(" + vocabularyShortId + ")", "urn:cspace:name(" + itemShortId + ")");
  
 		PoxPayloadOut payload = new PoxPayloadOut(response);
 
@@ -322,7 +324,8 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 		logger.debug("findReferencingObjects serviceName=" + serviceName + " parentCsid=" + parentCsid + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
 
 		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
-		AuthorityRefDocList refDocList = resource.getReferencingObjects(parentCsid, csid, createRefSearchFilterUriInfo(type));
+        UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
+		AuthorityRefDocList refDocList = resource.getReferencingObjects(parentCsid, csid, uriTemplateRegistry, createRefSearchFilterUriInfo(type));
 		List<String> csids = new ArrayList<String>();
 		
 		for (AuthorityRefDocList.AuthorityRefDocItem item : refDocList.getAuthorityRefDocItem()) {

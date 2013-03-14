@@ -74,7 +74,7 @@ public class ClearPotTagLabelRequestBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
-	private void clearLabelRequest(String potTagCsid) {
+	private void clearLabelRequest(String potTagCsid) throws URISyntaxException {
 		logger.debug("clear label request: potTagCsid=" + potTagCsid);
 
 		final String updatePayload = 
@@ -86,7 +86,7 @@ public class ClearPotTagLabelRequestBatchJob extends AbstractBatchJob {
 			"</document>";
 				
 		ResourceBase resource = getResourceMap().get(PottagClient.SERVICE_NAME);
-		resource.update(getResourceMap(), potTagCsid, updatePayload);
+		resource.update(getResourceMap(), createUriInfo(), potTagCsid, updatePayload);
 	}
 	
 	private List<String> findLabelRequests() throws URISyntaxException {

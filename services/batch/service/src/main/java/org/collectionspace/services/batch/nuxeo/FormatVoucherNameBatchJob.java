@@ -180,7 +180,7 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 		return formattedName;
 	}
 
-	private void setStyledName(String loanoutCsid, String styledName) {
+	private void setStyledName(String loanoutCsid, String styledName) throws URISyntaxException {
 		final String updatePayload = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"loansout\">" +
@@ -190,7 +190,7 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 			"</document>";
 			
 		ResourceBase resource = getResourceMap().get(LoanoutClient.SERVICE_NAME);
-		resource.update(getResourceMap(), loanoutCsid, updatePayload);		
+		resource.update(getResourceMap(), createUriInfo(), loanoutCsid, updatePayload);		
 	}
 	
 	private UriInfo createLabelRequestSearchUriInfo() throws URISyntaxException {

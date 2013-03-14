@@ -74,7 +74,7 @@ public class ClearLocationLabelRequestBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
-	private void clearLabelRequest(String movementCsid) {
+	private void clearLabelRequest(String movementCsid) throws URISyntaxException {
 		logger.debug("clear label request: movementCsid=" + movementCsid);
 
 		final String updatePayload = 
@@ -92,7 +92,7 @@ public class ClearLocationLabelRequestBatchJob extends AbstractBatchJob {
 			"</document>";
 				
 		ResourceBase resource = getResourceMap().get(MovementClient.SERVICE_NAME);
-		resource.update(getResourceMap(), movementCsid, updatePayload);
+		resource.update(getResourceMap(), createUriInfo(), movementCsid, updatePayload);
 	}
 	
 	private List<String> findLabelRequests() throws URISyntaxException {
