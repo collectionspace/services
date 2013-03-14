@@ -2737,6 +2737,7 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.work.nuxeo.WorkDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
                     </service:ListResultsFields>
