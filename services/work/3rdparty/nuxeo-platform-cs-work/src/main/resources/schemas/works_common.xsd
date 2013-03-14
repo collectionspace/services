@@ -50,6 +50,7 @@
     <xs:complexType name="workTermGroup">
         <xs:sequence>
             <xs:element name="termDisplayName" type="xs:string"/>
+            <xs:element name="termFormattedDisplayName" type="xs:string"/>
             <xs:element name="termName" type="xs:string"/>
             <xs:element name="termType" type="xs:string"/>
             <xs:element name="termStatus" type="xs:string"/>
