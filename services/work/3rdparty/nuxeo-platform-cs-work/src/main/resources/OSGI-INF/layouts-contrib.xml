@@ -85,9 +85,6 @@
         <row><widget>displayName</widget></row>
         <row><widget>displayNameComputed</widget></row>
         <row><widget>name</widget></row>
-        <row><widget>conditionNote</widget></row>
-        <row><widget>conditionNoteDate</widget></row>
-        <row><widget>securityNote</widget></row>
         <row><widget>workType</widget></row>
         <row><widget>status</widget></row>
       </rows>
@@ -164,45 +161,6 @@
         <translated>true</translated>
         <fields>
           <field schema="works_common">name</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-      
-      <widget name="conditionNote" type="text">
-        <labels>
-          <label mode="any">conditionNote</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="works_common">conditionNote</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-      
-      <widget name="conditionNoteDate" type="text">
-        <labels>
-          <label mode="any">conditionNoteDate</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="works_common">conditionNoteDate</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-      
-      <widget name="securityNote" type="text">
-        <labels>
-          <label mode="any">securityNote</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="works_common">securityNote</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
