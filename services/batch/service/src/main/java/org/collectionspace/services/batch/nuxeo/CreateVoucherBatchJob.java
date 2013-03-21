@@ -119,15 +119,28 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 	}
 	
 	private String getFieldCollectionNote(PoxPayloadOut collectionObjectPayload) throws URISyntaxException, DocumentException {
-		String fieldCollectionPlace = getReverseFieldCollectionPlace(collectionObjectPayload);		
-		String comment = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.COMMENT_SCHEMA_NAME, CollectionObjectConstants.COMMENT_FIELD_NAME);
-		String collectionNote;
+		String placeNote = "";
+		String reverseFieldCollectionPlace = getReverseFieldCollectionPlace(collectionObjectPayload);
 		
-		if (StringUtils.isNotBlank(fieldCollectionPlace) && StringUtils.isNotBlank(comment)) {
-			collectionNote = fieldCollectionPlace + ": " + comment;
+		if (StringUtils.isNotBlank(reverseFieldCollectionPlace)) {
+			placeNote = reverseFieldCollectionPlace;
 		}
-		else if (StringUtils.isNotBlank(fieldCollectionPlace)) {
-			collectionNote = fieldCollectionPlace;
+		else {
+			String taxonomicRange = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.TAXONOMIC_RANGE_SCHEMA_NAME, CollectionObjectConstants.TAXONOMIC_RANGE_FIELD_NAME);
+
+			if (StringUtils.isNotBlank(taxonomicRange)) {
+				placeNote = "Geographic range " + taxonomicRange;
+			}
+		}
+
+		String comment = this.getFieldValue(collectionObjectPayload, CollectionObjectConstants.COMMENT_SCHEMA_NAME, CollectionObjectConstants.COMMENT_FIELD_NAME);
+		String collectionNote = "";		
+		
+		if (StringUtils.isNotBlank(placeNote) && StringUtils.isNotBlank(comment)) {
+			collectionNote = placeNote + ": " + comment;
+		}
+		else if (StringUtils.isNotBlank(placeNote)) {
+			collectionNote = placeNote;
 		}
 		else {
 			collectionNote = comment;

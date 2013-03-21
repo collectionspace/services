@@ -46,7 +46,10 @@ public class CollectionObjectConstants {
 
     public final static String FIELD_COLLECTION_PLACE_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
     public final static String FIELD_COLLECTION_PLACE_FIELD_NAME = "localityGroupList/localityGroup/fieldLocPlace";
-    
+
+    public final static String TAXONOMIC_RANGE_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String TAXONOMIC_RANGE_FIELD_NAME = "localityGroupList/localityGroup/taxonomicRange";
+
     public final static String COMMENT_SCHEMA_NAME = COMMON_SCHEMA_NAME;
     public final static String COMMENT_FIELD_NAME = "comments/comment";
 
