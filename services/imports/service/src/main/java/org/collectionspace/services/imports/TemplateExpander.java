@@ -176,7 +176,7 @@ public class TemplateExpander {
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"),
                 getDocUri(tenantId, SERVICE_TYPE, docID, partTmpl));
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("refName"),
-                getRefName(tenantId, SERVICE_TYPE, docID, partTmpl));
+                getRefName(tenantId, SERVICE_TYPE, docID, partTmpl).replace("&", "&amp;"));
 
 
         String serviceDir = outDir + '/' + docID;
