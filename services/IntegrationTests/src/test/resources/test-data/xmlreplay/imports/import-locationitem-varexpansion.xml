@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<imports>
+    <import service="Locations" type="Locationitem" CSID="${recordCSID}">
+        <schema xmlns:locations_common="http://collectionspace.org/services/location" 
+                name="locations_common">
+            <!--
+            Values containing Ampersand character entities are hard-coded
+            here in this file, rather than being passed in as values from
+            the XmlReplay control file, because in the control file it
+            appears we needed to double-encode them as '&amp;amp;',
+            which would complicate testing of CSPACE-5940.
+            -->
+            <locTermGroupList>
+                <locTermGroup>
+                    <termDisplayName>Wattford &amp; Gump Outbuilding</termDisplayName>
+                </locTermGroup>
+            </locTermGroupList>
+            <shortIdentifier>${shortIdentifierValue}</shortIdentifier>
+            <refName>urn:cspace:core.collectionspace.org:locationauthorities:name(${importLocationAuthorityWithVarExpansion.shortIdentifierValue})'Wattford &amp; Gump Outbuilding'</refName>
+            <inAuthority>${inAuthorityValue}</inAuthority>
+        </schema>
+    </import>
+</imports>
