@@ -18,6 +18,9 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +39,7 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
@@ -866,7 +870,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         	Profiler profiler = new Profiler(this, 2);
         	profiler.log("Executing NXQL query: " + query.toString());
         	profiler.start();
-        	if (handler.isCMISQuery() == true) {
+        	if (handler.isJDBCQuery() == true) {
+        		docList = getFilteredJDBC(repoSession, ctx, handler, queryContext);
+        	} else if (handler.isCMISQuery() == true) {
         		docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); //FIXME: REM - Need to deal with paging info in CMIS query
         	} else if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
                 docList = repoSession.query(query, null,
@@ -893,6 +899,41 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 releaseRepositorySession(ctx, repoSession);
             }
         }
+    }
+    
+    private DocumentModelList getFilteredJDBC(RepositoryInstance repoSession, ServiceContext ctx, DocumentHandler handler, QueryContext queryContext)
+            throws Exception {
+    	DocumentModelList result = new DocumentModelListImpl();
+    	
+    	String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
+    	String repositoryName = ctx.getRepositoryName();
+    	Connection connection = JDBCTools.getConnection(dataSourceName, repositoryName);
+    	
+    	String theQuery = "<build up the query and put it in this string.";
+    			
+    	// make sure autocommit is off see
+    	//		http://jdbc.postgresql.org/documentation/80/query.html#query-with-cursor
+    	//		http://docs.oracle.com/javase/7/docs/api/java/sql/ResultSet.html
+    	
+    	connection.setAutoCommit(false);
+    	Statement st = connection.createStatement();
+
+    	MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+    	
+    	// Turn use of the cursor on.
+    	st.setFetchSize(50);
+    	ResultSet rs = st.executeQuery(partialTerm);
+    	while (rs.next()) {
+    		String id = rs.getString("id");
+    	   System.out.print("A row was returned with ID:" + id);
+    	}
+    	rs.close();
+
+    	// Close the statement.
+    	st.close();    	
+    	
+    	return result;
     }
 
     private DocumentModelList getFilteredCMIS(RepositoryInstance repoSession, ServiceContext ctx, DocumentHandler handler, QueryContext queryContext)

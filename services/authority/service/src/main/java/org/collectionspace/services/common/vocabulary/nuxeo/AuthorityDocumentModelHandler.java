@@ -25,6 +25,9 @@ package org.collectionspace.services.common.vocabulary.nuxeo;
 
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefName;
@@ -192,5 +195,5 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon>
             objectProps.remove(AuthorityJAXBSchema.SHORT_IDENTIFIER);
             objectProps.remove(AuthorityJAXBSchema.REF_NAME);
         }
-    }
+    }    
 }

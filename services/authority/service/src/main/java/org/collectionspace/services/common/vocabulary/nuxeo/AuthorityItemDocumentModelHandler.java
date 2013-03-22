@@ -664,4 +664,21 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String getAuthorityItemCommonSchemaName() {
     	return authorityItemCommonSchemaName;
     }
+    
+    @Override
+    public boolean isJDBCQuery() {
+    	boolean result = false;
+    	
+    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
+    	//
+    	// Look the query params to see if we need to make a SQL query.
+    	//
+        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+    	if (partialTerm != null && partialTerm.trim().isEmpty() == false) {
+    		result = true;
+    	}
+    	
+    	return result;
+    }
+    
 }
