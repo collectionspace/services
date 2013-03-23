@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -72,6 +73,7 @@ import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 //
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
+import org.collectionspace.services.common.api.Tools;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoRepository;
 
@@ -909,29 +911,51 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     	String repositoryName = ctx.getRepositoryName();
     	Connection connection = JDBCTools.getConnection(dataSourceName, repositoryName);
     	
-    	String theQuery = "<build up the query and put it in this string.";
-    			
-    	// make sure autocommit is off see
-    	//		http://jdbc.postgresql.org/documentation/80/query.html#query-with-cursor
-    	//		http://docs.oracle.com/javase/7/docs/api/java/sql/ResultSet.html
-    	
-    	connection.setAutoCommit(false);
-    	Statement st = connection.createStatement();
-
     	MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        
+        // FIXME: Replace this placeholder with an appropriate per-authority value
+        // obtained from the relevant document handler
+        String termInfoGroupTable = "loctermgroup";
+        
+        // FIXME: Replace this placeholder query with an actual query from CSPACE-5945
+        // FIXME: Consider using a prepared statement here
+    	String theQuery =
+                "SELECT termdisplayname FROM "
+                + termInfoGroupTable
+                + " WHERE termdisplayname LIKE '" + partialTerm + "%'";
+
+        // Make sure autocommit is off. See:
+    	// http://jdbc.postgresql.org/documentation/80/query.html#query-with-cursor
+    	// http://docs.oracle.com/javase/7/docs/api/java/sql/ResultSet.html
+    	connection.setAutoCommit(false);
     	
-    	// Turn use of the cursor on.
+        // FIXME: Add exception handling and 'finally' blocks to ensure we close resources
+        // FIXME: Identify whether we can piggyback on existing JDBC method(s) in common.storage,
+        // and if so, add whatever additional functionality may be required to those method(s)
+        // FIXME: Add pagination handling
+        
+        Statement st = connection.createStatement();
+    	// Enable use of the cursor for pagination
     	st.setFetchSize(50);
-    	ResultSet rs = st.executeQuery(partialTerm);
+        List<String> docIds = new ArrayList<String>();
+    	ResultSet rs = st.executeQuery(theQuery);
+        String id;
     	while (rs.next()) {
-    		String id = rs.getString("id");
-    	   System.out.print("A row was returned with ID:" + id);
+            id = rs.getString("id");
+            if (Tools.notBlank(id)) {
+                docIds.add(id);
+            }
     	}
     	rs.close();
 
     	// Close the statement.
-    	st.close();    	
+    	st.close();
+
+        // Get a list of document models, using the IDs obtained from the query
+        for (String docId : docIds) {
+            result.add(NuxeoUtils.getDocumentModel(repoSession, docId));
+        }
     	
     	return result;
     }
