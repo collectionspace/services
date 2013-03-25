@@ -927,9 +927,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // FIXME: Replace this placeholder query with an actual query from CSPACE-5945
         // FIXME: Consider using a prepared statement here
         String sql =
-                "SELECT id, termdisplayname FROM "
-                + termInfoGroupTableName
-                + " WHERE termdisplayname LIKE '" + partialTerm + "%'";
+                "SELECT DISTINCT hierarchy.id as id " // For debugging add: ", ltg.termdisplayname"
+                + " FROM hierarchy "
+                + " LEFT JOIN hierarchy h1 "
+	        + "   ON h1.parentid = hierarchy.id "
+		+ "   AND h1.name = 'locations_common:locTermGroupList' "
+                + " LEFT JOIN loctermgroup ltg "
+	        + "   ON ltg.id = h1.id "
+                + " WHERE (ltg.termdisplayname ILIKE '" + partialTerm + "%')";
 
         // Make sure autocommit is off. See:
         // http://jdbc.postgresql.org/documentation/80/query.html#query-with-cursor
