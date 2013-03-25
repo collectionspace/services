@@ -337,13 +337,13 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      */
     public String getCMISQuery(QueryContext queryContext);
     
-    /*
-     * Returns TRUE if a CMIS query should be used (instead of an NXQL) query
+    /**
+     * Returns TRUE if a CMIS query should be used (instead of an NXQL query)
      */
     public boolean isCMISQuery();
 
-    /*
-     * Returns TRUE if an SQL query should be used (instead of an NXQL)
+    /**
+     * Returns TRUE if a JDBC/SQL query should be used (instead of an NXQL query)
      */
-	public boolean isJDBCQuery();
+    public boolean isJDBCQuery();
 }

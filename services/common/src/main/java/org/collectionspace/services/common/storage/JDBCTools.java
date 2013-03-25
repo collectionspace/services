@@ -35,6 +35,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.RowSetFactory;
+import javax.sql.rowset.RowSetProvider;
 
 /**
  * User: laramie
@@ -164,22 +167,23 @@ public class JDBCTools {
     	        
         return result;
     }
-    
-    // Regarding the method below, we might instead identify whether we can
-    // return a CachedRowSet or equivalent.
-    // http://docs.oracle.com/javase/1.5.0/docs/api/javax/sql/rowset/CachedRowSet.html
-    // -- ADR 2012-12-06
 
-    /* THIS IS BROKEN - If you close the statement, it closes the ResultSet!!!
-    public static ResultSet executeQuery(String repoName, String sql) throws Exception {
+    public static CachedRowSet executeQuery(String dataSourceName, String repositoryName, String sql) throws Exception {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = getConnection(repoName);	// If null, uses default
+            conn = getConnection(dataSourceName, repositoryName);
             stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            stmt.close();
-            return rs;  //don't call rs.close() here ... Let caller close and catch any exceptions.
+             
+           RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+            CachedRowSet crs = rowSetFactory.createCachedRowSet();
+
+            stmt = conn.createStatement();
+            try (ResultSet resultSet = stmt.executeQuery(sql)) {
+                crs.populate(resultSet);
+            }
+            stmt.close(); // also closes resultSet
+            return crs;
         } catch (SQLException sqle) {
             SQLException tempException = sqle;
             while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
@@ -200,7 +204,7 @@ public class JDBCTools {
                 return null;
             }
         }
-    } */
+    }
 
     public static int executeUpdate(String dataSourceName, String repositoryName, String sql) throws Exception {
         Connection conn = null;
