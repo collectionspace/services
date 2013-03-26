@@ -44,6 +44,7 @@ import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.config.service.DocHandlerParams;
 import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -237,7 +238,7 @@ public class TemplateExpander {
             String partTmpl) throws Exception {
         String uri = "";
         UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
-        UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, docType);
+        UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(docType));
         StoredValuesUriTemplate template = registry.get(key);
         if (template != null) {
             Map<String, String> additionalValues = new HashMap<String, String>();
@@ -411,12 +412,20 @@ public class TemplateExpander {
     }
 
     private static String getServiceName(String tenantId, String serviceType) {
-        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, serviceType);
+        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(serviceType));
+        if (serviceBinding == null) {
+            logger.warn("Could not obtain service binding for tenant " + tenantId + " with document type " + serviceType);
+            return "";
+        }
         return serviceBinding.getName();
     }
 
     private static boolean serviceSupportsHierarchy(String tenantId, String serviceType) {
-        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, serviceType);
+        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(serviceType));
+        if (serviceBinding == null) {
+            logger.warn("Could not obtain service binding for tenant " + tenantId + " with document type " + serviceType);
+            return false;
+        }
         DocHandlerParams params = serviceBinding.getDocHandlerParams();
         if (params == null || params.getParams() == null || params.getParams().isSupportsHierarchy() == null) {
             return false;
@@ -427,7 +436,11 @@ public class TemplateExpander {
 
     private static String getRefNameDisplayNameXpath(String tenantId, String serviceType) {
         String displayNameXPath = "";
-        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, serviceType);
+        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(serviceType));
+        if (serviceBinding == null) {
+            logger.warn("Could not obtain service binding for tenant " + tenantId + " with document type " + serviceType);
+            return "";
+        }
         DocHandlerParams params = serviceBinding.getDocHandlerParams();
         if (params == null || params.getParams() == null) {
             return displayNameXPath;
