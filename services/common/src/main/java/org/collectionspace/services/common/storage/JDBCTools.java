@@ -225,6 +225,13 @@ public class JDBCTools {
                 crs.populate(resultSet);
             }
             return crs;
+        } catch (SQLException sqle) {
+            SQLException tempException = sqle;
+            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
+                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+                tempException = tempException.getNextException();
+            }
+            throw new RuntimeException("SQL problem in executePreparedQuery: ", sqle);
         } finally {
             try {
                 if (ps != null) {
