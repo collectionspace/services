@@ -936,7 +936,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 + " FROM hierarchy "
                 + " LEFT JOIN hierarchy h1 "
 	        + "   ON h1.parentid = hierarchy.id "
-                + " LEFT JOIN ? tg "
+                + " LEFT JOIN " + termGroupTableName + " tg "
 	        + "   ON tg.id = h1.id "
                 + " WHERE tg.termdisplayname ILIKE ?";
         
@@ -945,8 +945,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             protected void preparePrepared(PreparedStatement preparedStatement)
                 throws SQLException
             {
-                preparedStatement.setString(1, termGroupTableName);
-                preparedStatement.setString(2, partialTerm + JDBCTools.SQL_WILDCARD);
+                preparedStatement.setString(1, partialTerm + JDBCTools.SQL_WILDCARD);
             }};
 
         List<String> docIds = new ArrayList<String>();
