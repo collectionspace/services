@@ -18,6 +18,7 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.Serializable;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -42,6 +43,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.storage.JDBCTools;
+import org.collectionspace.services.common.storage.PreparedStatementBuilder;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
@@ -100,7 +102,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
     public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
     private static final String ID_COLUMN_NAME = "id";
-
+    
     /**
      * Instantiates a new repository java client impl.
      */
@@ -908,67 +910,48 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         }
     }
 
-    private DocumentModelList getFilteredJDBC(RepositoryInstance repoSession, ServiceContext ctx, DocumentHandler handler, QueryContext queryContext)
-            throws Exception {
+    private DocumentModelList getFilteredJDBC(RepositoryInstance repoSession, ServiceContext ctx, 
+            DocumentHandler handler, QueryContext queryContext) throws Exception {
         DocumentModelList result = new DocumentModelListImpl();
 
         String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
         String repositoryName = ctx.getRepositoryName();
 
-        // Connection connection = JDBCTools.getConnection(dataSourceName, repositoryName);
-
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        final String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
 
         // FIXME: Replace this placeholder with an appropriate per-authority value
         // obtained from the relevant document handler
-        String termInfoGroupTableName = "loctermgroup";
+        final String termGroupTableName = "loctermgroup";
+        
+        // AuthorityItemDocModelHandler authHandler = (AuthorityItemDocModelHandler) handler;
 
         // FIXME: Replace this placeholder query with an actual query from CSPACE-5945
-        // FIXME: Consider using a prepared statement here
+        
+        // IMPORTANT FIXME: Guard against SQL injection attacks, since partialTerm
+        // is obtained from user-supplied query parameters
+        // See, for example: http://stackoverflow.com/a/7127189
         String sql =
-                "SELECT DISTINCT hierarchy.id as id " // For debugging add: ", ltg.termdisplayname"
+                "SELECT DISTINCT hierarchy.id as id "
                 + " FROM hierarchy "
                 + " LEFT JOIN hierarchy h1 "
 	        + "   ON h1.parentid = hierarchy.id "
-		+ "   AND h1.name = 'locations_common:locTermGroupList' "
-                + " LEFT JOIN loctermgroup ltg "
-	        + "   ON ltg.id = h1.id "
-                + " WHERE (ltg.termdisplayname ILIKE '" + partialTerm + "%')";
-
-        // Make sure autocommit is off. See:
-        // http://jdbc.postgresql.org/documentation/80/query.html#query-with-cursor
-        // http://docs.oracle.com/javase/7/docs/api/java/sql/ResultSet.html
-        // connection.setAutoCommit(false);
-
-        // FIXME: Add exception handling and 'finally' blocks to ensure we close resources
-        // FIXME: Identify whether we can piggyback on existing JDBC method(s) in common.storage,
-        // and if so, add whatever additional functionality may be required to those method(s)
-        // FIXME: Add pagination handling
-
-        /*
-         Statement st = connection.createStatement();
-         // Enable use of the cursor for pagination
-         st.setFetchSize(50);
-         List<String> docIds = new ArrayList<String>();
-         ResultSet rs = st.executeQuery(sql);
-         String id;
-         while (rs.next()) {
-         id = rs.getString("id");
-         if (Tools.notBlank(id)) {
-         docIds.add(id);
-         }
-         }
-         rs.close();
-
-         // Close the statement.
-         st.close();
-         */
+                + " LEFT JOIN ? tg "
+	        + "   ON tg.id = h1.id "
+                + " WHERE tg.termdisplayname ILIKE ?";
+        
+        PreparedStatementBuilder partialTermMatchStatementBuilder = new PreparedStatementBuilder(sql){
+            @Override
+            protected void preparePrepared(PreparedStatement preparedStatement)
+                throws SQLException
+            {
+                preparedStatement.setString(1, termGroupTableName);
+                preparedStatement.setString(2, partialTerm + JDBCTools.SQL_WILDCARD);
+            }};
 
         List<String> docIds = new ArrayList<String>();
-        CachedRowSet crs = null;
-        try {
-            crs = JDBCTools.executeQuery(dataSourceName, repositoryName, sql);
+        try (CachedRowSet crs = JDBCTools.executePreparedQuery(partialTermMatchStatementBuilder,
+                dataSourceName, repositoryName, sql)) {
 
             // If the response to the query is null or contains zero rows,
             // return an empty list of document models
@@ -982,20 +965,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
             // Otherwise, get the document IDs from the results of the query
             String id;
-            /*
-            int idColumnIndex;
-            try {
-                idColumnIndex = crs.findColumn(ID_COLUMN_NAME);
-            } catch (SQLException sqle) {
-                logger.warn("Could not find expected column '" + ID_COLUMN_NAME + "' in query results.");
-                return result; // return an empty list of document models
-            } finally {
-                crs.close();
-            }
-            */
             crs.beforeFirst();
             while (crs.next()) {
-                // id = crs.getString(idColumnIndex);
                 id = crs.getString(1);
                 if (Tools.notBlank(id)) {
                     docIds.add(id);
@@ -1004,8 +975,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         } catch (SQLException sqle) {
             logger.warn("Could not obtain document IDs via SQL query '" + sql + "': " + sqle.getMessage());
             return result; // return an empty list of document models
-        } finally {
-            crs.close();
         } 
 
         // Get a list of document models, using the IDs obtained from the query
@@ -1015,6 +984,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         return result;
     }
+    
 
     private DocumentModelList getFilteredCMIS(RepositoryInstance repoSession, ServiceContext ctx, DocumentHandler handler, QueryContext queryContext)
             throws DocumentNotFoundException, DocumentException {

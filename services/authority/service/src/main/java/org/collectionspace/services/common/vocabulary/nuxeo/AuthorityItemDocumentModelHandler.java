@@ -153,6 +153,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public void setInAuthority(String inAuthority) {
         this.inAuthority = inAuthority;
     }
+    
+   public String getInAuthority() {
+        return this.inAuthority;
+    }
 
     /** Subclasses may override this to customize the URI segment. */
     public String getAuthorityServicePath() {

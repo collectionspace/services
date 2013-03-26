@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -55,6 +56,8 @@ public class JDBCTools {
     public static String NUXEO_MANAGER_DATASOURCE_NAME = "NuxeoMgrDS";
     public static String NUXEO_READER_DATASOURCE_NAME = "NuxeoReaderDS";
     public static String NUXEO_USER_NAME = "nuxeo";
+    public static String SQL_WILDCARD = "%";
+    
     //
     // Private constants
     //
@@ -175,14 +178,13 @@ public class JDBCTools {
             conn = getConnection(dataSourceName, repositoryName);
             stmt = conn.createStatement();
              
-           RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+            RowSetFactory rowSetFactory = RowSetProvider.newFactory();
             CachedRowSet crs = rowSetFactory.createCachedRowSet();
 
             stmt = conn.createStatement();
             try (ResultSet resultSet = stmt.executeQuery(sql)) {
                 crs.populate(resultSet);
             }
-            stmt.close(); // also closes resultSet
             return crs;
         } catch (SQLException sqle) {
             SQLException tempException = sqle;
@@ -193,11 +195,43 @@ public class JDBCTools {
             throw new RuntimeException("SQL problem in executeQuery: ", sqle);
         } finally {
             try {
+                if (stmt != null) {
+                    stmt.close();
+                }
                 if (conn != null) {
                     conn.close();
                 }
-                if (stmt != null) {
-                    stmt.close();
+            } catch (SQLException sqle) {
+                logger.debug("SQL Exception closing statement/connection in executeQuery: " + sqle.getLocalizedMessage());
+                return null;
+            }
+        }
+    }
+    
+    public static CachedRowSet executePreparedQuery(final PreparedStatementBuilder builder,
+            String dataSourceName, String repositoryName, String sql) throws Exception {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getConnection(dataSourceName, repositoryName);
+            RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+            CachedRowSet crs = rowSetFactory.createCachedRowSet();
+            ps = builder.build(conn);
+            // FIXME: transition this log statement to DEBUG level when appropriate
+            if (logger.isInfoEnabled()) {
+                logger.info("prepared statement=" + ps.toString());
+            }
+            try (ResultSet resultSet = ps.executeQuery()) {
+                crs.populate(resultSet);
+            }
+            return crs;
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
                 }
             } catch (SQLException sqle) {
                 logger.debug("SQL Exception closing statement/connection in executeQuery: " + sqle.getLocalizedMessage());
@@ -233,11 +267,11 @@ public class JDBCTools {
             throw new RuntimeException("SQL problem in executeUpdate: " + msg, sqle);
         } finally {
             try {
-                if (conn != null) {
-                    conn.close();
-                }
                 if (stmt != null) {
                     stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
                 }
             } catch (SQLException sqle) {
                 logger.debug("SQL Exception closing statement/connection in executeUpdate: " + sqle.getLocalizedMessage());
