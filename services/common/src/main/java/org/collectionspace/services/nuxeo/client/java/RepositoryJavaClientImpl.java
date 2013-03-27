@@ -101,7 +101,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 //    private String foo = Profiler.createLogger();
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
     public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
-    private static final String ID_COLUMN_NAME = "id";
+    public static final String JDBC_TABLE_NAME_PARAM = "TABLE_NAME";
     
     /**
      * Instantiates a new repository java client impl.
@@ -916,31 +916,22 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
         String repositoryName = ctx.getRepositoryName();
-
+        
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         final String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
 
-        // FIXME: Replace this placeholder with an appropriate per-authority value
-        // obtained from the relevant document handler
-        final String termGroupTableName = "loctermgroup";
-        
-        // AuthorityItemDocModelHandler authHandler = (AuthorityItemDocModelHandler) handler;
-
-        // FIXME: Replace this placeholder query with an actual query from CSPACE-5945
-        
-        // IMPORTANT FIXME: Guard against SQL injection attacks, since partialTerm
-        // is obtained from user-supplied query parameters
-        // See, for example: http://stackoverflow.com/a/7127189
+        // FIXME: Replace this placeholder query with an actual query resulting
+        // from CSPACE-5945 work
         String sql =
                 "SELECT DISTINCT hierarchy.id as id "
                 + " FROM hierarchy "
                 + " LEFT JOIN hierarchy h1 "
 	        + "   ON h1.parentid = hierarchy.id "
-                + " LEFT JOIN " + termGroupTableName + " tg "
+                + " LEFT JOIN " + handler.getJDBCQueryParams().get(JDBC_TABLE_NAME_PARAM) + " tg "
 	        + "   ON tg.id = h1.id "
                 + " WHERE tg.termdisplayname ILIKE ?";
         
-        PreparedStatementBuilder partialTermMatchStatementBuilder = new PreparedStatementBuilder(sql){
+        PreparedStatementBuilder jdbcFilterBuilder = new PreparedStatementBuilder(sql){
             @Override
             protected void preparePrepared(PreparedStatement preparedStatement)
                 throws SQLException
@@ -948,8 +939,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 preparedStatement.setString(1, partialTerm + JDBCTools.SQL_WILDCARD);
             }};
 
-        List<String> docIds = new ArrayList<String>();
-        try (CachedRowSet crs = JDBCTools.executePreparedQuery(partialTermMatchStatementBuilder,
+        List<String> docIds = new ArrayList<>();
+        try (CachedRowSet crs = JDBCTools.executePreparedQuery(jdbcFilterBuilder,
                 dataSourceName, repositoryName, sql)) {
 
             // If the response to the query is null or contains zero rows,

@@ -91,6 +91,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String authorityRefNameBase = null;
     // Used to determine when the displayName changes as part of the update.
     protected String oldDisplayNameOnUpdate = null;
+    private String TERM_GROUP_TABLE_NAME_SUFFIX = "termgroup";
 
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
@@ -669,7 +670,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	return authorityItemCommonSchemaName;
     }
     
-    @Override
+    // @Override
     public boolean isJDBCQuery() {
     	boolean result = false;
     	
@@ -683,6 +684,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	}
     	
     	return result;
+    }
+    
+    protected String getTermGroupTableName() {
+        return TERM_GROUP_TABLE_NAME_SUFFIX;
+    }
+    
+    @Override
+    public Map<String,String> getJDBCQueryParams() {
+        Map<String,String> params = super.getJDBCQueryParams();
+        params.put(RepositoryJavaClientImpl.JDBC_TABLE_NAME_PARAM, getTermGroupTableName());
+        return params;
     }
     
 }
