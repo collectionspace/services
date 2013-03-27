@@ -13,6 +13,10 @@
                         <service:key>sqlScriptName</service:key>
                         <service:value>load_botgarden_id_generators.sql</service:value>
                     </service:property>
+                    <service:property merge:matcher="skip" merge:action="insert">
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>ucbg_custom_sql.sql</service:value>
+                    </service:property>
                 </service:params>
             </service:initHandler>
         </tenant:serviceBindings>
