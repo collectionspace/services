@@ -175,10 +175,6 @@ public class PersonDocumentModelHandler
     public String getQProperty(String prop) {
         return PersonConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
-    
-    @Override
-    protected String getTermGroupTableName() {
-        return "person" + super.getTermGroupTableName();
-    }
+
 }
 

@@ -91,7 +91,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String authorityRefNameBase = null;
     // Used to determine when the displayName changes as part of the update.
     protected String oldDisplayNameOnUpdate = null;
-    private String TERM_GROUP_TABLE_NAME_SUFFIX = "termgroup";
+    private final static String LIST_SUFFIX = "List";
 
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
@@ -686,8 +686,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     	return result;
     }
     
+    // By convention, the name of the database table that contains
+    // repeatable term information group records is derivable from
+    // an XPath base value by removing a suffix and converting to lowercase
     protected String getTermGroupTableName() {
-        return TERM_GROUP_TABLE_NAME_SUFFIX;
+        String termInfoGroupListName = getItemTermInfoGroupXPathBase();
+        return termInfoGroupListName.substring(0, termInfoGroupListName.lastIndexOf(LIST_SUFFIX)).toLowerCase();
     }
     
     @Override
