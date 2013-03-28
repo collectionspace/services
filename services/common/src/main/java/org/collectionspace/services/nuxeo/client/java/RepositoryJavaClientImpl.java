@@ -929,6 +929,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 	        + "  ON h1.parentid = hierarchy.id "
                 + " LEFT JOIN " + handler.getJDBCQueryParams().get(JDBC_TABLE_NAME_PARAM) + " tg "
 	        + "   ON tg.id = h1.id "
+                + " LEFT JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema "
+	        + "   ON commonschema.id = hierarchy.id "
                 + " LEFT JOIN misc "
 	        + "   ON misc.id = hierarchy.id "
                 + " WHERE (tg.termdisplayname ILIKE ?) "
