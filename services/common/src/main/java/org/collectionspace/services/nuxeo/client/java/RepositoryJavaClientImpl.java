@@ -923,13 +923,16 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // FIXME: Replace this placeholder query with an actual query resulting
         // from CSPACE-5945 work
         String sql =
-                "SELECT DISTINCT hierarchy.id as id "
+                "SELECT DISTINCT hierarchy.id as id"
                 + " FROM hierarchy "
                 + " LEFT JOIN hierarchy h1 "
-	        + "   ON h1.parentid = hierarchy.id "
+	        + "  ON h1.parentid = hierarchy.id "
                 + " LEFT JOIN " + handler.getJDBCQueryParams().get(JDBC_TABLE_NAME_PARAM) + " tg "
 	        + "   ON tg.id = h1.id "
-                + " WHERE tg.termdisplayname ILIKE ?";
+                + " LEFT JOIN misc "
+	        + "   ON misc.id = hierarchy.id "
+                + " WHERE (tg.termdisplayname ILIKE ?) "
+                + "   AND (misc.lifecyclestate <> 'deleted') ";
         
         PreparedStatementBuilder jdbcFilterBuilder = new PreparedStatementBuilder(sql){
             @Override
