@@ -936,6 +936,25 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 + " WHERE (tg.termdisplayname ILIKE ?) "
                 + "   AND (misc.lifecyclestate <> 'deleted') ";
         
+                
+        // FIXME: Need to add a WHERE clause restriction on inAuthority
+        
+        // FIXME: Need to handle the '_ALL_' case for inAuthority by removing
+        // that restriction (see AuthorityResource.getAuthorityItemList())
+        
+/*
+        Pseudo-code-like continuation
+        String inAuthority = handler.getJDBCQueryParams().get(IN_AUTHORITY_PARAM);
+        if (Tools.notBlank(inAuthority) {
+            if (!inAuthority.equals.(AuthorityResource.PARENT_WILDCARD)) {
+                sql = sql + " AND (commonschema.inauthority = '" + handler.getInAuthorityValue() + "') ";
+            }
+        }
+*/
+        
+        // FIXME: We might also consider skipping the JOIN on the common schema table
+        // in the '_ALL_' case, where we are not restricting by inAuthority value
+        
         PreparedStatementBuilder jdbcFilterBuilder = new PreparedStatementBuilder(sql){
             @Override
             protected void preparePrepared(PreparedStatement preparedStatement)
