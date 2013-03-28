@@ -43,7 +43,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.storage.JDBCTools;
-import org.collectionspace.services.common.storage.PreparedStatementBuilder;
+import org.collectionspace.services.common.storage.PreparedStatementSimpleBuilder;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
@@ -919,6 +919,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         final String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        
+        // FIXME: Look into whether this performance concern specific to query
+        // planning with prepared statements may be affecting us:
+        // http://stackoverflow.com/a/678452
+        // If that proves to be a significant concern, we can instead use
+        // JDBCTools.executeQuery(), and attempt to sanitize user input
+        // against potential SQL injection attacks.
 
         // FIXME: Replace this placeholder query with an actual query resulting
         // from CSPACE-5945 work
@@ -955,16 +962,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // FIXME: We might also consider skipping the JOIN on the common schema table
         // in the '_ALL_' case, where we are not restricting by inAuthority value
         
-        PreparedStatementBuilder jdbcFilterBuilder = new PreparedStatementBuilder(sql){
-            @Override
-            protected void preparePrepared(PreparedStatement preparedStatement)
-                throws SQLException
-            {
-                preparedStatement.setString(1, partialTerm + JDBCTools.SQL_WILDCARD);
-            }};
-
+        List<String> params = new ArrayList<>();
+        params.add(partialTerm + JDBCTools.SQL_WILDCARD);
+        PreparedStatementSimpleBuilder jdbcFilterQueryBuilder = new PreparedStatementSimpleBuilder(sql, params);
+        
         List<String> docIds = new ArrayList<>();
-        try (CachedRowSet crs = JDBCTools.executePreparedQuery(jdbcFilterBuilder,
+        try (CachedRowSet crs = JDBCTools.executePreparedQuery(jdbcFilterQueryBuilder,
                 dataSourceName, repositoryName, sql)) {
 
             // If the response to the query is null or contains zero rows,

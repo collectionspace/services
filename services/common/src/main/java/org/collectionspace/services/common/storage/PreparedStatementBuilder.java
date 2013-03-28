@@ -1,11 +1,11 @@
-package org.collectionspace.services.common.storage;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 /**
  * Per http://stackoverflow.com/a/7127189
  */
 
+package org.collectionspace.services.common.storage;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class PreparedStatementBuilder
