@@ -62,10 +62,10 @@ public class PreparedStatementBuilder
 
     /**
      * Build a PreparedStatement by obtaining it from a JDBC Connection,
-     * then applying setup directives.
+     * then applying setup directives before returning it.
      * 
      * @param conn a JDBC connection
-     * @return a JDBC PreparedStatement, with any 
+     * @return a JDBC PreparedStatement, with setup directives, if any, applied. 
      * @throws SQLException 
      */
     public PreparedStatement build(final Connection conn)
