@@ -934,16 +934,22 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 " LEFT JOIN hierarchy h1 "
 	        + "  ON h1.parentid = hierarchy.id "
                 + " LEFT JOIN " + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " tg "
-	        + "   ON tg.id = h1.id "
-                + " LEFT JOIN misc "
-	        + "   ON misc.id = hierarchy.id ";
-                        
-        String whereClause =              
-                " WHERE (tg.termdisplayname ILIKE ?) "
-                + "   AND (misc.lifecyclestate <> 'deleted') ";
+	        + "   ON tg.id = h1.id ";
+        
+        String whereClause =
+                " WHERE (tg.termdisplayname ILIKE ?) ";
         
         List<String> params = new ArrayList<>();
         params.add(partialTerm + JDBCTools.SQL_WILDCARD);
+        
+        String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
+        if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
+            joinClauses = joinClauses
+                + " LEFT JOIN misc "
+	        + "   ON misc.id = hierarchy.id ";
+            whereClause = whereClause
+                + "   AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "') ";
+        }
 
         // If a particular authority is specified, restrict the query further
         // to records within that authority
