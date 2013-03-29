@@ -919,13 +919,17 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         final String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
         
-        // FIXME: Get all of the following values from appropriate external constants
+        // FIXME: Get all of the following values from appropriate external constants.
+        // At present, these are duplicated in both RepositoryJavaClientImpl
+        // and in AuthorityItemDocumentModelHandler.
         final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
         final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
         final String PARENT_WILDCARD = "_ALL_"; // Get this from AuthorityResource or equivalent
                 
         // FIXME: Replace this placeholder query with an actual query resulting
         // from CSPACE-5945 work
+        
+        // Start with the default query
         String selectStatement =
                 "SELECT DISTINCT hierarchy.id as id"
                 + " FROM hierarchy ";
@@ -940,8 +944,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 " WHERE (tg.termdisplayname ILIKE ?) ";
         
         List<String> params = new ArrayList<>();
-        params.add(partialTerm + JDBCTools.SQL_WILDCARD);
+        params.add(partialTerm + JDBCTools.SQL_WILDCARD); // Value for replaceable parameter 1 in the query
         
+        // Restrict the query to filter out deleted records, if requested
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
             joinClauses = joinClauses
@@ -952,7 +957,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         }
 
         // If a particular authority is specified, restrict the query further
-        // to records within that authority
+        // to return only records within that authority
         String inAuthorityValue = (String) handler.getJDBCQueryParams().get(IN_AUTHORITY_PARAM);
         if (Tools.notBlank(inAuthorityValue)) {
             // Handle the '_ALL_' case for inAuthority
@@ -964,10 +969,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 	            + "   ON commonschema.id = hierarchy.id ";
                 whereClause = whereClause
                     + " AND (commonschema.inauthority = ?)";
-                params.add(inAuthorityValue);
+                params.add(inAuthorityValue); // Value for replaceable parameter 2 in the query
             }
         }
-                
+        
         String sql = selectStatement + joinClauses + whereClause;
         
         // FIXME: Look into whether the following performance concern around
@@ -996,7 +1001,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             String id;
             crs.beforeFirst();
             while (crs.next()) {
-                id = crs.getString(1);
+                id = crs.getString(1); // There is only one column returned in this filter query
                 if (Tools.notBlank(id)) {
                     docIds.add(id);
                 }

@@ -697,13 +697,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     }
     
     protected String getInAuthorityValue() {
-        // FIXME: Replace this placeholder / stub
+        // FIXME: Replace this placeholder / stub with actual code
+        // to obtain the relevant inAuthority value
         return AuthorityResource.PARENT_WILDCARD;
     }
     
     @Override
     public Map<String,String> getJDBCQueryParams() {
-        // FIXME: Get all of the following values from appropriate external constants
+        // FIXME: Get all of the following values from appropriate external constants.
+        // At present, these are duplicated in both RepositoryJavaClientImpl
+        // and in AuthorityItemDocumentModelHandler.
         final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
         final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
         
