@@ -40,6 +40,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 
 import org.collectionspace.services.config.service.ListResultField;
@@ -626,6 +627,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     /* don't even THINK of re-using this method.
      * String example_uri = "/locationauthorities/7ec60f01-84ab-4908-9a6a/items/a5466530-713f-43b4-bc05";
      */
+    @Deprecated
     private String extractInAuthorityCSID(String uri) {
         String IN_AUTHORITY_REGEX = "/(.*?)/(.*?)/(.*)";
         Pattern p = Pattern.compile(IN_AUTHORITY_REGEX);
@@ -694,10 +696,20 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         return termInfoGroupListName.substring(0, termInfoGroupListName.lastIndexOf(LIST_SUFFIX)).toLowerCase();
     }
     
+    protected String getInAuthorityValue() {
+        // FIXME: Replace this placeholder / stub
+        return AuthorityResource.PARENT_WILDCARD;
+    }
+    
     @Override
     public Map<String,String> getJDBCQueryParams() {
+        // FIXME: Get all of the following values from appropriate external constants
+        final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
+        final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
+        
         Map<String,String> params = super.getJDBCQueryParams();
-        params.put(RepositoryJavaClientImpl.JDBC_TABLE_NAME_PARAM, getTermGroupTableName());
+        params.put(TERM_GROUP_TABLE_NAME_PARAM, getTermGroupTableName());
+        params.put(IN_AUTHORITY_PARAM, getInAuthorityValue());
         return params;
     }
     

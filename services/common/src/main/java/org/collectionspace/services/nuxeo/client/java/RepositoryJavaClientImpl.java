@@ -101,7 +101,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 //    private String foo = Profiler.createLogger();
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
     public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
-    public static final String JDBC_TABLE_NAME_PARAM = "TABLE_NAME";
     
     /**
      * Instantiates a new repository java client impl.
@@ -920,50 +919,57 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         final String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
         
-        // FIXME: Look into whether this performance concern specific to query
-        // planning with prepared statements may be affecting us:
+        // FIXME: Get all of the following values from appropriate external constants
+        final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
+        final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
+        final String PARENT_WILDCARD = "_ALL_"; // Get this from AuthorityResource or equivalent
+                
+        // FIXME: Replace this placeholder query with an actual query resulting
+        // from CSPACE-5945 work
+        String selectStatement =
+                "SELECT DISTINCT hierarchy.id as id"
+                + " FROM hierarchy ";
+        
+        String joinClauses =
+                " LEFT JOIN hierarchy h1 "
+	        + "  ON h1.parentid = hierarchy.id "
+                + " LEFT JOIN " + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " tg "
+	        + "   ON tg.id = h1.id "
+                + " LEFT JOIN misc "
+	        + "   ON misc.id = hierarchy.id ";
+                        
+        String whereClause =              
+                " WHERE (tg.termdisplayname ILIKE ?) "
+                + "   AND (misc.lifecyclestate <> 'deleted') ";
+        
+        List<String> params = new ArrayList<>();
+        params.add(partialTerm + JDBCTools.SQL_WILDCARD);
+
+        // If a particular authority is specified, restrict the query further
+        // to records within that authority
+        String inAuthorityValue = (String) handler.getJDBCQueryParams().get(IN_AUTHORITY_PARAM);
+        if (Tools.notBlank(inAuthorityValue)) {
+            // Handle the '_ALL_' case for inAuthority
+            if (inAuthorityValue.equals(PARENT_WILDCARD)) {
+                // Add nothing to the query here if it should match within all authorities
+            } else {
+                joinClauses = joinClauses
+                    + " LEFT JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema "
+	            + "   ON commonschema.id = hierarchy.id ";
+                whereClause = whereClause
+                    + " AND (commonschema.inauthority = ?)";
+                params.add(inAuthorityValue);
+            }
+        }
+                
+        String sql = selectStatement + joinClauses + whereClause;
+        
+        // FIXME: Look into whether the following performance concern around
+        // query planning with prepared statements may be affecting us:
         // http://stackoverflow.com/a/678452
         // If that proves to be a significant concern, we can instead use
         // JDBCTools.executeQuery(), and attempt to sanitize user input
         // against potential SQL injection attacks.
-
-        // FIXME: Replace this placeholder query with an actual query resulting
-        // from CSPACE-5945 work
-        String sql =
-                "SELECT DISTINCT hierarchy.id as id"
-                + " FROM hierarchy "
-                + " LEFT JOIN hierarchy h1 "
-	        + "  ON h1.parentid = hierarchy.id "
-                + " LEFT JOIN " + handler.getJDBCQueryParams().get(JDBC_TABLE_NAME_PARAM) + " tg "
-	        + "   ON tg.id = h1.id "
-                + " LEFT JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema "
-	        + "   ON commonschema.id = hierarchy.id "
-                + " LEFT JOIN misc "
-	        + "   ON misc.id = hierarchy.id "
-                + " WHERE (tg.termdisplayname ILIKE ?) "
-                + "   AND (misc.lifecyclestate <> 'deleted') ";
-        
-                
-        // FIXME: Need to add a WHERE clause restriction on inAuthority
-        
-        // FIXME: Need to handle the '_ALL_' case for inAuthority by removing
-        // that restriction (see AuthorityResource.getAuthorityItemList())
-        
-/*
-        Pseudo-code-like continuation
-        String inAuthority = handler.getJDBCQueryParams().get(IN_AUTHORITY_PARAM);
-        if (Tools.notBlank(inAuthority) {
-            if (!inAuthority.equals.(AuthorityResource.PARENT_WILDCARD)) {
-                sql = sql + " AND (commonschema.inauthority = '" + handler.getInAuthorityValue() + "') ";
-            }
-        }
-*/
-        
-        // FIXME: We might also consider skipping the JOIN on the common schema table
-        // in the '_ALL_' case, where we are not restricting by inAuthority value
-        
-        List<String> params = new ArrayList<>();
-        params.add(partialTerm + JDBCTools.SQL_WILDCARD);
         PreparedStatementSimpleBuilder jdbcFilterQueryBuilder = new PreparedStatementSimpleBuilder(sql, params);
         
         List<String> docIds = new ArrayList<>();
