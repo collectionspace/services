@@ -6,6 +6,21 @@
     <tenant:tenantBinding id="20" name="ucjeps.cspace.berkeley.edu" displayName="CollectionSpace UCJEPS Tenant" version="0.1">
         <tenant:repositoryDomain name="default-domain" storageName="ucjeps-domain" repositoryClient="nuxeo-java" />
 
+        <!--
+                            If you have term completion performance problems and are willing to 
+                            live with not defaulting to an initial wildcard, uncomment this
+                            section. Note that in term completion, you can always specify 
+                            something like "*atrick" (without quotes) to force the wildcard
+                            at the beginning.
+                            Performance may be an issue for very large authorities, especially if
+                            many of them share common substrings. -->
+        <tenant:properties>
+            <types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert" >
+                    <types:key>ptStartingWildcard</types:key>
+                    <types:value>false</types:value>
+            </types:item>
+        </tenant:properties>
+
         <tenant:serviceBindings merge:matcher="id" id="idgenerators">
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
