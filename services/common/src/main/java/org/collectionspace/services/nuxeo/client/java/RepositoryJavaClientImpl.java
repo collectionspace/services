@@ -912,6 +912,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     private DocumentModelList getFilteredJDBC(RepositoryInstance repoSession, ServiceContext ctx, 
             DocumentHandler handler, QueryContext queryContext) throws Exception {
         DocumentModelList result = new DocumentModelListImpl();
+        
+        final int LIMIT_SIZE = 40; // FIXME: Get from configuration and/or pagination query params
 
         String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
         String repositoryName = ctx.getRepositoryName();
@@ -931,17 +933,20 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         
         // Start with the default query
         String selectStatement =
-                "SELECT DISTINCT hierarchy.id as id"
-                + " FROM hierarchy ";
+                "SELECT DISTINCT hierarchy_termgroup.id as id, hierarchy_termgroup.parentid as parentid"
+                + " FROM " + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " termgroup ";
         
         String joinClauses =
-                " LEFT JOIN hierarchy h1 "
-	        + "  ON h1.parentid = hierarchy.id "
-                + " LEFT JOIN " + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " tg "
-	        + "   ON tg.id = h1.id ";
-        
+                " INNER JOIN hierarchy hierarchy_termgroup "
+	        + "  ON hierarchy_termgroup.id = termgroup.id "
+                + " INNER JOIN hierarchy hierarchy_commonschema "
+	        + "   ON hierarchy_commonschema.id = hierarchy_termgroup.parentid ";
+
         String whereClause =
-                " WHERE (tg.termdisplayname ILIKE ?) ";
+                " WHERE (termgroup.termdisplayname ILIKE ?) ";
+        
+        String limitClause =
+                " LIMIT " + LIMIT_SIZE;
         
         List<String> params = new ArrayList<>();
         params.add(partialTerm + JDBCTools.SQL_WILDCARD); // Value for replaceable parameter 1 in the query
@@ -950,8 +955,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
             joinClauses = joinClauses
-                + " LEFT JOIN misc "
-	        + "   ON misc.id = hierarchy.id ";
+                + " INNER JOIN misc "
+	        + "   ON misc.id = hierarchy_commonschema.id ";
             whereClause = whereClause
                 + "   AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "') ";
         }
@@ -965,15 +970,15 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 // Add nothing to the query here if it should match within all authorities
             } else {
                 joinClauses = joinClauses
-                    + " LEFT JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema "
-	            + "   ON commonschema.id = hierarchy.id ";
+                    + " INNER JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema "
+                    + "   ON commonschema.id = hierarchy_commonschema.id ";
                 whereClause = whereClause
                     + " AND (commonschema.inauthority = ?)";
                 params.add(inAuthorityValue); // Value for replaceable parameter 2 in the query
             }
         }
         
-        String sql = selectStatement + joinClauses + whereClause;
+        String sql = selectStatement + joinClauses + whereClause + limitClause;
         
         // FIXME: Look into whether the following performance concern around
         // query planning with prepared statements may be affecting us:
@@ -1001,7 +1006,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             String id;
             crs.beforeFirst();
             while (crs.next()) {
-                id = crs.getString(1); // There is only one column returned in this filter query
+                id = crs.getString(2); // Obtain parent IDs in the hierarchy table from column 2 of results
                 if (Tools.notBlank(id)) {
                     docIds.add(id);
                 }
@@ -1013,7 +1018,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         // Get a list of document models, using the IDs obtained from the query
         for (String docId : docIds) {
-            result.add(NuxeoUtils.getDocumentModel(repoSession, docId));
+            DocumentModel docModel = NuxeoUtils.getDocumentModel(repoSession, docId);
+            if (docModel == null) {
+                logger.debug("Could not obtain document model for document with ID " + docId);
+            } else {
+                result.add(NuxeoUtils.getDocumentModel(repoSession, docId));
+            }
         }
 
         return result;
