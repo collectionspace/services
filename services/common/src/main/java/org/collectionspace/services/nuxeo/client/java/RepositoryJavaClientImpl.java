@@ -923,8 +923,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         
         // FIXME: Resolve how to handle the case where the partial term
         // query parameter is included in the request, but has been given an
-        // empty (blank) value. Then implement that here, if current behavior
-        // does not match the required behavior.
+        // empty (blank) value ("...?pt=") Then implement the required
+        // behavior here, if current behavior does not match what is required.
         //
         // (We're currently returning all records in that case.)
        
@@ -967,6 +967,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // FIXME: Get this value from an existing constant, if available
         final String USER_SUPPLIED_WILDCARD = "*";
         partialTerm = handleProvidedLeadingWildcard(partialTerm, USER_SUPPLIED_WILDCARD);
+        // Automatically insert a trailing wildcard
         params.add(partialTerm + JDBCTools.SQL_WILDCARD); // Value for replaceable parameter 1 in the query
         
         // Restrict the query to filter out deleted records, if requested

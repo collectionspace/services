@@ -690,16 +690,20 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     
     // By convention, the name of the database table that contains
     // repeatable term information group records is derivable from
-    // an XPath base value by removing a suffix and converting to lowercase
+    // an existing XPath base value, by removing a suffix and converting
+    // to lowercase
     protected String getTermGroupTableName() {
         String termInfoGroupListName = getItemTermInfoGroupXPathBase();
         return termInfoGroupListName.substring(0, termInfoGroupListName.lastIndexOf(LIST_SUFFIX)).toLowerCase();
     }
     
     protected String getInAuthorityValue() {
-        // FIXME: Replace this placeholder / stub with actual code
-        // to obtain the relevant inAuthority value
-        return AuthorityResource.PARENT_WILDCARD;
+        String inAuthorityValue = getInAuthority();
+        if (Tools.notBlank(inAuthorityValue)) {
+            return inAuthorityValue;
+        } else {
+            return AuthorityResource.PARENT_WILDCARD;
+        }
     }
     
     @Override
