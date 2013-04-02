@@ -919,17 +919,23 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         String repositoryName = ctx.getRepositoryName();
         
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-        final String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
         
+        // FIXME: Resolve how to handle the case where the partial term
+        // query parameter is included in the request, but has been given an
+        // empty (blank) value. Then implement that here, if current behavior
+        // does not match the required behavior.
+        //
+        // (We're currently returning all records in that case.)
+       
         // FIXME: Get all of the following values from appropriate external constants.
-        // At present, these are duplicated in both RepositoryJavaClientImpl
+        //
+        // At present, the two constants below are duplicated in both RepositoryJavaClientImpl
         // and in AuthorityItemDocumentModelHandler.
         final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
         final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
-        final String PARENT_WILDCARD = "_ALL_"; // Get this from AuthorityResource or equivalent
-                
-        // FIXME: Replace this placeholder query with an actual query resulting
-        // from CSPACE-5945 work
+        // Get this from a constant in AuthorityResource or equivalent
+        final String PARENT_WILDCARD = "_ALL_"; 
         
         // Start with the default query
         String selectStatement =
@@ -949,6 +955,18 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 " LIMIT " + LIMIT_SIZE;
         
         List<String> params = new ArrayList<>();
+        // Handle user-provided leading wildcard characters, in the
+        // configuration where a leading wildcard is not automatically inserted.
+        // (The user-provided wildcard must be in the first character position
+        // in the partial term value.)
+        //
+        // FIXME: Read tenant bindings configuration to determine whether
+        // to automatically insert leading, as well as trailing, wildcards
+        // into the term matching string.
+        //
+        // FIXME: Get this value from an existing constant, if available
+        final String USER_SUPPLIED_WILDCARD = "*";
+        partialTerm = handleProvidedLeadingWildcard(partialTerm, USER_SUPPLIED_WILDCARD);
         params.add(partialTerm + JDBCTools.SQL_WILDCARD); // Value for replaceable parameter 1 in the query
         
         // Restrict the query to filter out deleted records, if requested
@@ -1006,7 +1024,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             String id;
             crs.beforeFirst();
             while (crs.next()) {
-                id = crs.getString(2); // Obtain parent IDs in the hierarchy table from column 2 of results
+                // Obtain parent IDs in the hierarchy table from column 2
+                // of results. These IDs correspond to parent (authority item)
+                // document records, rather than to term information group
+                // records.
+                id = crs.getString(2);
                 if (Tools.notBlank(id)) {
                     docIds.add(id);
                 }
@@ -1017,8 +1039,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         } 
 
         // Get a list of document models, using the IDs obtained from the query
+        DocumentModel docModel;
         for (String docId : docIds) {
-            DocumentModel docModel = NuxeoUtils.getDocumentModel(repoSession, docId);
+            docModel = NuxeoUtils.getDocumentModel(repoSession, docId);
             if (docModel == null) {
                 logger.debug("Could not obtain document model for document with ID " + docId);
             } else {
@@ -1617,5 +1640,16 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
         // This is a placeholder for when we change the StorageClient interface to treat workflow transitions as 1st class operations like 'get', 'create', 'update, 'delete', etc
+    }
+
+    private String handleProvidedLeadingWildcard(String partialTerm, final String USER_SUPPLIED_WILDCARD) {
+        if (Tools.notBlank(partialTerm)) {
+            if (partialTerm.substring(0, 1).equals(USER_SUPPLIED_WILDCARD)) {
+                StringBuffer buffer = new StringBuffer(partialTerm);
+                buffer.setCharAt(0, JDBCTools.SQL_WILDCARD.charAt(0));
+                partialTerm = buffer.toString();
+            }
+        }
+        return partialTerm;
     }
 }
