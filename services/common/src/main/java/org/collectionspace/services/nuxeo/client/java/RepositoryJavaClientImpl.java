@@ -76,7 +76,11 @@ import org.nuxeo.runtime.transaction.TransactionRuntimeException;
 //
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.config.TenantBindingUtils;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoRepository;
 
@@ -955,18 +959,25 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 " LIMIT " + LIMIT_SIZE;
         
         List<String> params = new ArrayList<>();
-        // Handle user-provided leading wildcard characters, in the
-        // configuration where a leading wildcard is not automatically inserted.
-        // (The user-provided wildcard must be in the first character position
-        // in the partial term value.)
-        //
-        // FIXME: Read tenant bindings configuration to determine whether
+
+        // Read tenant bindings configuration to determine whether
         // to automatically insert leading, as well as trailing, wildcards
         // into the term matching string.
-        //
-        // FIXME: Get this value from an existing constant, if available
-        final String USER_SUPPLIED_WILDCARD = "*";
-        partialTerm = handleProvidedLeadingWildcard(partialTerm, USER_SUPPLIED_WILDCARD);
+        TenantBindingConfigReaderImpl tReader =
+                ServiceMain.getInstance().getTenantBindingConfigReader();
+        TenantBindingType tenantBinding = tReader.getTenantBinding(ctx.getTenantId());
+        String usesStartingWildcard = TenantBindingUtils.getPropertyValue(tenantBinding,
+                IQueryManager.TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM);
+        // Handle user-provided leading wildcard characters, in the
+        // configuration where a leading wildcard is not automatically inserted.
+        // (The user-provided wildcard must be in the first, or "starting"
+        // character position in the partial term value.)
+        if (Tools.notBlank(usesStartingWildcard) && usesStartingWildcard.equalsIgnoreCase(Boolean.FALSE.toString())) {
+            partialTerm = handleProvidedStartingWildcard(partialTerm);
+            // Otherwise, automatically insert a leading wildcard
+        } else {
+            partialTerm = JDBCTools.SQL_WILDCARD + partialTerm;
+        }
         // Automatically insert a trailing wildcard
         params.add(partialTerm + JDBCTools.SQL_WILDCARD); // Value for replaceable parameter 1 in the query
         
@@ -1643,8 +1654,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // This is a placeholder for when we change the StorageClient interface to treat workflow transitions as 1st class operations like 'get', 'create', 'update, 'delete', etc
     }
 
-    private String handleProvidedLeadingWildcard(String partialTerm, final String USER_SUPPLIED_WILDCARD) {
+    private String handleProvidedStartingWildcard(String partialTerm) {
         if (Tools.notBlank(partialTerm)) {
+            // FIXME: Get this value from an existing constant, if available
+            final String USER_SUPPLIED_WILDCARD = "*";
             if (partialTerm.substring(0, 1).equals(USER_SUPPLIED_WILDCARD)) {
                 StringBuffer buffer = new StringBuffer(partialTerm);
                 buffer.setCharAt(0, JDBCTools.SQL_WILDCARD.charAt(0));
