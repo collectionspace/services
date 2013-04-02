@@ -117,6 +117,5 @@ public class LocationDocumentModelHandler
     public String getQProperty(String prop) {
         return LocationConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
-
 }
 

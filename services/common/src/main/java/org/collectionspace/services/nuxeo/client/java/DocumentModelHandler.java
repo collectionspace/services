@@ -441,7 +441,7 @@ public abstract class DocumentModelHandler<T, TL>
     	
     	return result;
     }
-        
+    
 	/**
 	 * Creates the CMIS query from the service context. Each document handler is
 	 * responsible for returning (can override) a valid CMIS query using the information in the
