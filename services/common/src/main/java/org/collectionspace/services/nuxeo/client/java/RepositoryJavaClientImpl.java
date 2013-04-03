@@ -919,8 +919,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             DocumentHandler handler, QueryContext queryContext) throws Exception {
         DocumentModelList result = new DocumentModelListImpl();
         
-        final int LIMIT_SIZE = 40; // FIXME: Get from configuration and/or pagination query params
-
         String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
         String repositoryName = ctx.getRepositoryName();
         
@@ -945,7 +943,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         
         // Start with the default query
         String selectStatement =
-                "SELECT DISTINCT hierarchy_termgroup.id as id, hierarchy_termgroup.parentid as parentid"
+                "SELECT DISTINCT hierarchy_termgroup.parentid as id"
                 + " FROM " + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " termgroup ";
         
         String joinClauses =
@@ -957,17 +955,19 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         String whereClause =
                 " WHERE (termgroup.termdisplayname ILIKE ?) ";
         
+        TenantBindingConfigReaderImpl tReader =
+                ServiceMain.getInstance().getTenantBindingConfigReader();
+        TenantBindingType tenantBinding = tReader.getTenantBinding(ctx.getTenantId());
+        String maxListItemsLimit = TenantBindingUtils.getPropertyValue(tenantBinding,
+                IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES);
         String limitClause =
-                " LIMIT " + LIMIT_SIZE;
+                " LIMIT " + getMaxItemsLimitOnJdbcQueries(maxListItemsLimit); // implicit int-to-String conversion
         
         List<String> params = new ArrayList<>();
 
         // Read tenant bindings configuration to determine whether
         // to automatically insert leading, as well as trailing, wildcards
         // into the term matching string.
-        TenantBindingConfigReaderImpl tReader =
-                ServiceMain.getInstance().getTenantBindingConfigReader();
-        TenantBindingType tenantBinding = tReader.getTenantBinding(ctx.getTenantId());
         String usesStartingWildcard = TenantBindingUtils.getPropertyValue(tenantBinding,
                 IQueryManager.TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM);
         // Handle user-provided leading wildcard characters, in the
@@ -1038,11 +1038,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             String id;
             crs.beforeFirst();
             while (crs.next()) {
-                // Obtain parent IDs in the hierarchy table from column 2
-                // of results. These IDs correspond to parent (authority item)
-                // document records, rather than to term information group
-                // records.
-                id = crs.getString(2);
+                id = crs.getString(1);
                 if (Tools.notBlank(id)) {
                     docIds.add(id);
                 }
@@ -1667,5 +1663,19 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
         }
         return partialTerm;
+    }
+
+    private int getMaxItemsLimitOnJdbcQueries(String maxListItemsLimit) {
+        final int DEFAULT_ITEMS_LIMIT = 40;
+        int itemsLimit;
+        try {
+            itemsLimit = Integer.parseInt(maxListItemsLimit);
+            if (itemsLimit < 1) {
+                itemsLimit = DEFAULT_ITEMS_LIMIT;
+            }
+        } catch (NumberFormatException nfe) {
+            itemsLimit = DEFAULT_ITEMS_LIMIT;
+        }
+        return itemsLimit;
     }
 }
