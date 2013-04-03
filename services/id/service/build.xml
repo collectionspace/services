@@ -109,33 +109,11 @@
 
     <target name="create_nuxeo_db"
     description="create tables(s), indices for id service">
-	<!-- No longer required since we are doing this work at system startup
-				<sql driver="${db.jdbc.driver.class}"
-            url="${db.jdbc.nuxeo.url}"
-            userid="${db.nuxeo.user}"
-            password="${db.nuxeo.user.password}"
-						src="${db.script.dir}/create_id_generators_table.sql" >
-            <classpath>
-                <pathelement path="${db.driver.jar}"/>
-            </classpath>
-        </sql>
-				<sql driver="${db.jdbc.driver.class}"
-            url="${db.jdbc.nuxeo.url}"
-            userid="${db.nuxeo.user}"
-            password="${db.nuxeo.user.password}"
-            src="${db.script.dir}/load_id_generators.sql" >
-            <classpath>
-                <pathelement path="${db.driver.jar}"/>
-            </classpath>
-        </sql>
-		-->
+	<!-- No longer required since we are doing this work at system startup -->
     </target>
 
     <target name="deploy" depends="install"
     description="deploy id service">
-        <copy todir="${jee.server.cspace}/cspace/services">
-            <fileset dir="${src}/main/resources/"/>
-        </copy>
     </target>
 
     <target name="undeploy"
@@ -144,10 +122,6 @@
 
     <target name="dist" depends="package"
     description="generate distribution for id">
-        <!-- copy db scripts, etc. -->
-        <copy todir="${services.trunk}/${dist.server.cspace}/cspace/services">
-            <fileset dir="${src}/main/resources/"/>
-        </copy>
     </target>
 
 </project>

@@ -93,6 +93,7 @@ public interface IQueryManager {
 	final static String CMIS_TARGET_UPDATED_AT = CMIS_TARGET_PREFIX + "." + CMIS_CS_UPDATED_AT;
 	
 	final static String TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM = "ptStartingWildcard";
+        final static String MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES = "maxListItemsReturnedLimitOnJdbcQueries";
 
 	public void execQuery(String queryString);
 	
