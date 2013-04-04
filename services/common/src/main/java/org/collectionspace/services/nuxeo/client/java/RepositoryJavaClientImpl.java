@@ -82,6 +82,7 @@ import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
 import org.collectionspace.services.config.tenant.TenantBindingType;
@@ -1019,23 +1020,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
         }
         
-        // FIXME: This query may also need to restrict its results to a
-        // specific tenant. Suggested pseudocode:
-        //
-        // * If the current tenant has its own repository (domain),
-        //   no restriction is required.
-        // * If a new - to be added - tenant bindings configuration setting is
-        //   present, to bypass checking for tenant ID (perhaps because there is
-        //   only one tenant present in the system), no restriction is required.
-        // * Otherwise, get the tenant ID from the ServiceContext and restrict
-        //   returned documents to those matching the tenant ID of the current request.
-        //
-        // Currently, restrictByTenantID(), below, is a stub method awaiting
-        // implementation. It always returns 'false', so that results are NOT
-        // restricted to a specific tenant. However, whenever a 'true' value
-        // is returned from that method, the code below will successfully
-        // restrict results.
-        if (restrictByTenantID()) {
+        // Restrict the query further to return only records pertaining to
+        // the current tenant, unless:
+        // * Data for this service, in this tenant, is stored in its own,
+        //   separate repository, rather than being intermingled with other
+        //   tenants' data in the default repository; or
+        // * Restriction by tenant ID in JDBC queries has been disabled,
+        //   via configuration for this tenant, 
+        if (restrictJDBCQueryByTenantID(tenantBinding, ctx)) {
                 joinClauses = joinClauses
                     + " INNER JOIN collectionspace_core core "
                     + "   ON core.id = hierarchy_commonschema.id ";
@@ -1731,9 +1723,35 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         return itemsLimit;
     }
 
-    // FIXME: Currently this method reflexively returns 'false'.
-    // Implement this stub method, as per comments in getFilteredJdbc(), above.
-    private boolean restrictByTenantID() {
-        return false;
+    /**
+     * Identifies whether a restriction on tenant ID - to return only records
+     * pertaining to the current tenant - is required in a JDBC query.
+     * 
+     * @param tenantBinding a tenant binding configuration.
+     * @param ctx a service context.
+     * @return true if a restriction on tenant ID is required in the query;
+     * false if a restriction is not required.
+     */
+    private boolean restrictJDBCQueryByTenantID(TenantBindingType tenantBinding, ServiceContext ctx) {
+        boolean restrict = true;
+        // If data for the current service, in the current tenant, is isolated
+        // within its own separate, per-tenant repository, as contrasted with
+        // being intermingled with other tenants' data in the default repository,
+        // no restriction on Tenant ID is required in the query.
+        String repositoryDomainName = ConfigUtils.getRepositoryName(tenantBinding, ctx.getRepositoryDomainName());
+        if (!(repositoryDomainName.equals(ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME))) {
+            restrict = false;
+        }
+        // If a configuration setting for this tenant identifies that JDBC
+        // queries should not be restricted by tenant ID (perhaps because
+        // there is always expected to be only one tenant's data present in
+        // the system), no restriction on Tenant ID is required in the query.
+        String queriesRestrictedByTenantId = TenantBindingUtils.getPropertyValue(tenantBinding,
+                IQueryManager.JDBC_QUERIES_ARE_TENANT_ID_RESTRICTED);
+        if (Tools.notBlank(queriesRestrictedByTenantId) &&
+                queriesRestrictedByTenantId.equalsIgnoreCase(Boolean.FALSE.toString())) {
+            restrict = false;
+        }
+        return restrict;
     }
 }
