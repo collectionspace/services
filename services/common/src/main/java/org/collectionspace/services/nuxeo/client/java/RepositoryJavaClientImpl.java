@@ -918,20 +918,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     private DocumentModelList getFilteredJDBC(RepositoryInstance repoSession, ServiceContext ctx, 
             DocumentHandler handler, QueryContext queryContext) throws Exception {
         DocumentModelList result = new DocumentModelListImpl();
-        
-        String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
-        String repositoryName = ctx.getRepositoryName();
-        
-        MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
-        
-        // FIXME: Resolve how to handle the case where the partial term
-        // query parameter is included in the request, but has been given an
-        // empty (blank) value ("...?pt=") Then implement the required
-        // behavior here, if current behavior does not match what is required.
-        //
-        // (We're currently returning all records in that case.)
-       
+
         // FIXME: Get all of the following values from appropriate external constants.
         //
         // At present, the two constants below are duplicated in both RepositoryJavaClientImpl
@@ -952,15 +939,34 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 + " INNER JOIN hierarchy hierarchy_commonschema "
 	        + "   ON hierarchy_commonschema.id = hierarchy_termgroup.parentid ";
 
-        String whereClause =
+        String whereClause;
+        MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        // If the value of the partial term query parameter is blank ('pt='),
+        // return all records, subject to restriction by any limit clause
+        if (Tools.isBlank(partialTerm)) {
+           whereClause = "";
+        } else {
+           // Otherwise, return records that match the supplied partial term
+           whereClause =
                 " WHERE (termgroup.termdisplayname ILIKE ?) ";
+        }
         
+        // FIXME: At present, we are planning to order results in code,
+        // by sorting the returned list of DocumentModels.
+        //
+        // To implement the orderByClause below in SQL, rather than in code;
+        // e.g. via 'ORDER BY termgroup.termdisplayname', that column must be
+        // returned by the SELECT statement.
+        String orderByClause = "";
+        
+        String limitClause;
         TenantBindingConfigReaderImpl tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
         TenantBindingType tenantBinding = tReader.getTenantBinding(ctx.getTenantId());
         String maxListItemsLimit = TenantBindingUtils.getPropertyValue(tenantBinding,
                 IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES);
-        String limitClause =
+        limitClause =
                 " LIMIT " + getMaxItemsLimitOnJdbcQueries(maxListItemsLimit); // implicit int-to-String conversion
         
         List<String> params = new ArrayList<>();
@@ -1010,16 +1016,40 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
         }
         
-        String sql = selectStatement + joinClauses + whereClause + limitClause;
+        // FIXME: This query may also need to restrict its results to a
+        // specific tenant. Suggested pseudocode:
+        //
+        // * If the current tenant has its own repository (domain),
+        //   no restriction is required.
+        // * If a new - to be added - tenant bindings configuration setting is
+        //   present, to bypass checking for tenant ID (perhaps because there is
+        //   only one tenant present in the system), no restriction is required.
+        // * Otherwise, get the tenant ID from the ServiceContext and restrict
+        //   returned documents to those matching the tenant ID of the current request.
+        //
+        // Currently, restrictByTenantID(), below, is a stub method awaiting
+        // implementation. It always returns 'false', so that results are NOT
+        // restricted to a specific tenant. However, the code below does
+        // successfully restrict results, as well, when a 'true' value is
+        // returned from that method.
+        if (restrictByTenantID()) {
+                joinClauses = joinClauses
+                    + " INNER JOIN collectionspace_core core "
+                    + "   ON core.id = hierarchy_commonschema.id ";
+                whereClause = whereClause
+                    + " AND (core.tenantid = ?)";
+                params.add(ctx.getTenantId()); // Value for replaceable parameter 3 in the query
+        }
         
-        // FIXME: Look into whether the following performance concern around
-        // query planning with prepared statements may be affecting us:
-        // http://stackoverflow.com/a/678452
-        // If that proves to be a significant concern, we can instead use
-        // JDBCTools.executeQuery(), and attempt to sanitize user input
-        // against potential SQL injection attacks.
+        // Piece together the SQL query from its parts
+        String sql = selectStatement + joinClauses + whereClause + orderByClause + limitClause;
+        
+        // Note: PostgreSQL 9.2 introduced a change that may improve performance
+        // of certain queries using JDBC PreparedStatements.  See comments on
+        // CSPACE-5943 for details.
         PreparedStatementSimpleBuilder jdbcFilterQueryBuilder = new PreparedStatementSimpleBuilder(sql, params);
-        
+        String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
+        String repositoryName = ctx.getRepositoryName();
         Set<String> docIds = new HashSet<>();
         try (CachedRowSet crs = JDBCTools.executePreparedQuery(jdbcFilterQueryBuilder,
                 dataSourceName, repositoryName, sql)) {
@@ -1053,7 +1083,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         for (String docId : docIds) {
             docModel = NuxeoUtils.getDocumentModel(repoSession, docId);
             if (docModel == null) {
-                logger.debug("Could not obtain document model for document with ID " + docId);
+                logger.warn("Could not obtain document model for document with ID " + docId);
             } else {
                 result.add(NuxeoUtils.getDocumentModel(repoSession, docId));
             }
@@ -1671,11 +1701,23 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         try {
             itemsLimit = Integer.parseInt(maxListItemsLimit);
             if (itemsLimit < 1) {
+                logger.warn("Value of configuration setting "
+                        + IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES
+                        + " must be a positive integer; current value is " + maxListItemsLimit);
                 itemsLimit = DEFAULT_ITEMS_LIMIT;
             }
         } catch (NumberFormatException nfe) {
+            logger.warn("Value of configuration setting "
+                        + IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES
+                        + " must be a positive integer; current value is " + maxListItemsLimit);
             itemsLimit = DEFAULT_ITEMS_LIMIT;
         }
         return itemsLimit;
+    }
+
+    // FIXME: Currently this method reflexively returns 'false'.
+    // Implement this stub method, as per comments in getFilteredJdbc(), above.
+    private boolean restrictByTenantID() {
+        return false;
     }
 }
