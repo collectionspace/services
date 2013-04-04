@@ -711,10 +711,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         // FIXME: Get all of the following values from appropriate external constants.
         // At present, these are duplicated in both RepositoryJavaClientImpl
         // and in AuthorityItemDocumentModelHandler.
+        final String TERM_GROUP_LIST_NAME = "TERM_GROUP_LIST_NAME";
         final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
         final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
         
         Map<String,String> params = super.getJDBCQueryParams();
+        params.put(TERM_GROUP_LIST_NAME, getItemTermInfoGroupXPathBase());
         params.put(TERM_GROUP_TABLE_NAME_PARAM, getTermGroupTableName());
         params.put(IN_AUTHORITY_PARAM, getInAuthorityValue());
         return params;

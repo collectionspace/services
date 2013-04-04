@@ -23,6 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -923,6 +925,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         //
         // At present, the two constants below are duplicated in both RepositoryJavaClientImpl
         // and in AuthorityItemDocumentModelHandler.
+        final String TERM_GROUP_LIST_NAME = "TERM_GROUP_LIST_NAME";
         final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
         final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
         // Get this from a constant in AuthorityResource or equivalent
@@ -952,12 +955,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 " WHERE (termgroup.termdisplayname ILIKE ?) ";
         }
         
-        // FIXME: At present, we are planning to order results in code,
-        // by sorting the returned list of DocumentModels.
+        // At present, results are ordered in code, below, rather than in SQL,
+        // and the orderByClause below is thus intentionally blank.
         //
-        // To implement the orderByClause below in SQL, rather than in code;
-        // e.g. via 'ORDER BY termgroup.termdisplayname', that column must be
-        // returned by the SELECT statement.
+        // To implement the orderByClause below in SQL; e.g. via
+        // 'ORDER BY termgroup.termdisplayname', the relevant column
+        // must be returned by the SELECT statement.
         String orderByClause = "";
         
         String limitClause;
@@ -1029,9 +1032,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         //
         // Currently, restrictByTenantID(), below, is a stub method awaiting
         // implementation. It always returns 'false', so that results are NOT
-        // restricted to a specific tenant. However, the code below does
-        // successfully restrict results, as well, when a 'true' value is
-        // returned from that method.
+        // restricted to a specific tenant. However, whenever a 'true' value
+        // is returned from that method, the code below will successfully
+        // restrict results.
         if (restrictByTenantID()) {
                 joinClauses = joinClauses
                     + " INNER JOIN collectionspace_core core "
@@ -1088,6 +1091,19 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 result.add(NuxeoUtils.getDocumentModel(repoSession, docId));
             }
         }
+        
+        // Order the results
+        final String COMMON_PART_SCHEMA = handler.getServiceContext().getCommonPartLabel();
+        final String DISPLAY_NAME_XPATH =
+                "//" + handler.getJDBCQueryParams().get(TERM_GROUP_LIST_NAME) + "/[0]/termDisplayName";
+        Collections.sort(result, new Comparator<DocumentModel>() {
+            @Override
+            public int compare(DocumentModel doc1, DocumentModel doc2) {
+                String termDisplayName1 = (String) NuxeoUtils.getXPathValue(doc1, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
+                String termDisplayName2 = (String) NuxeoUtils.getXPathValue(doc2, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
+                return termDisplayName1.compareTo(termDisplayName2);
+            }
+        });
 
         return result;
     }
