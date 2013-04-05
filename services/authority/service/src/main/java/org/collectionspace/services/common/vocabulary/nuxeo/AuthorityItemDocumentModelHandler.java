@@ -88,6 +88,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * inVocabulary is the parent Authority for this context
      */
     protected String inAuthority = null;
+    protected boolean wildcardedAuthorityRequest = false;
     protected String authorityRefNameBase = null;
     // Used to determine when the displayName changes as part of the update.
     protected String oldDisplayNameOnUpdate = null;
@@ -163,7 +164,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public String getUri(DocumentModel docModel) {
         // Laramie20110510 CSPACE-3932
         String authorityServicePath = getAuthorityServicePath();
-        if(inAuthority==null) {	// Only happens on queries to wildcarded authorities
+        if(inAuthority==null) {	// Only true with the first document model received, on queries to wildcarded authorities
+            wildcardedAuthorityRequest = true;
+        }
+        // If this search crosses multiple authorities, get the inAuthority value
+        // from each record, rather than using the cached value from the first record
+        if(wildcardedAuthorityRequest) {
         	try {
 	        	inAuthority = (String) docModel.getProperty(authorityItemCommonSchemaName,
 	                AuthorityItemJAXBSchema.IN_AUTHORITY);
