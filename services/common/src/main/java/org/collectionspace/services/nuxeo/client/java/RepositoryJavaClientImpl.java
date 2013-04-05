@@ -935,13 +935,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // Start with the default query
         String selectStatement =
                 "SELECT DISTINCT hierarchy_termgroup.parentid as id"
-                + " FROM " + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " termgroup ";
+                + " FROM " + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " termgroup";
         
         String joinClauses =
-                " INNER JOIN hierarchy hierarchy_termgroup "
-	        + "  ON hierarchy_termgroup.id = termgroup.id "
-                + " INNER JOIN hierarchy hierarchy_commonschema "
-	        + "   ON hierarchy_commonschema.id = hierarchy_termgroup.parentid ";
+                " INNER JOIN hierarchy hierarchy_termgroup"
+                + " ON hierarchy_termgroup.id = termgroup.id";
 
         String whereClause;
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
@@ -953,7 +951,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         } else {
            // Otherwise, return records that match the supplied partial term
            whereClause =
-                " WHERE (termgroup.termdisplayname ILIKE ?) ";
+                " WHERE (termgroup.termdisplayname ILIKE ?)";
         }
         
         // At present, results are ordered in code, below, rather than in SQL,
@@ -997,10 +995,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
             joinClauses = joinClauses
-                + " INNER JOIN misc "
-	        + "   ON misc.id = hierarchy_commonschema.id ";
+                + " INNER JOIN misc"
+                + "  ON misc.id = hierarchy_termgroup.parentid";
             whereClause = whereClause
-                + "   AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "') ";
+                + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "')";
         }
 
         // If a particular authority is specified, restrict the query further
@@ -1012,10 +1010,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 // Add nothing to the query here if it should match within all authorities
             } else {
                 joinClauses = joinClauses
-                    + " INNER JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema "
-                    + "   ON commonschema.id = hierarchy_commonschema.id ";
+                    + " INNER JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema"
+                    + "  ON commonschema.id = hierarchy_termgroup.parentid";
                 whereClause = whereClause
-                    + " AND (commonschema.inauthority = ?)";
+                    + "  AND (commonschema.inauthority = ?)";
                 params.add(inAuthorityValue); // Value for replaceable parameter 2 in the query
             }
         }
@@ -1029,10 +1027,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         //   via configuration for this tenant, 
         if (restrictJDBCQueryByTenantID(tenantBinding, ctx)) {
                 joinClauses = joinClauses
-                    + " INNER JOIN collectionspace_core core "
-                    + "   ON core.id = hierarchy_commonschema.id ";
+                    + " INNER JOIN collectionspace_core core"
+                    + "  ON core.id = hierarchy_termgroup.parentid";
                 whereClause = whereClause
-                    + " AND (core.tenantid = ?)";
+                    + "  AND (core.tenantid = ?)";
                 params.add(ctx.getTenantId()); // Value for replaceable parameter 3 in the query
         }
         
