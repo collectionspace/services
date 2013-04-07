@@ -194,7 +194,7 @@ public class JDBCTools {
                 logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
                 tempException = tempException.getNextException();
             }
-            throw new RuntimeException("SQL problem in executeQuery: ", sqle);
+            throw new RuntimeException("SQL Exception in executeQuery: ", sqle);
         } finally {
             try {
                 if (stmt != null) {
@@ -233,7 +233,7 @@ public class JDBCTools {
                 logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
                 tempException = tempException.getNextException();
             }
-            throw new RuntimeException("SQL problem in executePreparedQuery: ", sqle);
+            throw new RuntimeException("SQL Exception in executePreparedQuery: ", sqle);
         } finally {
             try {
                 if (ps != null) {
@@ -286,7 +286,7 @@ public class JDBCTools {
                 logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
                 tempException = tempException.getNextException();
             }
-            throw new RuntimeException("SQL problem in executePreparedQuery: ", sqle);
+            throw new RuntimeException("SQL Exception in executePreparedQueries: ", sqle);
         } finally {
             try {
                 if (ps != null) {
@@ -299,7 +299,7 @@ public class JDBCTools {
                     conn.close();
                 }
             } catch (SQLException sqle) {
-                logger.debug("SQL Exception closing statement/connection in executeQuery: " + sqle.getLocalizedMessage());
+                logger.debug("SQL Exception closing statement/connection in executePreparedQueries: " + sqle.getLocalizedMessage());
                 return null;
             }
         }
@@ -329,7 +329,7 @@ public class JDBCTools {
                 logger.debug("SQL Exception: " + msg);
                 tempException = tempException.getNextException();
             }
-            throw new RuntimeException("SQL problem in executeUpdate: " + msg, sqle);
+            throw new RuntimeException("SQL Exception in executeUpdate: " + msg, sqle);
         } finally {
             try {
                 if (stmt != null) {
