@@ -35,7 +35,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
@@ -238,6 +240,62 @@ public class JDBCTools {
                     ps.close();
                 }
                 if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                logger.debug("SQL Exception closing statement/connection in executePreparedQuery: " + sqle.getLocalizedMessage());
+                return null;
+            }
+        }
+    }
+    
+    // FIXME: This method's code significantly overlaps that of executePrepareQuery(), above,
+    // and the two could be refactored into a single method, if desired.
+    public static List<CachedRowSet> executePreparedQueries(final List<PreparedStatementBuilder> builders,
+            String dataSourceName, String repositoryName, String sql, Boolean executeWithinTransaction) throws Exception {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        List<CachedRowSet> results = new ArrayList<>();
+        try {
+            conn = getConnection(dataSourceName, repositoryName);
+            if (executeWithinTransaction) {
+                conn.setAutoCommit(false);
+            }
+            RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+            CachedRowSet crs = rowSetFactory.createCachedRowSet();
+            int statementCount = 0;
+            for (PreparedStatementBuilder builder : builders) {
+                ps = builder.build(conn);
+                // FIXME: transition this log statement to DEBUG level when appropriate
+                if (logger.isInfoEnabled()) {
+                    statementCount++;
+                    logger.info("prepared statement " + statementCount + "=" + ps.toString());
+                }
+                try (ResultSet resultSet = ps.executeQuery()) {
+                    crs.populate(resultSet);
+                }
+                results.add(crs);
+            }
+            return results;
+        } catch (SQLException sqle) {
+            if (executeWithinTransaction && conn != null) {
+                conn.rollback();
+            }
+            SQLException tempException = sqle;
+            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
+                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+                tempException = tempException.getNextException();
+            }
+            throw new RuntimeException("SQL problem in executePreparedQuery: ", sqle);
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    if (executeWithinTransaction) {
+                        conn.commit();
+                    }
                     conn.close();
                 }
             } catch (SQLException sqle) {
