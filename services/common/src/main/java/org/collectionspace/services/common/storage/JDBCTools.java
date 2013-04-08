@@ -211,7 +211,7 @@ public class JDBCTools {
     }
     
     public static CachedRowSet executePreparedQuery(final PreparedStatementBuilder builder,
-            String dataSourceName, String repositoryName, String sql) throws Exception {
+            String dataSourceName, String repositoryName) throws Exception {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
@@ -252,7 +252,7 @@ public class JDBCTools {
     // FIXME: This method's code significantly overlaps that of executePrepareQuery(), above,
     // and the two could be refactored into a single method, if desired.
     public static List<CachedRowSet> executePreparedQueries(final List<PreparedStatementBuilder> builders,
-            String dataSourceName, String repositoryName, String sql, Boolean executeWithinTransaction) throws Exception {
+            String dataSourceName, String repositoryName, Boolean executeWithinTransaction) throws Exception {
         Connection conn = null;
         PreparedStatement ps = null;
         List<CachedRowSet> results = new ArrayList<>();
@@ -271,10 +271,17 @@ public class JDBCTools {
                     statementCount++;
                     logger.info("prepared statement " + statementCount + "=" + ps.toString());
                 }
-                try (ResultSet resultSet = ps.executeQuery()) {
-                    crs.populate(resultSet);
+                // Try executing each statement, first as a query, then as an update
+                try {
+                    ResultSet resultSet = ps.executeQuery();
+                    if (resultSet != null) {
+                        crs.populate(resultSet);
+                        results.add(crs);
+                    }
+                } catch (Exception e) {
+                    int rowcount = ps.executeUpdate();
+                    // Throw uncaught exception here if update attempt also fails
                 }
-                results.add(crs);
             }
             return results;
         } catch (SQLException sqle) {

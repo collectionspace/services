@@ -85,6 +85,7 @@ import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
+import org.collectionspace.services.common.storage.PreparedStatementBuilder;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoRepository;
@@ -930,8 +931,23 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
         final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
         // Get this from a constant in AuthorityResource or equivalent
-        final String PARENT_WILDCARD = "_ALL_"; 
+        final String PARENT_WILDCARD = "_ALL_";
         
+        // Build two SQL statements, to be executed within a single transaction:
+        // the first statement to control join order, and the second statement
+        // representing the actual 'get filtered' query
+        
+        // Build the join control statement
+        //
+        // Per http://www.postgresql.org/docs/9.2/static/runtime-config-query.html#GUC-JOIN-COLLAPSE-LIMIT
+        // "Setting [this value] to 1 prevents any reordering of explicit JOINs.
+        // Thus, the explicit join order specified in the query will be the
+        // actual order in which the relations are joined."
+        // See CSPACE-5945 for further discussion of why this setting is needed.
+        String joinControlSql = "SET LOCAL join_collapse_limit TO 1;";
+        
+        // Build the query statement
+        //
         // Start with the default query
         String selectStatement =
                 "SELECT DISTINCT hierarchy_termgroup.parentid as id"
@@ -1035,39 +1051,54 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         }
         
         // Piece together the SQL query from its parts
-        String sql = selectStatement + joinClauses + whereClause + orderByClause + limitClause;
+        String querySql = selectStatement + joinClauses + whereClause + orderByClause + limitClause;
         
         // Note: PostgreSQL 9.2 introduced a change that may improve performance
         // of certain queries using JDBC PreparedStatements.  See comments on
         // CSPACE-5943 for details.
-        PreparedStatementSimpleBuilder jdbcFilterQueryBuilder = new PreparedStatementSimpleBuilder(sql, params);
+        PreparedStatementBuilder joinControlBuilder = new PreparedStatementBuilder(joinControlSql);
+        PreparedStatementSimpleBuilder queryBuilder = new PreparedStatementSimpleBuilder(querySql, params);
+        List<PreparedStatementBuilder> builders = new ArrayList<>();
+        builders.add(joinControlBuilder);
+        builders.add(queryBuilder);
         String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
         String repositoryName = ctx.getRepositoryName();
+        final Boolean EXECUTE_WITHIN_TRANSACTION = true;
         Set<String> docIds = new HashSet<>();
-        try (CachedRowSet crs = JDBCTools.executePreparedQuery(jdbcFilterQueryBuilder,
-                dataSourceName, repositoryName, sql)) {
+        try {
+            List<CachedRowSet> resultsList = JDBCTools.executePreparedQueries(builders,
+                dataSourceName, repositoryName, EXECUTE_WITHIN_TRANSACTION);
 
-            // If the response to the query is null or contains zero rows,
-            // return an empty list of document models
-            if (crs == null) {
+            // One set of results are expected, from the second prepared statement executed.
+            // If fewer results are returned, return an empty list of document models
+            if (resultsList == null || resultsList.size() < 1) {
                 return result;
             }
-            crs.last();
-            if (crs.getRow() == 0) {
+            // Join control query will not return results, so query results will
+            // be the first set of results (rowSet) returned in the list
+            CachedRowSet queryResults = resultsList.get(0);
+            
+            // If the result from executing the query is null or contains zero rows,
+            // return an empty list of document models
+            if (queryResults == null) {
+                return result;
+            }
+            queryResults.last();
+            if (queryResults.getRow() == 0) {
                 return result; // empty list of document models
             }
 
             // Otherwise, get the document IDs from the results of the query
             String id;
-            crs.beforeFirst();
-            while (crs.next()) {
-                id = crs.getString(1);
+            queryResults.beforeFirst();
+            while (queryResults.next()) {
+                id = queryResults.getString(1);
                 if (Tools.notBlank(id)) {
                     docIds.add(id);
                 }
             }
         } catch (SQLException sqle) {
-            logger.warn("Could not obtain document IDs via SQL query '" + sql + "': " + sqle.getMessage());
+            logger.warn("Could not obtain document IDs via SQL query '" + querySql + "': " + sqle.getMessage());
             return result; // return an empty list of document models
         } 
 
