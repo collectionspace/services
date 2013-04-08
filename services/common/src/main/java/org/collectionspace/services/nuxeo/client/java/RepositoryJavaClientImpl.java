@@ -950,12 +950,16 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         //
         // Start with the default query
         String selectStatement =
-                "SELECT DISTINCT hierarchy_termgroup.parentid as id"
-                + " FROM " + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " termgroup";
+                "SELECT DISTINCT commonschema.id"
+                + " FROM " + handler.getServiceContext().getCommonPartLabel() + " commonschema";
         
         String joinClauses =
-                " INNER JOIN hierarchy hierarchy_termgroup"
-                + " ON hierarchy_termgroup.id = termgroup.id";
+                " INNER JOIN misc"
+                + "  ON misc.id = commonschema.id"
+                + " INNER JOIN hierarchy hierarchy_termgroup"
+                + "  ON hierarchy_termgroup.parentid = misc.id"
+                + " INNER JOIN "  + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " termgroup"
+                + "  ON termgroup.id = hierarchy_termgroup.id ";
 
         String whereClause;
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
@@ -988,7 +992,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 " LIMIT " + getMaxItemsLimitOnJdbcQueries(maxListItemsLimit); // implicit int-to-String conversion
         
         List<String> params = new ArrayList<>();
-
+        
         // Read tenant bindings configuration to determine whether
         // to automatically insert leading, as well as trailing, wildcards
         // into the term matching string.
@@ -1007,12 +1011,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // Automatically insert a trailing wildcard
         params.add(partialTerm + JDBCTools.SQL_WILDCARD); // Value for replaceable parameter 1 in the query
         
+        // Optionally add restrictions to the default query, based on variables
+        // in the current request
+        
         // Restrict the query to filter out deleted records, if requested
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
-            joinClauses = joinClauses
-                + " INNER JOIN misc"
-                + "  ON misc.id = hierarchy_termgroup.parentid";
             whereClause = whereClause
                 + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "')";
         }
