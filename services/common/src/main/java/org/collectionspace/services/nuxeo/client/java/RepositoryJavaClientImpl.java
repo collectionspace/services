@@ -23,6 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -80,8 +82,10 @@ import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingUtils;
+import org.collectionspace.services.common.storage.PreparedStatementBuilder;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoRepository;
@@ -918,53 +922,77 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     private DocumentModelList getFilteredJDBC(RepositoryInstance repoSession, ServiceContext ctx, 
             DocumentHandler handler, QueryContext queryContext) throws Exception {
         DocumentModelList result = new DocumentModelListImpl();
-        
-        String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
-        String repositoryName = ctx.getRepositoryName();
-        
-        MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
-        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
-        
-        // FIXME: Resolve how to handle the case where the partial term
-        // query parameter is included in the request, but has been given an
-        // empty (blank) value ("...?pt=") Then implement the required
-        // behavior here, if current behavior does not match what is required.
-        //
-        // (We're currently returning all records in that case.)
-       
+
         // FIXME: Get all of the following values from appropriate external constants.
         //
         // At present, the two constants below are duplicated in both RepositoryJavaClientImpl
         // and in AuthorityItemDocumentModelHandler.
+        final String TERM_GROUP_LIST_NAME = "TERM_GROUP_LIST_NAME";
         final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
         final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
         // Get this from a constant in AuthorityResource or equivalent
-        final String PARENT_WILDCARD = "_ALL_"; 
+        final String PARENT_WILDCARD = "_ALL_";
         
+        // Build two SQL statements, to be executed within a single transaction:
+        // the first statement to control join order, and the second statement
+        // representing the actual 'get filtered' query
+        
+        // Build the join control statement
+        //
+        // Per http://www.postgresql.org/docs/9.2/static/runtime-config-query.html#GUC-JOIN-COLLAPSE-LIMIT
+        // "Setting [this value] to 1 prevents any reordering of explicit JOINs.
+        // Thus, the explicit join order specified in the query will be the
+        // actual order in which the relations are joined."
+        // See CSPACE-5945 for further discussion of why this setting is needed.
+        String joinControlSql = "SET LOCAL join_collapse_limit TO 1;";
+        
+        // Build the query statement
+        //
         // Start with the default query
         String selectStatement =
-                "SELECT DISTINCT hierarchy_termgroup.parentid as id"
-                + " FROM " + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " termgroup ";
+                "SELECT DISTINCT commonschema.id"
+                + " FROM " + handler.getServiceContext().getCommonPartLabel() + " commonschema";
         
         String joinClauses =
-                " INNER JOIN hierarchy hierarchy_termgroup "
-	        + "  ON hierarchy_termgroup.id = termgroup.id "
-                + " INNER JOIN hierarchy hierarchy_commonschema "
-	        + "   ON hierarchy_commonschema.id = hierarchy_termgroup.parentid ";
+                " INNER JOIN misc"
+                + "  ON misc.id = commonschema.id"
+                + " INNER JOIN hierarchy hierarchy_termgroup"
+                + "  ON hierarchy_termgroup.parentid = misc.id"
+                + " INNER JOIN "  + handler.getJDBCQueryParams().get(TERM_GROUP_TABLE_NAME_PARAM) + " termgroup"
+                + "  ON termgroup.id = hierarchy_termgroup.id ";
 
-        String whereClause =
-                " WHERE (termgroup.termdisplayname ILIKE ?) ";
+        String whereClause;
+        MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+        // If the value of the partial term query parameter is blank ('pt='),
+        // return all records, subject to restriction by any limit clause
+        if (Tools.isBlank(partialTerm)) {
+           whereClause = "";
+        } else {
+           // Otherwise, return records that match the supplied partial term
+           whereClause =
+                " WHERE (termgroup.termdisplayname ILIKE ?)";
+        }
         
+        // At present, results are ordered in code, below, rather than in SQL,
+        // and the orderByClause below is thus intentionally blank.
+        //
+        // To implement the orderByClause below in SQL; e.g. via
+        // 'ORDER BY termgroup.termdisplayname', the relevant column
+        // must be returned by the SELECT statement.
+        String orderByClause = "";
+        
+        String limitClause;
         TenantBindingConfigReaderImpl tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
         TenantBindingType tenantBinding = tReader.getTenantBinding(ctx.getTenantId());
         String maxListItemsLimit = TenantBindingUtils.getPropertyValue(tenantBinding,
                 IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES);
-        String limitClause =
+        limitClause =
                 " LIMIT " + getMaxItemsLimitOnJdbcQueries(maxListItemsLimit); // implicit int-to-String conversion
         
         List<String> params = new ArrayList<>();
-
+        
         // Read tenant bindings configuration to determine whether
         // to automatically insert leading, as well as trailing, wildcards
         // into the term matching string.
@@ -983,14 +1011,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // Automatically insert a trailing wildcard
         params.add(partialTerm + JDBCTools.SQL_WILDCARD); // Value for replaceable parameter 1 in the query
         
+        // Optionally add restrictions to the default query, based on variables
+        // in the current request
+        
         // Restrict the query to filter out deleted records, if requested
         String includeDeleted = queryParams.getFirst(WorkflowClient.WORKFLOW_QUERY_NONDELETED);
         if (includeDeleted != null && includeDeleted.equalsIgnoreCase(Boolean.FALSE.toString())) {
-            joinClauses = joinClauses
-                + " INNER JOIN misc "
-	        + "   ON misc.id = hierarchy_commonschema.id ";
             whereClause = whereClause
-                + "   AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "') ";
+                + "  AND (misc.lifecyclestate <> '" + WorkflowClient.WORKFLOWSTATE_DELETED + "')";
         }
 
         // If a particular authority is specified, restrict the query further
@@ -1002,49 +1030,79 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
                 // Add nothing to the query here if it should match within all authorities
             } else {
                 joinClauses = joinClauses
-                    + " INNER JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema "
-                    + "   ON commonschema.id = hierarchy_commonschema.id ";
+                    + " INNER JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema"
+                    + "  ON commonschema.id = hierarchy_termgroup.parentid";
                 whereClause = whereClause
-                    + " AND (commonschema.inauthority = ?)";
+                    + "  AND (commonschema.inauthority = ?)";
                 params.add(inAuthorityValue); // Value for replaceable parameter 2 in the query
             }
         }
         
-        String sql = selectStatement + joinClauses + whereClause + limitClause;
+        // Restrict the query further to return only records pertaining to
+        // the current tenant, unless:
+        // * Data for this service, in this tenant, is stored in its own,
+        //   separate repository, rather than being intermingled with other
+        //   tenants' data in the default repository; or
+        // * Restriction by tenant ID in JDBC queries has been disabled,
+        //   via configuration for this tenant, 
+        if (restrictJDBCQueryByTenantID(tenantBinding, ctx)) {
+                joinClauses = joinClauses
+                    + " INNER JOIN collectionspace_core core"
+                    + "  ON core.id = hierarchy_termgroup.parentid";
+                whereClause = whereClause
+                    + "  AND (core.tenantid = ?)";
+                params.add(ctx.getTenantId()); // Value for replaceable parameter 3 in the query
+        }
         
-        // FIXME: Look into whether the following performance concern around
-        // query planning with prepared statements may be affecting us:
-        // http://stackoverflow.com/a/678452
-        // If that proves to be a significant concern, we can instead use
-        // JDBCTools.executeQuery(), and attempt to sanitize user input
-        // against potential SQL injection attacks.
-        PreparedStatementSimpleBuilder jdbcFilterQueryBuilder = new PreparedStatementSimpleBuilder(sql, params);
+        // Piece together the SQL query from its parts
+        String querySql = selectStatement + joinClauses + whereClause + orderByClause + limitClause;
         
+        // Note: PostgreSQL 9.2 introduced a change that may improve performance
+        // of certain queries using JDBC PreparedStatements.  See comments on
+        // CSPACE-5943 for details.
+        PreparedStatementBuilder joinControlBuilder = new PreparedStatementBuilder(joinControlSql);
+        PreparedStatementSimpleBuilder queryBuilder = new PreparedStatementSimpleBuilder(querySql, params);
+        List<PreparedStatementBuilder> builders = new ArrayList<>();
+        builders.add(joinControlBuilder);
+        builders.add(queryBuilder);
+        String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
+        String repositoryName = ctx.getRepositoryName();
+        final Boolean EXECUTE_WITHIN_TRANSACTION = true;
         Set<String> docIds = new HashSet<>();
-        try (CachedRowSet crs = JDBCTools.executePreparedQuery(jdbcFilterQueryBuilder,
-                dataSourceName, repositoryName, sql)) {
+        try {
+            List<CachedRowSet> resultsList = JDBCTools.executePreparedQueries(builders,
+                dataSourceName, repositoryName, EXECUTE_WITHIN_TRANSACTION);
 
-            // If the response to the query is null or contains zero rows,
-            // return an empty list of document models
-            if (crs == null) {
+            // One set of results are expected, from the second prepared statement executed.
+            // If fewer results are returned, return an empty list of document models
+            if (resultsList == null || resultsList.size() < 1) {
                 return result;
             }
-            crs.last();
-            if (crs.getRow() == 0) {
+            // Join control query will not return results, so query results will
+            // be the first set of results (rowSet) returned in the list
+            CachedRowSet queryResults = resultsList.get(0);
+            
+            // If the result from executing the query is null or contains zero rows,
+            // return an empty list of document models
+            if (queryResults == null) {
+                return result;
+            }
+            queryResults.last();
+            if (queryResults.getRow() == 0) {
                 return result; // empty list of document models
             }
 
             // Otherwise, get the document IDs from the results of the query
             String id;
-            crs.beforeFirst();
-            while (crs.next()) {
-                id = crs.getString(1);
+            queryResults.beforeFirst();
+            while (queryResults.next()) {
+                id = queryResults.getString(1);
                 if (Tools.notBlank(id)) {
                     docIds.add(id);
                 }
             }
         } catch (SQLException sqle) {
-            logger.warn("Could not obtain document IDs via SQL query '" + sql + "': " + sqle.getMessage());
+            logger.warn("Could not obtain document IDs via SQL query '" + querySql + "': " + sqle.getMessage());
             return result; // return an empty list of document models
         } 
 
@@ -1053,11 +1111,24 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         for (String docId : docIds) {
             docModel = NuxeoUtils.getDocumentModel(repoSession, docId);
             if (docModel == null) {
-                logger.debug("Could not obtain document model for document with ID " + docId);
+                logger.warn("Could not obtain document model for document with ID " + docId);
             } else {
                 result.add(NuxeoUtils.getDocumentModel(repoSession, docId));
             }
         }
+        
+        // Order the results
+        final String COMMON_PART_SCHEMA = handler.getServiceContext().getCommonPartLabel();
+        final String DISPLAY_NAME_XPATH =
+                "//" + handler.getJDBCQueryParams().get(TERM_GROUP_LIST_NAME) + "/[0]/termDisplayName";
+        Collections.sort(result, new Comparator<DocumentModel>() {
+            @Override
+            public int compare(DocumentModel doc1, DocumentModel doc2) {
+                String termDisplayName1 = (String) NuxeoUtils.getXPathValue(doc1, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
+                String termDisplayName2 = (String) NuxeoUtils.getXPathValue(doc2, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
+                return termDisplayName1.compareTo(termDisplayName2);
+            }
+        });
 
         return result;
     }
@@ -1671,11 +1742,49 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         try {
             itemsLimit = Integer.parseInt(maxListItemsLimit);
             if (itemsLimit < 1) {
+                logger.warn("Value of configuration setting "
+                        + IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES
+                        + " must be a positive integer; current value is " + maxListItemsLimit);
                 itemsLimit = DEFAULT_ITEMS_LIMIT;
             }
         } catch (NumberFormatException nfe) {
+            logger.warn("Value of configuration setting "
+                        + IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES
+                        + " must be a positive integer; current value is " + maxListItemsLimit);
             itemsLimit = DEFAULT_ITEMS_LIMIT;
         }
         return itemsLimit;
+    }
+
+    /**
+     * Identifies whether a restriction on tenant ID - to return only records
+     * pertaining to the current tenant - is required in a JDBC query.
+     * 
+     * @param tenantBinding a tenant binding configuration.
+     * @param ctx a service context.
+     * @return true if a restriction on tenant ID is required in the query;
+     * false if a restriction is not required.
+     */
+    private boolean restrictJDBCQueryByTenantID(TenantBindingType tenantBinding, ServiceContext ctx) {
+        boolean restrict = true;
+        // If data for the current service, in the current tenant, is isolated
+        // within its own separate, per-tenant repository, as contrasted with
+        // being intermingled with other tenants' data in the default repository,
+        // no restriction on Tenant ID is required in the query.
+        String repositoryDomainName = ConfigUtils.getRepositoryName(tenantBinding, ctx.getRepositoryDomainName());
+        if (!(repositoryDomainName.equals(ConfigUtils.DEFAULT_NUXEO_REPOSITORY_NAME))) {
+            restrict = false;
+        }
+        // If a configuration setting for this tenant identifies that JDBC
+        // queries should not be restricted by tenant ID (perhaps because
+        // there is always expected to be only one tenant's data present in
+        // the system), no restriction on Tenant ID is required in the query.
+        String queriesRestrictedByTenantId = TenantBindingUtils.getPropertyValue(tenantBinding,
+                IQueryManager.JDBC_QUERIES_ARE_TENANT_ID_RESTRICTED);
+        if (Tools.notBlank(queriesRestrictedByTenantId) &&
+                queriesRestrictedByTenantId.equalsIgnoreCase(Boolean.FALSE.toString())) {
+            restrict = false;
+        }
+        return restrict;
     }
 }

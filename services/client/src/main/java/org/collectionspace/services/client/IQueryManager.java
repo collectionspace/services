@@ -94,6 +94,7 @@ public interface IQueryManager {
 	
 	final static String TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM = "ptStartingWildcard";
         final static String MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES = "maxListItemsReturnedLimitOnJdbcQueries";
+        final static String JDBC_QUERIES_ARE_TENANT_ID_RESTRICTED = "jdbcQueriesAreTenantIdRestricted";
 
 	public void execQuery(String queryString);
 	
