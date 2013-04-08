@@ -1029,9 +1029,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (inAuthorityValue.equals(PARENT_WILDCARD)) {
                 // Add nothing to the query here if it should match within all authorities
             } else {
-                joinClauses = joinClauses
-                    + " INNER JOIN " + handler.getServiceContext().getCommonPartLabel() + " commonschema"
-                    + "  ON commonschema.id = hierarchy_termgroup.parentid";
                 whereClause = whereClause
                     + "  AND (commonschema.inauthority = ?)";
                 params.add(inAuthorityValue); // Value for replaceable parameter 2 in the query
