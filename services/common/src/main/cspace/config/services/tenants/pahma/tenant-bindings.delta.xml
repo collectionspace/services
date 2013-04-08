@@ -12,6 +12,10 @@
 				<types:key>ptStartingWildcard</types:key>
 				<types:value>false</types:value>
 			</types:item>
+			<types:item xmlns:types="http://collectionspace.org/services/config/types">
+				<types:key>jdbcQueriesAreTenantIdRestricted</types:key>
+				<types:value>false</types:value>
+			</types:item>
 		</tenant:properties>
 		
 		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
