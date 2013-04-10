@@ -889,7 +889,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             profiler.log("Executing NXQL query: " + query.toString());
             profiler.start();
             if (handler.isJDBCQuery() == true) {
-                docList = getFilteredJDBC(repoSession, ctx, handler, queryContext);
+                docList = getFilteredJDBC(repoSession, ctx, handler);
             } else if (handler.isCMISQuery() == true) {
                 docList = getFilteredCMIS(repoSession, ctx, handler, queryContext); //FIXME: REM - Need to deal with paging info in CMIS query
             } else if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
@@ -919,8 +919,24 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         }
     }
 
+    /**
+     * Perform a database query, via JDBC and SQL, to retrieve matching records
+     * based on filter criteria.
+     * 
+     * Although this method currently has a general-purpose name, it is
+     * currently dedicated to a specific task: improving performance for
+     * partial term matching queries on authority items / terms, via
+     * the use of a hand-tuned SQL query, rather than the generated SQL
+     * produced by Nuxeo from an NXQL query.
+     * 
+     * @param repoSession a repository session.
+     * @param ctx the service context.
+     * @param handler a relevant document handler.
+     * @return a list of document models matching the search criteria.
+     * @throws Exception 
+     */
     private DocumentModelList getFilteredJDBC(RepositoryInstance repoSession, ServiceContext ctx, 
-            DocumentHandler handler, QueryContext queryContext) throws Exception {
+            DocumentHandler handler) throws Exception {
         DocumentModelList result = new DocumentModelListImpl();
 
         // FIXME: Get all of the following values from appropriate external constants.
@@ -944,7 +960,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // Thus, the explicit join order specified in the query will be the
         // actual order in which the relations are joined."
         // See CSPACE-5945 for further discussion of why this setting is needed.
-        String joinControlSql = "SET LOCAL join_collapse_limit TO 1;";
+        //
+        // Adding this statement is commented out here for now.  It significantly
+        // improved query performance for authority item / term queries where
+        // large numbers of rows were retrieved, but appears to have resulted
+        // in consistently slower-than-desired query performance where zero or
+        // very few records were retrieved. See notes on CSPACE-5945. - ADR 2013-04-09
+        // String joinControlSql = "SET LOCAL join_collapse_limit TO 1;";
         
         // Build the query statement
         //
@@ -1057,10 +1079,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // Note: PostgreSQL 9.2 introduced a change that may improve performance
         // of certain queries using JDBC PreparedStatements.  See comments on
         // CSPACE-5943 for details.
-        PreparedStatementBuilder joinControlBuilder = new PreparedStatementBuilder(joinControlSql);
+        //
+        // See a comment above for the reason that the joinControl SQL statement,
+        // along with its corresponding prepared statement builder, is commented out for now.
+        // PreparedStatementBuilder joinControlBuilder = new PreparedStatementBuilder(joinControlSql);
         PreparedStatementSimpleBuilder queryBuilder = new PreparedStatementSimpleBuilder(querySql, params);
         List<PreparedStatementBuilder> builders = new ArrayList<>();
-        builders.add(joinControlBuilder);
+        // builders.add(joinControlBuilder);
         builders.add(queryBuilder);
         String dataSourceName = JDBCTools.NUXEO_DATASOURCE_NAME;
         String repositoryName = ctx.getRepositoryName();
@@ -1070,23 +1095,25 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             List<CachedRowSet> resultsList = JDBCTools.executePreparedQueries(builders,
                 dataSourceName, repositoryName, EXECUTE_WITHIN_TRANSACTION);
 
-            // One set of results are expected, from the second prepared statement executed.
+            // At least one set of results is expected, from the second prepared
+            // statement to be executed.
             // If fewer results are returned, return an empty list of document models
             if (resultsList == null || resultsList.size() < 1) {
-                return result;
+                return result; // return an empty list of document models
             }
-            // Join control query will not return results, so query results will
-            // be the first set of results (rowSet) returned in the list
+            // The join control query (if enabled - it is currently commented
+            // out as per comments above) will not return results, so query results
+            // will be the first set of results (rowSet) returned in the list
             CachedRowSet queryResults = resultsList.get(0);
             
             // If the result from executing the query is null or contains zero rows,
             // return an empty list of document models
             if (queryResults == null) {
-                return result;
+                return result; // return an empty list of document models
             }
             queryResults.last();
             if (queryResults.getRow() == 0) {
-                return result; // empty list of document models
+                return result; // return an empty list of document models
             }
 
             // Otherwise, get the document IDs from the results of the query
