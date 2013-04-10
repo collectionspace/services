@@ -132,10 +132,6 @@
         <copy todir="${services.trunk}/${dist.installer.services}/id">
             <fileset dir="${basedir}/installer/"/>
         </copy>
-        <!-- copy db scripts, etc. -->
-        <copy todir="${services.trunk}/${dist.installer.services}/id/db/mysql">
-            <fileset dir="${src}/main/resources/db/mysql"/>
-        </copy>
     </target>
 
 </project>

@@ -1,27 +1,25 @@
 /**
- *  This document is a part of the source code and related artifacts
- *  for CollectionSpace, an open source collections management system
- *  for museums and related institutions:
-
- *  http://www.collectionspace.org
- *  http://wiki.collectionspace.org
-
- *  Copyright 2011 University of California at Berkeley
-
- *  Licensed under the Educational Community License (ECL), Version 2.0.
- *  You may not use this file except in compliance with this License.
-
- *  You may obtain a copy of the ECL 2.0 License at
-
- *  https://source.collectionspace.org/collection-space/LICENSE.txt
-
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * This document is a part of the source code and related artifacts for
+ * CollectionSpace, an open source collections management system for museums and
+ * related institutions:
+ *
+ * http://www.collectionspace.org http://wiki.collectionspace.org
+ *
+ * Copyright 2011 University of California at Berkeley
+ *
+ * Licensed under the Educational Community License (ECL), Version 2.0. You may
+ * not use this file except in compliance with this License.
+ *
+ * You may obtain a copy of the ECL 2.0 License at
+ *
+ * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
-
 package org.collectionspace.services.imports;
 
 import java.io.StringReader;
@@ -42,7 +40,15 @@ import org.collectionspace.services.common.XmlSaxFragmenter;
 import org.collectionspace.services.common.XmlTools;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.config.service.DocHandlerParams;
+import org.collectionspace.services.config.service.ListResultField;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -51,18 +57,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
-/** This class expands variables in templates specifically for the imports service.
+/**
+ * This class expands variables in templates specifically for the imports
+ * service.
  *
- *  To see capability to create workspaces, see svn revision 4346 on branch
- *  https://source.collectionspace.org/collection-space/src/services/branches/CSPACE-3178/services
- *  This capability was removed, as it was necessary for testing only.
+ * To see capability to create workspaces, see svn revision 4346 on branch
+ * https://source.collectionspace.org/collection-space/src/services/branches/CSPACE-3178/services
+ * This capability was removed, as it was necessary for testing only.
  *
  * @author Laramie Crocker
  */
 public class TemplateExpander {
-    
+
     private final static Logger logger = LoggerFactory.getLogger(TemplateExpander.class);
-    
     private static final String DEFAULT_WRAPPER_TEMPLATE_FILENAME = "service-document.xml";
     private static XPath xpath = XPathFactory.newInstance().newXPath();
     // XPath expressions to match the value of the inAuthority field in authority item records.
@@ -70,70 +77,81 @@ public class TemplateExpander {
     // non-namespace-qualified elements.
     private static final String IN_AUTHORITY_NAMESPACE_XPATH = "//*[local-name()='inAuthority']";
     private static final String IN_AUTHORITY_NO_NAMESPACE_XPATH = "//inAuthority";
-    
+    private static final String REFNAME_NAMESPACE_XPATH = "//*[local-name()='refName']";
+    private static final String REFNAME_NO_NAMESPACE_XPATH = "//refName";
+    private static final String SHORT_IDENTIFIER_NAMESPACE_XPATH = "//*[local-name()='shortIdentifier']";
+    private static final String SHORT_IDENTIFIER_NO_NAMESPACE_XPATH = "//shortIdentifier";
+    private static final String DISPLAYNAME_NAMESPACE_XPATH = "//*[local-name()='displayName']";
+    private static final String DISPLAYNAME_NO_NAMESPACE_XPATH = "//displayName";
     private static final String SERVICE_ATTRIBUTE = "service";
     private static final String TYPE_ATTRIBUTE = "type";
     private static final String CREATED_AT_ATTRIBUTE = "createdAt";
     private static final String CREATED_BY_ATTRIBUTE = "createdBy";
     private static final String UPDATED_AT_ATTRIBUTE = "updatedAt";
     private static final String UPDATED_BY_ATTRIBUTE = "updatedBy";
-    
+    private static TenantBindingConfigReaderImpl tReader =
+            ServiceMain.getInstance().getTenantBindingConfigReader();
 
-    protected static String var(String theVar){
-        return "\\$\\{"+theVar+"\\}";
+    protected static String var(String theVar) {
+        return "\\$\\{" + theVar + "\\}";
     }
 
     /**
-     * @param source the template, which contains variables wrapped in a dollar sign and curly braces, e.g. source="my template with ID ${docID} yada yada."
-     * @param theVar a variable name, without the dollar sign or curly braces or internal quotes, e.g. searchAndReplaceVar(source, "docID", "1234-5678")
+     * @param source the template, which contains variables wrapped in a dollar
+     * sign and curly braces, e.g. source="my template with ID ${docID} yada
+     * yada."
+     * @param theVar a variable name, without the dollar sign or curly braces or
+     * internal quotes, e.g. searchAndReplaceVar(source, "docID", "1234-5678")
      * @param replace the value the variable will be replaced with.
      * @return the expanded template.
      */
-    public static String searchAndReplaceVar(String source, String theVar, String replace){
+    public static String searchAndReplaceVar(String source, String theVar, String replace) {
         return Tools.searchAndReplaceWithQuoteReplacement(source, var(theVar), replace);
     }
 
     /**
-     * <p>Creates a single document, representing a single record or resource, ready
-     * for import into a Nuxeo workspace.</p>
-     * 
-     * <p>Expands macro variables within this document, with values supplied during
-     * import, or obtained from the CollectionSpace system or its environment.</p>
-     * 
+     * <p>Creates a single document, representing a single record or resource,
+     * ready for import into a Nuxeo workspace.</p>
+     *
+     * <p>Expands macro variables within this document, with values supplied
+     * during import, or obtained from the CollectionSpace system or its
+     * environment.</p>
+     *
      * @param tenantId a tenant ID.
      * @param outDir an output directory name.
      * @param partTmpl a template file containing the content to be imported.
-     *   This consists of content within one or more <schema> tags - one such tag
-     *   for each part of the record being imported - and may contain macro variables
-     *   such as ${docID} to be expanded.
-     * @param wrapperTmpl a wrapper template into which the content to be imported 
-     *   (in the partTmpl) will be inserted.  This template contains additional
-     *   metadata fields required by CollectionSpace and Nuxeo, some of whose values
-     *   are set in this method, via expansion of additional macro variables.
+     * This consists of content within one or more <schema> tags - one such tag
+     * for each part of the record being imported - and may contain macro
+     * variables such as ${docID} to be expanded.
+     * @param wrapperTmpl a wrapper template into which the content to be
+     * imported (in the partTmpl) will be inserted. This template contains
+     * additional metadata fields required by CollectionSpace and Nuxeo, some of
+     * whose values are set in this method, via expansion of additional macro
+     * variables.
      * @param SERVICE_TYPE the service document type.
      * @param SERVICE_NAME the service name.
      * @param CSID an optional CollectionSpace ID (CSID) for the document. If no
-     *   CSID was provided, it will be generated.
+     * CSID was provided, it will be generated.
      * @return the ID of the just-created document.
-     * @throws Exception  
+     * @throws Exception
      */
     public static String doOneService(String tenantId, String outDir, String partTmpl, String wrapperTmpl,
-                                      String SERVICE_TYPE, String SERVICE_NAME, Map<String,String> perRecordAttributes,
-                                      String CSID) throws Exception {
+            String SERVICE_TYPE, String SERVICE_NAME, Map<String, String> perRecordAttributes,
+            String CSID) throws Exception {
         String docID;
         // Generate a CSID if one was not provided with the import record.
-        if (Tools.notBlank(CSID)){
+        if (Tools.notBlank(CSID)) {
             docID = CSID;
         } else {
             docID = UUID.randomUUID().toString();
         }
-        
+
         // Expand macro variables within the content to be imported.
         String part = searchAndReplaceVar(partTmpl, "docID", docID);
-        
+
         // Insert the content to be imported into the wrapper template.
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "Schema", part);
-        
+
         // Expand macro variables within the wrapper template.
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "docID", docID);
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "tenantID", tenantId);
@@ -154,50 +172,61 @@ public class TemplateExpander {
         }
         wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "createdBy",
                 getAttributeValue(perRecordAttributes, CREATED_BY_ATTRIBUTE));
-        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedBy", 
+        wrapperTmpl = searchAndReplaceVar(wrapperTmpl, "updatedBy",
                 getAttributeValue(perRecordAttributes, UPDATED_BY_ATTRIBUTE));
         wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("uri"),
                 getDocUri(tenantId, SERVICE_TYPE, docID, partTmpl));
+        wrapperTmpl = Tools.searchAndReplace(wrapperTmpl, var("refName"),
+                getRefName(tenantId, SERVICE_TYPE, docID, partTmpl).replace("&", "&amp;"));
 
-        String serviceDir = outDir+'/'+docID;
+
+        String serviceDir = outDir + '/' + docID;
         FileTools.saveFile(serviceDir, "document.xml", wrapperTmpl, FileTools.FORCE_CREATE_PARENT_DIRS);
         return docID;
     }
 
-
-    /** Once you have called createWorkspace() to create a home for documents of a service, you can call this method to add documents for that service.
+    /**
+     * Once you have called createWorkspace() to create a home for documents of
+     * a service, you can call this method to add documents for that service.
      *
-     *  Internally, this method also gets called by the XmlSaxFragmenter callback via the public inner class FragmentHandlerImpl.
+     * Internally, this method also gets called by the XmlSaxFragmenter callback
+     * via the public inner class FragmentHandlerImpl.
      *
-     * @param partTmpl  A template file that contains the schema part for the service, and which has macros such as ${docID} to be expanded.
-     * @param SERVICE_NAME The name of the service, such as "CollectionObjects" or "Personauthorities".
-     * @param SERVICE_TYPE The Nuxeo document type, such as "CollectionObject" or "Personauthority".
-     * @param perRecordAttributes a property bag of additional per-record attributes.
-     * @param TEMPLATE_DIR The local filesystem location of all the standard templates that wrap up workspace documents;
-     *                     once expanded, these spit out Nuxeo import format.
-     * @param CSID an optional CollectionSpace ID (CSID) for the document. If no CSID was provided, it will be generated.
+     * @param partTmpl A template file that contains the schema part for the
+     * service, and which has macros such as ${docID} to be expanded.
+     * @param SERVICE_NAME The name of the service, such as "CollectionObjects"
+     * or "Personauthorities".
+     * @param SERVICE_TYPE The Nuxeo document type, such as "CollectionObject"
+     * or "Personauthority".
+     * @param perRecordAttributes a property bag of additional per-record
+     * attributes.
+     * @param TEMPLATE_DIR The local filesystem location of all the standard
+     * templates that wrap up workspace documents; once expanded, these spit out
+     * Nuxeo import format.
+     * @param CSID an optional CollectionSpace ID (CSID) for the document. If no
+     * CSID was provided, it will be generated.
      * @throws Exception
      */
     public static void createDocInWorkspace(
-    		String tenantId,
+            String tenantId,
             String partTmpl,
             String SERVICE_NAME,
             String SERVICE_TYPE,
-            Map<String,String> perRecordAttributes,
+            Map<String, String> perRecordAttributes,
             String TEMPLATE_DIR,
             String OUTPUT_DIR,
             String CSID) throws Exception {
         String wrapperTmpl = FileTools.readFile(TEMPLATE_DIR, DEFAULT_WRAPPER_TEMPLATE_FILENAME);
-        String outputDir = OUTPUT_DIR+'/'+SERVICE_NAME;
+        String outputDir = OUTPUT_DIR + '/' + SERVICE_NAME;
         doOneService(tenantId, outputDir, partTmpl, wrapperTmpl, SERVICE_TYPE, SERVICE_NAME, perRecordAttributes, CSID);
     }
 
-    public static void expand(String tenantId, String TEMPLATE_DIR, String outputDir, String requestFilename, String chopPath){
+    public static void expand(String tenantId, String TEMPLATE_DIR, String outputDir, String requestFilename, String chopPath) {
         FragmentHandlerImpl callback = new FragmentHandlerImpl(tenantId, TEMPLATE_DIR, outputDir);
         XmlSaxFragmenter.parse(requestFilename, chopPath, callback, false);
     }
 
-    public static void expandInputSource(String tenantId, String TEMPLATE_DIR, String outputDir, InputSource requestSource, String chopPath){
+    public static void expandInputSource(String tenantId, String TEMPLATE_DIR, String outputDir, InputSource requestSource, String chopPath) {
         FragmentHandlerImpl callback = new FragmentHandlerImpl(tenantId, TEMPLATE_DIR, outputDir);
         XmlSaxFragmenter.parse(requestSource, chopPath, callback, false);
     }
@@ -209,7 +238,7 @@ public class TemplateExpander {
             String partTmpl) throws Exception {
         String uri = "";
         UriTemplateRegistry registry = ServiceMain.getInstance().getUriTemplateRegistry();
-        UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, docType);
+        UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(docType));
         StoredValuesUriTemplate template = registry.get(key);
         if (template != null) {
             Map<String, String> additionalValues = new HashMap<String, String>();
@@ -241,24 +270,48 @@ public class TemplateExpander {
         }
         return uri;
     }
-    
+
     // FIXME: It may also be desirable to explicitly validate the format of
     // CSID values provided in fields such as inAuthority, and perhaps later on,
     // their uniqueness against those already present in a running system.
     // - ADR 2012-05-24
     private static String getInAuthorityValue(String xmlFragment) {
-        String inAuthorityValue = "";
-        // Check in two ways for the inAuthority value: one intended for records with
-        // namespace-qualified elements, the second for unqualified elements.
+        return extractNamespacedOrNonNamespacedValue(xmlFragment,
+                IN_AUTHORITY_NAMESPACE_XPATH, IN_AUTHORITY_NO_NAMESPACE_XPATH);
+    }
+
+    private static String getRefNameValue(String xmlFragment) {
+        return extractNamespacedOrNonNamespacedValue(xmlFragment,
+                REFNAME_NAMESPACE_XPATH, REFNAME_NO_NAMESPACE_XPATH);
+    }
+
+    private static String getShortIdentifierValue(String xmlFragment) {
+        return extractNamespacedOrNonNamespacedValue(xmlFragment,
+                SHORT_IDENTIFIER_NAMESPACE_XPATH, SHORT_IDENTIFIER_NO_NAMESPACE_XPATH);
+    }
+
+    private static String getDisplayNameValue(String xmlFragment) {
+        return extractNamespacedOrNonNamespacedValue(xmlFragment,
+                DISPLAYNAME_NAMESPACE_XPATH, DISPLAYNAME_NO_NAMESPACE_XPATH);
+    }
+
+    private static String extractNamespacedOrNonNamespacedValue(String xmlFragment,
+            String namespacedXpath, String nonNamespacedXpath) {
+        String value = "";
+        if (Tools.isBlank(namespacedXpath) || Tools.isBlank(nonNamespacedXpath)) {
+            return value;
+        }
+        // Extract the value using two XPath expressions: one intended for records
+        // with namespace-qualified elements, the second for unqualified elements.
         // (There may be a more elegant way to do this with a single XPath expression,
         // via an OR operator or the like.)
-        inAuthorityValue = extractValueFromXmlFragment(IN_AUTHORITY_NAMESPACE_XPATH, xmlFragment);
-        if (Tools.isBlank(inAuthorityValue)) {
-            inAuthorityValue = extractValueFromXmlFragment(IN_AUTHORITY_NO_NAMESPACE_XPATH, xmlFragment);
+        value = extractValueFromXmlFragment(namespacedXpath, xmlFragment);
+        if (Tools.isBlank(value)) {
+            value = extractValueFromXmlFragment(nonNamespacedXpath, xmlFragment);
         }
-        return inAuthorityValue;
+        return value;
     }
-    
+
     // FIXME: Need to handle cases here where the xmlFragment may contain more
     // than one matching expression. (Simply matching on instance [0] within
     // the XPath expression might not be reasonable, as it won't always be
@@ -266,8 +319,11 @@ public class TemplateExpander {
     private static String extractValueFromXmlFragment(String xpathExpr, String xmlFragment) {
         String value = "";
         try {
-            // FIXME: Cruelly ugly hack; at this point for imported records
-            // with more than one <schema> child, we have a non-well-formed fragment.
+            // FIXME: This '<root>' wrapper is a crudely ugly hack. This hack is
+            // used because, at this point, when handling imported records that
+            // contain more than one <schema> child, we have only a non-well-formed
+            // fragment to work with, and thus need we to wrap that fragment in a
+            // container element.
             String xmlFragmentWrapped = "<root>" + xmlFragment + "</root>";
             InputSource input = new InputSource(new StringReader(xmlFragmentWrapped));
             value = xpath.evaluate(xpathExpr, input);
@@ -277,22 +333,145 @@ public class TemplateExpander {
         return value;
 
     }
-    
-    private static String getAttributeValue(Map<String,String> attributes, String attributeName){
+
+    private static String getAttributeValue(Map<String, String> attributes, String attributeName) {
         String attributeVal = "";
         if (attributes.containsKey(attributeName.toLowerCase())) {
             attributeVal = (String) attributes.get(attributeName.toLowerCase());
         }
         return attributeVal;
     }
-    
-    /** This inner class is the callback target for calls to XmlSaxFragmenter, for example:
-     *     FragmentHandlerImpl callback = new FragmentHandlerImpl();
-     *     XmlSaxFragmenter.parse(filename, "/imports/import", callback, false);
-     *  It will be called for every /imports/import in the file:
-     *      &lt;import ID="1" service="Personauthorities" type="Personauthority">
+
+    private static String getRefName(String tenantId, String serviceType, String docID, String partTmpl) {
+        String refName = "";
+        String refNameDisplayName = "";
+        String shortIdentifier = "";
+
+        // If a valid refName value is provided within the imported record,
+        // use that value
+        refName = getRefNameValue(partTmpl);
+        if (Tools.notBlank(refName)) {
+            // Validate the provided refName by attempting to parse it   
+            if (RefNameUtils.parseAuthorityInfo(refName) != null
+                    || RefNameUtils.parseAuthorityTermInfo(refName) != null) {
+                return refName;
+            } else {
+                // If the provided refName wasn't valid, reset the refName value
+                refName = "";
+            }
+        }
+
+        shortIdentifier = getShortIdentifierValue(partTmpl);
+        if (Tools.notBlank(shortIdentifier)) {
+            // By inference, if a record contains values for both shortIdentifier
+            // and inAuthority, it is an authority item (term) record
+            if (Tools.notBlank(getInAuthorityValue(partTmpl))) {
+                // At present, we're not attempting to automatically generate
+                // refNames for authority item records. Their 'parent' authority
+                // records don't necessarily exist at the time the item records are
+                // being imported, and thus we might not have a good way of identifying
+                // parents and obtaining their data for building part of this refName.
+                //
+                // Until and unless this is changed, imported authority item records
+                // should include refName values.
+                //
+                // FIXME: We could conceivably do a CSID-based lookup for an
+                // authority item's parent here, using the inAuthority value,
+                // and might then obtain the values necessary for building the
+                // refName, if that parent does exist.
+                return refName;
+                // Otherwise, by inference, if a record contains a value for
+                // only a shortIdentifier, it is an authority record
+            } else {
+                refNameDisplayName = getDisplayNameValue(partTmpl);
+                RefName.RefNameInterface authorityRefName =
+                        RefName.Authority.buildAuthority(getTenantName(tenantId),
+                        getServiceName(tenantId, serviceType), null, shortIdentifier, refNameDisplayName);
+                return authorityRefName.toString();
+            }
+        }
+
+        // If this service supports hierarchy, get the refName display name from
+        // the appropriate field in the record, so it can be added to the refName
+        if (serviceSupportsHierarchy(tenantId, serviceType)) {
+            String displayNameFieldXpath = getRefNameDisplayNameXpath(tenantId, serviceType);
+            refNameDisplayName = extractValueFromXmlFragment(displayNameFieldXpath, partTmpl);
+        }
+        // Generate an 'ID' form of refName
+        RefName.RefNameInterface refname =
+                RefName.Authority.buildAuthority(getTenantName(tenantId),
+                getServiceName(tenantId, serviceType), docID, null, refNameDisplayName);
+        refName = refname.toString();
+
+        return refName;
+    }
+
+    private static String getTenantName(String tenantId) {
+        TenantBindingType tenantBinding = tReader.getTenantBinding(tenantId);
+        return tenantBinding.getName();
+    }
+
+    private static String getServiceName(String tenantId, String serviceType) {
+        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(serviceType));
+        if (serviceBinding == null) {
+            logger.warn("Could not obtain service binding for tenant " + tenantId + " with document type " + serviceType);
+            return "";
+        }
+        return serviceBinding.getName();
+    }
+
+    private static boolean serviceSupportsHierarchy(String tenantId, String serviceType) {
+        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(serviceType));
+        if (serviceBinding == null) {
+            logger.warn("Could not obtain service binding for tenant " + tenantId + " with document type " + serviceType);
+            return false;
+        }
+        DocHandlerParams params = serviceBinding.getDocHandlerParams();
+        if (params == null || params.getParams() == null || params.getParams().isSupportsHierarchy() == null) {
+            return false;
+        } else {
+            return params.getParams().isSupportsHierarchy();
+        }
+    }
+
+    private static String getRefNameDisplayNameXpath(String tenantId, String serviceType) {
+        String displayNameXPath = "";
+        ServiceBindingType serviceBinding = tReader.getServiceBindingForDocType(tenantId, ServiceBindingUtils.getUnqualifiedTenantDocType(serviceType));
+        if (serviceBinding == null) {
+            logger.warn("Could not obtain service binding for tenant " + tenantId + " with document type " + serviceType);
+            return "";
+        }
+        DocHandlerParams params = serviceBinding.getDocHandlerParams();
+        if (params == null || params.getParams() == null) {
+            return displayNameXPath;
+        }
+        ListResultField displayNameField = params.getParams().getRefnameDisplayNameField();
+        if (displayNameField == null) {
+            return displayNameXPath;
+
+        }
+        // Based on the two sample Xpath values for the RefnameDisplayNameField
+        // value, it appears these values require prefacing with the 'double slash'
+        // abbreviation, signifying the axis that selects all matching descendants
+        // of the document root. If that assumption proves incorrect in the future,
+        // we will need to revise this line. - ADR 2013-03-07
+        if (Tools.isBlank(displayNameField.getXpath())) {
+            return displayNameXPath;
+        } else {
+            displayNameXPath = "//" + displayNameField.getXpath();
+        }
+        return displayNameXPath;
+    }
+
+    /**
+     * This inner class is the callback target for calls to XmlSaxFragmenter,
+     * for example: FragmentHandlerImpl callback = new FragmentHandlerImpl();
+     * XmlSaxFragmenter.parse(filename, "/imports/import", callback, false); It
+     * will be called for every /imports/import in the file: &lt;import ID="1"
+     * service="Personauthorities" type="Personauthority">
      */
     public static class FragmentHandlerImpl implements IFragmentHandler {
+
         public String DEFAULT_SERVICE_NAME = "";   //You can provide a default.
         public String DEFAULT_SERVICE_TYPE = "";   //You can provide a default.
         public String TEMPLATE_DIR = "";   //You MUST provide a default via constructor.
@@ -300,58 +479,58 @@ public class TemplateExpander {
         public String TENANT_ID = "";
 
         //============IFragmentHandler===========================================================
-        public void onFragmentReady(Document context, Element fragmentParent, String currentPath, int fragmentIndex, String fragment){
+        public void onFragmentReady(Document context, Element fragmentParent, String currentPath, int fragmentIndex, String fragment) {
             try {
                 dump(context, currentPath, fragmentIndex, fragment);
                 String serviceName = checkAttribute(fragmentParent, SERVICE_ATTRIBUTE, DEFAULT_SERVICE_NAME);
                 String serviceType = checkAttribute(fragmentParent, TYPE_ATTRIBUTE, DEFAULT_SERVICE_TYPE);
-                Map<String,String> perRecordAttributes = getPerRecordAttributes(fragmentParent);
+                Map<String, String> perRecordAttributes = getPerRecordAttributes(fragmentParent);
                 serviceType = NuxeoUtils.getTenantQualifiedDocType(TENANT_ID, serviceType); //REM - Ensure a tenant qualified Nuxeo doctype
-                String CSID  = fragmentParent.attributeValue("CSID");
+                String CSID = fragmentParent.attributeValue("CSID");
                 TemplateExpander.createDocInWorkspace(TENANT_ID, fragment, serviceName, serviceType,
                         perRecordAttributes, TEMPLATE_DIR, OUPUT_DIR, CSID);
-            } catch (Exception e){
-                logger.error("ERROR calling expandXmlPayloadToDir"+e);
+            } catch (Exception e) {
+                logger.error("ERROR calling expandXmlPayloadToDir" + e);
                 e.printStackTrace();
             }
         }
-        public void onEndDocument(Document document, int fragmentCount){
+
+        public void onEndDocument(Document document, int fragmentCount) {
             if (logger.isTraceEnabled()) {
-                logger.trace("====TemplateExpander DONE============\r\n"+ XmlTools.prettyPrint(document)+"================");
+                logger.trace("====TemplateExpander DONE============\r\n" + XmlTools.prettyPrint(document) + "================");
             }
         }
-        
+
         //============helper methods==============================================================
-        public FragmentHandlerImpl(String tenantId, String templateDir, String outputDir){
+        public FragmentHandlerImpl(String tenantId, String templateDir, String outputDir) {
             TEMPLATE_DIR = templateDir;
             OUPUT_DIR = outputDir;
             TENANT_ID = tenantId;
         }
-        
-        private Map<String,String> getPerRecordAttributes(Element fragmentParent){
-            Map<String,String> perRecordAttributes = new HashMap<String,String>();
-            for ( Iterator<Attribute> attributesIterator = fragmentParent.attributeIterator(); attributesIterator.hasNext(); ) {
+
+        private Map<String, String> getPerRecordAttributes(Element fragmentParent) {
+            Map<String, String> perRecordAttributes = new HashMap<String, String>();
+            for (Iterator<Attribute> attributesIterator = fragmentParent.attributeIterator(); attributesIterator.hasNext();) {
                 Attribute attr = attributesIterator.next();
                 perRecordAttributes.put(attr.getName().toLowerCase(), attr.getValue());
             }
             return perRecordAttributes;
         }
-        
-        private String checkAttribute(Element fragmentParent, String attName, String defaultVal){
+
+        private String checkAttribute(Element fragmentParent, String attName, String defaultVal) {
             String val = fragmentParent.attributeValue(attName);
-            if (Tools.notEmpty(val)){
+            if (Tools.notEmpty(val)) {
                 return val;
             }
             return defaultVal;
         }
-        
-        private void dump(Document context, String currentPath, int fragmentIndex, String fragment){
+
+        private void dump(Document context, String currentPath, int fragmentIndex, String fragment) {
             if (logger.isTraceEnabled()) {
-                logger.trace("====Path============\r\n"+currentPath+'['+fragmentIndex+']');
-                logger.trace("====Context=========\r\n"+ XmlTools.prettyPrint(context));
-                logger.trace("====Fragment========\r\n"+fragment+"\r\n===================\r\n");
+                logger.trace("====Path============\r\n" + currentPath + '[' + fragmentIndex + ']');
+                logger.trace("====Context=========\r\n" + XmlTools.prettyPrint(context));
+                logger.trace("====Fragment========\r\n" + fragment + "\r\n===================\r\n");
             }
         }
     }
-
 }
