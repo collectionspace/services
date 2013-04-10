@@ -46,6 +46,10 @@
                 <types:value>da</types:value>
             </types:item>
             -->
+            <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                <types:key>maxListItemsReturnedLimitOnJdbcQueries</types:key>
+                <types:value>40</types:value>
+	    </types:item>
         </tenant:properties>        
         
         <!-- begin idgenerator service meta-data -->

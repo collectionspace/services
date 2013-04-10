@@ -337,5 +337,21 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      */
     public String getCMISQuery(QueryContext queryContext);
     
+    /**
+     * Returns TRUE if a CMIS query should be used (instead of an NXQL query)
+     */
     public boolean isCMISQuery();
+
+    /**
+     * Returns TRUE if a JDBC/SQL query should be used (instead of an NXQL query)
+     */
+    public boolean isJDBCQuery();
+    
+    /**
+     * Returns parameter values, relevant to this document handler, that can be used in JDBC/SQL queries
+     * 
+     * @return a set of zero or more parameter values relevant to this handler
+     */
+    public Map<String,String> getJDBCQueryParams();
+
 }

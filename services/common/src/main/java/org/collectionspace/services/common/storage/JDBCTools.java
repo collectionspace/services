@@ -30,11 +30,17 @@ import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.RowSetFactory;
+import javax.sql.rowset.RowSetProvider;
 
 /**
  * User: laramie
@@ -52,6 +58,8 @@ public class JDBCTools {
     public static String NUXEO_MANAGER_DATASOURCE_NAME = "NuxeoMgrDS";
     public static String NUXEO_READER_DATASOURCE_NAME = "NuxeoReaderDS";
     public static String NUXEO_USER_NAME = "nuxeo";
+    public static String SQL_WILDCARD = "%";
+    
     //
     // Private constants
     //
@@ -164,43 +172,145 @@ public class JDBCTools {
     	        
         return result;
     }
-    
-    // Regarding the method below, we might instead identify whether we can
-    // return a CachedRowSet or equivalent.
-    // http://docs.oracle.com/javase/1.5.0/docs/api/javax/sql/rowset/CachedRowSet.html
-    // -- ADR 2012-12-06
 
-    /* THIS IS BROKEN - If you close the statement, it closes the ResultSet!!!
-    public static ResultSet executeQuery(String repoName, String sql) throws Exception {
+    public static CachedRowSet executeQuery(String dataSourceName, String repositoryName, String sql) throws Exception {
         Connection conn = null;
         Statement stmt = null;
         try {
-            conn = getConnection(repoName);	// If null, uses default
+            conn = getConnection(dataSourceName, repositoryName);
             stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            stmt.close();
-            return rs;  //don't call rs.close() here ... Let caller close and catch any exceptions.
+             
+            RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+            CachedRowSet crs = rowSetFactory.createCachedRowSet();
+
+            stmt = conn.createStatement();
+            try (ResultSet resultSet = stmt.executeQuery(sql)) {
+                crs.populate(resultSet);
+            }
+            return crs;
         } catch (SQLException sqle) {
             SQLException tempException = sqle;
             while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
                 logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
                 tempException = tempException.getNextException();
             }
-            throw new RuntimeException("SQL problem in executeQuery: ", sqle);
+            throw new RuntimeException("SQL Exception in executeQuery: ", sqle);
         } finally {
             try {
-                if (conn != null) {
-                    conn.close();
-                }
                 if (stmt != null) {
                     stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
                 }
             } catch (SQLException sqle) {
                 logger.debug("SQL Exception closing statement/connection in executeQuery: " + sqle.getLocalizedMessage());
                 return null;
             }
         }
-    } */
+    }
+    
+    public static CachedRowSet executePreparedQuery(final PreparedStatementBuilder builder,
+            String dataSourceName, String repositoryName) throws Exception {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getConnection(dataSourceName, repositoryName);
+            RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+            CachedRowSet crs = rowSetFactory.createCachedRowSet();
+            ps = builder.build(conn);
+            // FIXME: transition this log statement to DEBUG level when appropriate
+            if (logger.isInfoEnabled()) {
+                logger.info("prepared statement=" + ps.toString());
+            }
+            try (ResultSet resultSet = ps.executeQuery()) {
+                crs.populate(resultSet);
+            }
+            return crs;
+        } catch (SQLException sqle) {
+            SQLException tempException = sqle;
+            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
+                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+                tempException = tempException.getNextException();
+            }
+            throw new RuntimeException("SQL Exception in executePreparedQuery: ", sqle);
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                logger.debug("SQL Exception closing statement/connection in executePreparedQuery: " + sqle.getLocalizedMessage());
+                return null;
+            }
+        }
+    }
+    
+    // FIXME: This method's code significantly overlaps that of executePrepareQuery(), above,
+    // and the two could be refactored into a single method, if desired.
+    public static List<CachedRowSet> executePreparedQueries(final List<PreparedStatementBuilder> builders,
+            String dataSourceName, String repositoryName, Boolean executeWithinTransaction) throws Exception {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        List<CachedRowSet> results = new ArrayList<>();
+        try {
+            conn = getConnection(dataSourceName, repositoryName);
+            if (executeWithinTransaction) {
+                conn.setAutoCommit(false);
+            }
+            RowSetFactory rowSetFactory = RowSetProvider.newFactory();
+            CachedRowSet crs = rowSetFactory.createCachedRowSet();
+            int statementCount = 0;
+            for (PreparedStatementBuilder builder : builders) {
+                ps = builder.build(conn);
+                // FIXME: transition this log statement to DEBUG level when appropriate
+                if (logger.isInfoEnabled()) {
+                    statementCount++;
+                    logger.info("prepared statement " + statementCount + "=" + ps.toString());
+                }
+                // Try executing each statement, first as a query, then as an update
+                try {
+                    ResultSet resultSet = ps.executeQuery();
+                    if (resultSet != null) {
+                        crs.populate(resultSet);
+                        results.add(crs);
+                    }
+                } catch (Exception e) {
+                    int rowcount = ps.executeUpdate();
+                    // Throw uncaught exception here if update attempt also fails
+                }
+            }
+            return results;
+        } catch (SQLException sqle) {
+            if (executeWithinTransaction && conn != null) {
+                conn.rollback();
+            }
+            SQLException tempException = sqle;
+            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
+                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+                tempException = tempException.getNextException();
+            }
+            throw new RuntimeException("SQL Exception in executePreparedQueries: ", sqle);
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    if (executeWithinTransaction) {
+                        conn.commit();
+                    }
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                logger.debug("SQL Exception closing statement/connection in executePreparedQueries: " + sqle.getLocalizedMessage());
+                return null;
+            }
+        }
+    }
 
     public static int executeUpdate(String dataSourceName, String repositoryName, String sql) throws Exception {
         Connection conn = null;
@@ -226,14 +336,14 @@ public class JDBCTools {
                 logger.debug("SQL Exception: " + msg);
                 tempException = tempException.getNextException();
             }
-            throw new RuntimeException("SQL problem in executeUpdate: " + msg, sqle);
+            throw new RuntimeException("SQL Exception in executeUpdate: " + msg, sqle);
         } finally {
             try {
-                if (conn != null) {
-                    conn.close();
-                }
                 if (stmt != null) {
                     stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
                 }
             } catch (SQLException sqle) {
                 logger.debug("SQL Exception closing statement/connection in executeUpdate: " + sqle.getLocalizedMessage());
