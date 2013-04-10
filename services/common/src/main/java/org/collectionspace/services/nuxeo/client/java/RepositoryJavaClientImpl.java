@@ -1762,6 +1762,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
     private int getMaxItemsLimitOnJdbcQueries(String maxListItemsLimit) {
         final int DEFAULT_ITEMS_LIMIT = 40;
+        if (maxListItemsLimit == null) {
+            return DEFAULT_ITEMS_LIMIT;
+        }
         int itemsLimit;
         try {
             itemsLimit = Integer.parseInt(maxListItemsLimit);
