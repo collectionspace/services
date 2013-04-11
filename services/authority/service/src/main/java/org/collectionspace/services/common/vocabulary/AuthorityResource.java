@@ -120,7 +120,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
     final static String URN_PREFIX_ID = "id(";
     final static int URN_ID_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_ID.length();
     final static String FETCH_SHORT_ID = "_fetch_";
-	final static String PARENT_WILDCARD = "_ALL_";
+    public final static String PARENT_WILDCARD = "_ALL_";
 	
     final Logger logger = LoggerFactory.getLogger(AuthorityResource.class);
 
