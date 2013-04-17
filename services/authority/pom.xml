@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.main</artifactId>
-        <version>3.2.2-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>

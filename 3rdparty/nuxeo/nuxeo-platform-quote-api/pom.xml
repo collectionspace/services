@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.collectionspace.services</groupId>
 		<artifactId>org.collectionspace.services.3rdparty.nuxeo</artifactId>
-		<version>3.2.2-SNAPSHOT</version>
+		<version>3.2.3-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.collectionspace.services</groupId>
