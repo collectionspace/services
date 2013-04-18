@@ -109,6 +109,10 @@
                             <types:key>authRef</types:key>
                             <types:value>hybridParentGroupList/*/hybridParent</types:value>
                         </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>accessionUseGroupList/*/usedIn</types:value>
+                        </types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd" />
@@ -363,18 +367,29 @@
 
         </tenant:serviceBindings>
 
-		<tenant:serviceBindings merge:matcher="id" id="Concepts">
-			<service:object xmlns:service="http://collectionspace.org/services/config/service">
-				
-				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="concepts_naturalhistory" updated="" order="3">
-					<service:content contentType="application/xml">
-						<service:xmlContent namespaceURI="http://collectionspace.org/services/concept/domain/naturalhistory"
-							schemaLocation="http://collectionspace.org/services/concept/domain/naturalhistory http://collectionspace.org/services/concept/domain/concepts_naturalhistory.xsd" />
-					</service:content>
-				</service:part>
-			
-			</service:object>
-		</tenant:serviceBindings>
+        <tenant:serviceBindings merge:matcher="id" id="Concepts">
+                <service:object xmlns:service="http://collectionspace.org/services/config/service">
+
+                        <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="concepts_naturalhistory" updated="" order="3">
+                                <service:properties>
+                                        <!-- Fields containing authority term references -->
+                                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                                                <types:key>authRef</types:key>
+                                                <types:value>associatedPerson</types:value>
+                                        </types:item>
+                                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                                                <types:key>authRef</types:key>
+                                                <types:value>associatedOrganization</types:value>
+                                        </types:item>
+                                </service:properties>
+                                <service:content contentType="application/xml">
+                                        <service:xmlContent namespaceURI="http://collectionspace.org/services/concept/domain/naturalhistory"
+                                                schemaLocation="http://collectionspace.org/services/concept/domain/naturalhistory http://collectionspace.org/services/concept/domain/concepts_naturalhistory.xsd" />
+                                </service:content>
+                        </service:part>
+
+                </service:object>
+        </tenant:serviceBindings>
 
         <!-- 2.0 propagations tenant-binding also included this line as a child of tenant:serviceBindings - something comparable is commented out in 2.4 -->
           <!-- <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/propagations/*/workflow/</service:uriPath> -->
