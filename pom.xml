@@ -244,10 +244,16 @@
 					<configuration>
 					</configuration>
 				</plugin>
-				<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
-					<configuration> <dependencyLocationEnabled>false</dependencyLocationEnabled> 
-					<unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand> </configuration> 
-					</plugin> -->
+				<!--
+				<plugin>
+				    <groupId>org.apache.maven.plugins</groupId>
+				    <artifactId>maven-site-plugin</artifactId> 
+					<configuration>
+					    <dependencyLocationEnabled>false</dependencyLocationEnabled> 
+					    <unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand>
+					</configuration> 
+				</plugin>
+				-->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
@@ -416,7 +422,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>2.6</version>
 				<configuration>
 				</configuration>
 				<reportSets>
@@ -427,9 +433,16 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
-				<version>2.6.1</version> <configuration> <show>public</show> </configuration> 
-				</plugin> -->
+			<!--
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-javadoc-plugin</artifactId> 
+				<version>2.6.1</version>
+				<configuration>
+				    <show>public</show>
+				</configuration> 
+			</plugin>
+			-->
 		</plugins>
 	</reporting>
 
