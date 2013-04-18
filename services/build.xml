@@ -298,6 +298,7 @@
             description="Generate a report of dependencies, including their licensing information.">
         <exec executable="mvn" failonerror="true">
             <arg value="project-info-reports:dependencies"/>
+            <arg value="-Ddependency.locations.enabled=false" />
         </exec>
     </target>
 
