@@ -439,4 +439,15 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     public boolean isCMISQuery() {
     	return false;
     }
+    
+    @Override
+    public boolean isJDBCQuery() {
+    	return false;
+    }
+    
+    @Override
+    public Map<String,String> getJDBCQueryParams() {
+        return new HashMap<>();
+    }
+    
 }
