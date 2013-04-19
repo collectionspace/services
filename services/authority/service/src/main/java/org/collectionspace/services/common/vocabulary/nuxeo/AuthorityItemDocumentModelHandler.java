@@ -40,6 +40,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 
 import org.collectionspace.services.config.service.ListResultField;
@@ -88,9 +89,11 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
      * inVocabulary is the parent Authority for this context
      */
     protected String inAuthority = null;
+    protected boolean wildcardedAuthorityRequest = false;
     protected String authorityRefNameBase = null;
     // Used to determine when the displayName changes as part of the update.
     protected String oldDisplayNameOnUpdate = null;
+    private final static String LIST_SUFFIX = "List";
 
     public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
         this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
@@ -153,6 +156,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public void setInAuthority(String inAuthority) {
         this.inAuthority = inAuthority;
     }
+    
+   public String getInAuthority() {
+        return this.inAuthority;
+    }
 
     /** Subclasses may override this to customize the URI segment. */
     public String getAuthorityServicePath() {
@@ -163,7 +170,12 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     public String getUri(DocumentModel docModel) {
         // Laramie20110510 CSPACE-3932
         String authorityServicePath = getAuthorityServicePath();
-        if(inAuthority==null) {	// Only happens on queries to wildcarded authorities
+        if(inAuthority==null) {	// Only true with the first document model received, on queries to wildcarded authorities
+            wildcardedAuthorityRequest = true;
+        }
+        // If this search crosses multiple authorities, get the inAuthority value
+        // from each record, rather than using the cached value from the first record
+        if(wildcardedAuthorityRequest) {
         	try {
 	        	inAuthority = (String) docModel.getProperty(authorityItemCommonSchemaName,
 	                AuthorityItemJAXBSchema.IN_AUTHORITY);
@@ -621,6 +633,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     /* don't even THINK of re-using this method.
      * String example_uri = "/locationauthorities/7ec60f01-84ab-4908-9a6a/items/a5466530-713f-43b4-bc05";
      */
+    @Deprecated
     private String extractInAuthorityCSID(String uri) {
         String IN_AUTHORITY_REGEX = "/(.*?)/(.*?)/(.*)";
         Pattern p = Pattern.compile(IN_AUTHORITY_REGEX);
@@ -664,4 +677,55 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
     protected String getAuthorityItemCommonSchemaName() {
     	return authorityItemCommonSchemaName;
     }
+    
+    // @Override
+    public boolean isJDBCQuery() {
+    	boolean result = false;
+    	
+    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
+    	//
+    	// Look the query params to see if we need to make a SQL query.
+    	//
+        String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
+    	if (partialTerm != null && partialTerm.trim().isEmpty() == false) {
+    		result = true;
+    	}
+    	
+    	return result;
+    }
+    
+    // By convention, the name of the database table that contains
+    // repeatable term information group records is derivable from
+    // an existing XPath base value, by removing a suffix and converting
+    // to lowercase
+    protected String getTermGroupTableName() {
+        String termInfoGroupListName = getItemTermInfoGroupXPathBase();
+        return termInfoGroupListName.substring(0, termInfoGroupListName.lastIndexOf(LIST_SUFFIX)).toLowerCase();
+    }
+    
+    protected String getInAuthorityValue() {
+        String inAuthorityValue = getInAuthority();
+        if (Tools.notBlank(inAuthorityValue)) {
+            return inAuthorityValue;
+        } else {
+            return AuthorityResource.PARENT_WILDCARD;
+        }
+    }
+    
+    @Override
+    public Map<String,String> getJDBCQueryParams() {
+        // FIXME: Get all of the following values from appropriate external constants.
+        // At present, these are duplicated in both RepositoryJavaClientImpl
+        // and in AuthorityItemDocumentModelHandler.
+        final String TERM_GROUP_LIST_NAME = "TERM_GROUP_LIST_NAME";
+        final String TERM_GROUP_TABLE_NAME_PARAM = "TERM_GROUP_TABLE_NAME";
+        final String IN_AUTHORITY_PARAM = "IN_AUTHORITY";
+        
+        Map<String,String> params = super.getJDBCQueryParams();
+        params.put(TERM_GROUP_LIST_NAME, getItemTermInfoGroupXPathBase());
+        params.put(TERM_GROUP_TABLE_NAME_PARAM, getTermGroupTableName());
+        params.put(IN_AUTHORITY_PARAM, getInAuthorityValue());
+        return params;
+    }
+    
 }
