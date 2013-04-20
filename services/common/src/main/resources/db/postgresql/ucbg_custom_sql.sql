@@ -2,9 +2,21 @@
 --    Aggregating the sql scripts into this single file makes it possible
 --    to specify the order of execution.
 
+-- Create the utils schema, views will go there
+DO $DO$
+BEGIN
+   IF NOT EXISTS ( SELECT 1
+      FROM
+         pg_catalog.pg_namespace n
+      WHERE n.nspname = 'utils' )
+   THEN
+      CREATE SCHEMA utils AUTHORIZATION nuxeo;
+   END IF;
+END$DO$;
+
 
 --  Type declarations go first as they usually have no other dependencies
-DO $DOS$
+DO $DO$
 BEGIN
    BEGIN
       CREATE TYPE voucherlabeltype AS
@@ -13,11 +25,9 @@ BEGIN
          determinationformatted varchar,
          family varchar,
          collectioninfo varchar,
-         locality varchar,
          vouchernumber varchar,
          numbersheets integer,
          labelrequested varchar,
-         gardenlocation varchar,
          gardeninfo varchar,
          vouchertype varchar,
          fieldcollectionnote varchar,
@@ -26,11 +36,11 @@ BEGIN
       );
    EXCEPTION
       WHEN duplicate_object THEN
-         RAISE NOTICE 'INFO voucherlabeltype already exists';
+         RAISE NOTICE 'INFO: voucherlabeltype already exists';
       WHEN OTHERS THEN
-         RAISE NOTICE 'ERROR creating type voucherlabeltype: (%)', SQLSTATE;
+         RAISE 'ERROR: creating type voucherlabeltype: (%)', SQLSTATE;
    END;
-END$DOS$;
+END$DO$;
 
 
 -- Botgarden tenant database add-ons, 
@@ -47,7 +57,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'The hierarchy table is missing';
+   RAISE NOTICE 'INFO: The hierarchy table is missing';
    RETURN;
 END IF;
 
@@ -93,7 +103,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'The misc table is missing';
+   RAISE NOTICE 'INFO: The misc table is missing';
    RETURN;
 END IF;
 
@@ -127,7 +137,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'The collectionobjects_botgarden table is missing';
+   RAISE NOTICE 'INFO: The collectionobjects_botgarden table is missing';
    RETURN;
 END IF;
 
@@ -161,7 +171,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'The collectionobjects_naturalhistory table is missing';
+   RAISE NOTICE 'INFO: The collectionobjects_naturalhistory table is missing';
    RETURN;
 END IF;
 
@@ -195,7 +205,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'The relations_common table is missing';
+   RAISE NOTICE 'INFO: The relations_common table is missing';
    RETURN;
 END IF;
 
@@ -242,7 +252,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'The taxonomicIdentGroup table is missing';
+   RAISE NOTICE 'NOTIC: The taxonomicIdentGroup table is missing';
    RETURN;
 END IF;
 
@@ -261,237 +271,318 @@ END IF;
 END$$;
 
 
-
--- Create findhybridname function.
---   Catch and report 'undefined_table' exception for any referenced table that
---   does not exist.  Catch and report any other exceptions with an error code.
-
--- Used in reports to construct a combined hybrid name from the hybrid parents
--- CRH 1/15/2013
--- from findhybridnamehtml though simpler; remove joins to get taxonterm fields
-
-
 DO $DO$
 BEGIN
    BEGIN
-      CREATE OR REPLACE FUNCTION findhybridname(character varying) RETURNS character varying AS
-      $CF$
-      DECLARE
-         numtimes integer;
-         htmlname text;
-         strresult text;
-         femalename text;
-         malename text;
-         parentgender text;
-
-      BEGIN
-
-      htmlname := '';
-      strresult := '';
-
-      SELECT INTO numtimes count(*)
-      FROM
-         public.taxonomicidentgroup tig
-         LEFT OUTER JOIN
-         hierarchy h ON (h.parentid=tig.id
-                         AND
-                         h.name='taxonomicIdentHybridParentGroupList')
-         LEFT OUTER JOIN
-         taxonomicidenthybridparentgroup thpg ON (h.id=thpg.id)
-      WHERE
-          tig.id = $1;
-
-      IF numtimes > 1
-      THEN
-         FOR htmlname IN
-            SELECT
-               regexp_replace(thpg.taxonomicidenthybridparent, '^.*\)''(.*)''$', '\1')
-            FROM
-               public.taxonomicidentgroup tig
-               LEFT OUTER JOIN
-               hierarchy h ON (h.parentid=tig.id
-                               AND
-                               h.name='taxonomicIdentHybridParentGroupList')
-               LEFT OUTER JOIN
-               taxonomicidenthybridparentgroup thpg on (h.id=thpg.id)
-            WHERE tig.id = $1
-            ORDER BY taxonomicidenthybridparentqualifier
-         LOOP
-            strresult := strresult || htmlname || ' × ';
-         END LOOP;
-
-         strresult := trim (trailing ' × ' from strresult);
-
-      ELSIF numtimes = 1
-      THEN
-         SELECT INTO htmlname, parentgender
-            regexp_replace(thpg.taxonomicidenthybridparent, '^.*\)''(.*)''$', '\1'),
-            thpg.taxonomicidenthybridparentqualifier
-         FROM
-            public.taxonomicidentgroup tig
-            LEFT OUTER JOIN
-            hierarchy h ON (h.parentid=tig.id
-                            AND
-                            h.name='taxonomicIdentHybridParentGroupList')
-            LEFT OUTER JOIN
-            taxonomicidenthybridparentgroup thpg ON (h.id=thpg.id)
-         WHERE
-            tig.id = $1;
-
-         -- if parentqualifier = 'female' then print htmlname||' × '
-         IF parentgender = 'female' THEN
-            strresult := htmlname||' ×';
-
-         -- if parentqualifier = 'male' then print ' × '||htmlname
-         ELSIF parentgender = 'male' THEN
-            strresult := '× '||htmlname;
-         END IF;
-
-      ELSIF numtimes = 0
-      THEN
-         -- fail
-         strresult := 'no hybrid parents';
-      END IF;
-
-      RETURN strresult;
-
-      END;
-      $CF$
-      LANGUAGE 'plpgsql' IMMUTABLE RETURNS NULL ON NULL INPUT;
-      GRANT EXECUTE ON FUNCTION findhybridname(character varying) to public;
+      CREATE OR REPLACE FUNCTION getdispl(in text) RETURNS text AS
+      $$
+        SELECT regexp_replace($1, '^.*\)''(.*)''$', '\1')
+      $$
+      LANGUAGE SQL IMMUTABLE
+      RETURNS NULL ON NULL INPUT;
+      GRANT EXECUTE ON FUNCTION getdispl(in text) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'ERROR creating function findhybridname: missing relation';
+         RAISE NOTICE 'INFO: Creating function getdispl: missing relation';
       WHEN OTHERS THEN
-         RAISE NOTICE 'ERROR creating function findhybridname: (%)', SQLSTATE;
+         RAISE 'ERROR: creating function getdispl: (%)', SQLSTATE;
    END;
 END$DO$;
 
 
--- Create findhybridnamehtml function.
---   Catch and report 'undefined_table' exception for any referenced table that
---   does not exist.  Catch and report any other exceptions with an error code.
-
--- Used in reports to construct a combined hybrid name from the hybrid parents
--- CRH 1/15/2013
--- simpler variant in findhybridname.
-
+-- 
 DO $DO$
 BEGIN
    BEGIN
-      CREATE OR REPLACE FUNCTION findhybridnamehtml(character varying) RETURNS character varying AS
+      CREATE OR REPLACE FUNCTION findhybridaffinhtml (tigid varchar)
+         RETURNS varchar AS
       $CF$
       DECLARE
-         numtimes integer;
-         htmlname text;
-         strresult text;
-         femalename text;
-         malename text;
-         parentgender text;
+         taxon_refname varchar(300);
+         taxon_name varchar(200);
+         taxon_name_form varchar(300);
+         is_hybrid boolean;
+         aff_refname varchar(300);
+         aff_name varchar(200);
+         aff_name_form varchar(300);
+         aff_genus varchar(100);
+         fhp_name varchar(200);
+         fhp_genus varchar(100);
+         mhp_name varchar(200);
+         mhp_genus varchar(100);
+         mhp_rest varchar(200);
+         return_name varchar(300);
 
       BEGIN
-         htmlname := '';
-         strresult := '';
+         SELECT INTO
+            taxon_refname,
+            taxon_name,
+            is_hybrid,
+            aff_refname,
+            aff_name,
+            aff_genus
+            tig.taxon,
+            regexp_replace(tig.taxon, '^.*\)''(.+)''$', '\1'),
+            tig.hybridflag,
+            tig.affinitytaxon,
+            regexp_replace(tig.affinitytaxon, '^.*\)''(.+)''$', '\1'),
+            regexp_replace(tig.affinitytaxon, '^.*\)''([^ ]+)( ?.*)''$', '\1')
+         FROM taxonomicidentgroup tig
+         WHERE tig.id = $1;
 
-         SELECT INTO numtimes count(*)
-         FROM
-            public.taxonomicidentgroup tig
-            LEFT OUTER JOIN hierarchy hhyb
-               ON (hhyb.parentid=tig.id
-                   AND
-                   hhyb.name='taxonomicIdentHybridParentGroupList')
-            LEFT OUTER JOIN taxonomicidenthybridparentgroup thpg
-               ON (hhyb.id=thpg.id)
-            LEFT OUTER JOIN taxon_common tc
-               ON (thpg.taxonomicidenthybridparent=tc.refname)
-            LEFT OUTER JOIN hierarchy htt
-               ON (tc.id=htt.parentid
-                   AND htt.name='taxon_common:taxonTermGroupList'
-                   AND htt.pos=0) -- for now assuming preferred name
-            LEFT OUTER JOIN taxontermgroup tt
-               ON (tt.id=htt.id)
-         WHERE
-            tig.id = $1;
-
-         IF numtimes > 1 THEN
-
-            FOR htmlname IN SELECT tt.termformatteddisplayname
+         IF NOT FOUND THEN
+            RETURN NULL;
+         ELSEIF is_hybrid IS FALSE AND aff_name IS NULL THEN
+            SELECT INTO taxon_name_form ttg.termformatteddisplayname
             FROM
-               public.taxonomicidentgroup tig
-               LEFT OUTER JOIN hierarchy hhyb
-                  ON (hhyb.parentid=tig.id
-                      AND hhyb.name='taxonomicIdentHybridParentGroupList')
-               LEFT OUTER JOIN taxonomicidenthybridparentgroup thpg
-                  ON (hhyb.id=thpg.id)
-               LEFT OUTER JOIN taxon_common tc
-                  ON (thpg.taxonomicidenthybridparent=tc.refname)
-               LEFT OUTER JOIN hierarchy htt
-                  ON (tc.id=htt.parentid
-                      AND htt.name='taxon_common:taxonTermGroupList'
-                      AND htt.pos=0)
-               LEFT OUTER JOIN taxontermgroup tt
-                  ON (tt.id=htt.id)
-            WHERE
-               tig.id = $1
-            ORDER BY taxonomicidenthybridparentqualifier
-               LOOP
-                  strresult := strresult || htmlname || ' × ';
-               END LOOP;
+               taxonomicidentgroup tig
+               INNER JOIN taxon_common tc ON (tig.taxon = tc.refname)
+               INNER JOIN hierarchy h
+                  ON (tc.id = h.parentid
+                      AND h.primarytype = 'taxonTermGroup')
+               INNER JOIN taxontermgroup ttg
+                  ON (h.id = ttg.id
+                      AND taxon_name = ttg.termdisplayname)
+            WHERE ttg.termformatteddisplayname IS NOT NULL
+                  AND tig.id = $1;
 
-            strresult := trim (trailing ' × ' from strresult);
+            RETURN taxon_name_form;
 
-         ELSIF numtimes = 1 THEN
-
-            SELECT INTO htmlname,
-                        parentgender tt.termformatteddisplayname,
-                        thpg.taxonomicidenthybridparentqualifier
+         ELSEIF is_hybrid is false AND aff_name IS NOT NULL THEN
+            SELECT INTO aff_name_form
+               regexp_replace(ttg.termformatteddisplayname,
+                  '^(<i>[^ ]+)( ?)(.*</i>.*)$', '\1</i> aff.\2<i>\3')
             FROM
-               public.taxonomicidentgroup tig
-               LEFT OUTER JOIN hierarchy hhyb
-                  ON (hhyb.parentid=tig.id
-                      AND hhyb.name='taxonomicIdentHybridParentGroupList')
-               LEFT OUTER JOIN taxonomicidenthybridparentgroup thpg
-                  ON (hhyb.id=thpg.id)
-               LEFT OUTER JOIN taxon_common tc
-                  ON (thpg.taxonomicidenthybridparent=tc.refname)
-               LEFT OUTER JOIN hierarchy htt
-                  ON (tc.id=htt.parentid
-                      AND htt.name='taxon_common:taxonTermGroupList'
-                      AND htt.pos=0)
-               LEFT OUTER JOIN taxontermgroup tt
-                  ON (tt.id=htt.id)
+               taxonomicidentgroup tig
+               INNER JOIN taxon_common tc
+                  ON (tig.affinitytaxon = tc.refname)
+               INNER JOIN hierarchy h
+                  ON (tc.id = h.parentid
+                      AND h.primarytype = 'taxonTermGroup')
+               INNER JOIN taxontermgroup ttg
+                  ON (h.id = ttg.id
+                      AND aff_name = ttg.termdisplayname)
             WHERE
-               tig.id = $1;
+               ttg.termformatteddisplayname IS NOT NULL
+               AND tig.id = $1;
 
-            -- if parentqualifier = 'female' then print htmlname||' × '
-            IF parentgender = 'female' THEN
-               strresult := htmlname||' ×';
+            RETURN aff_name_form; 
 
-            -- if parentqualifier = 'male' then print ' × '||htmlname
-            ELSIF parentgender = 'male' THEN
-               strresult := '× '||htmlname;
+         ELSEIF is_hybrid IS TRUE THEN
+            SELECT INTO fhp_name, fhp_genus
+               CASE WHEN fhp.taxonomicidenthybridparent IS NULL THEN ''
+               ELSE ttg.termformatteddisplayname
+               END,
+               CASE WHEN fhp.taxonomicidenthybridparent IS NULL THEN ''
+               ELSE regexp_replace(fhp.taxonomicidenthybridparent,
+                    '^.*\)''([^ ]+)( ?.*)''$', '\1')
+               END
+            FROM
+               taxonomicidentgroup tig
+               INNER JOIN hierarchy hfhp
+                  ON (hfhp.parentid = tig.id
+                      AND hfhp.name = 'taxonomicIdentHybridParentGroupList')
+               INNER JOIN taxonomicidenthybridparentgroup fhp
+                  ON (hfhp.id = fhp.id
+                      AND fhp.taxonomicidenthybridparentqualifier = 'female')
+               INNER JOIN taxon_common tc
+                  ON (fhp.taxonomicidenthybridparent = tc.refname)
+               INNER JOIN hierarchy h
+                  ON (tc.id = h.parentid
+                      AND h.primarytype = 'taxonTermGroup')
+               INNER JOIN taxontermgroup ttg
+                  ON (h.id = ttg.id
+                      AND regexp_replace(fhp.taxonomicidenthybridparent,
+                            '^.*\)''(.+)''$', '\1') = ttg.termdisplayname)
+            WHERE
+               ttg.termformatteddisplayname IS NOT NULL
+               AND tig.id = $1;
 
+            SELECT into mhp_name, mhp_genus, mhp_rest
+               CASE when mhp.taxonomicidenthybridparent IS NULL THEN ''
+               ELSE ttg.termformatteddisplayname
+               END,
+               CASE when mhp.taxonomicidenthybridparent IS NULL THEN ''
+               ELSE regexp_replace(mhp.taxonomicidenthybridparent,
+                       '^.*\)''([^ ]+)( .*)''$', '\1')
+               END,
+               CASE when mhp.taxonomicidenthybridparent IS NULL THEN ''
+               ELSE regexp_replace(ttg.termformatteddisplayname,
+                       '^[Xx×]? ?<i>[^ ]+( ?.*)$', '\1')
+               END
+            FROM
+               taxonomicidentgroup tig
+               INNER JOIN hierarchy hmhp
+                  ON (hmhp.parentid = tig.id
+                      AND hmhp.name = 'taxonomicIdentHybridParentGroupList')
+               INNER JOIN taxonomicidenthybridparentgroup mhp
+                  ON (hmhp.id = mhp.id
+                      AND mhp.taxonomicidenthybridparentqualifier = 'male')
+               INNER JOIN taxon_common tc
+                  ON (mhp.taxonomicidenthybridparent = tc.refname)
+               INNER JOIN hierarchy h
+                  ON (tc.id = h.parentid
+                      AND h.primarytype = 'taxonTermGroup')
+               INNER JOIN taxontermgroup ttg
+                  ON (h.id = ttg.id
+                      AND regexp_replace(mhp.taxonomicidenthybridparent,
+                             '^.*\)''(.+)''$', '\1') = ttg.termdisplayname)
+            WHERE
+               ttg.termformatteddisplayname IS NOT NULL
+               AND tig.id = $1;
+
+            IF aff_name IS NULL THEN
+               IF fhp_genus = mhp_genus THEN
+                  return_name := trim(fhp_name || ' × ' ||
+                     '<i>' || substr(mhp_genus, 1, 1) || '.' || mhp_rest);
+               ELSE
+                  return_name := trim(fhp_name || ' × ' || mhp_name);
+               END IF;
+            ELSE
+               IF aff_genus = mhp_genus THEN
+                  return_name := trim(aff_name_form || ' × ' ||
+                     '<i>' || substr(mhp_genus, 1, 1) || '.' || mhp_rest);
+               ELSE
+                  return_name := trim(aff_name_form || ' × ' || mhp_name);
+               END IF;
             END IF;
 
-         ELSIF numtimes = 0 THEN
-            -- fail
-            strresult := 'no hybrid parents';
+            IF return_name = ' × ' THEN
+               RETURN NULL;
+            ELSE
+               RETURN return_name;
+            END IF;
          END IF;
-
-         RETURN strresult;
       END;
       $CF$
-      LANGUAGE 'plpgsql' IMMUTABLE RETURNS NULL ON NULL INPUT;
-      GRANT EXECUTE ON function findhybridnamehtml(character varying) to public;
-
+      LANGUAGE 'plpgsql' IMMUTABLE
+      RETURNS NULL ON NULL INPUT;
+      GRANT EXECUTE ON FUNCTION findhybridaffinhtml(tgid varchar) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'ERROR creating function findhybridnamehtml: missing relation';
+         RAISE NOTICE 'INFO: creating function findhybridaffinhtml: missing relation';
       WHEN OTHERS THEN
-         RAISE NOTICE 'ERROR creating function findhybridnamehtml: (%)', SQLSTATE;
+         RAISE 'ERROR: creating function findhybridaffinhtml: (%)', SQLSTATE;
    END;
 END$DO$;
 
+
+DO $DO$
+BEGIN
+   BEGIN
+      CREATE OR REPLACE FUNCTION findhybridaffinname (tigid VARCHAR)
+      RETURNS VARCHAR AS
+      $CF$
+         DECLARE
+            taxon_name VARCHAR(200);
+            is_hybrid boolean;
+            aff_name VARCHAR(200);
+            aff_genus VARCHAR(100);
+            fhp_name VARCHAR(200);
+            fhp_genus VARCHAR(100);
+            mhp_name VARCHAR(200);
+            mhp_genus VARCHAR(100);
+            mhp_rest VARCHAR(200);
+            return_name VARCHAR(300);
+         
+         BEGIN
+         SELECT INTO
+            taxon_name,
+            is_hybrid,
+            aff_name,
+            aff_genus
+            regexp_replace(tig.taxon, '^.*\)''(.+)''$', '\1'),
+            tig.hybridflag, 
+            regexp_replace(tig.affinitytaxon, '^.*\)''([^ ]+)( ?.*)''$', '\1 aff.\2'),
+            regexp_replace(tig.affinitytaxon, '^.*\)''([^ ]+)( ?.*)''$', '\1')
+         FROM
+            taxonomicidentgroup tig
+         WHERE
+            tig.id = $1;
+         
+         IF NOT FOUND THEN
+            RETURN NULL;
+         ELSEIF is_hybrid IS FALSE AND aff_name IS NULL THEN
+            RETURN taxon_name;
+         ELSEIF is_hybrid IS FALSE AND aff_name IS NOT NULL THEN
+            RETURN aff_name;
+         ELSEIF is_hybrid is true THEN
+            SELECT INTO fhp_name, fhp_genus
+               CASE WHEN fhp.taxonomicidenthybridparent IS NULL THEN ''
+                  ELSE regexp_replace(fhp.taxonomicidenthybridparent,
+                     '^.*\)''(.+)''$', '\1')
+               END,
+               CASE WHEN fhp.taxonomicidenthybridparent IS NULL THEN ''
+                  ELSE regexp_replace(fhp.taxonomicidenthybridparent,
+                     '^.*\)''([^ ]+) ?.*''$', '\1')
+               END
+            FROM
+               taxonomicidentgroup tig
+               INNER JOIN hierarchy hfhp
+                  ON (hfhp.parentid = tig.id 
+                      AND hfhp.name = 'taxonomicIdentHybridParentGroupList')
+               INNER JOIN taxonomicidenthybridparentgroup fhp
+                  ON (hfhp.id = fhp.id 
+                      AND fhp.taxonomicidenthybridparentqualifier = 'female')
+            WHERE tig.id = $1;
+         
+            SELECT INTO mhp_name, mhp_genus, mhp_rest
+               CASE WHEN mhp.taxonomicidenthybridparent IS NULL THEN ''
+                  ELSE regexp_replace(mhp.taxonomicidenthybridparent,
+                     '^.*\)''(.+)''$', '\1')
+               END,
+               CASE WHEN mhp.taxonomicidenthybridparent IS NULL THEN ''
+                  ELSE regexp_replace(mhp.taxonomicidenthybridparent,
+                     '^.*\)''([^ ]+) ?.*''$', '\1')
+               END,
+               CASE WHEN mhp.taxonomicidenthybridparent IS NULL THEN ''
+                  ELSE regexp_replace(mhp.taxonomicidenthybridparent,
+                     '^.*\)''([^ ]+)( ?.*)''$', '\2')
+               END
+            FROM
+               taxonomicidentgroup tig
+               INNER JOIN hierarchy hmhp
+                  ON (hmhp.parentid = tig.id 
+                      AND hmhp.name = 'taxonomicIdentHybridParentGroupList')
+               INNER JOIN taxonomicidenthybridparentgroup mhp
+                  ON (hmhp.id = mhp.id 
+                      AND mhp.taxonomicidenthybridparentqualifier = 'male')
+            WHERE tig.id = $1;
+         
+            IF aff_name IS NULL THEN
+               IF fhp_genus = mhp_genus THEN
+                  return_name := trim(fhp_name || ' × ' || 
+                     substr(mhp_genus, 1, 1) || '.' || mhp_rest);
+               ELSE
+                  return_name := trim(fhp_name || ' × ' || mhp_name);
+               END IF;
+            ELSE 
+               IF aff_genus = mhp_genus THEN
+                  return_name := trim(aff_name || ' × ' || 
+                     substr(mhp_genus, 1, 1) || '.' || mhp_rest);
+               ELSE
+                  return_name := trim(aff_name || ' × ' || mhp_name);
+               END IF;
+            END IF;
+         
+            IF return_name = ' × ' THEN
+               RETURN NULL;
+            ELSE
+               RETURN return_name;
+            END IF;
+         END IF;
+      END;
+      $CF$
+      LANGUAGE 'plpgsql' IMMUTABLE
+      RETURNS NULL ON NULL INPUT;
+      GRANT EXECUTE ON FUNCTION findhybridaffinname(tgid VARCHAR) to public;
+   EXCEPTION
+      WHEN undefined_table THEN
+         RAISE NOTICE 'INFO: creating function findhybridaffinname: missing relation';
+      WHEN OTHERS THEN
+         RAISE 'ERROR: creating function findhybridaffinname: (%)', SQLSTATE;
+   END;
+END$DO$;
 
 -- Create findsectionparent function.
 --   Catch and report 'undefined_table' exception for any referenced table that
@@ -501,7 +592,7 @@ DO $DO$
 BEGIN
    BEGIN
       CREATE OR REPLACE FUNCTION findsectionparent(character varying) RETURNS character varying AS
-      $FUN$
+      $CF$
          SELECT regexp_replace(tc2.refname, '^.*\)''(.*)''$', '\1') sectionparent
          FROM taxon_common tc1
          JOIN hierarchy h1 ON tc1.id = h1.id
@@ -512,14 +603,14 @@ BEGIN
          JOIN taxon_common tc2 ON (tc2.id = h2.id)
          WHERE tc2.taxonrank = 'section'
          AND tc1.refname = $1
-      $FUN$
+      $CF$
       LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
       GRANT EXECUTE ON FUNCTION findsectionparent(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'ERROR creating function findsectionparent: missing relation';
+         RAISE NOTICE 'INFO: creating function findsectionparent: missing relation';
       WHEN OTHERS THEN
-         RAISE NOTICE 'ERROR creating function findsectionparent: (%)', SQLSTATE;
+         RAISE 'ERROR: creating function findsectionparent: (%)', SQLSTATE;
    END;
 END$DO$;
 
@@ -551,9 +642,9 @@ BEGIN
       GRANT EXECUTE ON FUNCTION findsubsectionparent(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'Creating function findsubsectionparent: missing relation';
+         RAISE NOTICE 'INFO: Creating function findsubsectionparent: missing relation';
       WHEN OTHERS THEN
-         RAISE NOTICE 'ERROR creating function findsubsectionparent : (%)', SQLSTATE;
+         RAISE 'ERROR: creating function findsubsectionparent : (%)', SQLSTATE;
    END;
 END$DO$;
 
@@ -567,54 +658,28 @@ END$DO$;
 
 DO $DO$
 BEGIN
-
-   IF NOT EXISTS ( SELECT 1
-      FROM
-         pg_namespace n
-         JOIN
-         pg_class c1 ON (n.oid = c1.relnamespace AND c1.relkind = 'r'
-                         AND n.nspname = 'public')
-         JOIN
-         pg_class c2 ON (n.oid = c2.relnamespace AND c2.relkind = 'r')
-         jOIN
-         pg_class c3 ON (n.oid = c3.relnamespace AND c3.relkind = 'r')
-      WHERE
-         c1.relname = 'hierarchy'
-         AND c2.relname = 'taxon_common'
-         AND c3.relname = 'naturalhistorycommonnamegroup' )
-   THEN
-      RAISE NOTICE 'One of the tables referenced in findcommonname is missing';
-      RETURN;
-   END IF;
-
-   IF NOT EXISTS ( SELECT 1
-      FROM
-         pg_catalog.pg_proc p JOIN pg_namespace n ON (n.oid = p.pronamespace)
-      WHERE
-         n.nspname = 'public'
-         AND p.proname = 'findcommonname'
-         AND pg_function_is_visible(p.oid)
-         AND n.nspname <> 'pg_catalog'
-         AND n.nspname <> 'information_schema' )
-   THEN
-      CREATE FUNCTION findcommonname(character varying) RETURNS character varying AS
-      'SELECT
-         regexp_replace( cn.naturalhistorycommonname, ''^.*\)''''(.*)''''$'', ''\1'') commonname
-      FROM
-         taxon_common tc LEFT OUTER JOIN hierarchy h
-            ON (tc.id = h.parentid
-                AND h.pos = 0
-                AND h.name = ''taxon_naturalhistory:naturalHistoryCommonNameGroupList'')
-         LEFT OUTER JOIN naturalhistorycommonnamegroup cn
-            ON (cn.id = h.id AND cn.naturalhistorycommonnametype=''preferred'')
-      WHERE
-         tc.refname=$1
-      '
-      LANGUAGE SQL
-      IMMUTABLE
+   BEGIN
+      CREATE OR REPLACE FUNCTION findcommonname(character varying) RETURNS character varying AS
+      $CF$
+         SELECT regexp_replace(cng.naturalhistorycommonname, '^.*\)''(.*)''$', '\1') commonname
+         FROM taxon_common tc
+              LEFT OUTER JOIN hierarchy h
+                 ON (tc.id = h.parentid
+                     AND h.pos = 0
+                     AND h.name = 'taxon_naturalhistory:naturalHistoryCommonNameGroupList')
+              LEFT OUTER JOIN naturalhistorycommonnamegroup cng
+                 ON (cng.id = h.id)
+         WHERE tc.refname=$1       
+      $CF$
+      LANGUAGE SQL IMMUTABLE
       RETURNS NULL ON NULL INPUT;
       GRANT EXECUTE ON FUNCTION findcommonname(character varying) to public;
-   END IF;
+   EXCEPTION
+      WHEN undefined_table THEN
+         RAISE NOTICE 'INFO: Creating function findcommonname: missing relation';
+      WHEN OTHERS THEN
+         RAISE 'ERROR: creating function findcommonname: (%)', SQLSTATE;
+   END;
 END$DO$;
 
 
@@ -625,7 +690,7 @@ END$DO$;
 -- used by voucher label report to use number of sheets to print multiple voucher labels
 -- CRH 2/2/2013
 
-DO $DOS$
+DO $DO$
 BEGIN
    BEGIN
       CREATE OR REPLACE FUNCTION findvoucherlabels() RETURNS setof voucherlabeltype AS
@@ -652,11 +717,13 @@ BEGIN
             WHEN fc.item is not null
                  AND co1.fieldcollectionnumber is not null
                  AND sdg.datedisplaydate is null
-            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||co1.fieldcollectionnumber
+            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||
+                                co1.fieldcollectionnumber
 
             WHEN fc.item is not null AND co1.fieldcollectionnumber is null
                  AND sdg.datedisplaydate is not null
-            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||', '||sdg.datedisplaydate
+            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||', '||
+                                sdg.datedisplaydate
 
             WHEN fc.item is not null
                  AND co1.fieldcollectionnumber is null
@@ -786,10 +853,69 @@ BEGIN
       GRANT EXECUTE ON FUNCTION findvoucherlabels() to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'While creating function findvoucherlabels: missing relation';
+         RAISE NOTICE 'INFO: While creating function findvoucherlabels: missing relation';
       WHEN undefined_object THEN
-         RAISE NOTICE 'While creating function findvoucherlabels: undefined object (probably voucherlabeltype)';
+         RAISE NOTICE 'INFO: While creating function findvoucherlabels: undefined object (probably voucherlabeltype)';
       WHEN OTHERS THEN
-         RAISE NOTICE 'ERROR creating function findvoucherlabels: (%)', SQLSTATE;
+         RAISE 'ERROR: creating function findvoucherlabels: (%)', SQLSTATE;
    END;
-END$DOS$
+END$DO$
+
+
+DO $DO$
+BEGIN
+   BEGIN
+      CREATE OR REPLACE VIEW utils.plantsalespottags AS
+      SELECT
+         row_number() OVER (ORDER BY pc.id) AS label_id, 
+         co1.objectnumber AS accession_number, 
+         CASE
+            WHEN pc.taxonname IS NOT NULL AND pc.family IS NOT NULL THEN
+              (getdispl(pc.taxonname) || ' ') || getdispl(pc.family)
+            WHEN pc.taxonname IS NOT NULL AND pc.family IS NULL THEN
+               getdispl(pc.taxonname)
+            WHEN pc.taxonname IS NULL AND pc.family IS NOT NULL THEN
+               getdispl(pc.family)
+            ELSE NULL
+         END AS taxon_data, 
+         pc.commonname AS common_name,
+         pc.locale AS country_name, 
+         pc.labeldata AS label_data,
+         pc.numberoflabels AS quantity, 
+         pc.printlabels AS label_req_flag,
+         core.createdby AS staff_logon, 
+         date(core.createdat) AS date_entered, 
+         core.updatedby AS last_change_staff_logon, 
+         date(core.updatedat) AS last_change_date
+      FROM
+         pottags_common pc
+         LEFT JOIN hierarchy h1
+            ON pc.id = h1.id
+         LEFT JOIN relations_common r1
+            ON (h1.name = r1.subjectcsid
+                AND r1.objectdocumenttype = 'CollectionObject')
+         LEFT JOIN hierarchy h2
+            ON r1.objectcsid = h2.name
+         LEFT JOIN collectionobjects_common co1
+            ON co1.id = h2.id
+         JOIN collectionspace_core core
+            ON (core.id = pc.id
+                AND core.tenantid = 35)
+         JOIN misc misc1
+            ON (misc1.id = pc.id
+                AND misc1.lifecyclestate <> 'deleted')
+         LEFT JOIN misc misc2
+            ON (misc2.id = co1.id
+                AND misc2.lifecyclestate <> 'deleted')
+      WHERE pc.printlabels = 'yes'
+      ORDER BY row_number() OVER (ORDER BY pc.id);
+      ALTER VIEW utils.plantsalespottags OWNER TO nuxeo;
+   EXCEPTION
+      WHEN undefined_table THEN
+         RAISE NOTICE 'INFO: Creating view utils.plantsalespottags: missing relation';
+      WHEN OTHERS THEN
+         RAISE 'ERROR: creating function utils.plantsalespottags: (%)', SQLSTATE;
+   END;
+END$DO$;
+
+
