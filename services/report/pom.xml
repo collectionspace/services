@@ -19,6 +19,12 @@
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>5.0.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>itext</artifactId>
+					<groupId>com.lowagie</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- Jasper Reports fonts are still at 4.0.0, but are compatible with later 
 			software releases - ADR 2012-06-05 -->
