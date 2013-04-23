@@ -1771,13 +1771,15 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (itemsLimit < 1) {
                 logger.warn("Value of configuration setting "
                         + IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES
-                        + " must be a positive integer; current value is " + maxListItemsLimit);
+                        + " must be a positive integer; invalid current value is " + maxListItemsLimit);
+                logger.warn("Reverting to default value of " + DEFAULT_ITEMS_LIMIT);
                 itemsLimit = DEFAULT_ITEMS_LIMIT;
             }
         } catch (NumberFormatException nfe) {
             logger.warn("Value of configuration setting "
                         + IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES
-                        + " must be a positive integer; current value is " + maxListItemsLimit);
+                        + " must be a positive integer; invalid current value is " + maxListItemsLimit);
+            logger.warn("Reverting to default value of " + DEFAULT_ITEMS_LIMIT);
             itemsLimit = DEFAULT_ITEMS_LIMIT;
         }
         return itemsLimit;
