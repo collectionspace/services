@@ -99,7 +99,7 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>taxonomicIdentGroupList/*/requestedBy</types:value>
+                            <types:value>requestedBy</types:value>
                         </types:item>                        
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
