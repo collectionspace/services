@@ -93,6 +93,18 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
+                            <types:value>taxonomicIdentGroupList/*/taxonomicIdentHybridParentGroupList/*/taxonomicIdentHybridParent</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>taxonomicIdentGroupList/*/affinityTaxon</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>requestedBy</types:value>
+                        </types:item>                        
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
                             <types:value>annotationGroupList/*/annotationAuthor</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
@@ -115,6 +127,22 @@
                             <types:key>authRef</types:key>
                             <types:value>accessionUseGroupList/*/usedIn</types:value>
                         </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>localNameGroupList/*/localNameLanguage</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>localityGroupList/*/vCoordSys</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>vegetationType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>accessionUseGroupList/*/materialType</types:value>
+                        </types:item>                        
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd" />
@@ -354,13 +382,41 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
-                            <types:value>commonNameGroupList/*/commonName</types:value>
+                            <types:value>family</types:value>
                         </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>plantAttributesGroupList/*/recordedBy</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>plantAttributesGroupList/*/conservationCategory</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>plantAttributesGroupList/*/conservationOrganization</types:value>
+                        </types:item>                         
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>naturalHistoryCommonNameGroupList/*/naturalHistoryCommonName</types:value>
+                        </types:item>                        
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>relatedTermGroupList/*/relatedTerm</types:value>
                         </types:item>
-                    </service:properties>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>plantAttributesGroupList/*/habitat</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>plantAttributesGroupList/*/climateRating</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>naturalHistoryCommonNameGroupList/*/naturalHistoryCommonNameLanguage</types:value>
+                        </types:item>                        
+                    </service:properties>                    
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/taxonomy/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/taxonomy/domain/naturalhistory http://collectionspace.org/services/taxonomy/domain/taxon_naturalhistory.xsd" />
                     </service:content>
@@ -460,7 +516,39 @@
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="propagations_common" updated="" order="1">
                     <service:properties>
                         <!-- Fields containing authority term references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>propActivityGroupList/*/medium</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>propActivityGroupList/*/nurseryLocation</types:value>
+                        </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>hormone</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>plantType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>propActivityGroupList/*/activityType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>propActivityGroupList/*/potSize</types:value>
+                        </types:item> 
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>propActivityGroupList/*/conditions</types:value>
+                        </types:item> 
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>propActivityGroupList/*/chemicalApplied</types:value>
+                        </types:item>                         
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/propagation" schemaLocation="http://collectionspace.org/services/propagation http://services.collectionspace.org/propagation/propagations_common.xsd" />
@@ -539,6 +627,14 @@
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="pottags_common" updated="" order="1">
                     <service:properties>
                         <!-- Fields containing authority term references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>family</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>taxonName</types:value>
+                        </types:item>                        
                         <!-- Fields containing term list / controlled vocabulary references -->
                     </service:properties>
                     <service:content contentType="application/xml">
