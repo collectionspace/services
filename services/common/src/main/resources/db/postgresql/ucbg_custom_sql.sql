@@ -11,6 +11,11 @@ BEGIN
       WHERE n.nspname = 'utils' )
    THEN
       CREATE SCHEMA utils AUTHORIZATION nuxeo;
+      GRANT USAGE ON SCHEMA utils TO PUBLIC;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA utils
+         GRANT SELECT ON TABLES TO PUBLIC;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA utils
+        GRANT EXECUTE ON FUNCTIONS TO PUBLIC;
    END IF;
 END$DO$;
 
@@ -34,9 +39,10 @@ BEGIN
          annotation varchar,
          vouchercollectioninfo varchar
       );
+      ALTER TYPE voucherlabeltype OWNER TO nuxeo;
    EXCEPTION
       WHEN duplicate_object THEN
-         RAISE NOTICE 'INFO: voucherlabeltype already exists';
+         RAISE NOTICE 'NOTICE: voucherlabeltype already exists';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating type voucherlabeltype: (%)', SQLSTATE;
    END;
@@ -57,7 +63,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The hierarchy table is missing';
+   RAISE NOTICE 'NOTICE: The hierarchy table is missing';
    RETURN;
 END IF;
 
@@ -72,6 +78,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX hierarchy_name_idx ON hierarchy (name);
+   ALTER INDEX hierarchy_name_idx OWNER to nuxeo;
 END IF;
 
 IF NOT EXISTS( SELECT 1
@@ -85,6 +92,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX hierarchy_pos_idx ON hierarchy (pos);
+   ALTER INDEX hierarchy_pos_idx OWNER to nuxeo;
 END IF;
 END$$;
 
@@ -103,7 +111,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The misc table is missing';
+   RAISE NOTICE 'NOTICE: The misc table is missing';
    RETURN;
 END IF;
 
@@ -118,6 +126,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX misc_lifecyclestate_idx ON misc (lifecyclestate) ;
+   ALTER INDEX misc_lifecyclestate_idx OWNER TO nuxeo;
 END IF;
 END$$;
 
@@ -137,7 +146,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The collectionobjects_botgarden table is missing';
+   RAISE NOTICE 'NOTICE: The collectionobjects_botgarden table is missing';
    RETURN;
 END IF;
 
@@ -152,6 +161,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX collectionobjects_botgarden_deadflag_idx ON collectionobjects_botgarden (deadflag);
+   ALTER INDEX collectionobjects_botgarden_deadflag_idx OWNER TO nuxeo;
 END IF;
 END$$;
 
@@ -171,7 +181,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The collectionobjects_naturalhistory table is missing';
+   RAISE NOTICE 'NOTICE: The collectionobjects_naturalhistory table is missing';
    RETURN;
 END IF;
 
@@ -186,6 +196,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX collectionobjects_naturalhistory_rare_idx ON collectionobjects_naturalhistory (rare);
+   ALTER INDEX collectionobjects_naturalhistory_rare_idx OWNER TO nuxeo;
 END IF;
 END$$;
 
@@ -205,7 +216,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The relations_common table is missing';
+   RAISE NOTICE 'NOTICE: The relations_common table is missing';
    RETURN;
 END IF;
 
@@ -220,6 +231,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX relations_common_objectdocumenttype_idx ON relations_common (objectdocumenttype);
+   ALTER INDEX relations_common_objectdocumenttype_idx OWNER TO nuxeo;
 END IF;
 
 IF NOT EXISTS( SELECT 1
@@ -233,6 +245,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX relations_common_subjectdocumenttype_idx ON relations_common (subjectdocumenttype);
+   ALTER INDEX relations_common_subjectdocumenttype_idx OWNER to nuxeo;
 END IF;
 END$$;
 
@@ -252,7 +265,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'NOTIC: The taxonomicIdentGroup table is missing';
+   RAISE NOTICE 'NOTICE: The taxonomicIdentGroup table is missing';
    RETURN;
 END IF;
 
@@ -260,16 +273,19 @@ IF NOT EXISTS( SELECT 1
    FROM
       pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
    WHERE
-      c.relname = 'taxonomicIdentGroup_taxon_idx'
+      c.relname = 'taxonomicidentgroup_taxon_idx'
       AND
       c.relkind = 'i'
       AND
       n.nspname = 'public' )
 THEN
    CREATE INDEX taxonomicIdentGroup_taxon_idx ON taxonomicIdentGroup (taxon);
+   ALTER INDEX taxonomicIdentGroup_taxon_idx OWNER TO nuxeo;
 END IF;
 END$$;
 
+
+-- A convenience function, extracts displayname from a refname
 
 DO $DO$
 BEGIN
@@ -280,10 +296,9 @@ BEGIN
       $$
       LANGUAGE SQL IMMUTABLE
       RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION getdispl(in text) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION getdispl(in text) to public;
    EXCEPTION
-      WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: Creating function getdispl: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function getdispl: (%)', SQLSTATE;
    END;
@@ -457,10 +472,11 @@ BEGIN
       $CF$
       LANGUAGE 'plpgsql' IMMUTABLE
       RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findhybridaffinhtml (tigid varchar) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findhybridaffinhtml(tgid varchar) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: creating function findhybridaffinhtml: missing relation';
+         RAISE NOTICE 'NOTICE: creating function findhybridaffinhtml: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findhybridaffinhtml: (%)', SQLSTATE;
    END;
@@ -575,14 +591,16 @@ BEGIN
       $CF$
       LANGUAGE 'plpgsql' IMMUTABLE
       RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findhybridaffinname (tigid VARCHAR) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findhybridaffinname(tgid VARCHAR) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: creating function findhybridaffinname: missing relation';
+         RAISE NOTICE 'NOTICE: creating function findhybridaffinname: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findhybridaffinname: (%)', SQLSTATE;
    END;
 END$DO$;
+
 
 -- Create findsectionparent function.
 --   Catch and report 'undefined_table' exception for any referenced table that
@@ -605,10 +623,11 @@ BEGIN
          AND tc1.refname = $1
       $CF$
       LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findsectionparent(character varying) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findsectionparent(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: creating function findsectionparent: missing relation';
+         RAISE NOTICE 'NOTICE: creating function findsectionparent: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findsectionparent: (%)', SQLSTATE;
    END;
@@ -639,10 +658,11 @@ BEGIN
             AND tc1.refname=$1
       $CF$
       LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findsubsectionparent(character varying) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findsubsectionparent(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: Creating function findsubsectionparent: missing relation';
+         RAISE NOTICE 'NOTICE: Creating function findsubsectionparent: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findsubsectionparent : (%)', SQLSTATE;
    END;
@@ -673,10 +693,11 @@ BEGIN
       $CF$
       LANGUAGE SQL IMMUTABLE
       RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findcommonname(character varying) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findcommonname(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: Creating function findcommonname: missing relation';
+         RAISE NOTICE 'NOTICE: Creating function findcommonname: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findcommonname: (%)', SQLSTATE;
    END;
@@ -713,17 +734,19 @@ BEGIN
             WHEN fc.item is not null
                  AND co1.fieldcollectionnumber is not null
                  AND sdg.datedisplaydate is not null
-            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||co1.fieldcollectionnumber||', '||sdg.datedisplaydate
+            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1') || ' '
+                                || co1.fieldcollectionnumber || ', '
+                                || sdg.datedisplaydate
             WHEN fc.item is not null
                  AND co1.fieldcollectionnumber is not null
                  AND sdg.datedisplaydate is null
-            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||
-                                co1.fieldcollectionnumber
+            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1') || ' '
+                                || co1.fieldcollectionnumber
 
             WHEN fc.item is not null AND co1.fieldcollectionnumber is null
                  AND sdg.datedisplaydate is not null
-            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||', '||
-                                sdg.datedisplaydate
+            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1') || ', '
+                                || sdg.datedisplaydate
 
             WHEN fc.item is not null
                  AND co1.fieldcollectionnumber is null
@@ -850,17 +873,20 @@ BEGIN
       END;
       $CF$
       LANGUAGE 'plpgsql' IMMUTABLE RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findvoucherlabels() OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findvoucherlabels() to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: While creating function findvoucherlabels: missing relation';
+         RAISE NOTICE 'NOTICE: While creating function findvoucherlabels: missing relation';
       WHEN undefined_object THEN
-         RAISE NOTICE 'INFO: While creating function findvoucherlabels: undefined object (probably voucherlabeltype)';
+         RAISE NOTICE 'NOTICE: While creating function findvoucherlabels: undefined object (probably voucherlabeltype)';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findvoucherlabels: (%)', SQLSTATE;
    END;
-END$DO$
+END$DO$;
 
+
+-- A view used for creating plant tag records
 
 DO $DO$
 BEGIN
@@ -910,12 +936,12 @@ BEGIN
       WHERE pc.printlabels = 'yes'
       ORDER BY row_number() OVER (ORDER BY pc.id);
       ALTER VIEW utils.plantsalespottags OWNER TO nuxeo;
+      GRANT SELECT ON utils.plantsalespottags to PUBLIC;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: Creating view utils.plantsalespottags: missing relation';
+         RAISE NOTICE 'NOTICE: Creating view utils.plantsalespottags: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function utils.plantsalespottags: (%)', SQLSTATE;
    END;
 END$DO$;
-
 
