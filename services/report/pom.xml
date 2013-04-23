@@ -37,6 +37,11 @@
 		<!-- For some reason, have to declare this dependency explicitly, ot it does not find it.
 			It is a dependency of jasperreports 5.0.1 
 			-->
+		<dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>2.1.7</version>
+		</dependency>
 		<!-- The Jasper POM declares this as a compile-time dependency, but it is needed at runtime.
 			-->
 		<dependency>
