@@ -19,6 +19,12 @@
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>5.0.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>itext</artifactId>
+					<groupId>com.lowagie</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- Jasper Reports fonts are still at 4.0.0, but are compatible with later 
 			software releases - ADR 2012-06-05 -->
@@ -31,11 +37,6 @@
 		<!-- For some reason, have to declare this dependency explicitly, ot it does not find it.
 			It is a dependency of jasperreports 5.0.1 
 			-->
-		<dependency>
-			<groupId>com.lowagie</groupId>
-			<artifactId>itext</artifactId>
-			<version>2.1.7</version>
-		</dependency>
 		<!-- The Jasper POM declares this as a compile-time dependency, but it is needed at runtime.
 			-->
 		<dependency>
