@@ -765,11 +765,9 @@ public class NuxeoUtils {
 			Object value = docModel.getPropertyValue(xpath);
 			String returnVal = null;
 			if (value == null) {
-				// Nothing to do - leave returnVal null
-			} else if (value instanceof GregorianCalendar) {
-				returnVal = GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp((GregorianCalendar) value);
+		            // Nothing to do - leave returnVal null
 			} else {
-				returnVal = value.toString();
+                            returnVal = DocumentUtils.propertyValueAsString(value, docModel, xpath);
 			}
 			result = returnVal;
 		} catch (PropertyException pe) {
@@ -828,5 +826,6 @@ public class NuxeoUtils {
     	    return schema + ":" + complexPropertyName + "/*/" + fieldName;
         }
     }
+
     
 }
