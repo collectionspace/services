@@ -42,6 +42,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.query.QueryContext;
 
 import org.dom4j.Document;
@@ -765,11 +766,9 @@ public class NuxeoUtils {
 			Object value = docModel.getPropertyValue(xpath);
 			String returnVal = null;
 			if (value == null) {
-				// Nothing to do - leave returnVal null
-			} else if (value instanceof GregorianCalendar) {
-				returnVal = GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp((GregorianCalendar) value);
+		            // Nothing to do - leave returnVal null
 			} else {
-				returnVal = value.toString();
+                            returnVal = DocumentUtils.propertyValueAsString(value, docModel, xpath);
 			}
 			result = returnVal;
 		} catch (PropertyException pe) {
@@ -828,5 +827,6 @@ public class NuxeoUtils {
     	    return schema + ":" + complexPropertyName + "/*/" + fieldName;
         }
     }
+
     
 }
