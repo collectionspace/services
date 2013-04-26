@@ -117,6 +117,16 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 		return getFieldXml(fieldName, fields.get(fieldName));
 	}
 
+	protected String getFieldXml(Map<String, String> fields) {
+		StringBuffer xmlBuffer = new StringBuffer();
+		
+		for (String fieldName : fields.keySet()) {
+			xmlBuffer.append(getFieldXml(fields, fieldName));
+		}
+		
+		return xmlBuffer.toString();
+	}
+	
 	protected String getFieldXml(String fieldName, String fieldValue) {
 		String xml = "<" + fieldName + ">" + (fieldValue == null ? "" : StringEscapeUtils.escapeXml(fieldValue)) + "</" + fieldName + ">";
 		

@@ -103,6 +103,14 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 			fields.put("annotation", getAnnotation(collectionObjectPayload));
 			fields.put("labelRequested", LoanoutConstants.LABEL_REQUESTED_NO_VALUE);
 			
+			// UCBG-273: Explicitly set all boolean fields to false, because null values mess up the UI.
+			fields.put("reviewComplete", "false");
+			fields.put("flowering", "false");
+			fields.put("sterile", "false");
+			fields.put("fruiting", "false");
+			fields.put("inSpore", "false");
+			fields.put("fertile", "false");
+			
 			String voucherCsid = createVoucher(fields);
 			logger.debug("voucher created: voucherCsid=" + voucherCsid);
 			
@@ -252,11 +260,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"loansout\">" +
 				"<ns2:loansout_botgarden xmlns:ns2=\"http://collectionspace.org/services/loanout/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					getFieldXml(fields, "gardenLocation") +
-					getFieldXml(fields, "fieldCollectionNote") +
-					getFieldXml(fields, "fieldCollectionPlaceNote") +
-					getFieldXml(fields, "annotation") +
-					getFieldXml(fields, "labelRequested") +
+					getFieldXml(fields) +
 				"</ns2:loansout_botgarden>" +
 			"</document>";
 
