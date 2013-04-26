@@ -189,6 +189,26 @@ public class ServiceBindingUtils {
     	try {
             Object obj = docModel.getPropertyValue(propName);
             return DocumentUtils.propertyValueAsString(obj, docModel, propName);
+                return "";
+            }
+            if (String.class.isAssignableFrom(obj.getClass())) {
+                return (String)obj;
+            } else {
+                // Handle cases where a property value returned from the repository
+                // can't be directly cast to a String.
+                //
+                // FIXME: We may want to create a new utility method to centralize
+                // our handling of these cases, as similar conversions might currently
+                // be performed in multiple classes. - ADR 2013-04-25
+                if (obj instanceof GregorianCalendar) {
+                    return GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp((GregorianCalendar)obj);
+                } else {
+                    logger.warn("Could not convert value of property " + propName
+                            + " in path " + docModel.getPathAsString() + " to a String.");
+                    logger.warn("This may be due to a new, as-yet-unhandled datatype returned from the repository");
+                   return "";
+                }
+            }
     	} catch(IndexOutOfBoundsException ioobe) {
 				// Should not happen, but may with certain array forms
 				if(logger.isTraceEnabled()) {
