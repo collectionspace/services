@@ -11,6 +11,11 @@ BEGIN
       WHERE n.nspname = 'utils' )
    THEN
       CREATE SCHEMA utils AUTHORIZATION nuxeo;
+      GRANT USAGE ON SCHEMA utils TO PUBLIC;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA utils
+         GRANT SELECT ON TABLES TO PUBLIC;
+      ALTER DEFAULT PRIVILEGES IN SCHEMA utils
+        GRANT EXECUTE ON FUNCTIONS TO PUBLIC;
    END IF;
 END$DO$;
 
@@ -34,9 +39,10 @@ BEGIN
          annotation varchar,
          vouchercollectioninfo varchar
       );
+      ALTER TYPE voucherlabeltype OWNER TO nuxeo;
    EXCEPTION
       WHEN duplicate_object THEN
-         RAISE NOTICE 'INFO: voucherlabeltype already exists';
+         RAISE NOTICE 'NOTICE: voucherlabeltype already exists';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating type voucherlabeltype: (%)', SQLSTATE;
    END;
@@ -57,7 +63,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The hierarchy table is missing';
+   RAISE NOTICE 'NOTICE: The hierarchy table is missing';
    RETURN;
 END IF;
 
@@ -72,6 +78,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX hierarchy_name_idx ON hierarchy (name);
+   ALTER INDEX hierarchy_name_idx OWNER to nuxeo;
 END IF;
 
 IF NOT EXISTS( SELECT 1
@@ -85,6 +92,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX hierarchy_pos_idx ON hierarchy (pos);
+   ALTER INDEX hierarchy_pos_idx OWNER to nuxeo;
 END IF;
 END$$;
 
@@ -103,7 +111,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The misc table is missing';
+   RAISE NOTICE 'NOTICE: The misc table is missing';
    RETURN;
 END IF;
 
@@ -118,6 +126,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX misc_lifecyclestate_idx ON misc (lifecyclestate) ;
+   ALTER INDEX misc_lifecyclestate_idx OWNER TO nuxeo;
 END IF;
 END$$;
 
@@ -137,7 +146,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The collectionobjects_botgarden table is missing';
+   RAISE NOTICE 'NOTICE: The collectionobjects_botgarden table is missing';
    RETURN;
 END IF;
 
@@ -152,6 +161,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX collectionobjects_botgarden_deadflag_idx ON collectionobjects_botgarden (deadflag);
+   ALTER INDEX collectionobjects_botgarden_deadflag_idx OWNER TO nuxeo;
 END IF;
 END$$;
 
@@ -171,7 +181,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The collectionobjects_naturalhistory table is missing';
+   RAISE NOTICE 'NOTICE: The collectionobjects_naturalhistory table is missing';
    RETURN;
 END IF;
 
@@ -186,6 +196,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX collectionobjects_naturalhistory_rare_idx ON collectionobjects_naturalhistory (rare);
+   ALTER INDEX collectionobjects_naturalhistory_rare_idx OWNER TO nuxeo;
 END IF;
 END$$;
 
@@ -205,7 +216,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'INFO: The relations_common table is missing';
+   RAISE NOTICE 'NOTICE: The relations_common table is missing';
    RETURN;
 END IF;
 
@@ -220,6 +231,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX relations_common_objectdocumenttype_idx ON relations_common (objectdocumenttype);
+   ALTER INDEX relations_common_objectdocumenttype_idx OWNER TO nuxeo;
 END IF;
 
 IF NOT EXISTS( SELECT 1
@@ -233,6 +245,7 @@ IF NOT EXISTS( SELECT 1
       n.nspname = 'public' )
 THEN
    CREATE INDEX relations_common_subjectdocumenttype_idx ON relations_common (subjectdocumenttype);
+   ALTER INDEX relations_common_subjectdocumenttype_idx OWNER to nuxeo;
 END IF;
 END$$;
 
@@ -252,7 +265,7 @@ IF NOT EXISTS ( SELECT 1
       AND c.relkind = 'r'
       AND n.nspname = 'public' )
 THEN
-   RAISE NOTICE 'NOTIC: The taxonomicIdentGroup table is missing';
+   RAISE NOTICE 'NOTICE: The taxonomicIdentGroup table is missing';
    RETURN;
 END IF;
 
@@ -260,16 +273,19 @@ IF NOT EXISTS( SELECT 1
    FROM
       pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
    WHERE
-      c.relname = 'taxonomicIdentGroup_taxon_idx'
+      c.relname = 'taxonomicidentgroup_taxon_idx'
       AND
       c.relkind = 'i'
       AND
       n.nspname = 'public' )
 THEN
    CREATE INDEX taxonomicIdentGroup_taxon_idx ON taxonomicIdentGroup (taxon);
+   ALTER INDEX taxonomicIdentGroup_taxon_idx OWNER TO nuxeo;
 END IF;
 END$$;
 
+
+-- A convenience function, extracts displayname from a refname
 
 DO $DO$
 BEGIN
@@ -280,10 +296,9 @@ BEGIN
       $$
       LANGUAGE SQL IMMUTABLE
       RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION getdispl(in text) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION getdispl(in text) to public;
    EXCEPTION
-      WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: Creating function getdispl: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function getdispl: (%)', SQLSTATE;
    END;
@@ -457,10 +472,11 @@ BEGIN
       $CF$
       LANGUAGE 'plpgsql' IMMUTABLE
       RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findhybridaffinhtml (tigid varchar) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findhybridaffinhtml(tgid varchar) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: creating function findhybridaffinhtml: missing relation';
+         RAISE NOTICE 'NOTICE: creating function findhybridaffinhtml: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findhybridaffinhtml: (%)', SQLSTATE;
    END;
@@ -575,14 +591,16 @@ BEGIN
       $CF$
       LANGUAGE 'plpgsql' IMMUTABLE
       RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findhybridaffinname (tigid VARCHAR) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findhybridaffinname(tgid VARCHAR) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: creating function findhybridaffinname: missing relation';
+         RAISE NOTICE 'NOTICE: creating function findhybridaffinname: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findhybridaffinname: (%)', SQLSTATE;
    END;
 END$DO$;
+
 
 -- Create findsectionparent function.
 --   Catch and report 'undefined_table' exception for any referenced table that
@@ -605,10 +623,11 @@ BEGIN
          AND tc1.refname = $1
       $CF$
       LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findsectionparent(character varying) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findsectionparent(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: creating function findsectionparent: missing relation';
+         RAISE NOTICE 'NOTICE: creating function findsectionparent: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findsectionparent: (%)', SQLSTATE;
    END;
@@ -639,10 +658,11 @@ BEGIN
             AND tc1.refname=$1
       $CF$
       LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findsubsectionparent(character varying) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findsubsectionparent(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: Creating function findsubsectionparent: missing relation';
+         RAISE NOTICE 'NOTICE: Creating function findsubsectionparent: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findsubsectionparent : (%)', SQLSTATE;
    END;
@@ -673,10 +693,11 @@ BEGIN
       $CF$
       LANGUAGE SQL IMMUTABLE
       RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findcommonname(character varying) OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findcommonname(character varying) to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: Creating function findcommonname: missing relation';
+         RAISE NOTICE 'NOTICE: Creating function findcommonname: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findcommonname: (%)', SQLSTATE;
    END;
@@ -696,172 +717,117 @@ BEGIN
       CREATE OR REPLACE FUNCTION findvoucherlabels() RETURNS setof voucherlabeltype AS
       $CF$
       DECLARE
-         sheetcount integer;
-         r voucherlabeltype%rowtype;
-         n integer;
-
+          sheetcount integer;
+          r voucherlabeltype%rowtype;
+          n integer;
+      
       BEGIN
-         FOR r IN
-         SELECT co1.objectnumber,
-         CASE WHEN tig.hybridflag = 'false' THEN tt.termformatteddisplayname
-              WHEN tig.hybridflag = 'true' THEN findhybridnamehtml(tig.id)
-         END AS determinationformatted,
-         CASE WHEN (tn.family is not null AND tn.family <> '')
-            THEN regexp_replace(tn.family, '^.*\)''(.*)''$', '\1')
-         END AS family,
-         CASE
-            WHEN fc.item is not null
-                 AND co1.fieldcollectionnumber is not null
-                 AND sdg.datedisplaydate is not null
-            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||co1.fieldcollectionnumber||', '||sdg.datedisplaydate
-            WHEN fc.item is not null
-                 AND co1.fieldcollectionnumber is not null
-                 AND sdg.datedisplaydate is null
-            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||
-                                co1.fieldcollectionnumber
-
-            WHEN fc.item is not null AND co1.fieldcollectionnumber is null
-                 AND sdg.datedisplaydate is not null
-            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||', '||
-                                sdg.datedisplaydate
-
-            WHEN fc.item is not null
-                 AND co1.fieldcollectionnumber is null
-                 AND sdg.datedisplaydate is null
-            THEN regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')
-
-            WHEN fc.item is null
-                 AND co1.fieldcollectionnumber is not null
-                 AND sdg.datedisplaydate is not null
-            THEN co1.fieldcollectionnumber||', '||sdg.datedisplaydate
-
-            WHEN fc.item is null
-                 AND co1.fieldcollectionnumber is not null
-                 AND sdg.datedisplaydate is null
-            THEN co1.fieldcollectionnumber
-
-            WHEN fc.item is null
-                 AND co1.fieldcollectionnumber is null
-                 AND sdg.datedisplaydate is not null
-            THEN sdg.datedisplaydate
-         END AS collectioninfo,
-         CASE
-            WHEN (lg.fieldlocplace is not null
-                   AND lg.fieldlocplace <> '')
-            THEN regexp_replace(lg.fieldlocplace, '^.*\)''(.*)''$', '\1')
-
-            WHEN (lg.fieldlocplace is null
-                  AND lg.taxonomicrange is not null)
-            THEN 'Geographic range: '||lg.taxonomicrange
-         END AS locality,
-
-         lc.loanoutnumber vouchernumber,
-         lnh.numlent numbersheets,
-         lb.labelrequested,
-
-         CASE
-            WHEN (lb.gardenlocation is not null
-                  AND lb.gardenlocation <> '')
-            THEN regexp_replace(lb.gardenlocation, '^.*\)''(.*)''$', '\1')
-         END AS gardenlocation,
-
-         CASE
-            WHEN (lb.gardenlocation is not null
-                  AND lb.gardenlocation <> '')
-            THEN 'Garden No. '||co1.objectnumber||', Bed '||regexp_replace(lb.gardenlocation, '^.*\)''(.*)''$', '\1')
-            ELSE 'Garden No. '||co1.objectnumber||', Bed unknown'
-         END AS gardeninfo,
-
-         CASE
-            WHEN lb.hortwild='Horticultural' THEN 'Horticultural voucher:'
-            WHEN lb.hortwild='Wild' THEN 'Wild voucher:'
-         END AS vouchertype,
-
-         lb.fieldcollectionnote,
-         lb.annotation,
-
-         CASE
-            WHEN (lbc.item is not null AND lbc.item <> ''
-                  AND lc.loanoutdate is not null)
-            THEN regexp_replace(lbc.item, '^.*\)''(.*)''$', '\1')||', '||to_char(date(lc.loanoutdate + interval '8 hours'), 'MM/dd/yyyy')
-
-            WHEN (lbc.item is not null
-                  AND lbc.item <> ''
-                  AND lc.loanoutdate is null)
-            THEN regexp_replace(lbc.item, '^.*\)''(.*)''$', '\1')
-
-            WHEN (lbc.item is null
-                  AND lc.loanoutdate is not null)
-            THEN to_char(date(lc.loanoutdate + interval '8 hours'), 'MM/dd/yyyy')
-         END AS vouchercollectioninfo
-
-         FROM loansout_common lc
-            JOIN loansout_naturalhistory lnh ON (lc.id=lnh.id)
-            JOIN loansout_botgarden lb ON (lc.id=lb.id)
-            LEFT OUTER JOIN loansout_botgarden_collectorlist lbc ON (lbc.id = lc.id AND lbc.pos=0)
-            JOIN hierarchy h1 ON lc.id=h1.id
-            JOIN relations_common r1 ON (h1.name=r1.subjectcsid AND objectdocumenttype='CollectionObject')
-            JOIN hierarchy h2 ON (r1.objectcsid=h2.name)
-            JOIN collectionobjects_common co1 ON (co1.id=h2.id)
-
-            LEFT OUTER JOIN hierarchy htig
-               ON (co1.id = htig.parentid
-                   AND htig.pos = 0
-                   AND htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
-            LEFT OUTER JOIN taxonomicIdentGroup tig ON (tig.id = htig.id)
-
-            JOIN collectionspace_core core ON (core.id=co1.id)
-            JOIN misc misc2 ON (misc2.id = co1.id
-                                AND misc2.lifecyclestate <> 'deleted')
-
-            LEFT OUTER JOIN taxon_common tc ON (tig.taxon=tc.refname)
-            LEFT OUTER JOIN taxon_naturalhistory tn ON (tc.id=tn.id)
-            LEFT OUTER JOIN hierarchy htt
-               ON (tc.id=htt.parentid
-                   AND htt.name='taxon_common:taxonTermGroupList'
-                   AND htt.pos=0) -- for now assuming preferred name
-            LEFT OUTER JOIN taxontermgroup tt ON (tt.id=htt.id)
-            LEFT OUTER JOIN collectionobjects_common_fieldCollectors fc ON (co1.id = fc.id
-                                                                            AND fc.pos = 0)
-
-            LEFT OUTER JOIN hierarchy hfcdg ON (co1.id = hfcdg.parentid
-                                                AND hfcdg.name='collectionobjects_common:fieldCollectionDateGroup')
-            LEFT OUTER JOIN structureddategroup sdg ON (sdg.id = hfcdg.id)
-
-            LEFT OUTER JOIN hierarchy hlg ON (co1.id = hlg.parentid
-                                              AND hlg.pos = 0
-                                              AND hlg.name='collectionobjects_naturalhistory:localityGroupList')
-            LEFT OUTER JOIN localitygroup lg ON (lg.id = hlg.id)
-
-         WHERE lb.labelrequested = 'Yes'
-         ORDER BY objectnumber
-
-         LOOP
-            -- return next r;
-
-            sheetcount := r.numbersheets;
-
-            FOR n IN 1..sheetcount LOOP
-               RETURN next r;
-            END LOOP;
-         END LOOP;
+      
+      FOR r IN
+      select co1.objectnumber,
+      findhybridaffinhtml(tig.id) determinationformatted,
+      case when (tn.family is not null and tn.family <> '')
+           then regexp_replace(tn.family, '^.*\)''(.*)''$', '\1')
+      end as family,
+      case when fc.item is not null and co1.fieldcollectionnumber is not null and sdg.datedisplaydate is not null
+              then regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||co1.fieldcollectionnumber||', '||sdg.datedisplaydate
+        when fc.item is not null and co1.fieldcollectionnumber is not null and sdg.datedisplaydate is null
+              then regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' '||co1.fieldcollectionnumber||', s.d.'
+        when fc.item is not null and co1.fieldcollectionnumber is null and sdg.datedisplaydate is not null
+              then regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' s.n., '||sdg.datedisplaydate
+        when fc.item is not null and co1.fieldcollectionnumber is null and sdg.datedisplaydate is null
+              then regexp_replace(fc.item, '^.*\)''(.*)''$', '\1')||' s.n., s.d.'
+        when fc.item is null and co1.fieldcollectionnumber is not null and sdg.datedisplaydate is not null
+              then co1.fieldcollectionnumber||', '||sdg.datedisplaydate
+        when fc.item is null and co1.fieldcollectionnumber is not null and sdg.datedisplaydate is null
+              then co1.fieldcollectionnumber||', s.d.'
+        when fc.item is null and co1.fieldcollectionnumber is null and sdg.datedisplaydate is not null
+              then 's.n., '||sdg.datedisplaydate
+      end as collectioninfo,
+      lc.loanoutnumber vouchernumber,
+      lnh.numlent numbersheets,
+      lb.labelrequested,
+      case when (lb.gardenlocation is not null and lb.gardenlocation <> '')
+           then 'Garden No. '||co1.objectnumber||', Bed '||regexp_replace(lb.gardenlocation, '^.*\)''(.*)''$', '\1')
+           else 'Garden No. '||co1.objectnumber||', Bed unknown'
+      end as gardeninfo,
+      case when lb.hortwild='Horticultural' then 'Horticultural voucher:'
+           when lb.hortwild='Wild' then 'Wild voucher:'
+      end as vouchertype,
+      lb.fieldcollectionnote,
+      lb.annotation,
+      case when (lbc.item is not null and lbc.item <> '' and lc.loanoutdate is not null)
+            then regexp_replace(lbc.item, '^.*\)''(.*)''$', '\1')||', '||to_char(date(lc.loanoutdate + interval '8 hours'), 'MM/dd/yyyy')
+           when (lbc.item is not null and lbc.item <> '' and lc.loanoutdate is null)
+            then regexp_replace(lbc.item, '^.*\)''(.*)''$', '\1')
+           when (lbc.item is null and lc.loanoutdate is not null)
+            then to_char(date(lc.loanoutdate + interval '8 hours'), 'MM/dd/yyyy')
+      end as vouchercollectioninfo
+      from loansout_common lc
+      join loansout_naturalhistory lnh on (lc.id=lnh.id)
+      join loansout_botgarden lb on (lc.id=lb.id)
+      left outer join loansout_botgarden_collectorlist lbc on (lbc.id = lc.id and lbc.pos=0)
+      
+      join hierarchy h1 on lc.id=h1.id
+      join relations_common r1 on (h1.name=r1.subjectcsid and objectdocumenttype='CollectionObject')
+      join hierarchy h2 on (r1.objectcsid=h2.name)
+      join collectionobjects_common co1 on (co1.id=h2.id)
+      
+      left outer join hierarchy htig
+           on (co1.id = htig.parentid and htig.pos = 0 and htig.name = 'collectionobjects_naturalhistory:taxonomicIdentGroupList')
+      left outer join taxonomicIdentGroup tig on (tig.id = htig.id)
+      
+      join collectionspace_core core on (core.id=co1.id)
+      join misc misc2 on (misc2.id = co1.id and misc2.lifecyclestate <> 'deleted')
+      
+      left outer join taxon_common tc on (tig.taxon=tc.refname)
+      left outer join taxon_naturalhistory tn on (tc.id=tn.id)
+      
+      left outer join hierarchy htt
+          on (tc.id=htt.parentid and htt.name='taxon_common:taxonTermGroupList' and htt.pos=0)
+      left outer join taxontermgroup tt on (tt.id=htt.id)
+      
+      left outer join collectionobjects_common_fieldCollectors fc on (co1.id = fc.id and fc.pos = 0)
+      
+      left outer join hierarchy hfcdg on (co1.id = hfcdg.parentid  and hfcdg.name='collectionobjects_common:fieldCollectionDateGroup')
+      left outer join structureddategroup sdg on (sdg.id = hfcdg.id)
+      
+      where lb.labelrequested = 'Yes'
+      order by objectnumber
+      
+      LOOP
+      
+      -- return next r;
+      
+      sheetcount := r.numbersheets;
+      
+      for n in 1..sheetcount loop
+      
+      return next r;
+      
+      END LOOP;
+      
+      END LOOP;
+      
       RETURN;
-
-      END;
+      END; 
       $CF$
-      LANGUAGE 'plpgsql' IMMUTABLE RETURNS NULL ON NULL INPUT;
+      LANGUAGE 'plpgsql' IMMUTABLE
+      RETURNS NULL ON NULL INPUT;
+      ALTER FUNCTION findvoucherlabels() OWNER TO nuxeo;
       GRANT EXECUTE ON FUNCTION findvoucherlabels() to public;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: While creating function findvoucherlabels: missing relation';
+         RAISE NOTICE 'NOTICE: While creating function findvoucherlabels: missing relation';
       WHEN undefined_object THEN
-         RAISE NOTICE 'INFO: While creating function findvoucherlabels: undefined object (probably voucherlabeltype)';
+         RAISE NOTICE 'NOTICE: While creating function findvoucherlabels: undefined object (probably voucherlabeltype)';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function findvoucherlabels: (%)', SQLSTATE;
    END;
-END$DO$
+END$DO$;
 
 
+-- A view used for creating plant tag records
 DO $DO$
 BEGIN
    BEGIN
@@ -910,12 +876,12 @@ BEGIN
       WHERE pc.printlabels = 'yes'
       ORDER BY row_number() OVER (ORDER BY pc.id);
       ALTER VIEW utils.plantsalespottags OWNER TO nuxeo;
+      GRANT SELECT ON utils.plantsalespottags to PUBLIC;
    EXCEPTION
       WHEN undefined_table THEN
-         RAISE NOTICE 'INFO: Creating view utils.plantsalespottags: missing relation';
+         RAISE NOTICE 'NOTICE: Creating view utils.plantsalespottags: missing relation';
       WHEN OTHERS THEN
          RAISE 'ERROR: creating function utils.plantsalespottags: (%)', SQLSTATE;
    END;
 END$DO$;
-
 
