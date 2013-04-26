@@ -17,6 +17,9 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import java.lang.IndexOutOfBoundsException;
+import java.util.GregorianCalendar;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.api.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,10 +179,35 @@ public class ServiceBindingUtils {
     	}
     	*/
     	String propName = getPropertyValue(sb, logicalFieldName);
-    	if(propName==null||propName.isEmpty())
-    		return null;
+    	if(Tools.isBlank(propName)) {
+                logger.warn("Property name is empty for property " + logicalFieldName + " in service " + sb.getName());
+                logger.warn("This may be due to an improperly configured or missing "
+                        + "generic property (objectNameProperty, objectNumberProperty ...) in tenant bindings configuration");
+    		return "";
+        }
     	try {
-    		return (String)docModel.getPropertyValue(propName);
+            Object obj = docModel.getPropertyValue(propName);
+            if (obj == null) {
+                return "";
+            }
+            if (String.class.isAssignableFrom(obj.getClass())) {
+                return (String)obj;
+            } else {
+                // Handle cases where a property value returned from the repository
+                // can't be directly cast to a String.
+                //
+                // FIXME: We may want to create a new utility method to centralize
+                // our handling of these cases, as similar conversions might currently
+                // be performed in multiple classes. - ADR 2013-04-25
+                if (obj instanceof GregorianCalendar) {
+                    return GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp((GregorianCalendar)obj);
+                } else {
+                    logger.warn("Could not convert value of property " + propName
+                            + " in path " + docModel.getPathAsString() + " to a String.");
+                    logger.warn("This may be due to a new, as-yet-unhandled datatype returned from the repository");
+                   return "";
+                }
+            }
     	} catch(IndexOutOfBoundsException ioobe) {
 				// Should not happen, but may with certain array forms
 				if(logger.isTraceEnabled()) {
