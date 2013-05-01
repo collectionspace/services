@@ -146,8 +146,13 @@ public class FileTools {
     }
 
     public static String readFile(String dir, String relPath){
+        File theFile = new File(dir, relPath);
+        return readFile(theFile);
+
+    }
+    
+    public static String readFile(File theFile){
         try {
-            File theFile = new File(dir, relPath);
             FileInputStream fis = new FileInputStream(theFile);
             byte[] theData = new byte[(int) theFile.length()];
             // need to check the number of bytes read here
