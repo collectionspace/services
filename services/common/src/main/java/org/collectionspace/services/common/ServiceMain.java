@@ -366,12 +366,15 @@ public class ServiceMain {
         return serverRootDir;
     }
     
+    /**
+     * @return the server resources path
+     */
+    public String getServerResourcesPath() {
+        return getServerRootDir() + File.separator + ConfigReader.RESOURCES_DIR_PATH + File.separator;
+    }
+    
     public InputStream getResourceAsStream(String resourceName) throws FileNotFoundException {
-    	InputStream result = null;
-    	
-    	String resourcePath = getServerRootDir() + File.separator + ConfigReader.RESOURCES_DIR_PATH + File.separator + resourceName;
-    	result = new FileInputStream(new File(resourcePath));
-    	
+    	InputStream result = new FileInputStream(new File(getServerResourcesPath() + resourceName));
     	return result;
     }
 
