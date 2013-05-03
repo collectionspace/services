@@ -15,7 +15,11 @@
                             Performance may be an issue for very large authorities, especially if
                             many of them share common substrings. -->
         <tenant:properties>
-            <types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert" >
+            <types:item id="maxListItemsReturnedLimitOnJdbcQueries" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
+                <types:key>maxListItemsReturnedLimitOnJdbcQueries</types:key>
+                <types:value>100</types:value>
+            </types:item>
+            <types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
                     <types:key>ptStartingWildcard</types:key>
                     <types:value>false</types:value>
             </types:item>
