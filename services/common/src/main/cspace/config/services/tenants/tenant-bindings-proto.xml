@@ -49,16 +49,16 @@
             <!--
                 Controls whether term completion (aka partial term matching,
                 aka autocomplete) searches will automatically insert a leading
-                wildcard, in order to match your search expression when found
-                anywhere within a term, not just at the beginning of a term.
+                wildcard.
                 
-                The default value is 'true', which will match your search
-                expression when found anywhere within a term. If this value is
-                set to 'false', searches will only find terms which begin with
-                your search expression. However, even after doing so, you can
-                manually add a wildcard at the beginning of any search; e.g.
-                "*atrick" (without quotes) will match the string "atrick"
-                anywhere, not just at the beginning of a term.
+                The default value is 'true', which will cause your search
+                expression to be matched when found anywhere within a term.
+                If this value is set to 'false', searches will only find terms
+                which begin with your search expression. However, even with a
+                setting of 'false', you can manually add an asterisk (*) as a
+                wildcard at the beginning of any search; e.g. "*atrick"
+                (without quotes) will match the string "atrick" anywhere, not
+                just at the beginning of a term.
 
                 See the tenant-bindings.delta.xml file for the 'lifesci' tenant,
                 for an example of how to override this value in your tenant.
@@ -69,7 +69,7 @@
             </types:item>
             <!--
                By default, term completion searches return a maximum number
-               of terms in their search results. The default value is 40 terms
+               of terms in their search results. The default value is 40 terms.
                See the tenant-bindings.delta.xml file for the 'lifesci' tenant,
                for an example of how to override this value in your tenant.
             -->
