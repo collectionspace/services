@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.collectionspace.services</groupId>
 		<artifactId>org.collectionspace.services.main</artifactId>
-		<version>3.2.2-SNAPSHOT</version>
+		<version>3.2.3-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
@@ -19,6 +19,12 @@
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>5.0.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>itext</artifactId>
+					<groupId>com.lowagie</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- Jasper Reports fonts are still at 4.0.0, but are compatible with later 
 			software releases - ADR 2012-06-05 -->

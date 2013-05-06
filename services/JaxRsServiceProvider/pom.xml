@@ -4,7 +4,7 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>3.2.2-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -450,7 +450,7 @@
 			<!-- Until issue http://issues.collectionspace.org/browse/CSPACE-4639 is resolved, we
 				<version>5.5-NXP-8140</version>
 				need to use this patched Nuxeo artifact that is only available on our public Maven
-				repository -see http://source.collectionspace.org:8081/artifactory
+				repository -see http://nightly.collectionspace.org:8081/artifactory
 				
 				Once the issue is resolved and a public version of the artifact becomes available, we
 				should revert this dependency's version to be the following:

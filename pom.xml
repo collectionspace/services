@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services</artifactId>
-	<version>3.2.2-SNAPSHOT</version>
+	<version>3.2.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>services</name>
 
@@ -22,22 +22,22 @@
 		<nuxeo.platform.version>5.5-I20111104_1115</nuxeo.platform.version>
 		<nuxeo.core.version>5.5-I20111104_1115</nuxeo.core.version>
 -->
-		<cspace.services.version>3.2.2-SNAPSHOT</cspace.services.version>
-		<cspace.services.client.version>3.2.2-SNAPSHOT</cspace.services.client.version>
+		<cspace.services.version>3.2.3-SNAPSHOT</cspace.services.version>
+		<cspace.services.client.version>3.2.3-SNAPSHOT</cspace.services.client.version>
 		<spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.2.RELEASE</spring.security.version>
 	</properties>
 
 	<distributionManagement>
 		<repository>
-			<id>libs-releases-local</id>
-			<name>libs-releases-local</name>
-			<url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
+			<id>libs-release-local</id>
+			<name>libs-release-local</name>
+			<url>http://nightly.collectionspace.org:8081/artifactory/libs-release-local</url>
 		</repository>
 		<snapshotRepository>
-			<id>libs-snapshots-local</id>
-			<name>libs-snapshots-local</name>
-			<url>http://source.collectionspace.org:8081/artifactory/libs-snapshots-local</url>
+			<id>libs-snapshot-local</id>
+			<name>libs-snapshot-local</name>
+			<url>http://nightly.collectionspace.org:8081/artifactory/libs-snapshot-local</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -50,7 +50,7 @@
 		<repository>
 			<id>collectionspace-remote-repos</id>
 			<name>collectionspace-remote-repos</name>
-			<url>http://source.collectionspace.org:8081/artifactory/remote-repos</url>
+			<url>http://nightly.collectionspace.org:8081/artifactory/remote-repos</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -58,7 +58,7 @@
 		<repository>
 			<id>libs-releases-local</id>
 			<name>libs-releases-local</name>
-			<url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
+			<url>http://nightly.collectionspace.org:8081/artifactory/libs-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -145,7 +145,7 @@
 		<repository>
 			<id>nuxeo-public</id>
 			<name>nuxeo-public</name>
-			<url>http://source.collectionspace.org:8081/artifactory/nuxeo-public</url>
+			<url>http://nightly.collectionspace.org:8081/artifactory/nuxeo-public</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -155,7 +155,7 @@
 		</repository>
 		<!-- This should no longer be needed since we're using only "releases" 
 			artifacts <repository> <id>nuxeo-public-snapshot</id> <name>nuxeo-public-snapshot</name> 
-			<url>http://source.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url> 
+			<url>http://nightly.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url> 
 			<releases> <enabled>false</enabled> </releases> <snapshots> <enabled>true</enabled> 
 			<updatePolicy>never</updatePolicy> </snapshots> </repository> -->
 
@@ -178,7 +178,7 @@
 		<pluginRepository>
 			<id>collectionspace-plugins-remote-repos</id>
 			<name>collectionspace-plugins-remote-repos</name>
-			<url>http://source.collectionspace.org:8081/artifactory/plugins-remote-repos</url>
+			<url>http://nightly.collectionspace.org:8081/artifactory/plugins-remote-repos</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -244,10 +244,16 @@
 					<configuration>
 					</configuration>
 				</plugin>
-				<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-site-plugin</artifactId> 
-					<configuration> <dependencyLocationEnabled>false</dependencyLocationEnabled> 
-					<unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand> </configuration> 
-					</plugin> -->
+				<!--
+				<plugin>
+				    <groupId>org.apache.maven.plugins</groupId>
+				    <artifactId>maven-site-plugin</artifactId> 
+					<configuration>
+					    <dependencyLocationEnabled>false</dependencyLocationEnabled> 
+					    <unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand>
+					</configuration> 
+				</plugin>
+				-->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
@@ -416,7 +422,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>2.6</version>
 				<configuration>
 				</configuration>
 				<reportSets>
@@ -427,9 +433,16 @@
 					</reportSet>
 				</reportSets>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
-				<version>2.6.1</version> <configuration> <show>public</show> </configuration> 
-				</plugin> -->
+			<!--
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-javadoc-plugin</artifactId> 
+				<version>2.6.1</version>
+				<configuration>
+				    <show>public</show>
+				</configuration> 
+			</plugin>
+			-->
 		</plugins>
 	</reporting>
 

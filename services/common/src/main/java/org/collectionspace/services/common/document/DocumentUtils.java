@@ -36,6 +36,7 @@ import java.text.FieldPosition;
 import java.text.NumberFormat;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +56,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException; 
 
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.config.service.ObjectPartContentType;
@@ -68,6 +70,7 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 
 import org.nuxeo.ecm.core.io.ExportConstants;
 import org.nuxeo.common.collections.PrimitiveArrays;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.TypeConstants;
@@ -593,6 +596,8 @@ public class DocumentUtils {
             parent.appendChild(element);
             // extract the element content
             if (type.isSimpleType()) {
+                // Avoid returning scientific notation representations of
+                // very large or very small decimal values. See CSPACE-4691.
                 if (isNuxeoDecimalType(type) && valueMatchesNuxeoType(type, value)) {
                     element.setTextContent(nuxeoDecimalValueToDecimalString(value));
                /*
@@ -885,6 +890,43 @@ public class DocumentUtils {
          */
         private static boolean isNuxeoDecimalType(Type type) {
             return ((SimpleType)type).getPrimitiveType() instanceof DoubleType;
+        }
+        
+        /**
+         * Obtains a String representation of a Nuxeo property value, where
+         * the latter is an opaque Object that may or may not be directly
+         * convertible to a string.
+         * 
+         * @param obj an Object containing a property value
+         * @param docModel the document model associated with this property.
+         * @param propertyPath a path to the property, such as a property name, XPath, etc. 
+         * @return a String representation of the Nuxeo property value.
+         */
+        static public String propertyValueAsString(Object obj, DocumentModel docModel, String propertyPath) {
+            if (obj == null) {
+                return "";
+            }
+            if (String.class.isAssignableFrom(obj.getClass())) {
+                return (String)obj;
+            } else {
+                // Handle cases where a property value returned from the repository
+                // can't be directly cast to a String.
+                //
+                // FIXME: This method provides specific, hard-coded formatting
+                // for String representations of property values. We might want
+                // to add the ability to specify these formats via configuration.
+                // - ADR 2013-04-26
+                if (obj instanceof GregorianCalendar) {
+                    return GregorianCalendarDateTimeUtils.formatAsISO8601Date((GregorianCalendar)obj);
+                } else if (obj instanceof Double) {
+                    return nuxeoDecimalValueToDecimalString(obj);
+                } else {
+                   logger.warn("Could not convert value of property " + propertyPath
+                            + " in document " + docModel.getPathAsString() + " to a String.");
+                   logger.warn("This may be due to a new, as-yet-unhandled datatype returned from the repository");
+                   return "";
+                }
+            }
         }
         
         /*
