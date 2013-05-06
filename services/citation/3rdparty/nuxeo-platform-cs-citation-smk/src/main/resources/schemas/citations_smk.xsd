@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Citation schema (XSD)
+    
+    Entity  : Citation
+    Part    : Local - smk
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision: 860 $
+    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/citation/local/smk"
+  xmlns="http://collectionspace.org/services/citation/local/smk"
+  targetNamespace="http://collectionspace.org/services/citation/local/smk"
+  version="0.1"
+>
+
+
+	<xs:element name="smkCitationPublicationInfoGroupList" type="smkCitationPublicationInfoGroupList" />
+    
+    <xs:complexType name="smkCitationPublicationInfoGroupList">
+        <xs:sequence>
+            <xs:element name="smkCitationPublicationInfoGroup" type="smkCitationPublicationInfoGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="smkCitationPublicationInfoGroup">
+        <xs:sequence>
+        	<xs:element name="smkPublisher" type="xs:string"/>
+            <xs:element name="smkPlace" type="xs:string"/>
+            <xs:element name="smkPublicationDate" type="smkStructuredDateSMKGroup" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="smkEdition" type="xs:string"/>
+            <xs:element name="smkPages" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    
+  <xs:element name="smkCitationResourceIdentGroupList" type="smkCitationResourceIdentGroupList" />
+    
+    <xs:complexType name="smkCitationResourceIdentGroupList">
+        <xs:sequence>
+            <xs:element name="smkCitationResourceIdentGroup" type="smkCitationResourceIdentGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="smkCitationResourceIdentGroup">
+        <xs:sequence>
+        	<xs:element name="smkResourceIdent" type="xs:string"/>
+            <xs:element name="smkType" type="xs:string"/>            
+            <xs:element name="smkCaptureDate" type="smkStructuredDateSMKGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+        
+    <xs:complexType name="smkStructuredDateSMKGroup">
+        <xs:sequence>          
+            <xs:element name="dateSMKDisplayText" type="xs:string"/>
+            <xs:element name="dateSMKDisplayEngText" type="xs:string"/>
+            <xs:element name="dateSMKDateDay" type="xs:string"/>
+            <xs:element name="dateSMKDateMonth" type="xs:string"/>
+            <xs:element name="dateSMKDateYear" type="xs:string"/>
+            <xs:element name="dateSMKEraSelector" type="xs:string"/>
+            <xs:element name="dateSMKSecondDateDay" type="xs:string"/>
+            <xs:element name="dateSMKSecondDateMonth" type="xs:string"/>
+            <xs:element name="dateSMKSecondDateYear" type="xs:string"/>
+            <xs:element name="dateSMKSecondEraSelector" type="xs:string"/>            
+            <xs:element name="dateSMKThirdDateDay" type="xs:string"/>
+            <xs:element name="dateSMKThirdDateMonth" type="xs:string"/>
+            <xs:element name="dateSMKThirdDateYear" type="xs:string"/>
+            <xs:element name="dateSMKThirdEraSelector" type="xs:string"/>            
+            <xs:element name="dateSMKSegmentSelector" type="xs:string"/>
+            <xs:element name="dateSMKTypeSelector" type="xs:string"/> 
+            <xs:element name="dateSMKLatestScalarValue" type="xs:date"/>
+            <xs:element name="dateSMKEarliestScalarValue" type="xs:date"/> 
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>                                  	
+        </xs:sequence>
+    </xs:complexType> 	 	 	 
+
+</xs:schema>
+
