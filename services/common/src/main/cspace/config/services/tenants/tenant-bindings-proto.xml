@@ -2440,14 +2440,6 @@
                     <service:SupportsHierarchy>true</service:SupportsHierarchy>                
                     <service:ListResultsFields>
                         <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
-                        <!-- Uncomment when bug in returning list result values from complex types,
-                        currently in the CSPACE-4813 branch (P/NP term work in services), is fixed -->
-                        <!--
-                        <service:ListResultField>
-                            <service:element>taxonFullName</service:element>
-                            <service:xpath>taxonTermGroup/[0]/termName</service:xpath>
-                        </service:ListResultField>
-                        -->
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
