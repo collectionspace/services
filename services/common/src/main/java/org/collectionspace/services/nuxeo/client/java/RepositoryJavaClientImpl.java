@@ -1150,7 +1150,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             public int compare(DocumentModel doc1, DocumentModel doc2) {
                 String termDisplayName1 = (String) NuxeoUtils.getXPathValue(doc1, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
                 String termDisplayName2 = (String) NuxeoUtils.getXPathValue(doc2, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
-                return termDisplayName1.compareTo(termDisplayName2);
+                return termDisplayName1.compareToIgnoreCase(termDisplayName2);
             }
         });
 
