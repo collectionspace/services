@@ -114,6 +114,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     // FIXME: Get this value from an existing constant, if available
     private static final String USER_SUPPLIED_WILDCARD = "*";
     private static final String USER_SUPPLIED_WILDCARD_REGEX = "\\" + USER_SUPPLIED_WILDCARD;
+    private static final String USER_SUPPLIED_STOP_CHAR = "|";
+
     
     /**
      * Instantiates a new repository java client impl.
@@ -1017,35 +1019,46 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         limitClause =
                 " LIMIT " + getMaxItemsLimitOnJdbcQueries(maxListItemsLimit); // implicit int-to-String conversion
         
+        // After building the individual parts of the query, set the values
+        // of replaceable parameters that will be inserted into that query
+        // and optionally add restrictions
+        
         List<String> params = new ArrayList<>();
         
-        // Read tenant bindings configuration to determine whether
-        // to automatically insert leading, as well as trailing, wildcards
-        // into the term matching string.
-        String usesStartingWildcard = TenantBindingUtils.getPropertyValue(tenantBinding,
-                IQueryManager.TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM);
-        // Handle user-provided leading wildcard characters, in the
-        // configuration where a leading wildcard is not automatically inserted.
-        // (The user-provided wildcard must be in the first, or "starting"
-        // character position in the partial term value.)
-        if (Tools.notBlank(usesStartingWildcard) && usesStartingWildcard.equalsIgnoreCase(Boolean.FALSE.toString())) {
-            partialTerm = handleProvidedStartingWildcard(partialTerm);
-            // Otherwise, automatically insert a leading wildcard
-        } else {
-            partialTerm = JDBCTools.SQL_WILDCARD + partialTerm;
+        if (Tools.notBlank(whereClause)) {
+                        
+            // Read tenant bindings configuration to determine whether
+            // to automatically insert leading, as well as trailing, wildcards
+            // into the term matching string.
+            String usesStartingWildcard = TenantBindingUtils.getPropertyValue(tenantBinding,
+                    IQueryManager.TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM);
+            // Handle user-provided leading wildcard characters, in the
+            // configuration where a leading wildcard is not automatically inserted.
+            // (The user-provided wildcard must be in the first, or "starting"
+            // character position in the partial term value.)
+            if (Tools.notBlank(usesStartingWildcard) && usesStartingWildcard.equalsIgnoreCase(Boolean.FALSE.toString())) {
+                partialTerm = handleProvidedStartingWildcard(partialTerm);
+                // Otherwise, automatically insert a leading wildcard
+            } else {
+                partialTerm = JDBCTools.SQL_WILDCARD + partialTerm;
+            }
+            // Add SQL wildcards in the midst of the partial term match search
+            // expression, whever user-supplied wildcards appear, except in the
+            // first or last character positions of the search expression.
+            partialTerm = subtituteWildcardsInPartialTerm(partialTerm);
+
+            // If a designated 'stop character' is present as the last character
+            // in the search expression, strip that character and don't add
+            // a trailing wildcard
+            int lastCharPos = partialTerm.length() - 1;
+            if (partialTerm.endsWith(USER_SUPPLIED_STOP_CHAR) && lastCharPos > 0) {
+                    partialTerm = partialTerm.substring(0, lastCharPos);
+            } else {
+                // Otherwise, automatically add a trailing wildcard
+                partialTerm = partialTerm + JDBCTools.SQL_WILDCARD;
+            }
+            params.add(partialTerm);
         }
-        // Add SQL wildcards in the midst of the partial term match search
-        // expression, whever user-supplied wildcards appear, except in the
-        // first or last character positions of the search expression.
-        partialTerm = subtituteWildcardsInPartialTerm(partialTerm);
-        
-        // FIXME: We may wish to handle instances where a designated 'stop
-        // character' has been inserted by the user as the last character in
-        // the search expression, whereupon we would strip that stop character
-        // and skip the automatic adding of a trailing wildcard, below.
-        
-        // Automatically add a trailing wildcard
-        params.add(partialTerm + JDBCTools.SQL_WILDCARD);
         
         // Optionally add restrictions to the default query, based on variables
         // in the current request
@@ -1144,7 +1157,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             return result; // return an empty list of document models
         } 
 
-        // Get a list of document models, using the IDs obtained from the query
+        // Get a list of document models, using the list of IDs obtained from the query
+        //
+        // FIXME: Check whether we have a 'get document models from list of CSIDs'
+        // utility method like this, and if not, add this to the appropriate
+        // framework class
         DocumentModel docModel;
         for (String docId : docIds) {
             docModel = NuxeoUtils.getDocumentModel(repoSession, docId);

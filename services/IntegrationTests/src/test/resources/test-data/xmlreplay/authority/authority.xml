@@ -66,7 +66,7 @@
             <uri>/cspace-services/personauthorities/${createPersonAuthority1.CSID}/items</uri>
             <filename>authority/personitem.xml</filename>
             <vars>
-                <var ID="itemDisplayName">${createPersonAuthority1.word2} ${createPersonAuthority1.word1}</var>
+                <var ID="itemDisplayName">${createPersonAuthority1.word1} ${createPersonAuthority1.word2}</var>
                 <var ID="itemShortIdentifier">${createPersonAuthority1.word1}item1</var>
                 <var ID="itemBioNote">A bio note for this Person.</var>
             </vars>
@@ -198,7 +198,7 @@
         <!-- Partial term searches -->
         
         <!-- Stem matching on first word -->
-        <test ID="ptStemSearchPersonItems">
+        <test ID="ptStemSearchPersonItemsFirstWord">
             <expectedCodes>200</expectedCodes>
             <method>GET</method>
             <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.word1PartialTermStem}</uri>
@@ -208,7 +208,7 @@
             </response>
         </test>
         <!-- Stem matching on second word -->
-        <test ID="ptStemSearchPersonItems">
+        <test ID="ptStemSearchPersonItemsSecondWord">
             <expectedCodes>200</expectedCodes>
             <method>GET</method>
             <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.word2PartialTermStem}</uri>
@@ -225,6 +225,16 @@
             <response>
                 <expected level="TEXT"/>
                 <filename>authority/res/personItemsContainingWord2.res.xml</filename>
+            </response>
+        </test>
+        <!-- Using a stop character (|) at the end of the search expression -->
+        <test ID="ptStopCharSearchPersonItems">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.word1}%7C</uri>
+            <response>
+                <expected level="TEXT"/>
+                <filename>authority/res/personItemsOnlyWord1.res.xml</filename>
             </response>
         </test>
         
