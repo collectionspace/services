@@ -113,6 +113,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
     // FIXME: Get this value from an existing constant, if available
     private static final String USER_SUPPLIED_WILDCARD = "*";
+    private static final String USER_SUPPLIED_WILDCARD_REGEX = "\\" + USER_SUPPLIED_WILDCARD;
     
     /**
      * Instantiates a new repository java client impl.
@@ -1793,12 +1794,13 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         // Partial term search expressions of 2 or fewer characters
         // currently aren't amenable to the use of wildcards
         if (len <= 2)  {
-            logger.warn("Partial term matching expression of 1 or 2 characters contains user-supplied wildcard:" + partialTerm);
+            logger.warn("Partial term match search expression of just 1-2 characters in length contains a user-supplied wildcard: " + partialTerm);
+            logger.warn("Will handle that character as a literal value, rather than as a wildcard ...");
             return partialTerm;
         }
         int lastCharPos = len - 1;
         return partialTerm.substring(0, 1) // first char
-                + partialTerm.substring(1, lastCharPos).replaceAll("\\*", "%") // middle of search expression, excluding first and last
+                + partialTerm.substring(1, lastCharPos).replaceAll(USER_SUPPLIED_WILDCARD_REGEX, JDBCTools.SQL_WILDCARD) // middle of search expression, excluding first and last
                 + partialTerm.substring(lastCharPos); // last char
 
     }
