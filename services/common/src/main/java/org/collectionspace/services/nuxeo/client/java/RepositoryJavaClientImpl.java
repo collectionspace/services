@@ -111,6 +111,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 //    private String foo = Profiler.createLogger();
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
     public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
+    // FIXME: Get this value from an existing constant, if available
+    private static final String USER_SUPPLIED_WILDCARD = "*";
     
     /**
      * Instantiates a new repository java client impl.
@@ -985,6 +987,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         String whereClause;
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+        // Value for replaceable parameter 1 in the query
         String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
         // If the value of the partial term query parameter is blank ('pt='),
         // return all records, subject to restriction by any limit clause
@@ -1030,8 +1033,18 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         } else {
             partialTerm = JDBCTools.SQL_WILDCARD + partialTerm;
         }
-        // Automatically insert a trailing wildcard
-        params.add(partialTerm + JDBCTools.SQL_WILDCARD); // Value for replaceable parameter 1 in the query
+        // Add SQL wildcards in the midst of the partial term match search
+        // expression, whever user-supplied wildcards appear, except in the
+        // first or last character positions of the search expression.
+        partialTerm = subtituteWildcardsInPartialTerm(partialTerm);
+        
+        // FIXME: We may wish to handle instances where a designated 'stop
+        // character' has been inserted by the user as the last character in
+        // the search expression, whereupon we would strip that stop character
+        // and skip the automatic adding of a trailing wildcard, below.
+        
+        // Automatically add a trailing wildcard
+        params.add(partialTerm + JDBCTools.SQL_WILDCARD);
         
         // Optionally add restrictions to the default query, based on variables
         // in the current request
@@ -1749,8 +1762,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
     private String handleProvidedStartingWildcard(String partialTerm) {
         if (Tools.notBlank(partialTerm)) {
-            // FIXME: Get this value from an existing constant, if available
-            final String USER_SUPPLIED_WILDCARD = "*";
             if (partialTerm.substring(0, 1).equals(USER_SUPPLIED_WILDCARD)) {
                 StringBuffer buffer = new StringBuffer(partialTerm);
                 buffer.setCharAt(0, JDBCTools.SQL_WILDCARD.charAt(0));
@@ -1758,6 +1769,38 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
         }
         return partialTerm;
+    }
+    
+    /**
+     * Replaces user-supplied wildcards with SQL wildcards, in a partial term
+     * matching search expression.
+     * 
+     * The scope of this replacement excludes the beginning and ending
+     * characters in that search expression, as those are treated specially.
+     * 
+     * @param partialTerm
+     * @return the partial term, with any user-supplied wildcards replaced
+     * by SQL wildcards.
+     */
+    private String subtituteWildcardsInPartialTerm(String partialTerm) {
+        if (Tools.isBlank(partialTerm)) {
+            return partialTerm;
+        }
+        if (! partialTerm.contains(USER_SUPPLIED_WILDCARD)) {
+            return partialTerm;
+        }
+        int len = partialTerm.length();
+        // Partial term search expressions of 2 or fewer characters
+        // currently aren't amenable to the use of wildcards
+        if (len <= 2)  {
+            logger.warn("Partial term matching expression of 1 or 2 characters contains user-supplied wildcard:" + partialTerm);
+            return partialTerm;
+        }
+        int lastCharPos = len - 1;
+        return partialTerm.substring(0, 1) // first char
+                + partialTerm.substring(1, lastCharPos).replaceAll("\\*", "%") // middle of search expression, excluding first and last
+                + partialTerm.substring(lastCharPos); // last char
+
     }
 
     private int getMaxItemsLimitOnJdbcQueries(String maxListItemsLimit) {
