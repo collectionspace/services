@@ -29,6 +29,17 @@
             <expectedCodes>201</expectedCodes>
         </test>
         
+        <!--
+            This test is still mostly a placeholder, merely verifying that,
+            with a generated report returned matching the 'application/xml' MIME
+            type, the resultant document can be successfully parsed by an
+            XML parser, in XmlReplay's context.
+
+            Attempts to verify additional fidelity to an expected document
+            at the ADDOK level or higher have so far failed, while validation at
+            the (more permissive) TEXT level appears to be far too lenient.
+            - ADR 2013-05-13
+        -->
         <test ID="testInvokeSingle" auth="test" autoDeletePOSTS="false">
             <method>POST</method>
             <uri>/cspace-services/reports/${createReport1.CSID}</uri>
