@@ -8,7 +8,7 @@
 		<tenant:repositoryDomain name="default-domain" storageName="pahma-domain" repositoryClient="nuxeo-java" />
 
 		<tenant:properties>
-			<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+			<types:item id="ptstartingwildcard" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
 				<types:key>ptStartingWildcard</types:key>
 				<types:value>false</types:value>
 			</types:item>
