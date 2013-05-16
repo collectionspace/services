@@ -1793,8 +1793,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
      * Replaces user-supplied wildcards with SQL wildcards, in a partial term
      * matching search expression.
      * 
-     * The scope of this replacement excludes the beginning and ending
-     * characters in that search expression, as those are treated specially.
+     * The scope of this replacement excludes the beginning character
+     * in that search expression, as that character is treated specially.
      * 
      * @param partialTerm
      * @return the partial term, with any user-supplied wildcards replaced
@@ -1815,10 +1815,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             logger.warn("Will handle that character as a literal value, rather than as a wildcard ...");
             return partialTerm;
         }
-        int lastCharPos = len - 1;
         return partialTerm.substring(0, 1) // first char
-                + partialTerm.substring(1, lastCharPos).replaceAll(USER_SUPPLIED_WILDCARD_REGEX, JDBCTools.SQL_WILDCARD) // middle of search expression, excluding first and last
-                + partialTerm.substring(lastCharPos); // last char
+                + partialTerm.substring(1, len).replaceAll(USER_SUPPLIED_WILDCARD_REGEX, JDBCTools.SQL_WILDCARD);
 
     }
 
