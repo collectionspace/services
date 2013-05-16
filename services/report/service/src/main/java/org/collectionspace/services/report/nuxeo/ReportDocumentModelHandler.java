@@ -65,6 +65,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -326,7 +327,12 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 				outputFilename = outputFilename+"-default-to.pdf";
 			}
 			outReportFileName.append(outputFilename); // Set the out going param to the report's final file name
-	        // fill the report
+                        // FIXME: Logging temporarily set to INFO level for CSPACE-5766;
+                        // can change to TRACE or DEBUG level as warranted thereafter
+                        if (logger.isInfoEnabled()) {
+                            logger.info(FileTools.getJavaTmpDirInfo());
+                        }
+                        // fill the report
 			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
 				
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
