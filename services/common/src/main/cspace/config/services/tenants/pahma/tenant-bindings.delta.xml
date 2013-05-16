@@ -12,7 +12,7 @@
 				<types:key>ptStartingWildcard</types:key>
 				<types:value>false</types:value>
 			</types:item>
-			<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+			<types:item id="jdbcqueriestenantrestricted" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
 				<types:key>jdbcQueriesAreTenantIdRestricted</types:key>
 				<types:value>false</types:value>
 			</types:item>
