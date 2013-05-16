@@ -61,7 +61,8 @@
                 just at the beginning of a term.
 
                 See the tenant-bindings.delta.xml file for the 'lifesci' tenant,
-                for an example of how to override this value in your tenant.
+                for examples of how to override this value, and other, similar
+                values below, in your own tenant.
             -->
             <types:item id="ptstartingwildcard" xmlns:types="http://collectionspace.org/services/config/types">
                 <types:key>ptStartingWildcard</types:key>
@@ -70,12 +71,22 @@
             <!--
                By default, term completion searches return a maximum number
                of terms in their search results. The default value is 40 terms.
-               See the tenant-bindings.delta.xml file for the 'lifesci' tenant,
-               for an example of how to override this value in your tenant.
             -->
             <types:item id="maxlistitemsjdbc" xmlns:types="http://collectionspace.org/services/config/types">
                 <types:key>maxListItemsReturnedLimitOnJdbcQueries</types:key>
                 <types:value>40</types:value>
+            </types:item>
+             <!--
+               By default, term completion searches are restricted (constrained)
+               to the current tenant. On a system where a tenant's data is
+               isolated within its own repository, or on a shared repository
+               system where only one tenant has data, this restriction can be
+               removed by setting the value below to 'false'. That will remove
+               one SQL JOIN from the query, potentially improving search performance.
+            -->
+            <types:item id="jdbcqueriestenantrestricted" xmlns:types="http://collectionspace.org/services/config/types">
+                <types:key>jdbcQueriesAreTenantIdRestricted</types:key>
+                <types:value>true</types:value>
             </types:item>
         </tenant:properties>        
         
