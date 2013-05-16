@@ -116,7 +116,7 @@ BEGIN
                END,
                CASE when mhp.taxonomicidenthybridparent IS NULL THEN ''
                ELSE regexp_replace(ttg.termformatteddisplayname,
-                       '^[Xx×]? ?<i>[^ ]+( ?.*)$', '\1')
+                       '^[Xx]? ?<i>[^ ]+( ?.*)$', '\1')
                END
             FROM
                taxonomicidentgroup tig
@@ -141,21 +141,21 @@ BEGIN
 
             IF aff_name IS NULL THEN
                IF fhp_genus = mhp_genus THEN
-                  return_name := trim(fhp_name || ' × ' ||
+                  return_name := trim(fhp_name || ' x ' ||
                      '<i>' || substr(mhp_genus, 1, 1) || '.' || mhp_rest);
                ELSE
-                  return_name := trim(fhp_name || ' × ' || mhp_name);
+                  return_name := trim(fhp_name || ' x ' || mhp_name);
                END IF;
             ELSE
                IF aff_genus = mhp_genus THEN
-                  return_name := trim(aff_name_form || ' × ' ||
+                  return_name := trim(aff_name_form || ' x ' ||
                      '<i>' || substr(mhp_genus, 1, 1) || '.' || mhp_rest);
                ELSE
-                  return_name := trim(aff_name_form || ' × ' || mhp_name);
+                  return_name := trim(aff_name_form || ' x ' || mhp_name);
                END IF;
             END IF;
 
-            IF return_name = ' × ' THEN
+            IF return_name = ' x ' THEN
                RETURN NULL;
             ELSE
                RETURN return_name;
