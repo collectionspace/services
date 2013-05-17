@@ -17,11 +17,7 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -114,7 +110,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
     // FIXME: Get this value from an existing constant, if available
     private static final String USER_SUPPLIED_WILDCARD = "*";
     private static final String USER_SUPPLIED_WILDCARD_REGEX = "\\" + USER_SUPPLIED_WILDCARD;
-    private static final String USER_SUPPLIED_STOP_CHAR = "|";
+    private static final String USER_SUPPLIED_ANCHOR_CHAR = "^";
 
     
     /**
@@ -1036,22 +1032,33 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             // configuration where a leading wildcard is not automatically inserted.
             // (The user-provided wildcard must be in the first, or "starting"
             // character position in the partial term value.)
-            if (Tools.notBlank(usesStartingWildcard) && usesStartingWildcard.equalsIgnoreCase(Boolean.FALSE.toString())) {
-                partialTerm = handleProvidedStartingWildcard(partialTerm);
-                // Otherwise, automatically insert a leading wildcard
-            } else {
-                partialTerm = JDBCTools.SQL_WILDCARD + partialTerm;
+            if (Tools.notBlank(usesStartingWildcard)) {
+                if (usesStartingWildcard.equalsIgnoreCase(Boolean.FALSE.toString())) {
+                    partialTerm = handleProvidedStartingWildcard(partialTerm);
+                    // Otherwise, in the configuration where a leading wildcard
+                    // is usually automatically inserted, handle the cases where
+                    // a user has entered an anchor character in the first position
+                    // in the starting term value. In those cases, strip that
+                    // anchor character and don't add a leading wildcard
+                } else {
+                    if (partialTerm.startsWith(USER_SUPPLIED_ANCHOR_CHAR)) {
+                        partialTerm = partialTerm.substring(1, partialTerm.length());
+                        // Otherwise, automatically add a leading wildcard
+                    } else {
+                        partialTerm = JDBCTools.SQL_WILDCARD + partialTerm;
+                    }
+                }
             }
             // Add SQL wildcards in the midst of the partial term match search
             // expression, whever user-supplied wildcards appear, except in the
             // first or last character positions of the search expression.
             partialTerm = subtituteWildcardsInPartialTerm(partialTerm);
 
-            // If a designated 'stop character' is present as the last character
+            // If a designated 'anchor character' is present as the last character
             // in the search expression, strip that character and don't add
             // a trailing wildcard
             int lastCharPos = partialTerm.length() - 1;
-            if (partialTerm.endsWith(USER_SUPPLIED_STOP_CHAR) && lastCharPos > 0) {
+            if (partialTerm.endsWith(USER_SUPPLIED_ANCHOR_CHAR) && lastCharPos > 0) {
                     partialTerm = partialTerm.substring(0, lastCharPos);
             } else {
                 // Otherwise, automatically add a trailing wildcard

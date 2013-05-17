@@ -227,11 +227,11 @@
                 <filename>authority/res/personItemsContainingWord2.res.xml</filename>
             </response>
         </test>
-        <!-- Using a stop character (|) at the end of the search expression -->
-        <test ID="ptStopCharSearchPersonItems">
+        <!-- Using an anchor character (^) at the end of the search expression -->
+        <test ID="ptTrailingAnchorCharSearchPersonItems">
             <expectedCodes>200</expectedCodes>
             <method>GET</method>
-            <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.word1}%7C</uri>
+            <uri>/cspace-services/personauthorities/_ALL_/items?pt=${createPersonAuthority1.word1}%5E</uri>
             <response>
                 <expected level="TEXT"/>
                 <filename>authority/res/personItemsOnlyWord1.res.xml</filename>
