@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="movements">
+
+    <ns2:movements_common
+        xmlns:ns2="http://collectionspace.org/services/movement">
+        <currentLocation>${currentLocationValue}</currentLocation>
+        <locationDate>${locationDateValue}</locationDate>
+    </ns2:movements_common>
+
+</document>
+
+
