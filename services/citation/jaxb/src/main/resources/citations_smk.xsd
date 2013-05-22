@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    citation schema (XSD)
+    
+    Entity  : citation
+    Part    : Domain - SMK
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision: 987 $
+    $LastChangedDate: 2009-11-30 23:06:32 +0100 (Mon, 30 Nov 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/citation/local/smk"
+  xmlns="http://collectionspace.org/services/citation/local/smk"
+  targetNamespace="http://collectionspace.org/services/citation/local/smk"
+  version="0.1"
+>
+    <!-- citations for smk-->
+    <xs:element name="citations_smk">
+        <xs:complexType>
+            <xs:sequence>				
+    		    <xs:element name="smkCitationPublicationInfoGroupList" type="smkCitationPublicationInfoGroupList" />
+    		    <xs:element name="smkCitationResourceIdentGroupList" type="smkCitationResourceIdentGroupList" />
+             </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+  
+    <xs:complexType name="smkCitationPublicationInfoGroupList">
+        <xs:sequence>
+            <xs:element name="smkCitationPublicationInfoGroup" type="smkCitationPublicationInfoGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="smkCitationPublicationInfoGroup">
+        <xs:sequence>
+        	<xs:element name="smkPublisher" type="xs:string"/>
+            <xs:element name="smkPlace" type="xs:string"/>
+            <xs:element name="smkPublicationDate" type="smkStructuredDateSMKGroup" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="smkEdition" type="xs:string"/>
+            <xs:element name="smkPages" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="smkCitationResourceIdentGroupList">
+        <xs:sequence>
+            <xs:element name="smkCitationResourceIdentGroup" type="smkCitationResourceIdentGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="smkCitationResourceIdentGroup">
+        <xs:sequence>
+        	<xs:element name="smkResourceIdent" type="xs:string"/>
+            <xs:element name="smkType" type="xs:string"/>            
+            <xs:element name="smkCaptureDate" type="smkStructuredDateSMKGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+        
+    <xs:complexType name="smkStructuredDateSMKGroup">
+        <xs:sequence>          
+            <xs:element name="dateSMKDisplayText" type="xs:string"/>
+            <xs:element name="dateSMKDisplayEngText" type="xs:string"/>
+            <xs:element name="dateSMKDateDay" type="xs:string"/>
+            <xs:element name="dateSMKDateMonth" type="xs:string"/>
+            <xs:element name="dateSMKDateYear" type="xs:string"/>
+            <xs:element name="dateSMKEraSelector" type="xs:string"/>
+            <xs:element name="dateSMKSecondDateDay" type="xs:string"/>
+            <xs:element name="dateSMKSecondDateMonth" type="xs:string"/>
+            <xs:element name="dateSMKSecondDateYear" type="xs:string"/>
+            <xs:element name="dateSMKSecondEraSelector" type="xs:string"/>            
+            <xs:element name="dateSMKThirdDateDay" type="xs:string"/>
+            <xs:element name="dateSMKThirdDateMonth" type="xs:string"/>
+            <xs:element name="dateSMKThirdDateYear" type="xs:string"/>
+            <xs:element name="dateSMKThirdEraSelector" type="xs:string"/>            
+            <xs:element name="dateSMKSegmentSelector" type="xs:string"/>
+            <xs:element name="dateSMKTypeSelector" type="xs:string"/>
+            <xs:element name="dateSMKLatestScalarValue" type="xs:date"/> 
+            <xs:element name="dateSMKEarliestScalarValue" type="xs:date"/> 
+            <xs:element name="scalarValuesComputed" type="xs:boolean"/>                                  	
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
