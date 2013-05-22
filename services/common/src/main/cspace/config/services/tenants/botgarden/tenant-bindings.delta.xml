@@ -282,6 +282,32 @@
         </tenant:serviceBindings>
 
         <tenant:serviceBindings merge:matcher="id" id="ObjectExit">
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>exitNumber</service:element>
+                            <service:xpath>exitNumber</service:xpath>
+                            <service:setter>setExitNumber</service:setter>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>depositor</service:element>
+                            <service:xpath>depositor</service:xpath>
+                            <service:setter>setDepositor</service:setter>
+                        </service:ListResultField>                        
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>depositor</types:value>
+                 </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>exitNumber</types:value>
+                </types:item>
+            </service:properties>
             <service:object xmlns:service="http://collectionspace.org/services/config/service">
                 <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="objectexit_naturalhistory" updated="" order="3">
                     <service:content contentType="application/xml">
