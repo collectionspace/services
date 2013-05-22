@@ -22,7 +22,7 @@ import org.collectionspace.services.citation.CitationsCommon;
 /**
  * The Class CitationAuthorityClient.
  */
-public class CitationAuthorityClient extends AuthorityWithContactsClientImpl<CitationsCommon, CitationAuthorityProxy> {
+public class CitationAuthorityClient extends AuthorityClientImpl<CitationsCommon, CitationAuthorityProxy> {
 
     public static final String SERVICE_NAME = "citationauthorities";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

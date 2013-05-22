@@ -42,11 +42,6 @@
             <artifactId>org.collectionspace.services.citation.client</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.contact.service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- External dependencies -->        
         <dependency>
             <groupId>junit</groupId>

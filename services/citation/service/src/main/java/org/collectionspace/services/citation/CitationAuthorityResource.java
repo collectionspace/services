@@ -26,7 +26,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import org.collectionspace.services.client.CitationAuthorityClient;
-import org.collectionspace.services.contact.AuthorityResourceWithContacts;
+import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.citation.nuxeo.CitationDocumentModelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 @Path(CitationAuthorityClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class CitationAuthorityResource extends AuthorityResourceWithContacts<CitationauthoritiesCommon, CitationDocumentModelHandler> {
+public class CitationAuthorityResource extends AuthorityResource<CitationauthoritiesCommon, CitationDocumentModelHandler> {
 
     final Logger logger = LoggerFactory.getLogger(CitationAuthorityResource.class);
 

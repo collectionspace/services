@@ -10,6 +10,6 @@ import javax.ws.rs.Produces;
 @Path(CitationAuthorityClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface CitationAuthorityProxy extends AuthorityWithContactsProxy {
+public interface CitationAuthorityProxy extends AuthorityProxy {
 
 }
