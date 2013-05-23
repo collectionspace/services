@@ -6,9 +6,6 @@
     Entity  : Citation
     Part    : Common
     Used for: Nuxeo EP core document type
-    
-    $LastChangedRevision: 860 $
-    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
 -->
 
 <xs:schema 
@@ -18,7 +15,7 @@
     targetNamespace="http://collectionspace.org/services/citation"
     version="0.1"
 >
-<!-- See http://wiki.collectionspace.org/display/collectionspace/Citation+Service+Home -->    
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Citation+Service+Home -->    
 
     <!--  Citation Information Group -->
     <!--  inAuthority is the csid of the owning CitationAuthority -->
@@ -28,7 +25,14 @@
 
     <!-- Term Information repeatable group -->
     <xs:element name="citationTermGroupList" type="citationTermGroupList"/>
+    <xs:element name="citationPublicationInfoGroupList" type="citationPublicationInfoGroupList" />
+    <xs:element name="citationAgentInfoGroupList" type="citationAgentInfoGroupList" />
+    <xs:element name="citationNote" type="xs:string"/>
+    <xs:element name="citationResourceIdentGroupList" type="citationResourceIdentGroupList" />
+    <xs:element name="citationRelatedTermsGroupList" type="citationRelatedTermsGroupList" />
     
+    <!-- Complex types referenced in declarations above -->
+
     <xs:complexType name="citationTermGroupList">
         <xs:sequence>
             <xs:element name="citationTermGroup" type="citationTermGroup" minOccurs="0"
@@ -59,10 +63,64 @@
             <xs:element name="termIssue" type="xs:string"/>                        
         </xs:sequence>
     </xs:complexType>
+        
+    <xs:complexType name="citationPublicationInfoGroupList">
+        <xs:sequence>
+            <xs:element name="citationPublicationInfoGroup" type="citationPublicationInfoGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="citationPublicationInfoGroup">
+        <xs:sequence>
+            <xs:element name="publisher" type="xs:string"/>
+            <xs:element name="place" type="xs:string"/>
+            <xs:element name="publicationDate" type="structuredDateGroup" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="edition" type="xs:string"/>
+            <xs:element name="pages" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
     
-    <!-- Before (re)using this generic complex type in any record type -->
-    <!-- other than CollectionObject, be sure to verify that Nuxeo handles -->
-    <!-- that correctly in its table creation/row linking. -->
+    <xs:complexType name="citationAgentInfoGroupList">
+        <xs:sequence>
+            <xs:element name="citationAgentInfoGroup" type="citationAgentInfoGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="citationAgentInfoGroup">
+        <xs:sequence>
+            <xs:element name="agent" type="xs:string"/>
+            <xs:element name="role" type="xs:string"/>            
+            <xs:element name="note" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+        
+    <xs:complexType name="citationResourceIdentGroupList">
+        <xs:sequence>
+            <xs:element name="citationResourceIdentGroup" type="citationResourceIdentGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="citationResourceIdentGroup">
+        <xs:sequence>
+            <xs:element name="resourceIdent" type="xs:string"/>
+            <xs:element name="type" type="xs:string"/>            
+            <xs:element name="captureDate" type="structuredDateGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+        
+    <xs:complexType name="citationRelatedTermsGroupList">
+        <xs:sequence>
+            <xs:element name="citationRelatedTermsGroup" type="citationRelatedTermsGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="citationRelatedTermsGroup">
+        <xs:sequence>
+            <xs:element name="relatedTerm" type="xs:string"/>
+            <xs:element name="relationType" type="xs:string"/>                        
+        </xs:sequence>
+    </xs:complexType>    
+        
     <xs:complexType name="structuredDateGroup">
         <xs:sequence>
             <xs:element name="dateDisplayDate" type="xs:string"/>
@@ -89,81 +147,7 @@
             <xs:element name="dateLatestScalarValue" type="xs:date"/>
             <xs:element name="scalarValuesComputed" type="xs:boolean"/>
         </xs:sequence>
-    </xs:complexType>
-    
-    <xs:element name="citationPublicationInfoGroupList" type="citationPublicationInfoGroupList" />
-    
-    <xs:complexType name="citationPublicationInfoGroupList">
-        <xs:sequence>
-            <xs:element name="citationPublicationInfoGroup" type="citationPublicationInfoGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    
-    <xs:complexType name="citationPublicationInfoGroup">
-        <xs:sequence>
-        	<xs:element name="publisher" type="xs:string"/>
-            <xs:element name="place" type="xs:string"/>
-            <xs:element name="publicationDate" type="structuredDateGroup" minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="edition" type="xs:string"/>
-            <xs:element name="pages" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-    
-    
-    
-    <xs:element name="citationAgentInfoGroupList" type="citationAgentInfoGroupList" />
-    
-    <xs:complexType name="citationAgentInfoGroupList">
-        <xs:sequence>
-            <xs:element name="citationAgentInfoGroup" type="citationAgentInfoGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    
-    <xs:complexType name="citationAgentInfoGroup">
-        <xs:sequence>
-        	<xs:element name="agent" type="xs:string"/>
-            <xs:element name="role" type="xs:string"/>            
-            <xs:element name="note" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-            
-    <xs:element name="citationResourceIdentGroupList" type="citationResourceIdentGroupList" />
-    
-    <xs:complexType name="citationResourceIdentGroupList">
-        <xs:sequence>
-            <xs:element name="citationResourceIdentGroup" type="citationResourceIdentGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    
-    <xs:complexType name="citationResourceIdentGroup">
-        <xs:sequence>
-        	<xs:element name="resourceIdent" type="xs:string"/>
-            <xs:element name="type" type="xs:string"/>            
-            <xs:element name="captureDate" type="structuredDateGroup" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    
-    
-    <xs:element name="citationRelatedTermsGroupList" type="citationRelatedTermsGroupList" />
-    
-    <xs:complexType name="citationRelatedTermsGroupList">
-        <xs:sequence>
-            <xs:element name="citationRelatedTermsGroup" type="citationRelatedTermsGroup" minOccurs="0"
-                maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-    
-    <xs:complexType name="citationRelatedTermsGroup">
-        <xs:sequence>
-        	<xs:element name="relatedTerm" type="xs:string"/>
-            <xs:element name="relationType" type="xs:string"/>                        
-        </xs:sequence>
-    </xs:complexType>    
-    
-    <xs:element name="citationsNotes" type="xs:string"/>        
+    </xs:complexType>      
 
 </xs:schema>
 
