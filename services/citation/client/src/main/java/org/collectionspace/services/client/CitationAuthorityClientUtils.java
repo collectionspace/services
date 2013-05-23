@@ -1,144 +1,42 @@
-/**	
- * CitationAuthorityClientUtils.java
- *
- * {Purpose of This Class}
- *
- * {Other Notes Relating to This Class (Optional)}
- *
- * $LastChangedBy: $
- * $LastChangedRevision: $
- * $LastChangedDate: $
- *
- * This document is a part of the source code and related artifacts
- * for CollectionSpace, an open source collections management system
- * for museums and related institutions:
- *
- * http://www.collectionspace.org
- * http://wiki.collectionspace.org
- *
- * Copyright © 2009 {Contributing Institution}
- *
- * Licensed under the Educational Community License (ECL), Version 2.0.
- * You may not use this file except in compliance with this License.
- *
- * You may obtain a copy of the ECL 2.0 License at
- * https://source.collectionspace.org/collection-space/LICENSE.txt
- */
 package org.collectionspace.services.client;
 
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.CitationJAXBSchema;
+import org.apache.commons.io.FileUtils;
+import org.collectionspace.services.citation.CitationTermGroup;
+import org.collectionspace.services.citation.CitationauthoritiesCommon;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.citation.CitationTermGroup;
-import org.collectionspace.services.citation.CitationTermGroupList;
-import org.collectionspace.services.citation.CitationsCommon;
-import org.collectionspace.services.citation.CitationauthoritiesCommon;
+import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.collectionspace.services.citation.StructuredDateGroup;
 
-/**
- * The Class CitationAuthorityClientUtils.
- */
 public class CitationAuthorityClientUtils {
-    
-    /** The Constant logger. */
     private static final Logger logger =
         LoggerFactory.getLogger(CitationAuthorityClientUtils.class);
-	private static final ServiceRequestType READ_REQ = ServiceRequestType.READ;
+    private static final String CITATION_VOCAB_TYPE = "CitationAuthority";
 
     /**
-     * @param csid the id of the CitationAuthority
-     * @param client if null, creates a new client
-     * @return
-     */
-    public static String getAuthorityRefName(String csid, CitationAuthorityClient client){
-    	if (client == null) {
-    		client = new CitationAuthorityClient();
-    	}
-        ClientResponse<String> res = client.read(csid);
-        try {
-	        int statusCode = res.getStatus();
-	        if(!READ_REQ.isValidStatusCode(statusCode)
-	        	||(statusCode != CollectionSpaceClientUtils.STATUS_OK)) {
-	    		throw new RuntimeException("Invalid status code returned: "+statusCode);
-	        }
-	        //FIXME: remove the following try catch once Aron fixes signatures
-	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	            CitationauthoritiesCommon citationAuthority = 
-	            	(CitationauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
-	                    client.getCommonPartName(), CitationauthoritiesCommon.class);
-		        if(citationAuthority == null) {
-		    		throw new RuntimeException("Null citationAuthority returned from service.");
-		        }
-	            return citationAuthority.getRefName();
-	        } catch (Exception e) {
-	            throw new RuntimeException(e);
-	        }
-        } finally {
-        	res.releaseConnection();
-        }
-    }
-
-    /**
-     * @param csid the id of the CitationAuthority
-     * @param client if null, creates a new client
-     * @return
-     */
-    public static String getCitationRefName(String inAuthority, String csid, CitationAuthorityClient client){
-    	if ( client == null) {
-    		client = new CitationAuthorityClient();
-    	}
-        ClientResponse<String> res = client.readItem(inAuthority, csid);
-        try {
-	        int statusCode = res.getStatus();
-	        if(!READ_REQ.isValidStatusCode(statusCode)
-		        	||(statusCode != CollectionSpaceClientUtils.STATUS_OK)) {
-	    		throw new RuntimeException("Invalid status code returned: "+statusCode);
-	        }
-	        //FIXME: remove the following try catch once Aron fixes signatures
-	        try {
-	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-	            CitationsCommon citation = 
-	            	(CitationsCommon) CollectionSpaceClientUtils.extractPart(input,
-	                    client.getItemCommonPartName(), CitationsCommon.class);
-		        if (citation == null) {
-		    		throw new RuntimeException("Null citation returned from service.");
-		        }
-	            return citation.getRefName();
-	        } catch (Exception e) {
-	            throw new RuntimeException(e);
-	        }
-        } finally {
-        	res.releaseConnection();
-        }
-    }
-
-    /**
-     * Creates the citation authority instance.
-     *
-     * @param displayName the display name
-     * @param shortIdentifier the short Id 
-     * @param headerLabel the header label
-     * @return the multipart output
+     * Creates a new Citation Authority
+     * @param displayName	The displayName used in UI, etc.
+     * @param refName		The proper refName for this authority
+     * @param headerLabel	The common part label
+     * @return	The PoxPayloadOut payload for the create call
      */
     public static PoxPayloadOut createCitationAuthorityInstance(
     		String displayName, String shortIdentifier, String headerLabel ) {
         CitationauthoritiesCommon citationAuthority = new CitationauthoritiesCommon();
         citationAuthority.setDisplayName(displayName);
         citationAuthority.setShortIdentifier(shortIdentifier);
-        //String refName = createCitationAuthRefName(shortIdentifier, displayName);
-        //citationAuthority.setRefName(refName);
-        citationAuthority.setVocabType("CitationAuthority");
+        citationAuthority.setVocabType(CITATION_VOCAB_TYPE); //FIXME: REM - Should this really be hard-coded?
         PoxPayloadOut multipart = new PoxPayloadOut(CitationAuthorityClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(citationAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
@@ -152,172 +50,78 @@ public class CitationAuthorityClientUtils {
     }
 
     /**
-     * Creates a citation instance.
-     *
-     * @param inAuthority the owning authority
-     * @param citationAuthRefName the owning Authority ref name
-     * @param citationInfo the citation info
-     * @param headerLabel the header label
-     * @return the multipart output
+     * @param commonPartXML the XML payload for the common part.
+     * @param headerLabel	The common part label
+     * @return	The PoxPayloadOut payload for the create call
+     * @throws DocumentException
      */
-    public static PoxPayloadOut createCitationInstance(String inAuthority,
-    		String citationAuthRefName,
-    		Map<String, String> citationInfo,
-                List<CitationTermGroup> terms,
-    		String headerLabel){
-        if (terms == null || terms.isEmpty()) {
-            terms = getTermGroupInstance(getGeneratedIdentifier());
-        }
-        final Map<String, List<String>> EMPTY_CITATION_REPEATABLES_INFO =
-                new HashMap<String, List<String>>();
-        return createCitationInstance(inAuthority, null /*citationAuthRefName*/,
-                citationInfo, terms, EMPTY_CITATION_REPEATABLES_INFO, headerLabel);
-    }
-
-    /**
-     * Creates a citation instance.
-     *
-     * @param inAuthority the owning authority
-     * @param citationAuthRefName the owning Authority ref name
-     * @param citationInfo the citation info
-     * @param terms a list of Citation terms
-     * @param citationRepeatablesInfo names and values of repeatable scalar fields in the Citation record
-     * @param headerLabel the header label
-     * @return the multipart output
-     */
-    public static PoxPayloadOut createCitationInstance(String inAuthority, 
-    		String citationAuthRefName, Map<String, String> citationInfo,
-                List<CitationTermGroup> terms,
-                Map<String, List<String>> citationRepeatablesInfo, String headerLabel){
-        CitationsCommon citation = new CitationsCommon();
-        citation.setInAuthority(inAuthority);
-    	String shortId = citationInfo.get(CitationJAXBSchema.SHORT_IDENTIFIER);
-    	if (shortId == null || shortId.isEmpty()) {
-    		throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
-    	}      	
-    	citation.setShortIdentifier(shortId);
-    	
-    	String value;
-        List<String> values = null;
-        
-        // Set values in the Term Information Group
-        CitationTermGroupList termList = new CitationTermGroupList();
-        if (terms == null || terms.isEmpty()) {
-            terms = getTermGroupInstance(getGeneratedIdentifier());
-        }
-        termList.getCitationTermGroup().addAll(terms); 
-        citation.setCitationTermGroupList(termList);               
-        
+    public static PoxPayloadOut createCitationInstance(
+    		String commonPartXML, String headerLabel)  throws DocumentException {
         PoxPayloadOut multipart = new PoxPayloadOut(CitationAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(citation,
+        /*
+        PayloadOutputPart commonPart = multipart.addPart(commonPartXML,
             MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(headerLabel);
+        */
+        PayloadOutputPart commonPart = multipart.addPart(
+        		CitationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME,
+        		commonPartXML);
 
         if(logger.isDebugEnabled()){
-        	logger.debug("to be created, citation common ", citation, CitationsCommon.class);
+        	logger.debug("to be created, citation common ", commonPart.asXML());
         }
 
         return multipart;
     }
     
-    /**
-     * Creates the item in authority.
-     *
-     * @param vcsid the vcsid
-     * @param citationAuthorityRefName the citation authority ref name
-     * @param citationMap the citation map. CitationJAXBSchema.SHORT_IDENTIFIER is REQUIRED.
-     * @param client the client
-     * @return the string
-     */
-    public static String createItemInAuthority(String vcsid, 
-    		String citationAuthorityRefName, Map<String,String> citationMap,
-                List<CitationTermGroup> terms, Map<String, List<String>> citationRepeatablesMap,
-                CitationAuthorityClient client ) {
+    public static String createItemInAuthority(String vcsid,
+    		String commonPartXML,
+    		CitationAuthorityClient client ) throws DocumentException {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-        
-        String displayName = "";
-        if (terms !=null && terms.size() > 0) {
-            displayName = terms.get(0).getTermDisplayName();
-        }
     	
-    	if(logger.isDebugEnabled()){
-    		logger.debug("Creating item with display name: \"" + displayName
-    				+"\" in citationAuthority: \"" + vcsid +"\"");
-    	}
     	PoxPayloadOut multipart = 
-    		createCitationInstance(vcsid, null /*citationAuthorityRefName*/,
-    			citationMap, terms, citationRepeatablesMap, client.getItemCommonPartName());
-    	
-    	String result = null;
+    		createCitationInstance(commonPartXML, client.getItemCommonPartName());
+    	String newID = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
-    	try {
+        try {
 	    	int statusCode = res.getStatus();
 	
 	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-	    		throw new RuntimeException("Could not create Item: \""+citationMap.get(CitationJAXBSchema.SHORT_IDENTIFIER)
-	    				+"\" in citationAuthority: \"" + vcsid //citationAuthorityRefName
+	    		throw new RuntimeException("Could not create Item: \""+commonPartXML
+	    				+"\" in citationAuthority: \"" + vcsid
 	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	    	}
 	    	if(statusCode != EXPECTED_STATUS_CODE) {
-	    		throw new RuntimeException("Unexpected Status when creating Item: \""+citationMap.get(CitationJAXBSchema.SHORT_IDENTIFIER)
-	    				+"\" in citationAuthority: \"" + vcsid /*citationAuthorityRefName*/ +"\", Status:"+ statusCode);
+	    		throw new RuntimeException("Unexpected Status when creating Item: \""+commonPartXML
+	    				+"\" in citationAuthority: \"" + vcsid +"\", Status:"+ statusCode);
 	    	}
-	
-	    	result = extractId(res);
-    	} finally {
-    		res.releaseConnection();
-    	}
-    	
-    	return result;
-    }
+	        newID = extractId(res);
+        } finally {
+        	res.releaseConnection();
+        }
 
-    /**
-     * Creates the citationAuthority ref name.
-     *
-     * @param shortId the citationAuthority shortIdentifier
-     * @param displaySuffix displayName to be appended, if non-null
-     * @return the string
-     */
-    /*
-    public static String createCitationAuthRefName(String shortId, String displaySuffix) {
-    	String refName = "urn:cspace:org.collectionspace.demo:citationauthority:name("
-    			+shortId+")";
-    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
-    		refName += "'"+displaySuffix+"'";
-    	return refName;
+    	return newID;
     }
-    */
-
+    
     /**
-     * Creates the citation ref name.
+     * Creates an item in the authority from an XML file.
      *
-     * @param citationAuthRefName the citation auth ref name
-     * @param shortId the citation shortIdentifier
-     * @param displaySuffix displayName to be appended, if non-null
-     * @return the string
+     * @param fileName the file name
+     * @return new CSID as string
+     * @throws Exception the exception
      */
-    /*
-    public static String createCitationRefName(
-    						String citationAuthRefName, String shortId, String displaySuffix) {
-    	String refName = citationAuthRefName+":citation:name("+shortId+")";
-    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
-    		refName += "'"+displaySuffix+"'";
-    	return refName;
-    }
-    */
+    private String createItemInAuthorityFromXmlFile(String vcsid, String commonPartFileName, 
+    		CitationAuthorityClient client) throws Exception {
+        byte[] b = FileUtils.readFileToByteArray(new File(commonPartFileName));
+        String commonPartXML = new String(b);
+    	return createItemInAuthority(vcsid, commonPartXML, client );
+    }    
 
-    /**
-     * Extract id.
-     *
-     * @param res the res
-     * @return the string
-     */
     public static String extractId(ClientResponse<Response> res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
-        // FIXME: This may throw an NPE if the Location: header isn't present
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isDebugEnabled()){
         	logger.debug("extractId:uri=" + uri);
@@ -346,62 +150,8 @@ public class CitationAuthorityClientUtils {
         return "Status code '" + statusCode + "' in response is NOT within the expected set: " +
                 requestType.validStatusCodesAsString();
     }
-
-
     
-    /**
-     * Produces a default displayName from the basic name and dates fields.
-     * @see CitationDocumentModelHandler.prepareDefaultDisplayName() which
-     * duplicates this logic, until we define a service-general utils package
-     * that is neither client nor service specific.
-     * @param foreName	
-     * @param middleName
-     * @param surName
-     * @param birthDate
-     * @param deathDate
-     * @return display name
-     */
-    public static String prepareDefaultDisplayName(
-    		String foreName, String middleName, String surName, 
-            String birthDate, String deathDate) {
-    	StringBuilder newStr = new StringBuilder();
-		final String sep = " ";
-		final String dateSep = "-";
-		List<String> nameStrings = 
-			Arrays.asList(foreName, middleName, surName);
-		boolean firstAdded = false;
-    	for(String partStr : nameStrings ){
-			if(null != partStr ) {
-				if(firstAdded) {
-					newStr.append(sep);
-				}
-				newStr.append(partStr);
-				firstAdded = true;
-			}
-    	}
-    	// Now we add the dates. In theory could have dates with no name, but that is their problem.
-    	boolean foundBirth = false;
-        if(null != birthDate) {
-         if(firstAdded) {
-             newStr.append(sep);
-         }
-         newStr.append(birthDate);
-                 newStr.append(dateSep);     // Put this in whether there is a death date or not
-         foundBirth = true;
-        }
-        if(null != deathDate) {
-         if(!foundBirth) {
-             if(firstAdded) {
-                 newStr.append(sep);
-             }
-             newStr.append(dateSep);
-         }
-         newStr.append(deathDate);
-        }
-		return newStr.toString();
-    }
-    
-    public static List<CitationTermGroup> getTermGroupInstance(String identifier) {
+     public static List<CitationTermGroup> getTermGroupInstance(String identifier) {
         if (Tools.isBlank(identifier)) {
             identifier = getGeneratedIdentifier();
         }
