@@ -111,25 +111,21 @@
     <target name="deploy" depends="install"
     description="deploy citation in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-citation/build.xml" target="deploy" inheritall="false"/>
-    	<ant antfile="nuxeo-platform-cs-citation-smk/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy citation from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-citation/build.xml" target="undeploy" inheritall="false"/>
-		<ant antfile="nuxeo-platform-cs-citation-smk/build.xml" target="undeploy" inheritall="false"/>
    </target>
 
     <target name="dist"
     description="generate distribution for citation" depends="package">
         <ant antfile="nuxeo-platform-cs-citation/build.xml" target="dist" inheritall="false"/>
-	 	<ant antfile="nuxeo-platform-cs-citation-smk/build.xml" target="dist" inheritall="false"/> 
     </target>
     
     <target name="dist_installer"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="nuxeo-platform-cs-citation/build.xml" target="dist_installer" inheritall="false"/>
-		<ant antfile="nuxeo-platform-cs-citation-smk/build.xml" target="dist_installer" inheritall="false"/> 
    </target>
 
 </project>

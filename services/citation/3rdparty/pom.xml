@@ -25,7 +25,6 @@
 	</properties>
 
     <modules>
-        <module>nuxeo-platform-cs-citation</module>
-        <module>nuxeo-platform-cs-citation-smk</module>     
+        <module>nuxeo-platform-cs-citation</module>     
     </modules>
 </project>
