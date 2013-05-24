@@ -2188,7 +2188,23 @@
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/citation" schemaLocation="http://collectionspace.org/services/citation http://services.collectionspace.org/citation/citations_common.xsd" />
                     </service:content>
-                    <service:properties>                        
+                    <service:properties>       
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>citationPublicationInfoGroupList/*/publisher</types:value>
+                        </types:item>                 
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>citationPublicationInfoGroupList/*/publicationPlace</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>citationAgentInfoGroupList/*/agent</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>citationRelatedTermsGroupList/*/relatedTerm</types:value>
+                        </types:item>
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>

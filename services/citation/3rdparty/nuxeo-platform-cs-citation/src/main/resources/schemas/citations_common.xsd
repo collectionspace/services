@@ -73,7 +73,7 @@
     <xs:complexType name="citationPublicationInfoGroup">
         <xs:sequence>
             <xs:element name="publisher" type="xs:string"/>
-            <xs:element name="place" type="xs:string"/>
+            <xs:element name="publicationPlace" type="xs:string"/>
             <xs:element name="publicationDate" type="structuredDateGroup" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="edition" type="xs:string"/>
             <xs:element name="pages" type="xs:string"/>
