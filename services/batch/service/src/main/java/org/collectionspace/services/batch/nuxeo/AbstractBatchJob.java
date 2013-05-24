@@ -12,9 +12,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.batch.BatchInvocable;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
+import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PlaceAuthorityClient;
@@ -37,6 +40,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
+import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -44,72 +48,12 @@ import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractBatchJob implements BatchInvocable {
+public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	public final int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
 	public final int BAD_REQUEST_STATUS = Response.Status.BAD_REQUEST.getStatusCode();
 	public final int INT_ERROR_STATUS = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
 
-	private List<String> invocationModes = Collections.emptyList();
-	private ResourceMap resourceMap;
-	private InvocationContext context;
-	private int completionStatus;
-	private InvocationResults results;	
-	private InvocationError errorInfo;	
-
 	final Logger logger = LoggerFactory.getLogger(AbstractBatchJob.class);
-
-	public AbstractBatchJob() {
-		this.completionStatus = STATUS_UNSTARTED;
-		this.results = new InvocationResults();
-	}
-
-	public List<String> getSupportedInvocationModes() {
-		return invocationModes;
-	}
-	
-	protected void setSupportedInvocationModes(List<String> invocationModes) {
-		this.invocationModes = invocationModes;
-	}
-
-	public ResourceMap getResourceMap() {
-		return resourceMap;
-	}
-
-	public void setResourceMap(ResourceMap resourceMap) {
-		this.resourceMap = resourceMap;
-	}
-
-	public InvocationContext getInvocationContext() {
-		return context;
-	}
-
-	public void setInvocationContext(InvocationContext context) {
-		this.context = context;
-	}
-
-	public int getCompletionStatus() {
-		return completionStatus;
-	}
-	
-	protected void setCompletionStatus(int completionStatus) {
-		this.completionStatus = completionStatus;
-	}
-
-	public InvocationResults getResults() {
-		return (STATUS_COMPLETE == completionStatus) ? results : null;
-	}
-	
-	protected void setResults(InvocationResults results) {
-		this.results = results;
-	}
-
-	public InvocationError getErrorInfo() {
-		return errorInfo;
-	}
-	
-	protected void setErrorInfo(InvocationError errorInfo) {
-		this.errorInfo = errorInfo;
-	}
 
 	public abstract void run();
 	
@@ -148,8 +92,8 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 				"</ns2:relations_common>" +
 			"</document>";
 
-		ResourceBase resource = resourceMap.get(RelationClient.SERVICE_NAME);
-		Response response = resource.create(resourceMap, null, createRelationPayload);
+		ResourceBase resource = getResourceMap().get(RelationClient.SERVICE_NAME);
+		Response response = resource.create(getResourceMap(), null, createRelationPayload);
 
 		if (response.getStatus() == CREATED_STATUS) {
 			relationCsid = CollectionSpaceClientUtils.extractId(response);
@@ -162,32 +106,58 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 
 	/**
-	 * Return the csids of records that are related to a given subject record, and have a given document type.
-	 * Soft-deleted relations are filtered from the list, but soft-deleted object records are not.
+	 * Return related records, based on the supplied search criteria. Soft-deleted relations
+	 * are filtered from the list, but soft-deleted subject/object records are not.
 	 * 
-	 * @param subjectCsid		The csid of the subject record
-	 * @param objectDocType		The document type of the object records to find
+	 * @param subjectCsid		The csid of the subject record. If null or empty, match any subject.
+	 * @param subjectDocType	The document type of the subject record. If null or empty, match any subject type.
+	 * @param predicate			The predicate of the relation. If null or empty, match any predicate.
+	 * @param objectCsid		The csid of the object record. If null or empty, match any object.
+	 * @param objectDocType		The document type of the object record. If null or empty, match any object type.
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	protected List<String> findRelated(String subjectCsid, String objectDocType) throws URISyntaxException {
-		List<String> csids = new ArrayList<String>();
-		RelationResource relationResource = (RelationResource) resourceMap.get(RelationClient.SERVICE_NAME);
-		RelationsCommonList relationList = relationResource.getList(createRelationSearchUriInfo(subjectCsid, objectDocType));
+	protected List<RelationListItem> findRelated(String subjectCsid, String subjectDocType, String predicate, String objectCsid, String objectDocType) throws URISyntaxException {
+		RelationResource relationResource = (RelationResource) getResourceMap().get(RelationClient.SERVICE_NAME);
+		RelationsCommonList relationList = relationResource.getList(createRelationSearchUriInfo(subjectCsid, subjectDocType, predicate, objectCsid, objectDocType));
 
-		for (RelationsCommonList.RelationListItem item : relationList.getRelationListItem()) {
+		return relationList.getRelationListItem();
+	}
+	
+	protected List<String> findRelatedObjects(String subjectCsid, String subjectDocType, String predicate, String objectCsid, String objectDocType) throws URISyntaxException {
+		List<String> csids = new ArrayList<String>();
+
+		for (RelationsCommonList.RelationListItem item : findRelated(subjectCsid, subjectDocType, predicate, objectCsid, objectDocType)) {
 			csids.add(item.getObjectCsid());
 		}
+	
+		return csids;
+	}
 
+	protected List<String> findRelatedSubjects(String subjectCsid, String subjectDocType, String predicate, String objectCsid, String objectDocType) throws URISyntaxException {
+		List<String> csids = new ArrayList<String>();
+
+		for (RelationsCommonList.RelationListItem item : findRelated(subjectCsid, subjectDocType, predicate, objectCsid, objectDocType)) {
+			csids.add(item.getSubjectCsid());
+		}
+	
 		return csids;
 	}
 
 	protected List<String> findRelatedCollectionObjects(String subjectCsid) throws URISyntaxException {
-		return findRelated(subjectCsid, CollectionObjectConstants.NUXEO_DOCTYPE);
+		return findRelatedObjects(subjectCsid, null, "affects", null, CollectionObjectConstants.NUXEO_DOCTYPE);
 	}
 
 	protected List<String> findRelatedMovements(String subjectCsid) throws URISyntaxException {
-		return findRelated(subjectCsid, MovementConstants.NUXEO_DOCTYPE);
+		return findRelatedObjects(subjectCsid, null, "affects", null, MovementConstants.NUXEO_DOCTYPE);
+	}
+
+	protected List<String> findBroader(String subjectCsid) throws URISyntaxException {
+		return findRelatedObjects(subjectCsid, null, "hasBroader", null, null);
+	}
+
+	protected List<String> findNarrower(String subjectCsid) throws URISyntaxException {
+		return findRelatedSubjects(null, null, "hasBroader", subjectCsid, null);
 	}
 
 	/**
@@ -220,7 +190,7 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 
 	protected PoxPayloadOut findByCsid(String serviceName, String csid) throws URISyntaxException, DocumentException {
-		ResourceBase resource = resourceMap.get(serviceName);
+		ResourceBase resource = getResourceMap().get(serviceName);
 		byte[] response = resource.get(null, createUriInfo(), csid);
 
 		PoxPayloadOut payload = new PoxPayloadOut(response);
@@ -237,7 +207,7 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 	
 	protected List<String> findAll(String serviceName, int pageSize, int pageNum) throws URISyntaxException, DocumentException {
-		ResourceBase resource = resourceMap.get(serviceName);	
+		ResourceBase resource = getResourceMap().get(serviceName);	
 		AbstractCommonList list = resource.getList(this.createPagedListUriInfo(pageNum, pageSize));
 		List<String> csids = new ArrayList<String>();
 		
@@ -258,7 +228,7 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 	
 	protected List<String> getVocabularyCsids(String serviceName) throws URISyntaxException {
-		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
 		AbstractCommonList vocabularyList = resource.getAuthorityList(createDeleteFilterUriInfo());
 		List<String> csids = new ArrayList<String>();
 		
@@ -292,8 +262,8 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 	
 	protected PoxPayloadOut findAuthorityItemByCsid(String serviceName, String vocabularyCsid, String csid) throws URISyntaxException, DocumentException {
-		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
-		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), resourceMap, vocabularyCsid, csid);
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
+		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), getResourceMap(), vocabularyCsid, csid);
 		 
 		PoxPayloadOut payload = new PoxPayloadOut(response);
 
@@ -305,8 +275,8 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	}
 	
 	protected PoxPayloadOut findAuthorityItemByShortId(String serviceName, String vocabularyShortId, String itemShortId) throws URISyntaxException, DocumentException {
-		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
-		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), resourceMap, "urn:cspace:name(" + vocabularyShortId + ")", "urn:cspace:name(" + itemShortId + ")");
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
+		byte[] response = resource.getAuthorityItem(null, createDeleteFilterUriInfo(), getResourceMap(), "urn:cspace:name(" + vocabularyShortId + ")", "urn:cspace:name(" + itemShortId + ")");
  
 		PoxPayloadOut payload = new PoxPayloadOut(response);
 
@@ -333,7 +303,7 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 	protected List<String> findReferencingObjects(String serviceName, String parentCsid, String csid, String type, String sourceField) throws URISyntaxException {
 		logger.debug("findReferencingObjects serviceName=" + serviceName + " parentCsid=" + parentCsid + " csid=" + csid + " type=" + type + " sourceField=" + sourceField);
 
-		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) resourceMap.get(serviceName);
+		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get(serviceName);
         UriTemplateRegistry uriTemplateRegistry = ServiceMain.getInstance().getUriTemplateRegistry();
 		AuthorityRefDocList refDocList = resource.getReferencingObjects(parentCsid, csid, uriTemplateRegistry, createRefSearchFilterUriInfo(type));
 		List<String> csids = new ArrayList<String>();
@@ -410,8 +380,32 @@ public abstract class AbstractBatchJob implements BatchInvocable {
 		return createUriInfo("kw=&as=( (" +schemaName + ":" + fieldName + " ILIKE \"" + value + "\") )&wf_deleted=false");
 	}
 
-	protected UriInfo createRelationSearchUriInfo(String subjectCsid, String objType) throws URISyntaxException {
-		return createUriInfo("sbj=" + subjectCsid + "&objType=" + objType + "&wf_deleted=false");
+	protected UriInfo createRelationSearchUriInfo(String subjectCsid, String subjectDocType, String predicate, String objectCsid, String objectDocType) throws URISyntaxException {
+		List<String> queryParams = new ArrayList<String>(6);
+		
+		if (StringUtils.isNotEmpty(subjectCsid)) {
+			queryParams.add(IRelationsManager.SUBJECT_QP + "=" + subjectCsid);
+		}
+
+		if (StringUtils.isNotEmpty(subjectDocType)) {
+			queryParams.add(IRelationsManager.SUBJECT_TYPE_QP + "=" + subjectDocType);
+		}
+
+		if (StringUtils.isNotEmpty(predicate)) {
+			queryParams.add(IRelationsManager.PREDICATE_QP + "=" + predicate);
+		}
+
+		if (StringUtils.isNotEmpty(objectCsid)) {
+			queryParams.add(IRelationsManager.OBJECT_QP + "=" + objectCsid);
+		}
+		
+		if (StringUtils.isNotEmpty(objectDocType)) {
+			queryParams.add(IRelationsManager.OBJECT_TYPE_QP + "=" + objectDocType);
+		}
+				
+		queryParams.add("wf_deleted=false");
+		
+		return createUriInfo(StringUtils.join(queryParams, "&"));
 	}
 	
 	protected UriInfo createRefSearchFilterUriInfo(String type) throws URISyntaxException {
