@@ -2,18 +2,15 @@ package org.collectionspace.services.batch.nuxeo;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
-import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
-import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -44,7 +41,11 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 				String docType = getInvocationContext().getDocType();
 				
 				if (docType.equals(TaxonConstants.NUXEO_DOCTYPE)) {
-					setResults(updateAccessCode(csid));
+					//setResults(updateAccessCode(csid));
+					setResults(updateParentAccessCodes(csid));
+				}
+				else if (docType.equals(CollectionObjectConstants.NUXEO_DOCTYPE)) {
+					setResults(updateReferencedAccessCodes(csid));
 				}
 				else {
 					throw new Exception("Unsupported document type: " + docType);
@@ -69,11 +70,56 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 	}
 	
 	public InvocationResults updateAccessCode(String taxonCsid) throws URISyntaxException, DocumentException {
-		UpdateAccessCodeResults updateResults = updateAccessCode(taxonCsid, true);
+		UpdateAccessCodeResults updateResults = updateAccessCode(taxonCsid, true, false);
 		
 		InvocationResults results = new InvocationResults();
-		results.setNumAffected((updateResults.isChanged() ? 1 : 0) + updateResults.getNumChildrenChanged());
+		results.setNumAffected(updateResults.getNumAffected());
 		results.setUserNote(updateResults.isChanged() ? "access code changed to " + updateResults.getAccessCode() : "access code not changed");
+		
+		return results;
+	}
+	
+	public InvocationResults updateParentAccessCodes(String taxonCsid) throws URISyntaxException, DocumentException {
+		PoxPayloadOut taxonPayload = findTaxonByCsid(taxonCsid);
+		String taxonRefName = getFieldValue(taxonPayload, TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
+		String accessCode = getFieldValue(taxonPayload, TaxonConstants.ACCESS_CODE_SCHEMA_NAME, TaxonConstants.ACCESS_CODE_FIELD_NAME);
+
+		logger.debug("updating parent access codes: taxonRefName=" + taxonRefName + " accessCode=" + accessCode);
+
+		UpdateAccessCodeResults updateResults = updateParentAccessCodes(taxonCsid, accessCode);
+		
+		InvocationResults results = new InvocationResults();
+		results.setNumAffected(updateResults.getNumAffected());
+		results.setUserNote(results.getNumAffected() + " access codes changed");
+		
+		return results;
+	}
+	
+	public InvocationResults updateReferencedAccessCodes(String collectionObjectCsid) throws URISyntaxException, DocumentException {
+		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
+		
+		String deadFlag = getFieldValue(collectionObjectPayload, CollectionObjectConstants.DEAD_FLAG_SCHEMA_NAME, CollectionObjectConstants.DEAD_FLAG_FIELD_NAME);
+		boolean isAlive = (deadFlag == null) || (!deadFlag.equalsIgnoreCase("true"));
+
+		logger.debug("updating referenced access codes: collectionObjectCsid=" + collectionObjectCsid + " isAlive=" + isAlive);
+
+		List<String> taxonRefNames = getFieldValues(collectionObjectPayload, CollectionObjectConstants.TAXON_SCHEMA_NAME, CollectionObjectConstants.TAXON_FIELD_NAME);
+		long numAffected = 0;
+		
+		for (String taxonRefName : taxonRefNames) {
+			PoxPayloadOut taxonPayload = findTaxonByRefName(taxonRefName);
+			UpdateAccessCodeResults updateResults = updateAccessCode(taxonPayload, false, isAlive);
+			
+			if (updateResults.isChanged()) {
+				UpdateAccessCodeResults parentUpdateResults = updateParentAccessCodes(getCsid(taxonPayload), updateResults.getAccessCode());
+
+				numAffected += updateResults.getNumAffected() + parentUpdateResults.getNumAffected();
+			}
+		}
+		
+		InvocationResults results = new InvocationResults();
+		results.setNumAffected(numAffected);
+		results.setUserNote(numAffected + " access codes changed");
 		
 		return results;
 	}
@@ -85,21 +131,28 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 	 * the access code is set to dead. If any matching collectionobjects are not dead, and
 	 * the access code is dead, the access code is set to unrestricted.
 	 * 
-	 * @param taxonCsid		the csid of the taxon record
-	 * @param deep			if true, updates the access code of all descendant taxon records
+	 * @param taxonPayload	The services payload for the taxon record
+	 * @param deep			If true, updates the access code of all descendant taxon records
+	 * @param knownAlive	A hint that a child taxon of the specified taxon is known to be
+	 *                      alive, or that an example of the specified taxon is known to be
+	 *                      alive. This parameter allows for optimization when propagating
+	 *                      access code changes up the hiearchy; if a child taxon or
+	 *                      referencing collectionobject is known to be alive, and the
+	 *                      current access code is dead, then the access code can be changed
+	 *                      to unrestricted without looking at any other records.
 	 * @return
 	 * @throws DocumentException 
 	 * @throws URISyntaxException 
 	 */
-	private UpdateAccessCodeResults updateAccessCode(String taxonCsid, boolean deep) throws URISyntaxException, DocumentException {
+	public UpdateAccessCodeResults updateAccessCode(PoxPayloadOut taxonPayload, boolean deep, boolean knownAlive) throws URISyntaxException, DocumentException {
 		UpdateAccessCodeResults results = new UpdateAccessCodeResults();
-		boolean foundAlive = false;
+		boolean foundAlive = knownAlive;
 		
-		PoxPayloadOut taxonPayload = findTaxonByCsid(taxonCsid);
+		String taxonCsid = getCsid(taxonPayload);
 		String taxonRefName = getFieldValue(taxonPayload, TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
 		String accessCode = getFieldValue(taxonPayload, TaxonConstants.ACCESS_CODE_SCHEMA_NAME, TaxonConstants.ACCESS_CODE_FIELD_NAME);
 
-		logger.debug("updating access code: taxonRefName=" + taxonRefName);
+		logger.debug("updating access code: taxonRefName=" + taxonRefName + " deep=" + deep + " knownAlive=" + knownAlive);
 		
 		if (accessCode == null) {
 			accessCode = "";
@@ -113,7 +166,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 			// Update the access code on all the children, and track whether any are alive.
 			
 			for (String childTaxonCsid : childTaxonCsids) {
-				UpdateAccessCodeResults childResults = updateAccessCode(childTaxonCsid, true);
+				UpdateAccessCodeResults childResults = updateAccessCode(childTaxonCsid, true, false);
 				
 				if (!childResults.isSoftDeleted()) {
 					String childAccessCode = childResults.getAccessCode();
@@ -129,20 +182,22 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 				}
 			}
 			
-			results.setNumChildrenChanged(numChildrenChanged);
+			results.setNumAffected(numChildrenChanged);
 		}
 		else {
-			// Check if any of the children are alive.
-			
-			for (String childTaxonCsid : childTaxonCsids) {
-				PoxPayloadOut childTaxonPayload = findTaxonByCsid(childTaxonCsid);
+			if (!foundAlive) {
+				// Check if any of the children are alive.
 				
-				String childAccessCode = getFieldValue(childTaxonPayload, TaxonConstants.ACCESS_CODE_SCHEMA_NAME, TaxonConstants.ACCESS_CODE_FIELD_NAME);
-				boolean isChildAlive = !childAccessCode.equals(TaxonConstants.ACCESS_CODE_DEAD_VALUE);
-				
-				if (isChildAlive) {
-					foundAlive = true;
-					break;
+				for (String childTaxonCsid : childTaxonCsids) {
+					PoxPayloadOut childTaxonPayload = findTaxonByCsid(childTaxonCsid);
+					
+					String childAccessCode = getFieldValue(childTaxonPayload, TaxonConstants.ACCESS_CODE_SCHEMA_NAME, TaxonConstants.ACCESS_CODE_FIELD_NAME);
+					boolean isChildAlive = !childAccessCode.equals(TaxonConstants.ACCESS_CODE_DEAD_VALUE);
+					
+					if (isChildAlive) {
+						foundAlive = true;
+						break;
+					}
 				}
 			}
 		}
@@ -195,9 +250,39 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 			setAccessCode(inAuthority, taxonCsid, newAccessCode);
 			
 			results.setChanged(true);
+			results.setNumAffected(results.getNumAffected() + 1);
 		}
 
 		results.setAccessCode(newAccessCode);
+		
+		return results;
+	}
+	
+	public UpdateAccessCodeResults updateAccessCode(String taxonCsid, boolean deep, boolean knownAlive) throws URISyntaxException, DocumentException {
+		return updateAccessCode(findTaxonByCsid(taxonCsid), deep, knownAlive);
+	}
+	
+	public UpdateAccessCodeResults updateParentAccessCodes(String taxonCsid, String accessCode) throws URISyntaxException, DocumentException {
+		UpdateAccessCodeResults results = new UpdateAccessCodeResults();
+		String parentTaxonCsid = findBroader(taxonCsid);
+
+		if (parentTaxonCsid != null) {
+			boolean isAlive = (accessCode == null) || !accessCode.equals(TaxonConstants.ACCESS_CODE_DEAD_VALUE);
+
+			UpdateAccessCodeResults parentUpdateResults = updateAccessCode(parentTaxonCsid, false, isAlive);	
+	
+			if (parentUpdateResults.isChanged()) {
+				UpdateAccessCodeResults grandparentUpdateResults = updateParentAccessCodes(parentTaxonCsid, parentUpdateResults.getAccessCode());
+				
+				// Except for numAffected, the result fields are probably not all that useful in this situation.
+				// Set the changed flag to whether the immediate parent was changed, and the access code to
+				// the immediate parent's.
+				
+				results.setChanged(true);
+				results.setNumAffected(parentUpdateResults.getNumAffected() + grandparentUpdateResults.getNumAffected());
+				results.setAccessCode(parentUpdateResults.getAccessCode());
+			}
+		}
 		
 		return results;
 	}
@@ -227,7 +312,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		private boolean isSoftDeleted = false;
 		private boolean isChanged = false;
 		private String accessCode = null;
-		private long numChildrenChanged = 0;
+		private long numAffected = 0;
 
 		public boolean isSoftDeleted() {
 			return isSoftDeleted;
@@ -253,12 +338,12 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 			this.accessCode = accessCode;
 		}
 
-		public long getNumChildrenChanged() {
-			return numChildrenChanged;
+		public long getNumAffected() {
+			return numAffected;
 		}
 
-		public void setNumChildrenChanged(long numChildrenChanged) {
-			this.numChildrenChanged = numChildrenChanged;
+		public void setNumAffected(long numAffected) {
+			this.numAffected = numAffected;
 		}
 	}
 }

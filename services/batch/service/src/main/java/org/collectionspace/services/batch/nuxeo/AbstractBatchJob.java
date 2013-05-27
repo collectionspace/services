@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.batch.BatchInvocable;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.CollectionSpaceClientUtils;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.MovementClient;
@@ -152,8 +153,13 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return findRelatedObjects(subjectCsid, null, "affects", null, MovementConstants.NUXEO_DOCTYPE);
 	}
 
-	protected List<String> findBroader(String subjectCsid) throws URISyntaxException {
-		return findRelatedObjects(subjectCsid, null, "hasBroader", null, null);
+	protected String findBroader(String subjectCsid) throws URISyntaxException {
+		List<String> relatedObjects = findRelatedObjects(subjectCsid, null, "hasBroader", null, null);
+
+		// There should be only one broader object.
+		String broader = relatedObjects.size() > 0 ? relatedObjects.get(0) : null;
+		
+		return broader;
 	}
 
 	protected List<String> findNarrower(String subjectCsid) throws URISyntaxException {
@@ -469,6 +475,14 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		RefName.AuthorityItem item = RefName.AuthorityItem.parse(refName);
 
 		return (item == null ? refName : item.displayName);
+	}
+	
+	protected String getCsid(PoxPayloadOut payload) {
+		String uri = getFieldValue(payload, CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA, CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
+		String[] elements = StringUtils.split(uri, '/');
+		String csid = elements[elements.length - 1];
+		
+		return csid;
 	}
 	
 	protected class ResourceException extends Exception {
