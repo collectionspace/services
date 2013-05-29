@@ -1,5 +1,13 @@
 package org.collectionspace.services.nuxeo.extension.botgarden;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob;
@@ -22,8 +30,13 @@ public class UpdateAccessCodeListener implements EventListener {
 	final Log logger = LogFactory.getLog(UpdateAccessCodeListener.class);
 
 	public static final String PREVIOUS_DEAD_FLAG_PROPERTY_NAME = "UpdateAccessCodeListener.previousDeadFlag";
+	public static final String PREVIOUS_TAXON_NAMES_PROPERTY_NAME = "UpdateAccessCodeListener.previousTaxonNames";
 	public static final String PREVIOUS_ACCESS_CODE_PROPERTY_NAME = "UpdateAccessCodeListener.previousAccessCode";
 	
+	private static final String[] TAXON_PATH_ELEMENTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("/");
+	private static final String TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME = TAXON_PATH_ELEMENTS[0];
+	private static final String TAXON_FIELD_NAME = TAXON_PATH_ELEMENTS[2];
+
 	/* 
 	 * Set the access code on taxon records when the dead flag on a referencing collectionobject 
 	 * changes, or the access code on a child taxon changes.
@@ -43,20 +56,24 @@ public class UpdateAccessCodeListener implements EventListener {
 					!doc.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
 				
 				if (event.getName().equals(DocumentEventTypes.BEFORE_DOC_UPDATE)) {
-					// Stash the previous dead flag value, so it can be retrieved in the documentModified handler.
+					// Stash the previous dead flag and taxonomic ident values, so they can be retrieved in the documentModified handler.
 					
 					DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-					String previousDeadFlag = (String) previousDoc.getProperty(CollectionObjectConstants.DEAD_FLAG_SCHEMA_NAME, CollectionObjectConstants.DEAD_FLAG_FIELD_NAME);
 
+					String previousDeadFlag = (String) previousDoc.getProperty(CollectionObjectConstants.DEAD_FLAG_SCHEMA_NAME, CollectionObjectConstants.DEAD_FLAG_FIELD_NAME);
 					context.setProperty(PREVIOUS_DEAD_FLAG_PROPERTY_NAME, previousDeadFlag);
+					
+					List<String> previousTaxonNames = getTaxonNames(previousDoc);
+					context.setProperty(PREVIOUS_TAXON_NAMES_PROPERTY_NAME, previousTaxonNames.toArray(new String[previousTaxonNames.size()]));
 				}
 				else {
 					boolean updateRequired = false;
+					Set<String> deletedTaxonNames = null;
 					
 					if (event.getName().equals(DocumentEventTypes.DOCUMENT_UPDATED)) {						
-						 // As an optimization, check if the dead flag of the collectionobject has
-						 // changed, or if the taxonomic identification has changed. If so, we need to
-						 // update the access codes of referenced taxon records.
+						// As an optimization, check if the dead flag of the collectionobject has
+						// changed, or if the taxonomic identification has changed. If so, we need to
+						// update the access codes of referenced taxon records.
 
 						String previousDeadFlag = (String) context.getProperty(PREVIOUS_DEAD_FLAG_PROPERTY_NAME);
 						String currentDeadFlag = (String) doc.getProperty(CollectionObjectConstants.DEAD_FLAG_SCHEMA_NAME, CollectionObjectConstants.DEAD_FLAG_FIELD_NAME);
@@ -68,18 +85,26 @@ public class UpdateAccessCodeListener implements EventListener {
 						if (currentDeadFlag == null) {
 							currentDeadFlag = "";
 						}
-						
+												
 						if (previousDeadFlag.equals(currentDeadFlag)) {
 							logger.debug("update not required: previousDeadFlag=" + previousDeadFlag + " currentDeadFlag=" + currentDeadFlag);
 						}
 						else {
 							logger.debug("update required: previousDeadFlag=" + previousDeadFlag + " currentDeadFlag=" + currentDeadFlag);
 							updateRequired = true;
-						}						
+						}
+						
+						List<String> previousTaxonNames = Arrays.asList((String[]) context.getProperty(PREVIOUS_TAXON_NAMES_PROPERTY_NAME));
+						List<String> currentTaxonNames = getTaxonNames(doc);
+						
+						deletedTaxonNames = findDeletedTaxonNames(previousTaxonNames, currentTaxonNames);
+						logger.debug("found deleted taxon names: " + StringUtils.join(deletedTaxonNames, ", "));
 					}
 					else if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
 						updateRequired = true;
 					}
+					
+					UpdateAccessCodeBatchJob updater = createUpdater();
 					
 					if (updateRequired) {
 						String collectionObjectCsid = doc.getName();
@@ -89,13 +114,28 @@ public class UpdateAccessCodeListener implements EventListener {
 						 	// propagate changes up the taxon hierarchy. Propagation will be taken care of by this
 							// event handler. 
 						
-							InvocationResults results = createUpdater().updateReferencedAccessCodes(collectionObjectCsid, false);
+							InvocationResults results = updater.updateReferencedAccessCodes(collectionObjectCsid, false);
 			
 							logger.debug("updateReferencedAccessCodes complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
 						}
 						catch (Exception e) {
 							logger.error(e.getMessage(), e);
 						}
+					}
+					
+					if (deletedTaxonNames != null) {
+						try {
+							for (String deletedTaxonName : deletedTaxonNames) {
+								logger.debug("updating deleted taxon: " + deletedTaxonName);
+								
+								InvocationResults results = updater.updateAccessCode(deletedTaxonName, false);
+				
+								logger.debug("updateAccessCode complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
+							}
+						}
+						catch (Exception e) {
+							logger.error(e.getMessage(), e);
+						}						
 					}
 				}
 			}
@@ -162,6 +202,34 @@ public class UpdateAccessCodeListener implements EventListener {
 				}
 			}
 		}
+	}
+	
+	private List<String> getTaxonNames(DocumentModel doc) throws ClientException {
+		List<Map<String, Object>> taxonomicIdentGroupList = (List<Map<String, Object>>) doc.getProperty(CollectionObjectConstants.TAXON_SCHEMA_NAME, TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME);
+		List<String> taxonNames = new ArrayList<String>();
+
+		for (Map<String, Object> taxonomicIdentGroup : taxonomicIdentGroupList) {
+			String taxonName = (String) taxonomicIdentGroup.get(TAXON_FIELD_NAME);
+
+			if (StringUtils.isNotEmpty(taxonName)) {
+				taxonNames.add(taxonName);
+			}
+		}
+
+		return taxonNames;
+	}
+
+	private Set<String> findDeletedTaxonNames(List<String> previousTaxonNames, List<String> currentTaxonNames) {
+		Set<String> currentTaxonNameSet = new HashSet<String>(currentTaxonNames);
+		Set<String> deletedTaxonNameSet = new HashSet<String>();
+		
+		for (String previousTaxonName : previousTaxonNames) {
+			if (!currentTaxonNameSet.contains(previousTaxonName)) {
+				deletedTaxonNameSet.add(previousTaxonName);
+			}
+		}
+		
+		return deletedTaxonNameSet;
 	}
 	
 	private UpdateAccessCodeBatchJob createUpdater() {
