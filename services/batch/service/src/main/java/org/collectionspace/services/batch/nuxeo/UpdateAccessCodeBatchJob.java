@@ -41,7 +41,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 				String docType = getInvocationContext().getDocType();
 				
 				if (docType.equals(TaxonConstants.NUXEO_DOCTYPE)) {
-					//setResults(updateAccessCode(csid));
+					//setResults(updateAccessCode(csid, true));
 					setResults(updateParentAccessCode(csid, true));
 				}
 				else if (docType.equals(CollectionObjectConstants.NUXEO_DOCTYPE)) {
@@ -69,8 +69,8 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		}			
 	}
 	
-	public InvocationResults updateAccessCode(String taxonCsid) throws URISyntaxException, DocumentException {
-		UpdateAccessCodeResults updateResults = updateAccessCode(taxonCsid, true, false);
+	public InvocationResults updateAccessCode(String taxonRefNameOrCsid, boolean deep) throws URISyntaxException, DocumentException {
+		UpdateAccessCodeResults updateResults = updateAccessCode(taxonRefNameOrCsid, deep, false);
 		
 		InvocationResults results = new InvocationResults();
 		results.setNumAffected(updateResults.getNumAffected());
@@ -262,8 +262,17 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
-	public UpdateAccessCodeResults updateAccessCode(String taxonCsid, boolean deep, boolean knownAlive) throws URISyntaxException, DocumentException {
-		return updateAccessCode(findTaxonByCsid(taxonCsid), deep, knownAlive);
+	public UpdateAccessCodeResults updateAccessCode(String taxonRefNameOrCsid, boolean deep, boolean knownAlive) throws URISyntaxException, DocumentException {
+		PoxPayloadOut taxonPayload;
+		
+		if (RefName.AuthorityItem.parse(taxonRefNameOrCsid) == null) {		
+			taxonPayload = findTaxonByCsid(taxonRefNameOrCsid);
+		}
+		else {
+			taxonPayload = findTaxonByRefName(taxonRefNameOrCsid);
+		}
+		
+		return updateAccessCode(taxonPayload, deep, knownAlive);
 	}
 	
 	public UpdateAccessCodeResults updateParentAccessCode(String taxonCsid, String accessCode, boolean propagate) throws URISyntaxException, DocumentException {
