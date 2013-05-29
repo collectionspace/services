@@ -40,6 +40,8 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     private final static String MOVEMENT_DOCTYPE = MovementConstants.NUXEO_DOCTYPE;
     private final static String LOCATION_DATE_PROPERTY = "locationDate"; // FIXME: Get from external constant
     protected final static String CURRENT_LOCATION_PROPERTY = "currentLocation"; // FIXME: Get from external constant
+    protected final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core"; // FIXME: Get from external constant
+    protected final static String CREATED_AT_PROPERTY = "createdAt"; // FIXME: Get from external constant
     private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + "AND ecm:isProxy = 0 "
@@ -385,6 +387,10 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         // Iterate through related movement records, to find the related
         // Movement record with the most recent location date.
         GregorianCalendar mostRecentLocationDate = EARLIEST_COMPARISON_DATE;
+        // Note: the following value is used to compare any two records, rather
+        // than to identify the most recent value so far encountered. Thus, it may
+        // occasionally be set backward or forward in time, within the loop below.
+        GregorianCalendar comparisonCreationDate = EARLIEST_COMPARISON_DATE;
         DocumentModel movementDocModel;
         Set<String> alreadyProcessedMovementCsids = new HashSet<>();
         String relatedMovementCsid;
@@ -429,12 +435,29 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             }
             GregorianCalendar locationDate =
                     (GregorianCalendar) movementDocModel.getProperty(MOVEMENTS_COMMON_SCHEMA, LOCATION_DATE_PROPERTY);
+            // If the current Movement record lacks a location date, it cannot
+            // be established as the most recent Movement record; skip over it.
             if (locationDate == null) {
                 continue;
             }
+            GregorianCalendar creationDate =
+                        (GregorianCalendar) movementDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA, CREATED_AT_PROPERTY);
             if (locationDate.after(mostRecentLocationDate)) {
                 mostRecentLocationDate = locationDate;
+                if (creationDate != null) {
+                    comparisonCreationDate = creationDate;
+                }
                 mostRecentMovementDocModel = movementDocModel;
+                // If the current Movement record's location date is identical
+                // to that of the (at this time) most recent Movement record, then
+                // instead compare the two records using their creation date values
+            } else if (locationDate.compareTo(mostRecentLocationDate) == 0) {
+                if (creationDate != null && creationDate.after(comparisonCreationDate)) {
+                    // The most recent location date value doesn't need to be
+                    // updated here, as the two records' values are identical
+                    comparisonCreationDate = creationDate;
+                    mostRecentMovementDocModel = movementDocModel;
+                }
             }
         }
         return mostRecentMovementDocModel;

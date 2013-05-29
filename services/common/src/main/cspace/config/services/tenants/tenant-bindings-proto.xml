@@ -2955,7 +2955,7 @@
         <!-- end account service meta-data -->
     
         <!-- begin PublicItem service meta-data -->
-        <tenant:serviceBindings id="PublicItems" name="PublicItems" type="procedure" version="0.1">
+        <tenant:serviceBindings id="PublicItems" name="PublicItems" type="utility" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
             <!--
             <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
