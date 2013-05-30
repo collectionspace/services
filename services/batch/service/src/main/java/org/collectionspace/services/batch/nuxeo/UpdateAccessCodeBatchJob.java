@@ -16,6 +16,19 @@ import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A batch job that sets the access code on taxonomy records. The single CSID context is supported.
+ * 
+ * If the document is a taxon record, the access codes of the taxon record and all of its descendant
+ * (narrower context) records are updated.
+ * 
+ * If the document is a collectionobject, the access codes of all taxon records referenced by the
+ * collectionobject's taxonomic identification are updated, and propagated up the taxon
+ * hierarchy to the ancestors (broader contexts) of each taxon record.
+ *
+ * @author ray
+ *
+ */
 public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(UpdateRareFlagBatchJob.class);
 
@@ -23,7 +36,7 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 	private final String TAXON_FIELD_NAME_WITHOUT_PATH = TAXON_FIELD_NAME_PARTS[TAXON_FIELD_NAME_PARTS.length - 1];
 
 	public UpdateAccessCodeBatchJob() {
-		this.setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST, INVOCATION_MODE_NO_CONTEXT));
+		this.setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE));
 	}
 	
 	@Override
@@ -41,8 +54,8 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 				String docType = getInvocationContext().getDocType();
 				
 				if (docType.equals(TaxonConstants.NUXEO_DOCTYPE)) {
-					//setResults(updateAccessCode(csid, true));
-					setResults(updateParentAccessCode(csid, true));
+					setResults(updateAccessCode(csid, true));
+					//setResults(updateParentAccessCode(csid, true));
 				}
 				else if (docType.equals(CollectionObjectConstants.NUXEO_DOCTYPE)) {
 					setResults(updateReferencedAccessCodes(csid, true));
@@ -50,12 +63,6 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 				else {
 					throw new Exception("Unsupported document type: " + docType);
 				}				
-			}
-			else if (this.requestIsForInvocationModeList()) {
-				throw new Exception("Invocation mode not yet implemented: " + this.getInvocationContext().getMode());
-			}
-			else if (this.requestIsForInvocationModeNoContext()) {
-				throw new Exception("Invocation mode not yet implemented: " + this.getInvocationContext().getMode());
 			}
 			else {
 				throw new Exception("Unsupported invocation mode: " + this.getInvocationContext().getMode());
@@ -69,6 +76,24 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		}			
 	}
 	
+	
+	/**
+	 * Updates the access code of the specified taxon record.
+	 * 
+	 * @param taxonRefNameOrCsid	The refname or csid of the taxon record.
+	 * @param deep					If true, update the access codes of all descendant (narrower context)
+	 * 								taxon records. On a deep update, the access codes of all descendant
+	 * 								records are updated first, before calculating the access code of the parent.
+	 * 								This ensures that the access codes of children are up-to-date, and can be
+	 * 								used to calculate an up-to-date value for the parent.
+	 * 
+	 * 								If false, only the specified taxon record is updated. The calculation
+	 * 								of the access code uses the access codes of child taxon records, so
+	 * 								an accurate result depends on the accuracy of the children's access codes.
+	 * @return						The results of the invocation.
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	public InvocationResults updateAccessCode(String taxonRefNameOrCsid, boolean deep) throws URISyntaxException, DocumentException {
 		UpdateAccessCodeResults updateResults = updateAccessCode(taxonRefNameOrCsid, deep, false);
 		
@@ -79,6 +104,20 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
+	/**
+	 * Updates the access code of the parent (broader context) of the specified taxon record.
+	 * 
+	 * @param taxonCsid				The csid of the taxon record.
+	 * @param propagate				If true, propagate the access code up the taxon hierarchy to
+	 * 								all ancestors of the taxon record. The propagation stops when
+	 * 								the new value of the access code is the same as the old value,
+	 * 								or when a root node (a node with no broader context) is reached.
+	 * 
+	 * 								If false, update only the access code of the parent.
+	 * @return						The results of the invocation.
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	public InvocationResults updateParentAccessCode(String taxonCsid, boolean propagate) throws URISyntaxException, DocumentException {
 		PoxPayloadOut taxonPayload = findTaxonByCsid(taxonCsid);
 		String taxonRefName = getFieldValue(taxonPayload, TaxonConstants.REFNAME_SCHEMA_NAME, TaxonConstants.REFNAME_FIELD_NAME);
@@ -95,6 +134,22 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
+	/**
+	 * Updates the access codes of all taxon records that are referenced in the taxonomic identification
+	 * field of the specified collectionobject.
+	 * 
+	 * @param collectionObjectCsid	The csid of the collectionobject.
+	 * @param propagate				If true, propagate the access code up the taxon hierarchy to
+	 * 								the ancestors of each referenced taxon record. The propagation stops when
+	 * 								the new value of the access code is the same as the old value,
+	 * 								or when a root node (a node with no broader context) is reached.
+	 * 
+	 * 								If false, update only the access codes of the taxon records
+	 * 								that are directly referenced.
+	 * @return						The results of the invocation.
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	public InvocationResults updateReferencedAccessCodes(String collectionObjectCsid, boolean propagate) throws URISyntaxException, DocumentException {
 		PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 		
@@ -130,22 +185,33 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 	
 	/**
 	 * Updates the access code of the specified taxon record. The access code is determined by
-	 * examining all collectionobjects that have a taxonomic determination that matches the
-	 * refname of the given taxon record. If all matching collectionobjects are dead, then
-	 * the access code is set to dead. If any matching collectionobjects are not dead, and
-	 * the access code is dead, the access code is set to unrestricted.
+	 * examining all collectionobjects that have a taxonomic identification that matches the
+	 * refname of the taxon record, as well as the access codes of child (narrower context) 
+	 * taxon records. If all referencing collectionobjects are dead (as determined
+	 * by the dead flag), and all child taxon records are dead (as determined by their access
+	 * codes), then the access code is set to Dead. If any matching collectionobjects
+	 * are not dead, or any child taxons are not dead, and the access code is currently Dead,
+	 * the access code is set to Unrestricted. Otherwise, the access code is not changed.
 	 * 
-	 * @param taxonPayload	The services payload for the taxon record
-	 * @param deep			If true, updates the access code of all descendant taxon records
+	 * @param taxonPayload	The services payload of the taxon record.
+	 * @param deep			If true, update the access code of all descendant taxon records.
+	 * 						On a deep update, the access codes of all descendant
+	 * 						records are updated first, before calculating the access code of the parent.
+	 * 						This ensures that the access codes of children are up-to-date, and can be
+	 * 						used to calculate an up-to-date value for the parent.
+
+	 * 						If false, only the specified taxon record is updated. The calculation
+	 * 						of the access code uses the access codes of child taxon records, so
+	 * 						an accurate result depends on the accuracy of the children's access codes.
 	 * @param knownAlive	A hint that a child taxon of the specified taxon is known to be
-	 *                      alive, or that an example of the specified taxon is known to be
+	 *                      alive, or that a collectionobject of the specified taxon is known to be
 	 *                      alive. This parameter allows for optimization when propagating
-	 *                      access code changes up the hiearchy; if a child taxon or
+	 *                      access code changes up the hierarchy; if a child taxon or
 	 *                      referencing collectionobject is known to be alive, and the
-	 *                      current access code is dead, then the access code can be changed
-	 *                      to unrestricted without looking at any other records.
-	 * @return
-	 * @throws DocumentException 
+	 *                      current access code is Dead, then the access code can be changed
+	 *                      to Unrestricted without examining any other records.
+	 * @return				The results of the update.
+	 * @throws DocumentException
 	 * @throws URISyntaxException 
 	 */
 	public UpdateAccessCodeResults updateAccessCode(PoxPayloadOut taxonPayload, boolean deep, boolean knownAlive) throws URISyntaxException, DocumentException {
@@ -262,6 +328,16 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		return results;
 	}
 	
+	/**
+	 * Updates the access code of the taxon record with the specified refname or csid.
+	 * 
+	 * @param taxonRefNameOrCsid
+	 * @param deep
+	 * @param knownAlive
+	 * @return
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	public UpdateAccessCodeResults updateAccessCode(String taxonRefNameOrCsid, boolean deep, boolean knownAlive) throws URISyntaxException, DocumentException {
 		PoxPayloadOut taxonPayload;
 		
@@ -275,6 +351,22 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 		return updateAccessCode(taxonPayload, deep, knownAlive);
 	}
 	
+	/**
+	 * Updates the access code of the parent (broader context) of the specified taxon record,
+	 * whose access code is assumed to be a specified value.
+	 * 
+	 * @param taxonCsid				The csid of the taxon record.
+	 * @param accessCode			The access code of the taxon record.
+	 * @param propagate				If true, propagate the access code up the taxon hierarchy to
+	 * 								all ancestors of the taxon record. The propagation stops when
+	 * 								the new value of the access code is the same as the old value,
+	 * 								or when a root node (a node with no broader context) is reached.
+	 * 
+	 * 								If false, update only the access code of the parent.
+	 * @return						The results of the update.
+	 * @throws URISyntaxException
+	 * @throws DocumentException
+	 */
 	public UpdateAccessCodeResults updateParentAccessCode(String taxonCsid, String accessCode, boolean propagate) throws URISyntaxException, DocumentException {
 		UpdateAccessCodeResults results = new UpdateAccessCodeResults();
 		String parentTaxonCsid = findBroader(taxonCsid);
@@ -312,9 +404,9 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 	/**
 	 * Sets the access code of the specified taxon record to the specified value.
 	 * 
-	 * @param authorityCsid			the csid of the authority containing the taxon record
-	 * @param taxonCsid				the csid of the taxon record
-	 * @param accessCode			the value of the access code
+	 * @param authorityCsid			The csid of the authority containing the taxon record.
+	 * @param taxonCsid				The csid of the taxon record.
+	 * @param accessCode			The value of the access code.
 	 * @throws URISyntaxException 
 	 */
 	private void setAccessCode(String authorityCsid, String taxonCsid, String accessCode) throws URISyntaxException {
@@ -340,6 +432,9 @@ public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
 			return isSoftDeleted;
 		}
 
+		/**
+		 * @param isSoftDeleted
+		 */
 		public void setSoftDeleted(boolean isSoftDeleted) {
 			this.isSoftDeleted = isSoftDeleted;
 		}
