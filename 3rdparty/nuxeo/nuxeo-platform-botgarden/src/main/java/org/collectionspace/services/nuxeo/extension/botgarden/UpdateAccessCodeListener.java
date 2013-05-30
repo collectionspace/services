@@ -26,6 +26,14 @@ import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
+/**
+ * A listener that updates the access code on taxon records when collectionobjects
+ * or taxon records are created or modified.
+ * 
+ * @see org.collectionspace.services.batch.nuxeoUpdateAccessCodeBatchJob
+ * @author ray
+ *
+ */
 public class UpdateAccessCodeListener implements EventListener {
 	final Log logger = LogFactory.getLog(UpdateAccessCodeListener.class);
 
@@ -37,10 +45,6 @@ public class UpdateAccessCodeListener implements EventListener {
 	private static final String TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME = TAXON_PATH_ELEMENTS[0];
 	private static final String TAXON_FIELD_NAME = TAXON_PATH_ELEMENTS[2];
 
-	/* 
-	 * Set the access code on taxon records when the dead flag on a referencing collectionobject 
-	 * changes, or the access code on a child taxon changes.
-	 */
 	public void handleEvent(Event event) throws ClientException {
 		EventContext ec = event.getContext();
 		
@@ -111,8 +115,9 @@ public class UpdateAccessCodeListener implements EventListener {
 						
 						try {
 							// Pass false for the second parameter to updateReferencedAccessCodes, so that it doesn't
-						 	// propagate changes up the taxon hierarchy. Propagation will be taken care of by this
-							// event handler. 
+						 	// propagate changes up the taxon hierarchy. Propagation is taken care of by this
+							// event handler: As taxon records are modified, this handler executes, and updates the
+							// parent.
 						
 							InvocationResults results = updater.updateReferencedAccessCodes(collectionObjectCsid, false);
 			
@@ -124,18 +129,21 @@ public class UpdateAccessCodeListener implements EventListener {
 					}
 					
 					if (deletedTaxonNames != null) {
-						try {
-							for (String deletedTaxonName : deletedTaxonNames) {
-								logger.debug("updating deleted taxon: " + deletedTaxonName);
-								
+						// If any taxonomic idents were removed from the collectionobject, they need to have their
+						// access codes recalculated.
+
+						for (String deletedTaxonName : deletedTaxonNames) {
+							logger.debug("updating deleted taxon: " + deletedTaxonName);
+
+							try {									
 								InvocationResults results = updater.updateAccessCode(deletedTaxonName, false);
-				
+					
 								logger.debug("updateAccessCode complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
 							}
+							catch (Exception e) {
+								logger.error(e.getMessage(), e);
+							}						
 						}
-						catch (Exception e) {
-							logger.error(e.getMessage(), e);
-						}						
 					}
 				}
 			}
@@ -187,9 +195,10 @@ public class UpdateAccessCodeListener implements EventListener {
 						String taxonCsid = doc.getName();
 						
 						try {
-							// Pass false for the second parameter to updateParentAccessCode, so that it doesn't
-						 	// propagate changes up the taxon hierarchy. Propagation will be taken care of by this
-							// event handler.
+							// Pass false for the second parameter to updateReferencedAccessCodes, so that it doesn't
+						 	// propagate changes up the taxon hierarchy. Propagation is taken care of by this
+							// event handler: As taxon records are modified, this handler executes, and updates the
+							// parent.
 							
 							InvocationResults results = createUpdater().updateParentAccessCode(taxonCsid, false);
 			
