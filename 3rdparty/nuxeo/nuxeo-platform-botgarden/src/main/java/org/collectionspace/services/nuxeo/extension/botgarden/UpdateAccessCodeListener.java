@@ -71,8 +71,9 @@ public class UpdateAccessCodeListener implements EventListener {
 					context.setProperty(PREVIOUS_TAXON_NAMES_PROPERTY_NAME, previousTaxonNames.toArray(new String[previousTaxonNames.size()]));
 				}
 				else {
-					boolean updateRequired = false;
+					boolean deadFlagChanged = false;
 					Set<String> deletedTaxonNames = null;
+					Set<String> addedTaxonNames = null;
 					
 					if (event.getName().equals(DocumentEventTypes.DOCUMENT_UPDATED)) {						
 						// As an optimization, check if the dead flag of the collectionobject has
@@ -91,11 +92,11 @@ public class UpdateAccessCodeListener implements EventListener {
 						}
 												
 						if (previousDeadFlag.equals(currentDeadFlag)) {
-							logger.debug("update not required: previousDeadFlag=" + previousDeadFlag + " currentDeadFlag=" + currentDeadFlag);
+							logger.debug("dead flag not changed: previousDeadFlag=" + previousDeadFlag + " currentDeadFlag=" + currentDeadFlag);
 						}
 						else {
-							logger.debug("update required: previousDeadFlag=" + previousDeadFlag + " currentDeadFlag=" + currentDeadFlag);
-							updateRequired = true;
+							logger.debug("dead flag changed: previousDeadFlag=" + previousDeadFlag + " currentDeadFlag=" + currentDeadFlag);
+							deadFlagChanged = true;
 						}
 						
 						List<String> previousTaxonNames = Arrays.asList((String[]) context.getProperty(PREVIOUS_TAXON_NAMES_PROPERTY_NAME));
@@ -103,14 +104,17 @@ public class UpdateAccessCodeListener implements EventListener {
 						
 						deletedTaxonNames = findDeletedTaxonNames(previousTaxonNames, currentTaxonNames);
 						logger.debug("found deleted taxon names: " + StringUtils.join(deletedTaxonNames, ", "));
+
+						addedTaxonNames = findAddedTaxonNames(previousTaxonNames, currentTaxonNames);
+						logger.debug("found added taxon names: " + StringUtils.join(addedTaxonNames, ", "));					
 					}
 					else if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
-						updateRequired = true;
+						deadFlagChanged = true;
 					}
 					
 					UpdateAccessCodeBatchJob updater = createUpdater();
 					
-					if (updateRequired) {
+					if (deadFlagChanged) {
 						String collectionObjectCsid = doc.getName();
 						
 						try {
@@ -125,6 +129,25 @@ public class UpdateAccessCodeListener implements EventListener {
 						}
 						catch (Exception e) {
 							logger.error(e.getMessage(), e);
+						}
+					}
+					else {
+						// If the dead flag didn't change, we still need to recalculate the access codes of
+						// any taxonomic idents that were added.
+						
+						if (addedTaxonNames != null) {
+							for (String addedTaxonName : addedTaxonNames) {
+								logger.debug("updating added taxon: " + addedTaxonName);
+
+								try {									
+									InvocationResults results = updater.updateAccessCode(addedTaxonName, false);
+						
+									logger.debug("updateAccessCode complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
+								}
+								catch (Exception e) {
+									logger.error(e.getMessage(), e);
+								}						
+							}							
 						}
 					}
 					
@@ -239,6 +262,19 @@ public class UpdateAccessCodeListener implements EventListener {
 		}
 		
 		return deletedTaxonNameSet;
+	}
+	
+	private Set<String> findAddedTaxonNames(List<String> previousTaxonNames, List<String> currentTaxonNames) {
+		Set<String> previousTaxonNameSet = new HashSet<String>(previousTaxonNames);
+		Set<String> addedTaxonNameSet = new HashSet<String>();
+		
+		for (String currentTaxonName : currentTaxonNames) {
+			if (!previousTaxonNameSet.contains(currentTaxonName)) {
+				addedTaxonNameSet.add(currentTaxonName);
+			}
+		}
+		
+		return addedTaxonNameSet;
 	}
 	
 	private UpdateAccessCodeBatchJob createUpdater() {
