@@ -31,7 +31,7 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
  * A listener that updates the access code on taxon records when collectionobjects
  * or taxon records are created or modified.
  * 
- * @see org.collectionspace.services.batch.nuxeoUpdateAccessCodeBatchJob
+ * @see org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob
  * @author ray
  *
  */
