@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class UpdateAccessCodeBatchJob extends AbstractBatchJob {
-	final Logger logger = LoggerFactory.getLogger(UpdateRareFlagBatchJob.class);
+	final Logger logger = LoggerFactory.getLogger(UpdateAccessCodeBatchJob.class);
 
 	private final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("\\/");
 	private final String TAXON_FIELD_NAME_WITHOUT_PATH = TAXON_FIELD_NAME_PARTS[TAXON_FIELD_NAME_PARTS.length - 1];
