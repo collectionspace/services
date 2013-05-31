@@ -41,6 +41,8 @@
 			<event>beforeDocumentModification</event>
 			<event>documentModified</event>
 			<event>documentCreated</event>
+			<event>aboutToRemove</event>   <!-- To capture removal of hasBroader relations -->
+			<event>documentRemoved</event> <!-- To capture removal of hasBroader relations -->
 		</listener>
 	</extension>
 		

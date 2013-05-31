@@ -15,6 +15,7 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -40,6 +41,7 @@ public class UpdateAccessCodeListener implements EventListener {
 	public static final String PREVIOUS_DEAD_FLAG_PROPERTY_NAME = "UpdateAccessCodeListener.previousDeadFlag";
 	public static final String PREVIOUS_TAXON_NAMES_PROPERTY_NAME = "UpdateAccessCodeListener.previousTaxonNames";
 	public static final String PREVIOUS_ACCESS_CODE_PROPERTY_NAME = "UpdateAccessCodeListener.previousAccessCode";
+	public static final String DELETED_RELATION_PARENT_CSID_PROPERTY_NAME = "UpdateAccessCodeListener.deletedRelationParentCsid";
 	
 	private static final String[] TAXON_PATH_ELEMENTS = CollectionObjectConstants.TAXON_FIELD_NAME.split("/");
 	private static final String TAXONOMIC_IDENT_GROUP_LIST_FIELD_NAME = TAXON_PATH_ELEMENTS[0];
@@ -230,6 +232,63 @@ public class UpdateAccessCodeListener implements EventListener {
 						catch (Exception e) {
 							logger.error(e.getMessage(), e);
 						}
+					}
+				}
+			}
+			else if (doc.getType().equals(RelationConstants.NUXEO_DOCTYPE) &&
+					!doc.isVersion() && 
+					!doc.isProxy()) {
+				
+				if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
+					String subjectDocType = (String) doc.getProperty(RelationConstants.SUBJECT_DOCTYPE_SCHEMA_NAME, RelationConstants.SUBJECT_DOCTYPE_FIELD_NAME);
+					String objectDocType = (String) doc.getProperty(RelationConstants.OBJECT_DOCTYPE_SCHEMA_NAME, RelationConstants.OBJECT_DOCTYPE_FIELD_NAME);;
+					String relationType = (String) doc.getProperty(RelationConstants.TYPE_SCHEMA_NAME, RelationConstants.TYPE_FIELD_NAME);
+	
+					logger.debug("subjectDocType=" + subjectDocType + " objectDocType=" + objectDocType + " relationType=" + relationType);
+	
+					if (subjectDocType.equals(TaxonConstants.NUXEO_DOCTYPE) && objectDocType.equals(TaxonConstants.NUXEO_DOCTYPE) && relationType.equals(RelationConstants.BROADER_TYPE)) {
+						String parentTaxonCsid = (String) doc.getProperty(RelationConstants.OBJECT_CSID_SCHEMA_NAME, RelationConstants.OBJECT_CSID_FIELD_NAME);
+						logger.debug("child added, updating parent taxon: parentTaxonCsid=" + parentTaxonCsid);
+						
+						try {							
+							InvocationResults results = createUpdater().updateAccessCode(parentTaxonCsid, false);
+							
+							logger.debug("updateAccessCode complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
+						}
+						catch (Exception e) {
+							logger.error(e.getMessage(), e);
+						}
+					}
+				}
+				else if (event.getName().equals(DocumentEventTypes.ABOUT_TO_REMOVE)) {
+					String subjectDocType = (String) doc.getProperty(RelationConstants.SUBJECT_DOCTYPE_SCHEMA_NAME, RelationConstants.SUBJECT_DOCTYPE_FIELD_NAME);
+					String objectDocType = (String) doc.getProperty(RelationConstants.OBJECT_DOCTYPE_SCHEMA_NAME, RelationConstants.OBJECT_DOCTYPE_FIELD_NAME);;
+					String relationType = (String) doc.getProperty(RelationConstants.TYPE_SCHEMA_NAME, RelationConstants.TYPE_FIELD_NAME);
+	
+					logger.debug("subjectDocType=" + subjectDocType + " objectDocType=" + objectDocType + " relationType=" + relationType);
+
+					if (subjectDocType.equals(TaxonConstants.NUXEO_DOCTYPE) && objectDocType.equals(TaxonConstants.NUXEO_DOCTYPE) && relationType.equals(RelationConstants.BROADER_TYPE)) {
+						String parentTaxonCsid = (String) doc.getProperty(RelationConstants.OBJECT_CSID_SCHEMA_NAME, RelationConstants.OBJECT_CSID_FIELD_NAME);
+						
+						// Stash the parent taxon csid, so it can be retrieved in the documentRemoved handler.
+						logger.debug("about to delete taxon hierarchy relation: parentTaxonCsid=" + parentTaxonCsid);
+						context.setProperty(DELETED_RELATION_PARENT_CSID_PROPERTY_NAME, parentTaxonCsid);
+					}
+				}
+				else if (event.getName().equals(DocumentEventTypes.DOCUMENT_REMOVED)) {
+					String parentTaxonCsid = (String) context.getProperty(DELETED_RELATION_PARENT_CSID_PROPERTY_NAME);
+					
+					if (StringUtils.isNotEmpty(parentTaxonCsid)) {
+						logger.debug("child removed, updating parent taxon: parentTaxonCsid=" + parentTaxonCsid);
+
+						try {							
+							InvocationResults results = createUpdater().updateAccessCode(parentTaxonCsid, false);
+							
+							logger.debug("updateAccessCode complete: numAffected=" + results.getNumAffected() + " userNote=" + results.getUserNote());
+						}
+						catch (Exception e) {
+							logger.error(e.getMessage(), e);
+						}						
 					}
 				}
 			}

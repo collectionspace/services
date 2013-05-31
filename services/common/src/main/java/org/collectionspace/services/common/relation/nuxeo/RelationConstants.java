@@ -49,5 +49,9 @@ public class RelationConstants {
     public final static String OBJECT_DOCTYPE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
     public final static String OBJECT_DOCTYPE_FIELD_NAME = "objectDocumentType";
     
+    public final static String TYPE_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String TYPE_FIELD_NAME = "relationshipType";
+    
     public final static String AFFECTS_TYPE = "affects";
+    public final static String BROADER_TYPE = "hasBroader";
 }
