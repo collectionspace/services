@@ -35,16 +35,16 @@
 	
 	<!-- UpdateAccessCodeListener must run after UpdateDeadFlagListener, since it depends on the dead flag being set. -->
 
-	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+	<!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updateaccesscodelistener" async="false" postCommit="false"
 			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateAccessCodeListener" priority="300">
 			<event>beforeDocumentModification</event>
 			<event>documentModified</event>
 			<event>documentCreated</event>
-			<event>aboutToRemove</event>   <!-- To capture removal of hasBroader relations -->
-			<event>documentRemoved</event> <!-- To capture removal of hasBroader relations -->
+			<event>aboutToRemove</event>
+			<event>documentRemoved</event>
 		</listener>
-	</extension>
+	</extension> -->
 		
 	<!-- 
 		We should be able to use the versioning support that's now built into cspace, but need to make
