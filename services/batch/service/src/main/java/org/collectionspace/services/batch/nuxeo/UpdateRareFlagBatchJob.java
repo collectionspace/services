@@ -176,8 +176,13 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		}
 		else {
 			String taxonRefName = getFieldValue(collectionObjectPayload, CollectionObjectConstants.TAXON_SCHEMA_NAME, CollectionObjectConstants.TAXON_FIELD_NAME);
-			boolean oldIsRare = getBooleanFieldValue(collectionObjectPayload, CollectionObjectConstants.RARE_FLAG_SCHEMA_NAME, CollectionObjectConstants.RARE_FLAG_FIELD_NAME);
-			boolean newIsRare = false;
+			String oldIsRare = getFieldValue(collectionObjectPayload, CollectionObjectConstants.RARE_FLAG_SCHEMA_NAME, CollectionObjectConstants.RARE_FLAG_FIELD_NAME);
+			
+			if (oldIsRare == null) {
+				oldIsRare = "";
+			}
+			
+			String newIsRare = "false";
 
 			if (StringUtils.isNotBlank(taxonRefName)) {
 				PoxPayloadOut taxonPayload = null;
@@ -196,20 +201,20 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 						if (StringUtils.isNotEmpty(conservationCategory)) {
 							logger.debug("found non-null conservation category: " + conservationCategory);
 							
-							newIsRare = true;
+							newIsRare = "true";
 							break;
 						}
 					}
 				}
 			}
 			
-			if (newIsRare != oldIsRare) {
+			if (!newIsRare.equals(oldIsRare)) {
 				logger.debug("setting rare flag: collectionObjectCsid=" + collectionObjectCsid + " oldIsRare=" + oldIsRare +" newIsRare=" + newIsRare);
 				
 				setRareFlag(collectionObjectCsid, newIsRare);
 
 				results.setNumAffected(1);
-				results.setUserNote("rare flag set to " + (newIsRare ? "true" : "false"));
+				results.setUserNote("rare flag set to " + newIsRare);
 			}
 			else {
 				logger.debug("not setting rare flag: collectionObjectCsid=" + collectionObjectCsid + " oldIsRare=" + oldIsRare +" newIsRare=" + newIsRare);
@@ -290,12 +295,12 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	 * @param rareFlag				The value of the rare flag
 	 * @throws URISyntaxException 
 	 */
-	private void setRareFlag(String collectionObjectCsid, boolean rareFlag) throws URISyntaxException {
+	private void setRareFlag(String collectionObjectCsid, String rareFlag) throws URISyntaxException {
 		String updatePayload = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"collectionobjects\">" +
 				"<ns2:collectionobjects_naturalhistory xmlns:ns2=\"http://collectionspace.org/services/collectionobject/domain/naturalhistory\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					getFieldXml("rare", (rareFlag ? "true" : "false")) +
+					getFieldXml("rare", rareFlag) +
 				"</ns2:collectionobjects_naturalhistory>" +
 				"<ns2:collectionobjects_common xmlns:ns2=\"http://collectionspace.org/services/collectionobject\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
 				"</ns2:collectionobjects_common>" +					
