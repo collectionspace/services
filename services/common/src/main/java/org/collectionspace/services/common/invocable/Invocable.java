@@ -24,6 +24,7 @@ package org.collectionspace.services.common.invocable;
 
 import org.collectionspace.services.common.invocable.InvocationContext;
 import java.util.List;
+import org.collectionspace.services.common.api.Tools;
 
 /**
  * Invocable defines an interface for invocable jobs (batch, reports, exports,
@@ -59,7 +60,7 @@ public interface Invocable {
 
         @Override
         public String toString() {
-            return getMessage();
+            return (Tools.notBlank(message)) ? message : "No error message provided";  
         }
     }
     public String INVOCATION_MODE_SINGLE = "single";
