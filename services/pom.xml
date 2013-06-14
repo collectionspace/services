@@ -51,6 +51,7 @@
         <module>vocabulary</module>
         <module>organization</module>
         <module>person</module>
+        <module>citation</module>
         <module>id</module>
         <module>collectionobject</module>
         <module>servicegroup</module>

@@ -52,6 +52,7 @@ import org.collectionspace.services.relation.RelationsDocListItem;
 // HACK HACK HACK
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.CitationAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
@@ -478,6 +479,8 @@ public class RelationDocumentModelHandler
     		// HACK - Use startsWith to allow for extension of schemas.
 	    	if(docType.startsWith("Person"))
 	    		common_schema = PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
+	    	else if(docType.startsWith("Citation"))
+	    		common_schema = CitationAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
 	    	else if(docType.startsWith("Organization"))
 	    		common_schema = OrgAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME;
 	    	else if(docType.startsWith("Locationitem"))
