@@ -35,6 +35,7 @@
     <run controlFile="vocabulary/vocabulary.xml" testGroup="TestOrder" />
     <run controlFile="authrefs/authrefsSimple.xml" testGroup="AuthRefsSimple" />
     <run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
+    <run controlFile="authority/authority.xml" testGroup="TestAuthoritiesMultiVocabSearch" />
     <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
     
     <run controlFile="collectionobject/collectionobject-hierarchy-csid.xml" testGroup="CreateUpdateReadStructuredObjects" />
