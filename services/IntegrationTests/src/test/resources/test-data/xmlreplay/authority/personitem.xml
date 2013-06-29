@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <document name="persons">
     <ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb">
-        <displayName>${itemDisplayName}</displayName>
-        <displayNameComputed>false</displayNameComputed>
+        <personTermGroupList>
+            <personTermGroup>
+                <termDisplayName>${itemDisplayName}</termDisplayName>
+            </personTermGroup>   
+        </personTermGroupList>
         <shortIdentifier>${itemShortIdentifier}</shortIdentifier>
-        <bioNote>A bio note for this Person.</bioNote>
+        <bioNote>${itemBioNote}</bioNote>
         <foreName>${itemDisplayName}</foreName>
     </ns2:persons_common>
 </document>
