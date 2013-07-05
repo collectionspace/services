@@ -2141,13 +2141,9 @@
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.citation.nuxeo.CitationDocumentModelHandler</service:documentHandler>
             <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
-                	<service:SupportsHierarchy>true</service:SupportsHierarchy> 
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy> 
                     <service:ListResultsFields>
-                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->
-                        <service:ListResultField>
-                            <service:element>termDisplayName</service:element>
-                            <service:xpath>citationTermGroupList/[0]/termDisplayName</service:xpath>
-                        </service:ListResultField>                        
+                        <!-- Omit the standard AuthorityItem fields (they are handled by the code) -->                     
                     </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
