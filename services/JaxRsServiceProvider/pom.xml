@@ -116,11 +116,6 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.note.service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.id.service</artifactId>
             <version>${project.version}</version>
         </dependency>

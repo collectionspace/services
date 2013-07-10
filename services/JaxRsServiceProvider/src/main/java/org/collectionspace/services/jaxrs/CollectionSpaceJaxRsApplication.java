@@ -28,7 +28,6 @@ import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.media.MediaResource;
-import org.collectionspace.services.note.NoteResource;
 import org.collectionspace.services.group.GroupResource;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.loanin.LoaninResource;
@@ -121,7 +120,6 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new IntakeResource());
         addResourceToMapAndSingletons(new DimensionResource());
         addResourceToMapAndSingletons(new RelationResource());
-        addResourceToMapAndSingletons(new NoteResource());
         addResourceToMapAndSingletons(new LoaninResource());
         addResourceToMapAndSingletons(new LoanoutResource());
         addResourceToMapAndSingletons(new ObjectExitResource());
