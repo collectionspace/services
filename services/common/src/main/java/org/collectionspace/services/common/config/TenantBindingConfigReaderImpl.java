@@ -33,6 +33,8 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceObjectType;
@@ -57,10 +59,7 @@ import org.slf4j.LoggerFactory;
 public class TenantBindingConfigReaderImpl
         extends AbstractConfigReaderImpl<List<TenantBindingType>> {
     final private static String TENANT_BINDINGS_ERROR = "Tenant bindings error: ";
-    final private static String TENANT_BINDINGS_ROOTDIRNAME = "tenants";
-    final private static String TENANT_BINDINGS_FILENAME_PREFIX = "tenant-bindings";
-    final private static String TENANT_BINDINGS_PROTOTYPE_FILENAME = TENANT_BINDINGS_FILENAME_PREFIX + "-proto.xml";
-    final private static String TENANT_BINDINGS_DELTA_FILENAME = TENANT_BINDINGS_FILENAME_PREFIX + ".delta.xml";
+    final private static String TENANT_BINDINGS_DELTA_FILENAME = JEEServerDeployment.TENANT_BINDINGS_FILENAME_PREFIX + ".delta.xml";
     final private static String MERGED_SUFFIX = ".merged.xml";
     
     final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReaderImpl.class);
@@ -93,7 +92,7 @@ public class TenantBindingConfigReaderImpl
 		File result = null;
 		String errMessage = null;
 		try {
-			String tenantsRootPath = getConfigRootDir() + File.separator + TENANT_BINDINGS_ROOTDIRNAME;
+			String tenantsRootPath = getConfigRootDir() + File.separator + JEEServerDeployment.TENANT_BINDINGS_ROOTDIRNAME;
 			File tenantsRootDir = new File(tenantsRootPath);
 			if (tenantsRootDir.exists() == true) {
 				result = tenantsRootDir;
@@ -145,7 +144,7 @@ public class TenantBindingConfigReaderImpl
 		if (result != null) {
 			File outputDir = deltaFile.getParentFile();
 			String mergedFileName = outputDir.getAbsolutePath() + File.separator +
-				TenantBindingConfigReaderImpl.TENANT_BINDINGS_FILENAME_PREFIX + MERGED_SUFFIX;			
+					JEEServerDeployment.TENANT_BINDINGS_FILENAME_PREFIX + MERGED_SUFFIX;			
 			File mergedOutFile = new File(mergedFileName);
 			try {
 				FileUtils.copyInputStreamToFile(result, mergedOutFile);
@@ -160,20 +159,20 @@ public class TenantBindingConfigReaderImpl
 	}
 
     @Override
-    public void read() throws Exception {
+    public void read(boolean useAppGeneratedBindings) throws Exception {
     	String tenantsRootPath = getTenantsRootDir().getAbsolutePath();
-        read(tenantsRootPath);
+        read(tenantsRootPath, useAppGeneratedBindings);
     }
 
     @Override
-    public void read(String tenantRootDirPath) throws Exception {
+    public void read(String tenantRootDirPath, boolean useAppGeneratedBindings) throws Exception {
         File tenantsRootDir = new File(tenantRootDirPath);
         if (tenantsRootDir.exists() == false) {
         	throw new Exception("Cound not find tenant bindings root directory: " +
         			tenantRootDirPath);
         }
         File protoBindingsFile = new File(tenantRootDirPath + File.separator +
-        		TENANT_BINDINGS_PROTOTYPE_FILENAME);
+        		JEEServerDeployment.TENANT_BINDINGS_PROTOTYPE_FILENAME);
         
         List<File> tenantDirs = getDirectories(tenantsRootDir);
         tenantBindingTypeList = readTenantConfigs(protoBindingsFile, tenantDirs);

@@ -49,6 +49,7 @@ import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
+import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -88,9 +89,13 @@ public class AuthorizationGen {
 	private List<Role> allRoleList;
 
     public void initialize(String tenantRootDirPath) throws Exception {
+    	ServicesConfigReaderImpl servicesConfigReader = new ServicesConfigReaderImpl(tenantRootDirPath);
+        servicesConfigReader.read();        
+        Boolean useAppGeneratedBindings = servicesConfigReader.getConfiguration().isUseAppGeneratedTenantBindings();
+
         TenantBindingConfigReaderImpl tenantBindingConfigReader =
                 new TenantBindingConfigReaderImpl(tenantRootDirPath);
-        tenantBindingConfigReader.read();
+        tenantBindingConfigReader.read(useAppGeneratedBindings);
         tenantBindings = tenantBindingConfigReader.getTenantBindings();
         cspaceTenantMgmntRole = buildTenantMgmntRole();
 

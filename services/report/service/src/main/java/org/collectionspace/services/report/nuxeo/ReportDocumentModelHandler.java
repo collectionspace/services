@@ -45,6 +45,7 @@ import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -185,7 +186,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
 		Response response = null;
     	try {
 			String fullPath = ServiceMain.getInstance().getServerRootDir() +
-								File.separator + ConfigReader.CSPACE_DIR_NAME + 
+								File.separator + JEEServerDeployment.CSPACE_DIR_NAME + 
 								File.separator + REPORTS_FOLDER +
 								// File.separator + tenantName +
 								File.separator + reportFileName;
