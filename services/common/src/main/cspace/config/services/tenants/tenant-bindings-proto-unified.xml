@@ -1,10 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tenant:TenantBindingConfig
-	xmlns:merge='http://xmlmerge.el4j.elca.ch'
-	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
-	    	 
-    <tenant:tenantBinding id="100" name="core.collectionspace.org" displayName="CollectionSpace Core Demo Tenant" version="0.1">
-        <tenant:repositoryDomain name="default-domain" storageName="core-domain" repositoryClient="nuxeo-java" />
+<tenant:TenantBindingConfig xmlns:merge="http://xmlmerge.el4j.elca.ch" xmlns:tenant="http://collectionspace.org/services/config/tenant">
+
+    <tenant:tenantBinding>
+
+        <!-- begin idgenerator service meta-data -->
+        <tenant:serviceBindings id="idgenerators" merge:matcher="id" name="idgenerators" type="utility" version="0.1">
+            <!-- other URI paths through which this service could be accessed -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
+                <service:params>
+                    <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>create_id_generators_table.sql</service:value>
+                    </service:property>
+                    <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>load_id_generators.sql</service:value>
+                    </service:property>
+                </service:params>
+            </service:initHandler>
+        </tenant:serviceBindings>
+        <!-- end idgenerator service meta-data -->
+
+        <!-- begin id service meta-data -->
+        <tenant:serviceBindings id="id" merge:matcher="id" name="id" type="utility" version="0.1">
+            <!-- other URI paths through which this service could be accessed -->
+            <!-- 
+                <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                    /idgenerators/*/ids
+                </service:uriPath>
+            -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+        </tenant:serviceBindings>
+        <!-- end id service meta-data -->
+
+        <!-- begin servicegroup service meta-data -->
+        <!-- Servicegroup is a task service that has no representation in the repo, 
+               but provides tools like keyword search across many types of services. 
+        -->
+        <tenant:serviceBindings id="servicegroups" merge:matcher="id" name="servicegroups" type="utility" version="0.1">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler</service:documentHandler>
+        </tenant:serviceBindings>
+        <!-- end servicegroup service meta-data -->
+
     </tenant:tenantBinding>
-	    	       
+
 </tenant:TenantBindingConfig>

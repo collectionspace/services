@@ -68,6 +68,8 @@ public class AuthorizationGen {
     final public static boolean AUTHZ_IS_ENTITY_PROXY = false;
     
     final public static String TENANT_MGMNT_ID = "0";
+
+	private static final boolean USE_APP_GENERATED_BINDINGS = true;
     
     final Logger logger = LoggerFactory.getLogger(AuthorizationGen.class);
     private List<Permission> tenantMgmntPermList = new ArrayList<Permission>();
@@ -90,7 +92,7 @@ public class AuthorizationGen {
 
     public void initialize(String tenantRootDirPath) throws Exception {
     	ServicesConfigReaderImpl servicesConfigReader = new ServicesConfigReaderImpl(tenantRootDirPath);
-        servicesConfigReader.read();        
+        servicesConfigReader.read(USE_APP_GENERATED_BINDINGS);        
         Boolean useAppGeneratedBindings = servicesConfigReader.getConfiguration().isUseAppGeneratedTenantBindings();
 
         TenantBindingConfigReaderImpl tenantBindingConfigReader =
