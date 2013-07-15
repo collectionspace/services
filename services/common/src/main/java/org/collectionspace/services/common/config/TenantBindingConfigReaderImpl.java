@@ -175,7 +175,7 @@ public class TenantBindingConfigReaderImpl
         		JEEServerDeployment.TENANT_BINDINGS_PROTOTYPE_FILENAME);
         
         List<File> tenantDirs = getDirectories(tenantsRootDir);
-        tenantBindingTypeList = readTenantConfigs(protoBindingsFile, tenantDirs);
+        tenantBindingTypeList = readTenantConfigs(protoBindingsFile, tenantDirs, useAppGeneratedBindings);
         
         for (TenantBindingType tenantBinding : tenantBindingTypeList) {
         	if(tenantBindings.get(tenantBinding.getId()) != null) {
@@ -237,17 +237,29 @@ public class TenantBindingConfigReaderImpl
      * @return A list of tenant bindings.
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    List<TenantBindingType> readTenantConfigs(File protoBindingsFile, List<File> tenantDirList) throws IOException {
-		List<TenantBindingType> result = new ArrayList<TenantBindingType>();		
+    List<TenantBindingType> readTenantConfigs(File protoBindingsDir, List<File> tenantDirList, boolean useAppGeneratedBindings) throws IOException {
+		List<TenantBindingType> result = new ArrayList<TenantBindingType>();
+				
 		//
 		// Iterate through a list of directories.
 		//
 		for (File tenantDir : tenantDirList) {
 			boolean found = false;
 			String errMessage = null;
+			
+			File tenantBindingsProtoFile = null;
+			if (useAppGeneratedBindings == true) {
+				String tenantName = tenantDir.getName(); // By convention, the directory name should be the tenant name
+				tenantBindingsProtoFile = new File(protoBindingsDir.getAbsolutePath() + File.separator + tenantName +
+						"-" + JEEServerDeployment.TENANT_BINDINGS_PROTOTYPE_FILENAME);
+			} else {
+		        tenantBindingsProtoFile = new File(protoBindingsDir + File.separator +
+		        		JEEServerDeployment.TENANT_BINDINGS_PROTOTYPE_FILENAME);				
+			}
+			
 			File configFile = new File(tenantDir.getAbsoluteFile() + File.separator + getFileName());
 			if (configFile.exists() == true) {
-		        InputStream tenantBindingsStream = this.merge(protoBindingsFile, configFile);
+		        InputStream tenantBindingsStream = this.merge(tenantBindingsProtoFile, configFile);
 		        TenantBindingConfig tenantBindingConfig = null;
 		        try {
 					tenantBindingConfig = (TenantBindingConfig) parse(tenantBindingsStream,
