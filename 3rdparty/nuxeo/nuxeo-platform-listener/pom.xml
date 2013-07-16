@@ -15,7 +15,7 @@
     <modules>
         <module>updateobjectlocationonmove</module>
         <module>updaterelationsondelete</module>
-        <module>ucb</module>
+        <module>naturalhistory</module>
         <module>botgarden</module>
     </modules>
 

@@ -554,10 +554,10 @@
 					<groupId>net.oauth.core</groupId>
 				</exclusion>
 				<!-- Exclude google-collections, because we have a dependency on guava (the newer, renamed google-collections) in the batch service, via org.gbif:name-parser -->
-	            <exclusion>
-                    <artifactId>google-collections</artifactId>
-                    <groupId>com.google.collections</groupId>
-	            </exclusion>
+				<exclusion>
+					<artifactId>google-collections</artifactId>
+					<groupId>com.google.collections</groupId>
+				</exclusion>
 			</exclusions>
         </dependency>
         <dependency>

@@ -1,4 +1,4 @@
-<project name="org.collectionspace.services.3rdparty.nuxeo.listener.ucb" default="package" basedir=".">
+<project name="org.collectionspace.services.3rdparty.nuxeo.listener.naturalhistory" default="package" basedir=".">
   <description>
     CollectionSpace Nuxeo listener component type
   </description>
