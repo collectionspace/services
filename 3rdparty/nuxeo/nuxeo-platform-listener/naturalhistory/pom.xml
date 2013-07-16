@@ -11,8 +11,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <artifactId>org.collectionspace.services.listener.ucb</artifactId>
-    <name>org.collectionspace.services.listener.ucb</name>
+    <artifactId>org.collectionspace.services.listener.naturalhistory</artifactId>
+    <name>org.collectionspace.services.listener.naturalhistory</name>
     <url>http://maven.apache.org</url>
 
 	 

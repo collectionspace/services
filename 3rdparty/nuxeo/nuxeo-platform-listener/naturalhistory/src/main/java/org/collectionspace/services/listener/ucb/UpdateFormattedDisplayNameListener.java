@@ -1,4 +1,4 @@
-package org.collectionspace.services.listener.ucb;
+package org.collectionspace.services.listener.naturalhistory;
 
 import java.util.HashMap;
 import java.util.List;
