@@ -32,4 +32,33 @@ public class TaxonConstants {
     public final static String NUXEO_DOCTYPE = "Taxon";
     public final static String NUXEO_SCHEMA_NAME = "taxon";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Taxon";
+    
+    public final static String CORE_SCHEMA_NAME = "collectionspace_core";
+    public final static String COMMON_SCHEMA_NAME = "taxon_common";
+    public final static String NATURALHISTORY_SCHEMA_NAME = "taxon_naturalhistory";
+
+    public final static String IN_AUTHORITY_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String IN_AUTHORITY_FIELD_NAME = "inAuthority";
+
+    public final static String DISPLAY_NAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String DISPLAY_NAME_FIELD_NAME = "taxonTermGroupList/taxonTermGroup/termDisplayName";
+    
+    public final static String FORMATTED_DISPLAY_NAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String FORMATTED_DISPLAY_NAME_FIELD_NAME = "taxonTermGroupList/taxonTermGroup/termFormattedDisplayName";
+    
+    public final static String REFNAME_SCHEMA_NAME = COMMON_SCHEMA_NAME;
+    public final static String REFNAME_FIELD_NAME = "refName";    
+
+    public final static String CONSERVATION_CATEGORY_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String CONSERVATION_CATEGORY_FIELD_NAME = "plantAttributesGroupList/plantAttributesGroup/conservationCategory";    
+
+    public final static String ACCESS_CODE_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;
+    public final static String ACCESS_CODE_FIELD_NAME = "accessRestrictions";    
+    public final static String ACCESS_CODE_DEAD_VALUE = "Dead";    
+    public final static String ACCESS_CODE_UNRESTRICTED_VALUE = "Unrestricted";
+    
+    public final static String COMMON_VOCABULARY_SHORTID = "common";
+    
+	public static final String WORKFLOW_STATE_SCHEMA_NAME = CORE_SCHEMA_NAME;
+	public static final String WORKFLOW_STATE_FIELD_NAME = "workflowState";
 }
