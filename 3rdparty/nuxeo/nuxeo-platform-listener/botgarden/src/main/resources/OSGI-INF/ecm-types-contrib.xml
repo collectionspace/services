@@ -18,7 +18,7 @@
 	
  	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updateformatteddisplaynamelistener" async="false" postCommit="false"
-			class="org.collectionspace.services.listener.ucb.UpdateFormattedDisplayNameListener" priority="200">
+			class="org.collectionspace.services.listener.naturalhistory.UpdateFormattedDisplayNameListener" priority="200">
 			<event>beforeDocumentModification</event>
 			<event>documentCreated</event>
 		</listener>
