@@ -1,4 +1,4 @@
-package org.collectionspace.services.nuxeo.extension.botgarden;
+package org.collectionspace.services.listener.botgarden;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -1,4 +1,4 @@
-package org.collectionspace.services.nuxeo.extension.botgarden;
+package org.collectionspace.services.listener.botgarden;
 
 import java.util.ArrayList;
 import java.util.Arrays;

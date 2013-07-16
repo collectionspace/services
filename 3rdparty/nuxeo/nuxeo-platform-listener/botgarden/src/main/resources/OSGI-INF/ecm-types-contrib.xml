@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<component name="org.collectionspace.nuxeo.botgarden.ecm.types">	
+<component name="org.collectionspace.services.listener.botgarden.ecm.types">	
  	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updatelocationlistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateLocationListener" priority="100">
+			class="org.collectionspace.services.listener.botgarden.UpdateLocationListener" priority="100">
 			<event>documentCreated</event>
 			<event>beforeDocumentModification</event>
 		</listener>
@@ -10,7 +10,7 @@
 	
  	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updatedeadflaglistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateDeadFlagListener" priority="200">
+			class="org.collectionspace.services.listener.botgarden.UpdateDeadFlagListener" priority="200">
 			<event>documentCreated</event>
 			<event>documentModified</event>
 		</listener>
@@ -18,7 +18,7 @@
 	
  	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updateformatteddisplaynamelistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateFormattedDisplayNameListener" priority="200">
+			class="org.collectionspace.services.listener.botgarden.UpdateFormattedDisplayNameListener" priority="200">
 			<event>beforeDocumentModification</event>
 			<event>documentCreated</event>
 		</listener>
@@ -26,7 +26,7 @@
 	
 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updaterareflaglistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateRareFlagListener" priority="200">
+			class="org.collectionspace.services.listener.botgarden.UpdateRareFlagListener" priority="200">
 			<event>beforeDocumentModification</event>
 			<event>documentModified</event>
 			<event>documentCreated</event>
@@ -37,7 +37,7 @@
 
 	<!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updateaccesscodelistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateAccessCodeListener" priority="300">
+			class="org.collectionspace.services.listener.botgarden.UpdateAccessCodeListener" priority="300">
 			<event>beforeDocumentModification</event>
 			<event>documentModified</event>
 			<event>documentCreated</event>
@@ -53,7 +53,7 @@
 	-->
 	<extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="createversionlistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.CreateVersionListener" priority="999">
+			class="org.collectionspace.services.listener.botgarden.CreateVersionListener" priority="999">
 			<event>documentCreated</event>
 			<event>documentModified</event>
 		</listener>
@@ -66,13 +66,13 @@
 	-->
 	<!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="deletedeadlocationlistener" async="false" postCommit="false"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.DeleteDeadLocationListener" priority="150">
+			class="org.collectionspace.services.listener.botgarden.DeleteDeadLocationListener" priority="150">
 			<event>documentModified</event>
 		</listener>
 	</extension> -->
 	<!-- <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
 		<listener name="updatestylednamelistener" async="false" postCommit="true"
-			class="org.collectionspace.services.nuxeo.extension.botgarden.UpdateStyledNameListener" priority="200">
+			class="org.collectionspace.services.listener.botgarden.UpdateStyledNameListener" priority="200">
 			<event>documentCreated</event>
 			<event>beforeDocumentModification</event>
 			<event>documentModified</event>
