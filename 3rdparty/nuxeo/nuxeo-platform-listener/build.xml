@@ -118,6 +118,7 @@
         <ant antfile="updateobjectlocationonmove/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="updaterelationsondelete/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="naturalhistory/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="ucjeps/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
@@ -125,6 +126,7 @@
         <ant antfile="updateobjectlocationonmove/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="updaterelationsondelete/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="naturalhistory/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="ucjeps/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
@@ -132,6 +134,7 @@
         <ant antfile="updateobjectlocationonmove/build.xml" target="dist" inheritall="false"/>
         <ant antfile="updaterelationsondelete/build.xml" target="dist" inheritall="false"/>
         <ant antfile="naturalhistory/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="ucjeps/build.xml" target="dist" inheritall="false"/> 
     </target>
 
 </project>

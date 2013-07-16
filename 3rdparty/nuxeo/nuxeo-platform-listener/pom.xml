@@ -16,7 +16,7 @@
         <module>updateobjectlocationonmove</module>
         <module>updaterelationsondelete</module>
         <module>naturalhistory</module>
-
+        <module>ucjeps</module>
     </modules>
 
     <dependencies>
