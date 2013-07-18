@@ -58,9 +58,10 @@ import org.slf4j.LoggerFactory;
  */
 public class TenantBindingConfigReaderImpl
         extends AbstractConfigReaderImpl<List<TenantBindingType>> {
-    final private static String TENANT_BINDINGS_ERROR = "Tenant bindings error: ";
+    final private static String TENANT_BINDINGS_ERROR = "Tenant bindings error(s) for tenant: ";
     final private static String TENANT_BINDINGS_DELTA_FILENAME = JEEServerDeployment.TENANT_BINDINGS_FILENAME_PREFIX + ".delta.xml";
     final private static String MERGED_SUFFIX = ".merged.xml";
+	private static final String NO_SERVICE_BINDINGS_FOUND_ERR = "No Service bindings found.";
     
     final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReaderImpl.class);
     private List<TenantBindingType> tenantBindingTypeList;
@@ -87,6 +88,17 @@ public class TenantBindingConfigReaderImpl
     public String getFileName() {
         return TENANT_BINDINGS_DELTA_FILENAME;
     }
+    
+    private String getFileName(String tenantName, boolean useAppGeneratedBindings) {
+    	String result = getFileName();
+    	
+    	if (useAppGeneratedBindings == true) {
+    		result = tenantName + "-" + result;
+    	}
+    	
+    	return result;
+    }
+    
     
 	protected File getTenantsRootDir() {
 		File result = null;
@@ -171,14 +183,15 @@ public class TenantBindingConfigReaderImpl
         	throw new Exception("Cound not find tenant bindings root directory: " +
         			tenantRootDirPath);
         }
-        File protoBindingsFile = new File(tenantRootDirPath + File.separator +
-        		JEEServerDeployment.TENANT_BINDINGS_PROTOTYPE_FILENAME);
         
         List<File> tenantDirs = getDirectories(tenantsRootDir);
-        tenantBindingTypeList = readTenantConfigs(protoBindingsFile, tenantDirs, useAppGeneratedBindings);
+        tenantBindingTypeList = readTenantConfigs(new File(tenantRootDirPath), tenantDirs, useAppGeneratedBindings);
+        if (tenantBindingTypeList == null || tenantBindingTypeList.size() < 1) {
+        	throw new Exception(NO_SERVICE_BINDINGS_FOUND_ERR);
+        }
         
         for (TenantBindingType tenantBinding : tenantBindingTypeList) {
-        	if(tenantBindings.get(tenantBinding.getId()) != null) {
+        	if (tenantBindings.get(tenantBinding.getId()) != null) {
         		TenantBindingType tenantBindingOld = tenantBindings.get(tenantBinding.getId());
                 logger.error("Ignoring duplicate binding definition for tenant id=" 
                 		+ tenantBinding.getId()
@@ -248,8 +261,8 @@ public class TenantBindingConfigReaderImpl
 			String errMessage = null;
 			
 			File tenantBindingsProtoFile = null;
+			String tenantName = tenantDir.getName(); // By convention, the directory name should be the tenant name
 			if (useAppGeneratedBindings == true) {
-				String tenantName = tenantDir.getName(); // By convention, the directory name should be the tenant name
 				tenantBindingsProtoFile = new File(protoBindingsDir.getAbsolutePath() + File.separator + tenantName +
 						"-" + JEEServerDeployment.TENANT_BINDINGS_PROTOTYPE_FILENAME);
 			} else {
@@ -257,37 +270,42 @@ public class TenantBindingConfigReaderImpl
 		        		JEEServerDeployment.TENANT_BINDINGS_PROTOTYPE_FILENAME);				
 			}
 			
-			File configFile = new File(tenantDir.getAbsoluteFile() + File.separator + getFileName());
-			if (configFile.exists() == true) {
-		        InputStream tenantBindingsStream = this.merge(tenantBindingsProtoFile, configFile);
-		        TenantBindingConfig tenantBindingConfig = null;
-		        try {
-					tenantBindingConfig = (TenantBindingConfig) parse(tenantBindingsStream,
-							TenantBindingConfig.class);
-		        } catch (Exception e) {
-		        	logger.error("Could not parse the merged tenant bindings.", e);
-		        }
-				if (tenantBindingConfig != null) {
-					TenantBindingType binding = tenantBindingConfig.getTenantBinding();
-					if (binding != null) {
-						result.add(binding);
-						found = true;
-						if (logger.isInfoEnabled() == true) {
-							logger.info("Parsed tenant configureation for: " + binding.getDisplayName());
+			if (tenantBindingsProtoFile.exists() == true) {
+				File configFile = new File(tenantDir.getAbsoluteFile() + File.separator + getFileName(tenantName, useAppGeneratedBindings));
+				if (configFile.exists() == true) {
+			        InputStream tenantBindingsStream = this.merge(tenantBindingsProtoFile, configFile);
+			        TenantBindingConfig tenantBindingConfig = null;
+			        try {
+						tenantBindingConfig = (TenantBindingConfig) parse(tenantBindingsStream,
+								TenantBindingConfig.class);
+			        } catch (Exception e) {
+			        	logger.error("Could not parse the merged tenant bindings.", e);
+			        }
+					if (tenantBindingConfig != null) {
+						TenantBindingType binding = tenantBindingConfig.getTenantBinding();
+						if (binding != null) {
+							result.add(binding);
+							found = true;
+							if (logger.isInfoEnabled() == true) {
+								logger.info("Parsed tenant configureation for: " + binding.getDisplayName());
+							}
+						} else {
+							errMessage = "Cound not parse the tentant bindings in: ";
 						}
 					} else {
-						errMessage = "Cound not parse the tentant bindings in: ";
+						errMessage = "Could not parse the tenant bindings file: ";				
 					}
 				} else {
-					errMessage = "Could not parse the tenant bindings file: ";				
+					errMessage = "Expected to, but could not, find the tenant delta configuration file: " + configFile.getAbsolutePath();
 				}
 			} else {
-				errMessage = "Cound not find a tenant configuration file: ";
+				errMessage = "Expected to, but could not, find the tenant proto configuration file: " + tenantBindingsProtoFile.getAbsolutePath();
 			}
+			
 			if (found == false) {
 				if (logger.isErrorEnabled() == true) {
 					errMessage = errMessage != null ? errMessage : TENANT_BINDINGS_ERROR;
-					logger.error(errMessage + configFile.getAbsolutePath());
+					logger.error(errMessage + tenantName);
 				}
 			}
 		} // else-for
