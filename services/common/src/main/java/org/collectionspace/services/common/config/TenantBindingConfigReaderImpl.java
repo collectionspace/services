@@ -63,7 +63,7 @@ public class TenantBindingConfigReaderImpl
     final private static String MERGED_SUFFIX = ".merged.xml";
 	private static final String NO_SERVICE_BINDINGS_FOUND_ERR = "No Service bindings found.";
     
-    final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReaderImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReaderImpl.class);
     private List<TenantBindingType> tenantBindingTypeList;
     //tenant id, tenant binding
     private Hashtable<String, TenantBindingType> tenantBindings =
@@ -305,7 +305,7 @@ public class TenantBindingConfigReaderImpl
 			if (found == false) {
 				if (logger.isErrorEnabled() == true) {
 					errMessage = errMessage != null ? errMessage : TENANT_BINDINGS_ERROR;
-					logger.error(errMessage + tenantName);
+					logger.error(errMessage + " - For tenant: " + tenantName);
 				}
 			}
 		} // else-for
@@ -325,11 +325,14 @@ public class TenantBindingConfigReaderImpl
         for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
             String key = getTenantQualifiedServiceName(tenantBinding.getId(),
                     serviceBinding.getName());
+            if (key == null) {
+            	continue;
+            }
             serviceBindings.put(key, serviceBinding);
 
             if (serviceBinding!=null){
                 ServiceObjectType objectType = serviceBinding.getObject();
-                if (objectType!=null){
+                if (objectType != null) {
                     String docType = objectType.getName();
                     String docTypeKey = getTenantQualifiedIdentifier(tenantBinding.getId(), docType);
                     docTypes.put(docTypeKey, serviceBinding);
@@ -464,10 +467,16 @@ public class TenantBindingConfigReaderImpl
      * @param serviceName
      * @return the properly qualified service name
      */
-    public static String getTenantQualifiedServiceName(
-            String tenantId, String serviceName) {
-//        return tenantId + "." + serviceName.toLowerCase();
-        return getTenantQualifiedIdentifier(tenantId, serviceName.toLowerCase());
+    public static String getTenantQualifiedServiceName(String tenantId, String serviceName) {
+    	String result = null;
+    	
+    	if (serviceName != null) {
+    		logger.debug(String.format(" * tenant:serviceBindings '%s'", serviceName));
+    		System.out.println(String.format(" * tenant:serviceBindings '%s'", serviceName)); // Debug only
+    		return getTenantQualifiedIdentifier(tenantId, serviceName.toLowerCase());
+    	}
+    	
+    	return result;
     }
 
     public static String getTenantQualifiedIdentifier(String tenantId, String identifier) {
