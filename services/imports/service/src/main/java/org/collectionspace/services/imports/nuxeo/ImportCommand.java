@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.nuxeo.client.java.NuxeoClientEmbedded;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -22,45 +23,46 @@ import org.slf4j.LoggerFactory;
 
 // based loosely on package org.nuxeo.ecm.shell.commands.io.ImportCommand;
 public class ImportCommand {
-    
+
     private final Logger logger = LoggerFactory.getLogger(ImportCommand.class);
 
-    public String run(String src, String dest, int timeOut) throws Exception {
+    public String run(String src, String repoName, String workspacesPath, int timeOut) throws Exception {
         File file = new File(src);
         ///cspace way of configuring client and auth:
         NuxeoClientEmbedded client = NuxeoConnectorEmbedded.getInstance().getClient();
-        RepositoryInstance  repoSession = client.openRepository(timeOut);
+        RepositoryInstance repoSession = null;
         try {
+            repoSession = client.openRepository(repoName, timeOut);
             if (logger.isDebugEnabled()) {
                 String msg = String.format("Start of import is Local time: %tT", Calendar.getInstance());
                 logger.debug(msg);
             }
-            return importTree(repoSession, file, dest);
+            return importTree(repoSession, file, workspacesPath);
         } catch (Exception e) {
             throw e;
         } finally {
             if (logger.isDebugEnabled()) {
-        	String msg = String.format("End of import is Local time: %tT", Calendar.getInstance());
-        	logger.debug(msg);
+                String msg = String.format("End of import is Local time: %tT", Calendar.getInstance());
+                logger.debug(msg);
             }
             client.releaseRepository(repoSession);
         }
     }
 
     String importTree(RepositoryInstance repoSession, File file, String toPath) throws Exception {
-    	Exception failed = null;
+        Exception failed = null;
         DocumentReader reader = null;
         DocumentWriter writer = null;
         DocumentModel docModel = null;
         DocumentRef keyDocRef, valueDocRef;
         String docType;
         StringBuffer dump = new StringBuffer();
-        Map<String,Integer> recordsImportedForDocType = new HashMap<String,Integer>();
+        Map<String, Integer> recordsImportedForDocType = new HashMap<String, Integer>();
         Integer numRecordsImportedForDocType = new Integer(0);
         int totalRecordsImported = 0;
         try {
             if (logger.isInfoEnabled()) {
-                logger.info("importTree reading file: "+file+(file!=null ? " exists? "+file.exists() : " file param is null"));
+                logger.info("importTree reading file: " + file + (file != null ? " exists? " + file.exists() : " file param is null"));
             }
             reader = new LoggedXMLDirectoryReader(file);  //our overload of XMLDirectoryReader.
             writer = new DocumentModelWriter(repoSession, toPath, 10);
@@ -69,9 +71,9 @@ public class ImportCommand {
             pipe.setReader(reader);
             pipe.setWriter(writer);
             DocumentTranslationMap dtm = pipe.run();
-            Map<DocumentRef,DocumentRef> documentRefs = dtm.getDocRefMap(); // FIXME: Should be checking for null here!
+            Map<DocumentRef, DocumentRef> documentRefs = dtm.getDocRefMap(); // FIXME: Should be checking for null here!
             dump.append("<importedRecords>");
-            for (Map.Entry entry: documentRefs.entrySet()) {
+            for (Map.Entry entry : documentRefs.entrySet()) {
                 keyDocRef = (DocumentRef) entry.getKey();
                 valueDocRef = (DocumentRef) entry.getValue();
                 if (keyDocRef == null || valueDocRef == null) {
@@ -80,8 +82,8 @@ public class ImportCommand {
                 dump.append("<importedRecord>");
                 docModel = repoSession.getDocument(valueDocRef);
                 docType = docModel.getDocumentType().getName();
-                dump.append("<doctype>"+docType+"</doctype>");
-                dump.append("<csid>"+keyDocRef.toString()+"</csid>");
+                dump.append("<doctype>" + docType + "</doctype>");
+                dump.append("<csid>" + keyDocRef.toString() + "</csid>");
                 dump.append("</importedRecord>");
                 if (recordsImportedForDocType.containsKey(docType)) {
                     numRecordsImportedForDocType = (Integer) recordsImportedForDocType.get(docType);
@@ -94,32 +96,32 @@ public class ImportCommand {
             }
             dump.append("</importedRecords>");
         } catch (Exception e) {
-        	failed = e;
+            failed = e;
             throw failed;
         } finally {
-        	String status = failed == null ? "Success" : "Failed";
-        	dump.append("<status>" + status + "</status>");
-            dump.append("<totalRecordsImported>"+totalRecordsImported+"</totalRecordsImported>");
+            String status = failed == null ? "Success" : "Failed";
+            dump.append("<status>" + status + "</status>");
+            dump.append("<totalRecordsImported>" + totalRecordsImported + "</totalRecordsImported>");
             dump.append("<numRecordsImportedByDocType>");
             TreeSet<String> keys = new TreeSet<String>(recordsImportedForDocType.keySet());
             for (String key : keys) {
                 dump.append("<numRecordsImported>");
-                dump.append("<docType>"+key+"</docType>");
-                dump.append("<numRecords>"+recordsImportedForDocType.get(key).intValue()+"</numRecords>");
+                dump.append("<docType>" + key + "</docType>");
+                dump.append("<numRecords>" + recordsImportedForDocType.get(key).intValue() + "</numRecords>");
                 dump.append("</numRecordsImported>");
             }
             dump.append("</numRecordsImportedByDocType>");
             if (reader != null) {
-                dump.append("<report>"+(((LoggedXMLDirectoryReader)reader).report())+"</report>");
+                dump.append("<report>" + (((LoggedXMLDirectoryReader) reader).report()) + "</report>");
                 reader.close();
             }
             if (writer != null) {
                 writer.close();
             }
-            
+
             if (failed != null) {
-            	String msg = "The Import service encountered an exception: " + failed.getLocalizedMessage();
-            	logger.error(msg, failed);
+                String msg = "The Import service encountered an exception: " + failed.getLocalizedMessage();
+                logger.error(msg, failed);
             }
         }
         return dump.toString();

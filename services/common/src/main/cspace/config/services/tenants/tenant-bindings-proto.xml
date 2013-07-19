@@ -16,6 +16,15 @@
     <!-- begin prototype collectionspace.org tenant meta-data -->
     
     <tenant:tenantBinding id="-1" name="prototype.collectionspace.org" displayName="CollectionSpace Services Bindings Prototype" version="0.1">
+        <!--
+           Guide to the attributes of the repositoryDomain element, below:
+           name=CollectionSpace domain
+           repositoryName=Nuxeo repository name ('default' if not specified)
+             (for configuration see e.g. services/3rdparty/nuxeo/nuxeo-server/{version}/config/default-repo-config.xml)
+           storageName=Nuxeo domain name within that repository
+             (http://doc.nuxeo.com/display/USERDOC/Document+Management+concepts)
+           repositoryClient=repository client name
+        -->
         <tenant:repositoryDomain name="default-domain" storageName="prototype-domain" repositoryClient="nuxeo-java" />
         <tenant:properties>
             <types:item xmlns:types="http://collectionspace.org/services/config/types">
