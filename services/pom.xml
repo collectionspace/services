@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services</artifactId>
-        <version>3.2.2-SNAPSHOT</version>
+        <version>3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -52,6 +52,7 @@
         <module>vocabulary</module>
         <module>organization</module>
         <module>person</module>
+        <module>citation</module>
         <module>id</module>
         <module>collectionobject</module>
         <module>servicegroup</module>

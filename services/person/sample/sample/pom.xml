@@ -28,7 +28,7 @@
         <repository>
             <id>libs-releases-local</id>
             <name>libs-releases-local</name>
-            <url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
+            <url>http://nightly.collectionspace.org:8081/artifactory/libs-release-local</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -40,7 +40,7 @@
         <repository>
             <id>libs-snapshots-local</id>
             <name>libs-snapshots-local</name>
-            <url>http://source.collectionspace.org:8081/artifactory/libs-snapshots-local</url>
+            <url>http://nightly.collectionspace.org:8081/artifactory/libs-snapshot-local</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -51,7 +51,7 @@
         <repository>
             <id>nuxeo-public</id>
             <name>nuxeo-public</name>
-            <url>http://source.collectionspace.org:8081/artifactory/nuxeo-public</url>            
+            <url>http://nightly.collectionspace.org:8081/artifactory/nuxeo-public</url>            
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -62,7 +62,7 @@
         <repository>
             <id>nuxeo-public-snapshot</id>
             <name>nuxeo-public-snapshot</name>
-            <url>http://source.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url>
+            <url>http://nightly.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url>
             <releases>
                 <enabled>false</enabled>
             </releases>

@@ -419,7 +419,7 @@
             <expectedCodes>200</expectedCodes>
         </test>
 
-        <test ID="readCollectionObject1AfterMovement3BlankCurrentLocationUpdate">
+        <test ID="readCollectionObject1AfterMovement3NonBlankCurrentLocationUpdate">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
             <response>
@@ -432,6 +432,73 @@
             <expectedCodes>200</expectedCodes>
         </test>
         
+        <!-- CSPACE-6019: A Movement with a later creation timestamp is -->
+        <!-- deemed to have taken place later than a Movement with an earlier -->
+        <!-- creation timestamp, if both have identical location dates. -->
+        
+        <test ID="createMovement6">
+            <method>POST</method>
+            <uri>/cspace-services/movements</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">urn:cspace:core.collectionspace.org:locationauthorities:name(offsite_sla):item:name(Spokane1358215545524)'Spokane, WA, USA'</var>
+                <var ID="locationDate">${updateMovement3WithNonBlankCurrentLocation.locationDate}</var> <!-- Identical to Movement 3 -->
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        <test ID="readMovement6">
+            <method>GET</method>
+            <uri>/cspace-services/movements/${createMovement6.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/movement.res.xml</filename>
+                <vars>
+                    <var ID="currentLocationValue">${createMovement6.currentLocation}</var>
+                    <var ID="locationDateValue">${updateMovement3WithNonBlankCurrentLocation.got("//locationDate")}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="relateCollectionObject1ToMovement6">
+            <method>POST</method>
+            <uri>/cspace-services/relations</uri>
+            <filename>listener/relation.xml</filename>
+            <vars>
+                <var ID="subjectCsid">${createCollectionObject1.CSID}</var>
+                <var ID="subjectDocumentType">CollectionObject</var>
+                <var ID="objectCsid">${createMovement6.CSID}</var>
+                <var ID="objectDocumentType">Movement</var>
+            </vars>
+            <expectedCodes>201</expectedCodes>
+        </test>
+        
+        <!-- See comment on updateMovement1 for an explanation of why this -->
+        <!-- update is needed, after creating a new relation -->
+        <test ID="updateMovement6">
+            <method>PUT</method>
+            <uri>/cspace-services/movements/${createMovement6.CSID}</uri>
+            <filename>listener/movement.xml</filename>
+            <vars>
+                <var ID="currentLocation">${createMovement6.currentLocation}</var>
+                <var ID="locationDate">${createMovement6.locationDate}</var>
+            </vars>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
+        <test ID="readCollectionObject1AfterBeingRelatedToMovement6">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
+            <response>
+                <expected level="ADDOK" />
+                <filename>listener/res/collectionobject.res.xml</filename>
+                <vars>
+                    <var ID="computedCurrentLocationValue">${createMovement6.currentLocation}</var>
+                </vars>
+            </response>
+            <expectedCodes>200</expectedCodes>
+        </test>
+        
     </testGroup>
     
     <!-- Some of the following tests pertain to CSPACE-5793, not yet -->
@@ -439,41 +506,13 @@
     
     <testGroup ID="TestsStillUnderDevelopment">
         
-        <test ID="deleteRelationBetweenCollectionObject1AndMovement4">
+        <test ID="deleteRelationBetweenCollectionObject1AndMovement3">
             <method>DELETE</method>
-            <uri>/cspace-services/relations/${relateCollectionObject1ToMovement4.CSID}</uri>
+            <uri>/cspace-services/relations/${relateCollectionObject1ToMovement3.CSID}</uri>
             <expectedCodes>200</expectedCodes>
         </test>
         
         <test ID="readCollectionObject1AfterRelationDelete">
-            <method>GET</method>
-            <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
-            <response>
-                <expected level="ADDOK" />
-                <filename>listener/res/collectionobject.res.xml</filename>
-                <vars>
-                    <var ID="computedCurrentLocationValue">${createMovement3.currentLocation}</var>
-                </vars>
-            </response>
-            <expectedCodes>200</expectedCodes>
-        </test>
-        
-        <test ID="softDeleteMovement3">
-            <method>PUT</method>
-            <uri>/cspace-services/movements/${createMovement3.CSID}/workflow/delete</uri>
-            <expectedCodes>200</expectedCodes>
-            <!-- XmlReplay appears to require a filename on PUT. -->
-            <!-- If not present, throws "java.io.FileNotFoundException: File '' does not exist" -->
-            <!-- The contents of that file, sent in the PUT payload, will be ignored by the services. -->
-            <!-- Note that the filename below is in a different module than -->
-            <!-- the present XmlReplay control file. -->
-            <filename>relation/res/workflowState.res.xml</filename>
-            <vars>
-                <var ID="workflowState">deleted</var>
-            </vars>
-        </test>
-        
-        <test ID="readCollectionObject1AfterMovement3SoftDelete">
             <method>GET</method>
             <uri>/cspace-services/collectionobjects/${createCollectionObject1.CSID}</uri>
             <response>

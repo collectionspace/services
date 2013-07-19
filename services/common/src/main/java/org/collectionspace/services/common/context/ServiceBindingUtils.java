@@ -17,6 +17,10 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import java.lang.IndexOutOfBoundsException;
+import java.util.GregorianCalendar;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.document.DocumentUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,10 +180,15 @@ public class ServiceBindingUtils {
     	}
     	*/
     	String propName = getPropertyValue(sb, logicalFieldName);
-    	if(propName==null||propName.isEmpty())
-    		return null;
+    	if(Tools.isBlank(propName)) {
+                logger.warn("Property name is empty for property " + logicalFieldName + " in service " + sb.getName());
+                logger.warn("This may be due to an improperly configured or missing "
+                        + "generic property (objectNameProperty, objectNumberProperty ...) in tenant bindings configuration");
+    		return "";
+        }
     	try {
-    		return (String)docModel.getPropertyValue(propName);
+            Object obj = docModel.getPropertyValue(propName);
+            return DocumentUtils.propertyValueAsString(obj, docModel, propName);
     	} catch(IndexOutOfBoundsException ioobe) {
 				// Should not happen, but may with certain array forms
 				if(logger.isTraceEnabled()) {

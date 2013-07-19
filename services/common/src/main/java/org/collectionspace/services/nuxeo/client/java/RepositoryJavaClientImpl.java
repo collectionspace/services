@@ -17,11 +17,7 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -111,6 +107,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 //    private String foo = Profiler.createLogger();
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
     public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
+    // FIXME: Get this value from an existing constant, if available
+    private static final String USER_SUPPLIED_WILDCARD = "*";
+    private static final String USER_SUPPLIED_WILDCARD_REGEX = "\\" + USER_SUPPLIED_WILDCARD;
+    private static final String USER_SUPPLIED_ANCHOR_CHAR = "^";
+
     
     /**
      * Instantiates a new repository java client impl.
@@ -985,6 +986,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
         String whereClause;
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
+        // Value for replaceable parameter 1 in the query
         String partialTerm = queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM);
         // If the value of the partial term query parameter is blank ('pt='),
         // return all records, subject to restriction by any limit clause
@@ -1013,25 +1015,57 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
         limitClause =
                 " LIMIT " + getMaxItemsLimitOnJdbcQueries(maxListItemsLimit); // implicit int-to-String conversion
         
+        // After building the individual parts of the query, set the values
+        // of replaceable parameters that will be inserted into that query
+        // and optionally add restrictions
+        
         List<String> params = new ArrayList<>();
         
-        // Read tenant bindings configuration to determine whether
-        // to automatically insert leading, as well as trailing, wildcards
-        // into the term matching string.
-        String usesStartingWildcard = TenantBindingUtils.getPropertyValue(tenantBinding,
-                IQueryManager.TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM);
-        // Handle user-provided leading wildcard characters, in the
-        // configuration where a leading wildcard is not automatically inserted.
-        // (The user-provided wildcard must be in the first, or "starting"
-        // character position in the partial term value.)
-        if (Tools.notBlank(usesStartingWildcard) && usesStartingWildcard.equalsIgnoreCase(Boolean.FALSE.toString())) {
-            partialTerm = handleProvidedStartingWildcard(partialTerm);
-            // Otherwise, automatically insert a leading wildcard
-        } else {
-            partialTerm = JDBCTools.SQL_WILDCARD + partialTerm;
+        if (Tools.notBlank(whereClause)) {
+                        
+            // Read tenant bindings configuration to determine whether
+            // to automatically insert leading, as well as trailing, wildcards
+            // into the term matching string.
+            String usesStartingWildcard = TenantBindingUtils.getPropertyValue(tenantBinding,
+                    IQueryManager.TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM);
+            // Handle user-provided leading wildcard characters, in the
+            // configuration where a leading wildcard is not automatically inserted.
+            // (The user-provided wildcard must be in the first, or "starting"
+            // character position in the partial term value.)
+            if (Tools.notBlank(usesStartingWildcard)) {
+                if (usesStartingWildcard.equalsIgnoreCase(Boolean.FALSE.toString())) {
+                    partialTerm = handleProvidedStartingWildcard(partialTerm);
+                    // Otherwise, in the configuration where a leading wildcard
+                    // is usually automatically inserted, handle the cases where
+                    // a user has entered an anchor character in the first position
+                    // in the starting term value. In those cases, strip that
+                    // anchor character and don't add a leading wildcard
+                } else {
+                    if (partialTerm.startsWith(USER_SUPPLIED_ANCHOR_CHAR)) {
+                        partialTerm = partialTerm.substring(1, partialTerm.length());
+                        // Otherwise, automatically add a leading wildcard
+                    } else {
+                        partialTerm = JDBCTools.SQL_WILDCARD + partialTerm;
+                    }
+                }
+            }
+            // Add SQL wildcards in the midst of the partial term match search
+            // expression, whever user-supplied wildcards appear, except in the
+            // first or last character positions of the search expression.
+            partialTerm = subtituteWildcardsInPartialTerm(partialTerm);
+
+            // If a designated 'anchor character' is present as the last character
+            // in the search expression, strip that character and don't add
+            // a trailing wildcard
+            int lastCharPos = partialTerm.length() - 1;
+            if (partialTerm.endsWith(USER_SUPPLIED_ANCHOR_CHAR) && lastCharPos > 0) {
+                    partialTerm = partialTerm.substring(0, lastCharPos);
+            } else {
+                // Otherwise, automatically add a trailing wildcard
+                partialTerm = partialTerm + JDBCTools.SQL_WILDCARD;
+            }
+            params.add(partialTerm);
         }
-        // Automatically insert a trailing wildcard
-        params.add(partialTerm + JDBCTools.SQL_WILDCARD); // Value for replaceable parameter 1 in the query
         
         // Optionally add restrictions to the default query, based on variables
         // in the current request
@@ -1130,7 +1164,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             return result; // return an empty list of document models
         } 
 
-        // Get a list of document models, using the IDs obtained from the query
+        // Get a list of document models, using the list of IDs obtained from the query
+        //
+        // FIXME: Check whether we have a 'get document models from list of CSIDs'
+        // utility method like this, and if not, add this to the appropriate
+        // framework class
         DocumentModel docModel;
         for (String docId : docIds) {
             docModel = NuxeoUtils.getDocumentModel(repoSession, docId);
@@ -1150,7 +1188,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             public int compare(DocumentModel doc1, DocumentModel doc2) {
                 String termDisplayName1 = (String) NuxeoUtils.getXPathValue(doc1, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
                 String termDisplayName2 = (String) NuxeoUtils.getXPathValue(doc2, COMMON_PART_SCHEMA, DISPLAY_NAME_XPATH);
-                return termDisplayName1.compareTo(termDisplayName2);
+                return termDisplayName1.compareToIgnoreCase(termDisplayName2);
             }
         });
 
@@ -1749,8 +1787,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
 
     private String handleProvidedStartingWildcard(String partialTerm) {
         if (Tools.notBlank(partialTerm)) {
-            // FIXME: Get this value from an existing constant, if available
-            final String USER_SUPPLIED_WILDCARD = "*";
             if (partialTerm.substring(0, 1).equals(USER_SUPPLIED_WILDCARD)) {
                 StringBuffer buffer = new StringBuffer(partialTerm);
                 buffer.setCharAt(0, JDBCTools.SQL_WILDCARD.charAt(0));
@@ -1758,6 +1794,37 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             }
         }
         return partialTerm;
+    }
+    
+    /**
+     * Replaces user-supplied wildcards with SQL wildcards, in a partial term
+     * matching search expression.
+     * 
+     * The scope of this replacement excludes the beginning character
+     * in that search expression, as that character is treated specially.
+     * 
+     * @param partialTerm
+     * @return the partial term, with any user-supplied wildcards replaced
+     * by SQL wildcards.
+     */
+    private String subtituteWildcardsInPartialTerm(String partialTerm) {
+        if (Tools.isBlank(partialTerm)) {
+            return partialTerm;
+        }
+        if (! partialTerm.contains(USER_SUPPLIED_WILDCARD)) {
+            return partialTerm;
+        }
+        int len = partialTerm.length();
+        // Partial term search expressions of 2 or fewer characters
+        // currently aren't amenable to the use of wildcards
+        if (len <= 2)  {
+            logger.warn("Partial term match search expression of just 1-2 characters in length contains a user-supplied wildcard: " + partialTerm);
+            logger.warn("Will handle that character as a literal value, rather than as a wildcard ...");
+            return partialTerm;
+        }
+        return partialTerm.substring(0, 1) // first char
+                + partialTerm.substring(1, len).replaceAll(USER_SUPPLIED_WILDCARD_REGEX, JDBCTools.SQL_WILDCARD);
+
     }
 
     private int getMaxItemsLimitOnJdbcQueries(String maxListItemsLimit) {
@@ -1771,13 +1838,15 @@ public class RepositoryJavaClientImpl implements RepositoryClient<PoxPayloadIn, 
             if (itemsLimit < 1) {
                 logger.warn("Value of configuration setting "
                         + IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES
-                        + " must be a positive integer; current value is " + maxListItemsLimit);
+                        + " must be a positive integer; invalid current value is " + maxListItemsLimit);
+                logger.warn("Reverting to default value of " + DEFAULT_ITEMS_LIMIT);
                 itemsLimit = DEFAULT_ITEMS_LIMIT;
             }
         } catch (NumberFormatException nfe) {
             logger.warn("Value of configuration setting "
                         + IQueryManager.MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES
-                        + " must be a positive integer; current value is " + maxListItemsLimit);
+                        + " must be a positive integer; invalid current value is " + maxListItemsLimit);
+            logger.warn("Reverting to default value of " + DEFAULT_ITEMS_LIMIT);
             itemsLimit = DEFAULT_ITEMS_LIMIT;
         }
         return itemsLimit;
