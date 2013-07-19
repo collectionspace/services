@@ -414,10 +414,10 @@
                         <!-- Object Viewer's Contribution Information group -->
                         <!-- There are currently no authority term references in this group -->
                         <!-- Reference Information group -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>referenceGroupList/*/reference</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Object Collection Information group -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -1864,10 +1864,10 @@
                     <service:properties>
                         <!-- See CSPACE-3939 for potential additional authRef and termRef entries -->
                         <!-- Fields containing authority term references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>orgTermGroupList/*/termSource</types:value>
-                        </types:item>
+                        </types:item> -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>contactNames|contactName</types:value>
@@ -2050,10 +2050,10 @@
                     <service:properties>
                         <!-- See CSPACE-3938 for potential additional authRef and termRef entries -->
                         <!-- Fields containing authority term references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>personTermGroupList/*/termSource</types:value>
-                        </types:item>
+                        </types:item> -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                         <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
@@ -2253,10 +2253,10 @@
                     </service:content>
                     <service:properties>
                         <!-- Fields containing authority term references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>citationTermGroupList/*/termSource</types:value>
-                        </types:item>
+                        </types:item> -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>citationPublicationInfoGroupList/*/publisher</types:value>
@@ -2413,10 +2413,10 @@
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="locations_common" updated="" order="1">
                     <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                         <!-- Fields containing authority term references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>locTermGroupList/*/termSource</types:value>
-                        </types:item>                        
+                        </types:item>   -->                      
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
@@ -2560,10 +2560,10 @@
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="places_common" updated="" order="1">
                     <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                         <!-- Fields containing authority term references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>placeTermGroupList/*/termSource</types:value>
-                        </types:item>
+                        </types:item> -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>placeOwnerGroupList/*/owner</types:value>
@@ -2744,18 +2744,18 @@
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="taxon_common" updated="" order="1">
                     <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                         <!-- Fields containing authority term references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>taxonTermGroupList/*/termSource</types:value>
-                        </types:item>
+                        </types:item> -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>taxonAuthorGroupList/*/taxonAuthor</types:value>
                         </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>taxonCitationList|taxonCitation</types:value>
-                        </types:item>
+                        </types:item> -->
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>commonNameGroupList/*/commonNameSource</types:value>
@@ -2920,10 +2920,10 @@
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="concepts_common" updated="" order="1">
                     <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                         <!-- Fields containing authority term references -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>conceptTermGroupList/*/termSource</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
