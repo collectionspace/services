@@ -2054,7 +2054,6 @@
                             <types:key>authRef</types:key>
                             <types:value>personTermGroupList/*/termSource</types:value>
                         </types:item> -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
                         <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>birthPlace</types:value>
@@ -2756,10 +2755,10 @@
                             <types:key>authRef</types:key>
                             <types:value>taxonCitationList|taxonCitation</types:value>
                         </types:item> -->
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
                             <types:value>commonNameGroupList/*/commonNameSource</types:value>
-                        </types:item>
+                        </types:item> -->
                         <!-- Fields containing term list / controlled vocabulary references -->
                         <!-- <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
