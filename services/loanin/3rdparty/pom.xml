@@ -18,7 +18,15 @@
         3rd party build for loanin service
     </description>
 
+    <properties>
+        <ServiceName>loanin</ServiceName>
+        <NuxeoDocTypeName>Loanin</NuxeoDocTypeName>   
+        <CommonSchemaName>loansin_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+    </properties>
+
     <modules>
         <module>nuxeo-platform-cs-loanin</module>
+        <module>nuxeo-platform-loanin-pahma</module>
     </modules>
 </project>

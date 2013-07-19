@@ -111,16 +111,22 @@
     <target name="deploy" depends="install"
         description="deploy acquisition in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-acquisition/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-acquisition-anthropology/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-acquisition-pahma/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
         description="undeploy acquisition from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-acquisition/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-acquisition-anthropology/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-acquisition-pahma/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
         description="generate distribution for acquisition" depends="package">
         <ant antfile="nuxeo-platform-cs-acquisition/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-acquisition-anthropology/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-acquisition-pahma/build.xml" target="dist" inheritall="false"/>
     </target>
 
 

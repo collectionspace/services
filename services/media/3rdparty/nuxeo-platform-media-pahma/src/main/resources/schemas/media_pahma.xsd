@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+ 
+<!--
+    Media schema (XSD)
+     
+    Entity  : Media
+    Part    : Local extension schema for PAHMA tenant
+    Used for: Nuxeo EP core document type
+ 
+-->
+ 
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/media/local/pahma"
+  xmlns="http://collectionspace.org/services/media/local/pahma"
+  targetNamespace="http://collectionspace.org/services/media/local/pahma"
+  version="0.1">
+ 
+	<xs:element name="approvedForWeb" type="xs:boolean"/>
+	<xs:element name="primaryDisplay" type="xs:boolean"/>
+ 
+</xs:schema>

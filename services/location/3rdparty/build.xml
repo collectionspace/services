@@ -111,21 +111,29 @@
     <target name="deploy" depends="install"
     description="deploy location in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-location/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-location-anthropology/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-location-pahma/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy location from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-location/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-location-anthropology/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-location-pahma/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for location" depends="package">
         <ant antfile="nuxeo-platform-cs-location/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-location-anthropology/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-location-pahma/build.xml" target="dist" inheritall="false"/>
     </target>
     
     <target name="dist_installer"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="nuxeo-platform-cs-location/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="nuxeo-platform-location-anthropology/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="nuxeo-platform-location-pahma/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 
 </project>

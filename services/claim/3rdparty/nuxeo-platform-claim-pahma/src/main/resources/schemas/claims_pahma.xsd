@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Claim schema (XSD)
+    
+    Entity  : Claim
+    Part    : Local - Phoebe A. Hearst Museum of Anthropology
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: $
+    $LastChangedDate: $
+-->
+
+<!-- PATRICK ADVISED CORE SCHEMA SHOULD CONSIST OF ONLY:
+	* Date filed
+	* Claim number
+	* Filed by
+	* On behalf of
+	* Responsible department
+	
+	FIELDS BELOW ADDED TO EXTEND SCHEMA (BEYOND ANTHROPOLOGY DOMAIN EXTENSION):
+-->
+
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:ns="http://collectionspace.org/services/claim/local/pahma"
+	xmlns="http://collectionspace.org/services/claim/local/pahma"
+	targetNamespace="http://collectionspace.org/services/claim/local/pahma"
+	version="0.1">
+
+	<xs:element name="dispositionPossibilitiesDiscussed" type="xs:boolean"/>
+	<xs:element name="dispositionPossibilitiesDiscussedNote" type="xs:string"/>
+
+	<xs:element name="surroundingTribesContacted" type="xs:boolean"/>
+	<xs:element name="surroundingTribesContactedNote" type="xs:string"/>
+
+	<xs:element name="workingTeamNotified" type="xs:boolean"/>
+	<xs:element name="workingTeamNotifiedNote" type="xs:string"/>
+
+	<xs:element name="siteFileResearchCompleted" type="xs:boolean"/>
+	<xs:element name="siteFileResearchCompletedNote" type="xs:string"/>
+
+	<xs:element name="accessionFileResearchCompleted" type="xs:boolean"/>
+	<xs:element name="accessionFileResearchCompletedNote" type="xs:string"/>
+
+	<xs:element name="objectsLocatedAndCounted" type="xs:boolean"/>
+	<xs:element name="objectsLocatedAndCountedNote" type="xs:string"/>
+
+	<xs:element name="objectsConsolidated" type="xs:boolean"/>
+	<xs:element name="objectsConsolidatedNote" type="xs:string"/>
+
+	<xs:element name="objectsPhotographed" type="xs:boolean"/>
+	<xs:element name="objectsPhotographedNote" type="xs:string"/>
+
+	<xs:element name="registrationDocumentsDrafted" type="xs:boolean"/>
+	<xs:element name="registrationDocumentsDraftedNote" type="xs:string"/>
+
+	<xs:element name="tribeContactedForPackingPreferences" type="xs:boolean"/>
+	<xs:element name="tribeContactedForPackingPreferencesNote" type="xs:string"/>
+
+	<xs:element name="dateArrangedForTransfer" type="xs:boolean"/>
+	<xs:element name="dateArrangedForTransferNote" type="xs:string"/>
+
+	<xs:element name="objectsMarkedAsDeaccessioned" type="xs:boolean"/>
+	<xs:element name="objectsMarkedAsDeaccessionedNote" type="xs:string"/>
+
+	<xs:element name="documentsArchived" type="xs:boolean"/>
+	<xs:element name="documentsArchivedNote" type="xs:string"/>
+</xs:schema>

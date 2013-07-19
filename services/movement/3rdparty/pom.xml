@@ -18,7 +18,17 @@
         3rd party build for movement service
     </description>
 
+    <properties>
+        <ServiceName>movement</ServiceName>
+        <NuxeoDocTypeName>Movement</NuxeoDocTypeName>
+        <CommonSchemaName>movements_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+        <Lifecycle>cs_locking</Lifecycle>
+    </properties>
+
     <modules>
         <module>nuxeo-platform-cs-movement</module>
+        <module>nuxeo-platform-movement-anthropology</module>
+        <module>nuxeo-platform-movement-pahma</module>
     </modules>
 </project>

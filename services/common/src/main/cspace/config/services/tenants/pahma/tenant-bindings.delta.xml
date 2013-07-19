@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tenant:TenantBindingConfig
+	xmlns:merge='http://xmlmerge.el4j.elca.ch'
+	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
+	
+	<tenant:tenantBinding id="15" name="pahma.cspace.berkeley.edu" displayName="CollectionSpace PAHMA Tenant" version="0.1">
+		
+		<tenant:repositoryDomain name="default-domain" storageName="pahma-domain" repositoryClient="nuxeo-java" />
+
+		<tenant:properties>
+			<types:item id="ptstartingwildcard" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
+				<types:key>ptStartingWildcard</types:key>
+				<types:value>false</types:value>
+			</types:item>
+			<types:item id="jdbcqueriestenantrestricted" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
+				<types:key>jdbcQueriesAreTenantIdRestricted</types:key>
+				<types:value>false</types:value>
+			</types:item>
+		</tenant:properties>
+		
+		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
+			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:property merge:matcher="skip" merge:action="insert">
+						<service:key>sqlScriptName</service:key>
+						<service:value>load_pahma_id_generators.sql</service:value>
+					</service:property>
+				</service:params>
+			</service:initHandler>
+		</tenant:serviceBindings>
+		
+		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields>
+						<service:ListResultField merge:matcher="skip" merge:action="insert">
+							<service:element>taxon</service:element>
+							<service:schema>collectionobjects_naturalhistory</service:schema>
+							<service:xpath>taxonomicIdentGroupList/[0]/taxon</service:xpath>
+						</service:ListResultField>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+
+			<service:validatorHandler merge:matcher="tag" merge:action="replace" xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.PahmaCollectionObjectValidatorHandler</service:validatorHandler>
+			
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" id="assocConcept" merge:matcher="id" merge:action="delete"/>
+
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>materialGroupList/*/material</types:value>
+						</types:item>                        
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>contentPeoples|contentPeople</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>contentPlaces|contentPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>objectProductionPeopleGroupList/*/objectProductionPeople</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>objectProductionPlaceGroupList/*/objectProductionPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>assocPeopleGroupList/*/assocPeople</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>assocPlaceGroupList/*/assocPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>assocCulturalContextGroupList/*/assocCulturalContext</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>assocEventPeoples|assocEventPeople</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>assocEventPlaces|assocEventPlace</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+				
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_naturalhistory" updated="" order="3">
+					<service:properties>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>annotationGroupList/*/annotationAuthor</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>taxonomicIdentGroupList/*/taxon</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>taxonomicIdentGroupList/*/identBy</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>taxonomicIdentGroupList/*/institution</types:value>
+						</types:item>
+					</service:properties>
+					
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory" 
+							schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd" />
+					</service:content>
+				</service:part>
+				
+				<service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_anthropology" updated="" order="4">
+					<service:properties>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>homeLocation</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>homeCrate</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>computedCrate</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>accessRestrictionGroupList/*/accessRestrictionRequestor</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>accessRestrictionGroupList/*/accessRestrictionOnBehalfOf</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>repatriationClaimGroupList/*/repatriationClaimClaimant</types:value>
+						</types:item>
+					</service:properties>
+					
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/collectionobject/domain/anthropology http://collectionspace.org/services/collectionobject/domain/collectionobjects_anthropology.xsd" />
+					</service:content>
+				</service:part>
+				
+				<service:part id="5" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_pahma" updated="" order="5">
+					<service:properties>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>pahmaEthnographicFileCodeList|pahmaEthnographicFileCode</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>ownershipHistoryGroupList/*/previousOwner</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>ownershipHistoryGroupList/*/ownershipPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>pahmaFieldCollectionPlaceList|pahmaFieldCollectionPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>termRef</types:key>
+							<types:value>ownershipHistoryGroupList/*/ownershipPriceCurrency</types:value>
+						</types:item>
+					</service:properties>
+
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/local/pahma" 
+							schemaLocation="http://collectionspace.org/services/collectionobject/local/pahma http://collectionspace.org/services/collectionobject/local/collectionobjects_pahma.xsd" />
+					</service:content>
+				</service:part>
+				
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Intakes">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>fieldCollectionPlace</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Loansin">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>termRef</types:key>
+							<types:value>loanPurpose</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansin_pahma" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/loanin/local/pahma" schemaLocation="http://collectionspace.org/services/loanin/local/pahma http://collectionspace.org/services/loanin/local/loansin_pahma.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Loansout">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>termRef</types:key>
+							<types:value>loanPurpose</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansout_pahma" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/loanout/local/pahma" schemaLocation="http://collectionspace.org/services/loanout/local/pahma http://collectionspace.org/services/loanout/local/loansout_pahma.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="ObjectExit">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields merge:matcher="tag" merge:action="replace">
+						<service:ListResultField>
+							<service:element>exitNumber</service:element>
+							<service:xpath>exitNumber</service:xpath>
+							<service:setter>setExitNumber</service:setter>
+						</service:ListResultField>
+						<service:ListResultField>
+							<service:element>newOwner</service:element>
+							<service:schema>objectexit_anthropology</service:schema>
+							<service:xpath>newOwnerList/[0]</service:xpath>
+						</service:ListResultField>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+			
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNameProperty</types:key>
+					<types:value>newOwnerList/[0]</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNumberProperty</types:key>
+					<types:value>exitNumber</types:value>
+				</types:item>
+			</service:properties>
+			
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="objectexit_anthropology" updated="" order="3">
+					<service:properties>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>newOwnerList|newOwner</types:value>
+						</types:item>
+					</service:properties>
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/objectexit/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/objectexit/domain/anthropology http://collectionspace.org/services/objectexit/domain/objectexit_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Groups">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>termRef</types:key>
+							<types:value>responsibleDepartment</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		
+		<tenant:serviceBindings merge:matcher="id" id="Media">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>coverage</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>subjects|subject</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="media_pahma" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/media/local/pahma" schemaLocation="http://collectionspace.org/services/media/local/pahma http://collectionspace.org/services/media/local/media_pahma.xsd" />
+					</service:content>
+				</service:part>
+			 </service:object>
+		</tenant:serviceBindings>
+		
+		<tenant:serviceBindings merge:matcher="id" id="Movements">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields>
+						<service:ListResultField merge:matcher="skip" merge:action="insert">
+							<service:element>computedSummary</service:element>
+							<service:schema>movements_anthropology</service:schema>
+							<service:xpath>computedSummary</service:xpath>
+						</service:ListResultField>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                             <service:element>crate</service:element>
+                             <service:schema>movements_anthropology</service:schema>
+                             <service:xpath>crate</service:xpath>
+                        </service:ListResultField>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+			
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNameProperty</types:key>
+					<types:value>currentLocation</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNumberProperty</types:key>
+					<types:value>computedSummary</types:value>
+				</types:item>
+			</service:properties>
+			
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="movements_anthropology" updated="" order="3">
+					<service:properties>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>locationHandlers|locationHandler</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>crate</types:value>
+						</types:item>
+					</service:properties>
+
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/movement/domain/anthropology" schemaLocation="http://collectionspace.org/services/movement/domain/anthropology http://collectionspace.org/services/movement/domain/movements_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Claims">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields>
+						<service:ListResultField merge:matcher="skip" merge:action="insert">
+							<service:element>claimName</service:element>
+							<service:schema>claims_anthropology</service:schema>
+							<service:xpath>claimName</service:xpath>
+						</service:ListResultField>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+			
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNameProperty</types:key>
+					<types:value>claimName</types:value>
+				</types:item>
+				<types:item xmlns:types="http://collectionspace.org/services/config/types">
+					<types:key>objectNumberProperty</types:key>
+					<types:value>claimNumber</types:value>
+				</types:item>
+			</service:properties>
+			
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >		
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="claims_anthropology" updated="" order="3">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>claimSiteInvolvedGroupList/*/claimSiteInvolvedName</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>claimGroupInvolvedGroupList/*/groupInvolvedName</types:value>
+						</types:item>
+					</service:properties>
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/claim/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/claim/domain/anthropology http://collectionspace.org/services/claim/domain/claims_anthropology.xsd" />
+					</service:content>
+				</service:part>
+				
+				<service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="claims_pahma" updated="" order="4">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/claim/local/pahma" 
+							schemaLocation="http://collectionspace.org/services/claim/local/pahma http://collectionspace.org/services/claim/local/claims_pahma.xsd" />
+						</service:content>
+					</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Organizations">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>foundingPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>groups|group</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="organizations_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/organization/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/organization/domain/anthropology http://collectionspace.org/services/organization/domain/organizations_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Persons">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>birthPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>deathPlace</types:value>
+						</types:item>
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>authRef</types:key>
+							<types:value>groups|group</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="persons_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/person/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/person/domain/anthropology http://collectionspace.org/services/person/domain/persons_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Locations">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="locations_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/location/domain/anthropology" schemaLocation="http://collectionspace.org/services/location/domain/anthropology http://collectionspace.org/services/location/domain/locations_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		
+		<tenant:serviceBindings merge:matcher="id" id="Places">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="1" merge:matcher="id">
+					<service:properties merge:matcher="tag">
+						<types:item xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="skip" merge:action="insert">
+							<types:key>termRef</types:key>
+							<types:value>placeType</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="Acquisitions">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="acquisitions_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/acquisition/domain/anthropology" schemaLocation="http://collectionspace.org/services/acquisition/domain/anthropology http://collectionspace.org/services/acquisition/domain/acquisitions_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		
+		<tenant:serviceBindings merge:matcher="id" id="Contacts">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="contacts_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/contact/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/contact/domain/anthropology http://collectionspace.org/services/contact/domain/contacts_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+	</tenant:tenantBinding>
+</tenant:TenantBindingConfig>

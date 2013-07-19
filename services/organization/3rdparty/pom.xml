@@ -17,7 +17,16 @@
     3rd party build for organization service
     </description>
 
+    <properties>
+        <ServiceName>organization</ServiceName>
+        <NuxeoDocTypeName>Organization</NuxeoDocTypeName>   
+        <CommonSchemaName>organizations_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+    </properties>
+
     <modules>
         <module>nuxeo-platform-cs-organization</module>
+        <module>nuxeo-platform-organization-anthropology</module>
+        <module>nuxeo-platform-organization-pahma</module>
     </modules>
 </project>
