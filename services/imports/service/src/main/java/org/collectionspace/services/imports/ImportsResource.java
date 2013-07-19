@@ -84,35 +84,63 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 
 	public static final String SERVICE_NAME = "imports";
 	public static final String SERVICE_PATH = "/" + SERVICE_NAME;
-	private static final int DEFAULT_TX_TIMOUT = 600; // timeout period in seconds
+        private static String NUXEO_SPACES_PATH_DELIMITER = "/";
+
+	private static final int DEFAULT_TX_TIMEOUT = 600; // timeout period in seconds
 
 	/*
 	 * ASSUMPTION: All Nuxeo services of a given tenancy store their stuff in
-	 * the same repository domain under the "workspaces" directory.
+	 * a repository domain, under a "Workspaces" space within that domain.
+         * (See http://doc.nuxeo.com/display/USERDOC/Document+Management+concepts)
 	 * 
-	 * Using the tenant ID of the currently authenticated user, this method
-	 * returns the repository domain name of the current tenancy.
+	 * Using the tenant associated with the currently authenticated user, this
+	 * method returns a delimited path to the Workspaces space for that tenancy.
 	 */
-	private static String getWorkspaces() throws ConfigurationException {
+	private static String getWorkspacesPath() throws ConfigurationException {
 		String result = null;
-
-		TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance()
+		List<RepositoryDomainType> repositoryDomainList = getRepositoryDomainList();
+		if (repositoryDomainList.size() == 1) {
+			String domainName = repositoryDomainList.get(0).getStorageName()
+					.trim();
+			result = NUXEO_SPACES_PATH_DELIMITER + domainName 
+                                + NUXEO_SPACES_PATH_DELIMITER + NuxeoUtils.Workspaces;
+		} else {
+                        // Currently, the Imports service places all documents
+                        // imported via a single request, into the same repository
+                        // and repository domain. It doesn't currently have the
+                        // ability to assign individual documents, depending on
+                        // their associated service, to different repositories
+                        // and/or repository domains. If a tenant is configured with
+                        // more than one repository domain, the import will fail here.
+			throw new ConfigurationException(
+					"Tenant bindings contains 0 or more than 1 repository domains.");
+		}
+		return result;
+	}
+        
+        private static String getRepoName() throws ConfigurationException {
+		String repoName = null;
+		List<RepositoryDomainType> repositoryDomainList = getRepositoryDomainList();
+		if (repositoryDomainList.size() == 1) {
+	            repoName = repositoryDomainList.get(0).getRepositoryName().trim();
+		} else {
+                        // See relevant comments in getWorkspacesPath()
+			throw new ConfigurationException(
+					"Tenant bindings contains 0 or more than 1 repository domains.");
+		}
+		return repoName;
+	}
+        
+        private static List<RepositoryDomainType> getRepositoryDomainList() throws ConfigurationException {
+            TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance()
 				.getTenantBindingConfigReader();
 		TenantBindingType tenantBinding = tReader.getTenantBinding(AuthN.get()
 				.getCurrentTenantId());
 		List<RepositoryDomainType> repositoryDomainList = tenantBinding
 				.getRepositoryDomain();
-		if (repositoryDomainList.size() == 1) {
-			String domainName = repositoryDomainList.get(0).getStorageName()
-					.trim();
-			result = "/" + domainName + "/" + NuxeoUtils.Workspaces;
-		} else {
-			throw new ConfigurationException(
-					"Tenant bindings contains 0 or more than 1 repository domains.");
-		}
-
-		return result;
-	}
+                return repositoryDomainList;
+        }
+        
 
 	@Override
 	public String getServiceName() {
@@ -162,7 +190,7 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 	// }
 
 	private int getTimeoutParam(UriInfo ui) {
-		int result = DEFAULT_TX_TIMOUT;
+		int result = DEFAULT_TX_TIMEOUT;
 
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 		if (queryParams != null) {
@@ -228,11 +256,12 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 		// directory that has the expanded request.
 		ImportCommand importCommand = new ImportCommand();
 		// String destWorkspaces = "/default-domain/workspaces";
-		String destWorkspaces = getWorkspaces();
+		String workspacesPath = getWorkspacesPath();
+                String repoName = getRepoName();
 		String result = "";
 		try {
 			String report = "NORESULTS";
-			report = importCommand.run(outputDir, destWorkspaces, timeOut);
+			report = importCommand.run(outputDir, repoName, workspacesPath, timeOut);
 			result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg>"
 					+ report + "</import>";
 		} catch (Exception e) {
@@ -258,11 +287,12 @@ public class ImportsResource extends AbstractCollectionSpaceResourceImpl<PoxPayl
 		// directory that has the expanded request.
 		ImportCommand importCommand = new ImportCommand();
 		// String destWorkspaces = "/default-domain/workspaces";
-		String destWorkspaces = getWorkspaces();
+		String workspacesPath = getWorkspacesPath();
+                String repoName = getRepoName();
 		String result = "";
 		try {
 			String report = "NORESULTS";
-			report = importCommand.run(outputDir, destWorkspaces, timeOut);
+			report = importCommand.run(outputDir, repoName, workspacesPath, timeOut);
 			result = "<?xml version=\"1.0\"?><import><msg>SUCCESS</msg>"
 					+ report + "</import>";
 		} catch (Exception e) {
