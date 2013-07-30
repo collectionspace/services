@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tenant:TenantBindingConfig
+	xmlns:merge='http://xmlmerge.el4j.elca.ch'
+	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
+
+    <tenant:tenantBinding id="20" name="ucjeps.cspace.berkeley.edu" displayName="CollectionSpace UCJEPS Tenant" version="0.1">
+        <tenant:repositoryDomain name="default-domain" storageName="ucjeps-domain" repositoryClient="nuxeo-java" />
+
+        <!--
+                            If you have term completion performance problems and are willing to 
+                            live with not defaulting to an initial wildcard, uncomment this
+                            section. Note that in term completion, you can always specify 
+                            something like "*atrick" (without quotes) to force the wildcard
+                            at the beginning.
+                            Performance may be an issue for very large authorities, especially if
+                            many of them share common substrings. -->
+        <tenant:properties>
+            <types:item id="ptstartingwildcard" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
+                <types:key>ptStartingWildcard</types:key>
+                <types:value>false</types:value>
+            </types:item>
+            <types:item id="maxlistitemsjdbc" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
+                <types:key>maxListItemsReturnedLimitOnJdbcQueries</types:key>
+                <types:value>100</types:value>
+            </types:item>
+            <types:item id="jdbcqueriestenantrestricted" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
+                <types:key>jdbcQueriesAreTenantIdRestricted</types:key>
+                <types:value>false</types:value>
+            </types:item>
+        </tenant:properties>
+
+        <tenant:serviceBindings merge:matcher="id" id="idgenerators">
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:property merge:matcher="skip" merge:action="insert">
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>load_ucjeps_id_generators.sql</service:value>
+                    </service:property>
+                </service:params>
+            </service:initHandler>
+        </tenant:serviceBindings>
+                
+        <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                            <service:element>taxon</service:element>
+                            <service:schema>collectionobjects_naturalhistory</service:schema>
+                            <service:xpath>taxonomicIdentGroupList/[0]/taxon</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                            <service:element>typeSpecimenKind</service:element>
+                            <service:schema>collectionobjects_naturalhistory</service:schema>
+                            <service:xpath>typeSpecimenGroupList/[0]/typeSpecimenKind</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>taxonomicIdentGroupList/[0]/taxon</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>objectNumber</types:value>
+                </types:item>
+            </service:properties>
+
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" >
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_naturalhistory" updated="" order="3">
+                    <service:properties>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>basicStorageLocation</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>labelHeader</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>labelFooter</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>donor</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>fieldCollectionNumberAssignor</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>taxonomicIdentGroupList/*/taxon</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>associatedTaxaGroupList/*/associatedTaxon</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>taxonomicIdentGroupList/*/identBy</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>taxonomicIdentGroupList/*/institution</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>annotationGroupList/*/annotationAuthor</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>typeSpecimenGroupList/*/typeSpecimenAssertionBy</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>typeSpecimenGroupList/*/typeSpecimenBasionym</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>localityGroupList/*/fieldLocPlace</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>hybridParentGroupList/*/hybridParent</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_ucjeps" updated="" order="4">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/local/ucjeps" schemaLocation="http://collectionspace.org/services/collectionobject/local/ucjeps http://collectionspace.org/services/collectionobject/local/collectionobjects_ucjeps.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+
+        <tenant:serviceBindings merge:matcher="id" id="Loansin">
+            <service:object xmlns:service="http://collectionspace.org/services/config/service">
+                <service:properties>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>taxonomyList|taxonomy</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferInOrg</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferInPerson</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferOutGroupList/*/transferOutOrg</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferOutGroupList/*/transferOutPerson</types:value>
+                    </types:item>
+                    <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                        <types:key>authRef</types:key>
+                        <types:value>transferOutGroupList/*/transferOutDirector</types:value>
+                    </types:item>
+                </service:properties>
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansin_naturalhistory" updated="" order="3">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/loanin/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/loanin/domain/naturalhistory http://collectionspace.org/services/loanin/domain/loansin_naturalhistory.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+
+        <tenant:serviceBindings merge:matcher="id" id="Loansout">
+            <service:object xmlns:service="http://collectionspace.org/services/config/service">
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="loansout_naturalhistory" updated="" order="3">
+                    <service:properties>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>taxonomyList|taxonomy</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>transferGroupList/*/transferOrg</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>transferGroupList/*/transferPerson</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>transferGroupList/*/transferDirector</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>returnGroupList/*/returnDetermination</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/loanout/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/loanout/domain/naturalhistory http://collectionspace.org/services/loanout/domain/loansout_naturalhistory.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+    
+        <tenant:serviceBindings merge:matcher="id" id="Media">
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                            <service:element>scientificTaxonomy</service:element>
+                            <service:schema>media_ucjeps</service:schema>
+                            <service:xpath>scientificTaxonomy</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>scientificTaxonomy</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>identificationNumber</types:value>
+                </types:item>
+            </service:properties>
+            
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" >
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="media_ucjeps" updated="" order="3">
+                    <service:properties>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>scientificTaxonomy</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/media/local/ucjeps" schemaLocation="http://collectionspace.org/services/media/local/ucjeps http://collectionspace.org/services/media/local/media_ucjeps.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+
+        <tenant:serviceBindings merge:matcher="id" id="Organizations">
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" >
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="organizations_naturalhistory" updated="" order="3">
+                    <service:properties>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>associatedPersonGroupList/*/associatedPerson</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/organization/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/organization/domain/naturalhistory http://collectionspace.org/services/organization/domain/organizations_naturalhistory.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+
+        <tenant:serviceBindings merge:matcher="id" id="Taxon">
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                            <service:element>taxonRank</service:element>
+                            <service:xpath>taxonRank</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" >
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="taxon_naturalhistory" updated="" order="3">
+                    <service:properties>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>taxonBasionym</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>commonNameGroupList/*/commonName</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>relatedTermGroupList/*/relatedTerm</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/taxonomy/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/taxonomy/domain/naturalhistory http://collectionspace.org/services/taxonomy/domain/taxon_naturalhistory.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="4" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="taxon_ucjeps" updated="" order="4">
+                    <service:properties>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/taxonomy/local/ucjeps" schemaLocation="http://collectionspace.org/services/taxonomy/local/ucjeps http://collectionspace.org/services/taxonomy/local/taxon_ucjeps.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+
+        </tenant:serviceBindings>
+
+        
+    </tenant:tenantBinding>
+	    	       
+</tenant:TenantBindingConfig>

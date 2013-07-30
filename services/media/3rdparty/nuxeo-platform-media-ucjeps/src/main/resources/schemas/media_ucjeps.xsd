@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Media schema (XSD)
+    
+    Entity  : media_ucjeps
+    Part    : ucjeps extension
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/media/local/ucjeps"
+    xmlns="http://collectionspace.org/media/local/ucjeps"
+    targetNamespace="http://collectionspace.org/media/local/ucjeps"
+    version="0.1">
+    
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Media+Handling+Schema -->
+
+    <!--  Media Information Group -->
+
+    <xs:element name="scientificTaxonomy" type="xs:string"/>
+    <xs:element name="handwritten" type="xs:string"/>
+    <xs:element name="postToPublic" type="xs:string"/>
+
+</xs:schema>
