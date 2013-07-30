@@ -920,6 +920,8 @@ public class DocumentUtils {
                     return GregorianCalendarDateTimeUtils.formatAsISO8601Date((GregorianCalendar)obj);
                 } else if (obj instanceof Double) {
                     return nuxeoDecimalValueToDecimalString(obj);
+                } else if (obj instanceof Boolean) {
+                    return String.valueOf(obj);
                 } else {
                    logger.warn("Could not convert value of property " + propertyPath
                             + " in document " + docModel.getPathAsString() + " to a String.");
