@@ -92,10 +92,19 @@ public class UpdateObjectAndCrateLocationBatchJob extends UpdateObjectLocationBa
             logger.trace("previousComputedCrate=" + previousComputedCrate);
         }
 
-        if ((Tools.notBlank(previousComputedCurrentLocation)
-                && computedCurrentLocation.equals(previousComputedCurrentLocation))
-                && (Tools.notBlank(previousComputedCrate) && computedCrate.equals(previousComputedCrate))) {
+        // Return if neither location value should be updated.
+        if ((!shouldUpdateLocation(previousComputedCurrentLocation, computedCurrentLocation))
+                && (!shouldUpdateLocation(previousComputedCrate, computedCrate))) {
             return numUpdated;
+        }
+
+        // Otherwise, update one or both locations.
+        // (Updated location values can legitimately be blank, to 'null out' existing locations.)  
+        if (computedCurrentLocation == null) {
+            computedCurrentLocation = "";
+        }
+        if (computedCrate == null) {
+            computedCrate = "";
         }
 
         String collectionObjectUpdatePayload =
