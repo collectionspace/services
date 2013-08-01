@@ -103,6 +103,7 @@ BEGIN
                RETURN return_name;
             END IF;
          END IF;
+         RETURN NULL;
       END;
       $CF$
       LANGUAGE 'plpgsql' IMMUTABLE
