@@ -36,9 +36,6 @@
                 <!--  List of additional Work Term sources -->
                 <xs:element name="publisherGroupList" type="publisherGroupList"/>
 
-                <!-- List of MigratedEntities -->
-                <xs:element name="migratedEntityGroupList" type="migratedEntityGroupList"/>
-
                 <!-- Structured Date group -->
                 <xs:element name="workDateGroupList" type="workDateGroupList"/>
             </xs:sequence>
@@ -106,24 +103,6 @@
         <xs:sequence>
             <xs:element name="publisher" type="xs:string"/>
             <xs:element name="publisherType" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-
-<!-- =================================================================
-     Migrated Entity Group repeating structure
-     ================================================================= -->
-
-    <xs:complexType name="migratedEntityGroupList">
-        <xs:sequence>
-            <xs:element name="migratedEntityGroup" 
-                        type="migratedEntityGroup" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="migratedEntityGroup">
-        <xs:sequence>
-            <xs:element name="migratedEntity" type="xs:string"/>
-            <xs:element name="migratedEntityType" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
