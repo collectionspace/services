@@ -280,10 +280,10 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         previousComputedCurrentLocation = getFieldElementValue(collectionObjectPayload,
                 COLLECTIONOBJECTS_COMMON_SCHEMA_NAME, COLLECTIONOBJECTS_COMMON_NAMESPACE,
                 COMPUTED_CURRENT_LOCATION_ELEMENT_NAME);
-        if (Tools.notBlank(previousComputedCurrentLocation)
-                && computedCurrentLocation.equals(previousComputedCurrentLocation)) {
+        if (!shouldUpdateLocation(previousComputedCurrentLocation, computedCurrentLocation)) {
             return numUpdated;
         }
+    
         // Perform the update only if there is a non-blank object number available.
         //
         // In the default CollectionObject validation handler, the object number
@@ -301,6 +301,12 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
         // validation requirement.
         if (Tools.isBlank(objectNumber)) {
             return numUpdated;
+        }
+
+        // Update the location.
+        // (Updated location values can legitimately be blank, to 'null out' existing locations.)  
+        if (computedCurrentLocation == null) {
+            computedCurrentLocation = "";
         }
 
         String collectionObjectUpdatePayload =
@@ -324,6 +330,16 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
 
         }
         return numUpdated;
+    }
+    
+    protected boolean shouldUpdateLocation(String previousLocation, String currentLocation) {
+        boolean shouldUpdate = true;
+        if (Tools.isBlank(previousLocation) && Tools.isBlank(currentLocation)) {
+            shouldUpdate = false;
+        } else if (Tools.notBlank(previousLocation) && previousLocation.equals(currentLocation)) {
+            shouldUpdate = false;
+        }
+        return shouldUpdate;
     }
 
     // #################################################################
