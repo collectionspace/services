@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Plant Label schema (XSD)
+    
+    Entity  : Pottag 
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/pottag"
+  xmlns="http://collectionspace.org/services/pottag"
+  targetNamespace="http://collectionspace.org/services/pottag"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Plant+Label+Schema -->    
+    
+    <!--  Plant Label Information Group -->
+    <xs:element name="pottags_common">
+        <xs:complexType>
+            <xs:sequence>                
+                <!--  Volunteer Propagator Information -->
+                <xs:element name="family" type="xs:string"/>
+                <xs:element name="commonName" type="xs:string"/>
+                <xs:element name="locale" type="xs:string"/>
+                <xs:element name="taxonName" type="xs:string"/>
+                <xs:element name="labelData" type="xs:string"/>
+                <xs:element name="numberOfLabels" type="xs:integer"/>
+                <xs:element name="printLabels" type="xs:string"/>
+            </xs:sequence>
+
+        </xs:complexType>
+    </xs:element>
+        
+</xs:schema>
+

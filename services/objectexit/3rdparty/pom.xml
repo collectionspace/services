@@ -27,5 +27,7 @@
 
     <modules>
         <module>nuxeo-platform-cs-objectexit</module>
+		<module>nuxeo-platform-objectexit-naturalhistory</module>
+		<module>nuxeo-platform-objectexit-botgarden</module>
     </modules>
 </project>

@@ -111,16 +111,19 @@
     <target name="deploy" depends="install"
     description="deploy media in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-media/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-media-botgarden/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy media from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-media/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-media-botgarden/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for media" depends="package">
         <ant antfile="nuxeo-platform-cs-media/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-media-botgarden/build.xml" target="dist" inheritall="false"/>
     </target>
 
 

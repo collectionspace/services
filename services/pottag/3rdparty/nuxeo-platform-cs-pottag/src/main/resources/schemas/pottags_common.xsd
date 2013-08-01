@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Plant Label schema (XSD)
+    
+    Entity  : Pottag
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/pottag/"
+    xmlns="http://collectionspace.org/pottag/"
+    targetNamespace="http://collectionspace.org/pottag/"
+    version="0.1">
+    
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+In+Schema -->
+    
+    <!--  Volunteer Propagator Information -->
+    <xs:element name="family" type="xs:string"/>
+    <xs:element name="commonName" type="xs:string"/>
+    <xs:element name="locale" type="xs:string"/>
+    <xs:element name="taxonName" type="xs:string"/>
+    <xs:element name="labelData" type="xs:string"/>
+    <xs:element name="numberOfLabels" type="xs:integer"/>
+    <xs:element name="printLabels" type="xs:string"/>    
+</xs:schema>

@@ -16,7 +16,7 @@
         <module>updateobjectlocationonmove</module>
         <module>updaterelationsondelete</module>
         <module>naturalhistory</module>
-
+        <module>botgarden</module>
     </modules>
 
     <dependencies>

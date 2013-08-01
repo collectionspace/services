@@ -130,9 +130,10 @@ public class CollectionObjectValidatorHandler extends ValidatorHandlerImpl<PoxPa
     //    
     private void validateCollectionobjectsCommon(CollectionobjectsCommon co) throws AssertionError {
     	CS_ASSERT(co != null);
-        String objectNumber = co.getObjectNumber();
-        CS_ASSERT(objectNumber != null);
-        CS_ASSERT(objectNumber.isEmpty() == false, OBJECTNUMBER_NULL_ERROR);
+        // For botgarden, allow an empty object number.
+        // String objectNumber = co.getObjectNumber();
+        // CS_ASSERT(objectNumber != null);
+        // CS_ASSERT(objectNumber.isEmpty() == false, OBJECTNUMBER_NULL_ERROR);
 
     }
 }

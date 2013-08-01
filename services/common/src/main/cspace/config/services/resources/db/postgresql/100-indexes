@@ -1,0 +1,234 @@
+-- Botgarden tenant database additional indexes
+
+DO $$
+BEGIN
+
+IF NOT EXISTS ( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'hierarchy'
+      AND c.relkind = 'r'
+      AND n.nspname = 'public' )
+THEN
+   RAISE NOTICE 'NOTICE: The hierarchy table is missing';
+   RETURN;
+END IF;
+
+IF NOT EXISTS( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'hierarchy_name_idx'
+      AND
+      c.relkind = 'i'
+      AND
+      n.nspname = 'public' )
+THEN
+   CREATE INDEX hierarchy_name_idx ON hierarchy (name);
+   ALTER INDEX hierarchy_name_idx OWNER to nuxeo;
+END IF;
+
+IF NOT EXISTS( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'hierarchy_pos_idx'
+      AND
+      c.relkind = 'i'
+      AND
+      n.nspname = 'public' )
+THEN
+   CREATE INDEX hierarchy_pos_idx ON hierarchy (pos);
+   ALTER INDEX hierarchy_pos_idx OWNER to nuxeo;
+END IF;
+END$$;
+
+
+-- Botgarden tenant database add-ons, 
+-- indexes, grants, functions for the misc table
+
+DO $$
+BEGIN
+
+IF NOT EXISTS ( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'misc'
+      AND c.relkind = 'r'
+      AND n.nspname = 'public' )
+THEN
+   RAISE NOTICE 'NOTICE: The misc table is missing';
+   RETURN;
+END IF;
+
+IF NOT EXISTS( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'misc_lifecyclestate_idx'
+      AND
+      c.relkind = 'i'
+      AND
+      n.nspname = 'public' )
+THEN
+   CREATE INDEX misc_lifecyclestate_idx ON misc (lifecyclestate) ;
+   ALTER INDEX misc_lifecyclestate_idx OWNER TO nuxeo;
+END IF;
+END$$;
+
+
+
+-- Botgarden tenant database add-ons, 
+-- indexes, grants, functions for the collectionobjects_botgarden  table
+
+DO $$
+BEGIN
+
+IF NOT EXISTS ( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'collectionobjects_botgarden'
+      AND c.relkind = 'r'
+      AND n.nspname = 'public' )
+THEN
+   RAISE NOTICE 'NOTICE: The collectionobjects_botgarden table is missing';
+   RETURN;
+END IF;
+
+IF NOT EXISTS( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'collectionobjects_botgarden_deadflag_idx'
+      AND
+      c.relkind = 'i'
+      AND
+      n.nspname = 'public' )
+THEN
+   CREATE INDEX collectionobjects_botgarden_deadflag_idx ON collectionobjects_botgarden (deadflag);
+   ALTER INDEX collectionobjects_botgarden_deadflag_idx OWNER TO nuxeo;
+END IF;
+END$$;
+
+
+
+-- Botgarden tenant database add-ons, 
+-- indexes, grants, functions for the collectionobjects_naturalhistory table
+
+DO $$
+BEGIN
+
+IF NOT EXISTS ( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'collectionobjects_naturalhistory'
+      AND c.relkind = 'r'
+      AND n.nspname = 'public' )
+THEN
+   RAISE NOTICE 'NOTICE: The collectionobjects_naturalhistory table is missing';
+   RETURN;
+END IF;
+
+IF NOT EXISTS( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'collectionobjects_naturalhistory_rare_idx'
+      AND
+      c.relkind = 'i'
+      AND
+      n.nspname = 'public' )
+THEN
+   CREATE INDEX collectionobjects_naturalhistory_rare_idx ON collectionobjects_naturalhistory (rare);
+   ALTER INDEX collectionobjects_naturalhistory_rare_idx OWNER TO nuxeo;
+END IF;
+END$$;
+
+
+
+-- Botgarden tenant database add-ons, 
+-- indexes, grants, functions for the relations_common table
+
+DO $$
+BEGIN
+
+IF NOT EXISTS ( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'relations_common'
+      AND c.relkind = 'r'
+      AND n.nspname = 'public' )
+THEN
+   RAISE NOTICE 'NOTICE: The relations_common table is missing';
+   RETURN;
+END IF;
+
+IF NOT EXISTS( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'relations_common_objectdocumenttype_idx'
+      AND
+      c.relkind = 'i'
+      AND
+      n.nspname = 'public' )
+THEN
+   CREATE INDEX relations_common_objectdocumenttype_idx ON relations_common (objectdocumenttype);
+   ALTER INDEX relations_common_objectdocumenttype_idx OWNER TO nuxeo;
+END IF;
+
+IF NOT EXISTS( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'relations_common_subjectdocumenttype_idx'
+      AND
+      c.relkind = 'i'
+      AND
+      n.nspname = 'public' )
+THEN
+   CREATE INDEX relations_common_subjectdocumenttype_idx ON relations_common (subjectdocumenttype);
+   ALTER INDEX relations_common_subjectdocumenttype_idx OWNER to nuxeo;
+END IF;
+END$$;
+
+
+
+-- Botgarden tenant database add-ons, 
+-- indexes, grants, functions for the taxonomicIdentGroup table
+
+DO $$
+BEGIN
+
+IF NOT EXISTS ( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'taxonomicidentgroup'
+      AND c.relkind = 'r'
+      AND n.nspname = 'public' )
+THEN
+   RAISE NOTICE 'NOTICE: The taxonomicIdentGroup table is missing';
+   RETURN;
+END IF;
+
+IF NOT EXISTS( SELECT 1
+   FROM
+      pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace)
+   WHERE
+      c.relname = 'taxonomicidentgroup_taxon_idx'
+      AND
+      c.relkind = 'i'
+      AND
+      n.nspname = 'public' )
+THEN
+   CREATE INDEX taxonomicIdentGroup_taxon_idx ON taxonomicIdentGroup (taxon);
+   ALTER INDEX taxonomicIdentGroup_taxon_idx OWNER TO nuxeo;
+END IF;
+END$$;
+

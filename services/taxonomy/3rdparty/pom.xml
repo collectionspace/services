@@ -17,7 +17,16 @@
         3rd party build for taxonomy service
     </description>
 
+    <properties>
+        <ServiceName>taxonomy</ServiceName>
+        <NuxeoDocTypeName>Taxon</NuxeoDocTypeName>  
+        <CommonSchemaName>taxon_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+    </properties>
+
     <modules>
         <module>nuxeo-platform-cs-taxonomy</module>
+        <module>nuxeo-platform-taxonomy-naturalhistory</module>
+        <module>nuxeo-platform-taxonomy-botgarden</module>
     </modules>
 </project>
