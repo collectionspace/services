@@ -89,13 +89,11 @@ public class ImportAuthz {
     		String password,
     		String tenantBinding,
     		String exportDir) {
-    	logInfo(LOGGING_SEPARATOR_HEAD);
     	logInfo("Creating CollectionSpace authorization metadata using the following settings:");
     	logInfo("\tuser=" + user);
     	logInfo("\tpassword=" + password);
     	logInfo("\ttenantBinding=" + tenantBinding);
     	logInfo("\texportDir=" + exportDir);
-    	logInfo(LOGGING_SEPARATOR_TAIL);
     }
     
     private static void printUsage(PrintStream outStream) {
