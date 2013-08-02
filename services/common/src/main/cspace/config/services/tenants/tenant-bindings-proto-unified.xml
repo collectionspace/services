@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tenant:TenantBindingConfig xmlns:merge="http://xmlmerge.el4j.elca.ch" xmlns:tenant="http://collectionspace.org/services/config/tenant">
+
+    <tenant:tenantBinding>
+
+        <tenant:serviceBindings id="Vocabularyitems" merge:matcher="id">
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:RefnameDisplayNameField>
+                        <service:ListResultField>
+                            <service:element>order</service:element>
+                            <service:xpath>order</service:xpath>
+                        </service:ListResultField>
+                    </service:RefnameDisplayNameField>
+                </service:params>
+            </service:DocHandlerParams>
+        </tenant:serviceBindings>
+        
+        <!-- begin idgenerator service meta-data -->
+        <tenant:serviceBindings id="idgenerators" merge:matcher="id" name="idgenerators" type="utility" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
+                <service:params>
+                    <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>create_id_generators_table.sql</service:value>
+                    </service:property>
+                    <service:property>
+                        <service:key>sqlScriptName</service:key>
+                        <service:value>load_id_generators.sql</service:value>
+                    </service:property>
+                </service:params>
+            </service:initHandler>
+        </tenant:serviceBindings>
+        <!-- end idgenerator service meta-data -->
+
+        <!-- begin id service meta-data -->
+        <tenant:serviceBindings id="id" merge:matcher="id" name="id" type="utility" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <!-- 
+                <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                    /idgenerators/*/ids
+                </service:uriPath>
+            -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+        </tenant:serviceBindings>
+        <!-- end id service meta-data -->
+
+        <!-- begin servicegroup service meta-data -->
+        <!-- Servicegroup is a task service that has no representation in the repo, 
+               but provides tools like keyword search across many types of services. 
+        -->
+        <tenant:serviceBindings id="servicegroups" merge:matcher="id" name="servicegroups" type="utility" version="1.0">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.servicegroup.nuxeo.ServiceGroupDocumentModelHandler</service:documentHandler>
+        </tenant:serviceBindings>
+        <!-- end servicegroup service meta-data -->
+
+        <!-- begin blob service meta-data -->
+        <!-- This should likely be type="object" -->
+        <tenant:serviceBindings id="Blobs" merge:matcher="id" name="Blobs" type="utility" version="1.0">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>name</service:element>
+                            <service:xpath>name</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>mimeType</service:element>
+                            <service:xpath>mimeType</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>encoding</service:element>
+                            <service:xpath>encoding</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>length</service:element>
+                            <service:xpath>length</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.blob.nuxeo.BlobValidatorHandler</service:validatorHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Blob" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="blob-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="blobs_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/blob" schemaLocation="http://collectionspace.org/services/blob http://services.collectionspace.org/blob/blobs_common.xsd" />
+                        <!-- The Blob service has at least one authRef field and two or more termRef fields -->
+                        <!-- in its multivalued dimensionGroup. -->
+                        <!-- If these require enumeration here, please see authRef and termRef declarations -->
+                        <!-- in Media for relevant entries. -->
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="3" control_group="Managed" versionable="true" auditable="false" label="image_metadata" updated="" order="3">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/image_metadata/" schemaLocation="http://collectionspace.org/image_metadata/ http://services.collectionspace.org/image_metadata.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="4" control_group="Managed" versionable="true" auditable="false" label="iptc" updated="" order="4">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/iptc/" schemaLocation="http://collectionspace.org/iptc/ http://services.collectionspace.org/iptc.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end blob service meta-data -->
+        
+        <!-- begin batch service meta-data -->
+        <tenant:serviceBindings id="Batch" merge:matcher="id" name="Batch" type="utility" version="1.0">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.batch.nuxeo.BatchDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>name</service:element>
+                            <service:xpath>name</service:xpath>
+                            <service:setter>setName</service:setter>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.batch.nuxeo.BatchValidatorHandler</service:validatorHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Batch" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="batch-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="batch_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/batch" schemaLocation="http://collectionspace.org/services/batch http://services.collectionspace.org/batch/batch_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end batch service meta-data -->
+        
+        <!-- begin imports service meta-data -->
+        <tenant:serviceBindings id="Imports" merge:matcher="id" name="Imports" type="utility" version="1.0">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.imports.nuxeo.ImportsDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>importsField</service:element>
+                            <service:xpath>importsField</service:xpath>
+                            <service:setter>setImportsField</service:setter>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Imports" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="imports-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="imports_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/imports" schemaLocation="http://collectionspace.org/services/imports http://services.collectionspace.org/imports/imports_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end imports service meta-data -->
+        
+        <!-- begin Workflow service meta-data -->
+        <tenant:serviceBindings id="Workflow" merge:matcher="id" name="Workflow" type="utility" version="1.0">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.common.workflow.service.nuxeo.WorkflowDocumentModelHandler</service:documentHandler>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.workflow.nuxeo.WorkflowValidatorHandler</service:validatorHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Workflow" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="workflow-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="workflow_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/workflow" schemaLocation="http://collectionspace.org/services/workflow http://services.collectionspace.org/movement/workflow_common.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end Workflow service meta-data -->
+        
+        <!-- begin report service meta-data -->
+        <tenant:serviceBindings id="Reports" merge:matcher="id" name="Reports" type="utility" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /reports/*/output/
+            </service:uriPath>-->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.report.nuxeo.ReportDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>name</service:element>
+                            <service:xpath>name</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.report.nuxeo.ReportValidatorHandler</service:validatorHandler>
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.report.nuxeo.ReportPostInitHandler</service:classname>
+                <service:params>
+                    <service:property>
+                        <service:key>readerRoleName</service:key>
+                        <service:value>reader</service:value>
+                    </service:property>
+                </service:params>
+            </service:initHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Report" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="reports-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="reports_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/report" schemaLocation="http://collectionspace.org/services/report http://services.collectionspace.org/report/reports_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end report service meta-data -->
+        
+        <!-- begin relation service meta-data -->
+        <tenant:serviceBindings id="Relations" merge:matcher="id" name="Relations" type="utility" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.relation.nuxeo.RelationDocumentModelHandler</service:documentHandler>
+            <!-- Configuration of list results fields for relation items is commented out for now, -->
+            <!-- pending resolution of how to specify nested elements in list results. -->
+            <!--
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                <service:ListResultsFields>
+                    <service:ListResultField>
+                    <service:element>subjectCsid</service:element>
+                    <service:xpath>subjectCsid</service:xpath>
+                    </service:ListResultField>
+                    <service:ListResultField>
+                    <service:element>subjectRefName</service:element>
+                    <service:xpath>subjectRefName</service:xpath>
+                    </service:ListResultField>
+                    <service:ListResultField>
+                    <service:element>relationshipType</service:element>
+                    <service:xpath>relationshipType</service:xpath>
+                    </service:ListResultField>
+                    <service:ListResultField>
+                    <service:element>predicate</service:element>
+                    <service:xpath>predicate</service:xpath>
+                    </service:ListResultField>
+                    <service:ListResultField>
+                    <service:element>predicateDisplayName</service:element>
+                    <service:xpath>predicateDisplayName</service:xpath>
+                    </service:ListResultField>
+                    <service:ListResultField>
+                    <service:element>objectCsid</service:element>
+                    <service:xpath>objectCsid</service:xpath>
+                    </service:ListResultField>
+                    <service:ListResultField>
+                    <service:element>objectRefName</service:element>
+                    <service:xpath>objectRefName</service:xpath>
+                    </service:ListResultField>
+                    <service:ListResultField>
+                    <service:element>relationshipType</service:element>
+                    <service:xpath>relationshipType</service:xpath>
+                    </service:ListResultField>
+                </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            -->
+            <!--
+                Relation list items can include two additional fields,
+                'subject' and 'object', each of which are parent elements of,
+                and hence containers for, as many as eight child fields.  See
+                services/jaxb/src/main/resources/relations_common.xsd
+            -->
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.relation.nuxeo.RelationValidatorHandler</service:validatorHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>subjectCsid</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>predicateDisplayName</types:value>
+                </types:item>
+            </service:properties>
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>relations_common</service:table>
+                        <service:param>subjectcsid,objectcsid</service:param>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Relation" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="relations-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="relations_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/relation" schemaLocation="http://collectionspace.org/services/relation http://services.collectionspace.org/relation/relations_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end relation service meta-data -->
+
+        <!-- begin dimension service meta-data -->
+        <tenant:serviceBindings id="Dimensions" merge:matcher="id" name="Dimensions" type="utility" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <service:uriPath xmlns:service="http://collectionspace.org/services/config/service">/dimensions/workflow/</service:uriPath>
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.dimension.nuxeo.DimensionDocumentModelHandler</service:documentHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Dimension" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="dimensions-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="dimensions_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/dimension" schemaLocation="http://collectionspace.org/services/dimension http://services.collectionspace.org/dimension/dimensions_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end dimension service meta-data -->
+        
+        <!-- begin contact service meta-data -->
+        <tenant:serviceBindings id="Contacts" merge:matcher="id" name="Contacts" type="utility" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /personauthorities/*/items/*/contacts
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /orgauthorities/*/items/*/contacts
+            </service:uriPath>
+            -->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>displayName</service:element>
+                            <service:xpath>displayName</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Contact" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="contacts-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="contacts_common" updated="" order="1">
+                    <service:properties>
+                        <!-- Fields containing authority term references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>addressGroupList/*/addressMunicipality</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>addressGroupList/*/addressStateOrProvince</types:value>
+                        </types:item>
+                        <!-- Per CSPACE-5080: This field is configured as a term list, rather than being tied to Place authority as described in wiki schema -->
+                        <!--<types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>addressGroupList/*/addressCountry</types:value>
+                        </types:item> -->
+                        <!-- Fields containing term list / controlled vocabulary references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>emailGroupList/*/emailType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>telephoneNumberGroupList/*/telephoneNumberType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>faxNumberGroupList/*/faxNumberType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>webAddressGroupList/*/webAddressType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>addressGroupList/*/addressCountry</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>addressGroupList/*/addressType</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/contact" schemaLocation="http://collectionspace.org/services/contact http://services.collectionspace.org/contact/contacts_common.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end contact service meta-data -->
+
+        <!-- begin role service meta-data -->
+        <tenant:serviceBindings id="authorization/roles" merge:matcher="id" name="authorization/roles" type="security" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.authorization.storage.RoleDocumentHandler</service:documentHandler>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.authorization.storage.RoleValidatorHandler</service:validatorHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Role" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="roles_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="roles" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/authorization" schemaLocation="http://collectionspace.org/services/authorization http://services.collectionspace.org/authorization/roles.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end role service meta-data -->
+        
+        <!-- begin permission service meta-data -->
+        <tenant:serviceBindings id="authorization/permissions" merge:matcher="id" name="authorization/permissions" type="security" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.authorization.storage.PermissionDocumentHandler</service:documentHandler>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.authorization.storage.PermissionValidatorHandler</service:validatorHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="Permission" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="permissions_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="permissions" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/authorization" schemaLocation="http://collectionspace.org/services/authorization http://services.collectionspace.org/authorization/permissions.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end permission service meta-data -->
+        
+        <!-- begin permission-role service meta-data -->
+        <!-- the following service is same as authorization/roles/permroles service -->
+        <!-- except that it is available as a sub resource of the permission service -->
+        <tenant:serviceBindings id="authorization/permissions/permroles" merge:matcher="id" name="authorization/permissions/permroles" type="security" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /authorization/permissions/*/permroles/
+            </service:uriPath>
+            -->
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler</service:documentHandler>
+            <!--
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'>
+                org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler
+            </service:validatorHandler>
+            -->
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="PermissionRole" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="permroles_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="permroles" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/authorization" schemaLocation="http://collectionspace.org/services/authorization http://services.collectionspace.org/authorization/permissions_roles.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end permission-role service meta-data -->
+        
+        <!-- begin account-role service meta-data -->
+        <tenant:serviceBindings id="accounts/accountroles" merge:matcher="id" name="accounts/accountroles" type="security" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /accounts/*/accountroles/
+            </service:uriPath>
+            -->
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.account.storage.AccountRoleDocumentHandler</service:documentHandler>
+            <!--
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'>
+                org.collectionspace.services.account.storage.AccountRoleDocumentHandler
+            </service:validatorHandler>
+            -->
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="AccountRole" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="accountroles_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="accountroles" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/authorization" schemaLocation="http://collectionspace.org/services/authorization http://services.collectionspace.org/authorization/accounts_roles.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end account-role service meta-data -->
+        
+        <!-- begin role-permission service meta-data -->
+        <!-- the following service is same as authorization/permissions/permroles service -->
+        <!-- except that it is available as a sub resource of the role service -->
+        <tenant:serviceBindings id="authorization/roles/permroles" merge:matcher="id" name="authorization/roles/permroles" type="security" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /authorization/roles/*/permroles/
+            </service:uriPath>
+            -->
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler</service:documentHandler>
+            <!--
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'>
+                org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler
+            </service:validatorHandler>
+            -->
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="PermissionRole" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="permroles_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="permroles" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/authorization" schemaLocation="http://collectionspace.org/services/authorization http://services.collectionspace.org/authorization/permissions_roles.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end role-permission service meta-data -->
+        
+        <!-- begin role-account service meta-data -->
+        <!-- the following service is same as account/accountroles service -->
+        <!-- except that it is available as a sub resource of the role service -->
+        <tenant:serviceBindings id="authorization/roles/accountroles" merge:matcher="id" name="authorization/roles/accountroles" type="security" version="1.0">
+            <!-- other URI paths through which this service could be accessed -->
+            <!--
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /authorization/roles/*/accountroles/
+            </service:uriPath>
+            -->
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.account.storage.AccountRoleDocumentHandler</service:documentHandler>
+            <!--
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/config/service'>
+                org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler
+            </service:validatorHandler>
+            -->
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" name="AccountRole" version="1.0">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="accountroles_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd" />
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="accountroles" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/authorization" schemaLocation="http://collectionspace.org/services/authorization http://services.collectionspace.org/authorization/accounts_roles.xsd" />
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+
+    </tenant:tenantBinding>
+
+</tenant:TenantBindingConfig>

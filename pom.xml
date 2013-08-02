@@ -56,8 +56,8 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>libs-releases-local</id>
-			<name>libs-releases-local</name>
+			<id>libs-release-local</id>
+			<name>libs-release-local</name>
 			<url>http://nightly.collectionspace.org:8081/artifactory/libs-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
@@ -348,12 +348,12 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.5.8</version>
+				<version>1.6.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
-				<version>1.5.8</version>
+				<version>1.6.1</version>
 			</dependency>
             <dependency>
                 <groupId>org.testng</groupId>

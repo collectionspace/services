@@ -377,7 +377,7 @@
             <artifactId>spring-security-acl</artifactId>
             <version>${spring.security.version}</version>
             <scope>provided</scope>
-        </dependency>        
+        </dependency>
     </dependencies>
 
     <repositories>

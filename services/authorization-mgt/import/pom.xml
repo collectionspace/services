@@ -22,12 +22,10 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
         </dependency>
         <!-- CollectionSpace dependencies -->
         <dependency>
@@ -47,6 +45,11 @@
             <artifactId>org.collectionspace.services.authorization.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+		    <groupId>org.collectionspace.services</groupId>
+        	<artifactId>org.collectionspace.services.config</artifactId>
+			<version>${project.version}</version>
+        </dependency>        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
@@ -202,7 +205,7 @@
 												<!-- This should be (Needs testing):
 												<argument>${jboss.server.cspace}</argument>
 												-->
-                        <argument>${basedir}/../../common/src/main</argument>
+                        <argument>${env.CSPACE_JEESERVER_HOME}</argument>
                         <argument>-edir</argument>
                         <argument>${basedir}/target</argument>
                     </arguments>

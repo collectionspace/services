@@ -110,11 +110,15 @@
 
     <target name="deploy" depends="install"
     description="deploy taxonomy in ${jee.server.nuxeo}">
+    	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-taxonomy/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"
     description="undeploy taxonomy from ${jee.server.nuxeo}">
+    	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+    	leaving this only for backwards compatibility reasons. -->
         <ant antfile="nuxeo-platform-cs-taxonomy/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
