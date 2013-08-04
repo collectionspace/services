@@ -1,3 +1,4 @@
+*.org.*.bindings.xml
 services/publicitem/.project
 services/publicitem/.settings/
 services/publicitem/3rdparty/.project
