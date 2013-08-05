@@ -577,13 +577,19 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (String clazz : handlerClazzes) {
             clazz = clazz.trim();
-            Class<?> c = tccl.loadClass(clazz);
-            if (disableValidationAsserts() == false) {
-            	// enable validation assertions
-            	tccl.setClassAssertionStatus(clazz, true);
-            }
-            if (ValidatorHandler.class.isAssignableFrom(c)) {
-                handlers.add((ValidatorHandler) c.newInstance());
+            try {
+	            Class<?> c = tccl.loadClass(clazz);
+	            if (disableValidationAsserts() == false) {
+	            	// enable validation assertions
+	            	tccl.setClassAssertionStatus(clazz, true);
+	            }
+	            if (ValidatorHandler.class.isAssignableFrom(c)) {
+	                handlers.add((ValidatorHandler) c.newInstance());
+	            }
+            } catch (ClassNotFoundException e) {
+            	String msg = String.format("Missing document validation handler: '%s'.", clazz);
+            	logger.warn(msg);
+            	logger.trace(msg, e);
             }
         }
         valHandlers = handlers;
