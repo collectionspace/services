@@ -29,6 +29,7 @@
 			</types:item>
 		</tenant:properties>
 
+		<!--
 		<tenant:serviceBindings id="Vocabularyitems" merge:matcher="id">
 			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
 				<service:params>
@@ -41,6 +42,7 @@
 				</service:params>
 			</service:DocHandlerParams>
 		</tenant:serviceBindings>
+		-->
 
 		<!-- begin idgenerator service meta-data -->
 		<tenant:serviceBindings id="idgenerators" merge:matcher="id" name="idgenerators" type="utility"
