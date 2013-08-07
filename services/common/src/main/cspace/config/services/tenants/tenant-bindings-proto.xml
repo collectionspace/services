@@ -2902,6 +2902,171 @@
         </tenant:serviceBindings>
         <!-- end concept service meta-data -->
 
+        <!-- begin workauthority service meta-data -->
+        <tenant:serviceBindings id="Workauthorities" name="Workauthorities" type="utility" version="0.1">
+            <!--service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/workauthorities/*/workflow/</service:uriPath>
+            <service:uriPath xmlns:service="http://collectionspace.org/services/common/service">/workauthorities/*/items/*/workflow/</service:uriPath-->
+            <!-- other URI paths using which this service could be accessed -->
+            <!-- 
+            <service:uriPath xmlns:service='http://collectionspace.org/services/config/service'>
+                /workauthorities/*/items/
+            </service:uriPath>-->
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.work.nuxeo.WorkAuthorityDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>displayName</service:element>
+                            <service:xpath>displayName</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>shortIdentifier</service:element>
+                            <service:xpath>shortIdentifier</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>vocabType</service:element>
+                            <service:xpath>vocabType</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>workauthorities_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>workauthorities_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" id="1" name="Workauthority" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="workauthorities-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd"/>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="workauthorities_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/work" schemaLocation="http://collectionspace.org/services/work http://services.collectionspace.org/work/workauthorities_common.xsd"/>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd"/>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end workauthority service meta-data -->
+    
+        <!-- begin work service meta-data.
+             Note there is no Work service, but there is a
+             Repository workspace so we have to configure that.
+        -->
+        <tenant:serviceBindings id="Works" name="Works" type="authority" version="0.1">
+            <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+            <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.work.nuxeo.WorkDocumentModelHandler</service:documentHandler>
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+                <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>
+                    <service:ListResultsFields>
+                        <!-- Omit the standard AuthorityItem items (they are handled by the code) -->
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.work.nuxeo.WorkValidatorHandler</service:validatorHandler>
+            <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>works_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>worktermgroup</service:table>
+                        <service:col>termdisplayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>works_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>workTermGroupList/[0]/termDisplayName</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>shortIdentifier</types:value>
+                </types:item>
+            </service:properties>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" id="1" name="Workitem" version="0.1">
+                <service:part id="0" control_group="Managed" versionable="true" auditable="false" label="works-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/config/system" schemaLocation="http://collectionspace.org/services/config/system http://collectionspace.org/services/config/system/system-response.xsd"/>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="works_common" updated="" order="1">
+                    <service:properties xmlns:service="http://collectionspace.org/services/config/service">
+                        <!-- Fields containing authority term references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>creatorGroupList/*/creator</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>publisherGroupList/*/publisher</types:value>
+                        </types:item>
+                        <!-- Fields containing term list / controlled vocabulary references -->
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>creatorGroupList/*/creatorType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>publisherGroupList/*/publisherType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>workType</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>workTermGroupList/*/termType</types:value> 
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>workTermGroupList/*/termStatus</types:value> 
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>workTermGroupList/*/termLanguage</types:value> 
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>workTermGroupList/*/termSource</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/work" schemaLocation="http://collectionspace.org/services/work http://services.collectionspace.org/work/works_common.xsd"/>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed" versionable="true" auditable="false" label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/collectionspace_core/" schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd"/>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end work service meta-data --> 
+
         <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings id="Acquisitions" name="Acquisitions" type="procedure" version="0.1">
             <!-- other URI paths through which this service could be accessed -->
