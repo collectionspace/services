@@ -23,6 +23,7 @@
     <xs:element name="service-config">
         <xs:complexType>
             <xs:sequence>
+            	<xs:element name="use-app-generated-tenant-bindings" type="xs:boolean" minOccurs="0"  maxOccurs="1"/>
                 <!-- assumption: there is only one type of repository client used  -->
                 <xs:element name="repository-client" type="RepositoryClientConfigType" minOccurs="1"  maxOccurs="1"/>
                 <xs:element name="repository-workspace" type="RepositoryWorkspaceType" minOccurs="0"  maxOccurs="1" />

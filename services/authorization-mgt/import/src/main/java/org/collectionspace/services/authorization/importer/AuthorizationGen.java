@@ -27,28 +27,22 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.UUID;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.authorization.perms.Permission;
-import org.collectionspace.services.authorization.perms.EffectType;
-import org.collectionspace.services.authorization.perms.PermissionAction;
-import org.collectionspace.services.authorization.PermissionActionUtil;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
-import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.TenantClient;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
+import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -67,6 +61,8 @@ public class AuthorizationGen {
     final public static boolean AUTHZ_IS_ENTITY_PROXY = false;
     
     final public static String TENANT_MGMNT_ID = "0";
+    
+	private static final boolean USE_APP_GENERATED_BINDINGS = true;
     
     final Logger logger = LoggerFactory.getLogger(AuthorizationGen.class);
     private List<Permission> tenantMgmntPermList = new ArrayList<Permission>();
@@ -88,9 +84,13 @@ public class AuthorizationGen {
 	private List<Role> allRoleList;
 
     public void initialize(String tenantRootDirPath) throws Exception {
+    	ServicesConfigReaderImpl servicesConfigReader = new ServicesConfigReaderImpl(tenantRootDirPath);
+        servicesConfigReader.read(USE_APP_GENERATED_BINDINGS);        
+        Boolean useAppGeneratedBindings = servicesConfigReader.getConfiguration().isUseAppGeneratedTenantBindings();
+
         TenantBindingConfigReaderImpl tenantBindingConfigReader =
                 new TenantBindingConfigReaderImpl(tenantRootDirPath);
-        tenantBindingConfigReader.read();
+        tenantBindingConfigReader.read(useAppGeneratedBindings);
         // Note that we build permissions for all tenants, whether or not they are marked create disabled.
         // This is a hack until we can correctly run an incremental import.
         tenantBindings = tenantBindingConfigReader.getTenantBindings(

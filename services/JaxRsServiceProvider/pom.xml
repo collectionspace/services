@@ -35,17 +35,17 @@
             <version>1.2.14</version>
             <scope>provided</scope>
         </dependency>
-        <!-- somewhere dependency is added 1.5.8 unnecessarily -->
+        <!-- somewhere dependency is added 1.6.1 unnecessarily -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.5.8</version>
+            <version>1.6.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.5.8</version>
+            <version>1.6.1</version>
             <scope>test</scope>
         </dependency>
         <!-- CollectionSpace dependencies -->
@@ -114,11 +114,6 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.note.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -710,12 +705,12 @@
                     </webResources>
                     <archive>
                         <manifest>
-                            <packageName>${pom.groupid}</packageName>
+                            <packageName>${project.groupId}</packageName>
                             <!--addDefaultImplementationEntries/-->
                         </manifest>
                         <manifestEntries>
                             <Vendor>CollectionSpace Services</Vendor>
-                            <Package>${pom.groupId}</Package>
+                            <Package>${project.groupId}</Package>
                             <Release>${cs.release}</Release>
                         </manifestEntries>
                     </archive>

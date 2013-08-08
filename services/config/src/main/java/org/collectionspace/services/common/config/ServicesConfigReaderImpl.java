@@ -55,13 +55,13 @@ public class ServicesConfigReaderImpl
     }
 
     @Override
-    public void read() throws Exception {
+    public void read(boolean useAppGeneratedBindings) throws Exception {
         String configFileName = getAbsoluteFileName(CONFIG_FILE_NAME);
-        read(configFileName);
+        read(configFileName, useAppGeneratedBindings);
     }
 
     @Override
-    public void read(String configFileName) throws Exception {
+    public void read(String configFileName, boolean useAppGeneratedBindings) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("read() config file=" + configFileName);
         }

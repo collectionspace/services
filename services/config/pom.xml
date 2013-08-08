@@ -53,7 +53,11 @@
 			<groupId>org.jvnet.jaxb2_commons</groupId>
 			<artifactId>jaxb2-basics-runtime</artifactId>
 		</dependency>
-        
+		<dependency>
+		    <groupId>org.collectionspace.services</groupId>
+			<artifactId>org.collectionspace.services.common-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
     </dependencies>
 
     <repositories>
