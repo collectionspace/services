@@ -9,7 +9,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.citation.3rdparty</artifactId>
     <name>services.citation.3rdparty</name>
     <packaging>pom</packaging>
@@ -25,6 +24,8 @@
 	</properties>
 
     <modules>
-        <module>nuxeo-platform-cs-citation</module>     
+        <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+            <module>nuxeo-platform-cs-citation</module>
+        -->   
     </modules>
 </project>

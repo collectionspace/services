@@ -9,7 +9,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.work.3rdparty</artifactId>
     <name>services.work.3rdparty</name>
     <packaging>pom</packaging>
@@ -18,6 +17,8 @@
     </description>
 
     <modules>
-        <module>nuxeo-platform-cs-work</module>
+        <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+            <module>nuxeo-platform-cs-work</module>
+        -->
     </modules>
 </project>

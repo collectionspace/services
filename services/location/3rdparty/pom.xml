@@ -16,6 +16,8 @@
     </description>
 
     <modules>
-        <module>nuxeo-platform-cs-location</module>
+        <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+            <module>nuxeo-platform-cs-location</module>
+        -->
     </modules>
 </project>
