@@ -1,4 +1,3 @@
-
 <project name="nuxeo-platform-cs-work" default="package" basedir=".">
     <description>
         work nuxeo document type
@@ -12,7 +11,13 @@
     <property name="src" location="src"/>
     <property name="nuxeo.work.jar"
         value="org.collectionspace.services.work.3rdparty.nuxeo-${cspace.release}.jar"/>
-    <property name="nuxeo.work.jars.all"
+    <!-- JAR files used by CollectionSpace 4.0 and later -->
+    <property name="nuxeo.work.doctype.jars.all"
+        value="collectionspace.work.*doctype*.jar"/>
+    <property name="nuxeo.work.schema.jars.all"
+        value="collectionspace.work.*schema*.jar"/>
+    <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
+    <property name="nuxeo.work.legacy.jars.all"
         value="org.collectionspace.services.work.3rdparty.nuxeo-*.jar"/>
 
     <condition property="osfamily-unix">
@@ -114,19 +119,29 @@
 
     <target name="deploy" depends="install"
         description="deploy work doctype in ${jee.server.nuxeo}">
+        <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+        leaving this only for backwards compatibility reasons. -->  
         <copy file="${basedir}/target/${nuxeo.work.jar}"
-        todir="${jee.deploy.nuxeo.plugins}"/>
+            todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
         description="undeploy work doctype from ${jee.server.nuxeo}">
         <delete>
+            <!-- Undeploy doctype and schema artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.work.jars.all}"/>
+                <include name="${nuxeo.work.doctype.jars.all}"/>
             </fileset>
-            <!-- Legacy deployment location through release 0.6 -->
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.work.schema.jars.all}"/>
+            </fileset>
+            <!-- Undeploy legacy artifacts -->
+            <fileset dir="${jee.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.work.legacy.jars.all}"/>
+            </fileset>
+            <!-- Undeploy legacy artifacts from old deployment location through release 0.6 -->
             <fileset dir="${jee.deploy.nuxeo.system}">
-                <include name="${nuxeo.work.jars.all}"/>
+                <include name="${nuxeo.work.legacy.jars.all}"/>
             </fileset>
         </delete>
     </target>
