@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="nuxeo-platform-cs-work" default="package" basedir=".">
     <description>
         work nuxeo document type
@@ -9,16 +10,16 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
-    <property name="nuxeo.work.jar"
-        value="org.collectionspace.services.work.3rdparty.nuxeo-${cspace.release}.jar"/>
     <!-- JAR files used by CollectionSpace 4.0 and later -->
     <property name="nuxeo.work.doctype.jars.all"
-        value="collectionspace.work.*doctype*.jar"/>
-    <property name="nuxeo.work.schema.jars.all"
-        value="collectionspace.work.*schema*.jar"/>
+        value="collectionspace.work.doctype*.jar"/>
+    <property name="nuxeo.work.schema.common.jars.all"
+        value="collectionspace.work.schema*_common.jar"/>
     <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
     <property name="nuxeo.work.legacy.jars.all"
         value="org.collectionspace.services.work.3rdparty.nuxeo-*.jar"/>
+    <property name="nuxeo.work.legacy.jar"
+        value="org.collectionspace.services.work.3rdparty.nuxeo-${cspace.release}.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -121,7 +122,7 @@
         description="deploy work doctype in ${jee.server.nuxeo}">
         <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         leaving this only for backwards compatibility reasons. -->  
-        <copy file="${basedir}/target/${nuxeo.work.jar}"
+        <copy file="${basedir}/target/${nuxeo.work.legacy.jar}"
             todir="${jee.deploy.nuxeo.plugins}"/>
     </target>
 
@@ -133,7 +134,7 @@
                 <include name="${nuxeo.work.doctype.jars.all}"/>
             </fileset>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.work.schema.jars.all}"/>
+                <include name="${nuxeo.work.schema.common.jars.all}"/>
             </fileset>
             <!-- Undeploy legacy artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">
@@ -149,14 +150,14 @@
     <target name="dist"
         description="generate distribution for work doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
-            <fileset file="${basedir}/target/${nuxeo.work.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.work.legacy.jar}"/>
         </copy>
     </target>
 
     <target name="dist_installer"
         description="Creates an installer distribution for work doctype" depends="package">
         <copy todir="${services.trunk}/${dist.installer.services}/work/nuxeo">
-            <fileset file="${basedir}/target/${nuxeo.work.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.work.legacy.jar}"/>
         </copy>
     </target>
 
