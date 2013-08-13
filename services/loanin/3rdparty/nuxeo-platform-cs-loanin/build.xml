@@ -141,7 +141,9 @@
             <fileset dir="${jee.deploy.nuxeo.plugins}">
                 <include name="${nuxeo.loanin.legacy.jars.all}"/>
             </fileset>
-            <!-- Undeploy legacy artifacts from old deployment location through release 0.6 -->
+        </delete>
+        <!-- Undeploy legacy artifacts from old deployment location through release 0.6 -->
+        <delete quiet="true">
             <fileset dir="${jee.deploy.nuxeo.system}">
                 <include name="${nuxeo.loanin.legacy.jars.all}"/>
             </fileset>
