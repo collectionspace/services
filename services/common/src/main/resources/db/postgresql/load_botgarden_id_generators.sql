@@ -157,10 +157,6 @@ propagated.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>
-    <org.collectionspace.services.id.StringIDGeneratorPart>
-      <initialValue>UCBG</initialValue>
-      <currentValue>UCBG</currentValue>
-    </org.collectionspace.services.id.StringIDGeneratorPart>
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>9</maxLength>
       <initialValue>1</initialValue>
