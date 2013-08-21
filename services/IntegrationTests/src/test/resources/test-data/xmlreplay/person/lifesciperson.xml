@@ -28,7 +28,6 @@
         <var ID="foreName">John</var>
         <var ID="surName">Wayne</var>
         <var ID="entityType">Actor</var>
-        <var ID="lifeSpan">Way Long Time</var>
       </vars>
     </test>
     <test ID="Person2">
@@ -40,7 +39,6 @@
         <var ID="foreName">Billy-Bob</var>
         <var ID="surName">Homeboy</var>
         <var ID="entityType">Goof</var>
-        <var ID="lifeSpan">Too Long</var>
       </vars>
     </test>
     <test ID="getAuthorityList">
@@ -73,7 +71,6 @@
         <var ID="foreName">Billy-Bob</var>
         <var ID="surName">Homeboy</var>
         <var ID="entityType">Goof</var>
-        <var ID="lifeSpan">Too Long</var>
         <var ID="childCSID">${Person2.CSID}</var>
         <var ID="parentCSID">${Person1.CSID}</var>
         <var ID="parentName">John Wayne</var>
