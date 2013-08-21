@@ -19,33 +19,6 @@
 					<service:content contentType="application/xml">
 						<service:xmlContent namespaceURI="http://collectionspace.org/services/person/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/person/domain/naturalhistory http://collectionspace.org/services/person/domain/persons_naturalhistory.xsd"/>
 					</service:content>
-					<service:properties>
-						<!-- See CSPACE-3938 for potential additional authRef and termRef entries -->
-						<types:item xmlns:types="http://collectionspace.org/services/config/types">
-							<types:key>authRef</types:key>
-							<types:value>affiliatedPersonOrgGroupList/*/affiliatedPersonOrg</types:value>
-						</types:item>
-						<types:item xmlns:types="http://collectionspace.org/services/config/types">
-							<types:key>authRef</types:key>
-							<types:value>orgContactNames|orgContactName</types:value>
-						</types:item>
-						<types:item xmlns:types="http://collectionspace.org/services/config/types">
-							<types:key>termRef</types:key>
-							<types:value>affiliatedPersonOrgGroupList/*/affiliatedPersonOrgType</types:value>
-						</types:item>
-						<types:item xmlns:types="http://collectionspace.org/services/config/types">
-							<types:key>termRef</types:key>
-							<types:value>nameTypes|nameType</types:value>
-						</types:item>
-						<types:item xmlns:types="http://collectionspace.org/services/config/types">
-							<types:key>termRef</types:key>
-							<types:value>nameSource</types:value>
-						</types:item>
-						<types:item xmlns:types="http://collectionspace.org/services/config/types">
-							<types:key>termRef</types:key>
-							<types:value>entityType</types:value>
-						</types:item>
-					</service:properties>
 				</service:part>
 			</service:object>
 		</tenant:serviceBindings>
