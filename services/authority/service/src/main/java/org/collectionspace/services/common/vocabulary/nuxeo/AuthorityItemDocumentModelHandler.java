@@ -275,10 +275,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	        }
         			
         	        ListResultField field;
+                        
+                        // Certain fields in authority item list results
+                        // are handled specially here
+                        
+                        // Term display name
+                        //
                         // Ignore (throw out) any configuration entries that
                         // specify how the termDisplayName field should be
                         // emitted in authority item lists. This field will
-                        // be handled specially (see block below).
+                        // be handled in a standardized manner (see block below).
                         if (termDisplayNamePositionsInList.isEmpty() == false) {
                             // Remove matching items starting at the end of the list
                             // and moving towards the start, so that reshuffling of
@@ -288,21 +294,29 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
                                 list.remove(i);
                             }
                         }
-                        // Specially handle termDisplayName values in authority
-                        // item lists, by invoking code that emits display names
-                        // for both preferred and non-preferred terms
+                        // termDisplayName values in authority item lists
+                        // will be handled via code that emits display names
+                        // for both the preferred term and all non-preferred
+                        // terms (if any). The following is a placeholder
+                        // entry that will trigger this code. See the
+                        // getListResultValue() method in this class.
         	        field = getListResultsDisplayNameField();
         	        list.add(field);
+                        
+                        // Short identifier
         	        if (!hasShortId) {
         	            field = new ListResultField();
         	            field.setElement(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         	            field.setXpath(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         	            list.add(field);
         	        }
+                        
+                        // Term status
         	        if (!hasTermStatus) {
         	            field = getListResultsTermStatusField();
         	            list.add(field);
         	        }
+                        
         		}
         		
         		setListItemArrayExtended(true);
