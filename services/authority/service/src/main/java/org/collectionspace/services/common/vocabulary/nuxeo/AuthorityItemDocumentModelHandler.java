@@ -259,7 +259,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	        // Ensure that each item in a list of Authority items includes
         	        // a set of common fields, so we do not depend upon configuration
         	        // for general logic.
-         	        List<Integer> termDisplayNamePositionsInList = new ArrayList<>();;
+         	        List<Integer> termDisplayNamePositionsInList = new ArrayList<>();
        	                boolean hasShortId = false;
         	        boolean hasTermStatus = false;
         	        for (int i = 0; i < nFields; i++) {
