@@ -258,14 +258,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	        // Ensure that each item in a list of Authority items includes
         	        // a set of common fields, so we do not depend upon configuration
         	        // for general logic.
-        	        boolean hasDisplayName = false;
-        	        boolean hasShortId = false;
+         	        int termDisplayNamePosInList = 0;
+       	                boolean hasShortId = false;
         	        boolean hasTermStatus = false;
         	        for (int i = 0; i < nFields; i++) {
         	            ListResultField field = list.get(i);
         	            String elName = field.getElement();
         	            if (isTermDisplayName(elName) == true) {
-        	                hasDisplayName = true;
+        	                termDisplayNamePosInList = i;
         	            } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
         	                hasShortId = true;
         	            } else if (AuthorityItemJAXBSchema.TERM_STATUS.equals(elName)) {
@@ -274,10 +274,16 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	        }
         			
         	        ListResultField field;
-        	        if (!hasDisplayName) {
-        	        	field = getListResultsDisplayNameField();
-        	            list.add(field);
-        	        }
+                        // Ignore (throw out) any supplied configuration of how
+                        // the termDisplayName will be emitted in list results
+                        if (termDisplayNamePosInList > 0) {
+                            list.remove(termDisplayNamePosInList);
+                        }
+                        // Specially handle termDisplayName values in authority
+                        // item lists, by invoking code that emits display names
+                        // for both preferred and non-preferred terms
+        	        field = getListResultsDisplayNameField();
+        	        list.add(field);
         	        if (!hasShortId) {
         	            field = new ListResultField();
         	            field.setElement(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
