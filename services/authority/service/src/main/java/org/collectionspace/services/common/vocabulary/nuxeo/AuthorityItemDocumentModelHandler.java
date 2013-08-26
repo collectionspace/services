@@ -66,6 +66,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.MultivaluedMap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -258,14 +259,14 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	        // Ensure that each item in a list of Authority items includes
         	        // a set of common fields, so we do not depend upon configuration
         	        // for general logic.
-        	        boolean hasDisplayName = false;
-        	        boolean hasShortId = false;
+         	        List<Integer> termDisplayNamePositionsInList = new ArrayList<>();
+       	                boolean hasShortId = false;
         	        boolean hasTermStatus = false;
         	        for (int i = 0; i < nFields; i++) {
         	            ListResultField field = list.get(i);
         	            String elName = field.getElement();
         	            if (isTermDisplayName(elName) == true) {
-        	                hasDisplayName = true;
+        	                termDisplayNamePositionsInList.add(i);
         	            } else if (AuthorityItemJAXBSchema.SHORT_IDENTIFIER.equals(elName)) {
         	                hasShortId = true;
         	            } else if (AuthorityItemJAXBSchema.TERM_STATUS.equals(elName)) {
@@ -274,20 +275,48 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
         	        }
         			
         	        ListResultField field;
-        	        if (!hasDisplayName) {
-        	        	field = getListResultsDisplayNameField();
-        	            list.add(field);
-        	        }
+                        
+                        // Certain fields in authority item list results
+                        // are handled specially here
+                        
+                        // Term display name
+                        //
+                        // Ignore (throw out) any configuration entries that
+                        // specify how the termDisplayName field should be
+                        // emitted in authority item lists. This field will
+                        // be handled in a standardized manner (see block below).
+                        if (termDisplayNamePositionsInList.isEmpty() == false) {
+                            // Remove matching items starting at the end of the list
+                            // and moving towards the start, so that reshuffling of
+                            // list order doesn't alter the positions of earlier items
+                            Collections.sort(termDisplayNamePositionsInList, Collections.reverseOrder());
+                            for (int i : termDisplayNamePositionsInList) {
+                                list.remove(i);
+                            }
+                        }
+                        // termDisplayName values in authority item lists
+                        // will be handled via code that emits display names
+                        // for both the preferred term and all non-preferred
+                        // terms (if any). The following is a placeholder
+                        // entry that will trigger this code. See the
+                        // getListResultValue() method in this class.
+        	        field = getListResultsDisplayNameField();
+        	        list.add(field);
+                        
+                        // Short identifier
         	        if (!hasShortId) {
         	            field = new ListResultField();
         	            field.setElement(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         	            field.setXpath(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
         	            list.add(field);
         	        }
+                        
+                        // Term status
         	        if (!hasTermStatus) {
         	            field = getListResultsTermStatusField();
         	            list.add(field);
         	        }
+                        
         		}
         		
         		setListItemArrayExtended(true);
@@ -586,10 +615,17 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 		Object result = null;		
 
 		result = NuxeoUtils.getXPathValue(docModel, schema, field.getXpath());
+                
+		//
+                // Special handling of list item values for authority items (only)
+                // takes place here:
+                //
+		// If the list result field is the termDisplayName element,
+                // check whether a partial term matching query was made.
+                // If it was, emit values for both the preferred (aka primary)
+                // term and for all non-preferred terms, if any.
+		//
 		String elName = field.getElement();
-		//
-		// If the list result value is the termDisplayName element, we need to check to see if a partial term query was made.
-		//
 		if (isTermDisplayName(elName) == true) {
 			MultivaluedMap<String, String> queryParams = this.getServiceContext().getQueryParams();
 	        String partialTerm = queryParams != null ? queryParams.getFirst(IQueryManager.SEARCH_TYPE_PARTIALTERM) : null;
