@@ -14,13 +14,6 @@
 					</service:ListResultsFields>
 				</service:params>
 			</service:DocHandlerParams>
-			<service:object xmlns:service="http://collectionspace.org/services/config/service">
-				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="persons_naturalhistory" updated="" order="3">
-					<service:content contentType="application/xml">
-						<service:xmlContent namespaceURI="http://collectionspace.org/services/person/domain/naturalhistory" schemaLocation="http://collectionspace.org/services/person/domain/naturalhistory http://collectionspace.org/services/person/domain/persons_naturalhistory.xsd"/>
-					</service:content>
-				</service:part>
-			</service:object>
 		</tenant:serviceBindings>
 		
 		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
