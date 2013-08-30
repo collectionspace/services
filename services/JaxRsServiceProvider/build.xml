@@ -162,7 +162,7 @@
 		description="Generates and deploys the CollectionSpace Services' schema bundles, doctype bundles, and tenant bindings.">
 		<exec executable="${env.JAVA_HOME}/bin/java" failonerror="true">
 			<arg value="-Done-jar.silent=true" />
-			<arg value="-Dcatalina.home=${env.CATALINA_HOME}" />
+			<arg value="-Dcspace.jeeserver.home=${env.CSPACE_JEESERVER_HOME}" />
 			<arg value="-jar" />
 			<arg value="${application.trunk}/tomcat-main/target/${cspace.tool.csmake}.jar" />
 			<arg value="-ac" />
