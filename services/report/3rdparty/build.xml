@@ -1,4 +1,3 @@
-
 <project name="report.3rdparty" default="package" basedir=".">
     <description>
         report service 3rdparty
@@ -118,12 +117,16 @@
 
     <target name="deploy" depends="install"
     description="deploy report in ${jee.server.nuxeo}">
+    	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-report/build.xml" target="deploy" inheritall="false"/>
-				<antcall target="deploy_jasper_samples" />
+		-->
+		<antcall target="deploy_jasper_samples" />
     </target>
 
     <target name="undeploy"
     description="undeploy report from ${jee.server.nuxeo}">
+    	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+    	leaving this only for backwards compatibility reasons. -->
         <ant antfile="nuxeo-platform-cs-report/build.xml" target="undeploy" inheritall="false"/>
     </target>
 

@@ -70,6 +70,7 @@ public class ServiceMain {
     private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
     
     private static final String SERVER_HOME_PROPERTY = "catalina.home";
+	private static final boolean USE_APP_GENERATED_CONFIG = true;
     
     private ServiceMain() {
     	//empty
@@ -209,10 +210,11 @@ public class ServiceMain {
     private void readConfig() throws Exception {
         //read service config
         servicesConfigReader = new ServicesConfigReaderImpl(getServerRootDir());
-        servicesConfigReader.read();
-
+        servicesConfigReader.read(USE_APP_GENERATED_CONFIG);
+        
+        Boolean useAppGeneratedBindings = servicesConfigReader.getConfiguration().isUseAppGeneratedTenantBindings();
         tenantBindingConfigReader = new TenantBindingConfigReaderImpl(getServerRootDir()); 
-        tenantBindingConfigReader.read();
+        tenantBindingConfigReader.read(useAppGeneratedBindings);
     }
 
     private void propagateConfiguredProperties() {

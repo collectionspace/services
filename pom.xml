@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
 	<artifactId>org.collectionspace.services</artifactId>
-	<version>3.3-SNAPSHOT</version>
+	<version>4.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>services</name>
 
@@ -22,8 +22,8 @@
 		<nuxeo.platform.version>5.5-I20111104_1115</nuxeo.platform.version>
 		<nuxeo.core.version>5.5-I20111104_1115</nuxeo.core.version>
 -->
-		<cspace.services.version>3.3-SNAPSHOT</cspace.services.version>
-		<cspace.services.client.version>3.3-SNAPSHOT</cspace.services.client.version>
+		<cspace.services.version>4.0-SNAPSHOT</cspace.services.version>
+		<cspace.services.client.version>4.0-SNAPSHOT</cspace.services.client.version>
 		<spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.2.RELEASE</spring.security.version>
 	</properties>
@@ -56,8 +56,8 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>libs-releases-local</id>
-			<name>libs-releases-local</name>
+			<id>libs-release-local</id>
+			<name>libs-release-local</name>
 			<url>http://nightly.collectionspace.org:8081/artifactory/libs-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
@@ -348,12 +348,12 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.5.8</version>
+				<version>1.6.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
-				<version>1.5.8</version>
+				<version>1.6.1</version>
 			</dependency>
             <dependency>
                 <groupId>org.testng</groupId>

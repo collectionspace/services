@@ -65,6 +65,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ConfigReader;
@@ -243,7 +244,7 @@ public class ReportDocumentModelHandler extends DocHandlerBase<ReportsCommon> {
     		String reportDescriptionFilename = fileNameBase+ReportClient.REPORT_DECSRIPTION_EXTENSION;
     		
 			String basePath = ServiceMain.getInstance().getServerRootDir() +
-								File.separator + ConfigReader.CSPACE_DIR_NAME + 
+								File.separator + JEEServerDeployment.CSPACE_DIR_NAME + 
 								File.separator + REPORTS_FOLDER +
 								// File.separator + tenantName +
 								File.separator; // + reportFileName;

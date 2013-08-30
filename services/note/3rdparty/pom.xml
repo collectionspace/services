@@ -5,11 +5,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.note</artifactId>
-        <version>3.3-SNAPSHOT</version>
+        <version>4.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.note.3rdparty</artifactId>
     <name>services.note.3rdparty</name>
     <packaging>pom</packaging>
@@ -18,6 +17,8 @@
     </description>
 
     <modules>
+    <!--  This is an unused module from an unused and deprecated Service.
         <module>nuxeo-platform-cs-note</module>
+        -->
     </modules>
 </project>
