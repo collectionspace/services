@@ -110,12 +110,16 @@
 
     <target name="deploy" depends="install"
     description="deploy loanout in ${jee.server.nuxeo}">
+    	<!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-loanout/build.xml" target="deploy" inheritall="false"/>
+        -->
         <ant antfile="nuxeo-platform-loanout-pahma/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy loanout from ${jee.server.nuxeo}">
+    	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+    	leaving this only for backwards compatibility reasons. -->
         <ant antfile="nuxeo-platform-cs-loanout/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-loanout-pahma/build.xml" target="undeploy" inheritall="false"/>
     </target>

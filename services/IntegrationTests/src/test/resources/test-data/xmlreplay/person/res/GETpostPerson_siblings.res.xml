@@ -13,11 +13,11 @@
       <objectCsid>${personCSID}</objectCsid>
       <subject>
         <csid>${child2CSID}</csid>
-        <number>johnWayneActorChild2</number>
+        <number>John Wayne${termDisplayNameSuffix2}</number>
       </subject>
       <object>
         <csid>${personCSID}</csid>
-        <number>johnWayneActor</number>
+        <number>John Wayne</number>
       </object>
     </relation-list-item>
     <relation-list-item>
@@ -26,11 +26,11 @@
       <objectCsid>${personCSID}</objectCsid>
       <subject>
         <csid>${child3CSID}</csid>
-        <number>johnWayneActorChild3</number>
+        <number>John Wayne${termDisplayNameSuffix3}</number>
       </subject>
       <object>
         <csid>${personCSID}</csid>
-        <number>johnWayneActor</number>
+        <number>John Wayne</number>
       </object>
     </relation-list-item>
   </ns2:relations-common-list>

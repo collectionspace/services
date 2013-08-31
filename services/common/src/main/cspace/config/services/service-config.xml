@@ -14,6 +14,7 @@
                      xmlns:types='http://collectionspace.org/services/config/types'
                      xsi:schemaLocation='http://collectionspace.org/services/config ../resources/common.xsd'>
 
+	<use-app-generated-tenant-bindings>false</use-app-generated-tenant-bindings>
     <!-- name of the repository client is referred in each service binding -->
     <repository-client name="nuxeo-java" default="true">
         <!-- ip of network interface to which Nuxeo server is listening on -->

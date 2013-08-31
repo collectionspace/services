@@ -9,7 +9,7 @@
 		<personTermGroup>
 			<termName>John Wayne</termName>
 			<termPrefForLang>false</termPrefForLang>
-			<termDisplayName>John Wayne</termDisplayName>
+			<termDisplayName>John Wayne${termDisplayNameSuffix}</termDisplayName>
 		    <foreName>John</foreName>
 		    <surName>Wayne</surName>
 		</personTermGroup>

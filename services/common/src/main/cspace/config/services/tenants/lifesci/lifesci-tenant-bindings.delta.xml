@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tenant:TenantBindingConfig xmlns:merge="http://xmlmerge.el4j.elca.ch" xmlns:tenant="http://collectionspace.org/services/config/tenant">
+
+	<tenant:tenantBinding id="2">
+		<tenant:serviceBindings merge:matcher="id" id="Persons">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields>
+						<service:ListResultField merge:matcher="skip" merge:action="insert">
+							<service:element>entityType</service:element>
+							<service:schema>persons_naturalhistory</service:schema>
+							<service:xpath>entityType</service:xpath>
+						</service:ListResultField>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+		</tenant:serviceBindings>
+		
+		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:ListResultsFields>
+						<service:ListResultField merge:matcher="skip" merge:action="insert">
+							<service:element>taxon</service:element>
+							<service:schema>collectionobjects_naturalhistory</service:schema>
+							<service:xpath>taxonomicIdentGroupList/[0]/taxon</service:xpath>
+						</service:ListResultField>
+					</service:ListResultsFields>
+				</service:params>
+			</service:DocHandlerParams>
+			<service:object xmlns:service="http://collectionspace.org/services/config/service">
+				<service:part merge:matcher="id" id="3">
+					<!-- Include authRefs for fields in the added schema -->
+					<service:properties>
+						<types:item merge:matcher="skip" merge:action="insert" xmlns:types="http://collectionspace.org/services/config/types">
+							<types:key>authRef</types:key>
+							<types:value>associatedTaxaGroupList/*/taxon</types:value>
+						</types:item>
+					</service:properties>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
+		
+		<tenant:serviceBindings merge:matcher="id" id="Movements">
+			<service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:SupportsVersioning>true</service:SupportsVersioning>
+					<service:ListResultsFields merge:action="preserve"/>
+				</service:params>
+			</service:DocHandlerParams>
+		</tenant:serviceBindings>
+
+	</tenant:tenantBinding>
+
+</tenant:TenantBindingConfig>

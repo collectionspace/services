@@ -141,7 +141,7 @@ public class AuthorizationSeedDriver {
 //            authzSeed.seedPermissions(exportDir + File.separator + PERMISSION_FILE,
 //                    exportDir + File.separator + PERMISSION_ROLE_FILE);
             if (logger.isDebugEnabled()) {
-                logger.debug("authorization seeding completed ");
+                logger.debug("Authorization seeding completed.");
             }
         } catch (Exception ex) {
             if (status != null) {
@@ -202,6 +202,7 @@ public class AuthorizationSeedDriver {
             em.getTransaction().begin();
             
 	        AuthorizationStore authzStore = new AuthorizationStore();
+	        logger.info("Seeding Roles metadata to database.");
 	        for (Role role : authzGen.getDefaultRoles()) {
 	        	try {
 	        		authzStore.store(em, role);
@@ -218,10 +219,12 @@ public class AuthorizationSeedDriver {
 	        	}
 	        }
 	
+	        logger.info("Seeding Permissions metadata to database.");
 	        for (Permission perm : authzGen.getDefaultPermissions()) { //FIXME: REM - 3/27/2012 - If we change the CSID of permissions to something like a refname, then we need to check for existing perms just like we did above for roles
 	            authzStore.store(em, perm);
 	        }
 	
+	        logger.info("Seeding Permissions/Roles relationships metadata to database.");
 	        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
 	        for (PermissionRole pr : authzGen.getDefaultPermissionRoles()) {
 	            PermissionRoleUtil.buildPermissionRoleRel(em, pr, SubjectType.ROLE, permRoleRels, false /*not for delete*/);
@@ -233,7 +236,7 @@ public class AuthorizationSeedDriver {
 	        em.getTransaction().commit();
 	        em.close();
 	        if (logger.isInfoEnabled()) {
-	            logger.info("Authroization metata persisted.");
+	            logger.info("All Authroization metata persisted.");
 	        }
         } catch (Exception e) {
             if (em != null && em.getTransaction().isActive()) {

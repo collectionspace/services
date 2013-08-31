@@ -110,14 +110,18 @@
 
     <target name="deploy" depends="install"
     description="deploy person in ${jee.server.nuxeo}">
+    	<!-- These targets are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="deploy" inheritall="false"/>
+        -->
         <ant antfile="nuxeo-platform-person-anthropology/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-person-pahma/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy person from ${jee.server.nuxeo}">
+    	<!-- These targets are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+    	leaving this only for backwards compatibility reasons. -->
         <ant antfile="nuxeo-platform-cs-person/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-person-lifesci/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-person-anthropology/build.xml" target="undeploy" inheritall="false"/>

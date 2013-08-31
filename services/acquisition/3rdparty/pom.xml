@@ -5,11 +5,10 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.acquisition</artifactId>
-        <version>3.3-SNAPSHOT</version> 
+        <version>4.0-SNAPSHOT</version> 
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.acquisition.3rdparty</artifactId>
     <packaging>pom</packaging>
     <name>services.acquisition.3rdparty</name>
@@ -25,7 +24,9 @@
     </properties>
     
     <modules>
+    <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-acquisition</module>
+        -->
         <module>nuxeo-platform-acquisition-anthropology</module>
         <module>nuxeo-platform-acquisition-pahma</module>
     </modules>

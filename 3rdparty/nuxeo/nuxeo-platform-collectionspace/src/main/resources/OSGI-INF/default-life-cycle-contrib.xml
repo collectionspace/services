@@ -2,16 +2,16 @@
 <component name="org.collectionspace.ecm.platform.default.LifeCycleManagerExtensions">
 
   <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
-             point="types">
+  		point="types">
     <types>
       <type name="CollectionSpaceDocument">default</type>
     </types>
   </extension>
 
-  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService" point="lifecycle">
-
+  <!-- The definition of the CollectionSpace default lifecycle name "cs_default"  -->
+  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
+  		point="lifecycle">
     <documentation>CollectionSpace core default life cycle definition.</documentation>
-
     <lifecycle name="cs_default" defaultInitial="project">
       <transitions>
         <transition name="delete" destinationState="deleted">
@@ -31,10 +31,10 @@
     </lifecycle>
   </extension>
   
-  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService" point="lifecycle">
-  
+  <!-- The definition of the CollectionSpace locking lifecycle name "cs_locking"  -->  
+  <extension target="org.nuxeo.ecm.core.lifecycle.LifeCycleService"
+  		point="lifecycle">
     <documentation>CollectionSpace "locking" life cycle definition.</documentation>
-
     <lifecycle name="cs_locking" defaultInitial="project">
       <transitions>
         <transition name="lock" destinationState="locked">
@@ -60,5 +60,4 @@
       </states>
     </lifecycle>
   </extension>
-
 </component>
