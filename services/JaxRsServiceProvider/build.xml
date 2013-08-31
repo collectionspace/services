@@ -140,7 +140,8 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="package,deploy_services_bundles"
+    <!-- <target name="deploy" depends="package,deploy_services_bundles" -->
+    <target name="deploy" depends="package"
     description="deploy cspace services in ${jee.server.cspace}">
 		<delete file="${catalina.context.cspace}"/> <!-- This is a Tomcat specific file that we seem to need to delete inorder for it to be replace with a more recent one during deployment -->
 		<delete dir="${jee.deploy.cspace}/${cspace.services.context}"/>
