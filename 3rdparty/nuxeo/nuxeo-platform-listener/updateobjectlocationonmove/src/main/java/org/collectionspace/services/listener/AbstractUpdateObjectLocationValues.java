@@ -42,10 +42,12 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     protected final static String CURRENT_LOCATION_PROPERTY = "currentLocation"; // FIXME: Get from external constant
     protected final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core"; // FIXME: Get from external constant
     protected final static String CREATED_AT_PROPERTY = "createdAt"; // FIXME: Get from external constant
+    private final static String NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
+            "AND ecm:isCheckedInVersion = 0"
+            + "AND ecm:isProxy = 0 ";
     private final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND (ecm:currentLifeCycleState <> 'deleted') "
-            + "AND ecm:isProxy = 0 "
-            + "AND ecm:isCheckedInVersion = 0";
+            + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
 
     public enum EventNotificationDocumentType {
         // Document type about which we've received a notification
@@ -167,13 +169,19 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             if (logger.isTraceEnabled()) {
                 logger.trace("CollectionObject CSID=" + collectionObjectCsid);
             }
-            // Verify that the CollectionObject is retrievable.
-            collectionObjectDocModel = getDocModelFromCsid(coreSession, collectionObjectCsid);
+            // Verify that the CollectionObject is both retrievable and active.
+            collectionObjectDocModel = getCurrentDocModelFromCsid(coreSession, collectionObjectCsid);
             if (collectionObjectDocModel == null) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("CollectionObject is not current (i.e. is a non-current version), is a proxy, or is unretrievable.");
+                }
                 continue;
             }
             // Verify that the CollectionObject record is active.
             if (!isActiveDocument(collectionObjectDocModel)) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("CollectionObject is inactive (i.e. deleted or in an otherwise inactive lifestyle state).");
+                }
                 continue;
             }
             // Get the CollectionObject's most recent, related Movement.
@@ -270,13 +278,8 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     }
 
     /**
-     * Identifies whether a document is an active document; that is, if it is
-     * not a versioned record; not a proxy (symbolic link to an actual record);
-     * and not in the 'deleted' workflow state.
-     *
-     * (A note relating the latter: Nuxeo appears to send 'documentModified'
-     * events even on workflow transitions, such when records are 'soft deleted'
-     * by being transitioned to the 'deleted' workflow state.)
+     * Identifies whether a document is an active document; currently, whether
+     * it is not in the 'deleted' workflow state.
      *
      * @param docModel
      * @return true if the document is an active document; false if it is not.
@@ -287,9 +290,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
         }
         boolean isActiveDocument = false;
         try {
-            if (!docModel.isVersion()
-                    && !docModel.isProxy()
-                    && !docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
+            if (!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
                 isActiveDocument = true;
             }
         } catch (ClientException ce) {
@@ -299,28 +300,35 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
     }
 
     /**
-     * Returns a document model for a record identified by a CSID.
+     * Returns the current document model for a record identified by a CSID.
+     *
+     * Excludes documents which have been versioned (i.e. are a non-current
+     * version of a document), are a proxy for another document, or are
+     * un-retrievable via their CSIDs.
      *
      * @param session a repository session.
      * @param collectionObjectCsid a CollectionObject identifier (CSID)
-     * @return a document model for the record identified by the supplied CSID.
+     * @return a document model for the document identified by the supplied
+     * CSID.
      */
-    protected static DocumentModel getDocModelFromCsid(CoreSession session, String collectionObjectCsid) {
+    protected static DocumentModel getCurrentDocModelFromCsid(CoreSession session, String collectionObjectCsid) {
         DocumentModelList collectionObjectDocModels = null;
         try {
             final String query = "SELECT * FROM "
                     + NuxeoUtils.BASE_DOCUMENT_TYPE
                     + " WHERE "
-                    + NuxeoUtils.getByNameWhereClause(collectionObjectCsid);
+                    + NuxeoUtils.getByNameWhereClause(collectionObjectCsid)
+                    + " "
+                    + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
             collectionObjectDocModels = session.query(query);
         } catch (Exception e) {
-            logger.warn("Exception in query to get document model for CollectionObject: ", e);
+            logger.warn("Exception in query to get active document model for CollectionObject: ", e);
         }
         if (collectionObjectDocModels == null || collectionObjectDocModels.isEmpty()) {
-            logger.warn("Could not get document models for CollectionObject(s).");
+            logger.warn("Could not get active document models for CollectionObject(s).");
             return null;
         } else if (collectionObjectDocModels.size() != 1) {
-            logger.debug("Found more than 1 document with CSID=" + collectionObjectCsid);
+            logger.debug("Found more than 1 active document with CSID=" + collectionObjectCsid);
             return null;
         }
         return collectionObjectDocModels.get(0);
@@ -419,17 +427,17 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
             if (logger.isTraceEnabled()) {
                 logger.trace("Related movement CSID=" + relatedMovementCsid);
             }
-            movementDocModel = getDocModelFromCsid(session, relatedMovementCsid);
+            movementDocModel = getCurrentDocModelFromCsid(session, relatedMovementCsid);
             if (movementDocModel == null) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Movement is not current (i.e. is a non-current version), is a proxy, or is unretrievable.");
+                }
                 continue;
             }
-
-            // Verify that the Movement record is active. This will also exclude
-            // versioned Movement records from the computation of the current
-            // location, for tenants that are versioning such records.
+            // Verify that the Movement record is active.
             if (!isActiveDocument(movementDocModel)) {
                 if (logger.isTraceEnabled()) {
-                    logger.trace("Skipping this inactive Movement record ...");
+                    logger.trace("Movement is inactive (i.e. is deleted or in another inactive lifestyle state).");
                 }
                 continue;
             }
@@ -441,7 +449,7 @@ public abstract class AbstractUpdateObjectLocationValues implements EventListene
                 continue;
             }
             GregorianCalendar creationDate =
-                        (GregorianCalendar) movementDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA, CREATED_AT_PROPERTY);
+                    (GregorianCalendar) movementDocModel.getProperty(COLLECTIONSPACE_CORE_SCHEMA, CREATED_AT_PROPERTY);
             if (locationDate.after(mostRecentLocationDate)) {
                 mostRecentLocationDate = locationDate;
                 if (creationDate != null) {
