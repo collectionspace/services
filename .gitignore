@@ -1,4 +1,5 @@
 *.org.*.bindings.xml
+*.edu.*.bindings.xml
 services/citation/.settings/
 services/citation/3rdparty/.settings/
 services/citation/3rdparty/nuxeo-platform-cs-citation/.classpath
