@@ -112,9 +112,9 @@
     description="deploy location in ${jee.server.nuxeo}">
     	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-location/build.xml" target="deploy" inheritall="false"/>
-        -->
         <ant antfile="nuxeo-platform-location-anthropology/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-location-pahma/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"

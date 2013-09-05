@@ -27,7 +27,7 @@
     <modules>
     <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-loanout</module>
-        -->
         <module>nuxeo-platform-loanout-pahma</module>
+        -->
     </modules>
 </project>

@@ -25,8 +25,8 @@
     <modules>
         <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
             <module>nuxeo-platform-cs-location</module>
+	        <module>nuxeo-platform-location-anthropology</module>
+	        <module>nuxeo-platform-location-pahma</module>
         -->
-        <module>nuxeo-platform-location-anthropology</module>
-        <module>nuxeo-platform-location-pahma</module>
     </modules>
 </project>

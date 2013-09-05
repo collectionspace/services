@@ -112,9 +112,9 @@
     description="deploy objectexit in ${jee.server.nuxeo}">
     	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-objectexit/build.xml" target="deploy" inheritall="false"/>
-        -->
         <ant antfile="nuxeo-platform-objectexit-anthropology/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-objectexit-pahma/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"

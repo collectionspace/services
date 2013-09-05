@@ -27,10 +27,10 @@
     <modules>
         <!-- These modules are obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
     	<module>nuxeo-platform-cs-collectionobject</module>
-        -->
         <module>nuxeo-platform-collectionobject-lifesci</module>
         <module>nuxeo-platform-collectionobject-anthropology</module>
         <module>nuxeo-platform-collectionobject-pahma</module>
+        -->
     </modules>
 
 </project>

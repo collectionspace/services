@@ -28,8 +28,8 @@
     <modules>
     <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-movement</module>
-        -->
         <module>nuxeo-platform-movement-anthropology</module>
         <module>nuxeo-platform-movement-pahma</module>
+        -->
     </modules>
 </project>

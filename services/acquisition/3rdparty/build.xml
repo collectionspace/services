@@ -112,9 +112,9 @@
         description="deploy acquisition in ${jee.server.nuxeo}">
     	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-acquisition/build.xml" target="deploy" inheritall="false"/>
-        -->
         <ant antfile="nuxeo-platform-acquisition-anthropology/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-acquisition-pahma/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"

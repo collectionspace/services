@@ -112,8 +112,8 @@
     description="deploy loanin in ${jee.server.nuxeo}">
     	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-loanin/build.xml" target="deploy" inheritall="false"/>
-        -->
         <ant antfile="nuxeo-platform-loanin-pahma/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"

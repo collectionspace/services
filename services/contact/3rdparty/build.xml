@@ -110,9 +110,9 @@
     description="deploy contact in ${jee.server.nuxeo}">
     	<!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <ant antfile="nuxeo-platform-cs-contact/build.xml" target="deploy" inheritall="false"/>
-        -->
         <ant antfile="nuxeo-platform-contact-anthropology/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="nuxeo-platform-contact-pahma/build.xml" target="deploy" inheritall="false"/>
+        -->
     </target>
 
     <target name="undeploy"
