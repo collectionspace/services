@@ -9,7 +9,6 @@
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.claim.3rdparty</artifactId>
     <name>services.claim.3rdparty</name>
     <packaging>pom</packaging>
@@ -26,8 +25,10 @@
 	</properties>
 
     <modules>
+    <!-- This module is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
         <module>nuxeo-platform-cs-claim</module>
         <module>nuxeo-platform-claim-anthropology</module>
         <module>nuxeo-platform-claim-pahma</module>
+        -->
     </modules>
 </project>
