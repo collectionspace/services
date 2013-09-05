@@ -182,7 +182,7 @@
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
                 <service:classname>org.collectionspace.services.common.init.ModifyFieldDatatypes</service:classname>
                 <service:params>
-                    <service:field>
+                    <!-- <service:field>
                         <service:table>collectionobjects_common_briefdescriptions</service:table>
                         <service:col>item</service:col>
                         <service:type>LARGETEXT</service:type>
@@ -211,7 +211,7 @@
                         <service:col>item</service:col>
                         <service:type>LARGETEXT</service:type>
                         <service:param />
-                    </service:field>
+                    </service:field> -->
                 </service:params>
             </service:initHandler>
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
@@ -3560,7 +3560,7 @@
         <!-- end contact service meta-data -->
     
         <!-- begin note service meta-data -->
-        <tenant:serviceBindings id="Notes" name="Notes" type="utility" version="0.1">
+        <!-- <tenant:serviceBindings id="Notes" name="Notes" type="utility" version="0.1">
             <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
             <service:documentHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.note.nuxeo.NoteDocumentModelHandler</service:documentHandler>
             <service:object xmlns:service="http://collectionspace.org/services/config/service" name="CSNote" version="0.1">
@@ -3580,7 +3580,7 @@
                     </service:content>
                 </service:part>
             </service:object>
-        </tenant:serviceBindings>
+        </tenant:serviceBindings> -->
         <!-- end note service meta-data -->
     
         <!-- begin role service meta-data -->
