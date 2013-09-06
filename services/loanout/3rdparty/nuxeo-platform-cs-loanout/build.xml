@@ -12,9 +12,9 @@
     <property name="src" location="src"/>
     <!-- JAR files used by CollectionSpace 4.0 and later -->
     <property name="nuxeo.loanout.doctype.jars.all"
-        value="collectionspace.loanout.doctype*.jar"/>
-    <property name="nuxeo.loanout.schema.common.jars.all"
-        value="collectionspace.loanout.schema*_common.jar"/>
+        value="collectionspace.loanout.doctype.*.jar"/>
+    <property name="nuxeo.loanout.schema.jars.all"
+        value="collectionspace.loanout.schema.*.jar"/>
     <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
     <property name="nuxeo.loanout.legacy.jars.all"
         value="org.collectionspace.services.loanout.3rdparty.nuxeo-*.jar"/>
@@ -134,7 +134,7 @@
                 <include name="${nuxeo.loanout.doctype.jars.all}"/>
             </fileset>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.loanout.schema.common.jars.all}"/>
+                <include name="${nuxeo.loanout.schema.jars.all}"/>
             </fileset>
             <!-- Undeploy legacy artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">

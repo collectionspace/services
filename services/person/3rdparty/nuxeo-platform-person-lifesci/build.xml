@@ -13,10 +13,8 @@
     <property name="build" location="build"/>
     <property name="dist"  location="dist"/>
     <!-- JAR files used by CollectionSpace 4.0 and later -->
-    <!-- Doctype JAR(s) are removed via the 'undeploy' target in the -->
-    <!-- Ant buildfile for the common schema -->
-    <property name="nuxeo.person.schema.naturalhistory.jars.all"
-        value="collectionspace.person.schema*_naturalhistory.jar"/>
+    <!-- Both doctype and schema JAR(s) are removed via the 'undeploy' target -->
+    <!-- in another Ant buildfile, in a peer module to this module -->
     <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier -->
     <property name="nuxeo.person.lifesci.legacy.jars.all"
         value="org.collectionspace.services.person.3rdparty.lifesci.nuxeo-*.jar"/>
@@ -133,11 +131,8 @@
     <target name="undeploy"
         description="undeploy person doctype from ${jee.server.nuxeo}">
         <delete>
-            <!-- Doctype JAR(s) are removed via the 'undeploy' Ant target in the -->
-            <!-- buildfile for the common schema -->
-            <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.person.schema.naturalhistory.jars.all}"/>
-            </fileset>
+            <!-- Both doctype and schema JAR(s) are removed via the 'undeploy' target -->
+            <!-- in another Ant buildfile, in a peer module to this module -->
             <!-- Undeploy legacy artifacts -->
             <!-- Additional legacy JAR(s) are removed via the 'undeploy' target in the -->
             <!-- Ant buildfile for the common schema -->
