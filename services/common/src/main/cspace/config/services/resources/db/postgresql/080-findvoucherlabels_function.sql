@@ -74,7 +74,7 @@ BEGIN
       
       join collectionspace_core core on (core.id=co1.id)
       join misc misc2 on (misc2.id = co1.id and misc2.lifecyclestate <> 'deleted')
-      
+      join misc misc1 on (misc1.id = lc.id and misc1.lifecyclestate <> 'deleted')
       left outer join taxon_common tc on (tig.taxon=tc.refname)
       left outer join taxon_naturalhistory tn on (tc.id=tn.id)
       
