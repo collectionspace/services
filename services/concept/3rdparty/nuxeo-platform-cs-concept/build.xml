@@ -12,9 +12,9 @@
     <property name="src" location="src"/>
     <!-- JAR files used by CollectionSpace 4.0 and later -->
     <property name="nuxeo.concept.doctype.jars.all"
-        value="collectionspace.concept.doctype*.jar"/>
-    <property name="nuxeo.concept.schema.common.jars.all"
-        value="collectionspace.concept.schema*_common.jar"/>
+        value="collectionspace.concept.doctype.*.jar"/>
+    <property name="nuxeo.concept.schema.jars.all"
+        value="collectionspace.concept.schema.*.jar"/>
     <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
     <property name="nuxeo.concept.legacy.jars.all"
         value="org.collectionspace.services.concept.3rdparty.nuxeo-*.jar"/>
@@ -134,7 +134,7 @@
                 <include name="${nuxeo.concept.doctype.jars.all}"/>
             </fileset>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.concept.schema.common.jars.all}"/>
+                <include name="${nuxeo.concept.schema.jars.all}"/>
             </fileset>
             <!-- Undeploy legacy artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">
