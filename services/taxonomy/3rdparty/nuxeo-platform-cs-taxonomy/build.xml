@@ -12,11 +12,11 @@
     <property name="src" location="src"/>
     <!-- JAR files used by CollectionSpace 4.0 and later -->
     <!-- Note: the names of these JAR files include the string 'taxon', while -->
-    <!-- the names of of the legacy JAR files, below, include the string 'taxonomy'. -->
+    <!-- the names of the legacy JAR files, below, include the string 'taxonomy'. -->
     <property name="nuxeo.taxonomy.doctype.jars.all"
-        value="collectionspace.taxon.doctype*.jar"/>
-    <property name="nuxeo.taxonomy.schema.common.jars.all"
-        value="collectionspace.taxon.schema*_common.jar"/>
+        value="collectionspace.taxon.doctype.*.jar"/>
+    <property name="nuxeo.taxonomy.schema.jars.all"
+        value="collectionspace.taxon.schema.*.jar"/>
     <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
     <property name="nuxeo.taxonomy.legacy.jars.all"
         value="org.collectionspace.services.taxonomy.3rdparty.nuxeo-*.jar"/>
@@ -136,7 +136,7 @@
                 <include name="${nuxeo.taxonomy.doctype.jars.all}"/>
             </fileset>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.taxonomy.schema.common.jars.all}"/>
+                <include name="${nuxeo.taxonomy.schema.jars.all}"/>
             </fileset>
             <!-- Undeploy legacy artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">

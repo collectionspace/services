@@ -13,10 +13,8 @@
     <property name="build" location="build"/>
     <property name="dist"  location="dist"/>
     <!-- JAR files used by CollectionSpace 4.0 and later -->
-    <!-- Doctype JAR(s) are removed via the 'undeploy' target in the -->
-    <!-- Ant buildfile for the common schema -->
-    <property name="nuxeo.collectionobject.schema.naturalhistory.jars.all"
-        value="collectionspace.collectionobject.schema*_naturalhistory.jar"/>
+    <!-- Both doctype and schema JAR(s) are removed via the 'undeploy' target -->
+    <!-- in another Ant buildfile, in a peer module to this module -->
     <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier --> 
     <!-- Additional legacy JAR(s) are removed via the 'undeploy' target in the -->
     <!-- Ant buildfile for the common schema -->
