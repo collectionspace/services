@@ -4,6 +4,42 @@
 	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
 
 	<tenant:tenantBinding id="15">
+		<tenant:properties>
+			<types:item id="ptstartingwildcard" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
+				<types:key>ptStartingWildcard</types:key>
+				<types:value>false</types:value>
+			</types:item>
+			<types:item id="jdbcqueriestenantrestricted" xmlns:types="http://collectionspace.org/services/config/types" merge:matcher="id" merge:action="replace">
+				<types:key>jdbcQueriesAreTenantIdRestricted</types:key>
+				<types:value>false</types:value>
+			</types:item>
+		</tenant:properties>
 
+		<tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+			<service:validatorHandler merge:matcher="tag" merge:action="replace" xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.collectionobject.nuxeo.PahmaCollectionObjectValidatorHandler</service:validatorHandler>
+		</tenant:serviceBindings>
+
+		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
+			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:property merge:matcher="skip" merge:action="insert">
+						<service:key>sqlScriptName</service:key>
+						<service:value>load_pahma_id_generators.sql</service:value>
+					</service:property>
+				</service:params>
+			</service:initHandler>
+		</tenant:serviceBindings>
+		
+		<!-- CSPACE-6185: Contacts extension service bindings are not being generated from app layer config, so put them here for now. -->
+		<tenant:serviceBindings merge:matcher="id" id="Contacts">
+			<service:object xmlns:service="http://collectionspace.org/services/config/service" >
+				<service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="contacts_anthropology" updated="" order="3">
+					<service:content contentType="application/xml">
+						<service:xmlContent namespaceURI="http://collectionspace.org/services/contact/domain/anthropology" 
+							schemaLocation="http://collectionspace.org/services/contact/domain/anthropology http://collectionspace.org/services/contact/domain/contacts_anthropology.xsd" />
+					</service:content>
+				</service:part>
+			</service:object>
+		</tenant:serviceBindings>
 	</tenant:tenantBinding>
 </tenant:TenantBindingConfig>
