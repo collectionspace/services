@@ -85,7 +85,7 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 			results.setUserNote("skipped deleted record");
 		}
 		else {
-			Map<String, String> fields = new HashMap<String, String>();
+			Map<String, String> botGardenFields = new HashMap<String, String>();
 			
 			if (movementCsid == null) {
 				movementCsid = findSingleRelatedMovement(collectionObjectCsid);
@@ -95,23 +95,18 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 				PoxPayloadOut movementPayload = findMovementByCsid(movementCsid);
 				
 				if (movementPayload != null) {
-					fields.put("gardenLocation", getFieldValue(movementPayload, MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME));
+					botGardenFields.put("gardenLocation", getFieldValue(movementPayload, MovementConstants.CURRENT_LOCATION_SCHEMA_NAME, MovementConstants.CURRENT_LOCATION_FIELD_NAME));
 				}
 			}
 					
-			fields.put("fieldCollectionNote", getFieldCollectionNote(collectionObjectPayload));
-			fields.put("annotation", getAnnotation(collectionObjectPayload));
-			fields.put("labelRequested", LoanoutConstants.LABEL_REQUESTED_NO_VALUE);
+			botGardenFields.put("fieldCollectionNote", getFieldCollectionNote(collectionObjectPayload));
+			botGardenFields.put("annotation", getAnnotation(collectionObjectPayload));
+			botGardenFields.put("labelRequested", LoanoutConstants.LABEL_REQUESTED_NO_VALUE);
 			
-			// UCBG-273: Explicitly set all boolean fields to false, because null values mess up the UI.
-			fields.put("reviewComplete", "false");
-			fields.put("flowering", "false");
-			fields.put("sterile", "false");
-			fields.put("fruiting", "false");
-			fields.put("inSpore", "false");
-			fields.put("fertile", "false");
+			Map<String, String> naturalHistoryFields = new HashMap<String, String>();
+			naturalHistoryFields.put("numLent", "1");
 			
-			String voucherCsid = createVoucher(fields);
+			String voucherCsid = createVoucher(botGardenFields, naturalHistoryFields);
 			logger.debug("voucher created: voucherCsid=" + voucherCsid);
 			
 			String forwardRelationCsid = createRelation(voucherCsid, LoanoutConstants.NUXEO_DOCTYPE, collectionObjectCsid, CollectionObjectConstants.NUXEO_DOCTYPE, RelationConstants.AFFECTS_TYPE);
@@ -253,15 +248,18 @@ public class CreateVoucherBatchJob extends AbstractBatchJob {
 		return results;
 	}
 
-	private String createVoucher(Map<String, String> fields) throws ResourceException {
+	private String createVoucher(Map<String, String> botGardenFields, Map<String, String> naturalHistoryFields) throws ResourceException {
 		String voucherCsid = null;
 
 		String createVoucherPayload = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 			"<document name=\"loansout\">" +
 				"<ns2:loansout_botgarden xmlns:ns2=\"http://collectionspace.org/services/loanout/local/botgarden\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-					getFieldXml(fields) +
+					getFieldXml(botGardenFields) +
 				"</ns2:loansout_botgarden>" +
+				"<ns2:loansout_naturalhistory xmlns:ns2=\"http://collectionspace.org/services/loanout/domain/naturalhistory\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
+					getFieldXml(naturalHistoryFields) +
+				"</ns2:loansout_naturalhistory>" +
 			"</document>";
 
 		ResourceBase resource = getResourceMap().get(LoanoutClient.SERVICE_NAME);
