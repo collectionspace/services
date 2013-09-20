@@ -297,7 +297,7 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 								logger.info("Parsed tenant configuration for: " + binding.getDisplayName());
 							}
 						} else {
-							errMessage = "Cound not parse the tentant bindings in: ";
+							errMessage = "Cound not parse the tenant bindings in: ";
 						}
 					} else {
 						errMessage = "Could not parse the tenant bindings file: ";
