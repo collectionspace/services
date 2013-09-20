@@ -111,7 +111,7 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 					logger.debug("The home directory for all tenants is at: " + result.getCanonicalPath());
 				}
 			} else {
-				errMessage = "The home directory for all tenants is missing or inaccesible: ";
+				errMessage = "The home directory for all tenants is missing or inaccessible: ";
 				try {
 					errMessage = errMessage + tenantsRootDir.getCanonicalPath();
 				} catch (IOException ioException) {
@@ -294,7 +294,7 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 							result.add(binding);
 							found = true;
 							if (logger.isInfoEnabled() == true) {
-								logger.info("Parsed tenant configureation for: " + binding.getDisplayName());
+								logger.info("Parsed tenant configuration for: " + binding.getDisplayName());
 							}
 						} else {
 							errMessage = "Cound not parse the tentant bindings in: ";
