@@ -140,7 +140,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="package,deploy_services_bundles"
+    <target name="deploy" depends="package,deploy_services_artifacts"
     description="deploy cspace services in ${jee.server.cspace}">
 		<delete file="${catalina.context.cspace}"/> <!-- This is a Tomcat specific file that we seem to need to delete inorder for it to be replace with a more recent one during deployment -->
 		<delete dir="${jee.deploy.cspace}/${cspace.services.context}"/>
@@ -158,7 +158,7 @@
 		This target also assumes that the system environment variable 'CSPACE_JEESERVER_HOME' is set and pointing to the root
 		JEE server (usually Apache Tomcat) where CollectionSpace is installed.  All generated Service artifacts wi
 	-->
-	<target name="deploy_services_bundles"
+	<target name="deploy_services_artifacts"
 		description="Generates and deploys the CollectionSpace Services' schema bundles, doctype bundles, and tenant bindings.">
 		<exec executable="${env.JAVA_HOME}/bin/java" failonerror="true">
 			<arg value="-Done-jar.silent=true" />
