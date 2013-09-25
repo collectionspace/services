@@ -236,7 +236,7 @@ public class AuthorizationSeedDriver {
 	        em.getTransaction().commit();
 	        em.close();
 	        if (logger.isInfoEnabled()) {
-	            logger.info("All Authroization metata persisted.");
+	            logger.info("All Authorization metadata persisted.");
 	        }
         } catch (Exception e) {
             if (em != null && em.getTransaction().isActive()) {
