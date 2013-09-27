@@ -4,5 +4,15 @@
 	xmlns:tenant='http://collectionspace.org/services/config/tenant'>
     
 	<tenant:tenantBinding id="50">
+		<tenant:serviceBindings merge:matcher="id" id="idgenerators">
+			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
+				<service:params>
+					<service:property merge:matcher="skip" merge:action="insert">
+						<service:key>sqlScriptName</service:key>
+						<service:value>set_cinefiles_vocabulary_csids.sql</service:value>
+					</service:property>
+				</service:params>
+			</service:initHandler>
+		</tenant:serviceBindings>
 	</tenant:tenantBinding>
 </tenant:TenantBindingConfig>
