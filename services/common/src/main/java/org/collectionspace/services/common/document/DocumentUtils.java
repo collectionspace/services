@@ -922,6 +922,8 @@ public class DocumentUtils {
                     return nuxeoDecimalValueToDecimalString(obj);
                 } else if (obj instanceof Boolean) {
                     return String.valueOf(obj);
+                } else if (obj instanceof Long) {
+                	return Long.toString((Long) obj); 
                 } else {
                    logger.warn("Could not convert value of property " + propertyPath
                             + " in document " + docModel.getPathAsString() + " to a String.");
