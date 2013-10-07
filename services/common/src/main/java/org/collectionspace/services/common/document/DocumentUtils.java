@@ -882,7 +882,7 @@ public class DocumentUtils {
          * 
          * Note: currently, elements declared as xs:decimal in XSD schemas
          * are handled as the Nuxeo primitive DoubleType.  If this type
-         * changes, the test below should be changed accordingly.
+         * correspondence changes, the test below should be changed accordingly.
          *
          * @param type   a type.
 	 * @return       true, if is a Nuxeo decimal type;
@@ -920,10 +920,10 @@ public class DocumentUtils {
                     return GregorianCalendarDateTimeUtils.formatAsISO8601Date((GregorianCalendar)obj);
                 } else if (obj instanceof Double) {
                     return nuxeoDecimalValueToDecimalString(obj);
+                } else if (obj instanceof Long) {
+                    return nuxeoLongValueToString(obj);
                 } else if (obj instanceof Boolean) {
                     return String.valueOf(obj);
-                } else if (obj instanceof Long) {
-                	return Long.toString((Long) obj); 
                 } else {
                    logger.warn("Could not convert value of property " + propertyPath
                             + " in document " + docModel.getPathAsString() + " to a String.");
@@ -937,9 +937,10 @@ public class DocumentUtils {
          * Returns a string representation of the value of a Nuxeo decimal type.
          * 
          * Note: currently, elements declared as xs:decimal in XSD schemas
-         * are handled as the Nuxeo primitive DoubleType, and their values
-         * are convertible into the Java Double type.  If this type
-         * changes, the conversion below should be changed accordingly.
+         * are handled as the Nuxeo primitive DoubleType, and their values are
+         * convertible into the Java Double type.  If this type correspondence
+         * changes, the conversion below should be changed accordingly, as
+         * should any 'instanceof' or similar checks elsewhere in this code.
          *
 	 * @return  a string representation of the value of a Nuxeo decimal type.
          *     An empty string is returned if the value cannot be cast to the
@@ -968,6 +969,31 @@ public class DocumentUtils {
                 ((DecimalFormat) formatter).applyPattern("0.###############");
             }
             return formatter.format(doubleVal.doubleValue());
+       }
+        
+        /*
+         * Returns a string representation of the value of a Nuxeo long type.
+         * 
+         * Note: currently, elements declared as xs:integer in XSD schemas
+         * are handled as the Nuxeo primitive LongType, and their values are
+         * convertible into the Java Long type.  If this type correspondence
+         * changes, the conversion below should be changed accordingly, as
+         * should any 'instanceof' or similar checks elsewhere in this code.
+         *
+	 * @return  a string representation of the value of a Nuxeo long type.
+         *     An empty string is returned if the value cannot be cast to the
+         *     appropriate type.
+         */
+        private static String nuxeoLongValueToString(Object value) {
+            Long longVal;
+            try {
+                longVal = (Long) value;
+            } catch (ClassCastException cce) {
+                logger.warn("Could not convert a Nuxeo integer value to its string equivalent: "
+                        + cce.getMessage());
+                return "";
+            }
+            return longVal.toString();
        }
 
         /*
