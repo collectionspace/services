@@ -285,6 +285,10 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>authRef</types:key>
+                            <types:value>family</types:value>
+                        </types:item>                        
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
                             <types:value>commonNameGroupList/*/commonName</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
