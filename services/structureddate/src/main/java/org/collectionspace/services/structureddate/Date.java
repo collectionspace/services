@@ -6,7 +6,7 @@ public class Date {
 	public static final Integer DEFAULT_DAY = null;
 	public static final Era DEFAULT_ERA = Era.CE;
 	public static final Certainty DEFAULT_CERTAINTY = null;
-	public static final Qualifier DEFAULT_QUALIFIER = null;
+	public static final QualifierType DEFAULT_QUALIFIER = null;
 	public static final Integer DEFAULT_QUALIFIER_VALUE = null;
 	public static final QualifierUnit DEFAULT_QUALIFIER_UNIT = null;
 
@@ -15,7 +15,7 @@ public class Date {
 	private Integer day;
 	private Era era;
 	private Certainty certainty;
-	private Qualifier qualifier;
+	private QualifierType qualifierType;
 	private Integer qualifierValue;
 	private QualifierUnit qualifierUnit;
 	private String scalarValue;
@@ -28,23 +28,29 @@ public class Date {
 		this(year, month, day, DEFAULT_ERA, DEFAULT_CERTAINTY, DEFAULT_QUALIFIER, DEFAULT_QUALIFIER_VALUE, DEFAULT_QUALIFIER_UNIT);
 	}
 
-	public Date(Integer year, Integer month, Integer day, Era era, Certainty certainty, Qualifier qualifier, Integer qualifierValue, QualifierUnit qualifierUnit) {
+	public Date(Integer year, Integer month, Integer day, Era era, Certainty certainty, QualifierType qualifierType, Integer qualifierValue, QualifierUnit qualifierUnit) {
 		this.year = year;
 		this.month = month;
 		this.day = day;
 		this.era = era;
 		this.certainty = certainty;
-		this.qualifier = qualifier;
+		this.qualifierType = qualifierType;
 		this.qualifierValue = qualifierValue;
 		this.qualifierUnit = qualifierUnit;
 	}
 	
-	public void qualify(Qualifier qualifier, Integer qualifierValue, QualifierUnit qualifierUnit) {
-		this.qualifier = qualifier;
-		this.qualifierValue = qualifierValue;
-		this.qualifierUnit = qualifierUnit;			
+	public Date withEra(Era era) {
+		this.setEra(era);
+		
+		return this;
 	}
 	
+	public Date withQualifier(QualifierType qualifierType, Integer qualifierValue, QualifierUnit qualifierUnit) {
+		this.setQualifier(qualifierType, qualifierValue, qualifierUnit);
+
+		return this;
+	}
+		
 	public String toString() {
 		return
 			"year:           " + getYear() + "\n" +
@@ -52,7 +58,7 @@ public class Date {
 			"day:            " + getDay() + "\n" +
 			"era:            " + getEra() + "\n" +
 			"certainty:      " + getCertainty() + "\n" +
-			"qualifier:      " + getQualifier() + "\n" +
+			"qualifierType:  " + getQualifierType() + "\n" +
 			"qualifierValue: " + getQualifierValue() + "\n" +
 			"qualifierUnit:  " + getQualifierUnit() + "\n" +
 			"scalarValue:    " + getScalarValue() + "\n";
@@ -98,12 +104,12 @@ public class Date {
 		this.certainty = certainty;
 	}
 
-	public Qualifier getQualifier() {
-		return qualifier;
+	public QualifierType getQualifierType() {
+		return qualifierType;
 	}
 
-	public void setQualifier(Qualifier qualifier) {
-		this.qualifier = qualifier;
+	public void setQualifier(QualifierType qualifierType) {
+		this.qualifierType = qualifierType;
 	}
 
 	public Integer getQualifierValue() {
@@ -122,6 +128,12 @@ public class Date {
 		this.qualifierUnit = qualifierUnit;
 	}
 
+	public void setQualifier(QualifierType qualifierType, Integer qualifierValue, QualifierUnit qualifierUnit) {
+		this.qualifierType = qualifierType;
+		this.qualifierValue = qualifierValue;
+		this.qualifierUnit = qualifierUnit;
+	}
+	
 	public String getScalarValue() {
 		return scalarValue;
 	}

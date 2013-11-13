@@ -3,21 +3,18 @@ package org.collectionspace.services.structureddate.antlr;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
-
-import org.collectionspace.services.structureddate.Certainty;
+import org.antlr.v4.runtime.Recognizer;
+import org.collectionspace.services.structureddate.Date;
 import org.collectionspace.services.structureddate.DateUtils;
 import org.collectionspace.services.structureddate.Era;
-import org.collectionspace.services.structureddate.Qualifier;
+import org.collectionspace.services.structureddate.QualifierType;
 import org.collectionspace.services.structureddate.QualifierUnit;
 import org.collectionspace.services.structureddate.StructuredDate;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
-import org.collectionspace.services.structureddate.Date;
-import org.collectionspace.services.structureddate.antlr.StructuredDateBaseListener;
-import org.collectionspace.services.structureddate.antlr.StructuredDateLexer;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CircaYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DateRangeOnlyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.DayOfMonthContext;
@@ -34,8 +31,9 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Ye
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearOnlyContext;
 
 /**
- * ANTLR implementation of a StructuredDateEvaluator.
- * 
+ * A StructuredDateEvaluator that uses an ANTLR parser to parse the display date,
+ * and an ANTLR listener to generate a structured date from the resulting parse
+ * tree.
  */
 public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener implements StructuredDateEvaluator {	
 	protected StructuredDate result;
@@ -47,24 +45,20 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	
 	@Override
 	public StructuredDate evaluate(String displayDate) throws StructuredDateFormatException {
+		stack = new Stack<Object>();
+
+		result = new StructuredDate();
+		result.setDisplayDate(displayDate);
+
 		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate);
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
-
+		ErrorListener errorListener = new ErrorListener();
+		
+		parser.addErrorListener(errorListener);
 		parser.addParseListener(this);
-		
-		result = new StructuredDate();
-		result.setDisplayDate(displayDate);
-		
-		stack = new Stack<Object>();
-		
-		try {
-			parser.displayDate();
-		}
-		catch(RecognitionException e) {
-			throw new StructuredDateFormatException(e);
-		}
+		parser.displayDate();
 		
 		return result;
 	}
@@ -72,19 +66,19 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitCircaYear(CircaYearContext ctx) {
 		Integer year = (Integer) stack.pop();
-
-		Date earliestDate = new Date(year, 1, 1);
-		earliestDate.setEra(ctx.BCE() != null ? Era.BCE : Era.CE);
-		earliestDate.setCertainty(Certainty.CIRCA);
-		earliestDate.qualify(Qualifier.MINUS, 1, QualifierUnit.DAYS);
+		Era era = ctx.BCE() != null ? Era.BCE : Era.CE;
 		
-		Date latestDate = new Date(year, 12, 31);
-		latestDate.setEra(ctx.BCE() != null ? Era.BCE : Era.CE);
-		latestDate.setCertainty(Certainty.CIRCA);
-		latestDate.qualify(Qualifier.PLUS, 1, QualifierUnit.DAYS);
+		result.setEarliestSingleDate(
+			new Date(year, 1, 1)
+				.withEra(era)
+				.withQualifier(QualifierType.MINUS, 1, QualifierUnit.DAYS)
+		);
 		
-		result.setEarliestSingleDate(earliestDate);
-		result.setLatestDate(latestDate);
+		result.setLatestDate(
+			new Date(year, 12, 31)
+				.withEra(era)
+				.withQualifier(QualifierType.PLUS, 1, QualifierUnit.DAYS)
+		);
 	}
 	
 	@Override
@@ -196,7 +190,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitDayOfMonth(DayOfMonthContext ctx) {
 		stack.push(new Integer(ctx.NUMBER().getText()));
 	}
-
+	
 	public static void main(String[] args) {
 		StructuredDateEvaluator evaluator = new ANTLRStructuredDateEvaluator();
 		
@@ -207,6 +201,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			} catch (StructuredDateFormatException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	private class ErrorListener extends BaseErrorListener {
+		@Override
+		public void syntaxError(Recognizer<?,?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+			throw(new StructuredDateFormatException(msg, e));
 		}
 	}
 }
