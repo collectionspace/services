@@ -4,86 +4,86 @@ grammar StructuredDate;
  * This is a grammar for ANTLR 4 (http://www.antlr.org/).
  *
  * To generate the lexer, parser, and listener classes, use the command: 
- *     java -jar /usr/local/lib/antlr-4.1-complete.jar -package edu.berkeley.cspace.structureddate.antlr StructuredDate.g4
+ *     java -jar /usr/local/lib/antlr-4.1-complete.jar -package org.collectionspace.services.structureddate.antlr StructuredDate.g4
  */
 
 /*
  * Parser rules
  */
  
-displayDate:    CIRCA year (BCE|AD)? # circaYear
-|               year (BCE|AD)? # yearOnly
-//|               nth QUARTER year
-//|               LAST QUARTER year
-//|               nth HALF year
-//|               LAST HALF year
-//|               year HYPHEN year
-//|               CIRCA year HYPHEN year
-//|               CIRCA year HYPHEN year BCE
-//|               CIRCA year BCE HYPHEN year BCE
-//|               CIRCA year BCE HYPHEN year
-//|               CIRCA year BCE HYPHEN year AD
-//|               year BCE HYPHEN year BCE
-//|               year HYPHEN year BCE
-//|               year BCE HYPHEN year
-//|               year BCE HYPHEN year AD
-//|               season year
-//|               season HYPHEN season year
-//|               season year HYPHEN season year
-//|               season year BCE
-//|               partOf year
-//|               partOf year BCE
-//|               month
-//|               month HYPHEN month
-//|               partOf singleDate BCE
-//|               singleDate BCE
-//|               partOf singleDate
-|               singleDate # singleDateOnly
-//|               singleDate HYPHEN singleDate
-//|               nth CENTURY
-//|               CIRCA nth CENTURY
-//|               nth CENTURY AD
-//|               nth CENTURY BCE
-//|               CIRCA nth CENTURY BCE
-//|               nth CENTURY HYPHEN nth CENTURY
-//|               nth HYPHEN nth CENTURY
-//|               nth HYPHEN nth CENTURY BCE
-//|               nth CENTURY BCE HYPHEN nth CENTURY BCE
-//|               nth CENTURY BCE HYPHEN nth CENTURY
-//|               nth CENTURY BCE HYPHEN nth CENTURY AD
-//|               nth QUARTER nth CENTURY
-//|               nth QUARTER nth CENTURY HYPHEN nth QUARTER nth CENTURY
-//|               LAST QUARTER nth CENTURY
-//|               nth HALF nth CENTURY
-//|               LAST HALF nth CENTURY
-//|               partOf nth CENTURY
-//|               partOf nth CENTURY BCE
-//|               partOf nth CENTURY HYPHEN partOf nth CENTURY
-//|               partOf nth HYPHEN partOf nth CENTURY
-//|               partOf nth HYPHEN nth CENTURY
-//|               partOf nth CENTURY BCE HYPHEN partOf nth CENTURY BCE
-//|               partOf nth CENTURY BCE HYPHEN partOf nth CENTURY
-//|               century
-//|               partOf century
-//|               partOf century HYPHEN partOf century
-//|               partOf century BCE HYPHEN partOf century BCE
-//|               partOf century BCE
-//|               CIRCA century
-//|               CIRCA century BCE
-//|               nth MILLENIUM
-//|               nth MILLENIUM BCE
-//|               decade
-//|               decade HYPHEN decade
-//|               decade HYPHEN partOf decade
-//|               partOf decade HYPHEN partOf century
-//|               partOf decade HYPHEN partOf decade
-//|               partOf decade HYPHEN decade
-//|               partOf decade
-//|               decade BCE
-//|               partOf decade BCE
-//|               CIRCA decade
-//|               CIRCA decade BCE
-|               dateRange # dateRangeOnly
+displayDate:    CIRCA year (BCE|AD)?                                   # circaYear
+|               year (BCE|AD)?                                         # yearOnly
+|               nth QUARTER year                                       # todo
+|               LAST QUARTER year                                      # todo
+|               nth HALF year                                          # todo
+|               LAST HALF year                                         # todo
+|               year HYPHEN year                                       # todo
+|               CIRCA year HYPHEN year                                 # todo
+|               CIRCA year HYPHEN year BCE                             # todo
+|               CIRCA year BCE HYPHEN year BCE                         # todo
+|               CIRCA year BCE HYPHEN year                             # todo
+|               CIRCA year BCE HYPHEN year AD                          # todo
+|               year BCE HYPHEN year BCE                               # todo
+|               year HYPHEN year BCE                                   # todo
+|               year BCE HYPHEN year                                   # todo
+|               year BCE HYPHEN year AD                                # todo
+|               season year                                            # todo
+|               season HYPHEN season year                              # todo
+|               season year HYPHEN season year                         # todo
+|               season year BCE                                        # todo
+|               partOf year                                            # todo
+|               partOf year BCE                                        # todo
+|               month                                                  # todo
+|               month HYPHEN month                                     # todo
+|               partOf singleDate BCE                                  # todo
+|               singleDate BCE                                         # todo
+|               partOf singleDate                                      # todo
+|               singleDate                                             # singleDateOnly
+|               singleDate HYPHEN singleDate                           # todo
+|               nth CENTURY                                            # todo
+|               CIRCA nth CENTURY                                      # todo
+|               nth CENTURY AD                                         # todo
+|               nth CENTURY BCE                                        # todo
+|               CIRCA nth CENTURY BCE                                  # todo
+|               nth CENTURY HYPHEN nth CENTURY                         # todo
+|               nth HYPHEN nth CENTURY                                 # todo
+|               nth HYPHEN nth CENTURY BCE                             # todo
+|               nth CENTURY BCE HYPHEN nth CENTURY BCE                 # todo
+|               nth CENTURY BCE HYPHEN nth CENTURY                     # todo
+|               nth CENTURY BCE HYPHEN nth CENTURY AD                  # todo
+|               nth QUARTER nth CENTURY                                # todo
+|               nth QUARTER nth CENTURY HYPHEN nth QUARTER nth CENTURY # todo
+|               LAST QUARTER nth CENTURY                               # todo
+|               nth HALF nth CENTURY                                   # todo
+|               LAST HALF nth CENTURY                                  # todo
+|               partOf nth CENTURY                                     # todo
+|               partOf nth CENTURY BCE                                 # todo
+|               partOf nth CENTURY HYPHEN partOf nth CENTURY           # todo
+|               partOf nth HYPHEN partOf nth CENTURY                   # todo
+|               partOf nth HYPHEN nth CENTURY                          # todo
+|               partOf nth CENTURY BCE HYPHEN partOf nth CENTURY BCE   # todo
+|               partOf nth CENTURY BCE HYPHEN partOf nth CENTURY       # todo
+|               century                                                # todo
+|               partOf century                                         # todo
+|               partOf century HYPHEN partOf century                   # todo
+|               partOf century BCE HYPHEN partOf century BCE           # todo
+|               partOf century BCE                                     # todo
+|               CIRCA century                                          # todo
+|               CIRCA century BCE                                      # todo
+|               nth MILLENIUM                                          # todo
+|               nth MILLENIUM BCE                                      # todo
+|               decade                                                 # todo
+|               decade HYPHEN decade                                   # todo
+|               decade HYPHEN partOf decade                            # todo
+|               partOf decade HYPHEN partOf century                    # todo
+|               partOf decade HYPHEN partOf decade                     # todo
+|               partOf decade HYPHEN decade                            # todo
+|               partOf decade                                          # todo
+|               decade BCE                                             # todo
+|               partOf decade BCE                                      # todo
+|               CIRCA decade                                           # todo
+|               CIRCA decade BCE                                       # todo
+|               dateRange                                              # dateRangeOnly
 ;
 
 dateRange:      monthOnlyRange
