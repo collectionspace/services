@@ -1,5 +1,7 @@
 package org.collectionspace.services.structureddate;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 public class Date {
 	public static final Integer DEFAULT_YEAR = null;
 	public static final Integer DEFAULT_MONTH = null;
@@ -53,15 +55,45 @@ public class Date {
 		
 	public String toString() {
 		return
-			"year:           " + getYear() + "\n" +
-			"month:          " + getMonth() + "\n" + 
-			"day:            " + getDay() + "\n" +
-			"era:            " + getEra() + "\n" +
-			"certainty:      " + getCertainty() + "\n" +
-			"qualifierType:  " + getQualifierType() + "\n" +
-			"qualifierValue: " + getQualifierValue() + "\n" +
-			"qualifierUnit:  " + getQualifierUnit() + "\n" +
-			"scalarValue:    " + getScalarValue() + "\n";
+			"\t\tyear:           " + getYear() + "\n" +
+			"\t\tmonth:          " + getMonth() + "\n" + 
+			"\t\tday:            " + getDay() + "\n" +
+			"\t\tera:            " + getEra() + "\n" +
+			"\t\tcertainty:      " + getCertainty() + "\n" +
+			"\t\tqualifierType:  " + getQualifierType() + "\n" +
+			"\t\tqualifierValue: " + getQualifierValue() + "\n" +
+			"\t\tqualifierUnit:  " + getQualifierUnit() + "\n" +
+			"\t\tscalarValue:    " + getScalarValue() + "\n";
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) { 
+			return false;
+		}
+		
+		if (obj == this) {
+			return true;
+		}
+		
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		
+		Date that = (Date) obj;
+
+		return
+			new EqualsBuilder()
+				.append(this.getYear(), that.getYear())
+				.append(this.getMonth(), that.getMonth())
+				.append(this.getDay(), that.getDay())
+				.append(this.getEra(), that.getEra())
+				.append(this.getCertainty(), that.getCertainty())
+				.append(this.getQualifierType(), that.getQualifierType())
+				.append(this.getQualifierValue(), that.getQualifierValue())
+				.append(this.getQualifierUnit(), that.getQualifierUnit())
+				.append(this.getScalarValue(), that.getScalarValue())
+				.isEquals();
 	}
 
 	public Integer getYear() {
@@ -108,7 +140,7 @@ public class Date {
 		return qualifierType;
 	}
 
-	public void setQualifier(QualifierType qualifierType) {
+	public void setQualifierType(QualifierType qualifierType) {
 		this.qualifierType = qualifierType;
 	}
 

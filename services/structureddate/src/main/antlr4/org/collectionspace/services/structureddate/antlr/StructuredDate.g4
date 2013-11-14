@@ -10,6 +10,8 @@ grammar StructuredDate;
 /*
  * Parser rules
  */
+
+oneDisplayDate: displayDate EOF ; 
  
 displayDate:    CIRCA year (BCE|AD)?                                   # circaYear
 |               year (BCE|AD)?                                         # yearOnly

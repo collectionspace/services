@@ -1,0 +1,156 @@
+# This file contains test cases for structured date evaluation.
+#
+# Specify an input display date, and an expected output structured date. Fields expected to be null
+# in the structured date may be omitted.
+#
+# If the structured date's displayDate field is omitted, it will be expected to be equal to the 
+# input display date. This is the usual case.
+#
+# The StructuredDate's earliestSingleDate and latestDate should be specified as a
+# list: [year, month, day, era, certainty, qualifierType, qualifierValue, qualifierUnit, scalarValue]
+# Values at the end of the list may be omitted, in which case they will be expected to be null.
+#
+# If an input is expected to fail, specify null for the expected structured date.
+#
+#
+# Input Display Date        Expected Structured Date
+# ---------------------------------------------------------------------------------------------------
+
+  '1997':                   # yearOnly
+                            earliestSingleDate: [1997,  1,  1, CE]
+                            latestDate:         [1997, 12, 31, CE]
+
+  '53 BC':                  # yearOnly
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 bc':                  # yearOnly
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 B.C.':                # yearOnly
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 b.c.':                # yearOnly
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 BCE':                 # yearOnly
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 bce':                 # yearOnly
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 B.C.E.':              # yearOnly
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '53 b.c.e.':              # yearOnly
+                            earliestSingleDate: [  53,  1,  1, BCE]
+                            latestDate:         [  53, 12, 31, BCE]
+
+  '1974 AD':                # yearOnly
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+
+  '1974 ad':                # yearOnly
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+
+  '1974 A.D.':              # yearOnly
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+  
+  '1974 a.d.':              # yearOnly
+                            earliestSingleDate: [1974,  1,  1, CE]
+                            latestDate:         [1974, 12, 31, CE]
+
+  '3/12/2013':              # numDate
+                            earliestSingleDate: [2013,  3, 12, CE]
+
+  '03/05/13':               # numDate
+                            earliestSingleDate: [  13,  3,  5, CE]
+
+  'May 06 1952':            # strDate
+                            earliestSingleDate: [1952,  5,  6, CE]
+
+  'May 12 1952':            # strDate
+                            earliestSingleDate: [1952,  5, 12, CE]
+
+  'May 12, 1952':           # strDate
+                            earliestSingleDate: [1952,  5, 12, CE]
+
+  'may 12, 1952':           # strDate
+                            earliestSingleDate: [1952,  5, 12, CE]
+
+  'September 19, 1821':     # strDate
+                            earliestSingleDate: [1821,  9, 19, CE]
+
+  'Sep 19, 1821':           # strDate
+                            earliestSingleDate: [1821,  9, 19, CE]
+
+  'Sept 19, 1821':          # strDate
+                            earliestSingleDate: [1821,  9, 19, CE]
+
+  'Octo 19, 1821':          # bad format (not a valid month)
+                            null
+
+  '2000, April 1':          # invStrDate
+                            earliestSingleDate: [2000,  4,  1, CE]
+
+  '2000 , april 1':         # invStrDate
+                            earliestSingleDate: [2000,  4,  1, CE]
+
+  '2000 Apr 1':             # invStrDate
+                            earliestSingleDate: [2000,  4,  1, CE]
+
+  'Apr-Oct 2013':           # monthOnlyRange (31 day end month)
+                            earliestSingleDate: [2013,  4,  1, CE]
+                            latestDate:         [2013, 10, 31, CE]
+
+  'Apr-Sept 2013':          # monthOnlyRange (30 day end month)
+                            earliestSingleDate: [2013,  4,  1, CE]
+                            latestDate:         [2013,  9, 30, CE]
+
+  'Jan-Feb 2003':           # monthOnlyRange (28 day end month)
+                            earliestSingleDate: [2003,  1,  1, CE]
+                            latestDate:         [2003,  2, 28, CE]
+
+  'January - Feb 2004':     # monthOnlyRange (leap year, divisible by 4)
+                            earliestSingleDate: [2004,  1,  1, CE]
+                            latestDate:         [2004,  2, 29, CE]
+
+  'Jan-Feb, 1900':          # monthOnlyRange (not a leap year, divisible by 100)
+                            earliestSingleDate: [1900,  1,  1, CE]
+                            latestDate:         [1900,  2, 28, CE]
+
+  'jan-february, 2000':     # monthOnlyRange (leap year, divisible by 400)
+                            earliestSingleDate: [2000,  1,  1, CE]
+                            latestDate:         [2000,  2, 29, CE]
+
+  'jan-february, 1100':     # monthOnlyRange (leap year, divisible by 100, but before Gregorian calendar)
+                            earliestSingleDate: [1100,  1,  1, CE]
+                            latestDate:         [1100,  2, 29, CE]
+
+  'December 3-9, 2004':     # strDateRange
+                            earliestSingleDate: [2004, 12,  3, CE]
+                            latestDate:         [2004, 12,  9, CE]
+
+  'Jan 5 - 29 1850':        # strDateRange
+                            earliestSingleDate: [1850,  1,  5, CE]
+                            latestDate:         [1850,  1, 29, CE]
+
+  '1/5-29/1850':            # numDateRange
+                            earliestSingleDate: [1850,  1,  5, CE]
+                            latestDate:         [1850,  1, 29, CE]
+
+  '09/05 - 18/1776':        # numDateRange
+                            earliestSingleDate: [1776,  9,  5, CE]
+                            latestDate:         [1776,  9, 18, CE]
+                            
+  'Something else':         # bad format
+                            null            
+                              

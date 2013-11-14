@@ -1,5 +1,6 @@
 package org.collectionspace.services.structureddate;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.collectionspace.services.structureddate.antlr.ANTLRStructuredDateEvaluator;
 
 
@@ -25,26 +26,54 @@ public class StructuredDate {
 
 	public String toString() {
 		String string =
-			"displayDate: " + getDisplayDate() + "\n" +
-			"note:        " + getNote() + "\n" +
-			"association: " + getAssociation() + "\n" +
-			"period:      " + getPeriod() + "\n";
+			"\n" +
+			"\tdisplayDate: " + getDisplayDate() + "\n" +
+			"\tnote:        " + getNote() + "\n" +
+			"\tassociation: " + getAssociation() + "\n" +
+			"\tperiod:      " + getPeriod() + "\n";
 		
 		if (getEarliestSingleDate() != null) {
 			string += 
 				"\n" +
-				"earliestSingleDate: \n" +
+				"\tearliestSingleDate: \n" +
 				getEarliestSingleDate().toString() + "\n";
 		}
 		
 		if (getLatestDate() != null) {
 			string += 
 				"\n" +
-				"latestDate: \n" +
+				"\tlatestDate: \n" +
 				getLatestDate().toString() + "\n";			
 		}
 		
 		return string;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) { 
+			return false;
+		}
+		
+		if (obj == this) {
+			return true;
+		}
+		
+		if (obj.getClass() != getClass()) {
+			return false;
+		}
+		
+		StructuredDate that = (StructuredDate) obj;
+
+		return 
+			new EqualsBuilder()
+				.append(this.getDisplayDate(), that.getDisplayDate())
+				.append(this.getAssociation(), that.getAssociation())
+				.append(this.getNote(), that.getNote())
+				.append(this.getPeriod(), that.getPeriod())
+				.append(this.getEarliestSingleDate(), that.getEarliestSingleDate())
+				.append(this.areScalarValuesComputed(), that.areScalarValuesComputed())
+				.isEquals();
 	}
 	
 	public void computeScalarValues() {
