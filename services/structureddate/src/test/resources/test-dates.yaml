@@ -12,9 +12,24 @@
 #
 # If an input is expected to fail, specify null for the expected structured date.
 #
+# NOTE: "Circa" tests may fail in the future, because the qualifier value is based on the current
+# date. The expected qualifierValue numbers may need to be adjusted.
+# 
 #
 # Input Display Date        Expected Structured Date
 # ---------------------------------------------------------------------------------------------------
+
+  'circa 2013':             # circaYear
+                            earliestSingleDate: [2013,  1,  1, CE, null, MINUS, 5, YEARS]
+                            latestDate:         [2013, 12, 31, CE, null, PLUS,  5, YEARS]
+
+  'c. 1950':                # circaYear
+                            earliestSingleDate: [1950,  1,  1, CE, null, MINUS, 8, YEARS]
+                            latestDate:         [1950, 12, 31, CE, null, PLUS,  8, YEARS]
+
+  'Circa 10 BC':            # circaYear
+                            earliestSingleDate: [  10,  1,  1, BCE, null, MINUS, 106, YEARS]
+                            latestDate:         [  10, 12, 31, BCE, null, PLUS,  106, YEARS]
 
   '1997':                   # yearOnly
                             earliestSingleDate: [1997,  1,  1, CE]

@@ -80,17 +80,18 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitCircaYear(CircaYearContext ctx) {
 		Integer year = (Integer) stack.pop();
 		Era era = ctx.BCE() != null ? Era.BCE : Era.CE;
+		int interval = DateUtils.getCircaIntervalYears(year, era);
 		
 		result.setEarliestSingleDate(
 			new Date(year, FIRST_MONTH, FIRST_DAY_OF_FIRST_MONTH)
 				.withEra(era)
-				.withQualifier(QualifierType.MINUS, 1, QualifierUnit.DAYS)
+				.withQualifier(QualifierType.MINUS, interval, QualifierUnit.YEARS)
 		);
 		
 		result.setLatestDate(
 			new Date(year, LAST_MONTH, LAST_DAY_OF_LAST_MONTH)
 				.withEra(era)
-				.withQualifier(QualifierType.PLUS, 1, QualifierUnit.DAYS)
+				.withQualifier(QualifierType.PLUS, interval, QualifierUnit.YEARS)
 		);
 	}
 	
