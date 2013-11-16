@@ -3,6 +3,14 @@ grammar StructuredDate;
 /*
  * This is a grammar for ANTLR 4 (http://www.antlr.org/).
  *
+ * TODO: 
+ *   Lowercase all strings (assume the input has been normalized to lowercase before parsing)
+ *   Allow short months ending with periods
+ *   Allow ca '.'? for CIRCA
+ *   Allow c1970 for CIRCA
+ *   Allow ce for AD
+ *   Allow year month
+ *
  * To generate the lexer, parser, and listener classes, use the command: 
  *     java -jar /usr/local/lib/antlr-4.1-complete.jar -package org.collectionspace.services.structureddate.antlr StructuredDate.g4
  */
